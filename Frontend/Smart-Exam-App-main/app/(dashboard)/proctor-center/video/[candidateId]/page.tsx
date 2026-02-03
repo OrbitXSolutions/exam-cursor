@@ -1,0 +1,358 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { useI18n } from "@/lib/i18n/context"
+import { apiClient } from "@/lib/api-client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import {
+  ArrowLeft,
+  Video,
+  VideoOff,
+  User,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  Play,
+  Pause,
+  Download,
+  Info,
+} from "lucide-react"
+
+interface ProctorSession {
+  id: number
+  attemptId: number
+  examId: number
+  examTitleEn: string
+  examTitleAr?: string
+  candidateId: string
+  candidateName: string
+  status: number
+  statusName: string
+  startedAt: string
+  endedAt?: string
+  totalViolations: number
+  riskScore?: number
+}
+
+interface ProctorSnapshot {
+  id: number
+  sessionId: number
+  capturedAt: string
+  snapshotType: number
+  snapshotTypeName: string
+  filePath: string
+  fileUrl?: string
+}
+
+export default function CandidateVideoPage() {
+  const params = useParams<{ candidateId: string }>()
+  const candidateId = params.candidateId
+  const router = useRouter()
+  const { language, dir } = useI18n()
+
+  const [sessions, setSessions] = useState<ProctorSession[]>([])
+  const [snapshots, setSnapshots] = useState<ProctorSnapshot[]>([])
+  const [selectedSession, setSelectedSession] = useState<ProctorSession | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Get proctor sessions for this candidate
+        const query = new URLSearchParams()
+        query.set("CandidateId", candidateId)
+        query.set("PageSize", "50")
+
+        const res = await apiClient.get<{ items?: ProctorSession[]; Items?: ProctorSession[] } | ProctorSession[]>(
+          `/Proctor/sessions?${query}`
+        )
+        
+        let sessionList: ProctorSession[] = []
+        if (Array.isArray(res)) {
+          sessionList = res
+        } else if (res?.items) {
+          sessionList = res.items
+        } else if ((res as { Items?: ProctorSession[] })?.Items) {
+          sessionList = (res as { Items: ProctorSession[] }).Items
+        }
+
+        setSessions(sessionList)
+
+        if (sessionList.length > 0) {
+          const latest = sessionList[0]
+          setSelectedSession(latest)
+          await loadSnapshots(latest.id)
+        }
+      } catch (err) {
+        console.error("Failed to load proctor data:", err)
+        setError(language === "ar" ? "فشل في تحميل بيانات المراقبة" : "Failed to load proctoring data")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (candidateId) {
+      loadData()
+    }
+  }, [candidateId, language])
+
+  async function loadSnapshots(sessionId: number) {
+    try {
+      const res = await apiClient.get<{ items?: ProctorSnapshot[]; Items?: ProctorSnapshot[] } | ProctorSnapshot[]>(
+        `/Proctor/session/${sessionId}/snapshots`
+      )
+      
+      let snapshotList: ProctorSnapshot[] = []
+      if (Array.isArray(res)) {
+        snapshotList = res
+      } else if (res?.items) {
+        snapshotList = res.items
+      } else if ((res as { Items?: ProctorSnapshot[] })?.Items) {
+        snapshotList = (res as { Items: ProctorSnapshot[] }).Items
+      }
+      
+      setSnapshots(snapshotList)
+    } catch (err) {
+      console.warn("Failed to load snapshots:", err)
+      setSnapshots([])
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 space-y-6 p-6" dir={dir}>
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Video className="h-6 w-6" />
+            {language === "ar" ? "فيديو المرشح" : "Candidate Video"}
+          </h1>
+          <p className="text-muted-foreground">
+            {language === "ar" ? `المرشح: ${candidateId}` : `Candidate: ${candidateId}`}
+          </p>
+        </div>
+      </div>
+
+      {error ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+            <p className="text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      ) : sessions.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <VideoOff className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">
+              {language === "ar" ? "لا توجد جلسات مراقبة لهذا المرشح" : "No proctoring sessions found for this candidate"}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Session List */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {language === "ar" ? "الجلسات" : "Sessions"}
+              </CardTitle>
+              <CardDescription>
+                {language === "ar" ? `${sessions.length} جلسة` : `${sessions.length} sessions`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-2">
+                  {sessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => {
+                        setSelectedSession(session)
+                        loadSnapshots(session.id)
+                      }}
+                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                        selectedSession?.id === session.id
+                          ? "bg-primary/10 border border-primary"
+                          : "bg-muted hover:bg-muted/80"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-sm">{session.examTitleEn}</span>
+                        <Badge variant={session.statusName === "Active" ? "default" : "secondary"} className="text-xs">
+                          {session.statusName}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(session.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                      </div>
+                      {session.totalViolations > 0 && (
+                        <div className="flex items-center gap-1 mt-1 text-xs text-orange-600">
+                          <AlertTriangle className="h-3 w-3" />
+                          {session.totalViolations} {language === "ar" ? "مخالفة" : "violations"}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {selectedSession && (
+              <>
+                {/* Session Info */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{selectedSession.examTitleEn}</CardTitle>
+                    <CardDescription>
+                      {selectedSession.candidateName} ({selectedSession.candidateId})
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">{language === "ar" ? "البداية" : "Started"}</p>
+                          <p className="text-sm font-medium">
+                            {new Date(selectedSession.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">{language === "ar" ? "الحالة" : "Status"}</p>
+                          <Badge variant={selectedSession.statusName === "Active" ? "default" : "secondary"}>
+                            {selectedSession.statusName}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">{language === "ar" ? "المخالفات" : "Violations"}</p>
+                          <p className="text-sm font-medium">{selectedSession.totalViolations}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">{language === "ar" ? "الخطورة" : "Risk Score"}</p>
+                          <p className="text-sm font-medium">{selectedSession.riskScore ?? "N/A"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Video Placeholder */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Video className="h-5 w-5" />
+                      {language === "ar" ? "تسجيل الفيديو" : "Video Recording"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
+                      <VideoOff className="h-16 w-16 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground text-center">
+                        {language === "ar"
+                          ? "تسجيل الفيديو غير متوفر حالياً"
+                          : "Video recording not available"}
+                      </p>
+                      <p className="text-sm text-muted-foreground text-center mt-2">
+                        {language === "ar"
+                          ? "راجع اللقطات أدناه لعرض صور المراقبة"
+                          : "Check snapshots below for proctoring images"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Snapshots */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      {language === "ar" ? "اللقطات" : "Snapshots"}
+                    </CardTitle>
+                    <CardDescription>
+                      {language === "ar"
+                        ? `${snapshots.length} لقطة مسجلة`
+                        : `${snapshots.length} snapshots captured`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {snapshots.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        {language === "ar" ? "لا توجد لقطات متاحة" : "No snapshots available"}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {snapshots.map((snapshot) => (
+                          <div key={snapshot.id} className="relative group">
+                            <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                              {snapshot.fileUrl ? (
+                                <img
+                                  src={snapshot.fileUrl}
+                                  alt={`Snapshot ${snapshot.id}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Video className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {new Date(snapshot.capturedAt).toLocaleTimeString(language === "ar" ? "ar-SA" : "en-US")}
+                            </div>
+                            <Badge variant="outline" className="absolute top-2 right-2 text-xs">
+                              {snapshot.snapshotTypeName}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Back Button */}
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {language === "ar" ? "رجوع" : "Back"}
+        </Button>
+      </div>
+    </div>
+  )
+}

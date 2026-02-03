@@ -5,11 +5,11 @@ import { apiClient } from "@/lib/api-client"
 // ============================================
 
 export enum AttemptStatus {
-  Started = 0,
-  InProgress = 1,
-  Submitted = 2,
-  Expired = 3,
-  Cancelled = 4
+  Started = 1,
+  InProgress = 2,
+  Submitted = 3,
+  Expired = 4,
+  Cancelled = 5
 }
 
 export enum ExamType {
@@ -119,6 +119,10 @@ export interface CandidateExam {
   totalPoints: number
   myAttempts: number | null
   myBestIsPassed: boolean | null
+  latestAttemptId?: number | null
+  latestAttemptStatus?: AttemptStatus | null
+  latestAttemptSubmittedAt?: string | null
+  latestAttemptIsResultPublished?: boolean | null
 }
 
 export interface ExamPreview {

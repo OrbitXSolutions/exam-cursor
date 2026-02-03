@@ -65,6 +65,7 @@ export const translations = {
       added: "Added",
       overview: "Overview",
       settings: "Settings",
+      notAvailable: "Not available",
     },
 
     // Status
@@ -785,8 +786,11 @@ export const translations = {
     // My Exams Page
     candidateDashboard: {
       all: "All",
+      available: "Available",
       yetToStart: "Yet To Start",
       resume: "Resume",
+      inProgress: "In Progress",
+      submitted: "Submitted",
       completed: "Completed",
       expired: "Expired",
       terminated: "Terminated",
@@ -798,13 +802,18 @@ export const translations = {
     myExams: {
       title: "My Exams",
       subtitle: "View and take your assigned exams",
+      noExams: "No Exams",
+      noExamsDesc: "You don't have any exams assigned right now",
       activeExam: "Active Exam In Progress",
       activeExamDesc: "You have an exam currently in progress",
       continue: "Continue Exam",
+      retake: "Retake Exam",
+      underReview: "Under Review",
       upcoming: "Upcoming",
       active: "Active",
       completed: "Completed",
       startsIn: "Starts in",
+      startsOn: "Starts on",
       proctored: "Proctored",
       idRequired: "ID Required",
       startExam: "Start Exam",
@@ -896,6 +905,7 @@ export const translations = {
       added: "تمت الإضافة",
       overview: "نظرة عامة",
       settings: "الإعدادات",
+      notAvailable: "??? ????",
     },
 
     // Status
@@ -1289,8 +1299,11 @@ export const translations = {
     // My Exams (Candidate Portal)
     candidateDashboard: {
       all: "الكل",
+      available: "????",
       yetToStart: "لم يبدأ بعد",
       resume: "متابعة",
+      inProgress: "??? ???????",
+      submitted: "?? ???????",
       completed: "مكتمل",
       expired: "منتهي",
       terminated: "ملغى",
@@ -1302,13 +1315,18 @@ export const translations = {
     myExams: {
       title: "اختباراتي",
       subtitle: "عرض وأداء الاختبارات المخصصة لك",
+      noExams: "?? ???? ????????",
+      noExamsDesc: "?? ???? ???????? ????? ?? ??????",
       activeExam: "اختبار نشط قيد التنفيذ",
       activeExamDesc: "لديك اختبار قيد التنفيذ حالياً",
       continue: "متابعة الاختبار",
+      retake: "????? ????????",
+      underReview: "??? ????????",
       upcoming: "القادمة",
       active: "النشطة",
       completed: "المكتملة",
       startsIn: "يبدأ خلال",
+      startsOn: "???? ??",
       proctored: "مراقب",
       idRequired: "الهوية مطلوبة",
       startExam: "بدء الاختبار",

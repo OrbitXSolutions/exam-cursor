@@ -166,6 +166,19 @@ export async function getGradingSessionByAttempt(attemptId: number): Promise<Gra
 }
 
 /**
+ * Initiate grading for a submitted/expired attempt (creates grading session + auto-grades)
+ */
+export async function initiateGrading(attemptId: number): Promise<boolean> {
+  try {
+    await apiClient.post("/Grading/initiate", { attemptId })
+    return true
+  } catch (err) {
+    console.warn("[initiateGrading] Failed:", err)
+    return false
+  }
+}
+
+/**
  * Get questions requiring manual grading for a session
  */
 export async function getManualGradingQueue(gradingSessionId: number): Promise<GradedAnswerItem[]> {

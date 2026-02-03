@@ -24,6 +24,10 @@ public class CandidateExamListDto
     public decimal TotalPoints { get; set; }
  public int? MyAttempts { get; set; }
     public bool? MyBestIsPassed { get; set; }
+    public int? LatestAttemptId { get; set; }
+    public AttemptStatus? LatestAttemptStatus { get; set; }
+    public DateTime? LatestAttemptSubmittedAt { get; set; }
+    public bool? LatestAttemptIsResultPublished { get; set; }
 }
 
 /// <summary>

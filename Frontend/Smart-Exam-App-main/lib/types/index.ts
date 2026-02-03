@@ -17,11 +17,11 @@ export enum DifficultyLevel {
 }
 
 export enum AttemptStatus {
-  NotStarted = 0,
-  InProgress = 1,
-  Submitted = 2,
-  TimedOut = 3,
-  Cancelled = 4,
+  Started = 1,
+  InProgress = 2,
+  Submitted = 3,
+  Expired = 4,
+  Cancelled = 5,
 }
 
 export enum GradingStatus {

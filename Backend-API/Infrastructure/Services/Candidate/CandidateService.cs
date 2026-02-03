@@ -68,23 +68,50 @@ public class CandidateService : ICandidateService
 
         var exams = await query.ToListAsync();
 
-    // Get candidate's attempt counts per exam (directly from Attempt table)
-        var attemptCounts = await _context.Set<Domain.Entities.Attempt.Attempt>()
-     .Where(a => a.CandidateId == candidateId && !a.IsDeleted)
-            .GroupBy(a => a.ExamId)
-          .Select(g => new { ExamId = g.Key, Count = g.Count() })
-         .ToDictionaryAsync(x => x.ExamId, x => x.Count);
+        // Get candidate attempts for counts + latest status (single query)
+        var candidateAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .Where(a => a.CandidateId == candidateId && !a.IsDeleted)
+            .Select(a => new
+            {
+                a.Id,
+                a.ExamId,
+                a.Status,
+                a.StartedAt,
+                a.SubmittedAt
+            })
+            .ToListAsync();
 
-  // Get candidate's best results per exam (from Result table)
- var bestResults = await _context.Set<Domain.Entities.ExamResult.Result>()
-.Where(r => r.CandidateId == candidateId && !r.IsDeleted)
-     .GroupBy(r => r.ExamId)
-       .Select(g => new 
-            { 
-    ExamId = g.Key, 
-   BestIsPassed = g.Any(r => r.IsPassed == true)
-         })
-            .ToDictionaryAsync(x => x.ExamId, x => x.BestIsPassed);
+        var attemptCounts = candidateAttempts
+            .GroupBy(a => a.ExamId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var latestAttempts = candidateAttempts
+            .GroupBy(a => a.ExamId)
+            .Select(g => g.OrderByDescending(a => a.StartedAt).First())
+            .ToDictionary(a => a.ExamId, a => a);
+
+        // Get candidate's published results per exam (hide pass/fail until published)
+        var publishedResults = await _context.Set<Domain.Entities.ExamResult.Result>()
+            .Where(r => r.CandidateId == candidateId && !r.IsDeleted && r.IsPublishedToCandidate)
+            .Select(r => new
+            {
+                r.ExamId,
+                r.AttemptId,
+                r.IsPassed,
+                r.PublishedAt,
+                r.FinalizedAt
+            })
+            .ToListAsync();
+
+        var publishedByExam = publishedResults
+            .GroupBy(r => r.ExamId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderByDescending(r => r.PublishedAt ?? r.FinalizedAt).First());
+
+        var publishedAttemptIds = publishedResults
+            .Select(r => r.AttemptId)
+            .ToHashSet();
 
  var dtos = exams.Select(e =>
         {
@@ -92,9 +119,12 @@ public class CandidateService : ICandidateService
     
          // Get attempt count for this exam
          attemptCounts.TryGetValue(e.Id, out var myAttemptCount);
-  
-      // Get best result for this exam
-       bestResults.TryGetValue(e.Id, out var bestIsPassed);
+
+         // Get latest attempt for this exam
+         latestAttempts.TryGetValue(e.Id, out var latestAttempt);
+
+         // Get published result for this exam (only published results are visible to candidates)
+         publishedByExam.TryGetValue(e.Id, out var publishedResult);
 
           return new CandidateExamListDto
           {
@@ -113,8 +143,12 @@ public class CandidateService : ICandidateService
           TotalPoints = allQuestions.Sum(q => q.Points),
   // Set MyAttempts: null if 0 attempts, otherwise the count
   MyAttempts = myAttemptCount > 0 ? myAttemptCount : null,
-         // Set MyBestIsPassed: null if no attempts, otherwise the best result
-      MyBestIsPassed = myAttemptCount > 0 ? bestIsPassed : null
+         // Set MyBestIsPassed: null until a published result exists
+      MyBestIsPassed = publishedResult != null ? publishedResult.IsPassed : null,
+         LatestAttemptId = latestAttempt?.Id,
+         LatestAttemptStatus = latestAttempt?.Status,
+         LatestAttemptSubmittedAt = latestAttempt?.SubmittedAt,
+         LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id)
  };
    }).ToList();
 

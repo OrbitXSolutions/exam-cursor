@@ -3,17 +3,13 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import {
-  getAvailableExams,
-  getDashboard,
-  type CandidateExam,
-  type QuickAction,
-} from "@/lib/api/candidate"
+import { getAvailableExams, type CandidateExam, AttemptStatus } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { EmptyState } from "@/components/ui/empty-state"
+import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import {
   Clock,
@@ -23,6 +19,12 @@ import {
   Search,
   XCircle,
   AlertCircle,
+  RotateCcw,
+  Eye,
+  FileText,
+  Award,
+  Target,
+  User,
 } from "lucide-react"
 
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -35,12 +37,20 @@ function getLocalizedField<T extends Record<string, unknown>>(
   return (obj[field] as string) || (obj[fallback] as string) || ""
 }
 
-export type CandidateExamFilter = "all" | "yetToStart" | "resume" | "completed" | "expired" | "terminated"
+export type CandidateExamFilter =
+  | "all"
+  | "available"
+  | "inProgress"
+  | "submitted"
+  | "completed"
+  | "expired"
+  | "terminated"
+
+type ExamStatusKey = Exclude<CandidateExamFilter, "all">
 
 export default function MyExamsPage() {
   const { t, language } = useI18n()
   const [exams, setExams] = useState<CandidateExam[]>([])
-  const [activeAttempts, setActiveAttempts] = useState<QuickAction[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<CandidateExamFilter>("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -52,17 +62,12 @@ export default function MyExamsPage() {
   async function loadExams() {
     try {
       setLoading(true)
-      const [examsResponse, dashboardResponse] = await Promise.all([
-        getAvailableExams(),
-        getDashboard().catch(() => null),
-      ])
+      const examsResponse = await getAvailableExams()
       setExams(Array.isArray(examsResponse) ? examsResponse : [])
-      setActiveAttempts(dashboardResponse?.quickActions ?? [])
     } catch (error) {
       console.error("[my-exams] API error:", error)
       toast.error(error instanceof Error ? error.message : "Failed to load exams")
       setExams([])
-      setActiveAttempts([])
     } finally {
       setLoading(false)
     }
@@ -70,94 +75,44 @@ export default function MyExamsPage() {
 
   const now = new Date()
 
-  // Exams that haven't started yet (future start date) - for display only
-  const upcomingExams = exams.filter((exam) => {
-    if (!exam.startAt) return false
-    return new Date(exam.startAt) > now
-  })
-
-  const activeExams = exams.filter((exam) => {
-    const start = exam.startAt ? new Date(exam.startAt) : new Date(0)
-    const end = exam.endAt ? new Date(exam.endAt) : new Date(Date.now() + 1000 * 60 * 60 * 24 * 365)
-    return now >= start && now <= end
-  })
-
-  const resumeExamIds = new Set(activeAttempts.map((a) => a.examId))
-  const resumeExams = exams.filter((e) => resumeExamIds.has(e.id))
-
-  // Yet To Start: exams currently in window that the candidate hasn't started (no attempts)
-  const yetToStartExams = exams.filter((exam) => {
-    const hasStarted = exam.myAttempts != null && exam.myAttempts > 0
-    if (hasStarted) return false
-    const start = exam.startAt ? new Date(exam.startAt) : new Date(0)
-    const end = exam.endAt ? new Date(exam.endAt) : new Date(Date.now() + 1000 * 60 * 60 * 24 * 365)
-    return now >= start && now <= end
-  })
-
-  const completedExams = exams.filter((exam) => exam.myAttempts != null && exam.myAttempts > 0 && exam.myBestIsPassed != null)
-
-  const expiredExams = exams.filter((exam) => {
-    if (!exam.endAt) return false
-    const end = new Date(exam.endAt)
-    if (end <= now && !(exam.myAttempts != null && exam.myAttempts > 0)) return true
-    return false
-  })
-
-  const filterCounts = {
-    all: exams.length,
-    yetToStart: yetToStartExams.length,
-    resume: resumeExams.length,
-    completed: completedExams.length,
-    expired: expiredExams.length,
-    terminated: 0,
+  const statusLabels: Record<ExamStatusKey, string> = {
+    available: t("candidateDashboard.available"),
+    inProgress: t("candidateDashboard.inProgress"),
+    submitted: t("candidateDashboard.submitted"),
+    completed: t("candidateDashboard.completed"),
+    expired: t("candidateDashboard.expired"),
+    terminated: t("candidateDashboard.terminated"),
   }
 
-  const getFilteredExams = (): CandidateExam[] => {
-    let list: CandidateExam[] = []
-    switch (filter) {
-      case "all":
-        list = [...exams]
-        break
-      case "yetToStart":
-        list = yetToStartExams
-        break
-      case "resume":
-        list = resumeExams
-        break
-      case "completed":
-        list = completedExams
-        break
-      case "expired":
-        list = expiredExams
-        break
-      case "terminated":
-        list = []
-        break
-      default:
-        list = [...exams]
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      list = list.filter(
-        (e) =>
-          getLocalizedField(e, "title", language).toLowerCase().includes(q) ||
-          (e.descriptionEn ?? "").toLowerCase().includes(q) ||
-          (e.descriptionAr ?? "").toLowerCase().includes(q)
-      )
-    }
-    return list
+  const statusStyles: Record<ExamStatusKey, string> = {
+    available: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    inProgress: "border-sky-200 bg-sky-50 text-sky-700",
+    submitted: "border-amber-200 bg-amber-50 text-amber-700",
+    completed: "border-emerald-200 bg-emerald-100 text-emerald-700",
+    expired: "border-rose-200 bg-rose-50 text-rose-700",
+    terminated: "border-gray-200 bg-gray-100 text-gray-700",
   }
 
-  const filteredExams = getFilteredExams()
+  function getExamStatusKey(exam: CandidateExam): ExamStatusKey {
+    const latestStatus = exam.latestAttemptStatus ?? null
+    const latestPublished = exam.latestAttemptIsResultPublished === true
 
-  function getExamStatus(exam: CandidateExam): { label: string; variant: "completed" | "expired" | "yetToStart" | "resume" } {
-    if (resumeExamIds.has(exam.id)) return { label: t("myExams.continue"), variant: "resume" }
-    if (exam.myAttempts != null && exam.myAttempts > 0 && exam.myBestIsPassed != null) {
-      return { label: exam.myBestIsPassed ? t("myExams.passed") : t("myExams.failed"), variant: "completed" }
+    if (latestStatus === AttemptStatus.Started || latestStatus === AttemptStatus.InProgress) {
+      return "inProgress"
     }
-    if (exam.endAt && new Date(exam.endAt) <= now) return { label: t("candidateDashboard.expired"), variant: "expired" }
-    if (yetToStartExams.some((e) => e.id === exam.id)) return { label: t("candidateDashboard.yetToStart"), variant: "yetToStart" }
-    return { label: t("myExams.availableNow"), variant: "resume" }
+    if (latestStatus === AttemptStatus.Submitted) {
+      return latestPublished ? "completed" : "submitted"
+    }
+    if (latestStatus === AttemptStatus.Cancelled) {
+      return "terminated"
+    }
+    if (latestStatus === AttemptStatus.Expired) {
+      return "expired"
+    }
+    if (exam.endAt && new Date(exam.endAt) < now) {
+      return "expired"
+    }
+    return "available"
   }
 
   function formatDateTime(dateString: string | null) {
@@ -168,14 +123,38 @@ export default function MyExamsPage() {
     })
   }
 
-  const filterColors: Record<CandidateExamFilter, string> = {
-    all: "bg-amber-600 text-white",
-    yetToStart: "bg-emerald-600 text-white",
-    resume: "bg-sky-500 text-white",
-    completed: "bg-emerald-500 text-white",
-    expired: "bg-rose-500 text-white",
-    terminated: "bg-red-600 text-white",
+  const examsWithStatus = exams.map((exam) => ({
+    exam,
+    status: getExamStatusKey(exam),
+  }))
+
+  const filterCounts = {
+    all: exams.length,
+    available: examsWithStatus.filter((e) => e.status === "available").length,
+    inProgress: examsWithStatus.filter((e) => e.status === "inProgress").length,
+    submitted: examsWithStatus.filter((e) => e.status === "submitted").length,
+    completed: examsWithStatus.filter((e) => e.status === "completed").length,
+    expired: examsWithStatus.filter((e) => e.status === "expired").length,
+    terminated: examsWithStatus.filter((e) => e.status === "terminated").length,
   }
+
+  const filteredExams = (() => {
+    let list = examsWithStatus
+      .filter((e) => filter === "all" || e.status === filter)
+      .map((e) => e.exam)
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      list = list.filter(
+        (e) =>
+          getLocalizedField(e, "title", language).toLowerCase().includes(q) ||
+          (e.descriptionEn ?? "").toLowerCase().includes(q) ||
+          (e.descriptionAr ?? "").toLowerCase().includes(q)
+      )
+    }
+
+    return list
+  })()
 
   if (loading) {
     return (
@@ -187,13 +166,19 @@ export default function MyExamsPage() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Filter bar (image 1 style) */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">{t("myExams.title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("myExams.subtitle")}</p>
+      </div>
+
+      {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3">
         {(
           [
             { key: "all" as const, labelKey: "candidateDashboard.all" },
-            { key: "yetToStart" as const, labelKey: "candidateDashboard.yetToStart" },
-            { key: "resume" as const, labelKey: "candidateDashboard.resume" },
+            { key: "available" as const, labelKey: "candidateDashboard.available" },
+            { key: "inProgress" as const, labelKey: "candidateDashboard.inProgress" },
+            { key: "submitted" as const, labelKey: "candidateDashboard.submitted" },
             { key: "completed" as const, labelKey: "candidateDashboard.completed" },
             { key: "expired" as const, labelKey: "candidateDashboard.expired" },
             { key: "terminated" as const, labelKey: "candidateDashboard.terminated" },
@@ -203,9 +188,11 @@ export default function MyExamsPage() {
             key={key}
             type="button"
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 rounded-lg border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent ${filter === key ? "ring-2 ring-primary" : ""}`}
+            className={`flex items-center gap-2 rounded-lg border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent ${
+              filter === key ? "ring-2 ring-primary" : ""
+            }`}
           >
-            <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${filterColors[key]}`}>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
               {filterCounts[key]}
             </span>
             <span>{t(labelKey)}</span>
@@ -224,84 +211,233 @@ export default function MyExamsPage() {
         </div>
       </div>
 
-      {/* Exam cards grid */}
       {filteredExams.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title={t("myExams.noUpcoming")}
-          description={t("myExams.noUpcomingDesc")}
+          title={t("myExams.noExams")}
+          description={t("myExams.noExamsDesc")}
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredExams.map((exam) => {
-            const status = getExamStatus(exam)
-            const isResume = resumeExamIds.has(exam.id)
-            const attempt = activeAttempts.find((a) => a.examId === exam.id)
+            const statusKey = getExamStatusKey(exam)
+            const statusLabel = statusLabels[statusKey]
+            const statusClass = statusStyles[statusKey]
+            const attemptsUsed = exam.myAttempts ?? 0
+            const attemptsRemaining =
+              exam.maxAttempts > 0 ? Math.max(0, exam.maxAttempts - attemptsUsed) : null
+            const hasAttemptsRemaining = attemptsRemaining == null || attemptsRemaining > 0
+            const startAt = exam.startAt ? new Date(exam.startAt) : null
+            const endAt = exam.endAt ? new Date(exam.endAt) : null
+            const inWindow = (!startAt || now >= startAt) && (!endAt || now <= endAt)
+            const startsInFuture = !!startAt && now < startAt
+            const latestAttemptId = exam.latestAttemptId ?? null
+            const latestPublished = exam.latestAttemptIsResultPublished === true
+
+            const canResume = statusKey === "inProgress" && latestAttemptId != null
+            const canView = statusKey === "completed" && latestPublished && latestAttemptId != null
+            const canRetake =
+              (statusKey === "completed" || statusKey === "expired" || statusKey === "terminated") &&
+              hasAttemptsRemaining &&
+              inWindow
+            const canStart = statusKey === "available" && inWindow && hasAttemptsRemaining
+
+            let primaryAction: {
+              label: string
+              href?: string
+              icon: React.ReactNode
+              disabled?: boolean
+            } | null = null
+            let secondaryAction: {
+              label: string
+              href: string
+              icon: React.ReactNode
+            } | null = null
+
+            if (canResume) {
+              primaryAction = {
+                label: t("myExams.continue"),
+                href: `/take-exam/${latestAttemptId}`,
+                icon: <PlayCircle className="mr-2 h-4 w-4" />,
+              }
+            } else if (statusKey === "submitted") {
+              primaryAction = {
+                label: t("myExams.underReview"),
+                icon: <AlertCircle className="mr-2 h-4 w-4" />,
+                disabled: true,
+              }
+            } else if (statusKey === "completed") {
+              if (canRetake) {
+                primaryAction = {
+                  label: t("myExams.retake"),
+                  href: `/take-exam/${exam.id}/instructions`,
+                  icon: <RotateCcw className="mr-2 h-4 w-4" />,
+                }
+                if (canView) {
+                  secondaryAction = {
+                    label: t("myExams.viewResults"),
+                    href: `/results/${latestAttemptId}`,
+                    icon: <Eye className="mr-2 h-4 w-4" />,
+                  }
+                }
+              } else if (canView) {
+                primaryAction = {
+                  label: t("myExams.viewResults"),
+                  href: `/results/${latestAttemptId}`,
+                  icon: <Eye className="mr-2 h-4 w-4" />,
+                }
+              }
+            } else if (statusKey === "expired" || statusKey === "terminated") {
+              if (canRetake) {
+                primaryAction = {
+                  label: t("myExams.retake"),
+                  href: `/take-exam/${exam.id}/instructions`,
+                  icon: <RotateCcw className="mr-2 h-4 w-4" />,
+                }
+              } else {
+                primaryAction = {
+                  label: statusLabel,
+                  icon: <XCircle className="mr-2 h-4 w-4" />,
+                  disabled: true,
+                }
+              }
+            } else if (statusKey === "available") {
+              if (canStart) {
+                primaryAction = {
+                  label: t("myExams.startExam"),
+                  href: `/take-exam/${exam.id}/instructions`,
+                  icon: <PlayCircle className="mr-2 h-4 w-4" />,
+                }
+              } else if (!hasAttemptsRemaining) {
+                primaryAction = {
+                  label: t("myExams.noAttemptsLeft"),
+                  icon: <XCircle className="mr-2 h-4 w-4" />,
+                  disabled: true,
+                }
+              } else if (startsInFuture) {
+                primaryAction = {
+                  label: t("myExams.notYetAvailable"),
+                  icon: <Clock className="mr-2 h-4 w-4" />,
+                  disabled: true,
+                }
+              } else {
+                primaryAction = {
+                  label: t("myExams.startExam"),
+                  icon: <PlayCircle className="mr-2 h-4 w-4" />,
+                  disabled: true,
+                }
+              }
+            }
 
             return (
               <Card key={exam.id} className="overflow-hidden border shadow-sm">
-                <div
-                  className={`rounded-t-lg px-4 py-3 text-white ${status.variant === "completed"
-                    ? "bg-emerald-600"
-                    : status.variant === "expired"
-                      ? "bg-rose-500"
-                      : "bg-primary"
-                    }`}
-                >
-                  <h3 className="font-semibold leading-tight">
-                    {getLocalizedField(exam, "title", language)}
-                  </h3>
-                </div>
-                <CardContent className="space-y-3 p-4">
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>
-                      <span className="font-medium text-foreground">{t("candidateDashboard.start")}: </span>
-                      {formatDateTime(exam.startAt)}
-                    </p>
-                    <p>
-                      <span className="font-medium text-foreground">{t("candidateDashboard.expired")}: </span>
-                      {formatDateTime(exam.endAt)}
-                    </p>
-                    <p>
-                      {t("candidateDashboard.noOfQuestions")}: {exam.totalQuestions}
-                    </p>
-                    <p>
-                      {t("candidateDashboard.testDuration")}: {exam.durationMinutes} {t("common.minutes")}
-                    </p>
+                <div className="flex items-start justify-between gap-3 border-b bg-muted/30 px-4 py-3">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold leading-tight">
+                      {getLocalizedField(exam, "title", language)}
+                    </h3>
+                    {exam.descriptionEn || exam.descriptionAr ? (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {getLocalizedField(exam, "description", language)}
+                      </p>
+                    ) : null}
                   </div>
-                  <Button
-                    className="w-full"
-                    variant={status.variant === "expired" ? "secondary" : "default"}
-                    disabled={status.variant === "expired"}
-                    asChild={isResume || status.variant === "yetToStart" || (status.variant !== "yetToStart" && status.variant !== "expired")}
-                  >
-                    {isResume && attempt ? (
-                      <Link href={`/take-exam/${attempt.attemptId}`}>
-                        <PlayCircle className="mr-2 h-4 w-4" />
-                        {t("myExams.continue")}
-                      </Link>
-                    ) : status.variant === "completed" ? (
-                      <Link href="/my-results">
-                        <CheckCircle2 className="mr-2 h-4 w-4" />
-                        {status.label}
-                      </Link>
-                    ) : status.variant === "expired" ? (
-                      <>
-                        <XCircle className="mr-2 h-4 w-4" />
-                        {status.label}
-                      </>
-                    ) : status.variant === "yetToStart" ? (
-                      <Link href={`/take-exam/${exam.id}/instructions`}>
-                        <PlayCircle className="mr-2 h-4 w-4" />
-                        {t("myExams.startExam")}
-                      </Link>
-                    ) : (
-                      <Link href={`/take-exam/${exam.id}/instructions`}>
-                        <PlayCircle className="mr-2 h-4 w-4" />
-                        {t("myExams.startExam")}
-                      </Link>
+                  <Badge className={`border ${statusClass}`}>{statusLabel}</Badge>
+                </div>
+                <CardContent className="space-y-4 p-4">
+                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {exam.durationMinutes} {t("common.minutes")}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <FileText className="h-4 w-4" />
+                      {exam.totalQuestions} {t("common.questions")}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Award className="h-4 w-4" />
+                      {exam.totalPoints} {t("common.points")}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Target className="h-4 w-4" />
+                      {t("exams.passScore")}: {exam.passScore}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      {t("myExams.attempts")}
+                    </span>
+                    <span className="font-medium text-foreground">
+                      {attemptsUsed} / {exam.maxAttempts === 0 ? "∞" : exam.maxAttempts}
+                      {attemptsRemaining != null && (
+                        <span className="text-muted-foreground">
+                          {" "}
+                          ({attemptsRemaining} {t("common.remaining")})
+                        </span>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="grid gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between">
+                      <span>{t("candidateDashboard.start")}</span>
+                      <span className="text-foreground">{formatDateTime(exam.startAt)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>{t("candidateDashboard.expired")}</span>
+                      <span className="text-foreground">{formatDateTime(exam.endAt)}</span>
+                    </div>
+                  </div>
+
+                  {statusKey === "submitted" && (
+                    <div className="flex items-center gap-2 text-xs text-amber-700">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{t("results.pendingGrading")}</span>
+                    </div>
+                  )}
+
+                  {startsInFuture && statusKey === "available" && (
+                    <div className="text-xs text-muted-foreground">
+                      {t("myExams.startsOn")} {formatDateTime(exam.startAt)}
+                    </div>
+                  )}
+
+                  {statusKey === "completed" && exam.myBestIsPassed != null && (
+                    <Badge variant={exam.myBestIsPassed ? "default" : "destructive"}>
+                      {exam.myBestIsPassed ? t("myExams.passed") : t("myExams.failed")}
+                    </Badge>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {secondaryAction && (
+                      <Button variant="outline" asChild>
+                        <Link href={secondaryAction.href}>
+                          {secondaryAction.icon}
+                          {secondaryAction.label}
+                        </Link>
+                      </Button>
                     )}
-                  </Button>
+                    {primaryAction && primaryAction.href ? (
+                      <Button asChild>
+                        <Link href={primaryAction.href}>
+                          {primaryAction.icon}
+                          {primaryAction.label}
+                        </Link>
+                      </Button>
+                    ) : primaryAction ? (
+                      <Button variant="secondary" disabled className="w-full sm:w-auto">
+                        {primaryAction.icon}
+                        {primaryAction.label}
+                      </Button>
+                    ) : (
+                      <Button variant="secondary" disabled className="w-full sm:w-auto">
+                        <XCircle className="mr-2 h-4 w-4" />
+                        {t("common.notAvailable")}
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )

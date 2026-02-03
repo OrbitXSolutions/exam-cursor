@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import {
   getGradingSessionByAttempt,
+  initiateGrading,
   submitManualGrade,
   completeGrading,
   type GradingSessionDetail,
@@ -66,7 +67,13 @@ export default function GradeSubmissionPage() {
   async function loadSession() {
     try {
       setLoading(true)
-      const data = await getGradingSessionByAttempt(attemptId)
+      let data = await getGradingSessionByAttempt(attemptId)
+      if (!data) {
+        const initiated = await initiateGrading(attemptId)
+        if (initiated) {
+          data = await getGradingSessionByAttempt(attemptId)
+        }
+      }
       setSession(data || null)
       if (data) {
         const initialGrades = new Map<number, GradeState>()
@@ -92,6 +99,9 @@ export default function GradeSubmissionPage() {
     session?.answers.filter((a) => a.isManuallyGraded) || []
   const currentQuestion = manualQuestions[currentQuestionIndex]
   const currentGrade = currentQuestion ? grades.get(currentQuestion.questionId) : null
+  const isUnanswered = currentQuestion
+    ? !currentQuestion.textAnswer && (!currentQuestion.selectedOptionIds || currentQuestion.selectedOptionIds.length === 0)
+    : false
 
   function updateGrade(questionId: number, updates: Partial<GradeState>) {
     setGrades((prev) => {
@@ -226,6 +236,14 @@ export default function GradeSubmissionPage() {
                 <FileText className="h-5 w-5" />
                 Question {currentQuestionIndex + 1} of {manualQuestions.length}
               </CardTitle>
+              <CardDescription className="flex flex-wrap gap-2">
+                <Badge variant="secondary">{t("grading.manualGrading")}</Badge>
+                {isUnanswered && (
+                  <Badge variant="outline" className="border-amber-200 text-amber-700 bg-amber-50">
+                    {t("results.unanswered")}
+                  </Badge>
+                )}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {currentQuestion && (
