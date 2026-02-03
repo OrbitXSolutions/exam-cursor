@@ -1,0 +1,6 @@
+@Smart_Core_HostAddress = http://localhost:5221
+
+GET {{Smart_Core_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
