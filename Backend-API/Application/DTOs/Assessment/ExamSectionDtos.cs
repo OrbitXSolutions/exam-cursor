@@ -1,3 +1,5 @@
+using Smart_Core.Domain.Enums;
+
 namespace Smart_Core.Application.DTOs.Assessment;
 
 #region ExamSection DTOs
@@ -20,6 +22,17 @@ public class ExamSectionDto
     public int TopicsCount { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
+
+    // Builder fields
+    public SectionSourceType? SourceType { get; set; }
+    public int? QuestionSubjectId { get; set; }
+    public int? QuestionTopicId { get; set; }
+    public int PickCount { get; set; }
+    public string? SubjectNameEn { get; set; }
+    public string? SubjectNameAr { get; set; }
+    public string? TopicNameEn { get; set; }
+    public string? TopicNameAr { get; set; }
+
     public List<ExamTopicDto> Topics { get; set; } = new();
     public List<ExamQuestionDto> Questions { get; set; } = new();
 }

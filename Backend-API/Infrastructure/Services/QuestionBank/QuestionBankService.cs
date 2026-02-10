@@ -392,6 +392,24 @@ public class QuestionBankService : IQuestionBankService
         return ApiResponse<bool>.SuccessResponse(true, $"Question {status} successfully");
     }
 
+    public async Task<ApiResponse<int>> GetQuestionsCountAsync(int? subjectId, int? topicId)
+    {
+        var query = _context.Questions.Where(q => q.IsActive && !q.IsDeleted);
+
+        if (subjectId.HasValue)
+        {
+            query = query.Where(q => q.SubjectId == subjectId.Value);
+        }
+
+        if (topicId.HasValue)
+        {
+            query = query.Where(q => q.TopicId == topicId.Value);
+        }
+
+        var count = await query.CountAsync();
+        return ApiResponse<int>.SuccessResponse(count);
+    }
+
     #endregion
 
     #region Question Options

@@ -13,12 +13,12 @@ namespace Smart_Core.Controllers.QuestionBank;
 [Authorize(Roles = $"{AppRoles.Admin},{AppRoles.Instructor}")]
 public class QuestionBankController : ControllerBase
 {
-  private readonly IQuestionBankService _questionBankService;
+    private readonly IQuestionBankService _questionBankService;
     private readonly ICurrentUserService _currentUserService;
 
     public QuestionBankController(IQuestionBankService questionBankService, ICurrentUserService currentUserService)
     {
-      _questionBankService = questionBankService;
+        _questionBankService = questionBankService;
         _currentUserService = currentUserService;
     }
 
@@ -31,7 +31,7 @@ public class QuestionBankController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<PaginatedResponse<QuestionListDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllQuestions([FromQuery] QuestionSearchDto searchDto)
     {
-     var result = await _questionBankService.GetAllQuestionsAsync(searchDto);
+        var result = await _questionBankService.GetAllQuestionsAsync(searchDto);
         return Ok(result);
     }
 
@@ -39,11 +39,11 @@ public class QuestionBankController : ControllerBase
     /// Get question by ID with options and attachments
     /// </summary>
     [HttpGet("questions/{id}")]
-  [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetQuestionById(int id)
     {
-  var result = await _questionBankService.GetQuestionByIdAsync(id);
+        var result = await _questionBankService.GetQuestionByIdAsync(id);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -56,28 +56,28 @@ public class QuestionBankController : ControllerBase
     public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionDto dto)
     {
         var result = await _questionBankService.CreateQuestionAsync(dto, _currentUserService.UserId!);
-      return result.Success
- ? CreatedAtAction(nameof(GetQuestionById), new { id = result.Data!.Id }, result)
-        : BadRequest(result);
+        return result.Success
+   ? CreatedAtAction(nameof(GetQuestionById), new { id = result.Data!.Id }, result)
+          : BadRequest(result);
     }
 
     /// <summary>
- /// Update a question
+    /// Update a question
     /// </summary>
-  [HttpPut("questions/{id}")]
+    [HttpPut("questions/{id}")]
     [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status400BadRequest)]
- [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<QuestionDto>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateQuestion(int id, [FromBody] UpdateQuestionDto dto)
     {
         var result = await _questionBankService.UpdateQuestionAsync(id, dto, _currentUserService.UserId!);
-   return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Delete a question (hard delete)
-  /// </summary>
-[HttpDelete("questions/{id}")]
+    /// </summary>
+    [HttpDelete("questions/{id}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteQuestion(int id)
@@ -95,7 +95,18 @@ public class QuestionBankController : ControllerBase
     public async Task<IActionResult> ToggleQuestionStatus(int id)
     {
         var result = await _questionBankService.ToggleQuestionStatusAsync(id, _currentUserService.UserId!);
-   return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
+    }
+
+    /// <summary>
+    /// Get count of available questions for a subject or topic
+    /// </summary>
+    [HttpGet("questions/count")]
+    [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetQuestionsCount([FromQuery] int? subjectId, [FromQuery] int? topicId)
+    {
+        var result = await _questionBankService.GetQuestionsCountAsync(subjectId, topicId);
+        return Ok(result);
     }
 
     #endregion
@@ -105,13 +116,13 @@ public class QuestionBankController : ControllerBase
     /// <summary>
     /// Get all options for a question
     /// </summary>
- [HttpGet("questions/{questionId}/options")]
+    [HttpGet("questions/{questionId}/options")]
     [ProducesResponseType(typeof(ApiResponse<List<QuestionOptionDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<List<QuestionOptionDto>>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetQuestionOptions(int questionId)
     {
         var result = await _questionBankService.GetQuestionOptionsAsync(questionId);
-  return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -120,7 +131,7 @@ public class QuestionBankController : ControllerBase
     [HttpPost("questions/{questionId}/options")]
     [ProducesResponseType(typeof(ApiResponse<QuestionOptionDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<QuestionOptionDto>), StatusCodes.Status400BadRequest)]
-  public async Task<IActionResult> AddQuestionOption(int questionId, [FromBody] CreateQuestionOptionDto dto)
+    public async Task<IActionResult> AddQuestionOption(int questionId, [FromBody] CreateQuestionOptionDto dto)
     {
         var result = await _questionBankService.AddQuestionOptionAsync(questionId, dto, _currentUserService.UserId!);
         return result.Success ? Created(string.Empty, result) : BadRequest(result);
@@ -132,9 +143,9 @@ public class QuestionBankController : ControllerBase
     [HttpPut("options/{optionId}")]
     [ProducesResponseType(typeof(ApiResponse<QuestionOptionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<QuestionOptionDto>), StatusCodes.Status404NotFound)]
-public async Task<IActionResult> UpdateQuestionOption(int optionId, [FromBody] UpdateQuestionOptionDto dto)
+    public async Task<IActionResult> UpdateQuestionOption(int optionId, [FromBody] UpdateQuestionOptionDto dto)
     {
-     var result = await _questionBankService.UpdateQuestionOptionAsync(optionId, dto, _currentUserService.UserId!);
+        var result = await _questionBankService.UpdateQuestionOptionAsync(optionId, dto, _currentUserService.UserId!);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -146,7 +157,7 @@ public async Task<IActionResult> UpdateQuestionOption(int optionId, [FromBody] U
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteQuestionOption(int optionId)
     {
-    var result = await _questionBankService.DeleteQuestionOptionAsync(optionId);
+        var result = await _questionBankService.DeleteQuestionOptionAsync(optionId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -160,11 +171,11 @@ public async Task<IActionResult> UpdateQuestionOption(int optionId, [FromBody] U
     {
         var dto = new BulkUpdateQuestionOptionsDto
         {
-QuestionId = questionId,
-   Options = options
+            QuestionId = questionId,
+            Options = options
         };
         var result = await _questionBankService.BulkUpdateQuestionOptionsAsync(dto, _currentUserService.UserId!);
-   return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -179,8 +190,8 @@ QuestionId = questionId,
     [ProducesResponseType(typeof(ApiResponse<List<QuestionAttachmentDto>>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetQuestionAttachments(int questionId)
     {
-    var result = await _questionBankService.GetQuestionAttachmentsAsync(questionId);
-    return result.Success ? Ok(result) : NotFound(result);
+        var result = await _questionBankService.GetQuestionAttachmentsAsync(questionId);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -205,7 +216,7 @@ QuestionId = questionId,
     public async Task<IActionResult> UpdateQuestionAttachment(int attachmentId, [FromBody] UpdateQuestionAttachmentDto dto)
     {
         var result = await _questionBankService.UpdateQuestionAttachmentAsync(attachmentId, dto, _currentUserService.UserId!);
-    return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -227,7 +238,7 @@ QuestionId = questionId,
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetPrimaryAttachment(int attachmentId)
-  {
+    {
         var result = await _questionBankService.SetPrimaryAttachmentAsync(attachmentId, _currentUserService.UserId!);
         return result.Success ? Ok(result) : NotFound(result);
     }

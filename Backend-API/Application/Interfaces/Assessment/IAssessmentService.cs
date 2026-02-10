@@ -49,19 +49,19 @@ public interface IAssessmentService
 
     Task<ApiResponse<List<ExamQuestionDto>>> GetSectionQuestionsAsync(int sectionId);
     Task<ApiResponse<List<ExamQuestionDto>>> GetTopicQuestionsAsync(int topicId);
-    
+
     // Single question add
     Task<ApiResponse<ExamQuestionDto>> AddQuestionToSectionAsync(int sectionId, AddExamQuestionDto dto, string createdBy);
     Task<ApiResponse<ExamQuestionDto>> AddQuestionToTopicAsync(int topicId, AddExamQuestionDto dto, string createdBy);
-    
+
     // Bulk add (simple - auto order)
     Task<ApiResponse<List<ExamQuestionDto>>> BulkAddQuestionsToSectionAsync(int sectionId, BulkAddQuestionsDto dto, string createdBy);
     Task<ApiResponse<List<ExamQuestionDto>>> BulkAddQuestionsToTopicAsync(int topicId, BulkAddQuestionsDto dto, string createdBy);
-    
+
     // Manual selection (user picks questions with custom order/points)
     Task<ApiResponse<List<ExamQuestionDto>>> ManualAddQuestionsToSectionAsync(int sectionId, ManualQuestionSelectionDto dto, string createdBy);
     Task<ApiResponse<List<ExamQuestionDto>>> ManualAddQuestionsToTopicAsync(int topicId, ManualQuestionSelectionDto dto, string createdBy);
-    
+
     // Random selection (system picks questions based on criteria)
     Task<ApiResponse<List<ExamQuestionDto>>> RandomAddQuestionsToSectionAsync(int sectionId, RandomQuestionSelectionDto dto, string createdBy);
     Task<ApiResponse<List<ExamQuestionDto>>> RandomAddQuestionsToTopicAsync(int topicId, RandomQuestionSelectionDto dto, string createdBy);
@@ -87,6 +87,20 @@ public interface IAssessmentService
     Task<ApiResponse<ExamInstructionDto>> UpdateInstructionAsync(int instructionId, SaveExamInstructionDto dto, string updatedBy);
     Task<ApiResponse<bool>> DeleteInstructionAsync(int instructionId);
     Task<ApiResponse<bool>> ReorderInstructionsAsync(int examId, List<ReorderInstructionDto> reorderDtos, string updatedBy);
+
+    #endregion
+
+    #region Exam Builder
+
+    /// <summary>
+    /// Get exam builder configuration (sections with source type, subject/topic, pickCount)
+    /// </summary>
+    Task<ApiResponse<ExamBuilderDto>> GetExamBuilderAsync(int examId);
+
+    /// <summary>
+    /// Save exam builder configuration - replaces all existing sections with new ones
+    /// </summary>
+    Task<ApiResponse<ExamBuilderDto>> SaveExamBuilderAsync(int examId, SaveExamBuilderRequest dto, string userId);
 
     #endregion
 

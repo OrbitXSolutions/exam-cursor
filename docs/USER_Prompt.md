@@ -83,3 +83,119 @@ Builder tab for now: show “Welcome to Builder” + Exam ID
 
 Place "Exam Creation" directly below the existing "Create Exam" item under the Exams section in Sidebar Navigation
 Add a new menu item
+
+## Builder Tab:
+
+Okay Perfect Exam Setup page Configuration tab Done do not change anything,
+Now Let's Start Working on Builder tab (Tab 2) in production-quality Integrated with API,
+
+Context:
+
+- Builder Tab must contain everything related to sections/questions logic.
+- IMPORTANT: Do NOT use ExamTopic for the new Exam-Setup Page . We will rely on ExamSection only.
+
+What we want:
+Admin builds exam sections from Question Bank Subjects/Topics, sets duration per section, and sets how many questions to randomly pick per section (PickCount). Questions will be selected later per attempt; for now we persist the rules.
+
+========================
+TASKS (Step-by-step)
+========================
+
+1. Backend – minimal model updates Update ExamSection entity
+
+- Add enum: SectionSourceType { Subject = 1, Topic = 2 }.
+- Update ExamSection entity to support building sections from Question Bank:
+  Add fields:
+  - SourceType (SectionSourceType) // Subject or Topic
+  - QuestionSubjectId (int? nullable)
+  - QuestionTopicId (int? nullable)
+  - PickCount (int) // number of questions to randomly pick per section
+    Notes:
+  - DurationMinutes already exists in ExamSection and MUST be used.
+
+  - Keep TitleEn/TitleAr as snapshot/display fields. If QuestionSubjectId/TopicId is provided, auto-fill TitleEn/TitleAr from selected subject/topic on save if empty.
+
+- Do NOT remove existing tables. Do NOT touch ExamTopic. Keep existing ExamQuestion unchanged
+
+  Validation rules:
+  - If sourceType=Subject: each section must have questionSubjectId, and questionTopicId must be null.
+  - If sourceType=Topic: each section must have both questionSubjectId and questionTopicId.
+  - pickCount >= 1 and must be <= available questions count for that subject/topic.
+  - durationMinutes can be 0 or null (means no section timer).
+
+  Save strategy:
+  - Replace existing sections for the exam with provided payload (simple and deterministic).
+
+C) Availability counts (for UI validation):
+Provide an endpoint to get available questions count:
+GET /api/questionbank/questions/count?subjectId=...&topicId=...
+It returns { "count": N }.
+This is used to show “Available: N questions” and validate pickCount.
+
+3. Frontend – Exam Setup page integration
+
+- Keep /exams/setup and /exams/setup/[examId] pages as they are.
+
+4. Frontend – Build Tab UI (MVP without manual)
+   In Builder tab implement this flow:
+
+Q1) Select Subjects (multi-select)
+
+- Multi-select dropdown with search
+- Admin can select multiple subjects
+- Once selected, preload their topics and availability counts (as needed)
+
+Q2) How should sections be generated? (inline radio)
+
+- By Subject
+- By Topic
+
+Behavior:
+A) If “By Subject”
+
+- Auto-generate a Sections Preview list: one section per selected subject.
+- For each section show a Section Card (same design language as existing pages):
+  - Title (read-only, from subject name)
+  - DurationMinutes input (allow 0)
+  - PickCount input (number of questions to randomly pick)
+  - Show helper: “Available: N questions”
+  - Validate PickCount <= Available
+
+B) If “By Topic”
+
+- After selecting subjects, show accordion per selected subject:
+  - “Include all topics” (default ON)
+  - If OFF: show checklist of topics for that subject
+- Sections Preview becomes one section per selected topic.
+- For each topic-section show Section Card:
+  - Title (read-only, from topic name)
+  - DurationMinutes input
+  - PickCount input
+  - Available count for that topic
+
+Actions:
+
+- “Save Builder” button:
+  - Calls PUT /api/exams/{examId}/builder with sourceType + computed sections payload.
+  - Shows toast success.
+- Also implement “Load existing builder”:
+  - On opening builder tab for an existing exam, call GET /api/exams/{examId}/builder and prefill UI (subjects selection, sourceType, sections settings).
+
+5. Data mapping rules
+
+- For Subject-wise:
+  - ExamSection.SourceType = Subject
+  - QuestionSubjectId = selected subject
+  - QuestionTopicId = null
+- For Topic-wise:
+  - ExamSection.SourceType = Topic
+  - QuestionSubjectId = topic’s parent subject id
+  - QuestionTopicId = selected topic id
+- Titles are stored as snapshot (TitleEn/TitleAr) filled from selected lookup.
+
+Deliverables / acceptance:
+
+- Builder tab works end-to-end:
+  - Select subjects → choose By Subject/By Topic → set duration + pickCount → save → reload persists
+- API persists rules in real DB
+- UI styling matches existing patterns (no design overhaul)

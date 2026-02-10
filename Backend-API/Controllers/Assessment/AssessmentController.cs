@@ -19,7 +19,7 @@ public class AssessmentController : ControllerBase
         ICurrentUserService currentUserService)
     {
         _assessmentService = assessmentService;
-     _currentUserService = currentUserService;
+        _currentUserService = currentUserService;
     }
 
     #region Exams
@@ -27,11 +27,11 @@ public class AssessmentController : ControllerBase
     /// <summary>
     /// Get all exams with pagination and filtering
     /// </summary>
-  [HttpGet("exams")]
+    [HttpGet("exams")]
     public async Task<IActionResult> GetAllExams([FromQuery] ExamSearchDto searchDto)
-  {
+    {
         var result = await _assessmentService.GetAllExamsAsync(searchDto);
- return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public class AssessmentController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
- /// <summary>
+    /// <summary>
     /// Get exam by ID with full details
     /// </summary>
     [HttpGet("exams/{id}")]
@@ -62,14 +62,14 @@ public class AssessmentController : ControllerBase
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.CreateExamAsync(dto, userId);
-  return result.Success ? CreatedAtAction(nameof(GetExamById), new { id = result.Data?.Id }, result) : BadRequest(result);
+        return result.Success ? CreatedAtAction(nameof(GetExamById), new { id = result.Data?.Id }, result) : BadRequest(result);
     }
 
     /// <summary>
     /// Update an existing exam
     /// </summary>
     [HttpPut("exams/{id}")]
-public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
+    public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.UpdateExamAsync(id, dto, userId);
@@ -83,7 +83,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     public async Task<IActionResult> DeleteExam(int id)
     {
         var result = await _assessmentService.DeleteExamAsync(id);
- return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -92,9 +92,9 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpPost("exams/{id}/publish")]
     public async Task<IActionResult> PublishExam(int id)
     {
-  var userId = _currentUserService.UserId ?? "system";
-   var result = await _assessmentService.PublishExamAsync(id, userId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _assessmentService.PublishExamAsync(id, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -121,11 +121,11 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
 
     /// <summary>
     /// Validate exam for publishing
-  /// </summary>
+    /// </summary>
     [HttpGet("exams/{id}/validate")]
     public async Task<IActionResult> ValidateExamForPublish(int id)
     {
-   var result = await _assessmentService.ValidateExamForPublishAsync(id);
+        var result = await _assessmentService.ValidateExamForPublishAsync(id);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -156,10 +156,10 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.UpdateExamSettingsAsync(id, dto, userId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
- #endregion
+    #endregion
 
     #region Exam Sections
 
@@ -173,7 +173,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
- /// <summary>
+    /// <summary>
     /// Get section by ID
     /// </summary>
     [HttpGet("sections/{sectionId}")]
@@ -205,14 +205,14 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
- /// <summary>
-  /// Delete a section
+    /// <summary>
+    /// Delete a section
     /// </summary>
     [HttpDelete("sections/{sectionId}")]
     public async Task<IActionResult> DeleteSection(int sectionId)
     {
- var result = await _assessmentService.DeleteSectionAsync(sectionId);
-      return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _assessmentService.DeleteSectionAsync(sectionId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     public async Task<IActionResult> GetTopicById(int topicId)
     {
         var result = await _assessmentService.GetTopicByIdAsync(topicId);
-  return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -257,7 +257,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     public async Task<IActionResult> CreateTopic(int sectionId, [FromBody] SaveExamTopicDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-   var result = await _assessmentService.CreateTopicAsync(sectionId, dto, userId);
+        var result = await _assessmentService.CreateTopicAsync(sectionId, dto, userId);
         return result.Success ? CreatedAtAction(nameof(GetTopicById), new { topicId = result.Data?.Id }, result) : BadRequest(result);
     }
 
@@ -266,7 +266,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// </summary>
     [HttpPut("topics/{topicId}")]
     public async Task<IActionResult> UpdateTopic(int topicId, [FromBody] SaveExamTopicDto dto)
- {
+    {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.UpdateTopicAsync(topicId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -278,7 +278,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpDelete("topics/{topicId}")]
     public async Task<IActionResult> DeleteTopic(int topicId)
     {
-     var result = await _assessmentService.DeleteTopicAsync(topicId);
+        var result = await _assessmentService.DeleteTopicAsync(topicId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -287,11 +287,11 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// </summary>
     [HttpPost("sections/{sectionId}/topics/reorder")]
     public async Task<IActionResult> ReorderTopics(int sectionId, [FromBody] List<ReorderTopicDto> reorderDtos)
- {
+    {
         var userId = _currentUserService.UserId ?? "system";
-    var result = await _assessmentService.ReorderTopicsAsync(sectionId, reorderDtos, userId);
+        var result = await _assessmentService.ReorderTopicsAsync(sectionId, reorderDtos, userId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get all questions in a topic
@@ -299,15 +299,15 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpGet("topics/{topicId}/questions")]
     public async Task<IActionResult> GetTopicQuestions(int topicId)
     {
-     var result = await _assessmentService.GetTopicQuestionsAsync(topicId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _assessmentService.GetTopicQuestionsAsync(topicId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Add a single question to a topic
     /// </summary>
- [HttpPost("topics/{topicId}/questions")]
-  public async Task<IActionResult> AddQuestionToTopic(int topicId, [FromBody] AddExamQuestionDto dto)
+    [HttpPost("topics/{topicId}/questions")]
+    public async Task<IActionResult> AddQuestionToTopic(int topicId, [FromBody] AddExamQuestionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.AddQuestionToTopicAsync(topicId, dto, userId);
@@ -338,7 +338,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     public async Task<IActionResult> ManualAddQuestionsToTopic(int topicId, [FromBody] ManualQuestionSelectionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-      var result = await _assessmentService.ManualAddQuestionsToTopicAsync(topicId, dto, userId);
+        var result = await _assessmentService.ManualAddQuestionsToTopicAsync(topicId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -346,12 +346,12 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// Random add questions to a topic (system randomly selects based on criteria)
     /// </summary>
     /// <remarks>
- /// Use this when you want to:
+    /// Use this when you want to:
     /// - Automatically populate a topic with random questions
     /// - Filter by category, type, or difficulty
     /// - Ensure no duplicate questions in the exam
     /// </remarks>
- [HttpPost("topics/{topicId}/questions/random")]
+    [HttpPost("topics/{topicId}/questions/random")]
     public async Task<IActionResult> RandomAddQuestionsToTopic(int topicId, [FromBody] RandomQuestionSelectionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -359,7 +359,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
- #endregion
+    #endregion
 
     #region Exam Questions
 
@@ -368,12 +368,12 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// </summary>
     [HttpGet("sections/{sectionId}/questions")]
     public async Task<IActionResult> GetSectionQuestions(int sectionId)
-  {
+    {
         var result = await _assessmentService.GetSectionQuestionsAsync(sectionId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
- /// <summary>
+    /// <summary>
     /// Add a single question to a section
     /// </summary>
     [HttpPost("sections/{sectionId}/questions")]
@@ -391,7 +391,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     public async Task<IActionResult> BulkAddQuestions(int sectionId, [FromBody] BulkAddQuestionsDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-      var result = await _assessmentService.BulkAddQuestionsToSectionAsync(sectionId, dto, userId);
+        var result = await _assessmentService.BulkAddQuestionsToSectionAsync(sectionId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -402,7 +402,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// Use this when the user wants to:
     /// - Select specific questions from the Question Bank
     /// - Define custom order for each question
-/// - Override points for specific questions
+    /// - Override points for specific questions
     /// 
     /// Example:
     /// ```json
@@ -421,7 +421,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.ManualAddQuestionsToSectionAsync(sectionId, dto, userId);
-      return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -437,7 +437,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// ```json
     /// {
     ///   "count": 10,
-///   "categoryId": 1,
+    ///   "categoryId": 1,
     ///   "questionTypeId": 1,
     ///   "difficultyLevel": 2,
     ///   "useOriginalPoints": true,
@@ -462,14 +462,14 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpPut("exam-questions/{examQuestionId}")]
     public async Task<IActionResult> UpdateExamQuestion(int examQuestionId, [FromBody] UpdateExamQuestionDto dto)
     {
-      var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.UpdateExamQuestionAsync(examQuestionId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Remove a question from an exam
-  /// </summary>
+    /// </summary>
     [HttpDelete("exam-questions/{examQuestionId}")]
     public async Task<IActionResult> RemoveQuestionFromExam(int examQuestionId)
     {
@@ -485,7 +485,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.ReorderQuestionsAsync(sectionId, reorderDtos, userId);
-  return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -498,7 +498,7 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpGet("exams/{examId}/access-policy")]
     public async Task<IActionResult> GetAccessPolicy(int examId)
     {
-   var result = await _assessmentService.GetAccessPolicyAsync(examId);
+        var result = await _assessmentService.GetAccessPolicyAsync(examId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -506,9 +506,9 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// Create or update access policy for an exam
     /// </summary>
     [HttpPut("exams/{examId}/access-policy")]
-  public async Task<IActionResult> SaveAccessPolicy(int examId, [FromBody] SaveExamAccessPolicyDto dto)
- {
-   var userId = _currentUserService.UserId ?? "system";
+    public async Task<IActionResult> SaveAccessPolicy(int examId, [FromBody] SaveExamAccessPolicyDto dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.SaveAccessPolicyAsync(examId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -543,9 +543,9 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     /// </summary>
     [HttpPut("instructions/{instructionId}")]
     public async Task<IActionResult> UpdateInstruction(int instructionId, [FromBody] SaveExamInstructionDto dto)
-  {
-    var userId = _currentUserService.UserId ?? "system";
-     var result = await _assessmentService.UpdateInstructionAsync(instructionId, dto, userId);
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _assessmentService.UpdateInstructionAsync(instructionId, dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -555,20 +555,45 @@ public async Task<IActionResult> UpdateExam(int id, [FromBody] SaveExamDto dto)
     [HttpDelete("instructions/{instructionId}")]
     public async Task<IActionResult> DeleteInstruction(int instructionId)
     {
-     var result = await _assessmentService.DeleteInstructionAsync(instructionId);
-return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _assessmentService.DeleteInstructionAsync(instructionId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Reorder instructions within an exam
     /// </summary>
     [HttpPost("exams/{examId}/instructions/reorder")]
-public async Task<IActionResult> ReorderInstructions(int examId, [FromBody] List<ReorderInstructionDto> reorderDtos)
+    public async Task<IActionResult> ReorderInstructions(int examId, [FromBody] List<ReorderInstructionDto> reorderDtos)
     {
-   var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.ReorderInstructionsAsync(examId, reorderDtos, userId);
         return result.Success ? Ok(result) : BadRequest(result);
-}
+    }
+
+    #endregion
+
+    #region Exam Builder
+
+    /// <summary>
+    /// Get exam builder configuration
+    /// </summary>
+    [HttpGet("exams/{examId}/builder")]
+    public async Task<IActionResult> GetExamBuilder(int examId)
+    {
+        var result = await _assessmentService.GetExamBuilderAsync(examId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Save exam builder configuration - replaces existing sections
+    /// </summary>
+    [HttpPut("exams/{examId}/builder")]
+    public async Task<IActionResult> SaveExamBuilder(int examId, [FromBody] SaveExamBuilderRequest dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _assessmentService.SaveExamBuilderAsync(examId, dto, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     #endregion
 }

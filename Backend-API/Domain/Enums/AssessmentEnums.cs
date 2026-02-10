@@ -17,3 +17,19 @@ public enum ExamType : byte
     /// </summary>
     Fixed = 1
 }
+
+/// <summary>
+/// Section source type for Builder - determines if section pulls questions from Subject or Topic
+/// </summary>
+public enum SectionSourceType : byte
+{
+    /// <summary>
+    /// Section pulls questions from an entire Subject (all topics)
+    /// </summary>
+    Subject = 1,
+
+    /// <summary>
+    /// Section pulls questions from a specific Topic within a Subject
+    /// </summary>
+    Topic = 2
+}
