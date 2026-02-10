@@ -17,7 +17,16 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { createQuestion } from "@/lib/api/question-bank"
-import { getQuestionCategories, getQuestionTypes, type QuestionCategory, type QuestionType } from "@/lib/api/lookups"
+import {
+  getQuestionCategories,
+  getQuestionTypes,
+  getQuestionSubjects,
+  getQuestionTopics,
+  type QuestionCategory,
+  type QuestionType,
+  type QuestionSubject,
+  type QuestionTopic,
+} from "@/lib/api/lookups"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
 import {
@@ -60,6 +69,8 @@ const CreateQuestionPage = () => {
 
   const [categories, setCategories] = useState<QuestionCategory[]>([])
   const [types, setTypes] = useState<QuestionType[]>([])
+  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
+  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [formErrors, setFormErrors] = useState<string[]>([])
@@ -69,6 +80,8 @@ const CreateQuestionPage = () => {
     bodyAr: "",
     questionTypeId: "",
     questionCategoryId: "",
+    subjectId: "",
+    topicId: "",
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
@@ -115,9 +128,33 @@ const CreateQuestionPage = () => {
     }
   }, [formErrors])
 
+  // Fetch topics when subject changes
+  useEffect(() => {
+    if (!formData.subjectId) {
+      setTopics([])
+      setFormData((prev) => ({ ...prev, topicId: "" }))
+      return
+    }
+    const fetchTopics = async () => {
+      try {
+        const res = await getQuestionTopics({ subjectId: Number(formData.subjectId), pageSize: 100 })
+        setTopics(res?.items || [])
+        setFormData((prev) => ({ ...prev, topicId: "" })) // Reset topic when subject changes
+      } catch (error) {
+        console.error("Failed to fetch topics:", error)
+        setTopics([])
+      }
+    }
+    fetchTopics()
+  }, [formData.subjectId])
+
   const fetchLookups = async () => {
     try {
-      const [categoriesRes, typesRes] = await Promise.all([getQuestionCategories(), getQuestionTypes()])
+      const [categoriesRes, typesRes, subjectsRes] = await Promise.all([
+        getQuestionCategories(),
+        getQuestionTypes(),
+        getQuestionSubjects({ pageSize: 100 }),
+      ])
 
       // Categories - response is PaginatedResponse<QuestionCategory>
       const categoriesData = categoriesRes?.items || []
@@ -127,10 +164,19 @@ const CreateQuestionPage = () => {
       const typesData = typesRes?.items || []
       setTypes(typesData)
 
+      // Subjects - response is PaginatedResponse<QuestionSubject>
+      const subjectsData = subjectsRes?.items || []
+      setSubjects(subjectsData)
+
       // Default to MCQ Single if available
       if (typesData.length > 0) {
         const mcqType = typesData.find((t) => t.id === QUESTION_TYPE.MCQ_SINGLE) || typesData[0]
         setFormData((prev) => ({ ...prev, questionTypeId: String(mcqType.id) }))
+      }
+
+      // Default to first subject if available
+      if (subjectsData.length > 0) {
+        setFormData((prev) => ({ ...prev, subjectId: String(subjectsData[0].id) }))
       }
     } catch (error) {
       console.error("[v0] Failed to fetch lookups:", error)
@@ -207,6 +253,9 @@ const CreateQuestionPage = () => {
     if (!formData.questionCategoryId) {
       errors.push("Question category is required")
     }
+    if (!formData.subjectId) {
+      errors.push("Subject is required")
+    }
 
     if (needsOptions) {
       const hasCorrectAnswer = options.some((opt) => opt.isCorrect)
@@ -269,6 +318,8 @@ const CreateQuestionPage = () => {
         bodyAr: formData.bodyAr || formData.bodyEn, // Fallback to English if Arabic is empty
         questionTypeId: Number(formData.questionTypeId),
         questionCategoryId: Number(formData.questionCategoryId),
+        subjectId: Number(formData.subjectId),
+        topicId: formData.topicId ? Number(formData.topicId) : undefined,
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
@@ -443,6 +494,67 @@ const CreateQuestionPage = () => {
                           categories.map((cat) => (
                             <SelectItem key={cat.id} value={String(cat.id)}>
                               {language === "ar" ? cat.nameAr : cat.nameEn}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Subject and Topic Row */}
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-sm font-semibold flex items-center gap-2">
+                      {language === "ar" ? "المادة" : "Subject"}
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={formData.subjectId}
+                      onValueChange={(value) => setFormData({ ...formData, subjectId: value })}
+                    >
+                      <SelectTrigger id="subject" className="border-2 h-11 w-full">
+                        <SelectValue placeholder={language === "ar" ? "اختر المادة" : "Select subject"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.length === 0 ? (
+                          <SelectItem value="none" disabled>
+                            {language === "ar" ? "لا توجد مواد" : "No subjects available"}
+                          </SelectItem>
+                        ) : (
+                          subjects.map((subject) => (
+                            <SelectItem key={subject.id} value={String(subject.id)}>
+                              {language === "ar" ? subject.nameAr : subject.nameEn}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="topic" className="text-sm font-semibold flex items-center gap-2">
+                      {language === "ar" ? "الموضوع" : "Topic"}
+                    </Label>
+                    <Select
+                      value={formData.topicId}
+                      onValueChange={(value) => setFormData({ ...formData, topicId: value })}
+                      disabled={!formData.subjectId || topics.length === 0}
+                    >
+                      <SelectTrigger id="topic" className="border-2 h-11 w-full">
+                        <SelectValue placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {topics.length === 0 ? (
+                          <SelectItem value="none" disabled>
+                            {!formData.subjectId
+                              ? (language === "ar" ? "اختر مادة أولاً" : "Select a subject first")
+                              : (language === "ar" ? "لا توجد مواضيع" : "No topics for this subject")}
+                          </SelectItem>
+                        ) : (
+                          topics.map((topic) => (
+                            <SelectItem key={topic.id} value={String(topic.id)}>
+                              {language === "ar" ? topic.nameAr : topic.nameEn}
                             </SelectItem>
                           ))
                         )}

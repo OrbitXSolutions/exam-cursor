@@ -18,4 +18,18 @@ public interface ILookupsService
     Task<ApiResponse<QuestionTypeDto>> CreateQuestionTypeAsync(CreateQuestionTypeDto dto, string createdBy);
     Task<ApiResponse<QuestionTypeDto>> UpdateQuestionTypeAsync(int id, UpdateQuestionTypeDto dto, string updatedBy);
     Task<ApiResponse<bool>> DeleteQuestionTypeAsync(int id);
+
+    // Question Subject
+    Task<ApiResponse<PaginatedResponse<QuestionSubjectDto>>> GetAllQuestionSubjectsAsync(QuestionSubjectSearchDto searchDto);
+    Task<ApiResponse<QuestionSubjectDto>> GetQuestionSubjectByIdAsync(int id);
+    Task<ApiResponse<QuestionSubjectDto>> CreateQuestionSubjectAsync(CreateQuestionSubjectDto dto, string createdBy);
+    Task<ApiResponse<QuestionSubjectDto>> UpdateQuestionSubjectAsync(int id, UpdateQuestionSubjectDto dto, string updatedBy);
+    Task<ApiResponse<bool>> DeleteQuestionSubjectAsync(int id);
+
+    // Question Topic
+    Task<ApiResponse<PaginatedResponse<QuestionTopicDto>>> GetAllQuestionTopicsAsync(QuestionTopicSearchDto searchDto);
+    Task<ApiResponse<QuestionTopicDto>> GetQuestionTopicByIdAsync(int id);
+    Task<ApiResponse<QuestionTopicDto>> CreateQuestionTopicAsync(CreateQuestionTopicDto dto, string createdBy);
+    Task<ApiResponse<QuestionTopicDto>> UpdateQuestionTopicAsync(int id, UpdateQuestionTopicDto dto, string updatedBy);
+    Task<ApiResponse<bool>> DeleteQuestionTopicAsync(int id);
 }

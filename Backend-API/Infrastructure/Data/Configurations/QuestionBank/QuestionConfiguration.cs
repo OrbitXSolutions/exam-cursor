@@ -58,6 +58,16 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
             .HasForeignKey(x => x.QuestionCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(x => x.Subject)
+            .WithMany()
+            .HasForeignKey(x => x.SubjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Topic)
+            .WithMany()
+            .HasForeignKey(x => x.TopicId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasMany(x => x.Attachments)
             .WithOne(x => x.Question)
             .HasForeignKey(x => x.QuestionId)
@@ -74,6 +84,12 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
 
         builder.HasIndex(x => x.QuestionCategoryId)
             .HasDatabaseName("IX_Questions_QuestionCategoryId");
+
+        builder.HasIndex(x => x.SubjectId)
+            .HasDatabaseName("IX_Questions_SubjectId");
+
+        builder.HasIndex(x => x.TopicId)
+            .HasDatabaseName("IX_Questions_TopicId");
 
         builder.HasIndex(x => x.DifficultyLevel)
             .HasDatabaseName("IX_Questions_DifficultyLevel");

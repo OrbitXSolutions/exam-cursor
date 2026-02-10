@@ -17,22 +17,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
-  {
+    {
     }
 
     // Core Entities
     public DbSet<Department> Departments { get; set; } = null!;
     public DbSet<MediaFile> MediaFiles { get; set; } = null!;
-    
+
     // Lookups
     public DbSet<QuestionCategory> QuestionCategories { get; set; } = null!;
     public DbSet<QuestionType> QuestionTypes { get; set; } = null!;
+    public DbSet<QuestionSubject> QuestionSubjects { get; set; } = null!;
+    public DbSet<QuestionTopic> QuestionTopics { get; set; } = null!;
 
     // QuestionBank
     public DbSet<Question> Questions { get; set; } = null!;
     public DbSet<QuestionOption> QuestionOptions { get; set; } = null!;
     public DbSet<QuestionAttachment> QuestionAttachments { get; set; } = null!;
- public DbSet<QuestionAnswerKey> QuestionAnswerKeys { get; set; } = null!;
+    public DbSet<QuestionAnswerKey> QuestionAnswerKeys { get; set; } = null!;
 
     // Assessment
     public DbSet<Exam> Exams { get; set; } = null!;
@@ -52,7 +54,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<GradingSession> GradingSessions { get; set; } = null!;
     public DbSet<GradedAnswer> GradedAnswers { get; set; } = null!;
 
- // ExamResult
+    // ExamResult
     public DbSet<Result> Results { get; set; } = null!;
     public DbSet<ExamReport> ExamReports { get; set; } = null!;
     public DbSet<QuestionPerformanceReport> QuestionPerformanceReports { get; set; } = null!;
@@ -72,11 +74,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<IncidentCase> IncidentCases { get; set; } = null!;
     public DbSet<IncidentTimelineEvent> IncidentTimelineEvents { get; set; } = null!;
     public DbSet<IncidentEvidenceLink> IncidentEvidenceLinks { get; set; } = null!;
-  public DbSet<IncidentDecisionHistory> IncidentDecisionHistory { get; set; } = null!;
+    public DbSet<IncidentDecisionHistory> IncidentDecisionHistory { get; set; } = null!;
     public DbSet<IncidentComment> IncidentComments { get; set; } = null!;
     public DbSet<AppealRequest> AppealRequests { get; set; } = null!;
 
-  // Audit
+    // Audit
     public DbSet<AuditLog> AuditLogs { get; set; } = null!;
     public DbSet<AuditRetentionPolicy> AuditRetentionPolicies { get; set; } = null!;
     public DbSet<AuditExportJob> AuditExportJobs { get; set; } = null!;
@@ -87,26 +89,26 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
-   // Apply all configurations from the current assembly
+
+        // Apply all configurations from the current assembly
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-{
-    // Auto-update timestamps for entities
+    {
+        // Auto-update timestamps for entities
         foreach (var entry in ChangeTracker.Entries<ApplicationUser>())
         {
- switch (entry.State)
-    {
+            switch (entry.State)
+            {
                 case EntityState.Added:
-      entry.Entity.CreatedDate = DateTime.UtcNow;
-         break;
-            case EntityState.Modified:
- entry.Entity.UpdatedDate = DateTime.UtcNow;
-        break;
-     }
-     }
+                    entry.Entity.CreatedDate = DateTime.UtcNow;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.UpdatedDate = DateTime.UtcNow;
+                    break;
+            }
+        }
 
         return base.SaveChangesAsync(cancellationToken);
     }

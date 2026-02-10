@@ -19,6 +19,10 @@ public class Question : BaseEntity
     public int QuestionTypeId { get; set; }
     public int QuestionCategoryId { get; set; }
 
+    // Subject & Topic (Subject required, Topic optional)
+    public int SubjectId { get; set; }
+    public int? TopicId { get; set; }
+
     // Scoring & Difficulty
     public decimal Points { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
@@ -29,6 +33,8 @@ public class Question : BaseEntity
     // Navigation Properties
     public virtual Lookups.QuestionType QuestionType { get; set; } = null!;
     public virtual Lookups.QuestionCategory QuestionCategory { get; set; } = null!;
+    public virtual Lookups.QuestionSubject Subject { get; set; } = null!;
+    public virtual Lookups.QuestionTopic? Topic { get; set; }
 
     // Collections
     public virtual ICollection<QuestionAttachment> Attachments { get; set; } = new List<QuestionAttachment>();

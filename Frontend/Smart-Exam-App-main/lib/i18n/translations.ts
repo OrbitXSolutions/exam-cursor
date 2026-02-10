@@ -88,9 +88,13 @@ export const translations = {
     nav: {
       dashboard: "Dashboard",
       exams: "Exams",
+      examCreation: "Exam Creation",
       questionBank: "Question Bank",
       questionCategories: "Question Categories",
       questionTypes: "Question Types",
+      subjects: "Subjects",
+      topics: "Topics",
+      questions: "Questions",
       attempts: "Attempts",
       grading: "Grading",
       results: "Results",
@@ -188,34 +192,45 @@ export const translations = {
       instructionsPlaceholder: "Enter instructions for candidates",
       displayOptions: "Display Options",
       displayOptionsDesc: "Configure how questions and options are displayed",
-      shuffleQuestionsDesc: "Randomize the order of questions for each candidate",
-      shuffleOptionsDesc: "Randomize the order of answer options for each question",
+      shuffleQuestionsDesc:
+        "Randomize the order of questions for each candidate",
+      shuffleOptionsDesc:
+        "Randomize the order of answer options for each question",
       showResults: "Show Results",
-      showResultsDesc: "Allow candidates to view their results after submission",
+      showResultsDesc:
+        "Allow candidates to view their results after submission",
       allowBackNavigation: "Allow Back Navigation",
-      allowBackNavigationDesc: "Allow candidates to go back to previous questions",
+      allowBackNavigationDesc:
+        "Allow candidates to go back to previous questions",
       timingSettings: "Timing & Scoring",
-      timingSettingsDesc: "Configure exam duration, passing score, and attempt limits",
+      timingSettingsDesc:
+        "Configure exam duration, passing score, and attempt limits",
       durationMinutes: "Duration (Minutes)",
       durationRange: "1-600 minutes",
       passingScorePercent: "Passing Score (%)",
       securitySettings: "Security Settings",
       securitySettingsDesc: "Configure proctoring and security options",
       requireProctoring: "Require Proctoring",
-      requireProctoringDesc: "Enable camera and screen monitoring during the exam",
+      requireProctoringDesc:
+        "Enable camera and screen monitoring during the exam",
       requireIdVerification: "Require ID Verification",
-      requireIdVerificationDesc: "Require candidates to verify their identity before starting",
+      requireIdVerificationDesc:
+        "Require candidates to verify their identity before starting",
       preventTabSwitching: "Prevent Tab Switching",
-      preventTabSwitchingDesc: "Flag or block when candidates switch browser tabs",
+      preventTabSwitchingDesc:
+        "Flag or block when candidates switch browser tabs",
       preventCopyPaste: "Prevent Copy/Paste",
-      preventCopyPasteDesc: "Disable copy and paste functionality during the exam",
+      preventCopyPasteDesc:
+        "Disable copy and paste functionality during the exam",
       createAndContinue: "Create & Add Sections",
       examType: "Exam Type",
       examTypeDesc: "Choose how candidates can start the exam",
       examTypeFlex: "Flexible",
-      examTypeFlexDesc: "Candidates can start anytime within the availability window",
+      examTypeFlexDesc:
+        "Candidates can start anytime within the availability window",
       examTypeFixed: "Fixed",
-      examTypeFixedDesc: "All candidates must start at the exact scheduled time",
+      examTypeFixedDesc:
+        "All candidates must start at the exact scheduled time",
       department: "Department",
       departmentDesc: "Select the department this exam belongs to",
       selectDepartment: "Select Department",
@@ -244,9 +259,11 @@ export const translations = {
       timeLimit: "Time Limit",
       timeLimitDesc: "You have {minutes} minutes to complete this exam",
       fullscreen: "Fullscreen Mode",
-      fullscreenDesc: "The exam will run in fullscreen mode. Exiting may be flagged.",
+      fullscreenDesc:
+        "The exam will run in fullscreen mode. Exiting may be flagged.",
       connection: "Stable Connection",
-      connectionDesc: "Ensure you have a stable internet connection throughout the exam.",
+      connectionDesc:
+        "Ensure you have a stable internet connection throughout the exam.",
       answers: "Answer Saving",
       answersDesc: "Your answers are saved automatically as you progress.",
       importantWarnings: "Important Warnings",
@@ -255,9 +272,11 @@ export const translations = {
       warning3: "Ensure your device is fully charged or plugged in",
       warning4: "Once submitted, you cannot retake the exam unless allowed",
       securityNotice: "Security Notice",
-      securityDesc1: "This exam is proctored. Your webcam and screen may be monitored.",
+      securityDesc1:
+        "This exam is proctored. Your webcam and screen may be monitored.",
       securityDesc2: "Any suspicious activity will be flagged for review.",
-      agreement: "I have read and understood all instructions and agree to follow the exam rules.",
+      agreement:
+        "I have read and understood all instructions and agree to follow the exam rules.",
       pleaseAgree: "Please agree to the terms before starting",
       startExam: "Start Exam",
       noAttemptsLeft: "You have used all available attempts for this exam.",
@@ -269,7 +288,8 @@ export const translations = {
       howItWorks: "How It Works",
       howItWorksDesc: "Follow these steps to create and publish your exams",
       noExams: "No exams yet",
-      noExamsDesc: "Create your first exam to get started with online assessments",
+      noExamsDesc:
+        "Create your first exam to get started with online assessments",
       emptyStateStep1: "Create Exam",
       emptyStateStep1Desc: "Set up basic info, timing, and settings",
       emptyStateStep2: "Add Sections & Topics",
@@ -280,7 +300,8 @@ export const translations = {
       emptyStateStep4Desc: "Make the exam available to candidates",
       watchTutorial: "Watch Tutorial",
       configuration: "Configuration",
-      deleteConfirm: "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+      deleteConfirm:
+        'Are you sure you want to delete "{title}"? This action cannot be undone.',
       publish: "Publish",
       archive: "Archive",
       // Bilingual create/edit
@@ -314,7 +335,8 @@ export const translations = {
       isActiveDesc: "Allow this exam to be accessed by candidates",
       // Builder empty states
       noSections: "No sections yet",
-      noSectionsDesc: "Add sections to organize exam questions into logical groups",
+      noSectionsDesc:
+        "Add sections to organize exam questions into logical groups",
       noQuestionsInSection: "No questions in this section yet",
       // Section dialog
       sectionDialogDesc: "Create a section to organize related questions",
@@ -327,7 +349,8 @@ export const translations = {
       sectionTimeLimit: "Time limit (minutes)",
       sectionTimeLimitDesc: "Set to 0 for no time limit for this section",
       // Topic dialog
-      topicDialogDesc: "Create a topic to organize questions within this section",
+      topicDialogDesc:
+        "Create a topic to organize questions within this section",
       topicTitleEn: "Title (English)",
       topicTitleAr: "Title (Arabic)",
       topicTitleEnPlaceholder: "Enter topic title in English",
@@ -336,7 +359,8 @@ export const translations = {
       topicDescArPlaceholder: "Enter description in Arabic",
       // Select questions
       selectQuestions: "Select Questions",
-      selectQuestionsDesc: "Choose questions from the question bank to add to this section",
+      selectQuestionsDesc:
+        "Choose questions from the question bank to add to this section",
       manualSelection: "Manual Selection",
       randomSelection: "Random Selection",
       allCategories: "All Categories",
@@ -351,20 +375,23 @@ export const translations = {
       selectAtLeastOne: "Select at least one question",
       // Quick actions (exam detail)
       quickActions: "Quick Actions",
-      quickActionsDesc: "Complete these steps to set up your exam for candidates",
+      quickActionsDesc:
+        "Complete these steps to set up your exam for candidates",
       addSectionsTopics: "Add Sections & Topics",
       notStarted: "Not started",
       scheduleExam: "Schedule Exam",
       publishExam: "Publish Exam",
       // Instructions
       noInstructions: "No instructions",
-      noInstructionsDesc: "Add instructions that candidates will see before starting the exam",
+      noInstructionsDesc:
+        "Add instructions that candidates will see before starting the exam",
       // Configuration page
       examSettings: "Exam Settings",
       examSettingsDesc: "Configure basic exam parameters",
       securitySettingsDesc: "Configure proctoring and security options",
       allowReview: "Allow Review",
-      allowReviewDesc: "Allow candidates to review their answers after submission",
+      allowReviewDesc:
+        "Allow candidates to review their answers after submission",
       showCorrectAnswers: "Show Correct Answers",
       showCorrectAnswersDesc: "Show correct answers during review",
       requiresAllowReview: "Requires 'Allow Review' to be enabled",
@@ -383,28 +410,34 @@ export const translations = {
       examInstructionsDesc: "Instructions shown to candidates before the exam",
       instructionsEn: "Instructions (English)",
       instructionsAr: "Instructions (Arabic)",
-      instructionsPlaceholderEn: "Enter instructions for candidates in English...",
-      instructionsPlaceholderAr: "Enter instructions for candidates in Arabic...",
+      instructionsPlaceholderEn:
+        "Enter instructions for candidates in English...",
+      instructionsPlaceholderAr:
+        "Enter instructions for candidates in Arabic...",
       preventScreenCapture: "Prevent Screen Capture",
-      preventScreenCaptureDesc: "Attempt to block screenshots and screen recording",
+      preventScreenCaptureDesc:
+        "Attempt to block screenshots and screen recording",
       requireWebcam: "Webcam Required",
       requireWebcamDesc: "Candidates must enable webcam during the exam",
       requireFullscreen: "Fullscreen Required",
       requireFullscreenDesc: "Enforce fullscreen mode during the exam",
       browserLockdown: "Browser Lockdown",
-      browserLockdownDesc: "Restrict browser features (requires lockdown browser)",
+      browserLockdownDesc:
+        "Restrict browser features (requires lockdown browser)",
       notFound: "Exam not found",
       editSection: "Edit Section",
       // Publish dialogs
       publishConfirmTitle: "Publish Exam?",
-      publishConfirmDesc: "Are you sure you want to publish this exam? Once published, candidates will be able to take it.",
+      publishConfirmDesc:
+        "Are you sure you want to publish this exam? Once published, candidates will be able to take it.",
       publishConfirm: "Yes, Publish",
       publishCancel: "Cancel",
       publishSuccessTitle: "Exam Published!",
       publishSuccessDesc: "The exam is now available for candidates to take.",
       publishErrorTitle: "Publish Failed",
       publishErrorDesc: "Failed to publish the exam. Please try again.",
-      passScoreExceedsTotalPoints: "Pass score ({passScore}) cannot exceed exam total points ({totalPoints}). Please update pass score in exam settings.",
+      passScoreExceedsTotalPoints:
+        "Pass score ({passScore}) cannot exceed exam total points ({totalPoints}). Please update pass score in exam settings.",
       publishSuccess: "Exam published successfully",
     },
 
@@ -420,9 +453,11 @@ export const translations = {
       timeLimit: "Time Limit",
       timeLimitDesc: "You have {minutes} minutes to complete this exam",
       fullscreen: "Fullscreen Mode",
-      fullscreenDesc: "The exam will run in fullscreen mode. Exiting may be flagged.",
+      fullscreenDesc:
+        "The exam will run in fullscreen mode. Exiting may be flagged.",
       connection: "Stable Connection",
-      connectionDesc: "Ensure you have a stable internet connection throughout the exam.",
+      connectionDesc:
+        "Ensure you have a stable internet connection throughout the exam.",
       answers: "Answer Saving",
       answersDesc: "Your answers are saved automatically as you progress.",
       importantWarnings: "Important Warnings",
@@ -431,15 +466,18 @@ export const translations = {
       warning3: "Ensure your device is fully charged or plugged in",
       warning4: "Once submitted, you cannot retake the exam unless allowed",
       securityNotice: "Security Notice",
-      securityDesc1: "This exam is proctored. Your webcam and screen may be monitored.",
+      securityDesc1:
+        "This exam is proctored. Your webcam and screen may be monitored.",
       securityDesc2: "Any suspicious activity will be flagged for review.",
-      agreement: "I have read and understood all instructions and agree to follow the exam rules.",
+      agreement:
+        "I have read and understood all instructions and agree to follow the exam rules.",
       pleaseAgree: "Please agree to the terms before starting",
       startExam: "Start Exam",
       examInstructions: "Exam Instructions",
       noAttemptsLeft: "Cannot Start Exam",
       examLanguage: "Exam language",
-      examLanguageDesc: "Choose the language for the exam interface and questions.",
+      examLanguageDesc:
+        "Choose the language for the exam interface and questions.",
       english: "English",
       arabic: "Arabic",
     },
@@ -462,14 +500,17 @@ export const translations = {
       timeRemaining: "Time remaining",
       typeAnswer: "Type your answer here...",
       confirmSubmit: "Submit Exam?",
-      confirmSubmitDesc: "Are you sure you want to submit? You cannot change your answers after submission.",
+      confirmSubmitDesc:
+        "Are you sure you want to submit? You cannot change your answers after submission.",
       answered: "Answered",
       flaggedQuestions: "{count} flagged questions",
       unansweredWarning: "{count} unanswered questions",
       confirmAndSubmit: "Confirm & Submit",
       submitted: "Exam submitted successfully",
-      timeExpired: "Time has expired! Your exam will be submitted automatically.",
-      tabSwitchWarning: "Warning: Tab switching detected. This will be recorded.",
+      timeExpired:
+        "Time has expired! Your exam will be submitted automatically.",
+      tabSwitchWarning:
+        "Warning: Tab switching detected. This will be recorded.",
       copyPasteBlocked: "Copy/paste is not allowed during this exam.",
       sectionTimeExpired: "Section time has expired. Moving to next section.",
       cannotGoBack: "You cannot go back to previous sections.",
@@ -502,7 +543,8 @@ export const translations = {
       regrade: "Regrade",
       submittedAt: "Submitted At",
       noSubmissions: "No submissions to grade",
-      noSubmissionsDesc: "There are no exam submissions requiring manual grading. New submissions will appear here when candidates complete exams with essay or open-ended questions.",
+      noSubmissionsDesc:
+        "There are no exam submissions requiring manual grading. New submissions will appear here when candidates complete exams with essay or open-ended questions.",
       questionsGraded: "Questions graded",
       finalize: "Finalize Grading",
       candidateAnswer: "Candidate Answer",
@@ -516,7 +558,8 @@ export const translations = {
       gradeSaved: "Grade saved",
       finalized: "Grading finalized. Score: {score}",
       finalizeConfirm: "Finalize grading?",
-      finalizeConfirmDesc: "This will submit all grades and the candidate will see their final result. You cannot change grades after finalizing.",
+      finalizeConfirmDesc:
+        "This will submit all grades and the candidate will see their final result. You cannot change grades after finalizing.",
     },
 
     // Results
@@ -554,14 +597,18 @@ export const translations = {
       // New keys for candidate results page
       calculating: "Calculating your results...",
       notAvailable: "Results Not Available",
-      notAvailableDesc: "The results for this exam are not yet available. Please check back later.",
+      notAvailableDesc:
+        "The results for this exam are not yet available. Please check back later.",
       submittedSuccessfully: "Exam Submitted Successfully",
-      submittedDesc: "Your answers have been recorded. Results will be available once grading is complete.",
+      submittedDesc:
+        "Your answers have been recorded. Results will be available once grading is complete.",
       resultsHidden: "Results Hidden",
-      resultsHiddenDesc: "Results for this exam are hidden. Contact your instructor for more information.",
+      resultsHiddenDesc:
+        "Results for this exam are hidden. Contact your instructor for more information.",
       tryAgain: "Keep Trying!",
       passedMessage: "You have successfully passed this exam.",
-      failedMessage: "You did not achieve the passing score. You may try again if attempts remain.",
+      failedMessage:
+        "You did not achieve the passing score. You may try again if attempts remain.",
       totalScore: "Total Score",
       maxScore: "Max Score",
       submittedAt: "Submitted At",
@@ -569,7 +616,8 @@ export const translations = {
       share: "Share",
       timeTaken: "Time Taken",
       reviewAnswers: "Review Your Answers",
-      reviewWithCorrectAnswers: "View your answers with correct solutions highlighted",
+      reviewWithCorrectAnswers:
+        "View your answers with correct solutions highlighted",
       reviewWithoutCorrectAnswers: "View your submitted answers",
       viewDetailedReview: "View Detailed Review",
       submissionDetails: "Submission Details",
@@ -578,7 +626,8 @@ export const translations = {
       status: "Status",
       reviewTitle: "Answer Review",
       reviewNotAllowed: "Review Not Available",
-      reviewNotAllowedDesc: "Review is not allowed for this exam or results are not yet available.",
+      reviewNotAllowedDesc:
+        "Review is not allowed for this exam or results are not yet available.",
       backToResults: "Back to Results",
       questionList: "Questions",
       yourAnswer: "Your Answer",
@@ -647,7 +696,8 @@ export const translations = {
       send: "Send",
       warningSent: "Warning sent successfully",
       terminateSessionTitle: "Terminate Session",
-      terminateSessionDesc: "This will end the exam for the candidate immediately",
+      terminateSessionDesc:
+        "This will end the exam for the candidate immediately",
       terminateReasonPlaceholder: "Enter reason for termination...",
       terminate: "Terminate",
       sessionTerminated: "Session terminated",
@@ -687,7 +737,8 @@ export const translations = {
       pendingReview: "Pending Review",
       reviewed: "Reviewed",
       noIncidentsFound: "No incidents found",
-      noIncidentsFoundDesc: "There are no incidents matching your filters. Try adjusting the search or filter criteria.",
+      noIncidentsFoundDesc:
+        "There are no incidents matching your filters. Try adjusting the search or filter criteria.",
       incidentType: "Incident Type",
       timestamp: "Timestamp",
       incidentReviewed: "Incident reviewed successfully",
@@ -928,9 +979,13 @@ export const translations = {
     nav: {
       dashboard: "لوحة التحكم",
       exams: "الاختبارات",
+      examCreation: "إنشاء اختبار",
       questionBank: "بنك الأسئلة",
       questionCategories: "فئات الأسئلة",
       questionTypes: "أنواع الأسئلة",
+      subjects: "المواد",
+      topics: "المواضيع",
+      questions: "الأسئلة",
       attempts: "المحاولات",
       grading: "التصحيح",
       results: "النتائج",
@@ -1046,7 +1101,8 @@ export const translations = {
       requireIdVerification: "تتطلب التحقق من الهوية",
       requireIdVerificationDesc: "تتطلب من المرشحين التحقق من هويتهم قبل البدء",
       preventTabSwitching: "منع تبديل التبويبات",
-      preventTabSwitchingDesc: "تمييز أو حظر عند تبديل المرشحين لتبويبات المتصفح",
+      preventTabSwitchingDesc:
+        "تمييز أو حظر عند تبديل المرشحين لتبويبات المتصفح",
       preventCopyPaste: "منع النسخ/اللصق",
       preventCopyPasteDesc: "تعطيل وظيفة النسخ واللصق أثناء الاختبار",
       createAndContinue: "إنشاء وإضافة الأقسام",
@@ -1098,7 +1154,8 @@ export const translations = {
       startAt: "تاريخ ووقت البدء",
       endAt: "تاريخ ووقت الانتهاء",
       availabilityWindow: "نافذة التوفر",
-      availabilityWindowDesc: "الفترة الزمنية التي يمكن للمرشحين الوصول فيها لهذا الاختبار",
+      availabilityWindowDesc:
+        "الفترة الزمنية التي يمكن للمرشحين الوصول فيها لهذا الاختبار",
       // Active state
       isActive: "نشط",
       isActiveDesc: "السماح بالوصول لهذا الاختبار من قبل المرشحين",
@@ -1110,7 +1167,8 @@ export const translations = {
       // Pass Score
       passScorePoints: "درجة النجاح (النقاط)",
       passScoreHint: "يجب أن تكون أقل من أو تساوي إجمالي نقاط الاختبار",
-      passScoreExceedsTotalPoints: "درجة النجاح ({passScore}) لا يمكن أن تتجاوز إجمالي نقاط الاختبار ({totalPoints}). يرجى تحديث درجة النجاح في إعدادات الاختبار.",
+      passScoreExceedsTotalPoints:
+        "درجة النجاح ({passScore}) لا يمكن أن تتجاوز إجمالي نقاط الاختبار ({totalPoints}). يرجى تحديث درجة النجاح في إعدادات الاختبار.",
       // Empty state
       noExams: "لا توجد اختبارات بعد",
       noExamsDesc: "أنشئ أول اختبار للبدء في التقييمات عبر الإنترنت",
@@ -1126,7 +1184,8 @@ export const translations = {
       // Builder
       builder: "منشئ الاختبار",
       builderSubtitle: "أضف الأقسام والمواضيع والأسئلة إلى اختبارك",
-      securityConfiguredLater: "يمكن تكوين إعدادات الأمان بعد إنشاء الاختبار في منشئ الاختبار",
+      securityConfiguredLater:
+        "يمكن تكوين إعدادات الأمان بعد إنشاء الاختبار في منشئ الاختبار",
       // Sections
       noSections: "لا توجد أقسام بعد",
       noSectionsDesc: "أضف أقسام لتنظيم أسئلة الاختبار في مجموعات منطقية",
@@ -1143,7 +1202,8 @@ export const translations = {
       sectionDescArPlaceholder: "أدخل الوصف بالعربية",
       sectionTimeLimit: "الحد الزمني (بالدقائق)",
       sectionTimeLimitDesc: "اتركه 0 لعدم وجود حد زمني لهذا القسم",
-      deleteSectionConfirm: "هل أنت متأكد من حذف هذا القسم؟ سيتم إزالة جميع الأسئلة من الاختبار.",
+      deleteSectionConfirm:
+        "هل أنت متأكد من حذف هذا القسم؟ سيتم إزالة جميع الأسئلة من الاختبار.",
       noQuestionsInSection: "لم تتم إضافة أسئلة بعد",
       selectQuestions: "اختيار الأسئلة",
       selectQuestionsDesc: "اختر الأسئلة من بنك الأسئلة لإضافتها إلى هذا القسم",
@@ -1176,7 +1236,8 @@ export const translations = {
       topicTitleArPlaceholder: "أدخل عنوان الموضوع بالعربية",
       topicDescEnPlaceholder: "أدخل الوصف بالإنجليزية",
       topicDescArPlaceholder: "أدخل الوصف بالعربية",
-      deleteTopicConfirm: "هل أنت متأكد من حذف هذا الموضوع؟ سيتم إزالة جميع الأسئلة من هذا الموضوع.",
+      deleteTopicConfirm:
+        "هل أنت متأكد من حذف هذا الموضوع؟ سيتم إزالة جميع الأسئلة من هذا الموضوع.",
       noTopics: "لا توجد مواضيع في هذا القسم",
       noTopicsDesc: "أضف مواضيع لتنظيم الأسئلة داخل هذا القسم",
       // Actions
@@ -1186,7 +1247,8 @@ export const translations = {
       archiveError: "فشل في أرشفة الاختبار",
       deleteSuccess: "تم حذف الاختبار بنجاح",
       deleteError: "فشل في حذف الاختبار",
-      deleteConfirm: "هل أنت متأكد من حذف هذا الاختبار؟ لا يمكن التراجع عن هذا الإجراء.",
+      deleteConfirm:
+        "هل أنت متأكد من حذف هذا الاختبار؟ لا يمكن التراجع عن هذا الإجراء.",
       archive: "أرشفة",
       passingScore: "درجة النجاح",
       addInstruction: "إضافة تعليمات",
@@ -1243,7 +1305,8 @@ export const translations = {
       instructionsPlaceholderAr: "أدخل التعليمات للمرشحين بالعربية...",
       // Publish Dialog
       publishConfirmTitle: "نشر الاختبار",
-      publishConfirmDesc: "هل أنت متأكد من نشر هذا الاختبار؟ بمجرد النشر، سيتمكن المرشحون من أدائه.",
+      publishConfirmDesc:
+        "هل أنت متأكد من نشر هذا الاختبار؟ بمجرد النشر، سيتمكن المرشحون من أدائه.",
       publishConfirm: "نعم، انشر",
       publishCancel: "إلغاء",
       publishSuccessTitle: "تم نشر الاختبار!",
@@ -1254,7 +1317,8 @@ export const translations = {
       shuffleQuestions: "خلط الأسئلة",
       shuffleQuestionsDesc: "ترتيب عشوائي للأسئلة لكل مرشح",
       shuffleOptions: "خلط الخيارات",
-      shuffleOptionsDesc: "ترتيب عشوائي لخيارات الإجابة لأسئلة الاختيار المتعدد",
+      shuffleOptionsDesc:
+        "ترتيب عشوائي لخيارات الإجابة لأسئلة الاختيار المتعدد",
       showResults: "عرض النتائج",
       showResultsDesc: "السماح للمرشحين برؤية نتائجهم بعد التقديم",
       allowReview: "السماح بالمراجعة",
@@ -1264,7 +1328,8 @@ export const translations = {
       requiresAllowReview: "يتطلب تفعيل 'السماح بالمراجعة'",
       // Security Descriptions
       requireProctoring: "المراقبة مطلوبة",
-      requireProctoringDesc: "تمكين المراقبة الحية أو بالذكاء الاصطناعي لهذا الاختبار",
+      requireProctoringDesc:
+        "تمكين المراقبة الحية أو بالذكاء الاصطناعي لهذا الاختبار",
       requireIdVerification: "التحقق من الهوية مطلوب",
       requireIdVerificationDesc: "طلب من المرشحين التحقق من هويتهم قبل البدء",
       preventCopyPaste: "منع النسخ/اللصق",
@@ -1292,7 +1357,8 @@ export const translations = {
       accessCodeDesc: "طلب من المرشحين إدخال رمز للوصول إلى الاختبار",
       accessCodePlaceholder: "مثال: EXAM2026",
       restrictToAssigned: "تقييد المعينين",
-      restrictToAssignedDesc: "فقط المرشحون المعينون يمكنهم الوصول إلى هذا الاختبار",
+      restrictToAssignedDesc:
+        "فقط المرشحون المعينون يمكنهم الوصول إلى هذا الاختبار",
       notFound: "الاختبار غير موجود",
     },
 
@@ -1365,7 +1431,8 @@ export const translations = {
       previousQuestion: "السابق",
       nextQuestion: "التالي",
       submitConfirmTitle: "إرسال الاختبار؟",
-      submitConfirmMessage: "هل أنت متأكد من إرسال الاختبار؟ لا يمكن التراجع عن هذا الإجراء.",
+      submitConfirmMessage:
+        "هل أنت متأكد من إرسال الاختبار؟ لا يمكن التراجع عن هذا الإجراء.",
       unansweredWarning: "لديك أسئلة غير مجاب عليها.",
       systemCheck: "فحص النظام",
       checkCamera: "فحص الكاميرا",
@@ -1395,7 +1462,8 @@ export const translations = {
       timeLimit: "الحد الزمني",
       timeLimitDesc: "لديك {minutes} دقيقة لإكمال هذا الاختبار",
       fullscreen: "وضع ملء الشاشة",
-      fullscreenDesc: "سيتم تشغيل الاختبار في وضع ملء الشاشة. الخروج قد يتم تسجيله.",
+      fullscreenDesc:
+        "سيتم تشغيل الاختبار في وضع ملء الشاشة. الخروج قد يتم تسجيله.",
       connection: "اتصال مستقر",
       connectionDesc: "تأكد من أن لديك اتصال إنترنت مستقر طوال الاختبار.",
       answers: "حفظ الإجابات",
@@ -1408,7 +1476,8 @@ export const translations = {
       securityNotice: "إشعار أمني",
       securityDesc1: "هذا الاختبار مراقب. قد تتم مراقبة كاميرا الويب والشاشة.",
       securityDesc2: "سيتم الإبلاغ عن أي نشاط مشبوه للمراجعة.",
-      agreement: "لقد قرأت وفهمت جميع التعليمات وأوافق على اتباع قواعد الاختبار.",
+      agreement:
+        "لقد قرأت وفهمت جميع التعليمات وأوافق على اتباع قواعد الاختبار.",
       pleaseAgree: "يرجى الموافقة على الشروط قبل البدء",
       startExam: "بدء الاختبار",
       examInstructions: "تعليمات الاختبار",
@@ -1437,7 +1506,8 @@ export const translations = {
       timeRemaining: "الوقت المتبقي",
       typeAnswer: "اكتب إجابتك هنا...",
       confirmSubmit: "إرسال الاختبار؟",
-      confirmSubmitDesc: "هل أنت متأكد من الإرسال؟ لا يمكنك تغيير إجاباتك بعد الإرسال.",
+      confirmSubmitDesc:
+        "هل أنت متأكد من الإرسال؟ لا يمكنك تغيير إجاباتك بعد الإرسال.",
       answered: "تمت الإجابة",
       flaggedQuestions: "{count} أسئلة محددة",
       unansweredWarning: "{count} أسئلة غير مجاب عليها",
@@ -1477,7 +1547,8 @@ export const translations = {
       regrade: "إعادة التصحيح",
       submittedAt: "تاريخ التسليم",
       noSubmissions: "لا توجد إجابات للتصحيح",
-      noSubmissionsDesc: "لا توجد إجابات اختبار تحتاج تصحيحاً يدوياً. ستظهر الإجابات الجديدة هنا عندما يكمل المرشحون اختبارات تحتوي على أسئلة مقالية أو مفتوحة.",
+      noSubmissionsDesc:
+        "لا توجد إجابات اختبار تحتاج تصحيحاً يدوياً. ستظهر الإجابات الجديدة هنا عندما يكمل المرشحون اختبارات تحتوي على أسئلة مقالية أو مفتوحة.",
       questionsGraded: "أسئلة مصححة",
       finalize: "إتمام التصحيح",
       candidateAnswer: "إجابة المرشح",
@@ -1491,7 +1562,8 @@ export const translations = {
       gradeSaved: "تم حفظ الدرجة",
       finalized: "تم إتمام التصحيح. الدرجة: {score}",
       finalizeConfirm: "إتمام التصحيح؟",
-      finalizeConfirmDesc: "سيتم إرسال جميع الدرجات وسيرى المرشح نتيجته النهائية. لا يمكن تغيير الدرجات بعد الإتمام.",
+      finalizeConfirmDesc:
+        "سيتم إرسال جميع الدرجات وسيرى المرشح نتيجته النهائية. لا يمكن تغيير الدرجات بعد الإتمام.",
     },
 
     // Results
@@ -1531,12 +1603,15 @@ export const translations = {
       notAvailable: "النتائج غير متاحة",
       notAvailableDesc: "نتائج هذا الاختبار غير متاحة بعد. يرجى التحقق لاحقاً.",
       submittedSuccessfully: "تم تقديم الاختبار بنجاح",
-      submittedDesc: "تم تسجيل إجاباتك. ستكون النتائج متاحة بعد اكتمال التصحيح.",
+      submittedDesc:
+        "تم تسجيل إجاباتك. ستكون النتائج متاحة بعد اكتمال التصحيح.",
       resultsHidden: "النتائج مخفية",
-      resultsHiddenDesc: "نتائج هذا الاختبار مخفية. تواصل مع مدرسك للمزيد من المعلومات.",
+      resultsHiddenDesc:
+        "نتائج هذا الاختبار مخفية. تواصل مع مدرسك للمزيد من المعلومات.",
       tryAgain: "حاول مرة أخرى!",
       passedMessage: "لقد اجتزت هذا الاختبار بنجاح.",
-      failedMessage: "لم تحقق درجة النجاح المطلوبة. يمكنك المحاولة مرة أخرى إذا كانت هناك محاولات متبقية.",
+      failedMessage:
+        "لم تحقق درجة النجاح المطلوبة. يمكنك المحاولة مرة أخرى إذا كانت هناك محاولات متبقية.",
       totalScore: "مجموع الدرجات",
       maxScore: "الدرجة القصوى",
       submittedAt: "تاريخ التقديم",
@@ -1553,7 +1628,8 @@ export const translations = {
       status: "الحالة",
       reviewTitle: "مراجعة الإجابات",
       reviewNotAllowed: "المراجعة غير متاحة",
-      reviewNotAllowedDesc: "المراجعة غير مسموح بها لهذا الاختبار أو النتائج غير متاحة بعد.",
+      reviewNotAllowedDesc:
+        "المراجعة غير مسموح بها لهذا الاختبار أو النتائج غير متاحة بعد.",
       backToResults: "العودة للنتائج",
       questionList: "الأسئلة",
       yourAnswer: "إجابتك",
@@ -1662,7 +1738,8 @@ export const translations = {
       pendingReview: "قيد المراجعة",
       reviewed: "تمت المراجعة",
       noIncidentsFound: "لم يتم العثور على حوادث",
-      noIncidentsFoundDesc: "لا توجد حوادث تطابق الفلاتر. جرّب تغيير معايير البحث أو الفلترة.",
+      noIncidentsFoundDesc:
+        "لا توجد حوادث تطابق الفلاتر. جرّب تغيير معايير البحث أو الفلترة.",
       incidentType: "نوع الحادثة",
       timestamp: "الوقت",
       incidentReviewed: "تمت مراجعة الحادثة بنجاح",
@@ -1758,7 +1835,7 @@ export const translations = {
       serverError: "خطأ في الخادم. يرجى المحاولة لاحقاً.",
     },
   },
-}
+};
 
-export type Language = "en" | "ar"
-export type TranslationKey = keyof typeof translations.en
+export type Language = "en" | "ar";
+export type TranslationKey = keyof typeof translations.en;

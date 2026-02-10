@@ -36,6 +36,9 @@ import {
   Monitor,
   UserCheck,
   Layers,
+  Hash,
+  Library,
+  PlusSquare,
 } from "lucide-react"
 
 interface NavItem {
@@ -76,29 +79,29 @@ const candidateNavItems: NavItem[] = [
   },
 ]
 
+const questionBankNavGroup: NavGroup = {
+  icon: Library,
+  labelKey: "nav.questionBank",
+  roles: [UserRole.Admin, UserRole.Instructor],
+  children: [
+    { icon: BookOpen, labelKey: "nav.subjects", href: "/lookups/subjects" },
+    { icon: Hash, labelKey: "nav.topics", href: "/lookups/topics" },
+    { icon: ListTree, labelKey: "nav.questionTypes", href: "/lookups/question-types" },
+    { icon: FileQuestion, labelKey: "nav.questions", href: "/question-bank" },
+  ],
+}
+
 const instructorNavItems: NavItem[] = [
-  {
-    icon: FileQuestion,
-    labelKey: "nav.questionBank",
-    href: "/question-bank",
-    roles: [UserRole.Admin, UserRole.Instructor],
-  },
-  {
-    icon: FolderTree,
-    labelKey: "nav.questionCategories",
-    href: "/lookups/question-categories",
-    roles: [UserRole.Admin],
-  },
-  {
-    icon: ListTree,
-    labelKey: "nav.questionTypes",
-    href: "/lookups/question-types",
-    roles: [UserRole.Admin],
-  },
   {
     icon: ClipboardList,
     labelKey: "nav.exams",
     href: "/exams",
+    roles: [UserRole.Admin, UserRole.Instructor],
+  },
+  {
+    icon: PlusSquare,
+    labelKey: "nav.examCreation",
+    href: "/exams/setup",
     roles: [UserRole.Admin, UserRole.Instructor],
   },
   {
@@ -171,7 +174,7 @@ const adminNavItems: NavItem[] = [
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ result: true, proctor: true })
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ questionBank: true, result: true, proctor: true })
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
@@ -328,6 +331,18 @@ export function Sidebar() {
                 {filterByRole(candidateNavItems).map((item) => (
                   <NavLink key={item.href} item={item} />
                 ))}
+              </>
+            )}
+
+            {/* Question Bank (expandable) */}
+            {showGroup(questionBankNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "بنك الأسئلة" : "Question Bank"}
+                  </div>
+                )}
+                <NavGroupBlock group={questionBankNavGroup} groupKey="questionBank" />
               </>
             )}
 
