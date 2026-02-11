@@ -25,7 +25,7 @@ public class CandidateController : ControllerBase
 
     #region Exam Discovery & Preview
 
-  /// <summary>
+    /// <summary>
     /// Get all available exams (published + active)
     /// If user is in Candidate role and has no department => list all exams
     /// If user is in Candidate role and has department => list all exams (candidates can take any exam)
@@ -36,9 +36,9 @@ public class CandidateController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
-  {
-          return Unauthorized();
-      }
+        {
+            return Unauthorized();
+        }
 
         var result = await _candidateService.GetAvailableExamsAsync(candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -46,7 +46,7 @@ public class CandidateController : ControllerBase
 
     /// <summary>
     /// Get exam preview with instructions, access policy, and eligibility check
- /// Returns: { canStartNow, reasons[], attemptInfo, instructions, securitySettings }
+    /// Returns: { canStartNow, reasons[], attemptInfo, instructions, securitySettings }
     /// </summary>
     [HttpGet("exams/{examId}/preview")]
     public async Task<IActionResult> GetExamPreview(int examId)
@@ -54,16 +54,16 @@ public class CandidateController : ControllerBase
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-       return Unauthorized();
+            return Unauthorized();
         }
 
- var result = await _candidateService.GetExamPreviewAsync(examId, candidateId);
+        var result = await _candidateService.GetExamPreviewAsync(examId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
 
-  #region Start & Resume Exam
+    #region Start & Resume Exam
 
     /// <summary>
     /// Start a new attempt or resume an existing active attempt
@@ -75,8 +75,8 @@ public class CandidateController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
-     {
-  return Unauthorized();
+        {
+            return Unauthorized();
         }
 
         var result = await _candidateService.StartExamAsync(examId, request, candidateId);
@@ -93,18 +93,18 @@ public class CandidateController : ControllerBase
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-     return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _candidateService.GetAttemptSessionAsync(attemptId, candidateId);
-    return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
 
     #region Save Answers & Submit
 
-/// <summary>
+    /// <summary>
     /// Bulk save answers (idempotent) - updates existing or creates new
     /// Request: { answers: [{ questionId, selectedOptionIds?, textAnswer? }] }
     /// </summary>
@@ -113,9 +113,9 @@ public class CandidateController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
- {
-      return Unauthorized();
-     }
+        {
+            return Unauthorized();
+        }
 
         var result = await _candidateService.SaveAnswersAsync(attemptId, request, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -131,11 +131,11 @@ public class CandidateController : ControllerBase
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-  return Unauthorized();
+            return Unauthorized();
         }
 
-      var result = await _candidateService.SubmitAttemptAsync(attemptId, candidateId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _candidateService.SubmitAttemptAsync(attemptId, candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -149,13 +149,13 @@ public class CandidateController : ControllerBase
     /// - showResults=true => includes scores and pass/fail status
     /// Only returns published results
     /// </summary>
-  [HttpGet("results/my-result/{attemptId}")]
+    [HttpGet("results/my-result/{attemptId}")]
     public async Task<IActionResult> GetMyResult(int attemptId)
     {
         var candidateId = _currentUserService.UserId;
- if (string.IsNullOrEmpty(candidateId))
+        if (string.IsNullOrEmpty(candidateId))
         {
- return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _candidateService.GetMyResultAsync(attemptId, candidateId);
@@ -172,13 +172,13 @@ public class CandidateController : ControllerBase
     [HttpGet("results/my-result/{attemptId}/review")]
     public async Task<IActionResult> GetMyResultReview(int attemptId)
     {
-  var candidateId = _currentUserService.UserId;
-   if (string.IsNullOrEmpty(candidateId))
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
         {
-       return Unauthorized();
+            return Unauthorized();
         }
 
-      var result = await _candidateService.GetMyResultReviewAsync(attemptId, candidateId);
+        var result = await _candidateService.GetMyResultReviewAsync(attemptId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -187,21 +187,42 @@ public class CandidateController : ControllerBase
     #region Dashboard
 
     /// <summary>
-  /// Get comprehensive dashboard with all statistics and information
+    /// Get comprehensive dashboard with all statistics and information
     /// Returns: Welcome info, statistics cards, exams by status, quick actions, upcoming exams, recent activity
     /// </summary>
     [HttpGet("dashboard")]
     public async Task<IActionResult> GetDashboard()
     {
-      var candidateId = _currentUserService.UserId;
- if (string.IsNullOrEmpty(candidateId))
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
         {
-  return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _candidateService.GetDashboardAsync(candidateId);
-  return result.Success ? Ok(result) : BadRequest(result);
-  }
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    #endregion
+
+    #region Exam Journey
+
+    /// <summary>
+    /// Get exam journey - single endpoint for candidate landing page
+    /// Returns: Primary action + exams grouped by journey stage
+    /// </summary>
+    [HttpGet("journey")]
+    public async Task<IActionResult> GetExamJourney()
+    {
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _candidateService.GetExamJourneyAsync(candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     #endregion
 }

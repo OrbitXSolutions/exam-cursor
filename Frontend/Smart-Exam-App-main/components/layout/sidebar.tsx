@@ -39,6 +39,7 @@ import {
   Hash,
   Library,
   PlusSquare,
+  List,
 } from "lucide-react"
 
 interface NavItem {
@@ -91,19 +92,18 @@ const questionBankNavGroup: NavGroup = {
   ],
 }
 
+const examsNavGroup: NavGroup = {
+  icon: ClipboardList,
+  labelKey: "nav.exams",
+  roles: [UserRole.Admin, UserRole.Instructor],
+  children: [
+    { icon: ClipboardList, labelKey: "nav.exams", href: "/exams" },
+    { icon: PlusSquare, labelKey: "nav.createExam", href: "/exams/setup" },
+    { icon: List, labelKey: "nav.examsList", href: "/exams/list" },
+  ],
+}
+
 const instructorNavItems: NavItem[] = [
-  {
-    icon: ClipboardList,
-    labelKey: "nav.exams",
-    href: "/exams",
-    roles: [UserRole.Admin, UserRole.Instructor],
-  },
-  {
-    icon: PlusSquare,
-    labelKey: "nav.examCreation",
-    href: "/exams/setup",
-    roles: [UserRole.Admin, UserRole.Instructor],
-  },
   {
     icon: GraduationCap,
     labelKey: "nav.grading",
@@ -174,7 +174,7 @@ const adminNavItems: NavItem[] = [
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ questionBank: true, result: true, proctor: true })
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ questionBank: true, exams: true, result: true, proctor: true })
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
@@ -346,7 +346,19 @@ export function Sidebar() {
               </>
             )}
 
-            {/* Instructor Nav */}
+            {/* Exams Group (expandable) */}
+            {showGroup(examsNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "الاختبارات" : "Exams"}
+                  </div>
+                )}
+                <NavGroupBlock group={examsNavGroup} groupKey="exams" />
+              </>
+            )}
+
+            {/* Instructor Nav (Grading, Reports) */}
             {filterByRole(instructorNavItems).length > 0 && (
               <>
                 {!isCollapsed && (

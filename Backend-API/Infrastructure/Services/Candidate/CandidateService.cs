@@ -38,19 +38,19 @@ public class CandidateService : ICandidateService
 
     public async Task<ApiResponse<List<CandidateExamListDto>>> GetAvailableExamsAsync(string candidateId)
     {
-   var now = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
 
         // Get user and check role
-    var user = await _userManager.FindByIdAsync(candidateId);
-    if (user == null)
-  {
-         return ApiResponse<List<CandidateExamListDto>>.FailureResponse("User not found");
+        var user = await _userManager.FindByIdAsync(candidateId);
+        if (user == null)
+        {
+            return ApiResponse<List<CandidateExamListDto>>.FailureResponse("User not found");
         }
 
         var roles = await _userManager.GetRolesAsync(user);
         var isCandidate = roles.Contains(AppRoles.Candidate);
 
-     // Build query for published + active exams
+        // Build query for published + active exams
         var query = _context.Exams
           .Include(e => e.Department)
  .Include(e => e.Sections.Where(s => !s.IsDeleted))
@@ -59,7 +59,7 @@ public class CandidateService : ICandidateService
 
         // Department filtering logic:
         // - If user is Candidate role AND has no department => list all exams (no filter)
-// - If user is Candidate role AND has department => still list all exams (candidates can take any exam)
+        // - If user is Candidate role AND has department => still list all exams (candidates can take any exam)
         // - If user is NOT Candidate role => filter by user's department
         if (!isCandidate && user.DepartmentId.HasValue)
         {
@@ -113,49 +113,49 @@ public class CandidateService : ICandidateService
             .Select(r => r.AttemptId)
             .ToHashSet();
 
- var dtos = exams.Select(e =>
-        {
-            var allQuestions = e.Sections.SelectMany(s => s.Questions);
-    
-         // Get attempt count for this exam
-         attemptCounts.TryGetValue(e.Id, out var myAttemptCount);
+        var dtos = exams.Select(e =>
+               {
+                   var allQuestions = e.Sections.SelectMany(s => s.Questions);
 
-         // Get latest attempt for this exam
-         latestAttempts.TryGetValue(e.Id, out var latestAttempt);
+                   // Get attempt count for this exam
+                   attemptCounts.TryGetValue(e.Id, out var myAttemptCount);
 
-         // Get published result for this exam (only published results are visible to candidates)
-         publishedByExam.TryGetValue(e.Id, out var publishedResult);
+                   // Get latest attempt for this exam
+                   latestAttempts.TryGetValue(e.Id, out var latestAttempt);
 
-          return new CandidateExamListDto
-          {
-         Id = e.Id,
-   ExamType = e.ExamType,
-       TitleEn = e.TitleEn,
-  TitleAr = e.TitleAr,
-    DescriptionEn = e.DescriptionEn,
-                DescriptionAr = e.DescriptionAr,
- StartAt = e.StartAt,
-            EndAt = e.EndAt,
-         DurationMinutes = e.DurationMinutes,
-             MaxAttempts = e.MaxAttempts,
-                PassScore = e.PassScore,
-          TotalQuestions = allQuestions.Count(),
-          TotalPoints = allQuestions.Sum(q => q.Points),
-  // Set MyAttempts: null if 0 attempts, otherwise the count
-  MyAttempts = myAttemptCount > 0 ? myAttemptCount : null,
-         // Set MyBestIsPassed: null until a published result exists
-      MyBestIsPassed = publishedResult != null ? publishedResult.IsPassed : null,
-         LatestAttemptId = latestAttempt?.Id,
-         LatestAttemptStatus = latestAttempt?.Status,
-         LatestAttemptSubmittedAt = latestAttempt?.SubmittedAt,
-         LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id)
- };
-   }).ToList();
+                   // Get published result for this exam (only published results are visible to candidates)
+                   publishedByExam.TryGetValue(e.Id, out var publishedResult);
 
-   return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(dtos);
+                   return new CandidateExamListDto
+                   {
+                       Id = e.Id,
+                       ExamType = e.ExamType,
+                       TitleEn = e.TitleEn,
+                       TitleAr = e.TitleAr,
+                       DescriptionEn = e.DescriptionEn,
+                       DescriptionAr = e.DescriptionAr,
+                       StartAt = e.StartAt,
+                       EndAt = e.EndAt,
+                       DurationMinutes = e.DurationMinutes,
+                       MaxAttempts = e.MaxAttempts,
+                       PassScore = e.PassScore,
+                       TotalQuestions = allQuestions.Count(),
+                       TotalPoints = allQuestions.Sum(q => q.Points),
+                       // Set MyAttempts: null if 0 attempts, otherwise the count
+                       MyAttempts = myAttemptCount > 0 ? myAttemptCount : null,
+                       // Set MyBestIsPassed: null until a published result exists
+                       MyBestIsPassed = publishedResult != null ? publishedResult.IsPassed : null,
+                       LatestAttemptId = latestAttempt?.Id,
+                       LatestAttemptStatus = latestAttempt?.Status,
+                       LatestAttemptSubmittedAt = latestAttempt?.SubmittedAt,
+                       LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id)
+                   };
+               }).ToList();
+
+        return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(dtos);
     }
 
-  public async Task<ApiResponse<CandidateExamPreviewDto>> GetExamPreviewAsync(int examId, string candidateId)
+    public async Task<ApiResponse<CandidateExamPreviewDto>> GetExamPreviewAsync(int examId, string candidateId)
     {
         var exam = await _context.Exams
    .Include(e => e.Sections.Where(s => !s.IsDeleted))
@@ -165,36 +165,36 @@ public class CandidateService : ICandidateService
        .FirstOrDefaultAsync(e => e.Id == examId);
 
         if (exam == null)
- {
-         return ApiResponse<CandidateExamPreviewDto>.FailureResponse("Exam not found");
-}
+        {
+            return ApiResponse<CandidateExamPreviewDto>.FailureResponse("Exam not found");
+        }
 
         if (!exam.IsPublished || !exam.IsActive)
         {
-        return ApiResponse<CandidateExamPreviewDto>.FailureResponse("Exam is not available");
+            return ApiResponse<CandidateExamPreviewDto>.FailureResponse("Exam is not available");
         }
 
-    var allQuestions = exam.Sections.SelectMany(s => s.Questions);
+        var allQuestions = exam.Sections.SelectMany(s => s.Questions);
 
         var instructions = exam.Instructions
       .OrderBy(i => i.Order)
             .Select(i => new CandidateExamInstructionDto
             {
-      Order = i.Order,
-  ContentEn = i.ContentEn,
-  ContentAr = i.ContentAr
-  })
+                Order = i.Order,
+                ContentEn = i.ContentEn,
+                ContentAr = i.ContentAr
+            })
             .ToList();
 
         var accessPolicy = new CandidateAccessPolicyDto
         {
-         RequiresAccessCode = !string.IsNullOrEmpty(exam.AccessPolicy?.AccessCode),
-     RequireProctoring = exam.RequireProctoring,
-    RequireIdVerification = exam.RequireIdVerification,
-      RequireWebcam = exam.RequireWebcam,
+            RequiresAccessCode = !string.IsNullOrEmpty(exam.AccessPolicy?.AccessCode),
+            RequireProctoring = exam.RequireProctoring,
+            RequireIdVerification = exam.RequireIdVerification,
+            RequireWebcam = exam.RequireWebcam,
             PreventCopyPaste = exam.PreventCopyPaste,
-PreventScreenCapture = exam.PreventScreenCapture,
-    RequireFullscreen = exam.RequireFullscreen,
+            PreventScreenCapture = exam.PreventScreenCapture,
+            RequireFullscreen = exam.RequireFullscreen,
             BrowserLockdown = exam.BrowserLockdown
         };
 
@@ -202,24 +202,24 @@ PreventScreenCapture = exam.PreventScreenCapture,
         var eligibility = await CheckEligibilityAsync(exam, candidateId);
 
         var preview = new CandidateExamPreviewDto
-    {
-   ExamId = exam.Id,
-      ExamType = exam.ExamType,
-          TitleEn = exam.TitleEn,
-       TitleAr = exam.TitleAr,
-     DescriptionEn = exam.DescriptionEn,
- DescriptionAr = exam.DescriptionAr,
-     StartAt = exam.StartAt,
-         EndAt = exam.EndAt,
- DurationMinutes = exam.DurationMinutes,
- MaxAttempts = exam.MaxAttempts,
-          TotalQuestions = allQuestions.Count(),
-     TotalPoints = allQuestions.Sum(q => q.Points),
-PassScore = exam.PassScore,
-       Instructions = instructions,
+        {
+            ExamId = exam.Id,
+            ExamType = exam.ExamType,
+            TitleEn = exam.TitleEn,
+            TitleAr = exam.TitleAr,
+            DescriptionEn = exam.DescriptionEn,
+            DescriptionAr = exam.DescriptionAr,
+            StartAt = exam.StartAt,
+            EndAt = exam.EndAt,
+            DurationMinutes = exam.DurationMinutes,
+            MaxAttempts = exam.MaxAttempts,
+            TotalQuestions = allQuestions.Count(),
+            TotalPoints = allQuestions.Sum(q => q.Points),
+            PassScore = exam.PassScore,
+            Instructions = instructions,
             AccessPolicy = accessPolicy,
             Eligibility = eligibility
-   };
+        };
 
         return ApiResponse<CandidateExamPreviewDto>.SuccessResponse(preview);
     }
@@ -251,63 +251,63 @@ PassScore = exam.PassScore,
 
         if (exam == null)
         {
-   return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam not found");
-    }
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam not found");
+        }
 
         // Validate exam is active and published
         if (!exam.IsActive || !exam.IsPublished)
         {
-       return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam is not available");
-      }
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam is not available");
+        }
 
         // Validate schedule
-var now = DateTime.UtcNow;
-   if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+        var now = DateTime.UtcNow;
+        if (exam.StartAt.HasValue && now < exam.StartAt.Value)
         {
-     return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-          $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                 $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
         }
 
         if (exam.EndAt.HasValue && now > exam.EndAt.Value)
         {
-        return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
- $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+     $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
         }
 
-  // Validate access code
+        // Validate access code
         if (!string.IsNullOrEmpty(exam.AccessPolicy?.AccessCode))
         {
-if (string.IsNullOrEmpty(request.AccessCode) ||
-    !exam.AccessPolicy.AccessCode.Equals(request.AccessCode, StringComparison.Ordinal))
-    {
-     return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Invalid or missing access code");
+            if (string.IsNullOrEmpty(request.AccessCode) ||
+                !exam.AccessPolicy.AccessCode.Equals(request.AccessCode, StringComparison.Ordinal))
+            {
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Invalid or missing access code");
             }
         }
 
-   // Check for existing active attempt
-   var existingActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
-            .Include(a => a.Questions.OrderBy(q => q.Order))
-   .ThenInclude(aq => aq.Answers)
-            .FirstOrDefaultAsync(a =>
-       a.ExamId == examId &&
-   a.CandidateId == candidateId &&
-   (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
+        // Check for existing active attempt
+        var existingActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                 .Include(a => a.Questions.OrderBy(q => q.Order))
+        .ThenInclude(aq => aq.Answers)
+                 .FirstOrDefaultAsync(a =>
+            a.ExamId == examId &&
+        a.CandidateId == candidateId &&
+        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
 
         if (existingActive != null)
         {
-     // Check if expired
+            // Check if expired
             if (existingActive.ExpiresAt.HasValue && now > existingActive.ExpiresAt.Value)
- {
+            {
                 existingActive.Status = AttemptStatus.Expired;
-  await _context.SaveChangesAsync();
-    }
-    else
-     {
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
                 // Resume existing
-      return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
-           await BuildCandidateSessionDto(existingActive, exam),
-         "Resuming existing attempt");
-         }
+                return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
+                     await BuildCandidateSessionDto(existingActive, exam),
+                   "Resuming existing attempt");
+            }
         }
 
         // Check max attempts
@@ -315,64 +315,98 @@ if (string.IsNullOrEmpty(request.AccessCode) ||
         .CountAsync(a => a.ExamId == examId && a.CandidateId == candidateId);
 
         if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
-   {
- return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-      $"Maximum attempts ({exam.MaxAttempts}) reached");
+        {
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                 $"Maximum attempts ({exam.MaxAttempts}) reached");
         }
 
         // Create new attempt
         var attempt = new Domain.Entities.Attempt.Attempt
         {
-    ExamId = examId,
-        CandidateId = candidateId,
-   StartedAt = now,
+            ExamId = examId,
+            CandidateId = candidateId,
+            StartedAt = now,
             ExpiresAt = CalculateExpiresAt(now, exam.DurationMinutes, exam.EndAt),
-      Status = AttemptStatus.Started,
-    AttemptNumber = attemptCount + 1,
+            Status = AttemptStatus.Started,
+            AttemptNumber = attemptCount + 1,
             CreatedDate = now,
             CreatedBy = candidateId
         };
 
-  _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
+        _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
 
         // Generate attempt questions
-      var examQuestions = exam.Sections
-            .OrderBy(s => s.Order)
-  .SelectMany(s => s.Questions.OrderBy(q => q.Order))
- .ToList();
+        // Generate attempt questions from sections
+        // For Builder sections (SourceType set), pick random questions from QuestionBank
+        // For Manual sections, use pre-defined ExamQuestions
+        var attemptQuestionsList = new List<(int QuestionId, decimal Points)>();
 
- if (exam.ShuffleQuestions)
+        foreach (var section in exam.Sections.OrderBy(s => s.Order))
         {
-            examQuestions = examQuestions.OrderBy(_ => Guid.NewGuid()).ToList();
+            if (section.SourceType.HasValue && section.QuestionSubjectId.HasValue && section.PickCount > 0)
+            {
+                // Builder section - pick random questions from QuestionBank
+                var questionsQuery = _context.Questions
+                    .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == section.QuestionSubjectId);
+
+                if (section.QuestionTopicId.HasValue)
+                {
+                    questionsQuery = questionsQuery.Where(q => q.TopicId == section.QuestionTopicId);
+                }
+
+                var pickedQuestions = await questionsQuery
+                    .OrderBy(q => Guid.NewGuid()) // Random order
+                    .Take(section.PickCount)
+                    .Select(q => new { q.Id, q.Points })
+                    .ToListAsync();
+
+                foreach (var q in pickedQuestions)
+                {
+                    attemptQuestionsList.Add((q.Id, q.Points > 0 ? q.Points : 1));
+                }
+            }
+            else
+            {
+                // Manual section - use ExamQuestions
+                foreach (var eq in section.Questions.OrderBy(q => q.Order))
+                {
+                    attemptQuestionsList.Add((eq.QuestionId, eq.Points));
+                }
+            }
         }
 
-      var order = 1;
-     foreach (var eq in examQuestions)
-  {
+        if (exam.ShuffleQuestions)
+        {
+            attemptQuestionsList = attemptQuestionsList.OrderBy(_ => Guid.NewGuid()).ToList();
+        }
+
+        var order = 1;
+        foreach (var (questionId, points) in attemptQuestionsList)
+        {
             var attemptQuestion = new AttemptQuestion
             {
-      AttemptId = attempt.Id,
-           QuestionId = eq.QuestionId,
-           Order = order++,
-         Points = eq.Points,
-    CreatedDate = now,
-    CreatedBy = candidateId
+                AttemptId = attempt.Id,
+                QuestionId = questionId,
+                Order = order++,
+                Points = points,
+                CreatedDate = now,
+                CreatedBy = candidateId
             };
-         _context.Set<AttemptQuestion>().Add(attemptQuestion);
+            _context.Set<AttemptQuestion>().Add(attemptQuestion);
         }
 
         // Log event
         var startEvent = new AttemptEvent
         {
- AttemptId = attempt.Id,
-EventType = AttemptEventType.Started,
+            AttemptId = attempt.Id,
+            EventType = AttemptEventType.Started,
             OccurredAt = now,
-   MetadataJson = JsonSerializer.Serialize(new { attemptNumber = attempt.AttemptNumber }),
-      CreatedDate = now,
-         CreatedBy = candidateId
+            MetadataJson = JsonSerializer.Serialize(new { attemptNumber = attempt.AttemptNumber }),
+            CreatedDate = now,
+            CreatedBy = candidateId
         };
-   _context.Set<AttemptEvent>().Add(startEvent);
+        _context.Set<AttemptEvent>().Add(startEvent);
 
         await _context.SaveChangesAsync();
 
@@ -382,9 +416,9 @@ EventType = AttemptEventType.Started,
               .ThenInclude(aq => aq.Answers)
      .FirstAsync(a => a.Id == attempt.Id);
 
-   return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
-        await BuildCandidateSessionDto(createdAttempt, exam),
-   "Exam started successfully");
+        return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
+             await BuildCandidateSessionDto(createdAttempt, exam),
+        "Exam started successfully");
     }
 
     public async Task<ApiResponse<CandidateAttemptSessionDto>> GetAttemptSessionAsync(int attemptId, string candidateId)
@@ -399,15 +433,15 @@ EventType = AttemptEventType.Started,
         .ThenInclude(e => e.Instructions.Where(i => !i.IsDeleted).OrderBy(i => i.Order))
     .FirstOrDefaultAsync(a => a.Id == attemptId);
 
-      if (attempt == null)
-     {
-   return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Attempt not found");
+        if (attempt == null)
+        {
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Attempt not found");
         }
 
-if (attempt.CandidateId != candidateId)
-    {
-          return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Access denied");
-}
+        if (attempt.CandidateId != candidateId)
+        {
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Access denied");
+        }
 
         // Check if expired
         var now = DateTime.UtcNow;
@@ -416,10 +450,10 @@ if (attempt.CandidateId != candidateId)
         {
             attempt.Status = AttemptStatus.Expired;
             await _context.SaveChangesAsync();
-  }
+        }
 
-     if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
-            attempt.Status == AttemptStatus.Cancelled)
+        if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
+               attempt.Status == AttemptStatus.Cancelled)
         {
             return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
 $"Attempt is {attempt.Status}. Cannot resume.");
@@ -445,19 +479,19 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         if (attempt == null)
         {
-     return ApiResponse<bool>.FailureResponse("Attempt not found");
+            return ApiResponse<bool>.FailureResponse("Attempt not found");
         }
 
-   if (attempt.CandidateId != candidateId)
-     {
+        if (attempt.CandidateId != candidateId)
+        {
             return ApiResponse<bool>.FailureResponse("Access denied");
-  }
+        }
 
         var now = DateTime.UtcNow;
 
         // Validate attempt status
         if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress)
-   {
+        {
             return ApiResponse<bool>.FailureResponse($"Cannot save answers. Attempt is {attempt.Status}.");
         }
 
@@ -465,51 +499,51 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
         {
             attempt.Status = AttemptStatus.Expired;
-    await _context.SaveChangesAsync();
-     return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
+            await _context.SaveChangesAsync();
+            return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
 
         // Update status to InProgress if still Started
         if (attempt.Status == AttemptStatus.Started)
-     {
-    attempt.Status = AttemptStatus.InProgress;
-     }
+        {
+            attempt.Status = AttemptStatus.InProgress;
+        }
 
         // Process each answer (idempotent)
         foreach (var answerRequest in request.Answers)
         {
-       var attemptQuestion = attempt.Questions.FirstOrDefault(q => q.QuestionId == answerRequest.QuestionId);
-     if (attemptQuestion == null) continue;
+            var attemptQuestion = attempt.Questions.FirstOrDefault(q => q.QuestionId == answerRequest.QuestionId);
+            if (attemptQuestion == null) continue;
 
-var existingAnswer = attemptQuestion.Answers.FirstOrDefault();
+            var existingAnswer = attemptQuestion.Answers.FirstOrDefault();
 
-   if (existingAnswer != null)
-  {
-      // Update
-       existingAnswer.SelectedOptionIdsJson = answerRequest.SelectedOptionIds != null
-  ? JsonSerializer.Serialize(answerRequest.SelectedOptionIds)
-           : null;
-              existingAnswer.TextAnswer = answerRequest.TextAnswer;
-      existingAnswer.AnsweredAt = now;
-         existingAnswer.UpdatedDate = now;
-    existingAnswer.UpdatedBy = candidateId;
+            if (existingAnswer != null)
+            {
+                // Update
+                existingAnswer.SelectedOptionIdsJson = answerRequest.SelectedOptionIds != null
+           ? JsonSerializer.Serialize(answerRequest.SelectedOptionIds)
+                    : null;
+                existingAnswer.TextAnswer = answerRequest.TextAnswer;
+                existingAnswer.AnsweredAt = now;
+                existingAnswer.UpdatedDate = now;
+                existingAnswer.UpdatedBy = candidateId;
             }
-        else
-{
-        // Create
-           var newAnswer = new AttemptAnswer
-         {
-               AttemptId = attemptId,
-               AttemptQuestionId = attemptQuestion.Id,
-QuestionId = answerRequest.QuestionId,
-              SelectedOptionIdsJson = answerRequest.SelectedOptionIds != null
-       ? JsonSerializer.Serialize(answerRequest.SelectedOptionIds)
-        : null,
-         TextAnswer = answerRequest.TextAnswer,
- AnsweredAt = now,
-CreatedDate = now,
-     CreatedBy = candidateId
-      };
+            else
+            {
+                // Create
+                var newAnswer = new AttemptAnswer
+                {
+                    AttemptId = attemptId,
+                    AttemptQuestionId = attemptQuestion.Id,
+                    QuestionId = answerRequest.QuestionId,
+                    SelectedOptionIdsJson = answerRequest.SelectedOptionIds != null
+            ? JsonSerializer.Serialize(answerRequest.SelectedOptionIds)
+             : null,
+                    TextAnswer = answerRequest.TextAnswer,
+                    AnsweredAt = now,
+                    CreatedDate = now,
+                    CreatedBy = candidateId
+                };
                 _context.Set<AttemptAnswer>().Add(newAnswer);
             }
         }
@@ -528,20 +562,20 @@ CreatedDate = now,
      .FirstOrDefaultAsync(a => a.Id == attemptId);
 
         if (attempt == null)
-      {
-   return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt not found");
+        {
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt not found");
         }
 
         if (attempt.CandidateId != candidateId)
         {
-return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Access denied");
- }
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Access denied");
+        }
 
         var now = DateTime.UtcNow;
 
         if (attempt.Status == AttemptStatus.Submitted)
         {
-return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already submitted");
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already submitted");
         }
 
         if (attempt.Status == AttemptStatus.Expired || attempt.Status == AttemptStatus.Cancelled)
@@ -550,11 +584,11 @@ return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already s
         }
 
         // Check expiry
- if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
-  {
+        if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
+        {
             attempt.Status = AttemptStatus.Expired;
             await _context.SaveChangesAsync();
-    return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt has expired");
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt has expired");
         }
 
         // Submit
@@ -649,40 +683,40 @@ return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already s
         if (result == null)
         {
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Result not found or not yet graded");
-      }
+        }
 
         if (result.CandidateId != candidateId)
-{
+        {
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Access denied");
         }
 
         if (!result.IsPublishedToCandidate)
-     {
- return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Result is not yet published");
+        {
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Result is not yet published");
         }
 
-   var percentage = result.MaxPossibleScore > 0
-            ? (result.TotalScore / result.MaxPossibleScore) * 100
-      : 0;
+        var percentage = result.MaxPossibleScore > 0
+                 ? (result.TotalScore / result.MaxPossibleScore) * 100
+           : 0;
 
         var summary = new CandidateResultSummaryDto
         {
-       ResultId = result.Id,
-    ExamId = result.ExamId,
-      ExamTitleEn = result.Exam.TitleEn,
-      ExamTitleAr = result.Exam.TitleAr,
+            ResultId = result.Id,
+            ExamId = result.ExamId,
+            ExamTitleEn = result.Exam.TitleEn,
+            ExamTitleAr = result.Exam.TitleAr,
             AttemptNumber = result.Attempt.AttemptNumber,
-     SubmittedAt = result.Attempt.SubmittedAt ?? DateTime.UtcNow,
-  AllowReview = result.Exam.AllowReview,
-       ShowCorrectAnswers = result.Exam.ShowCorrectAnswers
+            SubmittedAt = result.Attempt.SubmittedAt ?? DateTime.UtcNow,
+            AllowReview = result.Exam.AllowReview,
+            ShowCorrectAnswers = result.Exam.ShowCorrectAnswers
         };
 
-      // Respect exam ShowResults setting
-  if (result.Exam.ShowResults)
- {
+        // Respect exam ShowResults setting
+        if (result.Exam.ShowResults)
+        {
             summary.TotalScore = result.TotalScore;
             summary.MaxPossibleScore = result.MaxPossibleScore;
-        summary.Percentage = percentage;
+            summary.Percentage = percentage;
             summary.IsPassed = result.IsPassed;
             summary.GradeLabel = result.GradeLabel;
         }
@@ -697,19 +731,19 @@ return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already s
     .Include(r => r.Attempt)
             .FirstOrDefaultAsync(r => r.AttemptId == attemptId);
 
- if (result == null)
-     {
-   return ApiResponse<CandidateResultReviewDto>.FailureResponse("Result not found");
- }
+        if (result == null)
+        {
+            return ApiResponse<CandidateResultReviewDto>.FailureResponse("Result not found");
+        }
 
- if (result.CandidateId != candidateId)
-     {
+        if (result.CandidateId != candidateId)
+        {
             return ApiResponse<CandidateResultReviewDto>.FailureResponse("Access denied");
         }
 
-if (!result.IsPublishedToCandidate)
+        if (!result.IsPublishedToCandidate)
         {
-       return ApiResponse<CandidateResultReviewDto>.FailureResponse("Result not published");
+            return ApiResponse<CandidateResultReviewDto>.FailureResponse("Result not published");
         }
 
         // Check AllowReview setting
@@ -717,7 +751,7 @@ if (!result.IsPublishedToCandidate)
         {
             return ApiResponse<CandidateResultReviewDto>.FailureResponse(
                 "Review is not allowed for this exam");
-     }
+        }
 
         // Get attempt with answers and grading
         var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -738,72 +772,72 @@ if (!result.IsPublishedToCandidate)
  ga.GradingSession.Status == GradingStatus.Completed)
        .ToDictionaryAsync(ga => ga.QuestionId);
 
-      var percentage = result.MaxPossibleScore > 0
-    ? (result.TotalScore / result.MaxPossibleScore) * 100
-        : 0;
+        var percentage = result.MaxPossibleScore > 0
+      ? (result.TotalScore / result.MaxPossibleScore) * 100
+          : 0;
 
         var review = new CandidateResultReviewDto
         {
-  ResultId = result.Id,
+            ResultId = result.Id,
             ExamId = result.ExamId,
             ExamTitleEn = result.Exam.TitleEn,
-        ExamTitleAr = result.Exam.TitleAr,
-    AttemptNumber = attempt.AttemptNumber,
-     SubmittedAt = attempt.SubmittedAt ?? DateTime.UtcNow
+            ExamTitleAr = result.Exam.TitleAr,
+            AttemptNumber = attempt.AttemptNumber,
+            SubmittedAt = attempt.SubmittedAt ?? DateTime.UtcNow
         };
 
         // Respect ShowResults
         if (result.Exam.ShowResults)
         {
             review.TotalScore = result.TotalScore;
-      review.MaxPossibleScore = result.MaxPossibleScore;
-    review.Percentage = percentage;
+            review.MaxPossibleScore = result.MaxPossibleScore;
+            review.Percentage = percentage;
             review.IsPassed = result.IsPassed;
-  review.GradeLabel = result.GradeLabel;
-  }
+            review.GradeLabel = result.GradeLabel;
+        }
 
-     // Build questions
+        // Build questions
         var questions = new List<CandidateResultQuestionDto>();
         foreach (var aq in attempt.Questions.OrderBy(q => q.Order))
         {
             var answer = aq.Answers.FirstOrDefault();
-      gradedAnswers.TryGetValue(aq.QuestionId, out var gradedAnswer);
+            gradedAnswers.TryGetValue(aq.QuestionId, out var gradedAnswer);
 
             var questionDto = new CandidateResultQuestionDto
-    {
-  QuestionId = aq.QuestionId,
-        Order = aq.Order,
-     BodyEn = aq.Question.BodyEn,
-          BodyAr = aq.Question.BodyAr,
-       QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
-     Points = aq.Points,
-    ScoreEarned = gradedAnswer?.Score,
-           SelectedOptionIds = answer != null && !string.IsNullOrEmpty(answer.SelectedOptionIdsJson)
+            {
+                QuestionId = aq.QuestionId,
+                Order = aq.Order,
+                BodyEn = aq.Question.BodyEn,
+                BodyAr = aq.Question.BodyAr,
+                QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
+                Points = aq.Points,
+                ScoreEarned = gradedAnswer?.Score,
+                SelectedOptionIds = answer != null && !string.IsNullOrEmpty(answer.SelectedOptionIdsJson)
     ? JsonSerializer.Deserialize<List<int>>(answer.SelectedOptionIdsJson)
           : null,
-   TextAnswer = answer?.TextAnswer
-      };
+                TextAnswer = answer?.TextAnswer
+            };
 
             // Options with conditional correctness
-     var selectedIds = questionDto.SelectedOptionIds ?? new List<int>();
-      questionDto.Options = aq.Question.Options
-     .OrderBy(o => o.Order)
-         .Select(o => new CandidateResultOptionDto
-       {
-      Id = o.Id,
-       TextEn = o.TextEn,
-           TextAr = o.TextAr,
-    WasSelected = selectedIds.Contains(o.Id),
-             // Only show IsCorrect if ShowCorrectAnswers = true
-           IsCorrect = result.Exam.ShowCorrectAnswers ? o.IsCorrect : null
-           })
-                .ToList();
+            var selectedIds = questionDto.SelectedOptionIds ?? new List<int>();
+            questionDto.Options = aq.Question.Options
+           .OrderBy(o => o.Order)
+               .Select(o => new CandidateResultOptionDto
+               {
+                   Id = o.Id,
+                   TextEn = o.TextEn,
+                   TextAr = o.TextAr,
+                   WasSelected = selectedIds.Contains(o.Id),
+                   // Only show IsCorrect if ShowCorrectAnswers = true
+                   IsCorrect = result.Exam.ShowCorrectAnswers ? o.IsCorrect : null
+               })
+                      .ToList();
 
-      // Only show IsCorrect and Feedback if ShowCorrectAnswers = true
-     if (result.Exam.ShowCorrectAnswers && gradedAnswer != null)
+            // Only show IsCorrect and Feedback if ShowCorrectAnswers = true
+            if (result.Exam.ShowCorrectAnswers && gradedAnswer != null)
             {
- questionDto.IsCorrect = gradedAnswer.IsCorrect;
-      questionDto.Feedback = gradedAnswer.GraderComment;
+                questionDto.IsCorrect = gradedAnswer.IsCorrect;
+                questionDto.Feedback = gradedAnswer.GraderComment;
             }
 
             questions.Add(questionDto);
@@ -811,7 +845,7 @@ if (!result.IsPublishedToCandidate)
 
         review.Questions = questions;
 
-    return ApiResponse<CandidateResultReviewDto>.SuccessResponse(review);
+        return ApiResponse<CandidateResultReviewDto>.SuccessResponse(review);
     }
 
     #endregion
@@ -821,68 +855,68 @@ if (!result.IsPublishedToCandidate)
     public async Task<ApiResponse<CandidateDashboardDto>> GetDashboardAsync(string candidateId)
     {
         var now = DateTime.UtcNow;
-   
+
         // Get user info
         var user = await _userManager.FindByIdAsync(candidateId);
         if (user == null)
- {
- return ApiResponse<CandidateDashboardDto>.FailureResponse("User not found");
+        {
+            return ApiResponse<CandidateDashboardDto>.FailureResponse("User not found");
         }
 
         // Get all candidate's attempts
- var allAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
-            .Include(a => a.Exam)
-            .Where(a => a.CandidateId == candidateId)
-    .ToListAsync();
+        var allAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                   .Include(a => a.Exam)
+                   .Where(a => a.CandidateId == candidateId)
+           .ToListAsync();
 
         // Get all available exams (same logic as GetAvailableExamsAsync)
- var roles = await _userManager.GetRolesAsync(user);
-   var isCandidate = roles.Contains(AppRoles.Candidate);
+        var roles = await _userManager.GetRolesAsync(user);
+        var isCandidate = roles.Contains(AppRoles.Candidate);
 
-    var examsQuery = _context.Exams
-            .Include(e => e.Sections.Where(s => !s.IsDeleted))
-     .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
-     .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted);
+        var examsQuery = _context.Exams
+                .Include(e => e.Sections.Where(s => !s.IsDeleted))
+         .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
+         .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted);
 
         if (!isCandidate && user.DepartmentId.HasValue)
-      {
-     examsQuery = examsQuery.Where(e => e.DepartmentId == user.DepartmentId.Value);
+        {
+            examsQuery = examsQuery.Where(e => e.DepartmentId == user.DepartmentId.Value);
         }
 
         var availableExams = await examsQuery.ToListAsync();
 
-     // Get results
+        // Get results
         var results = await _context.Set<Domain.Entities.ExamResult.Result>()
        .Where(r => r.CandidateId == candidateId)
      .ToListAsync();
 
         // Calculate statistics
-   var completedAttempts = allAttempts.Where(a => a.Status == AttemptStatus.Submitted).ToList();
+        var completedAttempts = allAttempts.Where(a => a.Status == AttemptStatus.Submitted).ToList();
         var passedResults = results.Where(r => r.IsPassed == true).Count();
-  var totalResults = results.Count;
+        var totalResults = results.Count;
         var passRate = totalResults > 0 ? (decimal)passedResults / totalResults * 100 : 0;
 
-     // Pending grading (submitted but no result yet)
+        // Pending grading (submitted but no result yet)
         var submittedAttemptIds = allAttempts
      .Where(a => a.Status == AttemptStatus.Submitted)
    .Select(a => a.Id)
        .ToHashSet();
- var gradedAttemptIds = results.Select(r => r.AttemptId).ToHashSet();
+        var gradedAttemptIds = results.Select(r => r.AttemptId).ToHashSet();
         var pendingGrading = submittedAttemptIds.Except(gradedAttemptIds).Count();
 
         // Statistics changes (mock for now - could compare with previous period)
         var totalExamsChangePercent = 0; // Could calculate based on historical data
-   var totalAttemptsChangePercent = 0;
+        var totalAttemptsChangePercent = 0;
 
         var stats = new DashboardStatsDto
-      {
-      TotalExamsAvailable = availableExams.Count,
+        {
+            TotalExamsAvailable = availableExams.Count,
             TotalExamsAvailableChangePercent = totalExamsChangePercent,
             TotalAttempts = allAttempts.Count,
             TotalAttemptsChangePercent = totalAttemptsChangePercent,
             PassRate = Math.Round(passRate, 1),
-        PendingGrading = pendingGrading
- };
+            PendingGrading = pendingGrading
+        };
 
         // Exams by status
         var activeAttemptExamIds = allAttempts
@@ -900,11 +934,11 @@ if (!result.IsPublishedToCandidate)
             .Where(e => !e.StartAt.HasValue || e.StartAt.Value > now)
       .ToList();
 
-      var examsByStatus = new ExamsByStatusDto
-{
-   UpcomingCount = upcomingExams.Count,
-        ActiveCount = activeAttemptExamIds.Count,
-    CompletedCount = completedExamIds.Count
+        var examsByStatus = new ExamsByStatusDto
+        {
+            UpcomingCount = upcomingExams.Count,
+            ActiveCount = activeAttemptExamIds.Count,
+            CompletedCount = completedExamIds.Count
         };
 
         // Quick actions (active attempts to resume)
@@ -916,20 +950,20 @@ if (!result.IsPublishedToCandidate)
 
         var quickActions = activeAttempts.Select(a =>
         {
-   var remainingMinutes = a.ExpiresAt.HasValue
-              ? Math.Max(0, (int)(a.ExpiresAt.Value - now).TotalMinutes)
-          : 0;
+            var remainingMinutes = a.ExpiresAt.HasValue
+                       ? Math.Max(0, (int)(a.ExpiresAt.Value - now).TotalMinutes)
+                   : 0;
 
-        return new QuickActionDto
-    {
-  AttemptId = a.Id,
-         ExamId = a.ExamId,
-       ExamTitleEn = a.Exam.TitleEn,
+            return new QuickActionDto
+            {
+                AttemptId = a.Id,
+                ExamId = a.ExamId,
+                ExamTitleEn = a.Exam.TitleEn,
                 ExamTitleAr = a.Exam.TitleAr,
-        ActionType = "Resume",
+                ActionType = "Resume",
                 ExpiresAt = a.ExpiresAt,
-   RemainingMinutes = remainingMinutes
-   };
+                RemainingMinutes = remainingMinutes
+            };
         }).ToList();
 
         // Upcoming exams (next 5)
@@ -940,102 +974,102 @@ if (!result.IsPublishedToCandidate)
    .Take(5)
  .Select(e =>
        {
-                var attemptsUsed = allAttempts.Count(a => a.ExamId == e.Id);
-   return new UpcomingExamDto
-    {
-     ExamId = e.Id,
-   TitleEn = e.TitleEn,
-   TitleAr = e.TitleAr,
-  ExamType = e.ExamType,
-     StartAt = e.StartAt,
-             EndAt = e.EndAt,
-             DurationMinutes = e.DurationMinutes,
-            TotalQuestions = e.Sections.SelectMany(s => s.Questions).Count(),
-        TotalPoints = e.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
- AttemptsUsed = attemptsUsed,
-          MaxAttempts = e.MaxAttempts
-              };
-            })
+           var attemptsUsed = allAttempts.Count(a => a.ExamId == e.Id);
+           return new UpcomingExamDto
+           {
+               ExamId = e.Id,
+               TitleEn = e.TitleEn,
+               TitleAr = e.TitleAr,
+               ExamType = e.ExamType,
+               StartAt = e.StartAt,
+               EndAt = e.EndAt,
+               DurationMinutes = e.DurationMinutes,
+               TotalQuestions = e.Sections.SelectMany(s => s.Questions).Count(),
+               TotalPoints = e.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
+               AttemptsUsed = attemptsUsed,
+               MaxAttempts = e.MaxAttempts
+           };
+       })
             .ToList();
 
-// Recent activity (last 10)
-    var recentActivity = new List<RecentActivityDto>();
+        // Recent activity (last 10)
+        var recentActivity = new List<RecentActivityDto>();
 
-  // Add attempt activities
+        // Add attempt activities
         var recentAttempts = allAttempts
      .OrderByDescending(a => a.CreatedDate)
             .Take(10)
        .ToList();
 
         foreach (var attempt in recentAttempts)
-    {
-      if (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress)
-      {
-   recentActivity.Add(new RecentActivityDto
-{
-    ActivityType = "Attempt Started",
-    ExamId = attempt.ExamId,
-        ExamTitleEn = attempt.Exam.TitleEn,
-   ExamTitleAr = attempt.Exam.TitleAr,
-        AttemptId = attempt.Id,
- ActivityDate = attempt.StartedAt,
-        Description = $"Attempt #{attempt.AttemptNumber} in progress"
-       });
-         }
-       else if (attempt.Status == AttemptStatus.Submitted && attempt.SubmittedAt.HasValue)
         {
-    recentActivity.Add(new RecentActivityDto
-           {
-           ActivityType = "Attempt Submitted",
-            ExamId = attempt.ExamId,
-     ExamTitleEn = attempt.Exam.TitleEn,
-         ExamTitleAr = attempt.Exam.TitleAr,
-           AttemptId = attempt.Id,
-    ActivityDate = attempt.SubmittedAt.Value,
- Description = $"Attempt #{attempt.AttemptNumber} submitted"
-     });
-   }
+            if (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress)
+            {
+                recentActivity.Add(new RecentActivityDto
+                {
+                    ActivityType = "Attempt Started",
+                    ExamId = attempt.ExamId,
+                    ExamTitleEn = attempt.Exam.TitleEn,
+                    ExamTitleAr = attempt.Exam.TitleAr,
+                    AttemptId = attempt.Id,
+                    ActivityDate = attempt.StartedAt,
+                    Description = $"Attempt #{attempt.AttemptNumber} in progress"
+                });
+            }
+            else if (attempt.Status == AttemptStatus.Submitted && attempt.SubmittedAt.HasValue)
+            {
+                recentActivity.Add(new RecentActivityDto
+                {
+                    ActivityType = "Attempt Submitted",
+                    ExamId = attempt.ExamId,
+                    ExamTitleEn = attempt.Exam.TitleEn,
+                    ExamTitleAr = attempt.Exam.TitleAr,
+                    AttemptId = attempt.Id,
+                    ActivityDate = attempt.SubmittedAt.Value,
+                    Description = $"Attempt #{attempt.AttemptNumber} submitted"
+                });
+            }
         }
 
- // Add result activities
-   var recentResults = results
-    .Where(r => r.IsPublishedToCandidate && r.PublishedAt.HasValue)
-    .OrderByDescending(r => r.PublishedAt)
-   .Take(5)
-   .ToList();
+        // Add result activities
+        var recentResults = results
+         .Where(r => r.IsPublishedToCandidate && r.PublishedAt.HasValue)
+         .OrderByDescending(r => r.PublishedAt)
+        .Take(5)
+        .ToList();
 
-      foreach (var result in recentResults)
+        foreach (var result in recentResults)
         {
             var exam = availableExams.FirstOrDefault(e => e.Id == result.ExamId);
-       recentActivity.Add(new RecentActivityDto
- {
-         ActivityType = "Result Published",
-    ExamId = result.ExamId,
-           ExamTitleEn = exam?.TitleEn ?? "Exam",
-   ExamTitleAr = exam?.TitleAr ?? "??????",
-           AttemptId = result.AttemptId,
-        ActivityDate = result.PublishedAt.Value,
-   Description = result.IsPassed ? "Passed" : "Not Passed",
- Score = result.TotalScore,
-      IsPassed = result.IsPassed
-        });
+            recentActivity.Add(new RecentActivityDto
+            {
+                ActivityType = "Result Published",
+                ExamId = result.ExamId,
+                ExamTitleEn = exam?.TitleEn ?? "Exam",
+                ExamTitleAr = exam?.TitleAr ?? "??????",
+                AttemptId = result.AttemptId,
+                ActivityDate = result.PublishedAt.Value,
+                Description = result.IsPassed ? "Passed" : "Not Passed",
+                Score = result.TotalScore,
+                IsPassed = result.IsPassed
+            });
         }
 
         // Sort and limit recent activity
- recentActivity = recentActivity
-       .OrderByDescending(a => a.ActivityDate)
-     .Take(10)
-        .ToList();
+        recentActivity = recentActivity
+              .OrderByDescending(a => a.ActivityDate)
+            .Take(10)
+               .ToList();
 
         var dashboard = new CandidateDashboardDto
         {
- CandidateName = user.FullName ?? user.DisplayName ?? user.UserName ?? "Candidate",
-   CandidateEmail = user.Email ?? "",
-       CurrentDateUtc = now,
+            CandidateName = user.FullName ?? user.DisplayName ?? user.UserName ?? "Candidate",
+            CandidateEmail = user.Email ?? "",
+            CurrentDateUtc = now,
             Stats = stats,
-        ExamsByStatus = examsByStatus,
-       QuickActions = quickActions,
-         UpcomingExams = upcomingExamsList,
+            ExamsByStatus = examsByStatus,
+            QuickActions = quickActions,
+            UpcomingExams = upcomingExamsList,
             RecentActivity = recentActivity
         };
 
@@ -1049,28 +1083,28 @@ if (!result.IsPublishedToCandidate)
     private async Task<CandidateEligibilityDto> CheckEligibilityAsync(
         Domain.Entities.Assessment.Exam exam, string candidateId)
     {
-     var eligibility = new CandidateEligibilityDto
+        var eligibility = new CandidateEligibilityDto
         {
-     CanStartNow = true,
-        Reasons = new List<string>()
+            CanStartNow = true,
+            Reasons = new List<string>()
         };
 
         var now = DateTime.UtcNow;
 
         // Check schedule
         if (exam.StartAt.HasValue && now < exam.StartAt.Value)
-  {
+        {
             eligibility.CanStartNow = false;
-   eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
-   }
+            eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+        }
 
         if (exam.EndAt.HasValue && now > exam.EndAt.Value)
         {
             eligibility.CanStartNow = false;
-  eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
-   }
+            eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+        }
 
-      // Check attempts
+        // Check attempts
         var attemptCount = await _context.Set<Domain.Entities.Attempt.Attempt>()
         .CountAsync(a => a.ExamId == exam.Id && a.CandidateId == candidateId);
 
@@ -1079,11 +1113,11 @@ if (!result.IsPublishedToCandidate)
             ? Math.Max(0, exam.MaxAttempts - attemptCount)
   : null;
 
-  if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
-      {
-       eligibility.CanStartNow = false;
+        if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
+        {
+            eligibility.CanStartNow = false;
             eligibility.Reasons.Add($"Maximum attempts ({exam.MaxAttempts}) reached");
-     }
+        }
 
         // Check for existing active attempt
         var hasActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -1093,7 +1127,7 @@ if (!result.IsPublishedToCandidate)
 
         if (hasActive)
         {
-          eligibility.Reasons.Add("You have an active attempt in progress");
+            eligibility.Reasons.Add("You have an active attempt in progress");
         }
 
         return eligibility;
@@ -1105,7 +1139,7 @@ if (!result.IsPublishedToCandidate)
 
         if (examEndAt.HasValue)
         {
-      return durationExpiry < examEndAt.Value ? durationExpiry : examEndAt.Value;
+            return durationExpiry < examEndAt.Value ? durationExpiry : examEndAt.Value;
         }
 
         return durationExpiry;
@@ -1117,7 +1151,7 @@ if (!result.IsPublishedToCandidate)
         if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
          attempt.Status == AttemptStatus.Cancelled)
         {
-       return 0;
+            return 0;
         }
 
         var remaining = (int)(attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds;
@@ -1129,8 +1163,8 @@ if (!result.IsPublishedToCandidate)
    Domain.Entities.Assessment.Exam exam)
     {
         var now = DateTime.UtcNow;
-        
-     // Get all attempt questions with their answers
+
+        // Get all attempt questions with their answers
         var attemptQuestions = await _context.Set<AttemptQuestion>()
       .Include(aq => aq.Question)
          .ThenInclude(q => q.QuestionType)
@@ -1143,7 +1177,7 @@ if (!result.IsPublishedToCandidate)
             .OrderBy(aq => aq.Order)
             .ToListAsync();
 
-  // Get exam questions with section/topic info to map attempt questions
+        // Get exam questions with section/topic info to map attempt questions
         var examQuestions = await _context.Set<Domain.Entities.Assessment.ExamQuestion>()
             .Where(eq => eq.ExamId == exam.Id && !eq.IsDeleted)
       .ToListAsync();
@@ -1152,67 +1186,67 @@ if (!result.IsPublishedToCandidate)
         var examQuestionLookup = examQuestions.ToDictionary(eq => eq.QuestionId);
 
         // Get sections with topics
-   var sections = await _context.Set<Domain.Entities.Assessment.ExamSection>()
-   .Include(s => s.Topics.Where(t => !t.IsDeleted).OrderBy(t => t.Order))
-            .Where(s => s.ExamId == exam.Id && !s.IsDeleted)
-            .OrderBy(s => s.Order)
-      .ToListAsync();
+        var sections = await _context.Set<Domain.Entities.Assessment.ExamSection>()
+        .Include(s => s.Topics.Where(t => !t.IsDeleted).OrderBy(t => t.Order))
+                 .Where(s => s.ExamId == exam.Id && !s.IsDeleted)
+                 .OrderBy(s => s.Order)
+           .ToListAsync();
 
-// Build flat questions list for backward compatibility
+        // Build flat questions list for backward compatibility
         var flatQuestions = new List<CandidateQuestionDto>();
-   
+
         // Build sections with topics and questions
         var sectionDtos = new List<CandidateSectionDto>();
 
         foreach (var section in sections)
-    {
+        {
             // Get exam questions for this section
             var sectionExamQuestions = examQuestions
      .Where(eq => eq.ExamSectionId == section.Id)
  .ToList();
 
             // Get attempt questions that belong to this section
-       var sectionAttemptQuestions = attemptQuestions
-            .Where(aq => sectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-     .ToList();
-
-     if (!sectionAttemptQuestions.Any())
-      continue; // Skip empty sections
-
-            // Build topics for this section
-     var topicDtos = new List<CandidateTopicDto>();
-    
-            foreach (var topic in section.Topics.OrderBy(t => t.Order))
- {
-            // Get exam questions for this topic
-      var topicExamQuestions = sectionExamQuestions
-           .Where(eq => eq.ExamTopicId == topic.Id)
+            var sectionAttemptQuestions = attemptQuestions
+                 .Where(aq => sectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
           .ToList();
 
-    // Get attempt questions that belong to this topic
-             var topicAttemptQuestions = attemptQuestions
-      .Where(aq => topicExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-               .ToList();
+            if (!sectionAttemptQuestions.Any())
+                continue; // Skip empty sections
 
-   if (!topicAttemptQuestions.Any())
-           continue; // Skip empty topics
+            // Build topics for this section
+            var topicDtos = new List<CandidateTopicDto>();
 
-    var topicQuestionDtos = BuildQuestionDtos(topicAttemptQuestions, exam, section.Id, topic.Id);
-    flatQuestions.AddRange(topicQuestionDtos);
+            foreach (var topic in section.Topics.OrderBy(t => t.Order))
+            {
+                // Get exam questions for this topic
+                var topicExamQuestions = sectionExamQuestions
+                     .Where(eq => eq.ExamTopicId == topic.Id)
+                    .ToList();
 
-           topicDtos.Add(new CandidateTopicDto
+                // Get attempt questions that belong to this topic
+                var topicAttemptQuestions = attemptQuestions
+         .Where(aq => topicExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
+                  .ToList();
+
+                if (!topicAttemptQuestions.Any())
+                    continue; // Skip empty topics
+
+                var topicQuestionDtos = BuildQuestionDtos(topicAttemptQuestions, exam, section.Id, topic.Id);
+                flatQuestions.AddRange(topicQuestionDtos);
+
+                topicDtos.Add(new CandidateTopicDto
                 {
-          TopicId = topic.Id,
-    Order = topic.Order,
-  TitleEn = topic.TitleEn,
-      TitleAr = topic.TitleAr,
-  DescriptionEn = topic.DescriptionEn,
-        DescriptionAr = topic.DescriptionAr,
-   TotalPoints = topicQuestionDtos.Sum(q => q.Points),
-    TotalQuestions = topicQuestionDtos.Count,
-           AnsweredQuestions = topicQuestionDtos.Count(q => q.CurrentAnswer != null),
-   Questions = topicQuestionDtos
-      });
+                    TopicId = topic.Id,
+                    Order = topic.Order,
+                    TitleEn = topic.TitleEn,
+                    TitleAr = topic.TitleAr,
+                    DescriptionEn = topic.DescriptionEn,
+                    DescriptionAr = topic.DescriptionAr,
+                    TotalPoints = topicQuestionDtos.Sum(q => q.Points),
+                    TotalQuestions = topicQuestionDtos.Count,
+                    AnsweredQuestions = topicQuestionDtos.Count(q => q.CurrentAnswer != null),
+                    Questions = topicQuestionDtos
+                });
             }
 
             // Get questions directly under section (not in any topic)
@@ -1220,70 +1254,70 @@ if (!result.IsPublishedToCandidate)
   .Where(eq => eq.ExamTopicId == null)
      .ToList();
 
-        var directSectionAttemptQuestions = attemptQuestions
-       .Where(aq => directSectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-       .ToList();
+            var directSectionAttemptQuestions = attemptQuestions
+           .Where(aq => directSectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
+           .ToList();
 
- var directSectionQuestionDtos = BuildQuestionDtos(directSectionAttemptQuestions, exam, section.Id, null);
+            var directSectionQuestionDtos = BuildQuestionDtos(directSectionAttemptQuestions, exam, section.Id, null);
             flatQuestions.AddRange(directSectionQuestionDtos);
 
             // Calculate section totals
-    var allSectionQuestionDtos = topicDtos.SelectMany(t => t.Questions).Concat(directSectionQuestionDtos).ToList();
+            var allSectionQuestionDtos = topicDtos.SelectMany(t => t.Questions).Concat(directSectionQuestionDtos).ToList();
 
             sectionDtos.Add(new CandidateSectionDto
             {
-             SectionId = section.Id,
-        Order = section.Order,
-          TitleEn = section.TitleEn,
-     TitleAr = section.TitleAr,
+                SectionId = section.Id,
+                Order = section.Order,
+                TitleEn = section.TitleEn,
+                TitleAr = section.TitleAr,
                 DescriptionEn = section.DescriptionEn,
- DescriptionAr = section.DescriptionAr,
-          DurationMinutes = section.DurationMinutes,
-        // Section timer info - would need tracking per section in actual implementation
-          RemainingSeconds = section.DurationMinutes.HasValue ? section.DurationMinutes.Value * 60 : null,
- SectionStartedAtUtc = null, // Would need to track when candidate entered section
+                DescriptionAr = section.DescriptionAr,
+                DurationMinutes = section.DurationMinutes,
+                // Section timer info - would need tracking per section in actual implementation
+                RemainingSeconds = section.DurationMinutes.HasValue ? section.DurationMinutes.Value * 60 : null,
+                SectionStartedAtUtc = null, // Would need to track when candidate entered section
                 SectionExpiresAtUtc = null, // Would calculate based on section start + duration
-      TotalPoints = allSectionQuestionDtos.Sum(q => q.Points),
-           TotalQuestions = allSectionQuestionDtos.Count,
-   AnsweredQuestions = allSectionQuestionDtos.Count(q => q.CurrentAnswer != null),
-         Topics = topicDtos,
+                TotalPoints = allSectionQuestionDtos.Sum(q => q.Points),
+                TotalQuestions = allSectionQuestionDtos.Count,
+                AnsweredQuestions = allSectionQuestionDtos.Count(q => q.CurrentAnswer != null),
+                Topics = topicDtos,
                 Questions = directSectionQuestionDtos
-     });
-   }
+            });
+        }
 
-      var instructions = exam.Instructions
-       .Where(i => !i.IsDeleted)
- .OrderBy(i => i.Order)
-            .Select(i => new CandidateExamInstructionDto
-   {
-            Order = i.Order,
-ContentEn = i.ContentEn,
-     ContentAr = i.ContentAr
-            })
-            .ToList();
+        var instructions = exam.Instructions
+         .Where(i => !i.IsDeleted)
+   .OrderBy(i => i.Order)
+              .Select(i => new CandidateExamInstructionDto
+              {
+                  Order = i.Order,
+                  ContentEn = i.ContentEn,
+                  ContentAr = i.ContentAr
+              })
+              .ToList();
 
         return new CandidateAttemptSessionDto
         {
-        AttemptId = attempt.Id,
+            AttemptId = attempt.Id,
             ExamId = exam.Id,
-     ExamTitleEn = exam.TitleEn,
-    ExamTitleAr = exam.TitleAr,
-     StartedAtUtc = attempt.StartedAt,
- ExpiresAtUtc = attempt.ExpiresAt ?? now,
-  RemainingSeconds = CalculateRemainingSeconds(attempt),
+            ExamTitleEn = exam.TitleEn,
+            ExamTitleAr = exam.TitleAr,
+            StartedAtUtc = attempt.StartedAt,
+            ExpiresAtUtc = attempt.ExpiresAt ?? now,
+            RemainingSeconds = CalculateRemainingSeconds(attempt),
             Status = attempt.Status,
             AttemptNumber = attempt.AttemptNumber,
-   MaxAttempts = exam.MaxAttempts,
+            MaxAttempts = exam.MaxAttempts,
             TotalQuestions = flatQuestions.Count,
-       AnsweredQuestions = flatQuestions.Count(q => q.CurrentAnswer != null),
+            AnsweredQuestions = flatQuestions.Count(q => q.CurrentAnswer != null),
             ExamSettings = new CandidateExamSettingsDto
             {
-    ShuffleQuestions = exam.ShuffleQuestions,
-   ShuffleOptions = exam.ShuffleOptions,
-        LockPreviousSections = true, // Default behavior
-  PreventBackNavigation = false // Default behavior
-      },
-     Sections = sectionDtos,
+                ShuffleQuestions = exam.ShuffleQuestions,
+                ShuffleOptions = exam.ShuffleOptions,
+                LockPreviousSections = true, // Default behavior
+                PreventBackNavigation = false // Default behavior
+            },
+            Sections = sectionDtos,
             Questions = flatQuestions.OrderBy(q => q.Order).ToList(),
             Instructions = instructions
         };
@@ -1298,64 +1332,346 @@ ContentEn = i.ContentEn,
         var questionDtos = new List<CandidateQuestionDto>();
 
         foreach (var aq in attemptQuestions)
- {
-  // Get options and shuffle if enabled (NOTE: NO IsCorrect field exposed)
- var optionsList = aq.Question.Options.ToList();
-        if (exam.ShuffleOptions)
-          {
-     optionsList = optionsList.OrderBy(_ => Guid.NewGuid()).ToList();
-            }
-         else
-  {
-              optionsList = optionsList.OrderBy(o => o.Order).ToList();
-         }
-
-      var options = optionsList.Select(o => new CandidateQuestionOptionDto
-    {
-      Id = o.Id,
-  TextEn = o.TextEn,
-     TextAr = o.TextAr,
-   Order = o.Order,
-        AttachmentPath = o.AttachmentPath
-       // NO IsCorrect here!
-        }).ToList();
-
-       var currentAnswer = aq.Answers.FirstOrDefault();
-
-          questionDtos.Add(new CandidateQuestionDto
-  {
-         AttemptQuestionId = aq.Id,
-           QuestionId = aq.QuestionId,
-     Order = aq.Order,
-                Points = aq.Points,
- BodyEn = aq.Question.BodyEn,
-    BodyAr = aq.Question.BodyAr,
-          QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
-     QuestionTypeId = aq.Question.QuestionTypeId,
-   SectionId = sectionId,
-                TopicId = topicId,
-       Options = options,
-         Attachments = aq.Question.Attachments.Select(a => new CandidateQuestionAttachmentDto
+        {
+            // Get options and shuffle if enabled (NOTE: NO IsCorrect field exposed)
+            var optionsList = aq.Question.Options.ToList();
+            if (exam.ShuffleOptions)
             {
- Id = a.Id,
-       FileName = a.FileName,
-         FilePath = a.FilePath,
-     FileType = a.FileType
-   }).ToList(),
-    CurrentAnswer = currentAnswer != null ? new CandidateAnswerDto
-{
-       AttemptAnswerId = currentAnswer.Id,
-    QuestionId = currentAnswer.QuestionId,
-        SelectedOptionIds = !string.IsNullOrEmpty(currentAnswer.SelectedOptionIdsJson)
-    ? JsonSerializer.Deserialize<List<int>>(currentAnswer.SelectedOptionIdsJson)
-        : null,
-          TextAnswer = currentAnswer.TextAnswer,
-     AnsweredAt = currentAnswer.AnsweredAt
-          } : null
-        });
-  }
+                optionsList = optionsList.OrderBy(_ => Guid.NewGuid()).ToList();
+            }
+            else
+            {
+                optionsList = optionsList.OrderBy(o => o.Order).ToList();
+            }
+
+            var options = optionsList.Select(o => new CandidateQuestionOptionDto
+            {
+                Id = o.Id,
+                TextEn = o.TextEn,
+                TextAr = o.TextAr,
+                Order = o.Order,
+                AttachmentPath = o.AttachmentPath
+                // NO IsCorrect here!
+            }).ToList();
+
+            var currentAnswer = aq.Answers.FirstOrDefault();
+
+            questionDtos.Add(new CandidateQuestionDto
+            {
+                AttemptQuestionId = aq.Id,
+                QuestionId = aq.QuestionId,
+                Order = aq.Order,
+                Points = aq.Points,
+                BodyEn = aq.Question.BodyEn,
+                BodyAr = aq.Question.BodyAr,
+                QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
+                QuestionTypeId = aq.Question.QuestionTypeId,
+                SectionId = sectionId,
+                TopicId = topicId,
+                Options = options,
+                Attachments = aq.Question.Attachments.Select(a => new CandidateQuestionAttachmentDto
+                {
+                    Id = a.Id,
+                    FileName = a.FileName,
+                    FilePath = a.FilePath,
+                    FileType = a.FileType
+                }).ToList(),
+                CurrentAnswer = currentAnswer != null ? new CandidateAnswerDto
+                {
+                    AttemptAnswerId = currentAnswer.Id,
+                    QuestionId = currentAnswer.QuestionId,
+                    SelectedOptionIds = !string.IsNullOrEmpty(currentAnswer.SelectedOptionIdsJson)
+      ? JsonSerializer.Deserialize<List<int>>(currentAnswer.SelectedOptionIdsJson)
+          : null,
+                    TextAnswer = currentAnswer.TextAnswer,
+                    AnsweredAt = currentAnswer.AnsweredAt
+                } : null
+            });
+        }
 
         return questionDtos;
+    }
+
+    #endregion
+
+    #region Exam Journey
+
+    public async Task<ApiResponse<ExamJourneyDto>> GetExamJourneyAsync(string candidateId)
+    {
+        var now = DateTime.UtcNow;
+
+        // Get user info
+        var user = await _userManager.FindByIdAsync(candidateId);
+        if (user == null)
+        {
+            return ApiResponse<ExamJourneyDto>.FailureResponse("User not found");
+        }
+
+        // Get all candidate's attempts with results
+        var allAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .Include(a => a.Exam)
+            .Include(a => a.Questions)
+                .ThenInclude(q => q.Answers)
+            .Where(a => a.CandidateId == candidateId && !a.IsDeleted)
+            .ToListAsync();
+
+        // Get all results for this candidate
+        var results = await _context.Set<Domain.Entities.ExamResult.Result>()
+            .Where(r => r.CandidateId == candidateId && !r.IsDeleted)
+            .ToListAsync();
+
+        // Get all available exams
+        var roles = await _userManager.GetRolesAsync(user);
+        var isCandidate = roles.Contains(AppRoles.Candidate);
+
+        var examsQuery = _context.Exams
+            .Include(e => e.Sections.Where(s => !s.IsDeleted))
+                .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
+            .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted);
+
+        if (!isCandidate && user.DepartmentId.HasValue)
+        {
+            examsQuery = examsQuery.Where(e => e.DepartmentId == user.DepartmentId.Value);
+        }
+
+        var availableExams = await examsQuery.ToListAsync();
+
+        // Build journey groups
+        var inProgress = new List<JourneyExamCardDto>();
+        var readyToStart = new List<JourneyExamCardDto>();
+        var finished = new List<JourneyExamCardDto>();
+        var waitingResult = new List<JourneyExamCardDto>();
+        var locked = new List<JourneyExamCardDto>();
+        var history = new List<JourneyExamCardDto>();
+
+        foreach (var exam in availableExams)
+        {
+            var examAttempts = allAttempts.Where(a => a.ExamId == exam.Id).ToList();
+            var examResults = results.Where(r => r.ExamId == exam.Id).ToList();
+            var attemptsUsed = examAttempts.Count;
+
+            // Check for active (in-progress) attempt
+            var activeAttempt = examAttempts
+                .Where(a => (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress)
+                            && a.ExpiresAt.HasValue && a.ExpiresAt.Value > now)
+                .OrderByDescending(a => a.CreatedDate)
+                .FirstOrDefault();
+
+            // Latest attempt info
+            var latestAttempt = examAttempts.OrderByDescending(a => a.CreatedDate).FirstOrDefault();
+            var latestResult = examResults.OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+
+            // Calculate exam totals
+            var totalQuestions = exam.Sections.SelectMany(s => s.Questions).Count();
+            var totalPoints = exam.Sections.SelectMany(s => s.Questions).Sum(q => q.Points);
+
+            // Build card
+            var card = new JourneyExamCardDto
+            {
+                ExamId = exam.Id,
+                TitleEn = exam.TitleEn,
+                TitleAr = exam.TitleAr,
+                DescriptionEn = exam.DescriptionEn,
+                DescriptionAr = exam.DescriptionAr,
+                DurationMinutes = exam.DurationMinutes,
+                TotalQuestions = totalQuestions,
+                TotalPoints = totalPoints,
+                PassScore = exam.PassScore,
+                AttemptsUsed = attemptsUsed,
+                MaxAttempts = exam.MaxAttempts,
+                LatestAttemptId = latestAttempt?.Id,
+                StartAt = exam.StartAt,
+                EndAt = exam.EndAt,
+                ExamType = exam.ExamType
+            };
+
+            // Determine journey stage
+            if (activeAttempt != null)
+            {
+                // IN_PROGRESS
+                var answeredCount = activeAttempt.Questions?.Count(q =>
+                    q.Answers.Any(a => !string.IsNullOrEmpty(a.SelectedOptionIdsJson) || !string.IsNullOrEmpty(a.TextAnswer))) ?? 0;
+                var remainingSeconds = (int)(activeAttempt.ExpiresAt!.Value - now).TotalSeconds;
+
+                card.Stage = JourneyStage.InProgress;
+                card.RemainingSeconds = Math.Max(0, remainingSeconds);
+                card.AnsweredQuestions = answeredCount;
+                card.CtaType = "resume";
+                card.CtaTarget = $"/take-exam/{activeAttempt.Id}";
+                card.LatestAttemptId = activeAttempt.Id;
+                inProgress.Add(card);
+            }
+            else if (latestAttempt?.Status == AttemptStatus.Submitted)
+            {
+                // Check if result exists and is published
+                if (latestResult != null && latestResult.IsPublishedToCandidate)
+                {
+                    // FINISHED - has published result
+                    card.Stage = JourneyStage.Finished;
+                    card.IsResultPublished = true;
+                    card.IsPassed = latestResult.IsPassed;
+                    card.Score = latestResult.TotalScore;
+                    card.MaxScore = latestResult.MaxPossibleScore;
+                    card.Percentage = latestResult.MaxPossibleScore > 0
+                        ? Math.Round((latestResult.TotalScore / latestResult.MaxPossibleScore) * 100, 1)
+                        : 0;
+                    card.CtaType = "view-result";
+                    card.CtaTarget = $"/results/my-result/{latestAttempt.Id}";
+                    finished.Add(card);
+                }
+                else
+                {
+                    // WAITING_RESULT - submitted but not graded/published
+                    card.Stage = JourneyStage.WaitingResult;
+                    card.IsResultPublished = false;
+                    card.CtaType = "waiting";
+                    waitingResult.Add(card);
+                }
+            }
+            else if (latestAttempt?.Status == AttemptStatus.Expired || latestAttempt?.Status == AttemptStatus.Cancelled)
+            {
+                // Check eligibility for restart
+                var canRestart = CheckEligibility(exam, attemptsUsed, now);
+                if (canRestart.CanStartNow)
+                {
+                    card.Stage = JourneyStage.ReadyToStart;
+                    card.CanStartNow = true;
+                    card.CtaType = "start";
+                    card.CtaTarget = $"/exams/{exam.Id}/preview";
+                    readyToStart.Add(card);
+                }
+                else
+                {
+                    // HISTORY - expired attempt, can't restart
+                    card.Stage = JourneyStage.History;
+                    card.CanStartNow = false;
+                    card.LockReasons = canRestart.Reasons;
+                    card.CtaType = "locked";
+                    history.Add(card);
+                }
+            }
+            else
+            {
+                // No attempt yet - check eligibility
+                var eligibility = CheckEligibility(exam, attemptsUsed, now);
+                if (eligibility.CanStartNow)
+                {
+                    // READY_TO_START
+                    card.Stage = JourneyStage.ReadyToStart;
+                    card.CanStartNow = true;
+                    card.CtaType = "start";
+                    card.CtaTarget = $"/exams/{exam.Id}/preview";
+                    readyToStart.Add(card);
+                }
+                else
+                {
+                    // LOCKED
+                    card.Stage = JourneyStage.Locked;
+                    card.CanStartNow = false;
+                    card.LockReasons = eligibility.Reasons;
+                    card.CtaType = "locked";
+                    locked.Add(card);
+                }
+            }
+        }
+
+        // Determine primary action
+        PrimaryActionDto? primaryAction = null;
+
+        // Priority 1: Resume in-progress
+        var topInProgress = inProgress.OrderBy(c => c.RemainingSeconds).FirstOrDefault();
+        if (topInProgress != null)
+        {
+            primaryAction = new PrimaryActionDto
+            {
+                ActionType = PrimaryActionType.Resume,
+                ExamId = topInProgress.ExamId,
+                AttemptId = topInProgress.LatestAttemptId,
+                TitleEn = topInProgress.TitleEn,
+                TitleAr = topInProgress.TitleAr,
+                RemainingSeconds = topInProgress.RemainingSeconds,
+                AnsweredQuestions = topInProgress.AnsweredQuestions,
+                TotalQuestions = topInProgress.TotalQuestions,
+                StatusLabel = "In Progress"
+            };
+        }
+        // Priority 2: Start new exam
+        else if (readyToStart.Any())
+        {
+            var topReady = readyToStart.First();
+            primaryAction = new PrimaryActionDto
+            {
+                ActionType = PrimaryActionType.Start,
+                ExamId = topReady.ExamId,
+                TitleEn = topReady.TitleEn,
+                TitleAr = topReady.TitleAr,
+                TotalQuestions = topReady.TotalQuestions,
+                StatusLabel = "Ready to Start"
+            };
+        }
+        // Priority 3: View result
+        else if (finished.Any())
+        {
+            var topFinished = finished.OrderByDescending(c => c.Score).First();
+            primaryAction = new PrimaryActionDto
+            {
+                ActionType = PrimaryActionType.ViewResult,
+                ExamId = topFinished.ExamId,
+                AttemptId = topFinished.LatestAttemptId,
+                TitleEn = topFinished.TitleEn,
+                TitleAr = topFinished.TitleAr,
+                Score = topFinished.Score,
+                MaxScore = topFinished.MaxScore,
+                IsPassed = topFinished.IsPassed,
+                StatusLabel = topFinished.IsPassed == true ? "Passed" : "Failed"
+            };
+        }
+
+        var response = new ExamJourneyDto
+        {
+            CurrentDateUtc = now,
+            CandidateNameEn = user.FullName ?? user.DisplayName ?? "",
+            CandidateNameAr = user.FullName ?? user.DisplayName ?? "",
+            PrimaryAction = primaryAction,
+            Groups = new JourneyGroupsDto
+            {
+                InProgress = inProgress,
+                ReadyToStart = readyToStart,
+                Finished = finished,
+                WaitingResult = waitingResult,
+                Locked = locked,
+                History = history
+            }
+        };
+
+        return ApiResponse<ExamJourneyDto>.SuccessResponse(response, "Exam journey loaded");
+    }
+
+    /// <summary>
+    /// Check eligibility for starting an exam
+    /// </summary>
+    private (bool CanStartNow, List<string> Reasons) CheckEligibility(Domain.Entities.Assessment.Exam exam, int attemptsUsed, DateTime now)
+    {
+        var reasons = new List<string>();
+
+        // Check attempts
+        if (exam.MaxAttempts > 0 && attemptsUsed >= exam.MaxAttempts)
+        {
+            reasons.Add("Maximum attempts reached");
+        }
+
+        // Check exam window
+        if (exam.StartAt.HasValue && exam.StartAt.Value > now)
+        {
+            reasons.Add($"Exam not yet available (starts {exam.StartAt.Value:g})");
+        }
+
+        if (exam.EndAt.HasValue && exam.EndAt.Value < now)
+        {
+            reasons.Add("Exam window has ended");
+        }
+
+        return (reasons.Count == 0, reasons);
     }
 
     #endregion

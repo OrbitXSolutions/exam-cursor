@@ -232,8 +232,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         
         setBuilderSections(loadedSections)
         
-        // Extract selected subject/topic IDs
-        const subjectIds = [...new Set(data.sections.map(s => s.questionSubjectId).filter(Boolean) as number[])]
+        // Use selected subject IDs from API or extract from sections
+        const subjectIds = data.selectedSubjectIds?.length > 0 
+          ? data.selectedSubjectIds 
+          : [...new Set(data.sections.map(s => s.questionSubjectId).filter(Boolean) as number[])]
         setSelectedSubjectIds(subjectIds)
         
         if (data.sourceType === SectionSourceType.Topic) {
@@ -396,7 +398,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
 
       const request: SaveExamBuilderRequest = {
         sourceType,
-        sections: builderSections.map(s => ({
+        sections: builderSections.map((s, index) => ({
           questionSubjectId: s.questionSubjectId,
           questionTopicId: s.questionTopicId,
           titleEn: s.titleEn,
@@ -404,12 +406,15 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           durationMinutes: s.durationMinutes,
           pickCount: s.pickCount,
           sourceType: s.sourceType,
+          order: index + 1,
         })),
       }
 
       const result = await saveExamBuilder(examId, request)
       setLoadedBuilderData(result)
       toast.success("Builder configuration saved successfully")
+      // Redirect to exam overview page
+      router.push(`/exams/${examId}/overview`)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save builder"
       setBuilderError(errorMessage)
@@ -506,7 +511,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/exams">
+          <Link href="/exams/list">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -804,7 +809,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
             {/* Submit Buttons */}
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" asChild>
-                <Link href="/exams">{t("common.cancel") || "Cancel"}</Link>
+                <Link href="/exams/list">{t("common.cancel") || "Cancel"}</Link>
               </Button>
               <Button type="submit" disabled={loading}>
                 {loading ? (
@@ -1149,7 +1154,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
               {builderSections.length > 0 && (
                 <div className="flex justify-end gap-3">
                   <Button variant="outline" asChild>
-                    <Link href="/exams">{t("common.cancel") || "Cancel"}</Link>
+                    <Link href="/exams/list">{t("common.cancel") || "Cancel"}</Link>
                   </Button>
                   <Button onClick={handleSaveBuilder} disabled={builderSaving}>
                     {builderSaving ? (

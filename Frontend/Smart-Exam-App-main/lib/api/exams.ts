@@ -977,7 +977,6 @@ export async function saveExamBuilder(
 ): Promise<ExamBuilderDto> {
   const response = await apiClient.put<ExamBuilderDto>(
     `/Assessment/exams/${examId}/builder`,
-    undefined,
     data,
   );
   return response as ExamBuilderDto;

@@ -238,9 +238,10 @@ public class AssessmentService : IAssessmentService
   "Cannot show correct answers without allowing review. Enable 'AllowReview' first.");
     }
 
-    // Validate unique title within department
+    // Validate unique title within department (excluding soft-deleted)
     var titleExists = await _context.Exams
   .AnyAsync(x => x.DepartmentId == departmentId &&
+   !x.IsDeleted &&
    (x.TitleEn.ToLower() == dto.TitleEn.ToLower() ||
      x.TitleAr.ToLower() == dto.TitleAr.ToLower()));
 
@@ -333,10 +334,11 @@ public class AssessmentService : IAssessmentService
        "Cannot show correct answers without allowing review. Enable 'AllowReview' first.");
     }
 
-    // Validate unique title within department (excluding current exam)
+    // Validate unique title within department (excluding current exam and soft-deleted)
     var titleExists = await _context.Exams
 .AnyAsync(x => x.Id != id &&
     x.DepartmentId == newDepartmentId &&
+   !x.IsDeleted &&
    (x.TitleEn.ToLower() == dto.TitleEn.ToLower() ||
    x.TitleAr.ToLower() == dto.TitleAr.ToLower()));
 
@@ -1339,13 +1341,41 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       result.Errors.Add("Exam must have at least one section");
     }
 
-    // Rule: Each section must have at least one question
+    // Rule: Each section must have at least one question (or be a valid Builder section)
     foreach (var section in exam.Sections)
     {
-      if (!section.Questions.Any())
+      // Builder mode: SourceType is set with QuestionSubjectId and PickCount
+      if (section.SourceType.HasValue && section.QuestionSubjectId.HasValue)
       {
-        result.IsValid = false;
-        result.Errors.Add($"Section '{section.TitleEn}' must have at least one question");
+        // Builder section - validate PickCount
+        if (section.PickCount <= 0)
+        {
+          result.IsValid = false;
+          result.Errors.Add($"Section '{section.TitleEn}' must have a valid PickCount (greater than 0)");
+        }
+        else
+        {
+          // Validate enough questions are available in QuestionBank
+          var availableCount = await _context.Questions
+            .Where(q => q.SubjectId == section.QuestionSubjectId && q.IsActive && !q.IsDeleted)
+            .Where(q => !section.QuestionTopicId.HasValue || q.TopicId == section.QuestionTopicId)
+            .CountAsync();
+
+          if (availableCount < section.PickCount)
+          {
+            result.IsValid = false;
+            result.Errors.Add($"Section '{section.TitleEn}' requires {section.PickCount} questions, but only {availableCount} are available in the QuestionBank");
+          }
+        }
+      }
+      else
+      {
+        // Manual mode - must have ExamQuestions
+        if (!section.Questions.Any())
+        {
+          result.IsValid = false;
+          result.Errors.Add($"Section '{section.TitleEn}' must have at least one question");
+        }
       }
     }
 
@@ -1410,7 +1440,36 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     }
 
     // Rule: PassScore must be valid
+    // Include points from manual questions
     var totalPoints = allQuestions.Sum(q => q.Points);
+    // Include points from Builder sections (calculate from available questions in QuestionBank)
+    foreach (var section in exam.Sections.Where(s => s.SourceType.HasValue && s.QuestionSubjectId.HasValue))
+    {
+      if (section.TotalPointsOverride.HasValue)
+      {
+        totalPoints += section.TotalPointsOverride.Value;
+      }
+      else
+      {
+        // Get actual question points from QuestionBank
+        var questionPointsQuery = _context.Questions
+            .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == section.QuestionSubjectId);
+
+        if (section.QuestionTopicId.HasValue)
+        {
+          questionPointsQuery = questionPointsQuery.Where(q => q.TopicId == section.QuestionTopicId);
+        }
+
+        // Get sum and count to calculate average (handles empty set)
+        var pointsSum = await questionPointsQuery.SumAsync(q => q.Points);
+        var questionCount = await questionPointsQuery.CountAsync();
+
+        // Calculate average points, default to 1 if no questions
+        var avgPointsPerQuestion = questionCount > 0 ? (pointsSum / questionCount) : 1m;
+
+        totalPoints += section.PickCount * avgPointsPerQuestion;
+      }
+    }
     if (exam.PassScore > totalPoints)
     {
       result.IsValid = false;
@@ -2378,13 +2437,17 @@ $"Questions not found: {string.Join(", ", missingIds)}");
       return ApiResponse<ExamBuilderDto>.FailureResponse("Exam not found");
     }
 
+    // Include all sections that have QuestionSubjectId (they can be loaded in builder)
+    // Infer SourceType if not set: if TopicId is set => Topic, otherwise => Subject
     var builderSections = exam.Sections
-        .Where(s => s.SourceType.HasValue)
+        .Where(s => s.QuestionSubjectId.HasValue)
         .OrderBy(s => s.Order)
         .Select(s => new BuilderSectionDto
         {
           Id = s.Id,
-          SourceType = s.SourceType!.Value,
+          SourceType = s.SourceType ?? (s.QuestionTopicId.HasValue
+              ? Domain.Enums.SectionSourceType.Topic
+              : Domain.Enums.SectionSourceType.Subject),
           QuestionSubjectId = s.QuestionSubjectId ?? 0,
           QuestionTopicId = s.QuestionTopicId,
           TitleEn = s.TitleEn,
@@ -2531,16 +2594,20 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         }
       }
 
+      // Ensure titles are not empty
+      if (string.IsNullOrWhiteSpace(titleEn)) titleEn = $"Section {sectionDto.Order}";
+      if (string.IsNullOrWhiteSpace(titleAr)) titleAr = $"قسم {sectionDto.Order}";
+
       var section = new ExamSection
       {
         ExamId = examId,
         TitleEn = titleEn,
         TitleAr = titleAr,
-        Order = sectionDto.Order,
+        Order = sectionDto.Order > 0 ? sectionDto.Order : (newSections.Count + 1),
         DurationMinutes = sectionDto.DurationMinutes,
         SourceType = sectionDto.SourceType,
-        QuestionSubjectId = sectionDto.QuestionSubjectId,
-        QuestionTopicId = sectionDto.QuestionTopicId,
+        QuestionSubjectId = sectionDto.QuestionSubjectId > 0 ? sectionDto.QuestionSubjectId : null,
+        QuestionTopicId = sectionDto.QuestionTopicId > 0 ? sectionDto.QuestionTopicId : null,
         PickCount = sectionDto.PickCount,
         CreatedDate = DateTime.UtcNow,
         CreatedBy = userId

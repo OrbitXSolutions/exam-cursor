@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
+import { UserRole } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -34,7 +35,19 @@ export default function LoginPage() {
 
     const success = await login(email, password)
     if (success) {
-      router.push("/dashboard")
+      // Get user from localStorage to determine role-based redirect
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        const user = JSON.parse(storedUser)
+        // Redirect candidates to My Exams, others to Dashboard
+        if (user.role === UserRole.Candidate) {
+          router.push("/my-exams")
+        } else {
+          router.push("/dashboard")
+        }
+      } else {
+        router.push("/dashboard")
+      }
     } else {
       setError(t("errors.invalidCredentials"))
     }

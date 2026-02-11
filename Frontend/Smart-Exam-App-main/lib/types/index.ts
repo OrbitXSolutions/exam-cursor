@@ -327,9 +327,8 @@ export interface ExamSection {
 // ============ EXAM BUILDER ============
 export interface ExamBuilderDto {
   examId: number;
-  examTitleEn: string;
-  examTitleAr: string;
   sourceType: SectionSourceType;
+  selectedSubjectIds: number[];
   sections: BuilderSectionDto[];
 }
 
@@ -363,6 +362,7 @@ export interface SaveBuilderSectionDto {
   durationMinutes: number | null;
   pickCount: number;
   sourceType: SectionSourceType;
+  order: number;
 }
 
 export interface QuestionsCountResponse {

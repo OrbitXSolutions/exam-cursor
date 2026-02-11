@@ -330,10 +330,11 @@ export default function MyExamsPage() {
             }
 
             return (
-              <Card key={exam.id} className="overflow-hidden border shadow-sm">
-                <div className="flex items-start justify-between gap-3 border-b bg-muted/30 px-4 py-3">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold leading-tight">
+              <Card key={exam.id} className="overflow-hidden border-2 shadow-md hover:shadow-lg transition-shadow">
+                {/* Header with Status Badge */}
+                <div className="flex items-start justify-between gap-3 border-b bg-gradient-to-r from-muted/50 to-muted/30 px-5 py-4">
+                  <div className="space-y-1.5 flex-1">
+                    <h3 className="text-xl font-bold leading-tight text-foreground">
                       {getLocalizedField(exam, "title", language)}
                     </h3>
                     {exam.descriptionEn || exam.descriptionAr ? (
@@ -342,77 +343,161 @@ export default function MyExamsPage() {
                       </p>
                     ) : null}
                   </div>
-                  <Badge className={`border ${statusClass}`}>{statusLabel}</Badge>
+                  <Badge className={`border text-sm px-3 py-1 ${statusClass}`}>{statusLabel}</Badge>
                 </div>
-                <CardContent className="space-y-4 p-4">
-                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {exam.durationMinutes} {t("common.minutes")}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <FileText className="h-4 w-4" />
-                      {exam.totalQuestions} {t("common.questions")}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Award className="h-4 w-4" />
-                      {exam.totalPoints} {t("common.points")}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Target className="h-4 w-4" />
-                      {t("exams.passScore")}: {exam.passScore}
-                    </span>
-                  </div>
 
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {t("myExams.attempts")}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {attemptsUsed} / {exam.maxAttempts === 0 ? "∞" : exam.maxAttempts}
-                      {attemptsRemaining != null && (
-                        <span className="text-muted-foreground">
-                          {" "}
-                          ({attemptsRemaining} {t("common.remaining")})
-                        </span>
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="grid gap-2 text-xs text-muted-foreground">
-                    <div className="flex items-center justify-between">
-                      <span>{t("candidateDashboard.start")}</span>
-                      <span className="text-foreground">{formatDateTime(exam.startAt)}</span>
+                <CardContent className="space-y-5 p-5">
+                  {/* Main Stats Grid - 2x2 */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t("common.questions")}</p>
+                        <p className="text-lg font-bold text-foreground">{exam.totalQuestions}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span>{t("candidateDashboard.expired")}</span>
-                      <span className="text-foreground">{formatDateTime(exam.endAt)}</span>
+                    
+                    <div className="flex items-center gap-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 p-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900">
+                        <Award className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t("common.points")}</p>
+                        <p className="text-lg font-bold text-foreground">{exam.totalPoints}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 p-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
+                        <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t("exams.passScore")}</p>
+                        <p className="text-lg font-bold text-foreground">{exam.passScore}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 rounded-lg bg-purple-50 dark:bg-purple-950/30 p-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
+                        <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t("exams.duration")}</p>
+                        <p className="text-lg font-bold text-foreground">{exam.durationMinutes} {t("common.min")}</p>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Attempts Progress */}
+                  <div className="rounded-lg border bg-muted/20 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        {t("myExams.attempts")}
+                      </span>
+                      <span className="text-base font-bold text-foreground">
+                        {attemptsUsed} / {exam.maxAttempts === 0 ? "∞" : exam.maxAttempts}
+                      </span>
+                    </div>
+                    {exam.maxAttempts > 0 && (
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all ${
+                            attemptsRemaining === 0 ? 'bg-red-500' : attemptsRemaining === 1 ? 'bg-amber-500' : 'bg-emerald-500'
+                          }`}
+                          style={{ width: `${Math.min(100, (attemptsUsed / exam.maxAttempts) * 100)}%` }}
+                        />
+                      </div>
+                    )}
+                    {attemptsRemaining != null && attemptsRemaining > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        {attemptsRemaining} {t("common.attemptsRemaining")}
+                      </p>
+                    )}
+                    {attemptsRemaining === 0 && (
+                      <p className="text-xs text-red-600 mt-1.5 font-medium">
+                        {t("myExams.noAttemptsLeft")}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Schedule Info - Only show if scheduled */}
+                  {(exam.startAt || exam.endAt) ? (
+                    <div className="rounded-lg border p-3 space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        {t("myExams.schedule")}
+                      </p>
+                      <div className="grid gap-2 text-sm">
+                        {exam.startAt && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {t("candidateDashboard.start")}
+                            </span>
+                            <span className="font-medium text-foreground">{formatDateTime(exam.startAt)}</span>
+                          </div>
+                        )}
+                        {exam.endAt && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {t("candidateDashboard.expired")}
+                            </span>
+                            <span className="font-medium text-foreground">{formatDateTime(exam.endAt)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-800 p-3">
+                      <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        {t("myExams.flexExam")}
+                      </p>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
+                        {t("myExams.flexExamDesc")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Status Messages */}
                   {statusKey === "submitted" && (
-                    <div className="flex items-center gap-2 text-xs text-amber-700">
+                    <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 p-3 text-amber-700 dark:text-amber-400">
                       <AlertCircle className="h-4 w-4" />
-                      <span>{t("results.pendingGrading")}</span>
+                      <span className="text-sm font-medium">{t("results.pendingGrading")}</span>
                     </div>
                   )}
 
                   {startsInFuture && statusKey === "available" && (
-                    <div className="text-xs text-muted-foreground">
-                      {t("myExams.startsOn")} {formatDateTime(exam.startAt)}
+                    <div className="flex items-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3 text-blue-700 dark:text-blue-400">
+                      <Clock className="h-4 w-4" />
+                      <span className="text-sm">{t("myExams.startsOn")} {formatDateTime(exam.startAt)}</span>
                     </div>
                   )}
 
                   {statusKey === "completed" && exam.myBestIsPassed != null && (
-                    <Badge variant={exam.myBestIsPassed ? "default" : "destructive"}>
-                      {exam.myBestIsPassed ? t("myExams.passed") : t("myExams.failed")}
-                    </Badge>
+                    <div className={`flex items-center gap-2 rounded-lg p-3 ${
+                      exam.myBestIsPassed 
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400' 
+                        : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
+                    }`}>
+                      {exam.myBestIsPassed ? (
+                        <CheckCircle2 className="h-5 w-5" />
+                      ) : (
+                        <XCircle className="h-5 w-5" />
+                      )}
+                      <span className="text-base font-bold">
+                        {exam.myBestIsPassed ? t("myExams.passed") : t("myExams.failed")}
+                      </span>
+                    </div>
                   )}
 
-                  <div className="flex flex-wrap gap-2">
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-3 pt-2">
                     {secondaryAction && (
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" size="lg" asChild className="flex-1">
                         <Link href={secondaryAction.href}>
                           {secondaryAction.icon}
                           {secondaryAction.label}
@@ -420,19 +505,19 @@ export default function MyExamsPage() {
                       </Button>
                     )}
                     {primaryAction && primaryAction.href ? (
-                      <Button asChild>
+                      <Button size="lg" asChild className="flex-1">
                         <Link href={primaryAction.href}>
                           {primaryAction.icon}
                           {primaryAction.label}
                         </Link>
                       </Button>
                     ) : primaryAction ? (
-                      <Button variant="secondary" disabled className="w-full sm:w-auto">
+                      <Button variant="secondary" size="lg" disabled className="flex-1">
                         {primaryAction.icon}
                         {primaryAction.label}
                       </Button>
                     ) : (
-                      <Button variant="secondary" disabled className="w-full sm:w-auto">
+                      <Button variant="secondary" size="lg" disabled className="flex-1">
                         <XCircle className="mr-2 h-4 w-4" />
                         {t("common.notAvailable")}
                       </Button>
