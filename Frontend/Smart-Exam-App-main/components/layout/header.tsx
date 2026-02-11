@@ -13,39 +13,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Bell, Search, User, Settings, LogOut, HelpCircle } from "lucide-react"
+import { Bell, User, Settings, LogOut, HelpCircle } from "lucide-react"
 import Link from "next/link"
 
-interface HeaderProps {
-  title?: string
-  subtitle?: string
-}
-
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header() {
   const { t, language } = useI18n()
   const { user, logout } = useAuth()
 
+  // Generate welcome title and date subtitle
+  const welcomeTitle = user
+    ? `${language === "ar" ? "مرحباً بعودتك" : "Welcome back"}, ${getLocalizedField(user, "fullName", language).split(" ")[0]}!`
+    : ""
+  const dateSubtitle = new Date().toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      {/* Left: Title */}
+      {/* Left: Welcome Title */}
       <div className="flex items-center gap-4">
-        {title && (
+        {user && (
           <div>
-            <h1 className="text-lg font-semibold">{title}</h1>
-            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+            <h1 className="text-lg font-semibold">{welcomeTitle}</h1>
+            <p className="text-sm text-muted-foreground">{dateSubtitle}</p>
           </div>
         )}
       </div>
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder={t("common.search")} className="w-64 pl-9 bg-muted/50 border-0" />
-        </div>
-
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />

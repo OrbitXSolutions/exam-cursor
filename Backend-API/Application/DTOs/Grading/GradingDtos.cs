@@ -10,11 +10,11 @@ namespace Smart_Core.Application.DTOs.Grading;
 public class GradingSessionDto
 {
     public int Id { get; set; }
-  public int AttemptId { get; set; }
+    public int AttemptId { get; set; }
     public int ExamId { get; set; }
     public string ExamTitleEn { get; set; } = string.Empty;
- public string ExamTitleAr { get; set; } = string.Empty;
-  public string CandidateId { get; set; } = string.Empty;
+    public string ExamTitleAr { get; set; } = string.Empty;
+    public string CandidateId { get; set; } = string.Empty;
     public string CandidateName { get; set; } = string.Empty;
     public string? GradedBy { get; set; }
     public string? GraderName { get; set; }
@@ -22,7 +22,7 @@ public class GradingSessionDto
     public string StatusName => Status.ToString();
     public decimal? TotalScore { get; set; }
     public decimal MaxPossibleScore { get; set; }
-  public decimal PassScore { get; set; }
+    public decimal PassScore { get; set; }
     public bool? IsPassed { get; set; }
     public DateTime? GradedAt { get; set; }
     public DateTime CreatedDate { get; set; }
@@ -51,6 +51,10 @@ public class GradingSessionListDto
     public bool? IsPassed { get; set; }
     public DateTime? GradedAt { get; set; }
     public int ManualGradingRequired { get; set; }
+    /// <summary>
+    /// Whether the exam result has been finalized (GradedAnswers copied to ExamResultAnswers, Result published)
+    /// </summary>
+    public bool IsResultFinalized { get; set; }
 }
 
 /// <summary>
@@ -88,7 +92,7 @@ public class GradingInitiatedDto
     public string StatusName => Status.ToString();
     public int AutoGradedCount { get; set; }
     public int ManualGradingRequired { get; set; }
-  public decimal? PartialScore { get; set; }
+    public decimal? PartialScore { get; set; }
     public string Message { get; set; } = string.Empty;
 }
 
@@ -104,31 +108,32 @@ public class GradedAnswerDto
     public int Id { get; set; }
     public int GradingSessionId { get; set; }
     public int QuestionId { get; set; }
-    
+
     // Bilingual Question Body
     public string QuestionBodyEn { get; set; } = string.Empty;
     public string QuestionBodyAr { get; set; } = string.Empty;
-    
+
     public string QuestionTypeName { get; set; } = string.Empty;
     public int QuestionTypeId { get; set; }
-  public decimal MaxPoints { get; set; }
-    
+    public decimal MaxPoints { get; set; }
+
     // Answer data
     public List<int>? SelectedOptionIds { get; set; }
+    public List<SelectedOptionDto>? SelectedOptions { get; set; }  // With text for display
     public string? TextAnswer { get; set; }
-    
+
     // Grading result
     public decimal Score { get; set; }
     public bool IsCorrect { get; set; }
     public bool IsManuallyGraded { get; set; }
     public string? GraderComment { get; set; }
-  
+
     // For display - correct answers (admin only)
     public List<CorrectOptionDto>? CorrectOptions { get; set; }
-    
+
     // Bilingual Model Answer
- public string? ModelAnswerEn { get; set; }
-  public string? ModelAnswerAr { get; set; }
+    public string? ModelAnswerEn { get; set; }
+    public string? ModelAnswerAr { get; set; }
 }
 
 /// <summary>
@@ -137,10 +142,23 @@ public class GradedAnswerDto
 public class CorrectOptionDto
 {
     public int Id { get; set; }
-    
+
     // Bilingual Text
- public string TextEn { get; set; } = string.Empty;
+    public string TextEn { get; set; } = string.Empty;
     public string TextAr { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Selected option for display (candidate's answer)
+/// </summary>
+public class SelectedOptionDto
+{
+    public int Id { get; set; }
+
+    // Bilingual Text
+    public string TextEn { get; set; } = string.Empty;
+    public string TextAr { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
 }
 
 /// <summary>
@@ -160,7 +178,7 @@ public class ManualGradeDto
 /// </summary>
 public class BulkManualGradeDto
 {
- public int GradingSessionId { get; set; }
+    public int GradingSessionId { get; set; }
     public List<ManualGradeItemDto> Grades { get; set; } = new();
 }
 
@@ -238,7 +256,7 @@ public class RegradeDto
 /// </summary>
 public class RegradeResultDto
 {
-  public int GradedAnswerId { get; set; }
+    public int GradedAnswerId { get; set; }
     public decimal PreviousScore { get; set; }
     public decimal NewScore { get; set; }
     public decimal NewTotalScore { get; set; }
@@ -259,12 +277,12 @@ public class ExamGradingStatsDto
     public string ExamTitleEn { get; set; } = string.Empty;
     public int TotalAttempts { get; set; }
     public int GradedAttempts { get; set; }
- public int PendingGrading { get; set; }
+    public int PendingGrading { get; set; }
     public int ManualGradingRequired { get; set; }
-  public int PassedCount { get; set; }
+    public int PassedCount { get; set; }
     public int FailedCount { get; set; }
     public decimal AverageScore { get; set; }
-  public decimal HighestScore { get; set; }
+    public decimal HighestScore { get; set; }
     public decimal LowestScore { get; set; }
     public decimal PassRate { get; set; }
 }
@@ -275,15 +293,15 @@ public class ExamGradingStatsDto
 public class QuestionGradingStatsDto
 {
     public int QuestionId { get; set; }
-    
+
     // Bilingual Question Body
     public string QuestionBodyEn { get; set; } = string.Empty;
-  public string QuestionBodyAr { get; set; } = string.Empty;
-    
+    public string QuestionBodyAr { get; set; } = string.Empty;
+
     public string QuestionTypeName { get; set; } = string.Empty;
     public int TotalAnswers { get; set; }
     public int CorrectAnswers { get; set; }
- public int IncorrectAnswers { get; set; }
+    public int IncorrectAnswers { get; set; }
     public decimal AverageScore { get; set; }
     public decimal MaxPoints { get; set; }
     public decimal DifficultyIndex { get; set; } // CorrectAnswers / TotalAnswers
@@ -306,14 +324,14 @@ public class CandidateGradingResultDto
     public decimal MaxPossibleScore { get; set; }
     public decimal PassScore { get; set; }
     public bool IsPassed { get; set; }
-public decimal Percentage { get; set; }
+    public decimal Percentage { get; set; }
     public DateTime? GradedAt { get; set; }
     public GradingStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public bool IsGradingComplete { get; set; }
-    
+
     // Optional: Per-question results if exam allows review
-  public List<CandidateQuestionResultDto>? QuestionResults { get; set; }
+    public List<CandidateQuestionResultDto>? QuestionResults { get; set; }
 }
 
 /// <summary>
@@ -322,11 +340,11 @@ public decimal Percentage { get; set; }
 public class CandidateQuestionResultDto
 {
     public int QuestionId { get; set; }
-    
+
     // Bilingual Question Body
     public string QuestionBodyEn { get; set; } = string.Empty;
     public string QuestionBodyAr { get; set; } = string.Empty;
-    
+
     public decimal PointsEarned { get; set; }
     public decimal MaxPoints { get; set; }
     public bool IsCorrect { get; set; }

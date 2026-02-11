@@ -126,6 +126,11 @@ public interface IExamResultService
     /// </summary>
     Task<ApiResponse<PaginatedResponse<CandidateExamSummaryListDto>>> GetExamCandidateSummariesAsync(int? examId, int pageNumber, int pageSize);
 
+    /// <summary>
+    /// Get combined candidate result list with grading status in a single request
+    /// </summary>
+    Task<ApiResponse<CandidateResultListResponseDto>> GetCandidateResultListAsync(int? examId, int pageNumber, int pageSize);
+
     #endregion
 
     #region Export

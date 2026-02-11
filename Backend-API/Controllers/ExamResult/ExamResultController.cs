@@ -20,7 +20,7 @@ public class ExamResultController : ControllerBase
     {
         _examResultService = examResultService;
         _currentUserService = currentUserService;
- }
+    }
 
     #region Result Management
 
@@ -31,7 +31,7 @@ public class ExamResultController : ControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> FinalizeResult(int gradingSessionId)
     {
-     var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _examResultService.FinalizeResultAsync(gradingSessionId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -43,8 +43,8 @@ public class ExamResultController : ControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetResult(int resultId)
     {
- var result = await _examResultService.GetResultByIdAsync(resultId);
-      return result.Success ? Ok(result) : NotFound(result);
+        var result = await _examResultService.GetResultByIdAsync(resultId);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -54,8 +54,8 @@ public class ExamResultController : ControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetResultByAttempt(int attemptId)
     {
-    var result = await _examResultService.GetResultByAttemptAsync(attemptId);
-     return result.Success ? Ok(result) : NotFound(result);
+        var result = await _examResultService.GetResultByAttemptAsync(attemptId);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -65,8 +65,8 @@ public class ExamResultController : ControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetResults([FromQuery] ResultSearchDto searchDto)
     {
-      var result = await _examResultService.GetResultsAsync(searchDto);
-      return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _examResultService.GetResultsAsync(searchDto);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public class ExamResultController : ControllerBase
     public async Task<IActionResult> GetExamResults(int examId, [FromQuery] ResultSearchDto searchDto)
     {
         var result = await _examResultService.GetExamResultsAsync(examId, searchDto);
-     return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -89,22 +89,22 @@ public class ExamResultController : ControllerBase
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _examResultService.UpdateResultFromRegradingAsync(gradingSessionId, userId);
- return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
 
     #region Publishing
 
-  /// <summary>
+    /// <summary>
     /// Publish a single result to candidate
     /// </summary>
     [HttpPost("{resultId}/publish")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> PublishResult(int resultId)
-{
-      var userId = _currentUserService.UserId ?? "system";
-   var result = await _examResultService.PublishResultAsync(resultId, userId);
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _examResultService.PublishResultAsync(resultId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -122,14 +122,14 @@ public class ExamResultController : ControllerBase
 
     /// <summary>
     /// Bulk publish results
- /// </summary>
+    /// </summary>
     [HttpPost("publish/bulk")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> BulkPublishResults([FromBody] BulkPublishResultsDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-      var result = await _examResultService.BulkPublishResultsAsync(dto, userId);
-    return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _examResultService.BulkPublishResultsAsync(dto, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -140,7 +140,7 @@ public class ExamResultController : ControllerBase
     public async Task<IActionResult> PublishExamResults([FromBody] PublishExamResultsDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-    var result = await _examResultService.PublishExamResultsAsync(dto, userId);
+        var result = await _examResultService.PublishExamResultsAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -153,16 +153,16 @@ public class ExamResultController : ControllerBase
     /// </summary>
     [HttpGet("my-result/{attemptId}")]
     public async Task<IActionResult> GetMyResult(int attemptId)
-  {
-       var candidateId = _currentUserService.UserId;
- if (string.IsNullOrEmpty(candidateId))
-  {
-      return Unauthorized();
-}
+    {
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+        {
+            return Unauthorized();
+        }
 
         var result = await _examResultService.GetCandidateResultAsync(attemptId, candidateId);
-    return result.Success ? Ok(result) : BadRequest(result);
-}
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     /// <summary>
     /// Get all published results for the current candidate
@@ -172,13 +172,13 @@ public class ExamResultController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
-     {
-         return Unauthorized();
-   }
+        {
+            return Unauthorized();
+        }
 
-      var result = await _examResultService.GetCandidateAllResultsAsync(candidateId);
+        var result = await _examResultService.GetCandidateAllResultsAsync(candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get candidate's exam summary
@@ -188,8 +188,8 @@ public class ExamResultController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
- {
-         return Unauthorized();
+        {
+            return Unauthorized();
         }
 
         var result = await _examResultService.GetCandidateExamSummaryAsync(examId, candidateId);
@@ -219,8 +219,8 @@ public class ExamResultController : ControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetExamReport(int examId)
     {
-  var result = await _examResultService.GetExamReportAsync(examId);
-    return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _examResultService.GetExamReportAsync(examId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -231,30 +231,30 @@ public class ExamResultController : ControllerBase
     public async Task<IActionResult> GenerateQuestionPerformance([FromBody] GenerateQuestionPerformanceDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-     var result = await _examResultService.GenerateQuestionPerformanceAsync(dto, userId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _examResultService.GenerateQuestionPerformanceAsync(dto, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Get question performance reports for an exam
     /// </summary>
- [HttpGet("report/question-performance/exam/{examId}")]
+    [HttpGet("report/question-performance/exam/{examId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetQuestionPerformance(int examId)
     {
-var result = await _examResultService.GetQuestionPerformanceAsync(examId);
+        var result = await _examResultService.GetQuestionPerformanceAsync(examId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Get result dashboard for an exam
     /// </summary>
-[HttpGet("dashboard/exam/{examId}")]
+    [HttpGet("dashboard/exam/{examId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetResultDashboard(int examId)
     {
-      var result = await _examResultService.GetResultDashboardAsync(examId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _examResultService.GetResultDashboardAsync(examId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -284,6 +284,20 @@ var result = await _examResultService.GetQuestionPerformanceAsync(examId);
         [FromQuery] int pageSize = 100)
     {
         var result = await _examResultService.GetExamCandidateSummariesAsync(examId, pageNumber, pageSize);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Get combined candidate result list with grading status and all required fields for result page
+    /// </summary>
+    [HttpGet("candidate-result-list")]
+    [Authorize(Roles = "Admin,Instructor")]
+    public async Task<IActionResult> GetCandidateResultList(
+        [FromQuery] int? examId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 100)
+    {
+        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -323,7 +337,7 @@ var result = await _examResultService.GetQuestionPerformanceAsync(examId);
     [HttpGet("export/{jobId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> GetExportJob(int jobId)
-  {
+    {
         var result = await _examResultService.GetExportJobAsync(jobId);
         return result.Success ? Ok(result) : NotFound(result);
     }
@@ -336,7 +350,7 @@ var result = await _examResultService.GetQuestionPerformanceAsync(examId);
     public async Task<IActionResult> GetExportJobs([FromQuery] ExportJobSearchDto searchDto)
     {
         var result = await _examResultService.GetExportJobsAsync(searchDto);
-    return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -358,20 +372,20 @@ var result = await _examResultService.GetQuestionPerformanceAsync(examId);
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> DownloadExport(int jobId)
     {
-    var jobResult = await _examResultService.GetExportJobAsync(jobId);
+        var jobResult = await _examResultService.GetExportJobAsync(jobId);
         if (!jobResult.Success || jobResult.Data == null)
-   {
+        {
             return NotFound("Export job not found");
-    }
+        }
 
         if (jobResult.Data.Status != Domain.Enums.ExportStatus.Completed)
         {
-        return BadRequest("Export is not yet completed");
-   }
+            return BadRequest("Export is not yet completed");
+        }
 
         if (string.IsNullOrEmpty(jobResult.Data.FilePath))
         {
-         return NotFound("Export file not found");
+            return NotFound("Export file not found");
         }
 
         // TODO: Implement actual file serving from storage

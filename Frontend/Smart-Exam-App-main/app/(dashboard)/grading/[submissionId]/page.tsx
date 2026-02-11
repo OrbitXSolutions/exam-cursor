@@ -256,7 +256,20 @@ export default function GradeSubmissionPage() {
                   <div className="rounded-lg bg-muted/50 p-4">
                     <Label className="text-sm text-muted-foreground">{t("grading.candidateAnswer")}</Label>
                     <p className="mt-2 whitespace-pre-wrap">
-                      {currentQuestion.textAnswer || JSON.stringify(currentQuestion.selectedOptionIds) || "-"}
+                      {currentQuestion.textAnswer ? (
+                        currentQuestion.textAnswer
+                      ) : currentQuestion.selectedOptions && currentQuestion.selectedOptions.length > 0 ? (
+                        currentQuestion.selectedOptions.map((opt, idx) => (
+                          <span key={opt.id}>
+                            {idx > 0 && ", "}
+                            <span className={opt.isCorrect ? "text-green-600 font-medium" : ""}>
+                              {language === "ar" ? opt.textAr : opt.textEn}
+                            </span>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-muted-foreground italic">{language === "ar" ? "لم يتم الإجابة" : "No answer"}</span>
+                      )}
                     </p>
                   </div>
                 </>

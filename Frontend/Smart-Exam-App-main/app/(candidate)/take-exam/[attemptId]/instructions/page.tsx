@@ -291,6 +291,34 @@ export default function ExamInstructionsPage() {
             )}
           </div>
 
+          {/* Exam language - at the top so user selects before reading */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("instructions.examLanguage")}</CardTitle>
+              <CardDescription>{t("instructions.examLanguageDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant={examLanguage === "en" ? "default" : "outline"}
+                  onClick={() => setExamLanguage("en")}
+                  className="flex-1"
+                >
+                  {t("instructions.english")}
+                </Button>
+                <Button
+                  type="button"
+                  variant={examLanguage === "ar" ? "default" : "outline"}
+                  onClick={() => setExamLanguage("ar")}
+                  className="flex-1"
+                >
+                  {t("instructions.arabic")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Ready Check Card */}
           <Card className={`border-2 ${
             readyCheckComplete && readyCheck.fullscreenSupported && readyCheck.webcamPermission 
@@ -574,34 +602,6 @@ export default function ExamInstructionsPage() {
               </CardContent>
             </Card>
           )}
-
-          {/* Exam language */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("instructions.examLanguage")}</CardTitle>
-              <CardDescription>{t("instructions.examLanguageDesc")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant={examLanguage === "en" ? "default" : "outline"}
-                  onClick={() => setExamLanguage("en")}
-                  className="flex-1"
-                >
-                  {t("instructions.english")}
-                </Button>
-                <Button
-                  type="button"
-                  variant={examLanguage === "ar" ? "default" : "outline"}
-                  onClick={() => setExamLanguage("ar")}
-                  className="flex-1"
-                >
-                  {t("instructions.arabic")}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Agreement and Start */}
           <Card>

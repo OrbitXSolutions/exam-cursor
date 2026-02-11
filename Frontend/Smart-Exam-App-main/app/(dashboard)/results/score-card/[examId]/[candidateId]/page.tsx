@@ -303,6 +303,17 @@ function AnswerCard({
         <div className="pl-6 text-sm">
           {answer.textAnswer ? (
             <p className="p-2 bg-background rounded border">{answer.textAnswer}</p>
+          ) : answer.selectedOptions && answer.selectedOptions.length > 0 ? (
+            <div className="p-2 bg-background rounded border">
+              {answer.selectedOptions.map((opt, idx) => (
+                <span key={opt.id}>
+                  {idx > 0 && ", "}
+                  <span className={opt.isCorrect ? "text-green-600 font-medium" : ""}>
+                    {language === "ar" ? opt.textAr : opt.textEn}
+                  </span>
+                </span>
+              ))}
+            </div>
           ) : answer.selectedOptionIds && answer.selectedOptionIds.length > 0 ? (
             <p className="text-muted-foreground">
               {language === "ar" ? `الخيارات المحددة: ${answer.selectedOptionIds.join(", ")}` : `Selected options: ${answer.selectedOptionIds.join(", ")}`}

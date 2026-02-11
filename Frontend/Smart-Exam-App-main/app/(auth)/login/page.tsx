@@ -225,8 +225,24 @@ export default function LoginPage() {
                       onClick={() => fillDemoCredentials("ali.it.candidate@examcore.com")}
                       className="w-full text-left p-2 rounded hover:bg-background transition-colors"
                     >
-                      <span className="font-medium text-primary">Candidate:</span>{" "}
+                      <span className="font-medium text-primary">Candidate 1:</span>{" "}
                       <span className="text-muted-foreground">ali.it.candidate@examcore.com</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillDemoCredentials("nour.it.candidate@examcore.com")}
+                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
+                    >
+                      <span className="font-medium text-primary">Candidate 2:</span>{" "}
+                      <span className="text-muted-foreground">nour.it.candidate@examcore.com</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillDemoCredentials("youssef.finance.candidate@examcore.com")}
+                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
+                    >
+                      <span className="font-medium text-primary">Candidate 3:</span>{" "}
+                      <span className="text-muted-foreground">youssef.finance.candidate@examcore.com</span>
                     </button>
                     <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
                       Password for all: <code className="bg-background px-1 py-0.5 rounded">Demo@123456</code>

@@ -70,6 +70,8 @@ export default function ExamPage() {
   // Timer state
   const [examTimeRemaining, setExamTimeRemaining] = useState(0)
   const [sectionTimers, setSectionTimers] = useState<Record<number, number>>({})
+  // Track which sections have been activated (entered by candidate) - only activated sections count down
+  const [activatedSections, setActivatedSections] = useState<Set<number>>(new Set())
 
   // UI state
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false)
@@ -84,6 +86,9 @@ export default function ExamPage() {
   const syncTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const snapshotIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const expiredSectionsRef = useRef<Set<number>>(new Set())
+  const activatedSectionsRef = useRef<Set<number>>(new Set()) // Track activated sections for interval callback
+  const webcamStreamRef = useRef<MediaStream | null>(null) // Persistent webcam stream
+  const webcamVideoRef = useRef<HTMLVideoElement | null>(null) // Video element for webcam
 
   // Computed values
   const sections = session?.sections || []
@@ -127,15 +132,36 @@ export default function ExamPage() {
     if (saved && (saved === "en" || saved === "ar")) {
       setLanguage(saved)
     }
+    
+    // Request fullscreen with cross-browser support
     const requestFullScreen = async () => {
       try {
-        const el = document.documentElement
-        if (el.requestFullscreen) await el.requestFullscreen()
-      } catch {
-        // ignore
+        const docEl = document.documentElement as HTMLElement & {
+          webkitRequestFullscreen?: () => Promise<void>;
+          mozRequestFullScreen?: () => Promise<void>;
+          msRequestFullscreen?: () => Promise<void>;
+        }
+        if (!document.fullscreenElement) {
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen()
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen()
+          } else if (docEl.mozRequestFullScreen) {
+            await docEl.mozRequestFullScreen()
+          } else if (docEl.msRequestFullscreen) {
+            await docEl.msRequestFullscreen()
+          }
+        }
+      } catch (error) {
+        console.log("[v0] Fullscreen request failed:", error)
       }
     }
+    
+    // Request fullscreen immediately and also after a short delay (for browser focus issues)
     requestFullScreen()
+    const retryTimeout = setTimeout(requestFullScreen, 500)
+    
+    return () => clearTimeout(retryTimeout)
   }, [setLanguage])
 
   useEffect(() => {
@@ -159,15 +185,38 @@ export default function ExamPage() {
     }
   }, [sectionTimers, currentSectionId, sections])
 
+  // Activate section timer when candidate enters a new section
+  useEffect(() => {
+    if (!currentSectionId) return
+    // Mark this section as activated - its timer will now start counting down
+    if (!activatedSectionsRef.current.has(currentSectionId)) {
+      activatedSectionsRef.current.add(currentSectionId)
+      setActivatedSections(prev => new Set([...prev, currentSectionId]))
+    }
+  }, [currentSectionId])
+
   useEffect(() => {
     if (!session) return
 
     // Security features
     const setupSecurityFeatures = async () => {
-      // Request fullscreen mode
+      // Request fullscreen mode with cross-browser support
       try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen()
+        const docEl = document.documentElement as HTMLElement & {
+          webkitRequestFullscreen?: () => Promise<void>;
+          mozRequestFullScreen?: () => Promise<void>;
+          msRequestFullscreen?: () => Promise<void>;
+        }
+        if (!document.fullscreenElement) {
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen()
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen()
+          } else if (docEl.mozRequestFullScreen) {
+            await docEl.mozRequestFullScreen()
+          } else if (docEl.msRequestFullscreen) {
+            await docEl.msRequestFullscreen()
+          }
         }
       } catch (error) {
         console.log("[v0] Fullscreen request failed:", error)
@@ -237,49 +286,88 @@ export default function ExamPage() {
     }
   }, [session, t])
 
-  // Proctoring: periodic webcam snapshot upload (when exam may require it)
+  // Proctoring: Keep webcam stream alive and take periodic snapshots
   useEffect(() => {
     if (!session?.attemptId) return
 
-    const captureAndUpload = async () => {
+    let isActive = true
+
+    // Initialize webcam stream once and keep it alive
+    const initWebcam = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { width: 320, height: 240, facingMode: "user" } 
+        })
+        if (!isActive) {
+          stream.getTracks().forEach(t => t.stop())
+          return
+        }
+        webcamStreamRef.current = stream
+
+        // Create persistent video element
         const video = document.createElement("video")
         video.srcObject = stream
         video.muted = true
         video.playsInline = true
         await video.play()
+        webcamVideoRef.current = video
 
+        console.log("[Proctor] Webcam stream initialized successfully")
+      } catch (error) {
+        console.warn("[Proctor] Could not initialize webcam:", error)
+      }
+    }
+
+    // Capture snapshot from the persistent stream
+    const captureSnapshot = async () => {
+      if (!webcamVideoRef.current || !webcamStreamRef.current) {
+        console.warn("[Proctor] No webcam stream available for snapshot")
+        return
+      }
+
+      try {
         const canvas = document.createElement("canvas")
         canvas.width = 320
         canvas.height = 240
         const ctx = canvas.getContext("2d")
-        if (!ctx) {
-          stream.getTracks().forEach((t) => t.stop())
-          return
-        }
-        ctx.drawImage(video, 0, 0)
-        stream.getTracks().forEach((t) => t.stop())
+        if (!ctx) return
 
+        ctx.drawImage(webcamVideoRef.current, 0, 0)
+        
         canvas.toBlob(
           async (blob) => {
-            if (blob) await uploadProctorSnapshot(session.attemptId, blob, "snapshot.jpg")
+            if (blob && session?.attemptId) {
+              const success = await uploadProctorSnapshot(session.attemptId, blob, `snapshot_${Date.now()}.jpg`)
+              if (success) {
+                console.log("[Proctor] Snapshot uploaded successfully")
+              }
+            }
           },
           "image/jpeg",
-          0.6
+          0.7
         )
-      } catch {
-        // Silently fail - webcam may not be required or permitted
+      } catch (error) {
+        console.warn("[Proctor] Snapshot capture failed:", error)
       }
     }
 
-    snapshotIntervalRef.current = setInterval(captureAndUpload, 90000) // every 90 seconds
-    captureAndUpload() // initial capture after 5s
-    const initialTimeout = setTimeout(captureAndUpload, 5000)
+    // Initialize webcam and start snapshot interval
+    initWebcam().then(() => {
+      // Take initial snapshot after 5 seconds
+      setTimeout(captureSnapshot, 5000)
+      // Then take snapshots every 60 seconds
+      snapshotIntervalRef.current = setInterval(captureSnapshot, 60000)
+    })
 
     return () => {
+      isActive = false
       if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
-      clearTimeout(initialTimeout)
+      // Stop webcam stream on cleanup
+      if (webcamStreamRef.current) {
+        webcamStreamRef.current.getTracks().forEach(t => t.stop())
+        webcamStreamRef.current = null
+      }
+      webcamVideoRef.current = null
     }
   }, [session?.attemptId])
 
@@ -351,13 +439,21 @@ export default function ExamPage() {
         })
       }, 1000)
 
-      // Start separate section timer for smoother countdown
+      // Activate the first section - its timer starts now
+      if (sessionData.sections && sessionData.sections.length > 0) {
+        const firstSectionId = sessionData.sections[0].sectionId
+        setActivatedSections(new Set([firstSectionId]))
+        activatedSectionsRef.current = new Set([firstSectionId])
+      }
+
+      // Start separate section timer - only counts down ACTIVATED sections
       sectionTimerRef.current = setInterval(() => {
         setSectionTimers((prev) => {
           const updated = { ...prev }
           for (const sectionId of Object.keys(updated)) {
             const id = Number(sectionId)
-            if (updated[id] > 0) {
+            // Only countdown if this section has been activated (entered by candidate)
+            if (activatedSectionsRef.current.has(id) && updated[id] > 0) {
               updated[id] = updated[id] - 1
             }
           }

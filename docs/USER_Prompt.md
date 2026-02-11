@@ -273,3 +273,70 @@ REQUIREMENTS
   - Remove/hide:
     - old Dashboard page
     - any other candidate pages
+
+## Left Menu
+
+Refactor the left Sidebar navigation structure + UI behavior.
+
+GOALS (UI/UX)
+
+1. Any menu item that has children (submenu) MUST be collapsed by default (closed on initial load).
+2. For any parent item with children, add a chevron/arrow icon at the far right to indicate it’s collapsible.
+   - Arrow rotates when expanded.
+   - Clicking the parent toggles expand/collapse.
+3. Keep existing styling, icons, and active route highlight behavior.
+4. Do NOT keep submenus expanded by default. If you have logic that auto-expands based on current route, keep it ONLY when the current route is inside that group; otherwise keep collapsed by default.
+
+STRUCTURE CHANGES (Navigation)
+A) Rename/Move Exam Section Header
+
+- The section title above the Exams items should be: "Exam Management"
+- Remove the separate "EXAM MANAGEMENT" title that appears below the Exams section (delete it).
+- Hide "Exams" item (First Item)
+- Add a new item "Exam Scheduler" (Empty for now page can show "Coming soon)" as Last Item (third Item).
+
+B) Result Group (NEW)
+Create a top-level collapsible group named "Result" with these sub-items in this exact order:
+
+1. Grading ->
+2. Candidate Result
+3. Certificate
+4. Verify Certificate
+5. Proctor Report
+
+C) Proctor Center
+After Result group, keep "Proctor Center" as it is with the same existing submenu items (do not remove any).
+
+D) Candidates Group (NEW)
+After Proctor Center, add a collapsible group named "Candidates" with these items (same order):
+
+- Batch
+- Candidates Data
+- Assign to Exam
+- End Exam
+- Resume Exam
+- Add Time
+- Candidate Exam Details
+
+E) Administration Group (NEW)
+After Candidates, add a collapsible group named "Administration" with these sub-items:
+
+- Users
+- Audit Logs
+- Settings
+
+Do not change unrelated business logic.
+
+##
+
+Here’s an explanation of each request and the error you’re seeing:
+
+1. /api/Assessment/exams/dropdown
+   Purpose: Fetches a list of available exams to populate a filter or dropdown menu. This allows users to filter results by exam.
+   Why it runs: Needed to let the user select/filter by exam on the results page.
+2. /api/ExamResult/summary/candidates?pageNumber=1&pageSize=200
+   Purpose: Retrieves a paginated list of candidate exam results (summary view). This is likely used to display the main table/grid of candidate results.
+   Why it runs: Needed to show the list of candidates and their exam results.
+3. /api/Grading?PageNumber=1&PageSize=500
+   Purpose: Attempts to fetch a paginated list of grading sessions or grading data.
+   Why it runs: The page or a component on it is trying to load grading information, possibly for a summary, dashboard, or to check grading status.

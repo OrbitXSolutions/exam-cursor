@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
 import { Sidebar } from "@/components/layout/sidebar"
+import { Header } from "@/components/layout/header"
 import { FullPageLoader } from "@/components/ui/loading-spinner"
 
 export default function DashboardLayout({
@@ -35,7 +36,10 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
       <Sidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
     </div>
   )
 }

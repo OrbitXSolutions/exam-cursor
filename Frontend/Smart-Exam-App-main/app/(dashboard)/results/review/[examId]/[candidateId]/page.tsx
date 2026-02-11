@@ -229,6 +229,17 @@ export default function ExamReviewPage() {
                   <div className="p-4 bg-muted rounded-lg">
                     {currentAnswer.textAnswer ? (
                       <p>{currentAnswer.textAnswer}</p>
+                    ) : currentAnswer.selectedOptions && currentAnswer.selectedOptions.length > 0 ? (
+                      <p>
+                        {currentAnswer.selectedOptions.map((opt, idx) => (
+                          <span key={opt.id}>
+                            {idx > 0 && ", "}
+                            <span className={opt.isCorrect ? "text-green-600 font-medium" : ""}>
+                              {language === "ar" ? opt.textAr : opt.textEn}
+                            </span>
+                          </span>
+                        ))}
+                      </p>
                     ) : currentAnswer.selectedOptionIds && currentAnswer.selectedOptionIds.length > 0 ? (
                       <p>
                         {language === "ar"

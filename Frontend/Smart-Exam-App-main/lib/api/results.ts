@@ -23,6 +23,42 @@ export interface PaginatedCandidates {
   totalCount: number;
 }
 
+export interface CandidateResultListItem {
+  examId: number;
+  examTitleEn: string;
+  examTitleAr: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail?: string;
+  totalAttempts: number;
+  attemptId: number;
+  attemptNumber: number;
+  gradingSessionId?: number;
+  resultId?: number;
+  score?: number;
+  maxPossibleScore?: number;
+  percentage?: number;
+  isPassed?: boolean;
+  isPublished: boolean;
+  isResultFinalized: boolean;
+  gradingStatusCode: number;
+  gradingStatus: string;
+  gradedAt?: string;
+  lastAttemptAt?: string;
+}
+
+export interface CandidateResultListSummary {
+  totalCandidates: number;
+}
+
+export interface CandidateResultListResponse {
+  items: CandidateResultListItem[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  summary: CandidateResultListSummary;
+}
+
 /**
  * Get candidate summaries for an exam or all exams.
  * Pass examId to filter by exam; omit (or pass undefined) to load all candidates across exams.
@@ -70,6 +106,42 @@ export async function getExamCandidateSummaries(
   params?: { pageNumber?: number; pageSize?: number },
 ): Promise<PaginatedCandidates> {
   return getCandidateSummaries(examId, params);
+}
+
+/**
+ * Single-call candidate result list with grading status.
+ */
+export async function getCandidateResultList(
+  examId: number | undefined,
+  params?: { pageNumber?: number; pageSize?: number },
+): Promise<CandidateResultListResponse> {
+  const query = new URLSearchParams();
+  query.set("pageNumber", String(params?.pageNumber ?? 1));
+  query.set("pageSize", String(params?.pageSize ?? 100));
+  if (examId != null && examId > 0) query.set("examId", String(examId));
+
+  const raw = await apiClient.get<unknown>(`/ExamResult/candidate-result-list?${query}`);
+  const inner =
+    raw && typeof raw === "object"
+      ? (((raw as Record<string, unknown>).data ??
+          (raw as Record<string, unknown>).Data ??
+          raw) as Record<string, unknown>)
+      : {};
+
+  const items = (inner?.items ?? inner?.Items ?? []) as CandidateResultListItem[];
+  const summary = (inner?.summary ?? inner?.Summary ?? {}) as CandidateResultListSummary;
+  const list = Array.isArray(items) ? items : [];
+
+  return {
+    items: list,
+    pageNumber: (inner?.pageNumber ?? inner?.PageNumber ?? params?.pageNumber ?? 1) as number,
+    pageSize: (inner?.pageSize ?? inner?.PageSize ?? params?.pageSize ?? 100) as number,
+    totalCount: (inner?.totalCount ?? inner?.TotalCount ?? list.length) as number,
+    summary: {
+      totalCandidates:
+        (summary?.totalCandidates ?? (summary as Record<string, unknown>)?.TotalCandidates ?? list.length) as number,
+    },
+  };
 }
 
 /** Attempt search result type */

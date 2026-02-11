@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
-import { Header } from "@/components/layout/header"
 import { StatCard } from "@/components/ui/stat-card"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -104,16 +103,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col">
-      <Header
-        title={`${t("dashboard.welcomeBack")}, ${getLocalizedField(user!, "fullName", language).split(" ")[0]}!`}
-        subtitle={new Date().toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      />
-
       <div className="flex-1 space-y-6 p-6">
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

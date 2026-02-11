@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -23,7 +23,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp,
   LogOut,
   BookOpen,
   BarChart3,
@@ -40,6 +39,14 @@ import {
   Library,
   PlusSquare,
   List,
+  Calendar,
+  UserCog,
+  UsersRound,
+  UserPlus,
+  Clock,
+  TimerOff,
+  PlayCircle,
+  ClipboardCheck,
 } from "lucide-react"
 
 interface NavItem {
@@ -48,6 +55,7 @@ interface NavItem {
   href: string
   roles?: UserRole[]
   badge?: number
+  hidden?: boolean
 }
 
 interface NavGroup {
@@ -92,50 +100,37 @@ const questionBankNavGroup: NavGroup = {
   ],
 }
 
+// Exam Management group: Hide "Exams" item, add "Exam Scheduler"
 const examsNavGroup: NavGroup = {
   icon: ClipboardList,
-  labelKey: "nav.exams",
+  labelKey: "nav.examManagement",
   roles: [UserRole.Admin, UserRole.Instructor],
   children: [
-    { icon: ClipboardList, labelKey: "nav.exams", href: "/exams" },
+    { icon: ClipboardList, labelKey: "nav.exams", href: "/exams", hidden: true },
     { icon: PlusSquare, labelKey: "nav.createExam", href: "/exams/setup" },
     { icon: List, labelKey: "nav.examsList", href: "/exams/list" },
+    { icon: Calendar, labelKey: "nav.examScheduler", href: "/exams/scheduler" },
   ],
 }
 
-const instructorNavItems: NavItem[] = [
-  {
-    icon: GraduationCap,
-    labelKey: "nav.grading",
-    href: "/grading",
-    roles: [UserRole.Admin, UserRole.Instructor],
-  },
-  {
-    icon: BarChart3,
-    labelKey: "nav.reports",
-    href: "/reports",
-    roles: [UserRole.Admin, UserRole.Instructor],
-  },
-]
-
+// Result group with reordered items per requirements
 const resultNavGroup: NavGroup = {
   icon: CheckCircle2,
   labelKey: "nav.result",
   roles: [UserRole.Admin, UserRole.Instructor],
   children: [
+    { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
     { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result" },
-    { icon: BarChart3, labelKey: "nav.examAnalytics", href: "/results/exam-analytics" },
-    { icon: FileText, labelKey: "nav.subjectiveExamAnalytics", href: "/results/subjective-analytics" },
-    { icon: Eye, labelKey: "nav.proctorAnalytics", href: "/results/proctor-analytics" },
-    { icon: Award, labelKey: "nav.editCertificate", href: "/results/edit-certificate" },
-    { icon: Users, labelKey: "nav.leadershipBoard", href: "/results/leadership-board" },
-    { icon: FileQuestion, labelKey: "nav.questionwiseAnalysis", href: "/results/questionwise-analysis" },
+    { icon: Award, labelKey: "nav.certificate", href: "/results/certificate" },
+    { icon: CheckCircle2, labelKey: "nav.verifyCertificate", href: "/verify-certificate" },
+    { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report" },
   ],
 }
 
+// Proctor Center group (unchanged)
 const proctorNavGroup: NavGroup = {
   icon: Monitor,
-  labelKey: "nav.proctor",
+  labelKey: "nav.proctorCenter",
   roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer],
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
@@ -145,42 +140,95 @@ const proctorNavGroup: NavGroup = {
   ],
 }
 
-const adminNavItems: NavItem[] = [
-  {
-    icon: Users,
-    labelKey: "nav.users",
-    href: "/users",
-    roles: [UserRole.Admin, UserRole.SuperAdmin],
-  },
-  {
-    icon: Award,
-    labelKey: "nav.verifyCertificate",
-    href: "/verify-certificate",
-    roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor],
-  },
-  {
-    icon: FileText,
-    labelKey: "nav.audit",
-    href: "/audit",
-    roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Auditor],
-  },
-  {
-    icon: Settings,
-    labelKey: "nav.settings",
-    href: "/settings",
-    roles: [UserRole.Admin, UserRole.SuperAdmin],
-  },
-]
+// NEW: Candidates group
+const candidatesNavGroup: NavGroup = {
+  icon: UsersRound,
+  labelKey: "nav.candidates",
+  roles: [UserRole.Admin, UserRole.Instructor],
+  children: [
+    { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
+    { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
+    { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
+    { icon: TimerOff, labelKey: "nav.endExam", href: "/candidates/end-exam" },
+    { icon: PlayCircle, labelKey: "nav.resumeExam", href: "/candidates/resume-exam" },
+    { icon: Clock, labelKey: "nav.addTime", href: "/candidates/add-time" },
+    { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
+  ],
+}
+
+// NEW: Administration group
+const administrationNavGroup: NavGroup = {
+  icon: UserCog,
+  labelKey: "nav.administration",
+  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  children: [
+    { icon: Users, labelKey: "nav.users", href: "/users" },
+    { icon: FileText, labelKey: "nav.audit", href: "/audit" },
+    { icon: Settings, labelKey: "nav.settings", href: "/settings" },
+  ],
+}
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ questionBank: true, exams: true, result: true, proctor: true })
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
 
+  // All navigation groups for easy access
+  const allGroups = useMemo(() => ({
+    questionBank: questionBankNavGroup,
+    exams: examsNavGroup,
+    result: resultNavGroup,
+    proctor: proctorNavGroup,
+    candidates: candidatesNavGroup,
+    administration: administrationNavGroup,
+  }), [])
+
+  // Compute which groups should be expanded based on current route
+  const computeOpenGroups = useMemo(() => {
+    const groups: Record<string, boolean> = {
+      questionBank: false,
+      exams: false,
+      result: false,
+      proctor: false,
+      candidates: false,
+      administration: false,
+    }
+    
+    // Check if current route is inside any group
+    Object.entries(allGroups).forEach(([key, group]) => {
+      const isRouteInGroup = group.children.some(
+        (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+      )
+      if (isRouteInGroup) {
+        groups[key] = true
+      }
+    })
+    
+    return groups
+  }, [pathname, allGroups])
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(computeOpenGroups)
+
+  // Update open groups when route changes (auto-expand if route is inside group)
+  useEffect(() => {
+    setOpenGroups(prev => {
+      const newState = { ...prev }
+      Object.entries(allGroups).forEach(([key, group]) => {
+        const isRouteInGroup = group.children.some(
+          (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+        )
+        if (isRouteInGroup) {
+          newState[key] = true
+        }
+      })
+      return newState
+    })
+  }, [pathname, allGroups])
+
   const filterByRole = (items: NavItem[]) => {
     return items.filter((item) => {
+      if (item.hidden) return false
       if (!item.roles) return true
       return item.roles.some((role) => hasRole(role))
     })
@@ -232,7 +280,7 @@ export function Sidebar() {
   }
 
   const NavGroupBlock = ({ group, groupKey }: { group: NavGroup; groupKey: string }) => {
-    const isOpen = openGroups[groupKey] ?? true
+    const isOpen = openGroups[groupKey] ?? false
     const Icon = group.icon
     const label = t(group.labelKey) || group.labelKey.split(".").pop()
     const children = filterByRole(group.children)
@@ -257,11 +305,12 @@ export function Sidebar() {
         >
           <Icon className="h-5 w-5 shrink-0" />
           <span className="flex-1 truncate text-start">{label}</span>
-          {isRTL ? (
-            isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-          ) : (
-            isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />
-          )}
+          <ChevronRight 
+            className={cn(
+              "h-4 w-4 shrink-0 transition-transform duration-200",
+              isOpen && "rotate-90"
+            )} 
+          />
         </button>
         {isOpen && (
           <div className="ms-6 space-y-0.5 border-s border-muted ps-2">
@@ -346,29 +395,15 @@ export function Sidebar() {
               </>
             )}
 
-            {/* Exams Group (expandable) */}
+            {/* Exam Management Group (expandable) */}
             {showGroup(examsNavGroup) && (
-              <>
-                {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {language === "ar" ? "الاختبارات" : "Exams"}
-                  </div>
-                )}
-                <NavGroupBlock group={examsNavGroup} groupKey="exams" />
-              </>
-            )}
-
-            {/* Instructor Nav (Grading, Reports) */}
-            {filterByRole(instructorNavItems).length > 0 && (
               <>
                 {!isCollapsed && (
                   <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {language === "ar" ? "إدارة الاختبارات" : "Exam Management"}
                   </div>
                 )}
-                {filterByRole(instructorNavItems).map((item) => (
-                  <NavLink key={item.href} item={item} />
-                ))}
+                <NavGroupBlock group={examsNavGroup} groupKey="exams" />
               </>
             )}
 
@@ -384,29 +419,39 @@ export function Sidebar() {
               </>
             )}
 
-            {/* Proctor (expandable) */}
+            {/* Proctor Center (expandable) */}
             {showGroup(proctorNavGroup) && (
               <>
                 {!isCollapsed && (
                   <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {language === "ar" ? "المراقبة" : "Proctor"}
+                    {language === "ar" ? "مركز المراقبة" : "Proctor Center"}
                   </div>
                 )}
                 <NavGroupBlock group={proctorNavGroup} groupKey="proctor" />
               </>
             )}
 
-            {/* Admin Nav */}
-            {filterByRole(adminNavItems).length > 0 && (
+            {/* Candidates (expandable) */}
+            {showGroup(candidatesNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "المرشحون" : "Candidates"}
+                  </div>
+                )}
+                <NavGroupBlock group={candidatesNavGroup} groupKey="candidates" />
+              </>
+            )}
+
+            {/* Administration (expandable) */}
+            {showGroup(administrationNavGroup) && (
               <>
                 {!isCollapsed && (
                   <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {language === "ar" ? "الإدارة" : "Administration"}
                   </div>
                 )}
-                {filterByRole(adminNavItems).map((item) => (
-                  <NavLink key={item.href} item={item} />
-                ))}
+                <NavGroupBlock group={administrationNavGroup} groupKey="administration" />
               </>
             )}
           </nav>

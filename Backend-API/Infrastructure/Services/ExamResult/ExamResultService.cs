@@ -763,6 +763,171 @@ Id = r.Id,
             });
     }
 
+    public async Task<ApiResponse<CandidateResultListResponseDto>> GetCandidateResultListAsync(
+        int? examId, int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 100;
+
+        var attemptsQuery = _context.Attempts
+            .Include(a => a.Candidate)
+            .Include(a => a.Exam)
+            .Where(a => a.Status == AttemptStatus.Submitted || a.Status == AttemptStatus.Expired)
+            .AsQueryable();
+
+        if (examId.HasValue && examId.Value > 0)
+        {
+            attemptsQuery = attemptsQuery.Where(a => a.ExamId == examId.Value);
+        }
+
+        var groupedAttemptsQuery = attemptsQuery
+            .GroupBy(a => new { a.ExamId, a.CandidateId })
+            .Select(g => new
+            {
+                g.Key.ExamId,
+                g.Key.CandidateId,
+                TotalAttempts = g.Count(),
+                LatestAttemptNumber = g.Max(x => x.AttemptNumber),
+                LastAttemptAt = g.Max(x => x.SubmittedAt ?? x.StartedAt)
+            });
+
+        var totalCount = await groupedAttemptsQuery.CountAsync();
+
+        var pagedGroups = await groupedAttemptsQuery
+            .OrderByDescending(x => x.LastAttemptAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        if (!pagedGroups.Any())
+        {
+            return ApiResponse<CandidateResultListResponseDto>.SuccessResponse(
+                new CandidateResultListResponseDto
+                {
+                    Items = new List<CandidateResultListDto>(),
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalCount,
+                    Summary = new CandidateResultListSummaryDto
+                    {
+                        TotalCandidates = totalCount
+                    }
+                });
+        }
+
+        var examIds = pagedGroups.Select(x => x.ExamId).Distinct().ToHashSet();
+        var candidateIds = pagedGroups.Select(x => x.CandidateId).Distinct().ToHashSet();
+        var keyedGroups = pagedGroups.ToDictionary(
+            x => $"{x.ExamId}:{x.CandidateId}",
+            x => x);
+
+        var candidateAttempts = await attemptsQuery
+            .Where(a => examIds.Contains(a.ExamId) && candidateIds.Contains(a.CandidateId))
+            .ToListAsync();
+
+        var latestAttempts = candidateAttempts
+            .GroupBy(a => $"{a.ExamId}:{a.CandidateId}")
+            .Where(g => keyedGroups.ContainsKey(g.Key))
+            .Select(g =>
+            {
+                var grp = keyedGroups[g.Key];
+                return g.Where(a => a.AttemptNumber == grp.LatestAttemptNumber)
+                    .OrderByDescending(a => a.SubmittedAt ?? a.StartedAt)
+                    .ThenByDescending(a => a.Id)
+                    .First();
+            })
+            .ToList();
+
+        var latestAttemptIds = latestAttempts.Select(a => a.Id).ToList();
+
+        var maxPossibleScoreByAttemptId = await _context.Set<Smart_Core.Domain.Entities.Attempt.AttemptQuestion>()
+            .Where(aq => latestAttemptIds.Contains(aq.AttemptId))
+            .GroupBy(aq => aq.AttemptId)
+            .Select(g => new { AttemptId = g.Key, MaxPossibleScore = g.Sum(x => x.Points) })
+            .ToDictionaryAsync(x => x.AttemptId, x => x.MaxPossibleScore);
+
+        var gradingSessions = await _context.GradingSessions
+            .Where(gs => latestAttemptIds.Contains(gs.AttemptId))
+            .ToListAsync();
+
+        var gradingByAttemptId = gradingSessions
+            .GroupBy(gs => gs.AttemptId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderByDescending(x => x.GradedAt ?? x.CreatedDate)
+                    .ThenByDescending(x => x.Id)
+                    .First());
+
+        var results = await _context.Set<Result>()
+            .Where(r => latestAttemptIds.Contains(r.AttemptId))
+            .ToListAsync();
+
+        var resultByAttemptId = results.ToDictionary(r => r.AttemptId, r => r);
+
+        var rows = latestAttempts
+            .Select(a =>
+            {
+                var key = $"{a.ExamId}:{a.CandidateId}";
+                var grouped = keyedGroups[key];
+                gradingByAttemptId.TryGetValue(a.Id, out var gradingSession);
+                resultByAttemptId.TryGetValue(a.Id, out var result);
+
+                var score = result?.TotalScore ?? gradingSession?.TotalScore;
+                decimal? maxScoreFromAttempt = null;
+                if (maxPossibleScoreByAttemptId.TryGetValue(a.Id, out var maxScoreValue))
+                {
+                    maxScoreFromAttempt = maxScoreValue;
+                }
+                var maxPossibleScore = result?.MaxPossibleScore ?? maxScoreFromAttempt;
+                var percentage = score.HasValue && maxPossibleScore.HasValue && maxPossibleScore.Value > 0
+                    ? (score.Value / maxPossibleScore.Value) * 100
+                    : (decimal?)null;
+
+                var gradingStatusCode = gradingSession?.Status ?? GradingStatus.Pending;
+                var gradingStatus = GetCandidateResultListGradingStatusLabel(gradingStatusCode);
+
+                return new CandidateResultListDto
+                {
+                    ExamId = a.ExamId,
+                    ExamTitleEn = a.Exam?.TitleEn ?? string.Empty,
+                    ExamTitleAr = a.Exam?.TitleAr ?? string.Empty,
+                    CandidateId = a.CandidateId,
+                    CandidateName = a.Candidate?.FullName ?? a.Candidate?.DisplayName ?? string.Empty,
+                    CandidateEmail = a.Candidate?.Email,
+                    TotalAttempts = grouped.TotalAttempts,
+                    AttemptId = a.Id,
+                    AttemptNumber = a.AttemptNumber,
+                    GradingSessionId = gradingSession?.Id,
+                    ResultId = result?.Id,
+                    Score = score,
+                    MaxPossibleScore = maxPossibleScore,
+                    Percentage = percentage,
+                    IsPassed = result?.IsPassed ?? gradingSession?.IsPassed,
+                    IsPublished = result?.IsPublishedToCandidate ?? false,
+                    IsResultFinalized = result != null,
+                    GradingStatusCode = gradingStatusCode,
+                    GradingStatus = gradingStatus,
+                    GradedAt = gradingSession?.GradedAt,
+                    LastAttemptAt = grouped.LastAttemptAt
+                };
+            })
+            .OrderByDescending(x => x.LastAttemptAt)
+            .ToList();
+
+        return ApiResponse<CandidateResultListResponseDto>.SuccessResponse(
+            new CandidateResultListResponseDto
+            {
+                Items = rows,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Summary = new CandidateResultListSummaryDto
+                {
+                    TotalCandidates = totalCount
+                }
+            });
+    }
+
     #endregion
 
     #region Export
@@ -1020,6 +1185,17 @@ PassedOnly = dto.PassedOnly,
         };
 
      return ApiResponse<ExamReportDto>.SuccessResponse(dto);
+    }
+
+    private string GetCandidateResultListGradingStatusLabel(GradingStatus status)
+    {
+        return status switch
+        {
+            GradingStatus.AutoGraded => "Auto Graded",
+            GradingStatus.ManualRequired => "In Review",
+            GradingStatus.Completed => "Manual Graded",
+            _ => "Pending"
+        };
     }
 
     private IQueryable<Result> ApplyResultFilters(IQueryable<Result> query, ResultSearchDto searchDto)

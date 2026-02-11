@@ -229,10 +229,17 @@ export default function GradingPage() {
                         </TableCell>
                         <TableCell>
                           {isCompleted ? (
-                            <Badge variant="default" className="gap-1 bg-green-600">
-                              <CheckCircle className="h-3.5 w-3.5" />
-                              {language === "ar" ? "مكتمل" : "Completed"}
-                            </Badge>
+                            sub.isResultFinalized ? (
+                              <Badge variant="default" className="gap-1 bg-green-600">
+                                <CheckCircle className="h-3.5 w-3.5" />
+                                {language === "ar" ? "مكتمل ومُنشر" : "Finalized"}
+                              </Badge>
+                            ) : (
+                              <Badge variant="default" className="gap-1 bg-amber-500">
+                                <Clock className="h-3.5 w-3.5" />
+                                {language === "ar" ? "مكتمل - لم يُنشر" : "Pending Finalize"}
+                              </Badge>
+                            )
                           ) : (
                             <Badge variant="secondary">{sub.statusName ?? (language === "ar" ? "قيد الانتظار" : "Pending")}</Badge>
                           )}
