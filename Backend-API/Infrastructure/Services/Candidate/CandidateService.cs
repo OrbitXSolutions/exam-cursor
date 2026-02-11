@@ -115,7 +115,27 @@ public class CandidateService : ICandidateService
 
         var dtos = exams.Select(e =>
                {
-                   var allQuestions = e.Sections.SelectMany(s => s.Questions);
+                   // Calculate total questions and points including Builder sections
+                   int totalQuestions = 0;
+                   decimal totalPoints = 0;
+
+                   foreach (var section in e.Sections)
+                   {
+                       if (section.SourceType.HasValue && section.PickCount > 0)
+                       {
+                           // Builder section - use PickCount as question count
+                           totalQuestions += section.PickCount;
+                           // Estimate points: use 1 point per question (actual points determined at attempt time)
+                           totalPoints += section.PickCount;
+                       }
+                       else
+                       {
+                           // Manual section - use ExamQuestions
+                           var sectionQuestions = section.Questions ?? new List<Domain.Entities.Assessment.ExamQuestion>();
+                           totalQuestions += sectionQuestions.Count;
+                           totalPoints += sectionQuestions.Sum(q => q.Points);
+                       }
+                   }
 
                    // Get attempt count for this exam
                    attemptCounts.TryGetValue(e.Id, out var myAttemptCount);
@@ -139,8 +159,8 @@ public class CandidateService : ICandidateService
                        DurationMinutes = e.DurationMinutes,
                        MaxAttempts = e.MaxAttempts,
                        PassScore = e.PassScore,
-                       TotalQuestions = allQuestions.Count(),
-                       TotalPoints = allQuestions.Sum(q => q.Points),
+                       TotalQuestions = totalQuestions,
+                       TotalPoints = totalPoints,
                        // Set MyAttempts: null if 0 attempts, otherwise the count
                        MyAttempts = myAttemptCount > 0 ? myAttemptCount : null,
                        // Set MyBestIsPassed: null until a published result exists
@@ -174,7 +194,27 @@ public class CandidateService : ICandidateService
             return ApiResponse<CandidateExamPreviewDto>.FailureResponse("Exam is not available");
         }
 
-        var allQuestions = exam.Sections.SelectMany(s => s.Questions);
+        // Calculate total questions and points including Builder sections
+        int totalQuestions = 0;
+        decimal totalPoints = 0;
+
+        foreach (var section in exam.Sections)
+        {
+            if (section.SourceType.HasValue && section.PickCount > 0)
+            {
+                // Builder section - use PickCount as question count
+                totalQuestions += section.PickCount;
+                // Estimate points: use 1 point per question (actual points determined at attempt time)
+                totalPoints += section.PickCount;
+            }
+            else
+            {
+                // Manual section - use ExamQuestions
+                var sectionQuestions = section.Questions ?? new List<Domain.Entities.Assessment.ExamQuestion>();
+                totalQuestions += sectionQuestions.Count;
+                totalPoints += sectionQuestions.Sum(q => q.Points);
+            }
+        }
 
         var instructions = exam.Instructions
       .OrderBy(i => i.Order)
@@ -213,8 +253,8 @@ public class CandidateService : ICandidateService
             EndAt = exam.EndAt,
             DurationMinutes = exam.DurationMinutes,
             MaxAttempts = exam.MaxAttempts,
-            TotalQuestions = allQuestions.Count(),
-            TotalPoints = allQuestions.Sum(q => q.Points),
+            TotalQuestions = totalQuestions,
+            TotalPoints = totalPoints,
             PassScore = exam.PassScore,
             Instructions = instructions,
             AccessPolicy = accessPolicy,
@@ -1160,37 +1200,43 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
     private async Task<CandidateAttemptSessionDto> BuildCandidateSessionDto(
         Domain.Entities.Attempt.Attempt attempt,
-   Domain.Entities.Assessment.Exam exam)
+        Domain.Entities.Assessment.Exam exam)
     {
         var now = DateTime.UtcNow;
 
-        // Get all attempt questions with their answers
+        // Get all attempt questions with their answers, including Subject/Topic for Builder sections
         var attemptQuestions = await _context.Set<AttemptQuestion>()
-      .Include(aq => aq.Question)
-         .ThenInclude(q => q.QuestionType)
             .Include(aq => aq.Question)
-   .ThenInclude(q => q.Options.Where(o => !o.IsDeleted))
+                .ThenInclude(q => q.QuestionType)
+            .Include(aq => aq.Question)
+                .ThenInclude(q => q.Options.Where(o => !o.IsDeleted))
             .Include(aq => aq.Question)
                 .ThenInclude(q => q.Attachments.Where(a => !a.IsDeleted))
-        .Include(aq => aq.Answers)
-     .Where(aq => aq.AttemptId == attempt.Id)
+            .Include(aq => aq.Question)
+                .ThenInclude(q => q.Subject)
+            .Include(aq => aq.Question)
+                .ThenInclude(q => q.Topic)
+            .Include(aq => aq.Answers)
+            .Where(aq => aq.AttemptId == attempt.Id)
             .OrderBy(aq => aq.Order)
             .ToListAsync();
 
-        // Get exam questions with section/topic info to map attempt questions
+        // Get exam questions with section/topic info to map attempt questions (for Manual sections)
         var examQuestions = await _context.Set<Domain.Entities.Assessment.ExamQuestion>()
             .Where(eq => eq.ExamId == exam.Id && !eq.IsDeleted)
-      .ToListAsync();
+            .ToListAsync();
 
         // Create a lookup for exam questions by QuestionId
         var examQuestionLookup = examQuestions.ToDictionary(eq => eq.QuestionId);
 
-        // Get sections with topics
+        // Get sections with topics, QuestionSubject, and QuestionTopic for Builder sections
         var sections = await _context.Set<Domain.Entities.Assessment.ExamSection>()
-        .Include(s => s.Topics.Where(t => !t.IsDeleted).OrderBy(t => t.Order))
-                 .Where(s => s.ExamId == exam.Id && !s.IsDeleted)
-                 .OrderBy(s => s.Order)
-           .ToListAsync();
+            .Include(s => s.Topics.Where(t => !t.IsDeleted).OrderBy(t => t.Order))
+            .Include(s => s.QuestionSubject)
+            .Include(s => s.QuestionTopic)
+            .Where(s => s.ExamId == exam.Id && !s.IsDeleted)
+            .OrderBy(s => s.Order)
+            .ToListAsync();
 
         // Build flat questions list for backward compatibility
         var flatQuestions = new List<CandidateQuestionDto>();
@@ -1198,68 +1244,147 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         // Build sections with topics and questions
         var sectionDtos = new List<CandidateSectionDto>();
 
+        // Track which attempt questions have been assigned to sections
+        var assignedQuestionIds = new HashSet<int>();
+
         foreach (var section in sections)
         {
-            // Get exam questions for this section
-            var sectionExamQuestions = examQuestions
-     .Where(eq => eq.ExamSectionId == section.Id)
- .ToList();
-
-            // Get attempt questions that belong to this section
-            var sectionAttemptQuestions = attemptQuestions
-                 .Where(aq => sectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-          .ToList();
-
-            if (!sectionAttemptQuestions.Any())
-                continue; // Skip empty sections
-
-            // Build topics for this section
             var topicDtos = new List<CandidateTopicDto>();
+            var directSectionQuestionDtos = new List<CandidateQuestionDto>();
 
-            foreach (var topic in section.Topics.OrderBy(t => t.Order))
+            // Check if this is a Builder section
+            var isBuilderSection = section.SourceType.HasValue && section.QuestionSubjectId.HasValue;
+
+            if (isBuilderSection)
             {
-                // Get exam questions for this topic
-                var topicExamQuestions = sectionExamQuestions
-                     .Where(eq => eq.ExamTopicId == topic.Id)
+                // Builder section - match questions by SubjectId/TopicId
+                List<AttemptQuestion> sectionAttemptQuestions;
+
+                if (section.SourceType == SectionSourceType.Topic && section.QuestionTopicId.HasValue)
+                {
+                    // SourceType = Topic: All questions belong to this specific topic
+                    sectionAttemptQuestions = attemptQuestions
+                        .Where(aq => aq.Question.TopicId == section.QuestionTopicId && !assignedQuestionIds.Contains(aq.Id))
+                        .ToList();
+                }
+                else
+                {
+                    // SourceType = Subject: All questions from this subject (may have multiple topics)
+                    sectionAttemptQuestions = attemptQuestions
+                        .Where(aq => aq.Question.SubjectId == section.QuestionSubjectId && !assignedQuestionIds.Contains(aq.Id))
+                        .ToList();
+                }
+
+                if (!sectionAttemptQuestions.Any())
+                    continue; // Skip empty sections
+
+                // Mark questions as assigned
+                foreach (var aq in sectionAttemptQuestions)
+                    assignedQuestionIds.Add(aq.Id);
+
+                if (section.SourceType == SectionSourceType.Subject)
+                {
+                    // Group questions by TopicId for Subject mode
+                    var groupedByTopic = sectionAttemptQuestions
+                        .GroupBy(aq => aq.Question.TopicId)
+                        .OrderBy(g => g.Key ?? int.MaxValue)
+                        .ToList();
+
+                    int topicOrder = 1;
+                    foreach (var topicGroup in groupedByTopic)
+                    {
+                        var topicQuestions = topicGroup.ToList();
+                        var topicQuestionDtos = BuildQuestionDtos(topicQuestions, exam, section.Id, topicGroup.Key);
+                        flatQuestions.AddRange(topicQuestionDtos);
+
+                        // Get topic name from Question.Topic navigation (first question's topic)
+                        var firstQuestion = topicQuestions.First().Question;
+                        var topicName = firstQuestion.Topic;
+
+                        topicDtos.Add(new CandidateTopicDto
+                        {
+                            TopicId = topicGroup.Key ?? 0,
+                            Order = topicOrder++,
+                            TitleEn = topicName?.NameEn ?? "General",
+                            TitleAr = topicName?.NameAr ?? "عام",
+                            DescriptionEn = null,
+                            DescriptionAr = null,
+                            TotalPoints = topicQuestionDtos.Sum(q => q.Points),
+                            TotalQuestions = topicQuestionDtos.Count,
+                            AnsweredQuestions = topicQuestionDtos.Count(q => q.CurrentAnswer != null),
+                            Questions = topicQuestionDtos
+                        });
+                    }
+                }
+                else
+                {
+                    // SourceType = Topic: All questions go directly into section (single topic)
+                    directSectionQuestionDtos = BuildQuestionDtos(sectionAttemptQuestions, exam, section.Id, section.QuestionTopicId);
+                    flatQuestions.AddRange(directSectionQuestionDtos);
+                }
+            }
+            else
+            {
+                // Manual section - use ExamQuestions/ExamTopics as before
+                var sectionExamQuestions = examQuestions
+                    .Where(eq => eq.ExamSectionId == section.Id)
                     .ToList();
 
-                // Get attempt questions that belong to this topic
-                var topicAttemptQuestions = attemptQuestions
-         .Where(aq => topicExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-                  .ToList();
+                var sectionAttemptQuestions = attemptQuestions
+                    .Where(aq => sectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
+                    .ToList();
 
-                if (!topicAttemptQuestions.Any())
-                    continue; // Skip empty topics
+                if (!sectionAttemptQuestions.Any())
+                    continue; // Skip empty sections
 
-                var topicQuestionDtos = BuildQuestionDtos(topicAttemptQuestions, exam, section.Id, topic.Id);
-                flatQuestions.AddRange(topicQuestionDtos);
+                // Mark questions as assigned
+                foreach (var aq in sectionAttemptQuestions)
+                    assignedQuestionIds.Add(aq.Id);
 
-                topicDtos.Add(new CandidateTopicDto
+                // Build topics for this section
+                foreach (var topic in section.Topics.OrderBy(t => t.Order))
                 {
-                    TopicId = topic.Id,
-                    Order = topic.Order,
-                    TitleEn = topic.TitleEn,
-                    TitleAr = topic.TitleAr,
-                    DescriptionEn = topic.DescriptionEn,
-                    DescriptionAr = topic.DescriptionAr,
-                    TotalPoints = topicQuestionDtos.Sum(q => q.Points),
-                    TotalQuestions = topicQuestionDtos.Count,
-                    AnsweredQuestions = topicQuestionDtos.Count(q => q.CurrentAnswer != null),
-                    Questions = topicQuestionDtos
-                });
+                    var topicExamQuestions = sectionExamQuestions
+                        .Where(eq => eq.ExamTopicId == topic.Id)
+                        .ToList();
+
+                    var topicAttemptQuestions = attemptQuestions
+                        .Where(aq => topicExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
+                        .ToList();
+
+                    if (!topicAttemptQuestions.Any())
+                        continue; // Skip empty topics
+
+                    var topicQuestionDtos = BuildQuestionDtos(topicAttemptQuestions, exam, section.Id, topic.Id);
+                    flatQuestions.AddRange(topicQuestionDtos);
+
+                    topicDtos.Add(new CandidateTopicDto
+                    {
+                        TopicId = topic.Id,
+                        Order = topic.Order,
+                        TitleEn = topic.TitleEn,
+                        TitleAr = topic.TitleAr,
+                        DescriptionEn = topic.DescriptionEn,
+                        DescriptionAr = topic.DescriptionAr,
+                        TotalPoints = topicQuestionDtos.Sum(q => q.Points),
+                        TotalQuestions = topicQuestionDtos.Count,
+                        AnsweredQuestions = topicQuestionDtos.Count(q => q.CurrentAnswer != null),
+                        Questions = topicQuestionDtos
+                    });
+                }
+
+                // Get questions directly under section (not in any topic)
+                var directSectionExamQuestions = sectionExamQuestions
+                    .Where(eq => eq.ExamTopicId == null)
+                    .ToList();
+
+                var directSectionAttemptQuestions = attemptQuestions
+                    .Where(aq => directSectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
+                    .ToList();
+
+                directSectionQuestionDtos = BuildQuestionDtos(directSectionAttemptQuestions, exam, section.Id, null);
+                flatQuestions.AddRange(directSectionQuestionDtos);
             }
-
-            // Get questions directly under section (not in any topic)
-            var directSectionExamQuestions = sectionExamQuestions
-  .Where(eq => eq.ExamTopicId == null)
-     .ToList();
-
-            var directSectionAttemptQuestions = attemptQuestions
-           .Where(aq => directSectionExamQuestions.Any(eq => eq.QuestionId == aq.QuestionId))
-           .ToList();
-
-            var directSectionQuestionDtos = BuildQuestionDtos(directSectionAttemptQuestions, exam, section.Id, null);
-            flatQuestions.AddRange(directSectionQuestionDtos);
 
             // Calculate section totals
             var allSectionQuestionDtos = topicDtos.SelectMany(t => t.Questions).Concat(directSectionQuestionDtos).ToList();
@@ -1272,8 +1397,16 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 TitleAr = section.TitleAr,
                 DescriptionEn = section.DescriptionEn,
                 DescriptionAr = section.DescriptionAr,
+                // Builder section metadata
+                SourceType = section.SourceType.HasValue ? (int)section.SourceType.Value : null,
+                SubjectId = section.QuestionSubjectId,
+                SubjectTitleEn = section.QuestionSubject?.NameEn,
+                SubjectTitleAr = section.QuestionSubject?.NameAr,
+                TopicId = section.QuestionTopicId,
+                TopicTitleEn = section.QuestionTopic?.NameEn,
+                TopicTitleAr = section.QuestionTopic?.NameAr,
                 DurationMinutes = section.DurationMinutes,
-                // Section timer info - would need tracking per section in actual implementation
+                // Section timer info
                 RemainingSeconds = section.DurationMinutes.HasValue ? section.DurationMinutes.Value * 60 : null,
                 SectionStartedAtUtc = null, // Would need to track when candidate entered section
                 SectionExpiresAtUtc = null, // Would calculate based on section start + duration
@@ -1285,16 +1418,24 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             });
         }
 
+        // FALLBACK: If there are attempt questions that weren't assigned to any section
+        var unassignedQuestions = attemptQuestions.Where(aq => !assignedQuestionIds.Contains(aq.Id)).ToList();
+        if (unassignedQuestions.Any())
+        {
+            var unassignedQuestionDtos = BuildQuestionDtos(unassignedQuestions, exam, 0, null);
+            flatQuestions.AddRange(unassignedQuestionDtos);
+        }
+
         var instructions = exam.Instructions
-         .Where(i => !i.IsDeleted)
-   .OrderBy(i => i.Order)
-              .Select(i => new CandidateExamInstructionDto
-              {
-                  Order = i.Order,
-                  ContentEn = i.ContentEn,
-                  ContentAr = i.ContentAr
-              })
-              .ToList();
+            .Where(i => !i.IsDeleted)
+            .OrderBy(i => i.Order)
+            .Select(i => new CandidateExamInstructionDto
+            {
+                Order = i.Order,
+                ContentEn = i.ContentEn,
+                ContentAr = i.ContentAr
+            })
+            .ToList();
 
         return new CandidateAttemptSessionDto
         {

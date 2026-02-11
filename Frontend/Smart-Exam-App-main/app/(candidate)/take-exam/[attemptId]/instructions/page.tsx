@@ -11,6 +11,8 @@ import {
   startExam,
   type ExamPreview,
   MOCK_EXAM_PREVIEW,
+  logAttemptEvent,
+  AttemptEventType,
 } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { ArrowLeft, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle } from "lucide-react"
+import { ArrowLeft, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
 
 // Helper function to get localized field
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -33,6 +35,13 @@ function getLocalizedField<T extends Record<string, unknown>>(
 
 const EXAM_LANGUAGE_KEY = "examLanguage"
 
+// Ready check status
+interface ReadyCheckStatus {
+  fullscreenSupported: boolean | null;
+  webcamPermission: boolean | null;
+  checking: boolean;
+}
+
 export default function ExamInstructionsPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const examId = Number.parseInt(attemptId, 10)
@@ -45,10 +54,75 @@ export default function ExamInstructionsPage() {
   const [examLanguage, setExamLanguage] = useState<"en" | "ar">(language)
   const [accessCode, setAccessCode] = useState("")
   const [accessCodeError, setAccessCodeError] = useState<string | null>(null)
+  
+  // Ready check state
+  const [readyCheck, setReadyCheck] = useState<ReadyCheckStatus>({
+    fullscreenSupported: null,
+    webcamPermission: null,
+    checking: false,
+  })
+  const [readyCheckComplete, setReadyCheckComplete] = useState(false)
+
+  // Check if fullscreen API is supported
+  const checkFullscreenSupport = (): boolean => {
+    const doc = document.documentElement as unknown as Record<string, unknown>
+    return !!(
+      doc.requestFullscreen ||
+      doc.webkitRequestFullscreen ||
+      doc.mozRequestFullScreen ||
+      doc.msRequestFullscreen
+    )
+  }
+
+  // Check webcam permission
+  const checkWebcamPermission = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      // Stop all tracks after checking
+      stream.getTracks().forEach(track => track.stop())
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  // Run ready checks
+  const runReadyChecks = async () => {
+    setReadyCheck(prev => ({ ...prev, checking: true }))
+    
+    // Check fullscreen support
+    const fullscreenSupported = checkFullscreenSupport()
+    setReadyCheck(prev => ({ ...prev, fullscreenSupported }))
+    
+    // Check webcam if proctoring is enabled
+    if (examPreview?.accessPolicy.requireProctoring) {
+      const webcamPermission = await checkWebcamPermission()
+      setReadyCheck(prev => ({ ...prev, webcamPermission }))
+    } else {
+      setReadyCheck(prev => ({ ...prev, webcamPermission: true }))
+    }
+    
+    setReadyCheck(prev => ({ ...prev, checking: false }))
+    setReadyCheckComplete(true)
+  }
+
+  // Retry a specific check
+  const retryWebcamCheck = async () => {
+    setReadyCheck(prev => ({ ...prev, webcamPermission: null, checking: true }))
+    const webcamPermission = await checkWebcamPermission()
+    setReadyCheck(prev => ({ ...prev, webcamPermission, checking: false }))
+  }
 
   useEffect(() => {
     loadExamPreview()
   }, [examId])
+
+  // Run ready checks when exam preview is loaded
+  useEffect(() => {
+    if (examPreview && !readyCheckComplete) {
+      runReadyChecks()
+    }
+  }, [examPreview])
 
   async function loadExamPreview() {
     try {
@@ -93,6 +167,28 @@ export default function ExamInstructionsPage() {
       const request: { accessCode?: string } = accessCode.trim() ? { accessCode: accessCode.trim() } : {}
       const session = await startExam(examId, request)
       console.log("[v0] Exam started, attemptId:", session.attemptId)
+      
+      // Request fullscreen before navigating to exam page
+      try {
+        const docEl = document.documentElement as HTMLElement & {
+          webkitRequestFullscreen?: () => Promise<void>;
+          mozRequestFullScreen?: () => Promise<void>;
+          msRequestFullscreen?: () => Promise<void>;
+        }
+        if (docEl.requestFullscreen) {
+          await docEl.requestFullscreen()
+        } else if (docEl.webkitRequestFullscreen) {
+          await docEl.webkitRequestFullscreen()
+        } else if (docEl.mozRequestFullScreen) {
+          await docEl.mozRequestFullScreen()
+        } else if (docEl.msRequestFullscreen) {
+          await docEl.msRequestFullscreen()
+        }
+      } catch (fsError) {
+        console.log("[v0] Fullscreen request failed:", fsError)
+        // Continue even if fullscreen fails - exam page will try again
+      }
+      
       // Redirect to exam taking page with attemptId
       router.push(`/take-exam/${session.attemptId}`)
     } catch (error: unknown) {
@@ -183,6 +279,122 @@ export default function ExamInstructionsPage() {
 
       <main className="flex-1 flex items-center justify-center py-8 px-6">
         <div className="w-full max-w-3xl space-y-6">
+          {/* Prominent Exam Title & Description */}
+          <div className="text-center space-y-3 pb-4 border-b">
+            <h2 className="text-2xl font-bold tracking-tight">
+              {getLocalizedField(examPreview, "title", language)}
+            </h2>
+            {getLocalizedField(examPreview, "description", language) && (
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                {getLocalizedField(examPreview, "description", language)}
+              </p>
+            )}
+          </div>
+
+          {/* Ready Check Card */}
+          <Card className={`border-2 ${
+            readyCheckComplete && readyCheck.fullscreenSupported && readyCheck.webcamPermission 
+              ? 'border-green-500/50 bg-green-500/5' 
+              : readyCheckComplete && (!readyCheck.fullscreenSupported || !readyCheck.webcamPermission)
+                ? 'border-red-500/50 bg-red-500/5'
+                : 'border-blue-500/50 bg-blue-500/5'
+          }`}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                {t("instructions.readyCheck")}
+              </CardTitle>
+              <CardDescription>{t("instructions.readyCheckDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Fullscreen Support Check */}
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-3">
+                  <Monitor className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">{t("instructions.fullscreenSupport")}</p>
+                    <p className="text-xs text-muted-foreground">{t("instructions.fullscreenSupportDesc")}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {readyCheck.fullscreenSupported === null ? (
+                    <LoadingSpinner size="sm" />
+                  ) : readyCheck.fullscreenSupported ? (
+                    <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                      <CheckCircle2 className="h-3 w-3 me-1" />
+                      {t("common.ready")}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                      <XCircle className="h-3 w-3 me-1" />
+                      {t("common.unsupported")}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Webcam Permission Check (if proctoring required) */}
+              {examPreview.accessPolicy.requireProctoring && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <Camera className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">{t("instructions.webcamPermission")}</p>
+                      <p className="text-xs text-muted-foreground">{t("instructions.webcamPermissionDesc")}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {readyCheck.webcamPermission === null ? (
+                      <LoadingSpinner size="sm" />
+                    ) : readyCheck.webcamPermission ? (
+                      <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                        <CheckCircle2 className="h-3 w-3 me-1" />
+                        {t("common.ready")}
+                      </Badge>
+                    ) : (
+                      <>
+                        <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                          <XCircle className="h-3 w-3 me-1" />
+                          {t("common.denied")}
+                        </Badge>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={retryWebcamCheck}
+                          disabled={readyCheck.checking}
+                        >
+                          <RefreshCw className={`h-3 w-3 me-1 ${readyCheck.checking ? 'animate-spin' : ''}`} />
+                          {t("common.retry")}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Summary */}
+              {readyCheckComplete && (
+                <div className={`p-3 rounded-lg ${
+                  readyCheck.fullscreenSupported && readyCheck.webcamPermission
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {readyCheck.fullscreenSupported && readyCheck.webcamPermission ? (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="font-medium">{t("instructions.allChecksPassed")}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5" />
+                      <span className="font-medium">{t("instructions.someChecksFailed")}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Error Alert - Top */}
           {accessCodeError && (
             <Card className="border-red-500 bg-red-50">
@@ -444,7 +656,10 @@ export default function ExamInstructionsPage() {
                   !agreed ||
                   !canStart ||
                   starting ||
-                  (examPreview.accessPolicy.requiresAccessCode && !accessCode.trim())
+                  (examPreview.accessPolicy.requiresAccessCode && !accessCode.trim()) ||
+                  !readyCheckComplete ||
+                  !readyCheck.fullscreenSupported ||
+                  !readyCheck.webcamPermission
                 }
                 className="w-full h-12 text-base font-semibold"
                 size="lg"

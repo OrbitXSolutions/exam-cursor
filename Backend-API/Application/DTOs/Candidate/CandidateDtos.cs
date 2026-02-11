@@ -180,6 +180,42 @@ public class CandidateSectionDto
     public string? DescriptionAr { get; set; }
 
     /// <summary>
+    /// Section source type: 1 = Subject (shows all topics), 2 = Topic (shows single topic)
+    /// If null, it's a manual section (not from Builder)
+    /// </summary>
+    public int? SourceType { get; set; }
+
+    /// <summary>
+    /// Subject ID for Builder sections
+    /// </summary>
+    public int? SubjectId { get; set; }
+
+    /// <summary>
+    /// Subject title (English) for display in exam
+    /// </summary>
+    public string? SubjectTitleEn { get; set; }
+
+    /// <summary>
+    /// Subject title (Arabic) for display in exam
+    /// </summary>
+    public string? SubjectTitleAr { get; set; }
+
+    /// <summary>
+    /// Topic ID for Builder sections (only if SourceType = Topic)
+    /// </summary>
+    public int? TopicId { get; set; }
+
+    /// <summary>
+    /// Topic title (English) for display in exam
+    /// </summary>
+    public string? TopicTitleEn { get; set; }
+
+    /// <summary>
+    /// Topic title (Arabic) for display in exam
+    /// </summary>
+    public string? TopicTitleAr { get; set; }
+
+    /// <summary>
     /// Section-specific duration in minutes (optional)
     /// If set, frontend should show a separate timer for this section
     /// When time expires, auto-switch to next section and disable navigation back

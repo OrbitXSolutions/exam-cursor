@@ -68,6 +68,9 @@ export const translations = {
       notAvailable: "Not available",
       min: "min",
       attemptsRemaining: "attempts remaining",
+      ready: "Ready",
+      unsupported: "Not Supported",
+      denied: "Denied",
     },
 
     // Status
@@ -487,6 +490,16 @@ export const translations = {
         "Choose the language for the exam interface and questions.",
       english: "English",
       arabic: "Arabic",
+      // Ready check translations
+      readyCheck: "System Ready Check",
+      readyCheckDesc:
+        "We need to verify your browser supports the required features",
+      fullscreenSupport: "Fullscreen Support",
+      fullscreenSupportDesc: "Required for exam security",
+      webcamPermission: "Webcam Permission",
+      webcamPermissionDesc: "Required for proctoring",
+      allChecksPassed: "All checks passed! You are ready to start.",
+      someChecksFailed: "Some checks failed. Please resolve the issues above.",
     },
 
     // Exam Taking
@@ -520,8 +533,27 @@ export const translations = {
         "Warning: Tab switching detected. This will be recorded.",
       copyPasteBlocked: "Copy/paste is not allowed during this exam.",
       sectionTimeExpired: "Section time has expired. Moving to next section.",
+      sectionTimeWarning: "Time is running out!",
+      sectionTimeWarningDesc:
+        "Only {seconds} seconds remaining in this section.",
       cannotGoBack: "You cannot go back to previous sections.",
+      confirmSectionChange: "Move to Next Section?",
+      sectionChangeLocked:
+        "If you continue, you will not be able to return to this section again.",
+      continueToSection: "Continue",
+      nextSection: "Next Section",
+      subject: "Subject",
+      topic: "Topic",
       topicQuestions: "{count} questions in this topic",
+      of: "of",
+      // Error messages
+      attemptExpired: "Attempt Expired",
+      attemptExpiredDesc:
+        "Your exam attempt has expired. The time limit was reached or the exam end date has passed. Please start a new attempt if available.",
+      cannotLoadExam: "Cannot Load Exam",
+      sessionLoadError:
+        "There was a problem loading your exam session. Please try again.",
+      backToMyExams: "Back to My Exams",
     },
 
     // Grading
@@ -1011,6 +1043,9 @@ export const translations = {
       notAvailable: "غير متاح",
       min: "د",
       attemptsRemaining: "محاولات متبقية",
+      ready: "جاهز",
+      unsupported: "غير مدعوم",
+      denied: "مرفوض",
     },
 
     // Status
@@ -1590,6 +1625,15 @@ export const translations = {
       examLanguageDesc: "اختر لغة واجهة الاختبار والأسئلة.",
       english: "English",
       arabic: "العربية",
+      // Ready check translations
+      readyCheck: "فحص جاهزية النظام",
+      readyCheckDesc: "نحتاج للتحقق من أن متصفحك يدعم الميزات المطلوبة",
+      fullscreenSupport: "دعم ملء الشاشة",
+      fullscreenSupportDesc: "مطلوب لأمان الاختبار",
+      webcamPermission: "إذن الكاميرا",
+      webcamPermissionDesc: "مطلوب للمراقبة",
+      allChecksPassed: "جميع الفحوصات ناجحة! أنت جاهز للبدء.",
+      someChecksFailed: "بعض الفحوصات فشلت. يرجى حل المشاكل أعلاه.",
     },
 
     // Exam Taking
@@ -1621,8 +1665,26 @@ export const translations = {
       tabSwitchWarning: "تحذير: تم اكتشاف تبديل علامة التبويب. سيتم تسجيل ذلك.",
       copyPasteBlocked: "النسخ/اللصق غير مسموح به أثناء هذا الاختبار.",
       sectionTimeExpired: "انتهى وقت القسم. الانتقال إلى القسم التالي.",
+      sectionTimeWarning: "الوقت ينفد!",
+      sectionTimeWarningDesc: "يتبقى فقط {seconds} ثانية في هذا القسم.",
       cannotGoBack: "لا يمكنك العودة إلى الأقسام السابقة.",
+      confirmSectionChange: "الانتقال إلى القسم التالي؟",
+      sectionChangeLocked:
+        "إذا تابعت، لن تتمكن من العودة إلى هذا القسم مرة أخرى.",
+      continueToSection: "متابعة",
+      nextSection: "القسم التالي",
+      subject: "المادة",
+      topic: "الموضوع",
       topicQuestions: "{count} سؤال في هذا الموضوع",
+      of: "من",
+      // Error messages
+      attemptExpired: "انتهت صلاحية المحاولة",
+      attemptExpiredDesc:
+        "انتهت صلاحية محاولتك للاختبار. تم الوصول إلى الحد الزمني أو انتهى تاريخ الاختبار. يرجى بدء محاولة جديدة إذا كانت متاحة.",
+      cannotLoadExam: "لا يمكن تحميل الاختبار",
+      sessionLoadError:
+        "حدثت مشكلة في تحميل جلسة الاختبار. يرجى المحاولة مرة أخرى.",
+      backToMyExams: "العودة إلى اختباراتي",
     },
 
     // Grading

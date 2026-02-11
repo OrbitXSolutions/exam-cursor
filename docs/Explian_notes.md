@@ -38,3 +38,33 @@ The fix: Validation now calculates total points using actual question points fro
 Before: 8 points (1 × 8 questions)
 After: ~47.5 points (actual points)
 PassScore: 25 ✓ (25 < 47.5)
+
+## Candidate:
+
+Implemented all exam-taking flow improvements:
+
+1. Instructions Page (instructions/page.tsx/take-exam/[attemptId]/instructions/page.tsx))
+
+Added prominent exam title & description banner at the top
+Added Ready Check Card with:
+Fullscreen support detection (browser API check)
+Webcam permission check (only if proctoring enabled)
+Green/red badges for status indicators
+Retry button for failed webcam permission
+Summary message showing pass/fail status
+Start button now disabled if any ready check fails 2. Security Features (already in exam-page.tsx/take-exam/[attemptId]/exam-page.tsx))
+
+✓ Fullscreen enforcement on start
+✓ Fullscreen exit detection with event logging
+✓ Tab switching detection with event logging
+✓ Copy/paste prevention with event logging 3. Section Navigation (already implemented)
+
+✓ Tab locks for previous sections when lockPreviousSections enabled
+✓ Section timer display with auto-advance when time expires
+✓ canNavigateBack() enforces navigation rules 4. Server-Driven Timer (already implemented)
+
+✓ Timer syncs with server every 60 seconds
+✓ Auto-submit when overall time expires
+✓ Event logging for timeouts 5. Translations
+
+Added EN/AR strings for ready check UI (readyCheck, fullscreenSupport, webcamPermission, allChecksPassed, etc.)

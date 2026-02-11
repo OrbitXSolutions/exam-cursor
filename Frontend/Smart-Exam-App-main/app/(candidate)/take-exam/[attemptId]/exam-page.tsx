@@ -34,9 +34,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 // Helper function to get localized field
 function getLocalizedField(
@@ -59,6 +60,7 @@ export default function ExamPage() {
   // Core state
   const [session, setSession] = useState<AttemptSession | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<number, SaveAnswerRequest>>({})
   const [flagged, setFlagged] = useState<Set<number>>(new Set())
 
@@ -73,11 +75,15 @@ export default function ExamPage() {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [savingAnswers, setSavingAnswers] = useState<Set<number>>(new Set())
+  const [sectionChangeConfirmOpen, setSectionChangeConfirmOpen] = useState(false)
+  const [pendingSectionId, setPendingSectionId] = useState<number | null>(null)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const sectionTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const syncTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const snapshotIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const expiredSectionsRef = useRef<Set<number>>(new Set())
 
   // Computed values
   const sections = session?.sections || []
@@ -136,10 +142,22 @@ export default function ExamPage() {
     initializeExam()
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
+      if (sectionTimerRef.current) clearInterval(sectionTimerRef.current)
       if (syncTimerRef.current) clearInterval(syncTimerRef.current)
       if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
     }
   }, [attemptId])
+
+  // Watch for section time expiration and auto-navigate
+  useEffect(() => {
+    if (!currentSectionId || !sections.length) return
+    
+    const currentTime = sectionTimers[currentSectionId]
+    if (currentTime !== undefined && currentTime <= 0 && !expiredSectionsRef.current.has(currentSectionId)) {
+      expiredSectionsRef.current.add(currentSectionId)
+      handleSectionTimeExpired(currentSectionId)
+    }
+  }, [sectionTimers, currentSectionId, sections])
 
   useEffect(() => {
     if (!session) return
@@ -321,9 +339,8 @@ export default function ExamPage() {
         setSectionTimers(sectionTimerState)
       }
 
-      // Start countdown timer
+      // Start exam countdown timer
       timerRef.current = setInterval(() => {
-        // Update exam timer
         setExamTimeRemaining((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current)
@@ -332,18 +349,16 @@ export default function ExamPage() {
           }
           return prev - 1
         })
+      }, 1000)
 
-        // Update section timers
+      // Start separate section timer for smoother countdown
+      sectionTimerRef.current = setInterval(() => {
         setSectionTimers((prev) => {
           const updated = { ...prev }
           for (const sectionId of Object.keys(updated)) {
             const id = Number(sectionId)
             if (updated[id] > 0) {
               updated[id] = updated[id] - 1
-              // Check if section time expired
-              if (updated[id] <= 0) {
-                handleSectionTimeExpired(id)
-              }
             }
           }
           return updated
@@ -368,10 +383,14 @@ export default function ExamPage() {
       await logAttemptEvent(sessionData.attemptId, {
         eventType: AttemptEventType.Started,
       }).catch(() => { })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("[v0] Failed to start exam:", error)
-      toast.error(t("common.error"))
-      router.push("/my-exams")
+      // Extract error message from API response
+      let errorMessage = t("common.error")
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -383,8 +402,33 @@ export default function ExamPage() {
     if (currentIndex !== -1 && currentIndex < sections.length - 1) {
       toast.warning(t("exam.sectionTimeExpired"))
       setCurrentSectionId(sections[currentIndex + 1].sectionId)
+    } else if (currentIndex === sections.length - 1) {
+      // Last section expired - auto submit
+      toast.warning(t("exam.sectionTimeExpired"))
+      setSubmitDialogOpen(true)
     }
   }
+
+  // Navigate to next section
+  function handleNextSection() {
+    if (!currentSectionId) return
+    const currentIndex = sections.findIndex(s => s.sectionId === currentSectionId)
+    if (currentIndex !== -1 && currentIndex < sections.length - 1) {
+      const nextSectionId = sections[currentIndex + 1].sectionId
+      if (session?.examSettings?.lockPreviousSections) {
+        setPendingSectionId(nextSectionId)
+        setSectionChangeConfirmOpen(true)
+      } else {
+        setCurrentSectionId(nextSectionId)
+      }
+    } else {
+      // Last section - show submit dialog
+      setSubmitDialogOpen(true)
+    }
+  }
+
+  // Check if this is the last section
+  const isLastSection = currentSectionId ? sections.findIndex(s => s.sectionId === currentSectionId) === sections.length - 1 : false
 
   function formatTime(seconds: number) {
     const hours = Math.floor(seconds / 3600)
@@ -506,10 +550,45 @@ export default function ExamPage() {
     )
   }
 
-  if (!session) {
+  // Show friendly error screen
+  if (error || !session) {
+    const isExpired = error?.toLowerCase().includes("expired")
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p>{t("common.error")}</p>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+            <CardTitle className="text-xl">
+              {isExpired ? t("exam.attemptExpired") : t("exam.cannotLoadExam")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              {error || t("exam.sessionLoadError")}
+            </p>
+            {isExpired && (
+              <p className="text-sm text-muted-foreground">
+                {t("exam.attemptExpiredDesc")}
+              </p>
+            )}
+            <div className="flex flex-col gap-2 pt-4">
+              <Button asChild>
+                <Link href="/my-exams">
+                  <ArrowLeft className="h-4 w-4 me-2" />
+                  {t("exam.backToMyExams")}
+                </Link>
+              </Button>
+              {!isExpired && (
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  <RefreshCw className="h-4 w-4 me-2" />
+                  {t("common.retry")}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -598,12 +677,19 @@ export default function ExamPage() {
                 return
               }
 
+              // If moving forward, show confirmation modal
+              if (newIndex > currentIndex && session?.examSettings?.lockPreviousSections) {
+                setPendingSectionId(newSectionId)
+                setSectionChangeConfirmOpen(true)
+                return
+              }
+
               setCurrentSectionId(newSectionId)
             }}
             className="flex h-full flex-col"
           >
-            <div className="border-b bg-muted/30 px-6">
-              <TabsList className="h-auto gap-2 bg-transparent p-0">
+            <div className="border-b bg-muted/30 px-4">
+              <TabsList className="w-full h-auto gap-1 bg-transparent p-2 flex-wrap justify-start">
                 {sections.map((section, index) => {
                   const sectionQuestions = getSectionQuestionsCount(section)
                   const answeredInSection = getAnsweredInSection(section)
@@ -614,7 +700,7 @@ export default function ExamPage() {
                     <TabsTrigger
                       key={section.sectionId}
                       value={section.sectionId.toString()}
-                      className="relative gap-2 data-[state=active]:bg-background"
+                      className="relative gap-2 px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md"
                       disabled={isLocked}
                     >
                       {isLocked && <Lock className="h-3 w-3" />}
@@ -636,13 +722,17 @@ export default function ExamPage() {
               >
                 <SectionContent
                   section={section}
+                  sections={sections}
                   answers={answers}
                   flagged={flagged}
                   savingAnswers={savingAnswers}
                   language={language}
                   totalQuestionsInExam={totalQuestions}
+                  sectionTimeRemaining={sectionTimers[section.sectionId]}
+                  isLastSection={sections.findIndex(s => s.sectionId === section.sectionId) === sections.length - 1}
                   onAnswerChange={handleAnswerChange}
                   onToggleFlag={handleToggleFlag}
+                  onNextSection={handleNextSection}
                 />
               </TabsContent>
             ))}
@@ -731,6 +821,34 @@ export default function ExamPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Section change confirmation dialog */}
+      <AlertDialog open={sectionChangeConfirmOpen} onOpenChange={setSectionChangeConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("exam.confirmSectionChange") || "Move to Next Section?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("exam.sectionChangeLocked") || "If you continue, you will not be able to return to this section again."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingSectionId(null)}>
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingSectionId !== null) {
+                  setCurrentSectionId(pendingSectionId)
+                  setPendingSectionId(null)
+                }
+                setSectionChangeConfirmOpen(false)
+              }}
+            >
+              {t("exam.continueToSection") || "Continue"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
@@ -738,33 +856,112 @@ export default function ExamPage() {
 // Section content component - shows ALL questions in the section
 function SectionContent({
   section,
+  sections,
   answers,
   flagged,
   savingAnswers,
   language,
   totalQuestionsInExam,
+  sectionTimeRemaining,
+  isLastSection,
   onAnswerChange,
   onToggleFlag,
+  onNextSection,
 }: {
   section: ExamSection
+  sections: ExamSection[]
   answers: Record<number, SaveAnswerRequest>
   flagged: Set<number>
   savingAnswers: Set<number>
   language: string
   totalQuestionsInExam: number
+  sectionTimeRemaining?: number | null
+  isLastSection: boolean
   onAnswerChange: (questionId: number, answer: SaveAnswerRequest) => void
   onToggleFlag: (questionId: number) => void
+  onNextSection: () => void
 }) {
+  const { t } = useI18n()
   const hasTopic = section.topics && section.topics.length > 0
+
+  // Check if this is a Builder section
+  const isBuilderSection = section.sourceType !== null && section.sourceType !== undefined
+  const isSubjectMode = section.sourceType === 1 // Subject = 1
+  const isTopicMode = section.sourceType === 2 // Topic = 2
+
+  // Get subject/topic titles for display
+  const subjectTitle = language === "ar" ? section.subjectTitleAr : section.subjectTitleEn
+  const topicTitle = language === "ar" ? section.topicTitleAr : section.topicTitleEn
 
   // Counter for question numbering
   let questionCounter = 1
 
+  // Show section timer warning when 30 seconds or less
+  const showTimeWarning = sectionTimeRemaining !== undefined && sectionTimeRemaining !== null && sectionTimeRemaining <= 30
+
+  // Get warning text with actual seconds
+  const warningDescText = (t("exam.sectionTimeWarningDesc") || "Only {seconds} seconds remaining in this section.")
+    .replace("{seconds}", String(sectionTimeRemaining || 0))
+
   return (
     <ScrollArea className="h-full">
       <div className="mx-auto max-w-5xl space-y-6 p-6">
-        {/* Section description */}
-        {(section.descriptionEn || section.descriptionAr) && (
+        {/* Section Time Warning Alert */}
+        {showTimeWarning && (
+          <div className="animate-pulse rounded-lg border-2 border-red-500 bg-red-50 p-4 dark:bg-red-950/40">
+            <div className="flex items-center gap-3">
+              <Clock className="h-6 w-6 text-red-600" />
+              <div>
+                <p className="font-semibold text-red-700 dark:text-red-400">
+                  {t("exam.sectionTimeWarning") || "Time is running out!"}
+                </p>
+                <p className="text-sm text-red-600 dark:text-red-300">
+                  {warningDescText}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Builder Section Header - Subject Mode */}
+        {isBuilderSection && isSubjectMode && subjectTitle && (
+          <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20">
+            <CardHeader className="py-2">
+              <div className="flex items-center justify-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {t("exam.subject") || "Subject"}
+                </Badge>
+                <CardTitle className="text-lg font-semibold text-purple-900 dark:text-purple-100">
+                  {subjectTitle}
+                </CardTitle>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
+        {/* Builder Section Header - Topic Mode */}
+        {isBuilderSection && isTopicMode && (
+          <Card className="border-l-4 border-l-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20">
+            <CardHeader className="py-2">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {subjectTitle && (
+                  <span className="text-sm text-muted-foreground">
+                    {subjectTitle} /
+                  </span>
+                )}
+                <Badge variant="outline" className="text-xs">
+                  {t("exam.topic") || "Topic"}
+                </Badge>
+                <CardTitle className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">
+                  {topicTitle || getLocalizedField(section, "title", language)}
+                </CardTitle>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
+        {/* Section description (for non-Builder sections) */}
+        {!isBuilderSection && (section.descriptionEn || section.descriptionAr) && (
           <Card className="border-l-4 border-l-primary">
             <CardHeader className="py-3">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -870,6 +1067,23 @@ function SectionContent({
             })}
           </div>
         )}
+
+        {/* Next Section / Submit Button */}
+        <div className="flex justify-end pt-4 border-t">
+          <Button onClick={onNextSection} className="gap-2">
+            {isLastSection ? (
+              <>
+                <Send className="h-4 w-4" />
+                {t("common.submit")}
+              </>
+            ) : (
+              <>
+                {t("exam.nextSection") || "Next Section"}
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </ScrollArea>
   )

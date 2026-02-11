@@ -279,6 +279,15 @@ export interface ExamSection {
   titleAr: string;
   descriptionEn?: string | null;
   descriptionAr?: string | null;
+  // Builder section metadata
+  sourceType?: number | null; // 1 = Subject, 2 = Topic
+  subjectId?: number | null;
+  subjectTitleEn?: string | null;
+  subjectTitleAr?: string | null;
+  topicId?: number | null;
+  topicTitleEn?: string | null;
+  topicTitleAr?: string | null;
+  // Section timing
   durationMinutes?: number | null;
   remainingSeconds?: number | null;
   sectionStartedAtUtc?: string | null;
