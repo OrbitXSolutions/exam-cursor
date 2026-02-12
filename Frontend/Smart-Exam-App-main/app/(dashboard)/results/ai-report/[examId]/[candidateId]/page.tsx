@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { getAttemptIdForCandidate } from "@/lib/api/results"
 import { apiClient } from "@/lib/api-client"
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Separator } from "@/components/ui/separator"
+import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-log"
 import {
   ArrowLeft,
   Brain,
@@ -50,17 +51,55 @@ interface AIAnalysis {
   recommendations: string[]
 }
 
+// AttemptEvent type imported from shared component
+
+interface ProctorEvidence {
+  id: number
+  type?: number
+  typeName?: string
+  fileName?: string
+  startAt?: string
+  endAt?: string
+  uploadedAt?: string
+  previewUrl?: string
+  downloadUrl?: string
+}
+
+
+
 export default function AIReportPage() {
   const params = useParams<{ examId: string; candidateId: string }>()
   const examId = Number(params.examId)
   const candidateId = params.candidateId
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const attemptIdFromQuery = Number(searchParams.get("attemptId") || "")
   const { language, dir } = useI18n()
 
   const [session, setSession] = useState<ProctorSession | null>(null)
   const [analysis, setAnalysis] = useState<AIAnalysis | null>(null)
+  const [attemptEvents, setAttemptEvents] = useState<AttemptEvent[]>([])
+  const [evidence, setEvidence] = useState<ProctorEvidence[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const normalizeList = <T,>(res: unknown): T[] => {
+    if (Array.isArray(res)) return res as T[]
+    if (res && typeof res === "object") {
+      const record = res as Record<string, unknown>
+      const items = (record.items ?? record.Items ?? record.data ?? record.Data) as T[] | undefined
+      return Array.isArray(items) ? items : []
+    }
+    return []
+  }
+
+  const normalizeEvidenceUrl = (url?: string | null) => {
+    if (!url) return undefined
+    if (url.startsWith("/api/")) return url.replace(/^\/api\//, "/api/proxy/")
+    return url
+  }
+
+
 
   useEffect(() => {
     async function loadData() {
@@ -68,43 +107,49 @@ export default function AIReportPage() {
         setLoading(true)
         setError(null)
 
-        // Get attempt ID for this candidate and exam
-        const attemptId = await getAttemptIdForCandidate(examId, candidateId)
-        if (!attemptId) {
+        // Resolve attempt ID for this candidate and exam
+        const resolvedAttemptId = attemptIdFromQuery || (await getAttemptIdForCandidate(examId, candidateId))
+        if (!resolvedAttemptId) {
           setError(language === "ar" ? "لم يتم العثور على محاولة" : "No attempt found")
           return
         }
 
-        // Get proctor session for this attempt
+        // Get proctor sessions for this candidate and select the matching attempt
         const query = new URLSearchParams()
-        query.set("AttemptId", String(attemptId))
-        query.set("PageSize", "1")
+        query.set("CandidateId", candidateId)
+        query.set("PageSize", "50")
 
-        const res = await apiClient.get<{ items?: ProctorSession[] }>(`/Proctor/sessions?${query}`)
-        const sessions = res?.items || []
+        const res = await apiClient.get<unknown>(`/Proctor/sessions?${query}`)
+        const sessions = normalizeList<ProctorSession>(res)
+        const selectedSession = sessions.find((s) => s.attemptId === resolvedAttemptId) ?? sessions[0]
 
-        if (sessions.length > 0) {
-          setSession(sessions[0])
-          
+        if (selectedSession) {
+          setSession(selectedSession)
+
           // Generate mock AI analysis based on session data
           // In a real implementation, this would come from an AI analysis endpoint
           const mockAnalysis: AIAnalysis = {
-            overallRiskScore: sessions[0].riskScore ?? Math.random() * 30,
+            overallRiskScore: selectedSession.riskScore ?? Math.random() * 30,
             faceDetectionScore: 85 + Math.random() * 15,
             eyeTrackingScore: 80 + Math.random() * 20,
             behaviorScore: 75 + Math.random() * 25,
             environmentScore: 90 + Math.random() * 10,
-            suspiciousActivities: sessions[0].totalViolations > 0
+            suspiciousActivities: selectedSession.totalViolations > 0
               ? [
                   language === "ar" ? "تم اكتشاف خروج من التبويب" : "Tab switch detected",
-                  ...(sessions[0].totalViolations > 1 ? [language === "ar" ? "حركة غير عادية" : "Unusual movement detected"] : []),
+                  ...(selectedSession.totalViolations > 1 ? [language === "ar" ? "حركة غير عادية" : "Unusual movement detected"] : []),
                 ]
               : [],
-            recommendations: sessions[0].requiresReview
+            recommendations: selectedSession.requiresReview
               ? [language === "ar" ? "يوصى بمراجعة يدوية" : "Manual review recommended"]
               : [language === "ar" ? "لا توجد مخاوف كبيرة" : "No major concerns"],
           }
           setAnalysis(mockAnalysis)
+
+          await Promise.all([
+            loadAttemptEvents(resolvedAttemptId),
+            loadEvidence(selectedSession.id),
+          ])
         } else {
           setError(language === "ar" ? "لا توجد بيانات مراقبة" : "No proctoring data found")
         }
@@ -119,7 +164,27 @@ export default function AIReportPage() {
     if (examId && candidateId) {
       loadData()
     }
-  }, [examId, candidateId, language])
+  }, [examId, candidateId, language, attemptIdFromQuery])
+
+  async function loadAttemptEvents(attemptId: number) {
+    try {
+      const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
+      setAttemptEvents(normalizeList<AttemptEvent>(res))
+    } catch (err) {
+      console.warn("Failed to load attempt events:", err)
+      setAttemptEvents([])
+    }
+  }
+
+  async function loadEvidence(sessionId: number) {
+    try {
+      const res = await apiClient.get<unknown>(`/Proctor/session/${sessionId}/evidence`)
+      setEvidence(normalizeList<ProctorEvidence>(res))
+    } catch (err) {
+      console.warn("Failed to load evidence:", err)
+      setEvidence([])
+    }
+  }
 
   const getRiskLevel = (score: number) => {
     if (score < 20) return { label: language === "ar" ? "منخفض" : "Low", color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/30" }
@@ -150,6 +215,13 @@ export default function AIReportPage() {
   }
 
   const riskLevel = analysis ? getRiskLevel(analysis.overallRiskScore) : null
+  const snapshotEvidence = evidence.filter(
+    (e) =>
+      e.type === 3 ||
+      e.type === 4 ||
+      e.typeName?.toLowerCase().includes("image") ||
+      e.typeName?.toLowerCase().includes("screen")
+  )
 
   return (
     <div className="flex-1 space-y-6 p-6" dir={dir}>
@@ -290,6 +362,56 @@ export default function AIReportPage() {
                   </Badge>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Attempt Events */}
+          <AttemptEventLog events={attemptEvents} />
+
+          {/* Evidence / Snapshots */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{language === "ar" ? "اللقطات" : "Snapshots"}</CardTitle>
+              <CardDescription>
+                {language === "ar"
+                  ? `${snapshotEvidence.length} لقطة مسجلة`
+                  : `${snapshotEvidence.length} snapshots captured`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {snapshotEvidence.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  {language === "ar" ? "لا توجد لقطات متاحة" : "No snapshots available"}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {snapshotEvidence.map((snap) => (
+                    <div key={snap.id} className="relative">
+                      <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                        {snap.previewUrl || snap.downloadUrl ? (
+                          <img
+                            src={normalizeEvidenceUrl(snap.previewUrl ?? snap.downloadUrl)}
+                            alt={`Snapshot ${snap.id}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Camera className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {new Date(snap.startAt ?? snap.uploadedAt ?? snap.endAt ?? new Date().toISOString()).toLocaleTimeString(
+                          language === "ar" ? "ar-SA" : "en-US"
+                        )}
+                      </div>
+                      <Badge variant="outline" className="absolute top-2 right-2 text-xs">
+                        {snap.typeName ?? "Evidence"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

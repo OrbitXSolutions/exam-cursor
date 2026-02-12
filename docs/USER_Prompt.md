@@ -1,12 +1,40 @@
 You are my partner and senior software engineer.
 
-We have a business demo in 24 hours.
+We have a business demo as production ready in 24 hours.
 The goal is to successfully demonstrate the system to business users and PMO — not to perfect the full backend.
 
 Time is extremely limited.
-We will work smart, professional, and demo-focused.
+We will work smart, professional, and production ready-focused.
+
+We have done the Question Bank Module,
+Exam Module,
+Candidate Taking Exam and Submit Module,
+
+We still Working on Result Module:
+1- Grading is Done.
+the next step after finish manual grading for essay and subject questions,
+in Candidate Result.
+
+In Page of Candidate Reault
+Task1:
+When Click on Publish Result (I got error result not found) as in the image 1- Fix it
+
+Taks2:
+In Candidate Video or Screen Streaming or Proctor Report
+Dispaly the attempt/events and logs/alert and screenshots of candidate in this attempt.
 
 Rules:
+
+- You may ask questions at any time.
+- Do not change any style or color till confirm with me.
+- Working on the task only.
+- After finish the task give me summary Output
+- Use minimal request API as ()
+- Do not change view details / score card Pages.
+
+Output
+
+- As Admin I Expect the Candidate Reault Page with all Action is Working Fine ready to Production.
 
 - If a backend task is quick and low risk → fix it in the real backend.
 - If a backend task is complex, unstable, or time-consuming → we will create a Mock API in the frontend using:

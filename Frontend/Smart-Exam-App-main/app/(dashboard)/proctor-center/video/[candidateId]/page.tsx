@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { apiClient } from "@/lib/api-client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-log"
 import {
   ArrowLeft,
   Video,
@@ -49,17 +50,54 @@ interface ProctorSnapshot {
   fileUrl?: string
 }
 
+// AttemptEvent type imported from shared component
+
+interface ProctorEvidence {
+  id: number
+  type?: number
+  typeName?: string
+  fileName?: string
+  startAt?: string
+  endAt?: string
+  uploadedAt?: string
+  previewUrl?: string
+  downloadUrl?: string
+}
+
+
+
 export default function CandidateVideoPage() {
   const params = useParams<{ candidateId: string }>()
   const candidateId = params.candidateId
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const attemptIdFromQuery = Number(searchParams.get("attemptId") || "")
   const { language, dir } = useI18n()
 
   const [sessions, setSessions] = useState<ProctorSession[]>([])
   const [snapshots, setSnapshots] = useState<ProctorSnapshot[]>([])
+  const [attemptEvents, setAttemptEvents] = useState<AttemptEvent[]>([])
   const [selectedSession, setSelectedSession] = useState<ProctorSession | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const normalizeList = <T,>(res: unknown): T[] => {
+    if (Array.isArray(res)) return res as T[]
+    if (res && typeof res === "object") {
+      const record = res as Record<string, unknown>
+      const items = (record.items ?? record.Items ?? record.data ?? record.Data) as T[] | undefined
+      return Array.isArray(items) ? items : []
+    }
+    return []
+  }
+
+  const normalizeEvidenceUrl = (url?: string | null) => {
+    if (!url) return undefined
+    if (url.startsWith("/api/")) return url.replace(/^\/api\//, "/api/proxy/")
+    return url
+  }
+
+
 
   useEffect(() => {
     async function loadData() {
@@ -72,25 +110,24 @@ export default function CandidateVideoPage() {
         query.set("CandidateId", candidateId)
         query.set("PageSize", "50")
 
-        const res = await apiClient.get<{ items?: ProctorSession[]; Items?: ProctorSession[] } | ProctorSession[]>(
-          `/Proctor/sessions?${query}`
-        )
-        
-        let sessionList: ProctorSession[] = []
-        if (Array.isArray(res)) {
-          sessionList = res
-        } else if (res?.items) {
-          sessionList = res.items
-        } else if ((res as { Items?: ProctorSession[] })?.Items) {
-          sessionList = (res as { Items: ProctorSession[] }).Items
+        const res = await apiClient.get<unknown>(`/Proctor/sessions?${query}`)
+        const sessionList = normalizeList<ProctorSession>(res)
+
+        let selected = sessionList[0] ?? null
+        if (attemptIdFromQuery && sessionList.length > 0) {
+          const match = sessionList.find((s) => s.attemptId === attemptIdFromQuery)
+          if (match) {
+            selected = match
+          }
         }
 
         setSessions(sessionList)
 
-        if (sessionList.length > 0) {
-          const latest = sessionList[0]
-          setSelectedSession(latest)
-          await loadSnapshots(latest.id)
+        if (selected) {
+          setSelectedSession(selected)
+          await Promise.all([loadSnapshots(selected.id), loadAttemptEvents(selected.attemptId)])
+        } else {
+          setAttemptEvents([])
         }
       } catch (err) {
         console.error("Failed to load proctor data:", err)
@@ -103,27 +140,44 @@ export default function CandidateVideoPage() {
     if (candidateId) {
       loadData()
     }
-  }, [candidateId, language])
+  }, [candidateId, language, attemptIdFromQuery])
 
   async function loadSnapshots(sessionId: number) {
     try {
-      const res = await apiClient.get<{ items?: ProctorSnapshot[]; Items?: ProctorSnapshot[] } | ProctorSnapshot[]>(
-        `/Proctor/session/${sessionId}/snapshots`
+      const res = await apiClient.get<unknown>(`/Proctor/session/${sessionId}/evidence`)
+      const evidenceList = normalizeList<ProctorEvidence>(res)
+      const imageEvidence = evidenceList.filter(
+        (e) =>
+          e.type === 3 ||
+          e.typeName?.toLowerCase().includes("image") ||
+          e.typeName?.toLowerCase().includes("photo")
       )
-      
-      let snapshotList: ProctorSnapshot[] = []
-      if (Array.isArray(res)) {
-        snapshotList = res
-      } else if (res?.items) {
-        snapshotList = res.items
-      } else if ((res as { Items?: ProctorSnapshot[] })?.Items) {
-        snapshotList = (res as { Items: ProctorSnapshot[] }).Items
-      }
-      
+
+      const snapshotList: ProctorSnapshot[] = (imageEvidence.length > 0 ? imageEvidence : evidenceList).map((e) => ({
+        id: e.id,
+        sessionId,
+        capturedAt: e.startAt ?? e.uploadedAt ?? e.endAt ?? new Date().toISOString(),
+        snapshotType: e.type ?? 0,
+        snapshotTypeName: e.typeName ?? "",
+        filePath: e.fileName ?? "",
+        fileUrl: normalizeEvidenceUrl(e.previewUrl ?? e.downloadUrl),
+      }))
+
       setSnapshots(snapshotList)
     } catch (err) {
       console.warn("Failed to load snapshots:", err)
       setSnapshots([])
+    }
+  }
+
+  async function loadAttemptEvents(attemptId: number) {
+    try {
+      const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
+      const eventList = normalizeList<AttemptEvent>(res)
+      setAttemptEvents(eventList)
+    } catch (err) {
+      console.warn("Failed to load attempt events:", err)
+      setAttemptEvents([])
     }
   }
 
@@ -190,6 +244,7 @@ export default function CandidateVideoPage() {
                       onClick={() => {
                         setSelectedSession(session)
                         loadSnapshots(session.id)
+                        loadAttemptEvents(session.attemptId)
                       }}
                       className={`w-full p-3 rounded-lg text-left transition-colors ${
                         selectedSession?.id === session.id
@@ -340,6 +395,9 @@ export default function CandidateVideoPage() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Attempt Events */}
+                <AttemptEventLog events={attemptEvents} />
               </>
             )}
           </div>

@@ -1301,6 +1301,13 @@ OperatingSystem = session.OperatingSystem,
 
     private ProctorEvidenceDto MapToEvidenceDto(ProctorEvidence evidence)
     {
+        var previewUrl = !string.IsNullOrWhiteSpace(evidence.FilePath)
+            ? $"/media/{evidence.FilePath.TrimStart('/')}"
+            : null;
+        var downloadUrl = evidence.IsUploaded
+            ? previewUrl ?? $"/api/proctor/evidence/{evidence.Id}/download"
+            : null;
+
         return new ProctorEvidenceDto
         {
       Id = evidence.Id,
@@ -1315,7 +1322,8 @@ OperatingSystem = session.OperatingSystem,
         DurationSeconds = evidence.DurationSeconds,
   IsUploaded = evidence.IsUploaded,
   UploadedAt = evidence.UploadedAt,
-      DownloadUrl = evidence.IsUploaded ? $"/api/proctor/evidence/{evidence.Id}/download" : null
+      PreviewUrl = previewUrl,
+      DownloadUrl = downloadUrl
         };
     }
 

@@ -156,6 +156,23 @@ export default function CandidateResultPage() {
 
   const getExamTitle = (exam: ExamDropdownItem) => (language === "ar" ? exam.titleAr : exam.titleEn) || ""
 
+  const getResultIdFromPayload = (payload: unknown) => {
+    if (!payload || typeof payload !== "object") return undefined
+    const record = payload as Record<string, unknown>
+    const data = record.data as Record<string, unknown> | undefined
+    const Data = record.Data as Record<string, unknown> | undefined
+    return (
+      (record.id as number | undefined) ??
+      (record.Id as number | undefined) ??
+      (record.resultId as number | undefined) ??
+      (record.ResultId as number | undefined) ??
+      (data?.id as number | undefined) ??
+      (data?.Id as number | undefined) ??
+      (Data?.id as number | undefined) ??
+      (Data?.Id as number | undefined)
+    )
+  }
+
   const handlePublish = async (row: EnrichedCandidate) => {
     if (!row.attemptId) {
       toast.error(language === "ar" ? "لا يوجد محاولة للنشر" : "No attempt to publish")
@@ -166,22 +183,29 @@ export default function CandidateResultPage() {
     setPublishingIds((prev) => new Set(prev).add(key))
     
     try {
-      if (!row.isResultFinalized && row.gradingSessionId) {
+      let resultId = row.resultId
+
+      if (!resultId && !row.isResultFinalized && row.gradingSessionId) {
         try {
-          await apiClient.post(`/ExamResult/finalize/${row.gradingSessionId}`)
+          const finalized = await apiClient.post<unknown>(`/ExamResult/finalize/${row.gradingSessionId}`)
+          resultId = getResultIdFromPayload(finalized)
         } catch {
           // Ignore if already finalized in backend
         }
       }
-      
-      const resultRes = await apiClient.get<{ data?: { id?: number } }>(`/ExamResult/attempt/${row.attemptId}`)
-      const resultId = resultRes?.data?.id
-      if (resultId) {
-        await apiClient.post(`/ExamResult/${resultId}/publish`)
-        toast.success(language === "ar" ? "تم نشر النتيجة" : "Result published successfully")
-      } else {
-        toast.error(language === "ar" ? "لم يتم العثور على النتيجة" : "Result not found")
+
+      if (!resultId) {
+        const resultRes = await apiClient.get<unknown>(`/ExamResult/attempt/${row.attemptId}`)
+        resultId = getResultIdFromPayload(resultRes)
       }
+
+      if (!resultId) {
+        toast.error(language === "ar" ? "لم يتم العثور على النتيجة" : "Result not found")
+        return
+      }
+
+      await apiClient.post(`/ExamResult/${resultId}/publish`)
+      toast.success(language === "ar" ? "تم نشر النتيجة" : "Result published successfully")
       loadCandidates()
     } catch (err) {
       console.error("Failed to publish:", err)
@@ -363,6 +387,7 @@ export default function CandidateResultPage() {
                         : ""
                     const publishKey = `${row.candidateId}-${row.examId}`
                     const isPublishing = publishingIds.has(publishKey)
+                    const attemptQuery = row.attemptId ? `?attemptId=${row.attemptId}` : ""
 
                     return (
                       <TableRow key={row.examId != null ? `${row.examId}-${row.candidateId}` : row.candidateId}>
@@ -440,18 +465,18 @@ export default function CandidateResultPage() {
                               <DropdownMenuSeparator />
                               {effectiveExamId && (
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/results/ai-report/${effectiveExamId}/${row.candidateId}`}>
+                                  <Link href={`/results/ai-report/${effectiveExamId}/${row.candidateId}${attemptQuery}`}>
                                     <Bot className="h-4 w-4 mr-2" />{language === "ar" ? "تقرير المراقبة" : "Proctor Report"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem asChild>
-                                <Link href={`/proctor-center/video/${row.candidateId}`}>
+                                <Link href={`/proctor-center/video/${row.candidateId}${attemptQuery}`}>
                                   <Video className="h-4 w-4 mr-2" />{language === "ar" ? "فيديو المرشح" : "Candidate Video"}
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
-                                <Link href={`/proctor-center/stream/${row.candidateId}`}>
+                                <Link href={`/proctor-center/stream/${row.candidateId}${attemptQuery}`}>
                                   <Monitor className="h-4 w-4 mr-2" />{language === "ar" ? "بث الشاشة" : "Screen Streaming"}
                                 </Link>
                               </DropdownMenuItem>
