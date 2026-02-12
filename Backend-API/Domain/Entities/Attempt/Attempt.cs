@@ -30,6 +30,15 @@ public class Attempt : BaseEntity
     public decimal? TotalScore { get; set; }
     public bool? IsPassed { get; set; }
 
+    // Admin control fields
+    public string? ForceSubmittedBy { get; set; }
+    public DateTime? ForceSubmittedAt { get; set; }
+    public int ExtraTimeSeconds { get; set; }
+    public int ResumeCount { get; set; }
+    public DateTime? LastActivityAt { get; set; }
+    public string? IPAddress { get; set; }
+    public string? DeviceInfo { get; set; }
+
     // Navigation Properties
     public virtual Exam Exam { get; set; } = null!;
     public virtual ApplicationUser Candidate { get; set; } = null!;

@@ -17,7 +17,7 @@ public enum AttemptStatus : byte
 
     /// <summary>
     /// Candidate has submitted the attempt
-  /// </summary>
+    /// </summary>
     Submitted = 3,
 
     /// <summary>
@@ -28,7 +28,17 @@ public enum AttemptStatus : byte
     /// <summary>
     /// Attempt was cancelled by admin/support
     /// </summary>
-    Cancelled = 5
+    Cancelled = 5,
+
+    /// <summary>
+    /// Attempt was paused (by admin or system)
+    /// </summary>
+    Paused = 6,
+
+    /// <summary>
+    /// Attempt was force-submitted by an administrator
+    /// </summary>
+    ForceSubmitted = 7
 }
 
 /// <summary>
@@ -94,5 +104,20 @@ public enum AttemptEventType : byte
     /// <summary>
     /// Right-click attempt detected
     /// </summary>
-    RightClickAttempt = 12
+    RightClickAttempt = 12,
+
+    /// <summary>
+    /// Attempt was force-ended by admin
+    /// </summary>
+    ForceEnded = 13,
+
+    /// <summary>
+    /// Attempt was resumed by admin
+    /// </summary>
+    AdminResumed = 14,
+
+    /// <summary>
+    /// Extra time was added by admin
+    /// </summary>
+    TimeAdded = 15
 }

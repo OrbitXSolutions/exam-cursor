@@ -149,9 +149,7 @@ const candidatesNavGroup: NavGroup = {
     { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
     { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
     { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
-    { icon: TimerOff, labelKey: "nav.endExam", href: "/candidates/end-exam" },
-    { icon: PlayCircle, labelKey: "nav.resumeExam", href: "/candidates/resume-exam" },
-    { icon: Clock, labelKey: "nav.addTime", href: "/candidates/add-time" },
+    { icon: Shield, labelKey: "nav.examControl", href: "/candidates/exam-control" },
     { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
   ],
 }

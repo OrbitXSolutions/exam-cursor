@@ -139,9 +139,7 @@ export const translations = {
       batch: "Batch",
       candidatesData: "Candidates Data",
       assignToExam: "Assign to Exam",
-      endExam: "End Exam",
-      resumeExam: "Resume Exam",
-      addTime: "Add Time",
+      examControl: "Exam Control",
       candidateExamDetails: "Candidate Exam Details",
       // Administration group
       administration: "Administration",
@@ -1130,9 +1128,7 @@ export const translations = {
       batch: "الدفعة",
       candidatesData: "بيانات المرشحين",
       assignToExam: "تعيين للاختبار",
-      endExam: "إنهاء الاختبار",
-      resumeExam: "استئناف الاختبار",
-      addTime: "إضافة وقت",
+      examControl: "التحكم بالاختبارات",
       candidateExamDetails: "تفاصيل اختبار المرشح",
       // Administration group
       administration: "الإدارة",
