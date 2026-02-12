@@ -362,7 +362,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <ScrollArea className="flex-1 px-3 py-4">
+        <ScrollArea className="flex-1 min-h-0 px-3 py-4">
           <nav className="flex flex-col gap-1">
             {/* Main Nav */}
             {mainNavItems.map((item) => (

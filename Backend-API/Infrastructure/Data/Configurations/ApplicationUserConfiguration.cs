@@ -14,8 +14,19 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(u => u.FullName)
      .HasMaxLength(200);
 
-     builder.Property(u => u.RefreshToken)
- .HasMaxLength(500);
+        builder.Property(u => u.FullNameAr)
+            .HasMaxLength(200);
+
+        builder.Property(u => u.RollNo)
+            .HasMaxLength(50);
+
+        builder.HasIndex(u => u.RollNo)
+            .IsUnique()
+            .HasFilter("[RollNo] IS NOT NULL")
+            .HasDatabaseName("IX_AspNetUsers_RollNo");
+
+        builder.Property(u => u.RefreshToken)
+    .HasMaxLength(500);
 
         builder.Property(u => u.CreatedBy)
  .HasMaxLength(450);
@@ -33,7 +44,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         // Index for email lookups
         builder.HasIndex(u => u.Email);
-        
+
         // Index for soft delete queries
         builder.HasIndex(u => u.IsDeleted);
 
@@ -42,6 +53,6 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     .HasDatabaseName("IX_AspNetUsers_DepartmentId");
 
         // Global query filter for soft delete
-    builder.HasQueryFilter(u => !u.IsDeleted);
+        builder.HasQueryFilter(u => !u.IsDeleted);
     }
 }

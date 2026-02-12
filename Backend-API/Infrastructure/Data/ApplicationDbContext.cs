@@ -10,6 +10,7 @@ using Smart_Core.Domain.Entities.Incident;
 using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Entities.Lookups;
 using Smart_Core.Domain.Entities.QuestionBank;
+using Smart_Core.Domain.Entities.Batch;
 
 namespace Smart_Core.Infrastructure.Data;
 
@@ -85,6 +86,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
     // Settings (global + brand)
     public DbSet<SystemSettings> SystemSettings { get; set; } = null!;
+
+    // Batch
+    public DbSet<Batch> Batches { get; set; } = null!;
+    public DbSet<BatchCandidate> BatchCandidates { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

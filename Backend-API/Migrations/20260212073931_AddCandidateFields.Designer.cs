@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Smart_Core.Infrastructure.Data;
 namespace Smart_Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212073931_AddCandidateFields")]
+    partial class AddCandidateFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1439,90 +1442,6 @@ namespace Smart_Core.Migrations
                         .HasDatabaseName("IX_AuditRetentionPolicies_Priority");
 
                     b.ToTable("AuditRetentionPolicies", (string)null);
-                });
-
-            modelBuilder.Entity("Smart_Core.Domain.Entities.Batch.Batch", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Batches_Name")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.ToTable("Batches", (string)null);
-                });
-
-            modelBuilder.Entity("Smart_Core.Domain.Entities.Batch.BatchCandidate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("BatchId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CandidateId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateId");
-
-                    b.HasIndex("BatchId", "CandidateId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_BatchCandidates_BatchId_CandidateId");
-
-                    b.ToTable("BatchCandidates", (string)null);
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Department", b =>
@@ -4440,25 +4359,6 @@ namespace Smart_Core.Migrations
                     b.Navigation("Requester");
                 });
 
-            modelBuilder.Entity("Smart_Core.Domain.Entities.Batch.BatchCandidate", b =>
-                {
-                    b.HasOne("Smart_Core.Domain.Entities.Batch.Batch", "Batch")
-                        .WithMany("BatchCandidates")
-                        .HasForeignKey("BatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Smart_Core.Domain.Entities.ApplicationUser", "Candidate")
-                        .WithMany()
-                        .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Batch");
-
-                    b.Navigation("Candidate");
-                });
-
             modelBuilder.Entity("Smart_Core.Domain.Entities.ExamResult.CandidateExamSummary", b =>
                 {
                     b.HasOne("Smart_Core.Domain.Entities.Attempt.Attempt", "BestAttempt")
@@ -4946,11 +4846,6 @@ namespace Smart_Core.Migrations
             modelBuilder.Entity("Smart_Core.Domain.Entities.Attempt.AttemptQuestion", b =>
                 {
                     b.Navigation("Answers");
-                });
-
-            modelBuilder.Entity("Smart_Core.Domain.Entities.Batch.Batch", b =>
-                {
-                    b.Navigation("BatchCandidates");
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Department", b =>
