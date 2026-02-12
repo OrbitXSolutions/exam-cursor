@@ -177,9 +177,32 @@ public class AttemptService : IAttemptService
     };
     _context.Set<AttemptEvent>().Add(startEvent);
 
+    // 10. Auto-create ProctorSession (Soft mode) — idempotent
+    var existingProctorSession = await _context.Set<ProctorSession>()
+        .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Mode == ProctorMode.Soft);
+    if (existingProctorSession == null)
+    {
+      var proctorSession = new ProctorSession
+      {
+        AttemptId = attempt.Id,
+        ExamId = exam.Id,
+        CandidateId = candidateId,
+        Mode = ProctorMode.Soft,
+        StartedAt = now,
+        Status = ProctorSessionStatus.Active,
+        TotalEvents = 0,
+        TotalViolations = 0,
+        RiskScore = 0,
+        LastHeartbeatAt = now,
+        CreatedDate = now,
+        CreatedBy = candidateId
+      };
+      _context.Set<ProctorSession>().Add(proctorSession);
+    }
+
     await _context.SaveChangesAsync();
 
-    // 10. Reload attempt with questions
+    // 11. Reload attempt with questions
     var createdAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
         .Include(a => a.Questions.OrderBy(q => q.Order))
        .ThenInclude(aq => aq.Answers)
@@ -230,6 +253,16 @@ public class AttemptService : IAttemptService
 (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
     {
       attempt.Status = AttemptStatus.Expired;
+      // Close proctor session on expiry
+      var proctorSession = await _context.Set<ProctorSession>()
+          .FirstOrDefaultAsync(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active);
+      if (proctorSession != null)
+      {
+        proctorSession.Status = ProctorSessionStatus.Completed;
+        proctorSession.EndedAt = now;
+        proctorSession.UpdatedDate = now;
+        proctorSession.UpdatedBy = "system";
+      }
       await _context.SaveChangesAsync();
     }
 
@@ -355,6 +388,16 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
           (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
     {
       attempt.Status = AttemptStatus.Expired;
+      // Close proctor session on expiry
+      var proctorSession = await _context.Set<ProctorSession>()
+          .FirstOrDefaultAsync(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active);
+      if (proctorSession != null)
+      {
+        proctorSession.Status = ProctorSessionStatus.Completed;
+        proctorSession.EndedAt = now;
+        proctorSession.UpdatedDate = now;
+        proctorSession.UpdatedBy = "system";
+      }
       await _context.SaveChangesAsync();
     }
 
@@ -379,6 +422,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
    a.ExpiresAt.Value < now)
      .ToListAsync();
 
+    var attemptIds = overdueAttempts.Select(a => a.Id).ToList();
+
     foreach (var attempt in overdueAttempts)
     {
       attempt.Status = AttemptStatus.Expired;
@@ -394,6 +439,18 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
         CreatedBy = "system"
       };
       _context.Set<AttemptEvent>().Add(expiredEvent);
+    }
+
+    // Close proctor sessions for all expired attempts
+    var orphanSessions = await _context.Set<ProctorSession>()
+        .Where(s => attemptIds.Contains(s.AttemptId) && s.Status == ProctorSessionStatus.Active)
+        .ToListAsync();
+    foreach (var ps in orphanSessions)
+    {
+      ps.Status = ProctorSessionStatus.Completed;
+      ps.EndedAt = now;
+      ps.UpdatedDate = now;
+      ps.UpdatedBy = "system";
     }
 
     await _context.SaveChangesAsync();
@@ -567,13 +624,13 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
  .SelectMany(q => q.Answers)
 .Select(a => new AttemptAnswerDto
 {
-AttemptAnswerId = a.Id,
-QuestionId = a.QuestionId,
-SelectedOptionIds = !string.IsNullOrEmpty(a.SelectedOptionIdsJson)
+  AttemptAnswerId = a.Id,
+  QuestionId = a.QuestionId,
+  SelectedOptionIds = !string.IsNullOrEmpty(a.SelectedOptionIdsJson)
   ? JsonSerializer.Deserialize<List<int>>(a.SelectedOptionIdsJson)
      : null,
-TextAnswer = a.TextAnswer,
-AnsweredAt = a.AnsweredAt
+  TextAnswer = a.TextAnswer,
+  AnsweredAt = a.AnsweredAt
 })
    .ToList();
 

@@ -9,13 +9,13 @@ namespace Smart_Core.Application.DTOs.Proctor;
 /// </summary>
 public class ProctorSessionDto
 {
- public int Id { get; set; }
+    public int Id { get; set; }
     public int AttemptId { get; set; }
     public int ExamId { get; set; }
     public string ExamTitleEn { get; set; } = string.Empty;
-  public string CandidateId { get; set; } = string.Empty;
+    public string CandidateId { get; set; } = string.Empty;
     public string CandidateName { get; set; } = string.Empty;
-public ProctorMode Mode { get; set; }
+    public ProctorMode Mode { get; set; }
     public string ModeName => Mode.ToString();
     public ProctorSessionStatus Status { get; set; }
     public string StatusName => Status.ToString();
@@ -31,15 +31,15 @@ public ProctorMode Mode { get; set; }
     public decimal? RiskScore { get; set; }
     public string RiskLevel => GetRiskLevel(RiskScore);
     public DateTime? LastHeartbeatAt { get; set; }
-  public int HeartbeatMissedCount { get; set; }
+    public int HeartbeatMissedCount { get; set; }
     public ProctorDecisionDto? Decision { get; set; }
     public List<ProctorEventDto> RecentEvents { get; set; } = new();
 
     private static string GetRiskLevel(decimal? score) => score switch
     {
-  null => "Unknown",
+        null => "Unknown",
         <= 20 => "Low",
-    <= 50 => "Medium",
+        <= 50 => "Medium",
         <= 75 => "High",
         _ => "Critical"
     };
@@ -55,8 +55,8 @@ public class ProctorSessionListDto
     public int ExamId { get; set; }
     public string ExamTitleEn { get; set; } = string.Empty;
     public string CandidateId { get; set; } = string.Empty;
- public string CandidateName { get; set; } = string.Empty;
-  public ProctorMode Mode { get; set; }
+    public string CandidateName { get; set; } = string.Empty;
+    public ProctorMode Mode { get; set; }
     public string ModeName => Mode.ToString();
     public ProctorSessionStatus Status { get; set; }
     public string StatusName => Status.ToString();
@@ -65,6 +65,10 @@ public class ProctorSessionListDto
     public decimal? RiskScore { get; set; }
     public ProctorDecisionStatus? DecisionStatus { get; set; }
     public bool RequiresReview { get; set; }
+    public bool IsSample { get; set; }
+    public string? LatestSnapshotUrl { get; set; }
+    public int SnapshotCount { get; set; }
+    public DateTime? LastSnapshotAt { get; set; }
 }
 
 /// <summary>
@@ -72,7 +76,7 @@ public class ProctorSessionListDto
 /// </summary>
 public class CreateProctorSessionDto
 {
- public int AttemptId { get; set; }
+    public int AttemptId { get; set; }
     public ProctorMode Mode { get; set; }
     public string? DeviceFingerprint { get; set; }
     public string? UserAgent { get; set; }
@@ -89,7 +93,7 @@ public class ProctorSessionCreatedDto
 {
     public int ProctorSessionId { get; set; }
     public int AttemptId { get; set; }
-public ProctorMode Mode { get; set; }
+    public ProctorMode Mode { get; set; }
     public DateTime StartedAt { get; set; }
     public int HeartbeatIntervalSeconds { get; set; }
     public string Message { get; set; } = string.Empty;
@@ -109,6 +113,7 @@ public class ProctorSessionSearchDto
     public decimal? MinRiskScore { get; set; }
     public DateTime? StartedFrom { get; set; }
     public DateTime? StartedTo { get; set; }
+    public bool IncludeSamples { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -135,13 +140,13 @@ public class ProctorEventDto
 
     private static string GetSeverityLabel(byte severity) => severity switch
     {
-0 => "Info",
- 1 => "Low",
+        0 => "Info",
+        1 => "Low",
         2 => "Medium",
-      3 => "High",
-  4 => "Critical",
+        3 => "High",
+        4 => "Critical",
         5 => "Severe",
-   _ => "Unknown"
+        _ => "Unknown"
     };
 }
 
@@ -163,7 +168,7 @@ public class LogProctorEventDto
 public class BulkLogProctorEventsDto
 {
     public int ProctorSessionId { get; set; }
-public List<LogProctorEventItemDto> Events { get; set; } = new();
+    public List<LogProctorEventItemDto> Events { get; set; } = new();
 }
 
 /// <summary>
@@ -192,7 +197,7 @@ public class HeartbeatDto
 /// </summary>
 public class HeartbeatResponseDto
 {
-public bool Success { get; set; }
+    public bool Success { get; set; }
     public DateTime ServerTime { get; set; }
     public decimal? CurrentRiskScore { get; set; }
     public int TotalViolations { get; set; }
@@ -215,13 +220,13 @@ public class ProctorRiskRuleDto
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public bool IsActive { get; set; }
-  public ProctorEventType EventType { get; set; }
+    public ProctorEventType EventType { get; set; }
     public string EventTypeName => EventType.ToString();
     public int ThresholdCount { get; set; }
     public int WindowSeconds { get; set; }
     public decimal RiskPoints { get; set; }
     public byte? MinSeverity { get; set; }
- public int? MaxTriggers { get; set; }
+    public int? MaxTriggers { get; set; }
     public int Priority { get; set; }
 }
 
@@ -232,11 +237,11 @@ public class SaveProctorRiskRuleDto
 {
     public string NameEn { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
- public string? DescriptionEn { get; set; }
+    public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public bool IsActive { get; set; }
     public ProctorEventType EventType { get; set; }
-  public int ThresholdCount { get; set; }
+    public int ThresholdCount { get; set; }
     public int WindowSeconds { get; set; }
     public decimal RiskPoints { get; set; }
     public byte? MinSeverity { get; set; }
@@ -258,7 +263,7 @@ public class ProctorEvidenceDto
     public int AttemptId { get; set; }
     public EvidenceType Type { get; set; }
     public string TypeName => Type.ToString();
- public string FileName { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
     public long FileSize { get; set; }
     public string FileSizeFormatted => FormatFileSize(FileSize);
     public string? ContentType { get; set; }
@@ -272,14 +277,14 @@ public class ProctorEvidenceDto
 
     private static string FormatFileSize(long bytes)
     {
-    string[] sizes = { "B", "KB", "MB", "GB" };
+        string[] sizes = { "B", "KB", "MB", "GB" };
         int order = 0;
         double size = bytes;
-      while (size >= 1024 && order < sizes.Length - 1)
-   {
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
             order++;
             size /= 1024;
-      }
+        }
         return $"{size:0.##} {sizes[order]}";
     }
 }
@@ -293,7 +298,7 @@ public class UploadEvidenceDto
     public EvidenceType Type { get; set; }
     public string FileName { get; set; } = string.Empty;
     public string? ContentType { get; set; }
- public DateTime? StartAt { get; set; }
+    public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
     public int? DurationSeconds { get; set; }
     public string? MetadataJson { get; set; }
@@ -426,7 +431,7 @@ public class EventTypeCountDto
 /// </summary>
 public class RiskDistributionDto
 {
-  public string Range { get; set; } = string.Empty;
+    public string Range { get; set; } = string.Empty;
     public int Count { get; set; }
     public decimal Percentage { get; set; }
 }

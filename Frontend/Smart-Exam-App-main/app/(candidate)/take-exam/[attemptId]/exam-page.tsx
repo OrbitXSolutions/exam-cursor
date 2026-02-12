@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -80,6 +80,13 @@ export default function ExamPage() {
   const [sectionChangeConfirmOpen, setSectionChangeConfirmOpen] = useState(false)
   const [pendingSectionId, setPendingSectionId] = useState<number | null>(null)
 
+  // Proctoring state
+  const [webcamStatus, setWebcamStatus] = useState<"pending" | "active" | "denied" | "error">("pending")
+  const [webcamError, setWebcamError] = useState<string | null>(null)
+  const [lastSnapshotTime, setLastSnapshotTime] = useState<string | null>(null)
+  const [lastSnapshotOk, setLastSnapshotOk] = useState<boolean | null>(null)
+  const [snapshotFailStreak, setSnapshotFailStreak] = useState(0)
+
   // Refs
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const sectionTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -89,6 +96,13 @@ export default function ExamPage() {
   const activatedSectionsRef = useRef<Set<number>>(new Set()) // Track activated sections for interval callback
   const webcamStreamRef = useRef<MediaStream | null>(null) // Persistent webcam stream
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null) // Video element for webcam
+
+  // Proctoring state
+  const [webcamStatus, setWebcamStatus] = useState<"pending" | "active" | "denied" | "error">("pending")
+  const [webcamError, setWebcamError] = useState<string | null>(null)
+  const [lastSnapshotTime, setLastSnapshotTime] = useState<string | null>(null)
+  const [lastSnapshotOk, setLastSnapshotOk] = useState<boolean | null>(null)
+  const [snapshotFailStreak, setSnapshotFailStreak] = useState(0)
 
   // Computed values
   const sections = session?.sections || []
@@ -293,14 +307,14 @@ export default function ExamPage() {
     let isActive = true
 
     // Initialize webcam stream once and keep it alive
-    const initWebcam = async () => {
+    const initWebcam = async (): Promise<boolean> => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { width: 320, height: 240, facingMode: "user" } 
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 320, height: 240, facingMode: "user" },
         })
         if (!isActive) {
-          stream.getTracks().forEach(t => t.stop())
-          return
+          stream.getTracks().forEach((t) => t.stop())
+          return false
         }
         webcamStreamRef.current = stream
 
@@ -312,18 +326,29 @@ export default function ExamPage() {
         await video.play()
         webcamVideoRef.current = video
 
+        setWebcamStatus("active")
+        setWebcamError(null)
         console.log("[Proctor] Webcam stream initialized successfully")
-      } catch (error) {
+        return true
+      } catch (error: any) {
         console.warn("[Proctor] Could not initialize webcam:", error)
+        const msg = error?.message ?? String(error)
+        setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
+        setWebcamError(msg)
+
+        // Log event
+        logAttemptEvent(session.attemptId, {
+          eventType: AttemptEventType.WebcamDenied,
+          metadataJson: JSON.stringify({ error: msg }),
+        }).catch(() => {})
+
+        return false
       }
     }
 
     // Capture snapshot from the persistent stream
     const captureSnapshot = async () => {
-      if (!webcamVideoRef.current || !webcamStreamRef.current) {
-        console.warn("[Proctor] No webcam stream available for snapshot")
-        return
-      }
+      if (!webcamVideoRef.current || !webcamStreamRef.current) return
 
       try {
         const canvas = document.createElement("canvas")
@@ -333,30 +358,56 @@ export default function ExamPage() {
         if (!ctx) return
 
         ctx.drawImage(webcamVideoRef.current, 0, 0)
-        
-        canvas.toBlob(
-          async (blob) => {
-            if (blob && session?.attemptId) {
-              const success = await uploadProctorSnapshot(session.attemptId, blob, `snapshot_${Date.now()}.jpg`)
-              if (success) {
-                console.log("[Proctor] Snapshot uploaded successfully")
-              }
-            }
-          },
-          "image/jpeg",
-          0.7
+
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b), "image/jpeg", 0.7),
         )
+        if (!blob || !session?.attemptId) return
+
+        const result = await uploadProctorSnapshot(
+          session.attemptId,
+          blob,
+          `snapshot_${Date.now()}.jpg`,
+        )
+
+        if (result.success) {
+          setLastSnapshotTime(new Date().toLocaleTimeString())
+          setLastSnapshotOk(true)
+          setSnapshotFailStreak(0)
+        } else {
+          setLastSnapshotOk(false)
+          setSnapshotFailStreak((prev) => {
+            const next = prev + 1
+            if (next === 1) {
+              toast.error("Snapshot upload failed — retrying next cycle")
+            }
+            if (next >= 3) {
+              toast.error("Proctor snapshots are not uploading", {
+                duration: Infinity,
+                id: "snapshot-fail-persist",
+              })
+            }
+            return next
+          })
+          // Log failure event
+          logAttemptEvent(session.attemptId, {
+            eventType: AttemptEventType.SnapshotFailed,
+            metadataJson: JSON.stringify({ error: result.error }),
+          }).catch(() => {})
+        }
       } catch (error) {
         console.warn("[Proctor] Snapshot capture failed:", error)
       }
     }
 
     // Initialize webcam and start snapshot interval
-    initWebcam().then(() => {
-      // Take initial snapshot after 5 seconds
-      setTimeout(captureSnapshot, 5000)
-      // Then take snapshots every 60 seconds
-      snapshotIntervalRef.current = setInterval(captureSnapshot, 60000)
+    initWebcam().then((ok) => {
+      if (ok && isActive) {
+        // Take first snapshot immediately after webcam is ready
+        captureSnapshot()
+        // Then take snapshots every 60 seconds
+        snapshotIntervalRef.current = setInterval(captureSnapshot, 60000)
+      }
     })
 
     return () => {
@@ -364,7 +415,7 @@ export default function ExamPage() {
       if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
       // Stop webcam stream on cleanup
       if (webcamStreamRef.current) {
-        webcamStreamRef.current.getTracks().forEach(t => t.stop())
+        webcamStreamRef.current.getTracks().forEach((t) => t.stop())
         webcamStreamRef.current = null
       }
       webcamVideoRef.current = null
@@ -608,6 +659,62 @@ export default function ExamPage() {
     }
   }
 
+  // Retry webcam initialization
+  async function handleRetryWebcam() {
+    setWebcamStatus("pending")
+    setWebcamError(null)
+    try {
+      // Stop existing stream if any
+      if (webcamStreamRef.current) {
+        webcamStreamRef.current.getTracks().forEach((t) => t.stop())
+        webcamStreamRef.current = null
+      }
+      webcamVideoRef.current = null
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 320, height: 240, facingMode: "user" },
+      })
+      webcamStreamRef.current = stream
+      const video = document.createElement("video")
+      video.srcObject = stream
+      video.muted = true
+      video.playsInline = true
+      await video.play()
+      webcamVideoRef.current = video
+      setWebcamStatus("active")
+      setWebcamError(null)
+      toast.success("Camera connected")
+
+      // Take immediate snapshot and restart interval
+      if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
+      // Trigger first snapshot
+      if (session?.attemptId) {
+        const canvas = document.createElement("canvas")
+        canvas.width = 320
+        canvas.height = 240
+        const ctx = canvas.getContext("2d")
+        if (ctx) {
+          ctx.drawImage(video, 0, 0)
+          canvas.toBlob(async (blob) => {
+            if (blob && session?.attemptId) {
+              const result = await uploadProctorSnapshot(session.attemptId, blob, `snapshot_${Date.now()}.jpg`)
+              if (result.success) {
+                setLastSnapshotTime(new Date().toLocaleTimeString())
+                setLastSnapshotOk(true)
+                setSnapshotFailStreak(0)
+              }
+            }
+          }, "image/jpeg", 0.7)
+        }
+      }
+    } catch (error: any) {
+      const msg = error?.message ?? String(error)
+      setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
+      setWebcamError(msg)
+      toast.error("Camera access failed")
+    }
+  }
+
   function getSectionQuestionsCount(section: ExamSection): number {
     let count = (section.questions || []).length
     for (const topic of section.topics || []) {
@@ -696,6 +803,28 @@ export default function ExamPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
+      {/* Webcam denial / snapshot persistent error banner */}
+      {(webcamStatus === "denied" || webcamStatus === "error") && (
+        <div className="flex items-center gap-3 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          <CameraOff className="h-4 w-4 shrink-0" />
+          <span className="flex-1">
+            {webcamStatus === "denied"
+              ? "Camera permission is required for proctoring snapshots. Please allow camera access in your browser settings."
+              : `Camera error: ${webcamError ?? "Unknown"}`}
+          </span>
+          <Button size="sm" variant="outline" className="shrink-0 h-7 text-xs" onClick={handleRetryWebcam}>
+            <RefreshCw className="h-3 w-3 me-1" />
+            Retry Camera
+          </Button>
+        </div>
+      )}
+      {snapshotFailStreak >= 3 && webcamStatus === "active" && (
+        <div className="flex items-center gap-3 border-b bg-red-50 px-4 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+          <CameraOff className="h-4 w-4 shrink-0" />
+          <span className="flex-1">Proctor snapshots are not uploading. Your exam will continue but proctoring evidence may be incomplete.</span>
+        </div>
+      )}
+
       {/* Header with timer and submit button */}
       <div className="border-b bg-card px-6 py-3">
         <div className="flex items-center justify-between">
@@ -731,6 +860,30 @@ export default function ExamPage() {
               )}>
                 {t("exam.timeRemaining") === "exam.timeRemaining" ? "Time remaining" : t("exam.timeRemaining")}: {formatTime(examTimeRemaining)}
               </p>
+            </div>
+
+            {/* Proctoring indicator */}
+            <div
+              className={cn(
+                "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs",
+                webcamStatus === "active" && lastSnapshotOk !== false
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
+                  : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
+              )}
+              title={lastSnapshotTime ? `Last snapshot: ${lastSnapshotTime}` : "Waiting for first snapshot"}
+            >
+              {webcamStatus === "active" ? (
+                <Camera className="h-3 w-3" />
+              ) : (
+                <CameraOff className="h-3 w-3" />
+              )}
+              <span className="hidden sm:inline">
+                {webcamStatus === "active"
+                  ? lastSnapshotTime
+                    ? `${lastSnapshotTime}`
+                    : "..."
+                  : "Off"}
+              </span>
             </div>
 
             {/* Submit Button */}

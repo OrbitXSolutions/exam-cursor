@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.AttemptControl;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces.AttemptControl;
+using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 
@@ -183,6 +184,17 @@ public class AttemptControlService : IAttemptControlService
             CreatedBy = adminUserId,
             CreatedDate = now
         });
+
+        // Close proctor session as Cancelled on force-end
+        var proctorSession = await _db.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Status == ProctorSessionStatus.Active);
+        if (proctorSession != null)
+        {
+            proctorSession.Status = ProctorSessionStatus.Cancelled;
+            proctorSession.EndedAt = now;
+            proctorSession.UpdatedDate = now;
+            proctorSession.UpdatedBy = adminUserId;
+        }
 
         await _db.SaveChangesAsync();
 

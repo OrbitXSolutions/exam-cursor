@@ -31,6 +31,11 @@ export enum AttemptEventType {
   CopyAttempt = 10,
   PasteAttempt = 11,
   RightClickAttempt = 12,
+  ForceEnded = 13,
+  AdminResumed = 14,
+  TimeAdded = 15,
+  WebcamDenied = 16,
+  SnapshotFailed = 17,
 }
 
 // Journey Stage - mapped from internal statuses

@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Dialog,
   DialogContent,
@@ -28,7 +27,6 @@ import {
   Flag,
   MessageSquare,
   XCircle,
-  Clock,
   AlertTriangle,
   CheckCircle2,
   User,
@@ -54,6 +52,7 @@ export default function SessionDetailPage() {
   const [warningMessage, setWarningMessage] = useState("")
   const [terminateDialogOpen, setTerminateDialogOpen] = useState(false)
   const [terminateReason, setTerminateReason] = useState("")
+  const [previewImage, setPreviewImage] = useState<{ url: string; timestamp: string } | null>(null)
 
   useEffect(() => {
     loadSession()
@@ -197,8 +196,9 @@ export default function SessionDetailPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Video Feed */}
+        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Latest Snapshot */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
@@ -208,51 +208,67 @@ export default function SessionDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                <img
-                  src={`/webcam-feed-.jpg?height=400&width=700&query=webcam feed ${session.candidateName} taking exam`}
-                  alt="Live feed"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-4 start-4 flex items-center gap-2">
-                  <Badge className="gap-1">
-                    <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                    {t("proctor.live")}
-                  </Badge>
-                </div>
-                <div className="absolute bottom-4 end-4 flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
-                  <Clock className="h-4 w-4" />
-                  {session.timeRemaining}m {t("proctor.remaining")}
-                </div>
+                {screenshots.length > 0 ? (
+                  <img
+                    src={screenshots[0].url}
+                    alt="Latest snapshot"
+                    className="w-full h-full object-cover cursor-pointer"
+                    onClick={() => setPreviewImage(screenshots[0])}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                    <Camera className="h-12 w-12 mb-2 opacity-30" />
+                    <p className="text-sm">No snapshots captured yet</p>
+                  </div>
+                )}
+                {screenshots.length > 0 && (
+                  <div className="absolute bottom-4 end-4 flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
+                    <Camera className="h-4 w-4" />
+                    {screenshots.length} snapshots
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Screenshots Timeline */}
+          {/* Screenshots Gallery */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <Camera className="h-5 w-5" />
                 {t("proctor.screenshotTimeline")}
+                <Badge variant="secondary" className="ms-auto">{screenshots.length}</Badge>
               </CardTitle>
               <CardDescription>{t("proctor.screenshotTimelineDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="w-full">
-                <div className="flex gap-4 pb-4">
+              {screenshots.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  <Camera className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                  No screenshots available yet
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {screenshots.map((ss) => (
-                    <div key={ss.id} className="shrink-0 space-y-2">
-                      <div className="w-48 aspect-video bg-muted rounded-lg overflow-hidden border">
+                    <div
+                      key={ss.id}
+                      className="space-y-1.5 cursor-pointer group"
+                      onClick={() => setPreviewImage(ss)}
+                    >
+                      <div className="aspect-video bg-muted rounded-lg overflow-hidden border group-hover:ring-2 group-hover:ring-primary/50 transition-all">
                         <img
-                          src={ss.url || "/placeholder.svg"}
+                          src={ss.url}
                           alt="Screenshot"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground text-center">{formatDateTime(ss.timestamp)}</p>
+                      <p className="text-xs text-muted-foreground text-center truncate">
+                        {ss.timestamp ? formatDateTime(ss.timestamp) : "—"}
+                      </p>
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -457,6 +473,30 @@ export default function SessionDetailPage() {
               {t("proctor.terminate")}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Screenshot Preview Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Screenshot Preview
+            </DialogTitle>
+            {previewImage?.timestamp && (
+              <DialogDescription>{formatDateTime(previewImage.timestamp)}</DialogDescription>
+            )}
+          </DialogHeader>
+          {previewImage && (
+            <div className="rounded-lg overflow-hidden bg-muted">
+              <img
+                src={previewImage.url}
+                alt="Screenshot preview"
+                className="w-full h-auto"
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

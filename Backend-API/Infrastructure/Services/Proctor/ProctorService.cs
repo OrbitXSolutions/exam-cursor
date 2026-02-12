@@ -26,47 +26,47 @@ public class ProctorService : IProctorService
 
     #region Session Management
 
-public async Task<ApiResponse<ProctorSessionCreatedDto>> CreateSessionAsync(
-        CreateProctorSessionDto dto, string candidateId, string ipAddress)
+    public async Task<ApiResponse<ProctorSessionCreatedDto>> CreateSessionAsync(
+            CreateProctorSessionDto dto, string candidateId, string ipAddress)
     {
         // Validate attempt exists and is in progress
-     var attempt = await _context.Attempts
-    .Include(a => a.Exam)
-      .FirstOrDefaultAsync(a => a.Id == dto.AttemptId);
+        var attempt = await _context.Attempts
+       .Include(a => a.Exam)
+         .FirstOrDefaultAsync(a => a.Id == dto.AttemptId);
 
         if (attempt == null)
         {
             return ApiResponse<ProctorSessionCreatedDto>.FailureResponse("Attempt not found");
-     }
+        }
 
         if (attempt.Status != AttemptStatus.InProgress)
         {
             return ApiResponse<ProctorSessionCreatedDto>.FailureResponse(
     $"Cannot start proctoring for attempt with status '{attempt.Status}'");
-}
+        }
 
         if (attempt.CandidateId != candidateId)
         {
-  return ApiResponse<ProctorSessionCreatedDto>.FailureResponse("Unauthorized");
+            return ApiResponse<ProctorSessionCreatedDto>.FailureResponse("Unauthorized");
         }
 
-  // Check if session already exists for this mode
+        // Check if session already exists for this mode
         var existingSession = await _context.Set<ProctorSession>()
           .FirstOrDefaultAsync(s => s.AttemptId == dto.AttemptId && s.Mode == dto.Mode);
 
         if (existingSession != null)
-    {
-    if (existingSession.Status == ProctorSessionStatus.Active)
-  {
-   return ApiResponse<ProctorSessionCreatedDto>.SuccessResponse(new ProctorSessionCreatedDto
-              {
-              ProctorSessionId = existingSession.Id,
-   AttemptId = dto.AttemptId,
-        Mode = dto.Mode,
-             StartedAt = existingSession.StartedAt,
-          HeartbeatIntervalSeconds = DefaultHeartbeatIntervalSeconds,
-  Message = "Existing active session returned"
- });
+        {
+            if (existingSession.Status == ProctorSessionStatus.Active)
+            {
+                return ApiResponse<ProctorSessionCreatedDto>.SuccessResponse(new ProctorSessionCreatedDto
+                {
+                    ProctorSessionId = existingSession.Id,
+                    AttemptId = dto.AttemptId,
+                    Mode = dto.Mode,
+                    StartedAt = existingSession.StartedAt,
+                    HeartbeatIntervalSeconds = DefaultHeartbeatIntervalSeconds,
+                    Message = "Existing active session returned"
+                });
             }
             return ApiResponse<ProctorSessionCreatedDto>.FailureResponse(
            $"A {dto.Mode} proctor session already exists for this attempt");
@@ -76,24 +76,24 @@ public async Task<ApiResponse<ProctorSessionCreatedDto>> CreateSessionAsync(
 
         var session = new ProctorSession
         {
-     AttemptId = dto.AttemptId,
-   ExamId = attempt.ExamId,
+            AttemptId = dto.AttemptId,
+            ExamId = attempt.ExamId,
             CandidateId = candidateId,
-      Mode = dto.Mode,
-          StartedAt = now,
-Status = ProctorSessionStatus.Active,
-       DeviceFingerprint = dto.DeviceFingerprint,
+            Mode = dto.Mode,
+            StartedAt = now,
+            Status = ProctorSessionStatus.Active,
+            DeviceFingerprint = dto.DeviceFingerprint,
             UserAgent = dto.UserAgent,
-   IpAddress = ipAddress,
+            IpAddress = ipAddress,
             BrowserName = dto.BrowserName,
-     BrowserVersion = dto.BrowserVersion,
-  OperatingSystem = dto.OperatingSystem,
+            BrowserVersion = dto.BrowserVersion,
+            OperatingSystem = dto.OperatingSystem,
             ScreenResolution = dto.ScreenResolution,
             TotalEvents = 0,
-   TotalViolations = 0,
-        RiskScore = 0,
+            TotalViolations = 0,
+            RiskScore = 0,
             LastHeartbeatAt = now,
-  CreatedDate = now,
+            CreatedDate = now,
             CreatedBy = candidateId
         };
 
@@ -102,12 +102,12 @@ Status = ProctorSessionStatus.Active,
 
         return ApiResponse<ProctorSessionCreatedDto>.SuccessResponse(new ProctorSessionCreatedDto
         {
-      ProctorSessionId = session.Id,
+            ProctorSessionId = session.Id,
             AttemptId = dto.AttemptId,
- Mode = dto.Mode,
- StartedAt = now,
-          HeartbeatIntervalSeconds = DefaultHeartbeatIntervalSeconds,
- Message = "Proctor session started successfully"
+            Mode = dto.Mode,
+            StartedAt = now,
+            HeartbeatIntervalSeconds = DefaultHeartbeatIntervalSeconds,
+            Message = "Proctor session started successfully"
         });
     }
 
@@ -115,15 +115,15 @@ Status = ProctorSessionStatus.Active,
     {
         var session = await GetSessionWithIncludesAsync(sessionId);
 
-      if (session == null)
+        if (session == null)
         {
-   return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
         }
 
         return ApiResponse<ProctorSessionDto>.SuccessResponse(MapToSessionDto(session));
     }
 
-public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int attemptId, ProctorMode mode)
+    public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int attemptId, ProctorMode mode)
     {
         var session = await _context.Set<ProctorSession>()
         .Include(s => s.Exam)
@@ -134,21 +134,21 @@ public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int a
 
         if (session == null)
         {
-     return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
-     }
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+        }
 
- return ApiResponse<ProctorSessionDto>.SuccessResponse(MapToSessionDto(session));
+        return ApiResponse<ProctorSessionDto>.SuccessResponse(MapToSessionDto(session));
     }
 
     public async Task<ApiResponse<ProctorSessionDto>> EndSessionAsync(int sessionId, string userId)
     {
-     var session = await _context.Set<ProctorSession>()
-       .FirstOrDefaultAsync(s => s.Id == sessionId);
+        var session = await _context.Set<ProctorSession>()
+          .FirstOrDefaultAsync(s => s.Id == sessionId);
 
-     if (session == null)
-    {
+        if (session == null)
+        {
             return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
-  }
+        }
 
         if (session.Status != ProctorSessionStatus.Active)
         {
@@ -166,7 +166,7 @@ public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int a
 
         await _context.SaveChangesAsync();
 
-      return await GetSessionAsync(sessionId);
+        return await GetSessionAsync(sessionId);
     }
 
     public async Task<ApiResponse<bool>> CancelSessionAsync(int sessionId, string adminUserId)
@@ -175,54 +175,66 @@ public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int a
          .FirstOrDefaultAsync(s => s.Id == sessionId);
 
         if (session == null)
-      {
+        {
             return ApiResponse<bool>.FailureResponse("Session not found");
         }
 
         var now = DateTime.UtcNow;
         session.Status = ProctorSessionStatus.Cancelled;
         session.EndedAt = now;
-    session.UpdatedDate = now;
-    session.UpdatedBy = adminUserId;
+        session.UpdatedDate = now;
+        session.UpdatedBy = adminUserId;
 
         await _context.SaveChangesAsync();
 
-   return ApiResponse<bool>.SuccessResponse(true, "Session cancelled");
-  }
+        return ApiResponse<bool>.SuccessResponse(true, "Session cancelled");
+    }
 
     public async Task<ApiResponse<PaginatedResponse<ProctorSessionListDto>>> GetSessionsAsync(
         ProctorSessionSearchDto searchDto)
     {
-  var query = _context.Set<ProctorSession>()
- .Include(s => s.Exam)
-.Include(s => s.Candidate)
-            .Include(s => s.Decision)
-            .AsQueryable();
+        var query = _context.Set<ProctorSession>()
+       .Include(s => s.Exam)
+      .Include(s => s.Candidate)
+                  .Include(s => s.Decision)
+                  .Include(s => s.EvidenceItems)
+                  .AsQueryable();
 
         query = ApplySessionFilters(query, searchDto);
- query = query.OrderByDescending(s => s.StartedAt);
+        query = query.OrderByDescending(s => s.StartedAt);
 
         var totalCount = await query.CountAsync();
+        var activeCount = await query.CountAsync(s => s.Status == ProctorSessionStatus.Active);
         var items = await query
             .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
   .Take(searchDto.PageSize)
     .ToListAsync();
 
+        var dtoItems = items.Select(MapToSessionListDto).ToList();
+
+        // Sample sessions fallback: if requested and no real active sessions exist
+        if (searchDto.IncludeSamples && activeCount == 0)
+        {
+            var samples = GenerateSampleSessions();
+            dtoItems.AddRange(samples);
+            totalCount += samples.Count;
+        }
+
         return ApiResponse<PaginatedResponse<ProctorSessionListDto>>.SuccessResponse(
     new PaginatedResponse<ProctorSessionListDto>
-          {
-        Items = items.Select(MapToSessionListDto).ToList(),
-      PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-       TotalCount = totalCount
-          });
+    {
+        Items = dtoItems,
+        PageNumber = searchDto.PageNumber,
+        PageSize = searchDto.PageSize,
+        TotalCount = totalCount
+    });
     }
 
     public async Task<ApiResponse<PaginatedResponse<ProctorSessionListDto>>> GetExamSessionsAsync(
   int examId, ProctorSessionSearchDto searchDto)
- {
+    {
         searchDto.ExamId = examId;
-return await GetSessionsAsync(searchDto);
+        return await GetSessionsAsync(searchDto);
     }
 
     #endregion
@@ -230,50 +242,50 @@ return await GetSessionsAsync(searchDto);
     #region Events
 
     public async Task<ApiResponse<ProctorEventDto>> LogEventAsync(LogProctorEventDto dto, string candidateId)
-  {
+    {
         var session = await _context.Set<ProctorSession>()
       .FirstOrDefaultAsync(s => s.Id == dto.ProctorSessionId);
 
         if (session == null)
         {
-    return ApiResponse<ProctorEventDto>.FailureResponse("Session not found");
+            return ApiResponse<ProctorEventDto>.FailureResponse("Session not found");
         }
 
         if (session.Status != ProctorSessionStatus.Active)
-     {
-       return ApiResponse<ProctorEventDto>.FailureResponse("Session is not active");
-   }
+        {
+            return ApiResponse<ProctorEventDto>.FailureResponse("Session is not active");
+        }
 
         if (session.CandidateId != candidateId)
-  {
-    return ApiResponse<ProctorEventDto>.FailureResponse("Unauthorized");
+        {
+            return ApiResponse<ProctorEventDto>.FailureResponse("Unauthorized");
         }
 
         var now = DateTime.UtcNow;
         var isViolation = IsViolationEvent(dto.EventType, dto.Severity);
 
-      var proctorEvent = new ProctorEvent
+        var proctorEvent = new ProctorEvent
         {
-     ProctorSessionId = dto.ProctorSessionId,
+            ProctorSessionId = dto.ProctorSessionId,
             AttemptId = session.AttemptId,
-     EventType = dto.EventType,
+            EventType = dto.EventType,
             Severity = dto.Severity,
-     IsViolation = isViolation,
-       MetadataJson = dto.MetadataJson,
-       ClientTimestamp = dto.ClientTimestamp ?? now,
-      OccurredAt = now,
+            IsViolation = isViolation,
+            MetadataJson = dto.MetadataJson,
+            ClientTimestamp = dto.ClientTimestamp ?? now,
+            OccurredAt = now,
             SequenceNumber = session.TotalEvents + 1,
             CreatedDate = now,
-         CreatedBy = candidateId
-};
+            CreatedBy = candidateId
+        };
 
-     _context.Set<ProctorEvent>().Add(proctorEvent);
+        _context.Set<ProctorEvent>().Add(proctorEvent);
 
         // Update session counters
         session.TotalEvents++;
- if (isViolation)
+        if (isViolation)
         {
-session.TotalViolations++;
+            session.TotalViolations++;
         }
 
         await _context.SaveChangesAsync();
@@ -286,48 +298,48 @@ session.TotalViolations++;
         var session = await _context.Set<ProctorSession>()
             .FirstOrDefaultAsync(s => s.Id == dto.ProctorSessionId);
 
-    if (session == null)
-    {
+        if (session == null)
+        {
             return ApiResponse<int>.FailureResponse("Session not found");
-      }
+        }
 
         if (session.Status != ProctorSessionStatus.Active)
-     {
+        {
             return ApiResponse<int>.FailureResponse("Session is not active");
         }
 
         if (session.CandidateId != candidateId)
         {
             return ApiResponse<int>.FailureResponse("Unauthorized");
-     }
+        }
 
         var now = DateTime.UtcNow;
-      var events = new List<ProctorEvent>();
+        var events = new List<ProctorEvent>();
         var sequenceNumber = session.TotalEvents;
 
         foreach (var eventDto in dto.Events)
         {
-     sequenceNumber++;
-   var isViolation = IsViolationEvent(eventDto.EventType, eventDto.Severity);
+            sequenceNumber++;
+            var isViolation = IsViolationEvent(eventDto.EventType, eventDto.Severity);
 
- events.Add(new ProctorEvent
-    {
-     ProctorSessionId = dto.ProctorSessionId,
-  AttemptId = session.AttemptId,
-         EventType = eventDto.EventType,
-           Severity = eventDto.Severity,
- IsViolation = isViolation,
-      MetadataJson = eventDto.MetadataJson,
-           ClientTimestamp = eventDto.ClientTimestamp ?? now,
-         OccurredAt = now,
+            events.Add(new ProctorEvent
+            {
+                ProctorSessionId = dto.ProctorSessionId,
+                AttemptId = session.AttemptId,
+                EventType = eventDto.EventType,
+                Severity = eventDto.Severity,
+                IsViolation = isViolation,
+                MetadataJson = eventDto.MetadataJson,
+                ClientTimestamp = eventDto.ClientTimestamp ?? now,
+                OccurredAt = now,
                 SequenceNumber = sequenceNumber,
-     CreatedDate = now,
+                CreatedDate = now,
                 CreatedBy = candidateId
- });
+            });
 
             if (isViolation)
             {
-          session.TotalViolations++;
+                session.TotalViolations++;
             }
         }
 
@@ -341,41 +353,41 @@ session.TotalViolations++;
 
     public async Task<ApiResponse<HeartbeatResponseDto>> ProcessHeartbeatAsync(HeartbeatDto dto, string candidateId)
     {
-var session = await _context.Set<ProctorSession>()
-         .FirstOrDefaultAsync(s => s.Id == dto.ProctorSessionId);
+        var session = await _context.Set<ProctorSession>()
+                 .FirstOrDefaultAsync(s => s.Id == dto.ProctorSessionId);
 
- if (session == null)
-   {
-        return ApiResponse<HeartbeatResponseDto>.FailureResponse("Session not found");
-      }
-
-        if (session.CandidateId != candidateId)
- {
-  return ApiResponse<HeartbeatResponseDto>.FailureResponse("Unauthorized");
+        if (session == null)
+        {
+            return ApiResponse<HeartbeatResponseDto>.FailureResponse("Session not found");
         }
 
-     var now = DateTime.UtcNow;
+        if (session.CandidateId != candidateId)
+        {
+            return ApiResponse<HeartbeatResponseDto>.FailureResponse("Unauthorized");
+        }
+
+        var now = DateTime.UtcNow;
 
         // Log heartbeat event
-      var heartbeatEvent = new ProctorEvent
+        var heartbeatEvent = new ProctorEvent
         {
-     ProctorSessionId = dto.ProctorSessionId,
- AttemptId = session.AttemptId,
-         EventType = ProctorEventType.Heartbeat,
+            ProctorSessionId = dto.ProctorSessionId,
+            AttemptId = session.AttemptId,
+            EventType = ProctorEventType.Heartbeat,
             Severity = 0,
             IsViolation = false,
             MetadataJson = dto.MetadataJson,
-    ClientTimestamp = dto.ClientTimestamp ?? now,
-          OccurredAt = now,
+            ClientTimestamp = dto.ClientTimestamp ?? now,
+            OccurredAt = now,
             SequenceNumber = session.TotalEvents + 1,
             CreatedDate = now,
             CreatedBy = candidateId
         };
 
-      _context.Set<ProctorEvent>().Add(heartbeatEvent);
+        _context.Set<ProctorEvent>().Add(heartbeatEvent);
 
         session.LastHeartbeatAt = now;
-   session.TotalEvents++;
+        session.TotalEvents++;
 
         await _context.SaveChangesAsync();
 
@@ -383,21 +395,21 @@ var session = await _context.Set<ProctorSession>()
         var hasWarning = session.TotalViolations > 5 || (session.RiskScore ?? 0) > 50;
         string? warningMessage = null;
         if (hasWarning)
-{
-        warningMessage = session.TotalViolations > 10
-          ? "Multiple violations detected. Your exam may be flagged for review."
-     : "Please stay focused on your exam.";
-   }
+        {
+            warningMessage = session.TotalViolations > 10
+              ? "Multiple violations detected. Your exam may be flagged for review."
+         : "Please stay focused on your exam.";
+        }
 
         return ApiResponse<HeartbeatResponseDto>.SuccessResponse(new HeartbeatResponseDto
         {
-       Success = true,
+            Success = true,
             ServerTime = now,
-         CurrentRiskScore = session.RiskScore,
-     TotalViolations = session.TotalViolations,
-      HasWarning = hasWarning,
-     WarningMessage = warningMessage
-      });
+            CurrentRiskScore = session.RiskScore,
+            TotalViolations = session.TotalViolations,
+            HasWarning = hasWarning,
+            WarningMessage = warningMessage
+        });
     }
 
     public async Task<ApiResponse<List<ProctorEventDto>>> GetSessionEventsAsync(int sessionId)
@@ -436,13 +448,13 @@ var session = await _context.Set<ProctorSession>()
     private async Task<ApiResponse<RiskCalculationResultDto>> CalculateRiskScoreInternalAsync(
   int sessionId, string calculatedBy)
     {
-   var session = await _context.Set<ProctorSession>()
-      .Include(s => s.Events)
-    .FirstOrDefaultAsync(s => s.Id == sessionId);
+        var session = await _context.Set<ProctorSession>()
+           .Include(s => s.Events)
+         .FirstOrDefaultAsync(s => s.Id == sessionId);
 
         if (session == null)
         {
-    return ApiResponse<RiskCalculationResultDto>.FailureResponse("Session not found");
+            return ApiResponse<RiskCalculationResultDto>.FailureResponse("Session not found");
         }
 
         var rules = await _context.Set<ProctorRiskRule>()
@@ -451,73 +463,73 @@ var session = await _context.Set<ProctorSession>()
             .ToListAsync();
 
         var now = DateTime.UtcNow;
-   decimal totalRiskPoints = 0;
+        decimal totalRiskPoints = 0;
         var triggeredRules = new List<TriggeredRuleDto>();
         var eventBreakdown = new Dictionary<string, int>();
 
         // Count events by type
         foreach (var eventGroup in session.Events.GroupBy(e => e.EventType))
         {
-          eventBreakdown[eventGroup.Key.ToString()] = eventGroup.Count();
+            eventBreakdown[eventGroup.Key.ToString()] = eventGroup.Count();
         }
 
-  // Evaluate each rule
+        // Evaluate each rule
         foreach (var rule in rules)
         {
-var relevantEvents = session.Events
-       .Where(e => e.EventType == rule.EventType)
-        .Where(e => !rule.MinSeverity.HasValue || e.Severity >= rule.MinSeverity.Value);
+            var relevantEvents = session.Events
+                   .Where(e => e.EventType == rule.EventType)
+                    .Where(e => !rule.MinSeverity.HasValue || e.Severity >= rule.MinSeverity.Value);
 
-         if (rule.WindowSeconds > 0)
-  {
-      var windowStart = now.AddSeconds(-rule.WindowSeconds);
-           relevantEvents = relevantEvents.Where(e => e.OccurredAt >= windowStart);
+            if (rule.WindowSeconds > 0)
+            {
+                var windowStart = now.AddSeconds(-rule.WindowSeconds);
+                relevantEvents = relevantEvents.Where(e => e.OccurredAt >= windowStart);
             }
 
             var eventCount = relevantEvents.Count();
-      var triggerCount = eventCount / rule.ThresholdCount;
+            var triggerCount = eventCount / rule.ThresholdCount;
 
-        if (rule.MaxTriggers.HasValue)
+            if (rule.MaxTriggers.HasValue)
             {
-         triggerCount = Math.Min(triggerCount, rule.MaxTriggers.Value);
+                triggerCount = Math.Min(triggerCount, rule.MaxTriggers.Value);
             }
 
-      if (triggerCount > 0)
+            if (triggerCount > 0)
             {
-            var points = triggerCount * rule.RiskPoints;
-        totalRiskPoints += points;
+                var points = triggerCount * rule.RiskPoints;
+                totalRiskPoints += points;
 
-    triggeredRules.Add(new TriggeredRuleDto
-         {
-       RuleId = rule.Id,
-              RuleName = rule.NameEn,
-          RiskPoints = points,
-   TriggerCount = triggerCount
-            });
+                triggeredRules.Add(new TriggeredRuleDto
+                {
+                    RuleId = rule.Id,
+                    RuleName = rule.NameEn,
+                    RiskPoints = points,
+                    TriggerCount = triggerCount
+                });
             }
- }
+        }
 
         // Cap at 100
         var riskScore = Math.Min(totalRiskPoints, 100);
 
         // Update session
-     session.RiskScore = riskScore;
+        session.RiskScore = riskScore;
         session.UpdatedDate = now;
 
         // Create snapshot
-      var snapshot = new ProctorRiskSnapshot
+        var snapshot = new ProctorRiskSnapshot
         {
             ProctorSessionId = sessionId,
-      RiskScore = riskScore,
+            RiskScore = riskScore,
             TotalEvents = session.TotalEvents,
-     TotalViolations = session.TotalViolations,
+            TotalViolations = session.TotalViolations,
             EventBreakdownJson = JsonSerializer.Serialize(eventBreakdown),
             TriggeredRulesJson = JsonSerializer.Serialize(triggeredRules),
-CalculatedAt = now,
-         CalculatedBy = calculatedBy,
+            CalculatedAt = now,
+            CalculatedBy = calculatedBy,
             CreatedDate = now,
-    CreatedBy = calculatedBy
-     };
+            CreatedBy = calculatedBy
+        };
 
         _context.Set<ProctorRiskSnapshot>().Add(snapshot);
         await _context.SaveChangesAsync();
@@ -525,23 +537,23 @@ CalculatedAt = now,
         return ApiResponse<RiskCalculationResultDto>.SuccessResponse(new RiskCalculationResultDto
         {
             ProctorSessionId = sessionId,
-  RiskScore = riskScore,
-       RiskLevel = GetRiskLevel(riskScore),
+            RiskScore = riskScore,
+            RiskLevel = GetRiskLevel(riskScore),
             TotalEvents = session.TotalEvents,
             TotalViolations = session.TotalViolations,
             TriggeredRules = triggeredRules,
-        EventBreakdown = eventBreakdown,
+            EventBreakdown = eventBreakdown,
             CalculatedAt = now
         });
     }
 
     public async Task<ApiResponse<List<ProctorRiskRuleDto>>> GetRiskRulesAsync(bool activeOnly = true)
     {
-      var query = _context.Set<ProctorRiskRule>().AsQueryable();
+        var query = _context.Set<ProctorRiskRule>().AsQueryable();
 
-      if (activeOnly)
+        if (activeOnly)
         {
-  query = query.Where(r => r.IsActive);
+            query = query.Where(r => r.IsActive);
         }
 
         var rules = await query.OrderBy(r => r.Priority).ToListAsync();
@@ -557,23 +569,23 @@ CalculatedAt = now,
 
         var rule = new ProctorRiskRule
         {
- NameEn = dto.NameEn,
-        NameAr = dto.NameAr,
-   DescriptionEn = dto.DescriptionEn,
+            NameEn = dto.NameEn,
+            NameAr = dto.NameAr,
+            DescriptionEn = dto.DescriptionEn,
             DescriptionAr = dto.DescriptionAr,
             IsActive = dto.IsActive,
-    EventType = dto.EventType,
+            EventType = dto.EventType,
             ThresholdCount = dto.ThresholdCount,
-      WindowSeconds = dto.WindowSeconds,
-         RiskPoints = dto.RiskPoints,
-         MinSeverity = dto.MinSeverity,
+            WindowSeconds = dto.WindowSeconds,
+            RiskPoints = dto.RiskPoints,
+            MinSeverity = dto.MinSeverity,
             MaxTriggers = dto.MaxTriggers,
-     Priority = dto.Priority,
- CreatedDate = now,
+            Priority = dto.Priority,
+            CreatedDate = now,
             CreatedBy = userId
-   };
+        };
 
-   _context.Set<ProctorRiskRule>().Add(rule);
+        _context.Set<ProctorRiskRule>().Add(rule);
         await _context.SaveChangesAsync();
 
         return ApiResponse<ProctorRiskRuleDto>.SuccessResponse(MapToRiskRuleDto(rule));
@@ -582,29 +594,29 @@ CalculatedAt = now,
     public async Task<ApiResponse<ProctorRiskRuleDto>> UpdateRiskRuleAsync(
         int ruleId, SaveProctorRiskRuleDto dto, string userId)
     {
-      var rule = await _context.Set<ProctorRiskRule>()
-            .FirstOrDefaultAsync(r => r.Id == ruleId);
+        var rule = await _context.Set<ProctorRiskRule>()
+              .FirstOrDefaultAsync(r => r.Id == ruleId);
 
         if (rule == null)
-      {
+        {
             return ApiResponse<ProctorRiskRuleDto>.FailureResponse("Rule not found");
- }
+        }
 
         var now = DateTime.UtcNow;
 
- rule.NameEn = dto.NameEn;
+        rule.NameEn = dto.NameEn;
         rule.NameAr = dto.NameAr;
         rule.DescriptionEn = dto.DescriptionEn;
-    rule.DescriptionAr = dto.DescriptionAr;
+        rule.DescriptionAr = dto.DescriptionAr;
         rule.IsActive = dto.IsActive;
         rule.EventType = dto.EventType;
-      rule.ThresholdCount = dto.ThresholdCount;
+        rule.ThresholdCount = dto.ThresholdCount;
         rule.WindowSeconds = dto.WindowSeconds;
         rule.RiskPoints = dto.RiskPoints;
-      rule.MinSeverity = dto.MinSeverity;
-   rule.MaxTriggers = dto.MaxTriggers;
+        rule.MinSeverity = dto.MinSeverity;
+        rule.MaxTriggers = dto.MaxTriggers;
         rule.Priority = dto.Priority;
-   rule.UpdatedDate = now;
+        rule.UpdatedDate = now;
         rule.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -612,7 +624,7 @@ CalculatedAt = now,
         return ApiResponse<ProctorRiskRuleDto>.SuccessResponse(MapToRiskRuleDto(rule));
     }
 
-  public async Task<ApiResponse<bool>> DeleteRiskRuleAsync(int ruleId, string userId)
+    public async Task<ApiResponse<bool>> DeleteRiskRuleAsync(int ruleId, string userId)
     {
         var rule = await _context.Set<ProctorRiskRule>()
    .FirstOrDefaultAsync(r => r.Id == ruleId);
@@ -626,9 +638,9 @@ CalculatedAt = now,
         rule.DeletedBy = userId;
         rule.UpdatedDate = DateTime.UtcNow;
 
-   await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
-     return ApiResponse<bool>.SuccessResponse(true, "Rule deleted");
+        return ApiResponse<bool>.SuccessResponse(true, "Rule deleted");
     }
 
     public async Task<ApiResponse<ProctorRiskRuleDto>> ToggleRiskRuleAsync(int ruleId, string userId)
@@ -636,14 +648,14 @@ CalculatedAt = now,
         var rule = await _context.Set<ProctorRiskRule>()
     .FirstOrDefaultAsync(r => r.Id == ruleId);
 
-   if (rule == null)
+        if (rule == null)
         {
             return ApiResponse<ProctorRiskRuleDto>.FailureResponse("Rule not found");
         }
 
         rule.IsActive = !rule.IsActive;
-     rule.UpdatedDate = DateTime.UtcNow;
-   rule.UpdatedBy = userId;
+        rule.UpdatedDate = DateTime.UtcNow;
+        rule.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
 
@@ -727,14 +739,14 @@ UploadEvidenceDto dto, string candidateId)
             .FirstOrDefaultAsync(s => s.Id == dto.ProctorSessionId);
 
         if (session == null)
-      {
-          return ApiResponse<EvidenceUploadResultDto>.FailureResponse("Session not found");
+        {
+            return ApiResponse<EvidenceUploadResultDto>.FailureResponse("Session not found");
         }
 
-   if (session.Status != ProctorSessionStatus.Active)
+        if (session.Status != ProctorSessionStatus.Active)
         {
-         return ApiResponse<EvidenceUploadResultDto>.FailureResponse("Session is not active");
- }
+            return ApiResponse<EvidenceUploadResultDto>.FailureResponse("Session is not active");
+        }
 
         if (session.CandidateId != candidateId)
         {
@@ -746,37 +758,37 @@ UploadEvidenceDto dto, string candidateId)
         var filePath = $"/evidence/{fileName}";
 
         var evidence = new ProctorEvidence
-    {
+        {
             ProctorSessionId = dto.ProctorSessionId,
-   AttemptId = session.AttemptId,
+            AttemptId = session.AttemptId,
             Type = dto.Type,
-   FileName = dto.FileName,
+            FileName = dto.FileName,
             FilePath = filePath,
-      FileSize = 0,
-ContentType = dto.ContentType,
-  StartAt = dto.StartAt,
-   EndAt = dto.EndAt,
-    DurationSeconds = dto.DurationSeconds,
+            FileSize = 0,
+            ContentType = dto.ContentType,
+            StartAt = dto.StartAt,
+            EndAt = dto.EndAt,
+            DurationSeconds = dto.DurationSeconds,
             IsUploaded = false,
-  UploadAttempts = 0,
-    MetadataJson = dto.MetadataJson,
-      ExpiresAt = now.AddDays(90), // 90-day retention
+            UploadAttempts = 0,
+            MetadataJson = dto.MetadataJson,
+            ExpiresAt = now.AddDays(90), // 90-day retention
             CreatedDate = now,
-          CreatedBy = candidateId
+            CreatedBy = candidateId
         };
 
         _context.Set<ProctorEvidence>().Add(evidence);
         await _context.SaveChangesAsync();
 
-     // Generate presigned URL (placeholder - implement with actual storage provider)
+        // Generate presigned URL (placeholder - implement with actual storage provider)
         var uploadUrl = $"/api/proctor/evidence/{evidence.Id}/upload";
-   var expiresAt = now.AddMinutes(30);
+        var expiresAt = now.AddMinutes(30);
 
         return ApiResponse<EvidenceUploadResultDto>.SuccessResponse(new EvidenceUploadResultDto
         {
-    EvidenceId = evidence.Id,
-        UploadUrl = uploadUrl,
-     ExpiresAt = expiresAt
+            EvidenceId = evidence.Id,
+            UploadUrl = uploadUrl,
+            ExpiresAt = expiresAt
         });
     }
 
@@ -787,22 +799,22 @@ ContentType = dto.ContentType,
             .FirstOrDefaultAsync(e => e.Id == evidenceId);
 
         if (evidence == null)
-      {
+        {
             return ApiResponse<ProctorEvidenceDto>.FailureResponse("Evidence not found");
         }
 
         var now = DateTime.UtcNow;
 
-    evidence.IsUploaded = true;
-   evidence.UploadedAt = now;
+        evidence.IsUploaded = true;
+        evidence.UploadedAt = now;
         evidence.FileSize = fileSize;
-    evidence.Checksum = checksum;
+        evidence.Checksum = checksum;
         evidence.ChecksumAlgorithm = checksum != null ? "SHA256" : null;
-      evidence.UpdatedDate = now;
+        evidence.UpdatedDate = now;
 
         await _context.SaveChangesAsync();
 
-     return ApiResponse<ProctorEvidenceDto>.SuccessResponse(MapToEvidenceDto(evidence));
+        return ApiResponse<ProctorEvidenceDto>.SuccessResponse(MapToEvidenceDto(evidence));
     }
 
     public async Task<ApiResponse<List<ProctorEvidenceDto>>> GetSessionEvidenceAsync(int sessionId)
@@ -812,34 +824,34 @@ ContentType = dto.ContentType,
             .OrderBy(e => e.StartAt ?? e.CreatedDate)
             .ToListAsync();
 
-   return ApiResponse<List<ProctorEvidenceDto>>.SuccessResponse(
-   evidence.Select(MapToEvidenceDto).ToList());
+        return ApiResponse<List<ProctorEvidenceDto>>.SuccessResponse(
+        evidence.Select(MapToEvidenceDto).ToList());
     }
 
     public async Task<ApiResponse<string>> GetEvidenceDownloadUrlAsync(int evidenceId, string userId)
     {
- var evidence = await _context.Set<ProctorEvidence>()
-       .FirstOrDefaultAsync(e => e.Id == evidenceId);
+        var evidence = await _context.Set<ProctorEvidence>()
+              .FirstOrDefaultAsync(e => e.Id == evidenceId);
 
-   if (evidence == null)
+        if (evidence == null)
         {
-    return ApiResponse<string>.FailureResponse("Evidence not found");
-     }
+            return ApiResponse<string>.FailureResponse("Evidence not found");
+        }
 
         if (!evidence.IsUploaded)
         {
-  return ApiResponse<string>.FailureResponse("Evidence not yet uploaded");
-  }
+            return ApiResponse<string>.FailureResponse("Evidence not yet uploaded");
+        }
 
         // Generate secure, time-limited URL (placeholder)
-      var downloadUrl = $"/api/proctor/evidence/{evidenceId}/download?token={Guid.NewGuid()}";
+        var downloadUrl = $"/api/proctor/evidence/{evidenceId}/download?token={Guid.NewGuid()}";
 
-  return ApiResponse<string>.SuccessResponse(downloadUrl);
+        return ApiResponse<string>.SuccessResponse(downloadUrl);
     }
 
     #endregion
 
-  #region Decisions
+    #region Decisions
 
     public async Task<ApiResponse<ProctorDecisionDto>> MakeDecisionAsync(
       MakeDecisionDto dto, string reviewerId)
@@ -852,52 +864,52 @@ ContentType = dto.ContentType,
         if (session == null)
         {
             return ApiResponse<ProctorDecisionDto>.FailureResponse("Session not found");
-    }
+        }
 
-    // Validate attempt is submitted or expired
+        // Validate attempt is submitted or expired
         if (session.Attempt.Status != AttemptStatus.Submitted &&
  session.Attempt.Status != AttemptStatus.Expired)
         {
-         return ApiResponse<ProctorDecisionDto>.FailureResponse(
-                "Decisions can only be made after attempt is submitted or expired");
- }
+            return ApiResponse<ProctorDecisionDto>.FailureResponse(
+                   "Decisions can only be made after attempt is submitted or expired");
+        }
 
         var now = DateTime.UtcNow;
 
         if (session.Decision != null)
         {
-   if (session.Decision.IsFinalized)
-        {
-      return ApiResponse<ProctorDecisionDto>.FailureResponse(
-    "Decision is finalized. Use override to change.");
-         }
+            if (session.Decision.IsFinalized)
+            {
+                return ApiResponse<ProctorDecisionDto>.FailureResponse(
+              "Decision is finalized. Use override to change.");
+            }
 
-         // Update existing decision
- session.Decision.Status = dto.Status;
-   session.Decision.DecisionReasonEn = dto.DecisionReasonEn;
-     session.Decision.DecisionReasonAr = dto.DecisionReasonAr;
-      session.Decision.InternalNotes = dto.InternalNotes;
-         session.Decision.DecidedBy = reviewerId;
-       session.Decision.DecidedAt = now;
-    session.Decision.IsFinalized = dto.Finalize;
-      session.Decision.UpdatedDate = now;
-    session.Decision.UpdatedBy = reviewerId;
+            // Update existing decision
+            session.Decision.Status = dto.Status;
+            session.Decision.DecisionReasonEn = dto.DecisionReasonEn;
+            session.Decision.DecisionReasonAr = dto.DecisionReasonAr;
+            session.Decision.InternalNotes = dto.InternalNotes;
+            session.Decision.DecidedBy = reviewerId;
+            session.Decision.DecidedAt = now;
+            session.Decision.IsFinalized = dto.Finalize;
+            session.Decision.UpdatedDate = now;
+            session.Decision.UpdatedBy = reviewerId;
         }
         else
-    {
+        {
             // Create new decision
-      var decision = new ProctorDecision
-  {
-         ProctorSessionId = dto.ProctorSessionId,
-        AttemptId = session.AttemptId,
-         Status = dto.Status,
-           DecisionReasonEn = dto.DecisionReasonEn,
+            var decision = new ProctorDecision
+            {
+                ProctorSessionId = dto.ProctorSessionId,
+                AttemptId = session.AttemptId,
+                Status = dto.Status,
+                DecisionReasonEn = dto.DecisionReasonEn,
                 DecisionReasonAr = dto.DecisionReasonAr,
-       InternalNotes = dto.InternalNotes,
- DecidedBy = reviewerId,
-     DecidedAt = now,
+                InternalNotes = dto.InternalNotes,
+                DecidedBy = reviewerId,
+                DecidedAt = now,
                 IsFinalized = dto.Finalize,
-      CreatedDate = now,
+                CreatedDate = now,
                 CreatedBy = reviewerId
             };
 
@@ -909,41 +921,41 @@ ContentType = dto.ContentType,
         return await GetDecisionAsync(dto.ProctorSessionId);
     }
 
- public async Task<ApiResponse<ProctorDecisionDto>> OverrideDecisionAsync(
-        OverrideDecisionDto dto, string adminUserId)
+    public async Task<ApiResponse<ProctorDecisionDto>> OverrideDecisionAsync(
+           OverrideDecisionDto dto, string adminUserId)
     {
         var decision = await _context.Set<ProctorDecision>()
             .FirstOrDefaultAsync(d => d.Id == dto.DecisionId);
 
-    if (decision == null)
+        if (decision == null)
         {
             return ApiResponse<ProctorDecisionDto>.FailureResponse("Decision not found");
-    }
+        }
 
         var now = DateTime.UtcNow;
 
         decision.PreviousStatus = decision.Status;
         decision.Status = dto.NewStatus;
         decision.OverriddenBy = adminUserId;
-   decision.OverriddenAt = now;
+        decision.OverriddenAt = now;
         decision.OverrideReason = dto.OverrideReason;
 
         if (!string.IsNullOrEmpty(dto.DecisionReasonEn))
         {
-      decision.DecisionReasonEn = dto.DecisionReasonEn;
-     }
-    if (!string.IsNullOrEmpty(dto.DecisionReasonAr))
+            decision.DecisionReasonEn = dto.DecisionReasonEn;
+        }
+        if (!string.IsNullOrEmpty(dto.DecisionReasonAr))
         {
             decision.DecisionReasonAr = dto.DecisionReasonAr;
         }
 
-     decision.UpdatedDate = now;
+        decision.UpdatedDate = now;
         decision.UpdatedBy = adminUserId;
 
         await _context.SaveChangesAsync();
 
         return await GetDecisionAsync(decision.ProctorSessionId);
- }
+    }
 
     public async Task<ApiResponse<ProctorDecisionDto>> GetDecisionAsync(int sessionId)
     {
@@ -951,18 +963,18 @@ ContentType = dto.ContentType,
        .FirstOrDefaultAsync(d => d.ProctorSessionId == sessionId);
 
         if (decision == null)
-   {
-      return ApiResponse<ProctorDecisionDto>.FailureResponse("No decision found");
+        {
+            return ApiResponse<ProctorDecisionDto>.FailureResponse("No decision found");
         }
 
-      return ApiResponse<ProctorDecisionDto>.SuccessResponse(MapToDecisionDto(decision));
+        return ApiResponse<ProctorDecisionDto>.SuccessResponse(MapToDecisionDto(decision));
     }
 
     public async Task<ApiResponse<PaginatedResponse<ProctorSessionListDto>>> GetPendingReviewAsync(
   ProctorSessionSearchDto searchDto)
     {
-    searchDto.RequiresReview = true;
-    return await GetSessionsAsync(searchDto);
+        searchDto.RequiresReview = true;
+        return await GetSessionsAsync(searchDto);
     }
 
     #endregion
@@ -972,10 +984,10 @@ ContentType = dto.ContentType,
     public async Task<ApiResponse<ProctorDashboardDto>> GetDashboardAsync(int examId)
     {
         var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
-      if (exam == null)
-     {
-    return ApiResponse<ProctorDashboardDto>.FailureResponse("Exam not found");
-    }
+        if (exam == null)
+        {
+            return ApiResponse<ProctorDashboardDto>.FailureResponse("Exam not found");
+        }
 
         var sessions = await _context.Set<ProctorSession>()
         .Include(s => s.Decision)
@@ -988,10 +1000,10 @@ ContentType = dto.ContentType,
     .Where(e => e.IsViolation)
      .GroupBy(e => e.EventType)
   .Select(g => new EventTypeCountDto
-        {
-          EventType = g.Key,
-     Count = g.Count()
-         })
+  {
+      EventType = g.Key,
+      Count = g.Count()
+  })
             .OrderByDescending(x => x.Count)
       .Take(10)
        .ToList();
@@ -1000,15 +1012,15 @@ ContentType = dto.ContentType,
 
         var dashboard = new ProctorDashboardDto
         {
-       ExamId = examId,
-  ExamTitleEn = exam.TitleEn,
-         TotalSessions = sessions.Count,
-  ActiveSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Active),
-     CompletedSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Completed),
-       HighRiskCount = sessions.Count(s => s.RiskScore >= 50),
-    PendingReviewCount = sessions.Count(s => s.Decision == null || s.Decision.Status == ProctorDecisionStatus.Pending),
-       ClearedCount = sessions.Count(s => s.Decision?.Status == ProctorDecisionStatus.Cleared),
-          InvalidatedCount = sessions.Count(s => s.Decision?.Status == ProctorDecisionStatus.Invalidated),
+            ExamId = examId,
+            ExamTitleEn = exam.TitleEn,
+            TotalSessions = sessions.Count,
+            ActiveSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Active),
+            CompletedSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Completed),
+            HighRiskCount = sessions.Count(s => s.RiskScore >= 50),
+            PendingReviewCount = sessions.Count(s => s.Decision == null || s.Decision.Status == ProctorDecisionStatus.Pending),
+            ClearedCount = sessions.Count(s => s.Decision?.Status == ProctorDecisionStatus.Cleared),
+            InvalidatedCount = sessions.Count(s => s.Decision?.Status == ProctorDecisionStatus.Invalidated),
             AverageRiskScore = riskScores.Any() ? riskScores.Average() : 0,
             TopViolations = violationCounts,
             RiskDistribution = CalculateRiskDistribution(sessions)
@@ -1019,7 +1031,7 @@ ContentType = dto.ContentType,
 
     public async Task<ApiResponse<List<LiveMonitoringDto>>> GetLiveMonitoringAsync(int examId)
     {
- var now = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
         var offlineThreshold = now.AddSeconds(-HeartbeatMissedThresholdSeconds);
 
         var activeSessions = await _context.Set<ProctorSession>()
@@ -1030,15 +1042,15 @@ ContentType = dto.ContentType,
 
         var monitoring = activeSessions.Select(s => new LiveMonitoringDto
         {
- ProctorSessionId = s.Id,
+            ProctorSessionId = s.Id,
             AttemptId = s.AttemptId,
             CandidateName = s.Candidate?.FullName ?? s.Candidate?.DisplayName ?? "",
             Status = s.Status,
-        RiskScore = s.RiskScore,
-     TotalViolations = s.TotalViolations,
+            RiskScore = s.RiskScore,
+            TotalViolations = s.TotalViolations,
             LastHeartbeatAt = s.LastHeartbeatAt,
-      IsOnline = s.LastHeartbeatAt >= offlineThreshold,
-         LastEvent = s.Events.Any() ? MapToEventDto(s.Events.First()) : null
+            IsOnline = s.LastHeartbeatAt >= offlineThreshold,
+            LastEvent = s.Events.Any() ? MapToEventDto(s.Events.First()) : null
         }).ToList();
 
         return ApiResponse<List<LiveMonitoringDto>>.SuccessResponse(monitoring);
@@ -1049,37 +1061,37 @@ ContentType = dto.ContentType,
         var now = DateTime.UtcNow;
         var threshold = now.AddSeconds(-thresholdSeconds);
 
-  var missedSessions = await _context.Set<ProctorSession>()
-            .Where(s => s.Status == ProctorSessionStatus.Active &&
-    s.LastHeartbeatAt < threshold)
-            .ToListAsync();
+        var missedSessions = await _context.Set<ProctorSession>()
+                  .Where(s => s.Status == ProctorSessionStatus.Active &&
+          s.LastHeartbeatAt < threshold)
+                  .ToListAsync();
 
-     foreach (var session in missedSessions)
+        foreach (var session in missedSessions)
         {
-      session.HeartbeatMissedCount++;
+            session.HeartbeatMissedCount++;
 
-       // Log network disconnected event
-      var disconnectEvent = new ProctorEvent
-{
-ProctorSessionId = session.Id,
-     AttemptId = session.AttemptId,
-        EventType = ProctorEventType.NetworkDisconnected,
-        Severity = 3,
-        IsViolation = true,
-    MetadataJson = JsonSerializer.Serialize(new
-      {
-          lastHeartbeat = session.LastHeartbeatAt,
+            // Log network disconnected event
+            var disconnectEvent = new ProctorEvent
+            {
+                ProctorSessionId = session.Id,
+                AttemptId = session.AttemptId,
+                EventType = ProctorEventType.NetworkDisconnected,
+                Severity = 3,
+                IsViolation = true,
+                MetadataJson = JsonSerializer.Serialize(new
+                {
+                    lastHeartbeat = session.LastHeartbeatAt,
                     missedCount = session.HeartbeatMissedCount
-            }),
+                }),
                 ClientTimestamp = now,
-  OccurredAt = now,
-    SequenceNumber = session.TotalEvents + 1,
-            CreatedDate = now,
-         CreatedBy = "System"
-      };
+                OccurredAt = now,
+                SequenceNumber = session.TotalEvents + 1,
+                CreatedDate = now,
+                CreatedBy = "System"
+            };
 
-        _context.Set<ProctorEvent>().Add(disconnectEvent);
-      session.TotalEvents++;
+            _context.Set<ProctorEvent>().Add(disconnectEvent);
+            session.TotalEvents++;
             session.TotalViolations++;
         }
 
@@ -1094,7 +1106,7 @@ ProctorSessionId = session.Id,
 
     public async Task<int> CleanupExpiredEvidenceAsync()
     {
- var now = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
 
         var expiredEvidence = await _context.Set<ProctorEvidence>()
       .Where(e => e.ExpiresAt < now && !e.IsExpired)
@@ -1102,12 +1114,12 @@ ProctorSessionId = session.Id,
 
         foreach (var evidence in expiredEvidence)
         {
-       evidence.IsExpired = true;
-        evidence.UpdatedDate = now;
-     // TODO: Actually delete file from storage
-    }
+            evidence.IsExpired = true;
+            evidence.UpdatedDate = now;
+            // TODO: Actually delete file from storage
+        }
 
-   await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
         return expiredEvidence.Count;
     }
@@ -1116,7 +1128,7 @@ ProctorSessionId = session.Id,
 
     #region Private Helper Methods
 
-  private async Task<ProctorSession?> GetSessionWithIncludesAsync(int sessionId)
+    private async Task<ProctorSession?> GetSessionWithIncludesAsync(int sessionId)
     {
         return await _context.Set<ProctorSession>()
 .Include(s => s.Exam)
@@ -1126,44 +1138,44 @@ ProctorSessionId = session.Id,
      .FirstOrDefaultAsync(s => s.Id == sessionId);
     }
 
-  private IQueryable<ProctorSession> ApplySessionFilters(
-        IQueryable<ProctorSession> query, ProctorSessionSearchDto searchDto)
+    private IQueryable<ProctorSession> ApplySessionFilters(
+          IQueryable<ProctorSession> query, ProctorSessionSearchDto searchDto)
     {
         if (searchDto.ExamId.HasValue)
-        query = query.Where(s => s.ExamId == searchDto.ExamId.Value);
+            query = query.Where(s => s.ExamId == searchDto.ExamId.Value);
 
         if (!string.IsNullOrEmpty(searchDto.CandidateId))
-         query = query.Where(s => s.CandidateId == searchDto.CandidateId);
+            query = query.Where(s => s.CandidateId == searchDto.CandidateId);
 
-      if (searchDto.Mode.HasValue)
+        if (searchDto.Mode.HasValue)
             query = query.Where(s => s.Mode == searchDto.Mode.Value);
 
         if (searchDto.Status.HasValue)
-         query = query.Where(s => s.Status == searchDto.Status.Value);
+            query = query.Where(s => s.Status == searchDto.Status.Value);
 
         if (searchDto.DecisionStatus.HasValue)
-    query = query.Where(s => s.Decision != null && s.Decision.Status == searchDto.DecisionStatus.Value);
+            query = query.Where(s => s.Decision != null && s.Decision.Status == searchDto.DecisionStatus.Value);
 
         if (searchDto.RequiresReview == true)
-  query = query.Where(s => s.Decision == null ||
-        s.Decision.Status == ProctorDecisionStatus.Pending);
+            query = query.Where(s => s.Decision == null ||
+                  s.Decision.Status == ProctorDecisionStatus.Pending);
 
-     if (searchDto.MinRiskScore.HasValue)
-       query = query.Where(s => s.RiskScore >= searchDto.MinRiskScore.Value);
+        if (searchDto.MinRiskScore.HasValue)
+            query = query.Where(s => s.RiskScore >= searchDto.MinRiskScore.Value);
 
         if (searchDto.StartedFrom.HasValue)
             query = query.Where(s => s.StartedAt >= searchDto.StartedFrom.Value);
 
         if (searchDto.StartedTo.HasValue)
-  query = query.Where(s => s.StartedAt <= searchDto.StartedTo.Value);
+            query = query.Where(s => s.StartedAt <= searchDto.StartedTo.Value);
 
         return query;
     }
 
- private bool IsViolationEvent(ProctorEventType eventType, byte severity)
+    private bool IsViolationEvent(ProctorEventType eventType, byte severity)
     {
         // Heartbeat is never a violation
-   if (eventType == ProctorEventType.Heartbeat)
+        if (eventType == ProctorEventType.Heartbeat)
             return false;
 
         // High severity events are always violations
@@ -1171,8 +1183,8 @@ ProctorSessionId = session.Id,
             return true;
 
         // Specific event types are violations regardless of severity
-     var violationTypes = new[]
-        {
+        var violationTypes = new[]
+           {
      ProctorEventType.TabSwitched,
     ProctorEventType.FullscreenExited,
      ProctorEventType.CopyAttempt,
@@ -1185,12 +1197,52 @@ ProctorSessionId = session.Id,
         return violationTypes.Contains(eventType);
     }
 
+    private static List<ProctorSessionListDto> GenerateSampleSessions()
+    {
+        var now = DateTime.UtcNow;
+        return new List<ProctorSessionListDto>
+        {
+            new()
+            {
+                Id = -1,
+                AttemptId = -1,
+                ExamId = -1,
+                ExamTitleEn = "Introduction to Computer Science — Final",
+                CandidateId = "sample-1",
+                CandidateName = "Sarah Ahmed",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-22),
+                TotalViolations = 1,
+                RiskScore = 12,
+                RequiresReview = false,
+                IsSample = true
+            },
+            new()
+            {
+                Id = -2,
+                AttemptId = -2,
+                ExamId = -1,
+                ExamTitleEn = "Introduction to Computer Science — Final",
+                CandidateId = "sample-2",
+                CandidateName = "Omar Khalid",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-15),
+                TotalViolations = 3,
+                RiskScore = 35,
+                RequiresReview = true,
+                IsSample = true
+            }
+        };
+    }
+
     private string GetRiskLevel(decimal score) => score switch
     {
-   <= 20 => "Low",
+        <= 20 => "Low",
         <= 50 => "Medium",
         <= 75 => "High",
-   _ => "Critical"
+        _ => "Critical"
     };
 
     private List<RiskDistributionDto> CalculateRiskDistribution(List<ProctorSession> sessions)
@@ -1205,62 +1257,75 @@ ProctorSessionId = session.Id,
 
         var total = sessions.Count(s => s.RiskScore.HasValue);
 
-    return ranges.Select(r => new RiskDistributionDto
+        return ranges.Select(r => new RiskDistributionDto
         {
-   Range = r.Item1,
+            Range = r.Item1,
             Count = sessions.Count(s => s.RiskScore >= r.Item2 && s.RiskScore <= r.Item3),
             Percentage = total > 0
-                ? (decimal)sessions.Count(s => s.RiskScore >= r.Item2 && s.RiskScore <= r.Item3) / total * 100
-: 0
-    }).ToList();
+                    ? (decimal)sessions.Count(s => s.RiskScore >= r.Item2 && s.RiskScore <= r.Item3) / total * 100
+    : 0
+        }).ToList();
     }
 
     private ProctorSessionDto MapToSessionDto(ProctorSession session)
     {
- return new ProctorSessionDto
-  {
-       Id = session.Id,
-        AttemptId = session.AttemptId,
-        ExamId = session.ExamId,
+        return new ProctorSessionDto
+        {
+            Id = session.Id,
+            AttemptId = session.AttemptId,
+            ExamId = session.ExamId,
             ExamTitleEn = session.Exam?.TitleEn ?? "",
- CandidateId = session.CandidateId,
+            CandidateId = session.CandidateId,
             CandidateName = session.Candidate?.FullName ?? session.Candidate?.DisplayName ?? "",
-        Mode = session.Mode,
-    Status = session.Status,
-       StartedAt = session.StartedAt,
-        EndedAt = session.EndedAt,
-       DeviceFingerprint = session.DeviceFingerprint,
+            Mode = session.Mode,
+            Status = session.Status,
+            StartedAt = session.StartedAt,
+            EndedAt = session.EndedAt,
+            DeviceFingerprint = session.DeviceFingerprint,
             UserAgent = session.UserAgent,
-       IpAddress = session.IpAddress,
+            IpAddress = session.IpAddress,
             BrowserName = session.BrowserName,
-OperatingSystem = session.OperatingSystem,
-          TotalEvents = session.TotalEvents,
-      TotalViolations = session.TotalViolations,
-      RiskScore = session.RiskScore,
+            OperatingSystem = session.OperatingSystem,
+            TotalEvents = session.TotalEvents,
+            TotalViolations = session.TotalViolations,
+            RiskScore = session.RiskScore,
             LastHeartbeatAt = session.LastHeartbeatAt,
- HeartbeatMissedCount = session.HeartbeatMissedCount,
- Decision = session.Decision != null ? MapToDecisionDto(session.Decision) : null,
-        RecentEvents = session.Events.Select(MapToEventDto).ToList()
+            HeartbeatMissedCount = session.HeartbeatMissedCount,
+            Decision = session.Decision != null ? MapToDecisionDto(session.Decision) : null,
+            RecentEvents = session.Events.Select(MapToEventDto).ToList()
         };
     }
 
     private ProctorSessionListDto MapToSessionListDto(ProctorSession session)
     {
+        // Get latest uploaded image evidence for thumbnail
+        var imageEvidence = session.EvidenceItems?
+            .Where(e => e.IsUploaded && e.Type == EvidenceType.Image)
+            .OrderByDescending(e => e.UploadedAt ?? e.CreatedDate)
+            .ToList();
+        var latest = imageEvidence?.FirstOrDefault();
+        var latestUrl = latest != null && !string.IsNullOrWhiteSpace(latest.FilePath)
+            ? $"/media/{latest.FilePath.TrimStart('/')}"
+            : null;
+
         return new ProctorSessionListDto
         {
-      Id = session.Id,
- AttemptId = session.AttemptId,
-       ExamId = session.ExamId,
- ExamTitleEn = session.Exam?.TitleEn ?? "",
+            Id = session.Id,
+            AttemptId = session.AttemptId,
+            ExamId = session.ExamId,
+            ExamTitleEn = session.Exam?.TitleEn ?? "",
             CandidateId = session.CandidateId,
             CandidateName = session.Candidate?.FullName ?? session.Candidate?.DisplayName ?? "",
- Mode = session.Mode,
-    Status = session.Status,
-       StartedAt = session.StartedAt,
-   TotalViolations = session.TotalViolations,
-       RiskScore = session.RiskScore,
+            Mode = session.Mode,
+            Status = session.Status,
+            StartedAt = session.StartedAt,
+            TotalViolations = session.TotalViolations,
+            RiskScore = session.RiskScore,
             DecisionStatus = session.Decision?.Status,
-         RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending
+            RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending,
+            LatestSnapshotUrl = latestUrl,
+            SnapshotCount = imageEvidence?.Count ?? 0,
+            LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate
         };
     }
 
@@ -1269,29 +1334,29 @@ OperatingSystem = session.OperatingSystem,
         return new ProctorEventDto
         {
             Id = e.Id,
-        ProctorSessionId = e.ProctorSessionId,
-        EventType = e.EventType,
-    Severity = e.Severity,
-     IsViolation = e.IsViolation,
- MetadataJson = e.MetadataJson,
+            ProctorSessionId = e.ProctorSessionId,
+            EventType = e.EventType,
+            Severity = e.Severity,
+            IsViolation = e.IsViolation,
+            MetadataJson = e.MetadataJson,
             OccurredAt = e.OccurredAt,
-    SequenceNumber = e.SequenceNumber
+            SequenceNumber = e.SequenceNumber
         };
     }
 
     private ProctorRiskRuleDto MapToRiskRuleDto(ProctorRiskRule rule)
     {
- return new ProctorRiskRuleDto
+        return new ProctorRiskRuleDto
         {
-  Id = rule.Id,
-      NameEn = rule.NameEn,
-    NameAr = rule.NameAr,
-          DescriptionEn = rule.DescriptionEn,
-          DescriptionAr = rule.DescriptionAr,
+            Id = rule.Id,
+            NameEn = rule.NameEn,
+            NameAr = rule.NameAr,
+            DescriptionEn = rule.DescriptionEn,
+            DescriptionAr = rule.DescriptionAr,
             IsActive = rule.IsActive,
-      EventType = rule.EventType,
+            EventType = rule.EventType,
             ThresholdCount = rule.ThresholdCount,
-  WindowSeconds = rule.WindowSeconds,
+            WindowSeconds = rule.WindowSeconds,
             RiskPoints = rule.RiskPoints,
             MinSeverity = rule.MinSeverity,
             MaxTriggers = rule.MaxTriggers,
@@ -1310,36 +1375,36 @@ OperatingSystem = session.OperatingSystem,
 
         return new ProctorEvidenceDto
         {
-      Id = evidence.Id,
-        ProctorSessionId = evidence.ProctorSessionId,
-       AttemptId = evidence.AttemptId,
+            Id = evidence.Id,
+            ProctorSessionId = evidence.ProctorSessionId,
+            AttemptId = evidence.AttemptId,
             Type = evidence.Type,
-        FileName = evidence.FileName,
+            FileName = evidence.FileName,
             FileSize = evidence.FileSize,
             ContentType = evidence.ContentType,
             StartAt = evidence.StartAt,
-    EndAt = evidence.EndAt,
-        DurationSeconds = evidence.DurationSeconds,
-  IsUploaded = evidence.IsUploaded,
-  UploadedAt = evidence.UploadedAt,
-      PreviewUrl = previewUrl,
-      DownloadUrl = downloadUrl
+            EndAt = evidence.EndAt,
+            DurationSeconds = evidence.DurationSeconds,
+            IsUploaded = evidence.IsUploaded,
+            UploadedAt = evidence.UploadedAt,
+            PreviewUrl = previewUrl,
+            DownloadUrl = downloadUrl
         };
     }
 
     private ProctorDecisionDto MapToDecisionDto(ProctorDecision decision)
     {
-    return new ProctorDecisionDto
+        return new ProctorDecisionDto
         {
-  Id = decision.Id,
-     ProctorSessionId = decision.ProctorSessionId,
-    AttemptId = decision.AttemptId,
- Status = decision.Status,
+            Id = decision.Id,
+            ProctorSessionId = decision.ProctorSessionId,
+            AttemptId = decision.AttemptId,
+            Status = decision.Status,
             DecisionReasonEn = decision.DecisionReasonEn,
             DecisionReasonAr = decision.DecisionReasonAr,
             DecidedBy = decision.DecidedBy,
             DecidedAt = decision.DecidedAt,
-  IsFinalized = decision.IsFinalized,
+            IsFinalized = decision.IsFinalized,
             PreviousStatus = decision.PreviousStatus
         };
     }

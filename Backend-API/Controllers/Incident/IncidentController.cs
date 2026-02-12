@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Incident;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Incident;
+using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Controllers.Incident;
 
@@ -14,25 +15,25 @@ public class IncidentController : ControllerBase
     private readonly IIncidentService _incidentService;
     private readonly ICurrentUserService _currentUserService;
 
- public IncidentController(
- IIncidentService incidentService,
-     ICurrentUserService currentUserService)
+    public IncidentController(
+    IIncidentService incidentService,
+        ICurrentUserService currentUserService)
     {
         _incidentService = incidentService;
         _currentUserService = currentUserService;
-  }
+    }
 
     #region Case Management
 
-/// <summary>
+    /// <summary>
     /// Create a new incident case
     /// </summary>
     [HttpPost("case")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> CreateCase([FromBody] CreateIncidentCaseDto dto)
     {
-var userId = _currentUserService.UserId ?? "system";
-  var result = await _incidentService.CreateCaseAsync(dto, userId);
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _incidentService.CreateCaseAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -40,22 +41,22 @@ var userId = _currentUserService.UserId ?? "system";
     /// Create case automatically from proctor session
     /// </summary>
     [HttpPost("case/from-proctor/{proctorSessionId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> CreateCaseFromProctor(int proctorSessionId)
     {
-     var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.CreateCaseFromProctorAsync(proctorSessionId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
- }
+    }
 
     /// <summary>
-  /// Get incident case by ID
+    /// Get incident case by ID
     /// </summary>
     [HttpGet("case/{caseId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetCase(int caseId)
     {
-   var result = await _incidentService.GetCaseAsync(caseId);
+        var result = await _incidentService.GetCaseAsync(caseId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -63,10 +64,10 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get incident case by attempt ID
     /// </summary>
     [HttpGet("case/by-attempt/{attemptId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetCaseByAttempt(int attemptId)
- {
-     var result = await _incidentService.GetCaseByAttemptAsync(attemptId);
+    {
+        var result = await _incidentService.GetCaseByAttemptAsync(attemptId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -74,49 +75,49 @@ var userId = _currentUserService.UserId ?? "system";
     /// Update incident case
     /// </summary>
     [HttpPut("case")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> UpdateCase([FromBody] UpdateIncidentCaseDto dto)
     {
-   var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.UpdateCaseAsync(dto, userId);
-  return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
-  /// Get all incident cases with filtering
+    /// Get all incident cases with filtering
     /// </summary>
     [HttpGet("cases")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetCases([FromQuery] IncidentCaseSearchDto searchDto)
     {
- var result = await _incidentService.GetCasesAsync(searchDto);
-     return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _incidentService.GetCasesAsync(searchDto);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Get incident cases for an exam
     /// </summary>
     [HttpGet("cases/exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetExamCases(int examId, [FromQuery] IncidentCaseSearchDto searchDto)
     {
         var result = await _incidentService.GetExamCasesAsync(examId, searchDto);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-/// <summary>
+    /// <summary>
     /// Get cases assigned to current reviewer
     /// </summary>
     [HttpGet("cases/my-assigned")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetMyAssignedCases([FromQuery] IncidentCaseSearchDto searchDto)
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId))
         {
-  return Unauthorized();
+            return Unauthorized();
         }
-  var result = await _incidentService.GetAssignedCasesAsync(userId, searchDto);
+        var result = await _incidentService.GetAssignedCasesAsync(userId, searchDto);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -124,12 +125,12 @@ var userId = _currentUserService.UserId ?? "system";
 
     #region Assignment & Status
 
-  /// <summary>
+    /// <summary>
     /// Assign case to a reviewer
     /// </summary>
     [HttpPost("case/assign")]
-    [Authorize(Roles = "Admin")]
- public async Task<IActionResult> AssignCase([FromBody] AssignCaseDto dto)
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    public async Task<IActionResult> AssignCase([FromBody] AssignCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.AssignCaseAsync(dto, userId);
@@ -139,36 +140,36 @@ var userId = _currentUserService.UserId ?? "system";
     /// <summary>
     /// Reassign case to a different reviewer
     /// </summary>
- [HttpPost("case/reassign")]
-    [Authorize(Roles = "Admin")]
+    [HttpPost("case/reassign")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> ReassignCase([FromBody] AssignCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.ReassignCaseAsync(dto, userId);
-    return result.Success ? Ok(result) : BadRequest(result);
-}
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     /// <summary>
     /// Change case status
     /// </summary>
     [HttpPost("case/status")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> ChangeStatus([FromBody] ChangeStatusDto dto)
     {
-   var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.ChangeStatusAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Close a resolved case
     /// </summary>
     [HttpPost("case/{caseId}/close")]
- [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> CloseCase(int caseId)
     {
         var userId = _currentUserService.UserId ?? "system";
-      var result = await _incidentService.CloseCaseAsync(caseId, userId);
+        var result = await _incidentService.CloseCaseAsync(caseId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -176,12 +177,12 @@ var userId = _currentUserService.UserId ?? "system";
     /// Reopen a case
     /// </summary>
     [HttpPost("case/{caseId}/reopen")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> ReopenCase(int caseId, [FromQuery] string reason)
     {
-     var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.ReopenCaseAsync(caseId, reason, userId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -192,19 +193,19 @@ var userId = _currentUserService.UserId ?? "system";
     /// Link evidence to a case
     /// </summary>
     [HttpPost("evidence/link")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> LinkEvidence([FromBody] LinkEvidenceDto dto)
     {
- var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.LinkEvidenceAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get evidence for a case
     /// </summary>
     [HttpGet("case/{caseId}/evidence")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetCaseEvidence(int caseId)
     {
         var result = await _incidentService.GetCaseEvidenceAsync(caseId);
@@ -213,14 +214,14 @@ var userId = _currentUserService.UserId ?? "system";
 
     /// <summary>
     /// Remove evidence link
- /// </summary>
+    /// </summary>
     [HttpDelete("evidence/{linkId}")]
-  [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> RemoveEvidenceLink(int linkId)
-  {
-      var userId = _currentUserService.UserId ?? "system";
+    {
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.RemoveEvidenceLinkAsync(linkId, userId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -231,19 +232,19 @@ var userId = _currentUserService.UserId ?? "system";
     /// Record a decision on a case
     /// </summary>
     [HttpPost("decision")]
-  [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> RecordDecision([FromBody] RecordDecisionDto dto)
     {
-   var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.RecordDecisionAsync(dto, userId);
-  return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
-/// <summary>
+    /// <summary>
     /// Get decision history for a case
     /// </summary>
     [HttpGet("case/{caseId}/decisions")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetDecisionHistory(int caseId)
     {
         var result = await _incidentService.GetDecisionHistoryAsync(caseId);
@@ -254,7 +255,7 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get the latest decision for a case
     /// </summary>
     [HttpGet("case/{caseId}/decision/latest")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetLatestDecision(int caseId)
     {
         var result = await _incidentService.GetLatestDecisionAsync(caseId);
@@ -266,26 +267,26 @@ var userId = _currentUserService.UserId ?? "system";
     #region Comments
 
     /// <summary>
-/// Add a comment to a case
+    /// Add a comment to a case
     /// </summary>
     [HttpPost("comment")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> AddComment([FromBody] AddCommentDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.AddCommentAsync(dto, userId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Edit a comment
     /// </summary>
     [HttpPut("comment")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
-  public async Task<IActionResult> EditComment([FromBody] EditCommentDto dto)
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
+    public async Task<IActionResult> EditComment([FromBody] EditCommentDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
- var result = await _incidentService.EditCommentAsync(dto, userId);
+        var result = await _incidentService.EditCommentAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -293,10 +294,10 @@ var userId = _currentUserService.UserId ?? "system";
     /// Delete a comment
     /// </summary>
     [HttpDelete("comment/{commentId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> DeleteComment(int commentId)
     {
-    var userId = _currentUserService.UserId ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var result = await _incidentService.DeleteCommentAsync(commentId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -305,7 +306,7 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get comments for a case
     /// </summary>
     [HttpGet("case/{caseId}/comments")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetComments(int caseId)
     {
         var result = await _incidentService.GetCommentsAsync(caseId, true);
@@ -320,7 +321,7 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get timeline for a case
     /// </summary>
     [HttpGet("case/{caseId}/timeline")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetTimeline(int caseId)
     {
         var result = await _incidentService.GetTimelineAsync(caseId);
@@ -337,11 +338,11 @@ var userId = _currentUserService.UserId ?? "system";
     [HttpPost("appeal")]
     public async Task<IActionResult> SubmitAppeal([FromBody] SubmitAppealDto dto)
     {
-    var candidateId = _currentUserService.UserId;
- if (string.IsNullOrEmpty(candidateId))
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
         {
-   return Unauthorized();
-    }
+            return Unauthorized();
+        }
         var result = await _incidentService.SubmitAppealAsync(dto, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -350,7 +351,7 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get appeal by ID
     /// </summary>
     [HttpGet("appeal/{appealId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetAppeal(int appealId)
     {
         var result = await _incidentService.GetAppealAsync(appealId);
@@ -361,33 +362,33 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get appeals for a case
     /// </summary>
     [HttpGet("case/{caseId}/appeals")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetCaseAppeals(int caseId)
     {
-      var result = await _incidentService.GetCaseAppealsAsync(caseId);
-      return result.Success ? Ok(result) : BadRequest(result);
- }
+        var result = await _incidentService.GetCaseAppealsAsync(caseId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     /// <summary>
     /// Get all appeals with filtering
     /// </summary>
     [HttpGet("appeals")]
-  [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetAppeals([FromQuery] AppealSearchDto searchDto)
     {
         var result = await _incidentService.GetAppealsAsync(searchDto);
- return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
-  /// Review an appeal (admin/reviewer)
+    /// Review an appeal (admin/reviewer)
     /// </summary>
     [HttpPost("appeal/review")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> ReviewAppeal([FromBody] ReviewAppealDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-  var result = await _incidentService.ReviewAppealAsync(dto, userId);
+        var result = await _incidentService.ReviewAppealAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -398,9 +399,9 @@ var userId = _currentUserService.UserId ?? "system";
     public async Task<IActionResult> CanSubmitAppeal(int caseId)
     {
         var candidateId = _currentUserService.UserId;
-      if (string.IsNullOrEmpty(candidateId))
+        if (string.IsNullOrEmpty(candidateId))
         {
-   return Unauthorized();
+            return Unauthorized();
         }
         var result = await _incidentService.CanSubmitAppealAsync(caseId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -414,30 +415,30 @@ var userId = _currentUserService.UserId ?? "system";
     /// Get candidate's incident status for an attempt
     /// </summary>
     [HttpGet("my-incident/attempt/{attemptId}")]
-public async Task<IActionResult> GetMyIncidentStatus(int attemptId)
+    public async Task<IActionResult> GetMyIncidentStatus(int attemptId)
     {
         var candidateId = _currentUserService.UserId;
-      if (string.IsNullOrEmpty(candidateId))
+        if (string.IsNullOrEmpty(candidateId))
         {
-     return Unauthorized();
+            return Unauthorized();
         }
-var result = await _incidentService.GetCandidateIncidentStatusAsync(attemptId, candidateId);
+        var result = await _incidentService.GetCandidateIncidentStatusAsync(attemptId, candidateId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
-/// <summary>
+    /// <summary>
     /// Get all incidents for current candidate
     /// </summary>
     [HttpGet("my-incidents")]
     public async Task<IActionResult> GetMyIncidents()
     {
- var candidateId = _currentUserService.UserId;
+        var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
             return Unauthorized();
         }
-      var result = await _incidentService.GetCandidateIncidentsAsync(candidateId);
-return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _incidentService.GetCandidateIncidentsAsync(candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -446,26 +447,26 @@ return result.Success ? Ok(result) : BadRequest(result);
     [HttpGet("case/{caseId}/my-appeal")]
     public async Task<IActionResult> GetMyAppeal(int caseId)
     {
-   var candidateId = _currentUserService.UserId;
-if (string.IsNullOrEmpty(candidateId))
-      {
-  return Unauthorized();
-     }
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+        {
+            return Unauthorized();
+        }
         var result = await _incidentService.GetCandidateAppealAsync(caseId, candidateId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
     #endregion
 
- #region Dashboard
+    #region Dashboard
 
     /// <summary>
     /// Get incident dashboard for an exam
     /// </summary>
     [HttpGet("dashboard/exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor,ProctorReviewer")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
     public async Task<IActionResult> GetDashboard(int examId)
- {
+    {
         var result = await _incidentService.GetDashboardAsync(examId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -474,11 +475,11 @@ if (string.IsNullOrEmpty(candidateId))
     /// Get global incident dashboard
     /// </summary>
     [HttpGet("dashboard")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> GetGlobalDashboard()
     {
-      var result = await _incidentService.GetGlobalDashboardAsync();
-   return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _incidentService.GetGlobalDashboardAsync();
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion

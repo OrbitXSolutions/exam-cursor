@@ -42,6 +42,7 @@ import {
   Activity,
   RefreshCw,
   Monitor,
+  Camera,
 } from "lucide-react"
 
 export default function ProctorCenterPage() {
@@ -237,18 +238,36 @@ export default function ProctorCenterPage() {
                 session.flagged ? "border-amber-500/50 bg-amber-500/5" : ""
               }`}
             >
-              {/* Video Preview Placeholder */}
+              {/* Snapshot Preview / Placeholder */}
               <div className="relative aspect-video bg-muted">
-                <img
-                  src={`/webcam-feed-.jpg?height=180&width=320&query=webcam feed ${session.candidateName}`}
-                  alt={session.candidateName}
-                  className="w-full h-full object-cover"
-                />
+                {session.latestSnapshotUrl && !session.isSample ? (
+                  <img
+                    src={session.latestSnapshotUrl}
+                    alt={session.candidateName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted-foreground/10 text-muted-foreground text-xl font-semibold">
+                      {session.candidateName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </div>
+                  </div>
+                )}
                 <div className="absolute top-2 start-2 flex items-center gap-2">
                   <Badge variant={session.status === "Active" ? "default" : "secondary"} className="gap-1">
                     <span className="h-2 w-2 rounded-full bg-current animate-pulse" />
                     {t("proctor.live")}
                   </Badge>
+                  {session.isSample && (
+                    <Badge variant="outline" className="bg-blue-500/20 border-blue-500/50 text-blue-600">
+                      Sample
+                    </Badge>
+                  )}
                   {session.flagged && (
                     <Badge variant="outline" className="bg-amber-500/20 border-amber-500/50 text-amber-600">
                       <Flag className="h-3 w-3 me-1" />
@@ -264,6 +283,12 @@ export default function ProctorCenterPage() {
                     </Badge>
                   </div>
                 )}
+                {!session.isSample && (session.snapshotCount ?? 0) > 0 && (
+                  <div className="absolute bottom-2 start-2 flex items-center gap-1 px-2 py-1 rounded bg-black/70 text-white text-xs">
+                    <Camera className="h-3 w-3" />
+                    {session.snapshotCount}
+                  </div>
+                )}
                 <div className="absolute bottom-2 end-2 flex items-center gap-1 px-2 py-1 rounded bg-black/70 text-white text-xs">
                   <Clock className="h-3 w-3" />
                   {formatTime(session.timeRemaining)}
@@ -276,45 +301,49 @@ export default function ProctorCenterPage() {
                     <p className="font-medium truncate">{session.candidateName}</p>
                     <p className="text-sm text-muted-foreground truncate">{session.examTitle}</p>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align={dir === "rtl" ? "start" : "end"}>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/proctor-center/${session.id}`}>
-                          <Eye className="h-4 w-4 me-2" />
-                          {t("proctor.viewDetails")}
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleToggleFlag(session)}>
-                        <Flag className="h-4 w-4 me-2" />
-                        {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedSession(session)
-                          setWarningDialogOpen(true)
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 me-2" />
-                        {t("proctor.sendWarning")}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => {
-                          setSelectedSession(session)
-                          setTerminateDialogOpen(true)
-                        }}
-                      >
-                        <XCircle className="h-4 w-4 me-2" />
-                        {t("proctor.terminateSession")}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {session.isSample ? (
+                    <Badge variant="outline" className="text-xs shrink-0">Sample</Badge>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align={dir === "rtl" ? "start" : "end"}>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/proctor-center/${session.id}`}>
+                            <Eye className="h-4 w-4 me-2" />
+                            {t("proctor.viewDetails")}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleToggleFlag(session)}>
+                          <Flag className="h-4 w-4 me-2" />
+                          {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedSession(session)
+                            setWarningDialogOpen(true)
+                          }}
+                        >
+                          <MessageSquare className="h-4 w-4 me-2" />
+                          {t("proctor.sendWarning")}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => {
+                            setSelectedSession(session)
+                            setTerminateDialogOpen(true)
+                          }}
+                        >
+                          <XCircle className="h-4 w-4 me-2" />
+                          {t("proctor.terminateSession")}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
                   <Activity className="h-3 w-3" />

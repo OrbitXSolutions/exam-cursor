@@ -816,3 +816,8 @@ Rules:
 - Working on the task only.
 - Follow existing project architecture and naming conventions.
 - After finish the task give me summary Output.
+
+TASK A Summary — ProctorSession Lifecycle Fix + Sample Sessions Fallback
+What was done
+
+# Change File Lines

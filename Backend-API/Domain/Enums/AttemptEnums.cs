@@ -119,5 +119,15 @@ public enum AttemptEventType : byte
     /// <summary>
     /// Extra time was added by admin
     /// </summary>
-    TimeAdded = 15
+    TimeAdded = 15,
+
+    /// <summary>
+    /// Webcam permission was denied by the candidate
+    /// </summary>
+    WebcamDenied = 16,
+
+    /// <summary>
+    /// Proctor snapshot upload failed
+    /// </summary>
+    SnapshotFailed = 17
 }
