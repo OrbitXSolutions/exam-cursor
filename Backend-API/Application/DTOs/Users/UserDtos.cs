@@ -13,6 +13,9 @@ public class UserDto
     public bool EmailConfirmed { get; set; }
     public List<string> Roles { get; set; } = new();
     public DateTime CreatedDate { get; set; }
+    public int? DepartmentId { get; set; }
+    public string? DepartmentNameEn { get; set; }
+    public string? DepartmentNameAr { get; set; }
 }
 
 public class UserDetailDto : UserDto
@@ -29,6 +32,8 @@ public class UpdateUserDto
     public string? DisplayName { get; set; }
     public string? FullName { get; set; }
     public string? PhoneNumber { get; set; }
+    public int? DepartmentId { get; set; }
+    public bool ClearDepartment { get; set; } = false;
 }
 
 public class UserFilterDto
@@ -37,6 +42,7 @@ public class UserFilterDto
     public string? Role { get; set; }
     public UserStatus? Status { get; set; }
     public bool? IsBlocked { get; set; }
+    public int? DepartmentId { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

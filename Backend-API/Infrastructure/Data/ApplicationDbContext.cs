@@ -88,6 +88,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     // Settings (global + brand)
     public DbSet<SystemSettings> SystemSettings { get; set; } = null!;
 
+    // Organization branding
+    public DbSet<OrganizationSettings> OrganizationSettings { get; set; } = null!;
+
     // Batch
     public DbSet<Batch> Batches { get; set; } = null!;
     public DbSet<BatchCandidate> BatchCandidates { get; set; } = null!;

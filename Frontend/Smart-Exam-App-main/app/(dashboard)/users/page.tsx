@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import type { User } from "@/lib/types"
-import { getUsers, getUserById, updateUser, deleteUser } from "@/lib/api/admin"
+import { getUsers, getUserById, updateUser, deleteUser, getDepartmentsList } from "@/lib/api/admin"
+import type { DepartmentListItem } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -53,12 +54,18 @@ export default function UsersPage() {
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  const [departments, setDepartments] = useState<DepartmentListItem[]>([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
   useEffect(() => {
     loadUsers()
-  }, [roleFilter, statusFilter])
+  }, [roleFilter, statusFilter, departmentFilter])
+
+  useEffect(() => {
+    getDepartmentsList().then(setDepartments).catch(() => setDepartments([]))
+  }, [])
 
   async function loadUsers() {
     setLoading(true)
@@ -67,6 +74,7 @@ export default function UsersPage() {
         search: search || undefined,
         role: roleFilter === "all" ? undefined : roleFilter,
         isActive: statusFilter === "all" ? undefined : statusFilter === "active",
+        departmentId: departmentFilter === "all" ? undefined : Number(departmentFilter),
         page: 1,
         pageSize: 100,
       })
@@ -244,6 +252,19 @@ export default function UsersPage() {
                 <SelectItem value="inactive">{language === "ar" ? "غير نشط" : "Inactive"}</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder={language === "ar" ? "القسم" : "Department"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{language === "ar" ? "جميع الأقسام" : "All Departments"}</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={String(dept.id)}>
+                    {language === "ar" ? dept.nameAr : dept.nameEn}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="rounded-md border">
@@ -253,6 +274,7 @@ export default function UsersPage() {
                   <TableHead>{language === "ar" ? "المستخدم" : "User"}</TableHead>
                   <TableHead>{language === "ar" ? "البريد الإلكتروني" : "Email"}</TableHead>
                   <TableHead>{language === "ar" ? "الدور" : "Role"}</TableHead>
+                  <TableHead>{language === "ar" ? "القسم" : "Department"}</TableHead>
                   <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                   <TableHead>{language === "ar" ? "تاريخ الإنشاء" : "Created"}</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
@@ -261,7 +283,7 @@ export default function UsersPage() {
               <TableBody>
                 {filteredUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       {language === "ar" ? "لا يوجد مستخدمون" : "No users found"}
                     </TableCell>
                   </TableRow>
@@ -279,6 +301,11 @@ export default function UsersPage() {
                       <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell>
                         <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {language === "ar"
+                          ? (user.departmentNameAr || "—")
+                          : (user.departmentNameEn || "—")}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={user.isActive ? "Active" : "Inactive"} />

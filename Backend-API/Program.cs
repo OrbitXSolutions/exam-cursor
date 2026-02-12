@@ -296,6 +296,20 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/media"
 });
 
+// Serve organization images from wwwroot/Organization/
+var orgImagePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "Organization");
+if (!Directory.Exists(orgImagePath))
+{
+    Directory.CreateDirectory(orgImagePath);
+    Log.Information("Created Organization image directory at {Path}", orgImagePath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(orgImagePath),
+    RequestPath = "/organization"
+});
+
 // Rate Limiting
 app.UseRateLimiter();
 

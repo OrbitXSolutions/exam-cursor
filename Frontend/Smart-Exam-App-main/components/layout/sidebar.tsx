@@ -47,6 +47,7 @@ import {
   TimerOff,
   PlayCircle,
   ClipboardCheck,
+  Building2,
 } from "lucide-react"
 
 interface NavItem {
@@ -161,6 +162,7 @@ const administrationNavGroup: NavGroup = {
   roles: [UserRole.Admin, UserRole.SuperAdmin],
   children: [
     { icon: Users, labelKey: "nav.users", href: "/users" },
+    { icon: Building2, labelKey: "nav.organization", href: "/organization" },
     { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Settings, labelKey: "nav.settings", href: "/settings" },
   ],

@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { createUser } from "@/lib/api/admin"
+import { createUser, getDepartmentsList } from "@/lib/api/admin"
+import type { DepartmentListItem } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,6 +19,7 @@ export default function CreateUserPage() {
   const { language } = useI18n()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [departments, setDepartments] = useState<DepartmentListItem[]>([])
   const [formData, setFormData] = useState({
     email: "",
     fullNameEn: "",
@@ -25,7 +27,12 @@ export default function CreateUserPage() {
     role: "",
     password: "",
     confirmPassword: "",
+    departmentId: "",
   })
+
+  useEffect(() => {
+    getDepartmentsList().then(setDepartments).catch(() => setDepartments([]))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -50,6 +57,7 @@ export default function CreateUserPage() {
         fullNameAr: formData.fullNameAr,
         role: formData.role,
         password: formData.password,
+        departmentId: formData.departmentId ? Number(formData.departmentId) : null,
       })
       toast.success(language === "ar" ? "تم إنشاء المستخدم بنجاح" : "User created successfully")
       router.push("/users")
@@ -131,6 +139,25 @@ export default function CreateUserPage() {
                     <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
                     <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
                     <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="departmentId">{language === "ar" ? "القسم (اختياري)" : "Department (Optional)"}</Label>
+                <Select value={formData.departmentId} onValueChange={(value) => setFormData({ ...formData, departmentId: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={language === "ar" ? "اختر القسم" : "Select department"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{language === "ar" ? "بدون قسم" : "No Department"}</SelectItem>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.id} value={String(dept.id)}>
+                        {language === "ar" ? dept.nameAr : dept.nameEn}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

@@ -166,6 +166,9 @@ export interface User {
   isActive: boolean;
   createdDate: string;
   avatarUrl?: string;
+  departmentId?: number | null;
+  departmentNameEn?: string;
+  departmentNameAr?: string;
 }
 
 export interface AuthResponse {

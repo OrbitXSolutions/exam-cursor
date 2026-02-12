@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Smart_Core.Infrastructure.Data;
 namespace Smart_Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212113120_AddOrganizationSettings")]
+    partial class AddOrganizationSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3352,9 +3355,6 @@ namespace Smart_Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OfficeNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PrimaryColor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SupportEmail")
