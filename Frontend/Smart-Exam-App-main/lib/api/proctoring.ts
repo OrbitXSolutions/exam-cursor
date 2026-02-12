@@ -1,5 +1,11 @@
 import { apiClient } from "@/lib/api-client";
 import type { LiveSession, Incident } from "@/lib/types/proctoring";
+import type {
+  IdentityVerificationListItem,
+  IdentityVerificationDetail,
+  IdentityBulkActionResult,
+  PagedResult,
+} from "@/lib/types";
 
 // Backend IncidentCaseListDto (camelCase from API)
 interface IncidentCaseListDto {
@@ -324,4 +330,108 @@ export async function uploadProctorSnapshot(
     }
   }
   return { success: false, error: lastError };
+}
+
+// ============ IDENTITY VERIFICATION API ============
+
+/**
+ * Fetch paginated identity verifications with filters.
+ * GET /proctor/authentication/verifications
+ */
+export async function getIdentityVerifications(params?: {
+  status?: number;
+  examId?: number;
+  riskLevel?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  assignedProctorId?: string;
+  search?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}): Promise<PagedResult<IdentityVerificationListItem>> {
+  const query = new URLSearchParams();
+  query.set("PageNumber", String(params?.pageNumber ?? 1));
+  query.set("PageSize", String(params?.pageSize ?? 20));
+  if (params?.status !== undefined && params.status !== -1)
+    query.set("Status", String(params.status));
+  if (params?.examId) query.set("ExamId", String(params.examId));
+  if (params?.riskLevel && params.riskLevel !== "all")
+    query.set("RiskLevel", params.riskLevel);
+  if (params?.dateFrom) query.set("DateFrom", params.dateFrom);
+  if (params?.dateTo) query.set("DateTo", params.dateTo);
+  if (params?.assignedProctorId)
+    query.set("AssignedProctorId", params.assignedProctorId);
+  if (params?.search) query.set("Search", params.search);
+
+  try {
+    const raw = await apiClient.get<PagedResult<IdentityVerificationListItem>>(
+      `/proctor/authentication/verifications?${query}`,
+    );
+    return (
+      raw ?? {
+        items: [],
+        totalCount: 0,
+        pageNumber: 1,
+        pageSize: 20,
+        totalPages: 0,
+      }
+    );
+  } catch (err) {
+    console.warn("[Proctor] getIdentityVerifications failed:", err);
+    return {
+      items: [],
+      totalCount: 0,
+      pageNumber: 1,
+      pageSize: 20,
+      totalPages: 0,
+    };
+  }
+}
+
+/**
+ * Fetch full detail for a single identity verification.
+ * GET /proctor/authentication/verifications/{id}
+ */
+export async function getIdentityVerificationDetail(
+  id: number,
+): Promise<IdentityVerificationDetail | null> {
+  try {
+    return await apiClient.get<IdentityVerificationDetail>(
+      `/proctor/authentication/verifications/${id}`,
+    );
+  } catch (err) {
+    console.warn("[Proctor] getIdentityVerificationDetail failed:", err);
+    return null;
+  }
+}
+
+/**
+ * Apply a single action (Approve / Reject / Flag) on one verification.
+ * POST /proctor/authentication/verifications/{id}/action
+ */
+export async function applyVerificationAction(
+  id: number,
+  action: string,
+  reason?: string,
+): Promise<void> {
+  await apiClient.post(`/proctor/authentication/verifications/${id}/action`, {
+    id,
+    action,
+    reason: reason ?? undefined,
+  });
+}
+
+/**
+ * Apply a bulk action on multiple verifications.
+ * POST /proctor/authentication/bulk-action
+ */
+export async function applyBulkVerificationAction(
+  ids: number[],
+  action: string,
+  reason?: string,
+): Promise<IdentityBulkActionResult> {
+  return await apiClient.post<IdentityBulkActionResult>(
+    `/proctor/authentication/bulk-action`,
+    { ids, action, reason: reason ?? undefined },
+  );
 }

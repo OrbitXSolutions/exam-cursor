@@ -97,13 +97,6 @@ export default function ExamPage() {
   const webcamStreamRef = useRef<MediaStream | null>(null) // Persistent webcam stream
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null) // Video element for webcam
 
-  // Proctoring state
-  const [webcamStatus, setWebcamStatus] = useState<"pending" | "active" | "denied" | "error">("pending")
-  const [webcamError, setWebcamError] = useState<string | null>(null)
-  const [lastSnapshotTime, setLastSnapshotTime] = useState<string | null>(null)
-  const [lastSnapshotOk, setLastSnapshotOk] = useState<boolean | null>(null)
-  const [snapshotFailStreak, setSnapshotFailStreak] = useState(0)
-
   // Computed values
   const sections = session?.sections || []
   const hasSections = sections.length > 0

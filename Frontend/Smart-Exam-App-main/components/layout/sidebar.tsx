@@ -34,7 +34,6 @@ import {
   CheckCircle2,
   Monitor,
   UserCheck,
-  Layers,
   Hash,
   Library,
   PlusSquare,
@@ -136,7 +135,6 @@ const proctorNavGroup: NavGroup = {
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
     { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign" },
-    { icon: Layers, labelKey: "nav.bulkAuthApproval", href: "/proctor/bulk-auth" },
     { icon: Users, labelKey: "nav.userIdentification", href: "/proctor/user-identification" },
   ],
 }

@@ -133,6 +133,7 @@ export enum VerificationStatus {
   Pending = "Pending",
   Approved = "Approved",
   Rejected = "Rejected",
+  Flagged = "Flagged",
 }
 
 export enum ExamType {
@@ -697,4 +698,69 @@ export interface IdentityVerification {
   reviewedAt: string | null;
   rejectionReason: string | null;
   createdDate: string;
+}
+
+// --- Identity Verification List DTO (from backend) ---
+export interface IdentityVerificationListItem {
+  id: number;
+  proctorSessionId: number;
+  attemptId: number;
+  examId: number;
+  examTitleEn: string;
+  candidateId: string;
+  candidateName: string;
+  idDocumentUploaded: boolean;
+  faceMatchScore: number | null;
+  livenessResult: number;
+  livenessResultName: string;
+  riskScore: number | null;
+  status: number;
+  statusName: string;
+  assignedProctorId: string | null;
+  assignedProctorName: string | null;
+  submittedAt: string;
+}
+
+// --- Identity Verification Detail DTO (from backend) ---
+export interface IdentityVerificationDetail {
+  id: number;
+  proctorSessionId: number;
+  attemptId: number;
+  examId: number;
+  examTitleEn: string;
+  candidateId: string;
+  candidateName: string;
+  idDocumentUploaded: boolean;
+  idDocumentUrl: string | null;
+  idDocumentType: string | null;
+  selfieUrl: string | null;
+  faceMatchScore: number | null;
+  livenessResult: number;
+  livenessResultName: string;
+  riskScore: number | null;
+  status: number;
+  statusName: string;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  reviewNotes: string | null;
+  assignedProctorId: string | null;
+  assignedProctorName: string | null;
+  deviceInfo: string | null;
+  ipAddress: string | null;
+  submittedAt: string;
+  auditLogs: IdentityAuditLog[];
+}
+
+export interface IdentityAuditLog {
+  timestamp: string;
+  action: string;
+  performedBy: string | null;
+  details: string | null;
+}
+
+export interface IdentityBulkActionResult {
+  totalRequested: number;
+  succeeded: number;
+  failed: number;
+  errors: string[];
 }

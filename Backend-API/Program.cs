@@ -201,6 +201,7 @@ builder.Services.AddScoped<IGradingService, GradingService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IProctorService, ProctorService>();
+builder.Services.AddScoped<IIdentityVerificationService, IdentityVerificationService>();
 builder.Services.AddScoped<IIncidentService, IncidentService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();

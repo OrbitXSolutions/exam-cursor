@@ -71,6 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<ProctorRiskSnapshot> ProctorRiskSnapshots { get; set; } = null!;
     public DbSet<ProctorEvidence> ProctorEvidence { get; set; } = null!;
     public DbSet<ProctorDecision> ProctorDecisions { get; set; } = null!;
+    public DbSet<IdentityVerification> IdentityVerifications { get; set; } = null!;
 
     // Incident
     public DbSet<IncidentCase> IncidentCases { get; set; } = null!;
