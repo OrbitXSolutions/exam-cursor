@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Entities.Lookups;
 using Smart_Core.Domain.Entities.QuestionBank;
 using Smart_Core.Domain.Entities.Batch;
+using Smart_Core.Domain.Entities.ExamAssignment;
 
 namespace Smart_Core.Infrastructure.Data;
 
@@ -90,6 +91,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     // Batch
     public DbSet<Batch> Batches { get; set; } = null!;
     public DbSet<BatchCandidate> BatchCandidates { get; set; } = null!;
+
+    // ExamAssignment
+    public DbSet<ExamAssignment> ExamAssignments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

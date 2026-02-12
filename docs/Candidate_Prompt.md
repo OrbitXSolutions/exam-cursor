@@ -181,6 +181,8 @@ Frontend /candidates/batch: 200
 Frontend /candidates/batch/1: 200
 Bilingual: EN/AR throughout
 
+## Asign
+
 You are a senior full-stack engineer working on Smart Exam system.
 
 Implement a complete "Batch Management" module inside Admin → Candidates → Batch.
@@ -460,100 +462,350 @@ GET /api/batches/{id}/export
 
 ## Asign to Exam
 
+Summary Output
+
+1. What Was Implemented
+   Assign to Exam (Single + Batch + Filtered) — full-stack feature allowing admins/instructors to assign candidates to published exams with three modes:
+
+Manual selection — pick individual candidates via checkboxes
+Batch mode — assign all candidates in a specific batch
+Filter-all mode — assign all candidates matching current search/status filters
+Unified candidate endpoint returns ExamAssigned and ExamStarted flags computed server-side in a single query.
+
+2. API Endpoints Created
+   Method Route Description
+   GET /api/Assignments/candidates Enriched candidate list with ExamAssigned/ExamStarted flags
+   POST /api/Assignments/assign Assign exam (single/batch/filtered) with schedule
+   POST /api/Assignments/unassign Unassign exam from selected candidates
+   All endpoints require SuperDev, Admin, or Instructor role.
+
+3. Database Changes
+   New table: ExamAssignments (Id, ExamId, CandidateId, ScheduleFrom, ScheduleTo, IsActive, AssignedAt, AssignedBy + BaseEntity audit columns)
+   Unique filtered index on (ExamId, CandidateId) where IsActive=1 AND IsDeleted=0
+   Migration: AddExamAssignments — created and applied
+4. Files Created / Modified
+   Backend (7 new, 2 modified):
+
+ExamAssignment.cs — entity
+ExamAssignmentConfiguration.cs — EF config
+ExamAssignmentDtos.cs — 6 DTOs
+IExamAssignmentService.cs — interface
+ExamAssignmentService.cs — service (~270 lines)
+AssignmentsController.cs — controller
+ApplicationDbContext.cs — added DbSet
+Program.cs — DI registration
+Frontend (1 new, 1 modified):
+
+exam-assignment.ts — API service + types
+page.tsx/candidates/assign-to-exam/page.tsx) — replaced placeholder with full UI 5. Manual Test Steps
+Login as Admin → Navigate to Candidates → Assign to Exam
+Select a published exam from the dropdown
+Set valid Schedule From/To (To > From)
+Candidate table loads with Assigned/Started badges
+Select candidates via checkboxes → Click Assign → Confirm → See result summary
+Verify assigned candidates show "Yes" badge on reload
+Select assigned candidates → Click Unassign → Verify badge reverts
+Use Assign All Matching to bulk-assign by batch or filter
+Verify blocked candidates and already-started exams are skipped (shown in result details)
+
+===============================
+
 You are my partner and senior software engineer.
 
-We have a business demo as production ready in 24 hours.
-The goal is to successfully demonstrate the system to business users and PMO — not to perfect the full backend.
+We are implementing a production-ready feature inside Smart Exam.
 
-Time is extremely limited.
-We will work smart, professional, and production ready-focused.
+This feature must be scalable, clean, maintainable, and enterprise-grade.
+It must follow solid backend architecture and clean frontend structure.
 
 We still Working on Candidate Module:
 
 ---
 
-TASK: [Write the exact task title here – e.g. Assign to Exam]
+TASK: Implement "Candidate Exam Control" page (End Exam + Resume Exam + Add Time) as a unified operational control center for active exam attempts.
 
 ---
 
 # Business Objective
 
-Implement this feature in a demo-ready, production-looking way.
-Focus on clean behavior, correct logic, and smooth UX.
-Avoid over-engineering.
-Do not redesign system architecture.
+Provide administrators with centralized control over active and paused exam attempts.
+
+This page must allow:
+
+1. Force End Exam (Force Submit)
+2. Resume Exam
+3. Add Extra Time
+4. Monitor attempt state in real time (status + remaining time)
+
+This feature operates on Exam Attempts (NOT Assignments).
 
 ---
 
-# Technical Constraints (VERY IMPORTANT)
+# Core Concept
 
-1. Follow existing project architecture and naming conventions.
-2. Do NOT modify global styles or colors unless I confirm.
-3. If new table is required:
-   - Inherit from BaseEntity.
-   - UpdatedAt / UpdatedBy already handled.
-4. Do NOT split simple data retrieval into multiple API calls.
-   - The main table must be returned from ONE endpoint.
-   - All relations, computed flags, joins and merging must be handled in backend.
-   - Frontend must receive ready-to-use DTO.
-5. No logic duplication in frontend.
-6. No unnecessary APIs.
+Assignment = permission to start exam.
+Attempt = actual running session.
+
+This page controls Attempt lifecycle.
+
+---
+
+# Database Expectations
+
+Use existing ExamAttempt entity if available.
+If enhancements are needed, extend safely using BaseEntity.
+
+ExamAttempt (assumed fields):
+
+- Id
+- ExamId
+- CandidateId
+- Status (NotStarted / InProgress / Paused / Submitted / ForceSubmitted / Expired)
+- StartedAt
+- SubmittedAt
+- RemainingSeconds
+- TotalDurationSeconds
+- LastActivityAt
+- IsLocked (optional)
+- DeviceInfo (optional)
+- IPAddress (optional)
+
+Add if missing:
+
+- ForceSubmittedBy
+- ForceSubmittedAt
+- ExtraTimeSeconds (accumulated)
+- ResumeCount (optional)
+- AuditNotes (optional)
+
+All new entities inherit from BaseEntity.
+
+---
+
+# Page Scope
+
+This page lists ONLY attempts that are:
+
+- InProgress
+- Paused
+- Disconnected (if exists)
+- Locked (if exists)
+
+Completed attempts should not appear here (unless filter changed).
 
 ---
 
 # Backend Requirements
 
-- Use clean service layer logic.
-- Handle relations in backend.
-- Return a single enriched response model.
-- Enforce business rules server-side.
-- Keep performance in mind (demo scale is enough).
-- Keep it simple and safe.
+IMPORTANT:
+Return enriched DTO from ONE main endpoint.
+Frontend must not call separate APIs to compute flags.
 
-Example:
-If table shows:
-ExamAssigned?
-ExamStarted?
+---
 
-Those must be computed in backend and returned in the main list endpoint.
-Frontend must NOT call separate APIs to get status.
+## 1) Main Endpoint
+
+GET /api/attempt-control
+
+Query params:
+
+- examId (optional)
+- batchId (optional)
+- search (RollNo/Email/Name)
+- status (InProgress / Paused / All)
+- page
+- pageSize
+
+Response must include:
+
+For each attempt:
+
+- AttemptId
+- CandidateId
+- RollNo
+- FullName
+- ExamName
+- StartedAt
+- RemainingSeconds
+- Status
+- LastActivityAt
+- ExtraTimeSeconds
+- ResumeCount
+- IsLocked
+- IPAddress
+- DeviceInfo
+- CanForceEnd (bool)
+- CanResume (bool)
+- CanAddTime (bool)
+
+These flags must be computed in backend based on business rules.
+
+Pagination required.
+
+---
+
+## 2) Force End Exam Endpoint
+
+POST /api/attempt-control/force-end
+
+Body:
+
+- attemptId
+- reason (optional)
+
+Rules:
+
+- Only allowed if Status = InProgress OR Paused
+- Change Status to ForceSubmitted
+- Set SubmittedAt = now
+- Store ForceSubmittedBy
+- Prevent future resume
+- Trigger grading pipeline if applicable
+
+Return:
+
+- success
+- updated status
+- timestamp
+
+---
+
+## 3) Resume Exam Endpoint
+
+POST /api/attempt-control/resume
+
+Body:
+
+- attemptId
+
+Rules:
+
+- Allowed only if Status = Paused OR Disconnected
+- Must still be within schedule window
+- Must not be submitted
+- Change Status to InProgress
+- Increment ResumeCount
+- Log action
+
+Return updated attempt snapshot.
+
+---
+
+## 4) Add Time Endpoint
+
+POST /api/attempt-control/add-time
+
+Body:
+
+- attemptId
+- extraMinutes
+- reason (optional)
+
+Rules:
+
+- Allowed only if Status = InProgress
+- Increase RemainingSeconds
+- Increase ExtraTimeSeconds
+- Log who added time
+- Ensure no overflow or negative value
+
+Return updated RemainingSeconds.
+
+---
+
+# Business Rules Enforcement
+
+- Cannot resume submitted attempt.
+- Cannot force end already submitted attempt.
+- Cannot add time to submitted attempt.
+- Must validate schedule window.
+- All operations must be transactional.
+- Audit every action (AdminId + timestamp).
 
 ---
 
 # Frontend Requirements
 
-- Use existing UI layout/components.
-- No style changes.
-- Clean loading state.
-- Simple confirmation dialogs.
-- Clear success/error toast.
-- Minimal but professional.
+Page Name: Candidate Exam Control
+
+Layout:
+
+Filters:
+
+- Exam dropdown
+- Batch dropdown
+- Search
+- Status filter
+
+Table Columns:
+
+- RollNo
+- Name
+- Exam
+- Status (colored badge)
+- StartedAt
+- Remaining Time (live countdown optional)
+- Extra Time Added
+- Resume Count
+- Last Activity
+- Actions
+
+Actions per row:
+
+- Force End (red)
+- Resume (blue)
+- Add Time (clock icon)
+
+Behavior:
+
+- Confirmation modal for Force End
+- Modal input for Add Time
+- Disable buttons based on CanForceEnd / CanResume / CanAddTime flags
+- Proper loading states
+- Toast notifications
+- No global style changes
 
 ---
 
-# Edge Cases
+# Performance
 
-Handle basic realistic cases:
-
-- Blocked candidate
-- Already assigned
-- Started exam
-- Invalid input
-- Duplicate operations
-
-No over-complex scenarios.
+- No N+1 queries.
+- Proper joins.
+- Index on ExamId, CandidateId, Status.
+- Efficient pagination.
+- Designed to handle 10k+ attempts safely.
 
 ---
 
-After finishing the task:
+# Security
+
+- Admin-only endpoint.
+- Role-based authorization.
+- Validate ownership if multi-tenant.
+- Prevent manipulation of attempt state.
+
+---
+
+# Logging & Auditing
+
+Every control action must:
+
+- Be logged
+- Include AdminId
+- Include IP if needed
+- Include reason if provided
+
+---
+
+After finishing:
 
 Provide:
 
 1. What was implemented
-2. APIs created/updated
-3. DB changes (if any)
-4. Manual test steps (short checklist)
-5. Important notes / assumptions
+2. DB changes
+3. Endpoints created
+4. Business rules implemented
+5. Manual test checklist
+6. Any assumptions made
 
 ---
 
@@ -564,368 +816,3 @@ Rules:
 - Working on the task only.
 - Follow existing project architecture and naming conventions.
 - After finish the task give me summary Output.
-
-Rules:
-
-- You may ask questions at any time.
-- Do not change any style or color till confirm with me.
-- Working on the task only.
-- Follow existing project architecture and naming conventions.
-- After finish the task give me summary Output
-
-the next step after finish manual grading for essay and subject questions,
-in Candidate Result.
-
-In Page of Candidate Reault
-Task1:
-When Click on Publish Result (I got error result not found) as in the image 1- Fix it
-
-Taks2:
-In Candidate Video or Screen Streaming or Proctor Report
-Dispaly the attempt/events and logs/alert and screenshots of candidate in this attempt.
-
-Rules:
-
-- You may ask questions at any time.
-- Do not change any style or color till confirm with me.
-- Working on the task only.
-- After finish the task give me summary Output
-- Use minimal request API as ()
-- Do not change view details / score card Pages.
-
-Output
-
-- As Admin I Expect the Candidate Reault Page with all Action is Working Fine ready to Production.
-
-- If a backend task is quick and low risk → fix it in the real backend.
-- If a backend task is complex, unstable, or time-consuming → we will create a Mock API in the frontend using:
-  - JSON files
-  - In-memory data
-  - or temporary Next.js Route Handlers
-
-Working style:
-
-- We will work module by module.
-- For each module:
-  1. Review its purpose and demo value.
-  2. List required demo features.
-  3. Decide per feature:
-     - Real backend
-     - or Mock API
-  4. Create a clear TODO checklist.
-  5. Implement step by step.
-
-You may ask questions at any time.
-You may suggest smarter or safer demo shortcuts.
-
-Before we start:
-
-- Read and understand the full project context and documentation.
-- Confirm you understand:
-  - the system domain (Exam / Question Bank / Attempts / Results / Admin / Candidate)
-  - the demo goal
-  - your role in this process
-
-## Once you confirm understanding, we will start with the first module together.
-
-Current Status Summary
-✅ Fully Working: Auth, Candidate journey, Grading, Reports, Certificates, Question Bank, Exams
-⚠️ Partial: Proctor Center UI, Settings, Audit logs UI
-❌ Not Ready: Live video proctoring, CI/CD
-Demo Critical Paths
-Candidate Journey: Login → My Exams → Take Exam → Submit → View Result → Download Certificate
-Admin Flow: Create Questions → Create Exam → Publish → Grade → View Reports
-Certificate Verification: Public page verification
-
-## For Exam Builer: :|
-
-Keep the old page as-is: /exams/create
-
-Create a new page:
-
-- /exams/setup (Create)
-- /exams/setup/[examId] (Edit)
-
-IMPORTANT UI:
-Do NOT change the existing design style. Reuse the same section-card UI used in /exams/create
-(green section title + icon + same spacing and card layout). The new Setup page must look identical in styling.
-
-Setup page has 2 tabs:
-
-1. Configuration (same sections style)
-2. Builder (placeholder)
-
-Rules:
-
-- In /exams/setup (no id): Builder tab disabled with message “Please save exam first”
-- Save/Next creates exam via real API and navigates to /exams/setup/{id}?tab=builder
-- /exams/setup/[examId] loads data (GET) and allows update (PUT/PATCH)
-- Please implement tabs using query string ?tab= (not local state)
-  so that:
-  -Page refresh keeps the active tab
-  -Direct links to Builder tab are possible
-  Examples:
-  /exams/setup/12?tab=config
-  /exams/setup/12?tab=builder
-
-Builder tab for now: show “Welcome to Builder” + Exam ID
-
-Place "Exam Creation" directly below the existing "Create Exam" item under the Exams section in Sidebar Navigation
-Add a new menu item
-
-## Builder Tab:
-
-Okay Perfect Exam Setup page Configuration tab Done do not change anything,
-Now Let's Start Working on Builder tab (Tab 2) in production-quality Integrated with API,
-
-Context:
-
-- Builder Tab must contain everything related to sections/questions logic.
-- IMPORTANT: Do NOT use ExamTopic for the new Exam-Setup Page . We will rely on ExamSection only.
-
-What we want:
-Admin builds exam sections from Question Bank Subjects/Topics, sets duration per section, and sets how many questions to randomly pick per section (PickCount). Questions will be selected later per attempt; for now we persist the rules.
-
-========================
-TASKS (Step-by-step)
-========================
-
-1. Backend – minimal model updates Update ExamSection entity
-
-- Add enum: SectionSourceType { Subject = 1, Topic = 2 }.
-- Update ExamSection entity to support building sections from Question Bank:
-  Add fields:
-  - SourceType (SectionSourceType) // Subject or Topic
-  - QuestionSubjectId (int? nullable)
-  - QuestionTopicId (int? nullable)
-  - PickCount (int) // number of questions to randomly pick per section
-    Notes:
-  - DurationMinutes already exists in ExamSection and MUST be used.
-
-  - Keep TitleEn/TitleAr as snapshot/display fields. If QuestionSubjectId/TopicId is provided, auto-fill TitleEn/TitleAr from selected subject/topic on save if empty.
-
-- Do NOT remove existing tables. Do NOT touch ExamTopic. Keep existing ExamQuestion unchanged
-
-  Validation rules:
-  - If sourceType=Subject: each section must have questionSubjectId, and questionTopicId must be null.
-  - If sourceType=Topic: each section must have both questionSubjectId and questionTopicId.
-  - pickCount >= 1 and must be <= available questions count for that subject/topic.
-  - durationMinutes can be 0 or null (means no section timer).
-
-  Save strategy:
-  - Replace existing sections for the exam with provided payload (simple and deterministic).
-
-C) Availability counts (for UI validation):
-Provide an endpoint to get available questions count:
-GET /api/questionbank/questions/count?subjectId=...&topicId=...
-It returns { "count": N }.
-This is used to show “Available: N questions” and validate pickCount.
-
-3. Frontend – Exam Setup page integration
-
-- Keep /exams/setup and /exams/setup/[examId] pages as they are.
-
-4. Frontend – Build Tab UI (MVP without manual)
-   In Builder tab implement this flow:
-
-Q1) Select Subjects (multi-select)
-
-- Multi-select dropdown with search
-- Admin can select multiple subjects
-- Once selected, preload their topics and availability counts (as needed)
-
-Q2) How should sections be generated? (inline radio)
-
-- By Subject
-- By Topic
-
-Behavior:
-A) If “By Subject”
-
-- Auto-generate a Sections Preview list: one section per selected subject.
-- For each section show a Section Card (same design language as existing pages):
-  - Title (read-only, from subject name)
-  - DurationMinutes input (allow 0)
-  - PickCount input (number of questions to randomly pick)
-  - Show helper: “Available: N questions”
-  - Validate PickCount <= Available
-
-B) If “By Topic”
-
-- After selecting subjects, show accordion per selected subject:
-  - “Include all topics” (default ON)
-  - If OFF: show checklist of topics for that subject
-- Sections Preview becomes one section per selected topic.
-- For each topic-section show Section Card:
-  - Title (read-only, from topic name)
-  - DurationMinutes input
-  - PickCount input
-  - Available count for that topic
-
-Actions:
-
-- “Save Builder” button:
-  - Calls PUT /api/exams/{examId}/builder with sourceType + computed sections payload.
-  - Shows toast success.
-- Also implement “Load existing builder”:
-  - On opening builder tab for an existing exam, call GET /api/exams/{examId}/builder and prefill UI (subjects selection, sourceType, sections settings).
-
-5. Data mapping rules
-
-- For Subject-wise:
-  - ExamSection.SourceType = Subject
-  - QuestionSubjectId = selected subject
-  - QuestionTopicId = null
-- For Topic-wise:
-  - ExamSection.SourceType = Topic
-  - QuestionSubjectId = topic’s parent subject id
-  - QuestionTopicId = selected topic id
-- Titles are stored as snapshot (TitleEn/TitleAr) filled from selected lookup.
-
-Deliverables / acceptance:
-
-- Builder tab works end-to-end:
-  - Select subjects → choose By Subject/By Topic → set duration + pickCount → save → reload persists
-- API persists rules in real DB
-- UI styling matches existing patterns (no design overhaul)
-
-## Exma menu and Actions:
-
-Continue from the current SmartExam frontend/backend. Implement the following production-ready navigation + exam management pages.
-
-A) Sidebar menu changes
-
-- Create an "Exams" group in the left sidebar (keep existing design).
-- Add sub menu items:
-  1. Exams (existing) -> /exams (keep the old page as-is)
-  2. Create Exam -> /exams/setup (new two-tabs setup page already implemented)
-  3. Exams List -> /exams/list (new page to be implemented)
-
-B) New page: Exams List (/exams/list)
-
-- Build a table list for all exams using real backend API.
-- Columns:
-  - Exam Title (EN/AR display as per current locale) >> link when click open /exams/setup/{id}?tab=config
-  - Status (Draft/Published/Archived badge)
-  - Configuration button -> /exams/{id}/configuration
-  - Builder button -> /exams/setup/{id}?tab=builder
-  - Actions menu (dropdown):
-    - View -> /exams/{id}/overview
-    - Edit -> /exams/setup/{id}?tab=config
-    - Publish or Archive (based on current status) -> call real API
-    - Delete
-
-C) New page: Exam Overview (/exams/{id}/overview)
-
-- After a successful SAVE on Builder tab (Tab 2) in /exams/setup/{id}?tab=builder,
-  redirect to /exams/{id}/overview.
-- Design a Production Overview UI shows:
-  "Exam Saved Successfully "
-  Exam title, status, exam id.
-- Primary Actions:
-  1. Go to Configuration -> /exams/{id}/configuration
-  2. Publish Exam (if Draft) -> call real publish API
-  3. Edit Builder -> /exams/setup/{id}?tab=builder
-  4. Preview Exam (if page exists; otherwise disabled)
-- Secondary Actions:
-  - Back to Exams List -> /exams/list
-  - Archive Exam (only if Published)
-
-Constraints:
-
-- Do NOT modify the existing /exams page.
-- Reuse the current UI style (shadcn/ui + same design language).
-- Use query string tab navigation for setup pages (?tab=...).
-- Ensure routing works and menu active state is correct.
-
-## Candidate Dashboard .....
-
-ROLE
-You are a senior full-stack engineer on Smart Exam. Review the existing candidate portal pages and refactor to match the new MVP navigation.
-
-GOAL
-Set “My Exams” as the main Candidate Dashboard page, and remove/hide other candidate pages that are not needed now.
-
-REQUIREMENTS
-
-1. Candidate landing
-
-- After candidate login, redirect the candidate to “My Exams” as the default landing page.
-- “My Exams” becomes the dashboard home (single source of truth for what the candidate should do now).
-
-2. Navigation cleanup
-
-- Update the left-side menu for Candidate Portal:
-  - Keep ONLY:
-    - My Exams (as Dashboard)
-    - My Results
-  - Remove/hide:
-    - old Dashboard page
-    - any other candidate pages
-
-## Left Menu
-
-Refactor the left Sidebar navigation structure + UI behavior.
-
-GOALS (UI/UX)
-
-1. Any menu item that has children (submenu) MUST be collapsed by default (closed on initial load).
-2. For any parent item with children, add a chevron/arrow icon at the far right to indicate it’s collapsible.
-   - Arrow rotates when expanded.
-   - Clicking the parent toggles expand/collapse.
-3. Keep existing styling, icons, and active route highlight behavior.
-4. Do NOT keep submenus expanded by default. If you have logic that auto-expands based on current route, keep it ONLY when the current route is inside that group; otherwise keep collapsed by default.
-
-STRUCTURE CHANGES (Navigation)
-A) Rename/Move Exam Section Header
-
-- The section title above the Exams items should be: "Exam Management"
-- Remove the separate "EXAM MANAGEMENT" title that appears below the Exams section (delete it).
-- Hide "Exams" item (First Item)
-- Add a new item "Exam Scheduler" (Empty for now page can show "Coming soon)" as Last Item (third Item).
-
-B) Result Group (NEW)
-Create a top-level collapsible group named "Result" with these sub-items in this exact order:
-
-1. Grading ->
-2. Candidate Result
-3. Certificate
-4. Verify Certificate
-5. Proctor Report
-
-C) Proctor Center
-After Result group, keep "Proctor Center" as it is with the same existing submenu items (do not remove any).
-
-D) Candidates Group (NEW)
-After Proctor Center, add a collapsible group named "Candidates" with these items (same order):
-
-- Batch
-- Candidates Data
-- Assign to Exam
-- End Exam
-- Resume Exam
-- Add Time
-- Candidate Exam Details
-
-E) Administration Group (NEW)
-After Candidates, add a collapsible group named "Administration" with these sub-items:
-
-- Users
-- Audit Logs
-- Settings
-
-Do not change unrelated business logic.
-
-##
-
-Here’s an explanation of each request and the error you’re seeing:
-
-1. /api/Assessment/exams/dropdown
-   Purpose: Fetches a list of available exams to populate a filter or dropdown menu. This allows users to filter results by exam.
-   Why it runs: Needed to let the user select/filter by exam on the results page.
-2. /api/ExamResult/summary/candidates?pageNumber=1&pageSize=200
-   Purpose: Retrieves a paginated list of candidate exam results (summary view). This is likely used to display the main table/grid of candidate results.
-   Why it runs: Needed to show the list of candidates and their exam results.
-3. /api/Grading?PageNumber=1&PageSize=500
-   Purpose: Attempts to fetch a paginated list of grading sessions or grading data.
-   Why it runs: The page or a component on it is trying to load grading information, possibly for a summary, dashboard, or to check grading status.
