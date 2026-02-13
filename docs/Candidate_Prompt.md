@@ -821,3 +821,18 @@ TASK A Summary — ProctorSession Lifecycle Fix + Sample Sessions Fallback
 What was done
 
 # Change File Lines
+
+[21:50:32 INF] HTTP GET /api/Candidate/attempts/17/session responded 400 in 23.5047 ms
+[21:50:40 INF] HTTP PUT /api/Candidate/attempts/17/answers responded 400 in 7.3158 ms
+[21:50:45 INF] HTTP PUT /api/Candidate/attempts/17/answers responded 400 in 5.7191 ms
+[21:50:49 INF] HTTP POST /api/Attempt/17/events responded 400 in 2.9330 ms
+[21:50:52 INF] HTTP POST /api/Attempt/17/events responded 400 in 2.7838 ms
+[21:50:52 WRN] Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+[21:50:52 INF] HTTP POST /api/Candidate/attempts/17/submit responded 400 in 66.6296 ms
+[21:51:06 INF] HTTP POST /api/Attempt/17/events responded 400 in 3.2112 ms
+[21:51:06 INF] HTTP POST /api/Candidate/attempts/17/submit responded 400 in 4.3588 ms
+[21:51:23 INF] HTTP POST /api/Attempt/17/events responded 400 in 2.8145 ms
+[21:51:23 INF] HTTP POST /api/Candidate/attempts/17/submit responded 400 in 4.1443 ms
+[21:51:32 INF] HTTP GET /api/Candidate/attempts/17/session responded 400 in 9.8150 ms
+[21:51:48 INF] HTTP POST /api/Attempt/17/events responded 400 in 5.4705 ms
+[21:51:49 INF] HTTP POST /api/Attempt/17/events responded 400 in 4.1314 ms

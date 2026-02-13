@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Candidate;
@@ -14,13 +15,16 @@ public class CandidateController : ControllerBase
 {
     private readonly ICandidateService _candidateService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ILogger<CandidateController> _logger;
 
     public CandidateController(
         ICandidateService candidateService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ILogger<CandidateController> logger)
     {
         _candidateService = candidateService;
         _currentUserService = currentUserService;
+        _logger = logger;
     }
 
     #region Exam Discovery & Preview
@@ -134,7 +138,16 @@ public class CandidateController : ControllerBase
             return Unauthorized();
         }
 
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
         var result = await _candidateService.SubmitAttemptAsync(attemptId, candidateId);
+
+        if (!result.Success)
+        {
+            result.TraceId = traceId;
+            _logger.LogWarning("Submit returned failure | AttemptId={AttemptId} | CandidateId={CandidateId} | TraceId={TraceId} | Message={Message}",
+                attemptId, candidateId, traceId, result.Message);
+        }
+
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

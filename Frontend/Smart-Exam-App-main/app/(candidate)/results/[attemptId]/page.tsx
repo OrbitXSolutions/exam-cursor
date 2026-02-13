@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
@@ -34,9 +34,15 @@ export default function ResultsPage() {
   const [certificate, setCertificate] = useState<{ id: number; downloadUrl: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [gradingPending, setGradingPending] = useState(false)
+  const pollCountRef = useRef(0)
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     loadResult()
+    return () => {
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
+    }
   }, [attemptId])
 
   useEffect(() => {
@@ -51,24 +57,38 @@ export default function ResultsPage() {
     try {
       setLoading(true)
       setError(null)
+      setGradingPending(false)
 
       const data = await getMyResult(attemptId)
       console.log("[v0] Result loaded:", data)
       setResult(data)
+      pollCountRef.current = 0 // reset on success
     } catch (err) {
       console.error("[v0] Error loading result:", err)
+
+      // If just submitted and result not ready, poll up to 6 times (30s total)
+      if (justSubmitted && pollCountRef.current < 6) {
+        setGradingPending(true)
+        pollCountRef.current += 1
+        pollTimerRef.current = setTimeout(() => loadResult(), 5000)
+        return
+      }
+
+      setGradingPending(false)
       setError(t("results.notAvailable"))
     } finally {
-      setLoading(false)
+      if (!gradingPending) setLoading(false)
     }
   }
 
-  if (loading) {
+  if (loading || gradingPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <LoadingSpinner size="lg" />
-          <p className="text-muted-foreground">{t("results.calculating")}</p>
+          <p className="text-muted-foreground">
+            {gradingPending ? (t("results.submittedDesc") || t("results.calculating")) : t("results.calculating")}
+          </p>
         </div>
       </div>
     )

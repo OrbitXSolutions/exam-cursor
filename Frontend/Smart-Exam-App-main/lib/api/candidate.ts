@@ -215,6 +215,8 @@ export interface CandidateExam {
   latestAttemptStatus?: AttemptStatus | null;
   latestAttemptSubmittedAt?: string | null;
   latestAttemptIsResultPublished?: boolean | null;
+  /** Server-driven: eligible to retake (has attempts, in window, not passed+published) */
+  canRetake?: boolean;
 }
 
 export interface ExamPreview {

@@ -21,17 +21,23 @@ public class CandidateService : ICandidateService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IGradingService _gradingService;
     private readonly IExamResultService _examResultService;
+    private readonly ILogger<CandidateService> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public CandidateService(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
         IGradingService gradingService,
-        IExamResultService examResultService)
+        IExamResultService examResultService,
+        ILogger<CandidateService> logger,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _context = context;
         _userManager = userManager;
         _gradingService = gradingService;
         _examResultService = examResultService;
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     #region Exam Discovery & Preview
@@ -146,6 +152,16 @@ public class CandidateService : ICandidateService
                    // Get published result for this exam (only published results are visible to candidates)
                    publishedByExam.TryGetValue(e.Id, out var publishedResult);
 
+                   var now = DateTime.UtcNow;
+                   var hasAttemptsLeft = e.MaxAttempts == 0 || myAttemptCount < e.MaxAttempts;
+                   var inWindow = (!e.StartAt.HasValue || now >= e.StartAt.Value)
+                               && (!e.EndAt.HasValue || now <= e.EndAt.Value);
+                   var isPassedAndPublished = publishedResult != null && publishedResult.IsPassed;
+                   var hasFinishedAttempt = latestAttempt != null
+                       && (latestAttempt.Status == AttemptStatus.Submitted
+                        || latestAttempt.Status == AttemptStatus.Expired
+                        || latestAttempt.Status == AttemptStatus.Cancelled);
+
                    return new CandidateExamListDto
                    {
                        Id = e.Id,
@@ -168,7 +184,8 @@ public class CandidateService : ICandidateService
                        LatestAttemptId = latestAttempt?.Id,
                        LatestAttemptStatus = latestAttempt?.Status,
                        LatestAttemptSubmittedAt = latestAttempt?.SubmittedAt,
-                       LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id)
+                       LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id),
+                       CanRetake = hasFinishedAttempt && hasAttemptsLeft && inWindow && !isPassedAndPublished
                    };
                }).ToList();
 
@@ -596,42 +613,82 @@ $"Attempt is {attempt.Status}. Cannot resume.");
     public async Task<ApiResponse<CandidateResultSummaryDto>> SubmitAttemptAsync(int attemptId, string candidateId)
     {
         var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
-   .Include(a => a.Exam)
-    .Include(a => a.Questions)
-.ThenInclude(aq => aq.Answers)
-     .FirstOrDefaultAsync(a => a.Id == attemptId);
+            .Include(a => a.Exam)
+            .Include(a => a.Questions)
+                .ThenInclude(aq => aq.Answers)
+            .FirstOrDefaultAsync(a => a.Id == attemptId);
 
         if (attempt == null)
         {
+            _logger.LogWarning("Submit failed: Attempt {AttemptId} not found | CandidateId={CandidateId}", attemptId, candidateId);
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt not found");
         }
 
         if (attempt.CandidateId != candidateId)
         {
+            _logger.LogWarning("Submit denied: Attempt {AttemptId} belongs to different candidate | RequestedBy={CandidateId}", attemptId, candidateId);
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Access denied");
         }
 
         var now = DateTime.UtcNow;
 
+        // If already submitted, return success (idempotent) — do NOT return 400
         if (attempt.Status == AttemptStatus.Submitted)
         {
-            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt already submitted");
+            _logger.LogInformation("Submit idempotent: Attempt {AttemptId} already submitted | CandidateId={CandidateId}", attemptId, candidateId);
+            var idempotentSummary = new CandidateResultSummaryDto
+            {
+                ResultId = 0,
+                ExamId = attempt.ExamId,
+                ExamTitleEn = attempt.Exam.TitleEn,
+                ExamTitleAr = attempt.Exam.TitleAr,
+                AttemptNumber = attempt.AttemptNumber,
+                SubmittedAt = attempt.SubmittedAt ?? now,
+                AllowReview = attempt.Exam.AllowReview,
+                ShowCorrectAnswers = attempt.Exam.ShowCorrectAnswers
+            };
+            return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(
+                idempotentSummary,
+                "Attempt already submitted successfully.");
         }
 
         if (attempt.Status == AttemptStatus.Expired || attempt.Status == AttemptStatus.Cancelled)
         {
+            _logger.LogWarning("Submit failed: Attempt {AttemptId} is {Status} | CandidateId={CandidateId}", attemptId, attempt.Status, candidateId);
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse($"Attempt is {attempt.Status}");
         }
 
-        // Check expiry
+        // Check expiry — but still mark as submitted if expired (save the answers)
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
         {
-            attempt.Status = AttemptStatus.Expired;
+            _logger.LogInformation("Submit on expired attempt: Attempt {AttemptId} expired but submitting anyway | CandidateId={CandidateId}", attemptId, candidateId);
+            attempt.Status = AttemptStatus.Submitted;
+            attempt.SubmittedAt = now;
+            attempt.UpdatedDate = now;
+            attempt.UpdatedBy = candidateId;
             await _context.SaveChangesAsync();
-            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt has expired");
+
+            // Still trigger background grading for expired-then-submitted
+            _ = TriggerBackgroundGradingAsync(attemptId, candidateId, attempt.Exam.ShowResults);
+
+            var expiredSummary = new CandidateResultSummaryDto
+            {
+                ResultId = 0,
+                ExamId = attempt.ExamId,
+                ExamTitleEn = attempt.Exam.TitleEn,
+                ExamTitleAr = attempt.Exam.TitleAr,
+                AttemptNumber = attempt.AttemptNumber,
+                SubmittedAt = now,
+                AllowReview = attempt.Exam.AllowReview,
+                ShowCorrectAnswers = attempt.Exam.ShowCorrectAnswers
+            };
+            return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(
+                expiredSummary,
+                "Attempt submitted successfully (time had expired). Results will be available after grading.");
         }
 
-        // Submit
+        // ===== PRIMARY SUBMIT PATH =====
+        // Step 1: Persist submission state (this is the critical save)
         attempt.Status = AttemptStatus.Submitted;
         attempt.SubmittedAt = now;
         attempt.UpdatedDate = now;
@@ -648,12 +705,24 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         };
         _context.Set<AttemptEvent>().Add(submitEvent);
 
+        // Close any active proctor session (hard-lock snapshots/events)
+        var proctorSession = await _context.Set<Domain.Entities.Proctor.ProctorSession>()
+            .FirstOrDefaultAsync(s => s.AttemptId == attemptId
+                && s.Status == ProctorSessionStatus.Active);
+        if (proctorSession != null)
+        {
+            proctorSession.Status = ProctorSessionStatus.Completed;
+            proctorSession.EndedAt = now;
+            proctorSession.UpdatedDate = now;
+            proctorSession.UpdatedBy = candidateId;
+        }
+
         await _context.SaveChangesAsync();
 
-        // Auto-trigger grading immediately after submit
-        var gradingResult = await _gradingService.InitiateGradingAsync(
-            new InitiateGradingDto { AttemptId = attemptId }, candidateId);
+        _logger.LogInformation("Submit succeeded: Attempt {AttemptId} submitted | CandidateId={CandidateId} | ExamId={ExamId}",
+            attemptId, candidateId, attempt.ExamId);
 
+        // Step 2: Build response IMMEDIATELY (before grading)
         var summary = new CandidateResultSummaryDto
         {
             ResultId = 0,
@@ -666,47 +735,69 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             ShowCorrectAnswers = attempt.Exam.ShowCorrectAnswers
         };
 
-        // If fully auto-graded, finalize result and optionally publish
-        if (gradingResult.Success && gradingResult.Data != null &&
-            gradingResult.Data.Status == GradingStatus.AutoGraded)
+        // Step 3: Fire-and-forget background grading (never blocks submit response)
+        _ = TriggerBackgroundGradingAsync(attemptId, candidateId, attempt.Exam.ShowResults);
+
+        return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(
+            summary,
+            "Attempt submitted successfully. Results will be available after grading.");
+    }
+
+    /// <summary>
+    /// Background grading: runs in a new DI scope so it doesn't affect the submit response.
+    /// Safe fire-and-forget with full error logging.
+    /// </summary>
+    private async Task TriggerBackgroundGradingAsync(int attemptId, string candidateId, bool showResults)
+    {
+        try
         {
-            var finalizeResult = await _examResultService.FinalizeResultAsync(
-                gradingResult.Data.GradingSessionId, candidateId);
+            await using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var gradingService = scope.ServiceProvider.GetRequiredService<IGradingService>();
+            var examResultService = scope.ServiceProvider.GetRequiredService<IExamResultService>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<CandidateService>>();
 
-            if (finalizeResult.Success && finalizeResult.Data != null)
+            logger.LogInformation("Background grading started: Attempt {AttemptId} | CandidateId={CandidateId}", attemptId, candidateId);
+
+            var gradingResult = await gradingService.InitiateGradingAsync(
+                new InitiateGradingDto { AttemptId = attemptId }, candidateId);
+
+            if (!gradingResult.Success)
             {
-                summary.ResultId = finalizeResult.Data.Id;
+                logger.LogWarning("Background grading initiation failed: Attempt {AttemptId} | Message={Message}",
+                    attemptId, gradingResult.Message);
+                return;
+            }
 
-                // Auto-publish if exam allows showing results
-                if (attempt.Exam.ShowResults)
+            // If fully auto-graded, finalize result and optionally publish
+            if (gradingResult.Data != null && gradingResult.Data.Status == GradingStatus.AutoGraded)
+            {
+                var finalizeResult = await examResultService.FinalizeResultAsync(
+                    gradingResult.Data.GradingSessionId, candidateId);
+
+                if (finalizeResult.Success && finalizeResult.Data != null && showResults)
                 {
-                    await _examResultService.PublishResultAsync(finalizeResult.Data.Id, candidateId);
-                    summary.TotalScore = finalizeResult.Data.TotalScore;
-                    summary.MaxPossibleScore = finalizeResult.Data.MaxPossibleScore;
-                    summary.Percentage = finalizeResult.Data.MaxPossibleScore > 0
-                        ? (finalizeResult.Data.TotalScore / finalizeResult.Data.MaxPossibleScore) * 100
-                        : null;
-                    summary.IsPassed = finalizeResult.Data.IsPassed;
-                    summary.GradeLabel = finalizeResult.Data.GradeLabel;
+                    await examResultService.PublishResultAsync(finalizeResult.Data.Id, candidateId);
+                    logger.LogInformation("Background grading complete + published: Attempt {AttemptId} | ResultId={ResultId} | IsPassed={IsPassed}",
+                        attemptId, finalizeResult.Data.Id, finalizeResult.Data.IsPassed);
+                }
+                else
+                {
+                    logger.LogInformation("Background grading finalized: Attempt {AttemptId} | Published={Published}",
+                        attemptId, finalizeResult.Success && showResults);
                 }
             }
+            else
+            {
+                logger.LogInformation("Background grading requires manual review: Attempt {AttemptId}", attemptId);
+            }
         }
-
-        // Only show results if exam allows it (and we didn't already set them above)
-        if (!attempt.Exam.ShowResults)
+        catch (Exception ex)
         {
-            summary.TotalScore = null;
-            summary.MaxPossibleScore = null;
-            summary.Percentage = null;
-            summary.IsPassed = null;
-            summary.GradeLabel = null;
+            // CRITICAL: Never let grading failure propagate — it must only be logged
+            _logger.LogError(ex,
+                "Background grading FAILED: Attempt {AttemptId} | CandidateId={CandidateId} | Error={Error}. Attempt remains submitted; grading can be retried manually.",
+                attemptId, candidateId, ex.Message);
         }
-
-        var message = summary.ResultId > 0
-            ? "Attempt submitted successfully. Results are available."
-            : "Attempt submitted successfully. Results will be available after grading.";
-
-        return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(summary, message);
     }
 
     #endregion

@@ -100,8 +100,12 @@ class ApiClient {
             : errors && typeof errors === "object"
               ? Object.values(errors).flat().filter(Boolean).join(", ")
               : "";
-        const errorMessage =
+        const traceId = jsonResponse.traceId || "";
+        const baseMessage =
           jsonResponse.message || errorsStr || `HTTP Error: ${response.status}`;
+        const errorMessage = traceId
+          ? `${baseMessage} (Ref: ${traceId})`
+          : baseMessage;
         throw new Error(errorMessage);
       }
 

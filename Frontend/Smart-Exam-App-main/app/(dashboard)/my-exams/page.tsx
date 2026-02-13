@@ -236,10 +236,13 @@ export default function MyExamsPage() {
 
             const canResume = statusKey === "inProgress" && latestAttemptId != null
             const canView = statusKey === "completed" && latestPublished && latestAttemptId != null
-            const canRetake =
-              (statusKey === "completed" || statusKey === "expired" || statusKey === "terminated") &&
+            // Use server-driven canRetake flag (falls back to FE logic for safety)
+            const isPassedAndPublished = exam.myBestIsPassed === true && latestPublished
+            const canRetake = exam.canRetake ??
+              ((statusKey === "completed" || statusKey === "expired" || statusKey === "terminated") &&
               hasAttemptsRemaining &&
-              inWindow
+              inWindow &&
+              !isPassedAndPublished)
             const canStart = statusKey === "available" && inWindow && hasAttemptsRemaining
 
             let primaryAction: {

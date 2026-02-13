@@ -28,6 +28,11 @@ public class CandidateExamListDto
     public AttemptStatus? LatestAttemptStatus { get; set; }
     public DateTime? LatestAttemptSubmittedAt { get; set; }
     public bool? LatestAttemptIsResultPublished { get; set; }
+    /// <summary>
+    /// Server-driven flag: true when candidate is eligible to retake (has attempts left,
+    /// within exam window, and has NOT already passed with a published result).
+    /// </summary>
+    public bool CanRetake { get; set; }
 }
 
 /// <summary>

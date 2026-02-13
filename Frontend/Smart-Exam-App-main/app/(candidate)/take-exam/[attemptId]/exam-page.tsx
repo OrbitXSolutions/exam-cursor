@@ -619,6 +619,19 @@ export default function ExamPage() {
     })
   }, [])
 
+  // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
+  function stopAllBackgroundActivity() {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = undefined }
+    if (sectionTimerRef.current) { clearInterval(sectionTimerRef.current); sectionTimerRef.current = undefined }
+    if (syncTimerRef.current) { clearInterval(syncTimerRef.current); syncTimerRef.current = undefined }
+    if (snapshotIntervalRef.current) { clearInterval(snapshotIntervalRef.current); snapshotIntervalRef.current = undefined }
+    // Stop webcam stream
+    if (webcamStreamRef.current) {
+      webcamStreamRef.current.getTracks().forEach((t) => t.stop())
+      webcamStreamRef.current = null
+    }
+  }
+
   async function handleAutoSubmit() {
     if (!session) return
     toast.warning(t("exam.timeExpired"))
@@ -635,6 +648,9 @@ export default function ExamPage() {
     try {
       setSubmitting(true)
 
+      // Stop all background calls BEFORE submit to prevent race conditions
+      stopAllBackgroundActivity()
+
       await logAttemptEvent(session.attemptId, {
         eventType: AttemptEventType.Submitted,
       }).catch(() => { })
@@ -642,10 +658,23 @@ export default function ExamPage() {
       const result = await submitAttempt(session.attemptId)
 
       toast.success(t("exam.submitted"))
-      router.push(`/results/${session.attemptId}`)
-    } catch (error) {
+
+      // If grading completed synchronously and result exists, go to score-card
+      if (result && result.resultId && result.resultId > 0) {
+        router.push(`/results/${session.attemptId}?submitted=true`)
+      } else {
+        // Grading is async / pending — go back to my-exams safely
+        router.push("/my-exams")
+      }
+    } catch (error: unknown) {
       console.error("[v0] Failed to submit exam:", error)
-      toast.error(t("common.error"))
+      // Show meaningful error with traceId reference if available
+      const errMsg = error instanceof Error ? error.message : ""
+      if (errMsg && errMsg !== "An error occurred") {
+        toast.error(errMsg)
+      } else {
+        toast.error(t("common.errorOccurred") || "Submission failed. Please try again.")
+      }
     } finally {
       setSubmitting(false)
       setSubmitDialogOpen(false)
