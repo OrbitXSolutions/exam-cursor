@@ -108,9 +108,17 @@ export default function EditExamPage() {
       setError(t("exams.errorDurationRange"))
       return
     }
-    // Fixed exam type requires startAt
-    if (formData.examType === ExamType.Fixed && !formData.startAt) {
-      setError("Start date is required for Fixed exam type")
+    // StartAt and EndAt are required for both exam types
+    if (!formData.startAt) {
+      setError(t("exams.errorStartAtRequired") || "Start date & time is required")
+      return
+    }
+    if (!formData.endAt) {
+      setError(t("exams.errorEndAtRequired") || "End date & time is required")
+      return
+    }
+    if (new Date(formData.endAt) <= new Date(formData.startAt)) {
+      setError(t("exams.errorEndBeforeStart") || "End date must be after start date")
       return
     }
 
@@ -298,14 +306,18 @@ export default function EditExamPage() {
               </Label>
             </RadioGroup>
 
-            {/* Fixed Exam Only - Show Start Time */}
-            {formData.examType === ExamType.Fixed && (
+            {/* Schedule — Start & End DateTime for both Flexible and Fixed */}
               <div className="pt-4 border-t space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  {formData.examType === ExamType.Fixed
+                    ? (t("exams.fixedScheduleHelp") || "All candidates must start at the exact scheduled time.")
+                    : (t("exams.flexScheduleHelp") || "Candidates can start anytime within the availability window.")}
+                </p>
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="startAt" className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      {t("exams.startAt")} *
+                      {t("exams.startAt") || "Start Date & Time"} *
                     </Label>
                     <Input
                       id="startAt"
@@ -319,7 +331,7 @@ export default function EditExamPage() {
                   <div className="space-y-2">
                     <Label htmlFor="endAt" className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      {t("exams.endAt")}
+                      {t("exams.endAt") || "End Date & Time"} *
                     </Label>
                     <Input
                       id="endAt"
@@ -327,11 +339,11 @@ export default function EditExamPage() {
                       value={formData.endAt}
                       onChange={(e) => updateField("endAt", e.target.value)}
                       className="w-full h-11"
+                      required
                     />
                   </div>
                 </div>
               </div>
-            )}
           </CardContent>
         </Card>
 

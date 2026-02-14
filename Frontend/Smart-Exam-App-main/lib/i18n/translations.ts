@@ -141,6 +141,7 @@ export const translations = {
       candidatesData: "Candidates Data",
       assignToExam: "Assign to Exam",
       examControl: "Exam Control",
+      examOperations: "Exam Operations",
       candidateExamDetails: "Candidate Exam Details",
       // Administration group
       administration: "Administration",
@@ -264,6 +265,15 @@ export const translations = {
       examDescription: "Description",
       startDate: "Start Date",
       endDate: "End Date",
+      startAt: "Start Date & Time",
+      endAt: "End Date & Time",
+      flexScheduleHelp:
+        "Candidates can start anytime within the availability window.",
+      fixedScheduleHelp:
+        "All candidates must start at the exact scheduled time.",
+      errorStartAtRequired: "Start date & time is required",
+      errorEndAtRequired: "End date & time is required",
+      errorEndBeforeStart: "End date must be after start date",
       duration: "Duration (minutes)",
       maxAttempts: "Maximum Attempts",
       maxAttemptsHint: "0 = Unlimited attempts",
@@ -561,6 +571,14 @@ export const translations = {
       topic: "Topic",
       topicQuestions: "{count} questions in this topic",
       of: "of",
+      // Auto-save indicator
+      saving: "Saving...",
+      saved: "Saved",
+      saveFailed: "Save failed",
+      // Summary labels
+      unanswered: "Unanswered",
+      flagged: "Flagged",
+
       // Error messages
       attemptExpired: "Attempt Expired",
       attemptExpiredDesc:
@@ -1011,6 +1029,7 @@ export const translations = {
       schedule: "Schedule",
       flexExam: "Flexible Schedule",
       flexExamDesc: "Take this exam anytime - no time restrictions",
+      graceWindowPassed: "The allowed start window has passed",
     },
     // Exam Journey
     journey: {
@@ -1053,6 +1072,46 @@ export const translations = {
       ready: "Ready",
       left: "left",
       passScore: "Pass",
+    },
+
+    // Exam Operations (Admin Override)
+    examOperations: {
+      title: "Exam Operations",
+      subtitle:
+        "Admin override actions: grant new attempts, add time, terminate",
+      selectExam: "Select Exam",
+      selectExamPlaceholder: "Choose an exam...",
+      selectExamFirst: "Select an Exam",
+      selectExamFirstDesc:
+        "Choose an exam from the dropdown to see candidates.",
+      noCandidates: "No Candidates",
+      noCandidatesDesc: "No candidates found for this exam.",
+      candidate: "Candidate",
+      rollNo: "Roll No",
+      attempts: "Attempts",
+      latestStatus: "Latest Status",
+      overrides: "Overrides",
+      actions: "Actions",
+      allowNewAttempt: "New Attempt",
+      addTime: "Add Time",
+      terminate: "Terminate",
+      allowNewAttemptTitle: "Allow New Attempt",
+      allowNewAttemptDesc:
+        "Grant an admin override so this candidate can take an additional attempt.",
+      addTimeTitle: "Add Extra Time",
+      addTimeDesc: "Add extra time to the candidate's active attempt.",
+      terminateTitle: "Terminate Attempt",
+      terminateDesc:
+        "This will force-end the candidate's active attempt. This action cannot be undone.",
+      reason: "Reason",
+      reasonPlaceholder: "Enter reason...",
+      extraMinutes: "Extra Minutes",
+      confirm: "Confirm",
+      confirmTerminate: "Terminate",
+      attemptId: "Attempt ID",
+      status: "Status",
+      adminOverride: "Admin Override",
+      resumeTab: "Resume",
     },
   },
 
@@ -1197,6 +1256,7 @@ export const translations = {
       candidatesData: "بيانات المرشحين",
       assignToExam: "تعيين للاختبار",
       examControl: "التحكم بالاختبارات",
+      examOperations: "عمليات الاختبار",
       candidateExamDetails: "تفاصيل اختبار المرشح",
       // Administration group
       administration: "الإدارة",
@@ -1342,6 +1402,11 @@ export const translations = {
       // Timing fields
       startAt: "تاريخ ووقت البدء",
       endAt: "تاريخ ووقت الانتهاء",
+      flexScheduleHelp: "يمكن للمرشحين البدء في أي وقت خلال نافذة التوفر.",
+      fixedScheduleHelp: "يجب على جميع المرشحين البدء في الوقت المحدد بالضبط.",
+      errorStartAtRequired: "تاريخ ووقت البدء مطلوب",
+      errorEndAtRequired: "تاريخ ووقت الانتهاء مطلوب",
+      errorEndBeforeStart: "تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء",
       availabilityWindow: "نافذة التوفر",
       availabilityWindowDesc:
         "الفترة الزمنية التي يمكن للمرشحين الوصول فيها لهذا الاختبار",
@@ -1610,6 +1675,7 @@ export const translations = {
       schedule: "الجدول الزمني",
       flexExam: "جدول مرن",
       flexExamDesc: "يمكنك أداء هذا الاختبار في أي وقت - لا توجد قيود زمنية",
+      graceWindowPassed: "انتهت نافذة البدء المسموحة",
     },
     // Exam Journey
     journey: {
@@ -1773,6 +1839,14 @@ export const translations = {
       topic: "الموضوع",
       topicQuestions: "{count} سؤال في هذا الموضوع",
       of: "من",
+      // Auto-save indicator
+      saving: "جارٍ الحفظ...",
+      saved: "تم الحفظ",
+      saveFailed: "فشل الحفظ",
+      // Summary labels
+      unanswered: "غير مُجاب",
+      flagged: "مُعلَّم",
+
       // Error messages
       attemptExpired: "انتهت صلاحية المحاولة",
       attemptExpiredDesc:
@@ -2160,6 +2234,43 @@ export const translations = {
       sessionExpired: "انتهت صلاحية جلستك",
       networkError: "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
       serverError: "خطأ في الخادم. يرجى المحاولة لاحقاً.",
+    },
+
+    // Exam Operations (Admin Override)
+    examOperations: {
+      title: "عمليات الاختبار",
+      subtitle: "إجراءات المسؤول: منح محاولات جديدة، إضافة وقت، إنهاء",
+      selectExam: "اختر الاختبار",
+      selectExamPlaceholder: "اختر اختباراً...",
+      selectExamFirst: "اختر اختباراً",
+      selectExamFirstDesc: "اختر اختباراً من القائمة لعرض المرشحين.",
+      noCandidates: "لا يوجد مرشحون",
+      noCandidatesDesc: "لم يتم العثور على مرشحين لهذا الاختبار.",
+      candidate: "المرشح",
+      rollNo: "الرقم التسلسلي",
+      attempts: "المحاولات",
+      latestStatus: "الحالة الأخيرة",
+      overrides: "التجاوزات",
+      actions: "الإجراءات",
+      allowNewAttempt: "محاولة جديدة",
+      addTime: "إضافة وقت",
+      terminate: "إنهاء",
+      allowNewAttemptTitle: "السماح بمحاولة جديدة",
+      allowNewAttemptDesc: "منح تجاوز إداري للسماح للمرشح بمحاولة إضافية.",
+      addTimeTitle: "إضافة وقت إضافي",
+      addTimeDesc: "إضافة وقت إضافي لمحاولة المرشح النشطة.",
+      terminateTitle: "إنهاء المحاولة",
+      terminateDesc:
+        "سيتم إنهاء محاولة المرشح النشطة بالقوة. لا يمكن التراجع عن هذا الإجراء.",
+      reason: "السبب",
+      reasonPlaceholder: "أدخل السبب...",
+      extraMinutes: "الدقائق الإضافية",
+      confirm: "تأكيد",
+      confirmTerminate: "إنهاء",
+      attemptId: "معرف المحاولة",
+      status: "الحالة",
+      adminOverride: "تجاوز إداري",
+      resumeTab: "استئناف",
     },
   },
 };

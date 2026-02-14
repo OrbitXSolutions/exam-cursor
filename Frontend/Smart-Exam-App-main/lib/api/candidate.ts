@@ -217,6 +217,8 @@ export interface CandidateExam {
   latestAttemptIsResultPublished?: boolean | null;
   /** Server-driven: eligible to retake (has attempts, in window, not passed+published) */
   canRetake?: boolean;
+  /** True if an admin has granted an unused override for additional attempt */
+  hasAdminOverride?: boolean;
 }
 
 export interface ExamPreview {

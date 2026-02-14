@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -79,6 +79,10 @@ export default function ExamPage() {
   const [savingAnswers, setSavingAnswers] = useState<Set<number>>(new Set())
   const [sectionChangeConfirmOpen, setSectionChangeConfirmOpen] = useState(false)
   const [pendingSectionId, setPendingSectionId] = useState<number | null>(null)
+
+  // Auto-save indicator state
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+  const saveStatusTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Proctoring state
   const [webcamStatus, setWebcamStatus] = useState<"pending" | "active" | "denied" | "error">("pending")
@@ -587,7 +591,13 @@ export default function ExamPage() {
       if (session) {
         try {
           setSavingAnswers(prev => new Set(prev).add(questionId))
+          setSaveStatus("saving")
           await saveAnswer(session.attemptId, answer)
+
+          // Show saved indicator briefly
+          setSaveStatus("saved")
+          if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
+          saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
 
           await logAttemptEvent(session.attemptId, {
             eventType: AttemptEventType.AnswerSaved,
@@ -595,6 +605,9 @@ export default function ExamPage() {
           }).catch(() => { })
         } catch (error) {
           console.error("[v0] Failed to save answer:", error)
+          setSaveStatus("error")
+          if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
+          saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 5000)
         } finally {
           setSavingAnswers(prev => {
             const newSet = new Set(prev)
@@ -884,6 +897,25 @@ export default function ExamPage() {
               </p>
             </div>
 
+            {/* Auto-save indicator */}
+            {saveStatus === "saving" && (
+              <span className="text-xs text-muted-foreground animate-pulse">
+                {t("exam.saving") || "Saving..."}
+              </span>
+            )}
+            {saveStatus === "saved" && (
+              <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {t("exam.saved") || "Saved"}
+              </span>
+            )}
+            {saveStatus === "error" && (
+              <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {t("exam.saveFailed") || "Save failed"}
+              </span>
+            )}
+
             {/* Proctoring indicator */}
             <div
               className={cn(
@@ -1078,8 +1110,30 @@ export default function ExamPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("exam.confirmSubmit")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {answeredCount} {t("exam.of")} {totalQuestions} {t("common.questions")} {t("exam.answered")}
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>{t("exam.confirmSubmitDesc")}</p>
+                <div className="rounded-md border bg-muted/50 p-3 space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span>{t("exam.answered") || "Answered"}</span>
+                    <span className="font-medium text-foreground">{answeredCount} / {totalQuestions}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("exam.unanswered") || "Unanswered"}</span>
+                    <span className="font-medium text-foreground">{totalQuestions - answeredCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("exam.flagged") || "Flagged"}</span>
+                    <span className="font-medium text-foreground">{flagged.size}</span>
+                  </div>
+                </div>
+                {totalQuestions - answeredCount > 0 && (
+                  <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <span>{(t("exam.unansweredWarning") || "{count} unanswered questions").replace("{count}", String(totalQuestions - answeredCount))}</span>
+                  </div>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1087,7 +1141,7 @@ export default function ExamPage() {
               {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmit} disabled={submitting}>
-              {submitting ? <LoadingSpinner size="sm" /> : t("common.submit")}
+              {submitting ? <LoadingSpinner size="sm" /> : (t("exam.confirmAndSubmit") || t("common.submit"))}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1098,8 +1152,51 @@ export default function ExamPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("exam.confirmSectionChange") || "Move to Next Section?"}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("exam.sectionChangeLocked") || "If you continue, you will not be able to return to this section again."}
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>{t("exam.sectionChangeLocked") || "If you continue, you will not be able to return to this section again."}</p>
+                {currentSection && (() => {
+                  const sectionTotal = getSectionQuestionsCount(currentSection)
+                  const sectionAnswered = getAnsweredInSection(currentSection)
+                  const sectionUnanswered = sectionTotal - sectionAnswered
+                  const sectionFlagged = (() => {
+                    let count = 0
+                    for (const topic of currentSection.topics || []) {
+                      for (const q of topic.questions || []) {
+                        if (flagged.has(q.questionId)) count++
+                      }
+                    }
+                    for (const q of currentSection.questions || []) {
+                      if (flagged.has(q.questionId)) count++
+                    }
+                    return count
+                  })()
+                  return (
+                    <>
+                      <div className="rounded-md border bg-muted/50 p-3 space-y-1.5 text-sm">
+                        <div className="flex justify-between">
+                          <span>{t("exam.answered") || "Answered"}</span>
+                          <span className="font-medium text-foreground">{sectionAnswered} / {sectionTotal}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>{t("exam.unanswered") || "Unanswered"}</span>
+                          <span className="font-medium text-foreground">{sectionUnanswered}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>{t("exam.flagged") || "Flagged"}</span>
+                          <span className="font-medium text-foreground">{sectionFlagged}</span>
+                        </div>
+                      </div>
+                      {sectionUnanswered > 0 && (
+                        <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                          <AlertTriangle className="h-4 w-4 shrink-0" />
+                          <span>{(t("exam.unansweredWarning") || "{count} unanswered questions").replace("{count}", String(sectionUnanswered))}</span>
+                        </div>
+                      )}
+                    </>
+                  )
+                })()}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

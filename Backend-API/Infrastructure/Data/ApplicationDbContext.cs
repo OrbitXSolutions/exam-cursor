@@ -51,6 +51,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<AttemptQuestion> AttemptQuestions { get; set; } = null!;
     public DbSet<AttemptAnswer> AttemptAnswers { get; set; } = null!;
     public DbSet<AttemptEvent> AttemptEvents { get; set; } = null!;
+    public DbSet<AdminAttemptOverride> AdminAttemptOverrides { get; set; } = null!;
 
     // Grading
     public DbSet<GradingSession> GradingSessions { get; set; } = null!;

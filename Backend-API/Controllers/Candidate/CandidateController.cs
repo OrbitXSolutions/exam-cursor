@@ -49,6 +49,22 @@ public class CandidateController : ControllerBase
     }
 
     /// <summary>
+    /// Get exams where admin has granted an override for additional attempt (Resume tab)
+    /// </summary>
+    [HttpGet("exams/admin-overrides")]
+    public async Task<IActionResult> GetAdminOverrideExams()
+    {
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _candidateService.GetAdminOverrideExamsAsync(candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
     /// Get exam preview with instructions, access policy, and eligibility check
     /// Returns: { canStartNow, reasons[], attemptInfo, instructions, securitySettings }
     /// </summary>

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -119,6 +120,13 @@ public class CandidateService : ICandidateService
             .Select(r => r.AttemptId)
             .ToHashSet();
 
+        // Get admin attempt overrides for this candidate (unused)
+        var adminOverrideExamIds = await _context.Set<Domain.Entities.Attempt.AdminAttemptOverride>()
+            .Where(o => o.CandidateId == candidateId && !o.IsUsed && !o.IsDeleted)
+            .Select(o => o.ExamId)
+            .ToListAsync();
+        var overrideExamIdSet = new HashSet<int>(adminOverrideExamIds);
+
         var dtos = exams.Select(e =>
                {
                    // Calculate total questions and points including Builder sections
@@ -160,7 +168,10 @@ public class CandidateService : ICandidateService
                    var hasFinishedAttempt = latestAttempt != null
                        && (latestAttempt.Status == AttemptStatus.Submitted
                         || latestAttempt.Status == AttemptStatus.Expired
-                        || latestAttempt.Status == AttemptStatus.Cancelled);
+                        || latestAttempt.Status == AttemptStatus.Cancelled
+                        || latestAttempt.Status == AttemptStatus.ForceSubmitted);
+
+                   var hasAdminOverride = overrideExamIdSet.Contains(e.Id);
 
                    return new CandidateExamListDto
                    {
@@ -185,11 +196,36 @@ public class CandidateService : ICandidateService
                        LatestAttemptStatus = latestAttempt?.Status,
                        LatestAttemptSubmittedAt = latestAttempt?.SubmittedAt,
                        LatestAttemptIsResultPublished = latestAttempt != null && publishedAttemptIds.Contains(latestAttempt.Id),
-                       CanRetake = hasFinishedAttempt && hasAttemptsLeft && inWindow && !isPassedAndPublished
+                       CanRetake = (hasFinishedAttempt && hasAttemptsLeft && inWindow && !isPassedAndPublished) || hasAdminOverride,
+                       HasAdminOverride = hasAdminOverride
                    };
                }).ToList();
 
         return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(dtos);
+    }
+
+    public async Task<ApiResponse<List<CandidateExamListDto>>> GetAdminOverrideExamsAsync(string candidateId)
+    {
+        // Get all unused overrides for this candidate
+        var overrides = await _context.Set<Domain.Entities.Attempt.AdminAttemptOverride>()
+            .Where(o => o.CandidateId == candidateId && !o.IsUsed && !o.IsDeleted)
+            .Select(o => o.ExamId)
+            .Distinct()
+            .ToListAsync();
+
+        if (!overrides.Any())
+            return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(new List<CandidateExamListDto>());
+
+        // Get the full exams list and filter to only override exams
+        var allExamsResult = await GetAvailableExamsAsync(candidateId);
+        if (!allExamsResult.Success || allExamsResult.Data == null)
+            return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(new List<CandidateExamListDto>());
+
+        var overrideExams = allExamsResult.Data
+            .Where(e => overrides.Contains(e.Id))
+            .ToList();
+
+        return ApiResponse<List<CandidateExamListDto>>.SuccessResponse(overrideExams);
     }
 
     public async Task<ApiResponse<CandidateExamPreviewDto>> GetExamPreviewAsync(int examId, string candidateId)
@@ -317,18 +353,76 @@ public class CandidateService : ICandidateService
             return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam is not available");
         }
 
-        // Validate schedule
+        // Validate schedule (Flexible vs Fixed)
         var now = DateTime.UtcNow;
-        if (exam.StartAt.HasValue && now < exam.StartAt.Value)
-        {
-            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                 $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
-        }
+        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
 
-        if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+        if (!exam.StartAt.HasValue && !exam.EndAt.HasValue)
         {
-            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-     $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            // Legacy exams without schedule — allow start (backward compatibility)
+            _logger.LogWarning(
+                "[StartExam] Exam {ExamId} has no StartAt/EndAt — allowing start for backward compatibility. CandidateId={CandidateId} TraceId={TraceId}",
+                examId, candidateId, traceId);
+        }
+        else if (exam.ExamType == ExamType.Fixed)
+        {
+            // Fixed: candidate must start within [StartAt, StartAt + grace] AND now <= EndAt
+            var graceMinutes = ExamDefaults.FixedStartGraceMinutes;
+            var windowEnd = exam.StartAt.HasValue
+                ? exam.StartAt.Value.AddMinutes(graceMinutes)
+                : (DateTime?)null;
+
+            // Clamp grace window to EndAt
+            if (windowEnd.HasValue && exam.EndAt.HasValue && windowEnd.Value > exam.EndAt.Value)
+                windowEnd = exam.EndAt.Value;
+
+            if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+            {
+                _logger.LogWarning(
+                    "[StartExam] BLOCKED — Fixed exam expired | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Fixed TraceId={TraceId} Reason=PastEndAt",
+                    examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+
+            if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+            {
+                _logger.LogWarning(
+                    "[StartExam] BLOCKED — Fixed exam not started yet | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Fixed TraceId={TraceId} Reason=BeforeStartAt",
+                    examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                    $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+
+            if (windowEnd.HasValue && now > windowEnd.Value)
+            {
+                _logger.LogWarning(
+                    "[StartExam] BLOCKED — Fixed exam grace window passed | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} GraceEnd={GraceEnd} EndAt={EndAt} ExamType=Fixed GraceMinutes={GraceMinutes} TraceId={TraceId} Reason=PastGraceWindow",
+                    examId, candidateId, now, exam.StartAt, windowEnd, exam.EndAt, graceMinutes, traceId);
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                    $"The allowed start window has passed. You must start within {graceMinutes} minutes of the scheduled time ({exam.StartAt!.Value:yyyy-MM-dd HH:mm} UTC).");
+            }
+        }
+        else
+        {
+            // Flexible: candidate can start anytime within [StartAt, EndAt]
+            if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+            {
+                _logger.LogWarning(
+                    "[StartExam] BLOCKED — Flexible exam not available yet | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Flex TraceId={TraceId} Reason=BeforeStartAt",
+                    examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                    $"Exam is not available yet. Available from: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+
+            if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+            {
+                _logger.LogWarning(
+                    "[StartExam] BLOCKED — Flexible exam expired | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Flex TraceId={TraceId} Reason=PastEndAt",
+                    examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
         }
 
         // Validate access code
@@ -371,10 +465,22 @@ public class CandidateService : ICandidateService
         var attemptCount = await _context.Set<Domain.Entities.Attempt.Attempt>()
         .CountAsync(a => a.ExamId == examId && a.CandidateId == candidateId);
 
+        // Check for admin override that bypasses MaxAttempts
+        Domain.Entities.Attempt.AdminAttemptOverride? adminOverride = null;
         if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
         {
-            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                 $"Maximum attempts ({exam.MaxAttempts}) reached");
+            // Look for an unused admin override
+            adminOverride = await _context.Set<Domain.Entities.Attempt.AdminAttemptOverride>()
+                .FirstOrDefaultAsync(o => o.CandidateId == candidateId
+                                       && o.ExamId == examId
+                                       && !o.IsUsed
+                                       && !o.IsDeleted);
+
+            if (adminOverride == null)
+            {
+                return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
+                     $"Maximum attempts ({exam.MaxAttempts}) reached");
+            }
         }
 
         // Create new attempt
@@ -392,6 +498,17 @@ public class CandidateService : ICandidateService
 
         _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
+
+        // Mark admin override as used (if applicable)
+        if (adminOverride != null)
+        {
+            adminOverride.IsUsed = true;
+            adminOverride.UsedAttemptId = attempt.Id;
+            adminOverride.UsedAt = now;
+            adminOverride.UpdatedDate = now;
+            adminOverride.UpdatedBy = candidateId;
+            await _context.SaveChangesAsync();
+        }
 
         // Generate attempt questions
         // Generate attempt questions from sections
@@ -1222,17 +1339,47 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         var now = DateTime.UtcNow;
 
-        // Check schedule
-        if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+        // Check schedule (Flexible vs Fixed)
+        if (exam.ExamType == ExamType.Fixed)
         {
-            eligibility.CanStartNow = false;
-            eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
-        }
+            var graceMinutes = ExamDefaults.FixedStartGraceMinutes;
+            var windowEnd = exam.StartAt.HasValue
+                ? exam.StartAt.Value.AddMinutes(graceMinutes)
+                : (DateTime?)null;
 
-        if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+            if (windowEnd.HasValue && exam.EndAt.HasValue && windowEnd.Value > exam.EndAt.Value)
+                windowEnd = exam.EndAt.Value;
+
+            if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+            else if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+            else if (windowEnd.HasValue && now > windowEnd.Value)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Start window has passed. Must start within {graceMinutes} minutes of {exam.StartAt!.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+        }
+        else
         {
-            eligibility.CanStartNow = false;
-            eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            // Flexible
+            if (exam.StartAt.HasValue && now < exam.StartAt.Value)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Exam is available from {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
+
+            if (exam.EndAt.HasValue && now > exam.EndAt.Value)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+            }
         }
 
         // Check attempts
@@ -1246,8 +1393,18 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
         {
-            eligibility.CanStartNow = false;
-            eligibility.Reasons.Add($"Maximum attempts ({exam.MaxAttempts}) reached");
+            // Check for admin override before blocking
+            var hasOverride = await _context.Set<Domain.Entities.Attempt.AdminAttemptOverride>()
+                .AnyAsync(o => o.CandidateId == candidateId
+                             && o.ExamId == exam.Id
+                             && !o.IsUsed
+                             && !o.IsDeleted);
+
+            if (!hasOverride)
+            {
+                eligibility.CanStartNow = false;
+                eligibility.Reasons.Add($"Maximum attempts ({exam.MaxAttempts}) reached");
+            }
         }
 
         // Check for existing active attempt

@@ -836,3 +836,197 @@ What was done
 [21:51:32 INF] HTTP GET /api/Candidate/attempts/17/session responded 400 in 9.8150 ms
 [21:51:48 INF] HTTP POST /api/Attempt/17/events responded 400 in 5.4705 ms
 [21:51:49 INF] HTTP POST /api/Attempt/17/events responded 400 in 4.1314 ms
+
+## Resume Exam:
+
+You are my partner and senior software engineer.
+
+We have a business demo as production ready in 24 hours.
+The goal is to successfully demonstrate the system to business users and PMO — not to perfect the full backend.
+
+Time is extremely limited.
+We will work smart, professional, and production ready-focused.
+
+We have a production-ready system.
+NO breaking changes.
+NO modification of existing grading / submit / result flows.
+NO change in design styles or colors.
+Minimal API requests.
+Full backward compatibility.
+
+We are implementing a controlled Admin Override system for Attempts.
+
+============================================================
+GOAL
+============================================================
+
+We want:
+
+1. Candidate UI to have a new tab called:
+   Resume
+
+2. Resume DOES NOT mean continue attempt.
+   There is NO continue attempt in the system.
+
+3. All resumes are implemented as:
+   "Create New Attempt by Admin Override"
+
+4. AttemptsAllowed = 1 remains unchanged at exam level.
+   Admin Override is per candidate only.
+   It does NOT modify exam configuration.
+
+5. Old attempts remain immutable.
+   We NEVER reopen Submitted / Completed / Expired attempts.
+
+============================================================
+CANDIDATE SIDE
+============================================================
+
+Add a new tab in My Exams:
+Resume
+
+Rules:
+
+- Resume tab shows ONLY exams where:
+  Admin has granted a new attempt override for that specific candidate.
+
+- Resume button action:
+  → Create new attempt
+  → Redirect candidate to start exam page
+  → Standard exam start flow (camera/fullscreen/etc)
+
+- No continue logic.
+- No reopening previous attempt.
+- Old attempt stays:
+  Submitted / Completed / Expired / Terminated
+  unchanged.
+
+- If no override exists → Resume tab is empty.
+
+IMPORTANT:
+Do NOT modify:
+
+- Existing InProgress / Submitted / Completed flows
+- Result page
+- Score card
+- Grading logic
+
+============================================================
+ADMIN SIDE
+============================================================
+
+Create a new page:
+Exam Operations
+
+This is separate from:
+Exam Control (Live attempts)
+
+Exam Operations is NOT real-time.
+It works at any time.
+
+Available actions:
+
+1. Allow New Attempt (Admin Override)
+   - For selected candidate + exam
+   - Creates permission for a new attempt
+   - Does NOT modify AttemptsAllowed
+   - Does NOT reopen old attempt
+
+2. Add Time
+   - Only if there is an active attempt
+   - No change to closed attempts
+
+3. Terminate / Force End
+   - Ends active attempt only
+
+4. Resume Attempt (Continue old attempt)
+   - MUST exist in code
+   - BUT Hidden in UI
+   - Do not remove from system
+   - Do not expose in interface
+
+============================================================
+ATTEMPT LOGIC
+============================================================
+
+When Admin clicks "Allow New Attempt":
+
+Option A (preferred safe approach):
+
+- Insert a new Attempt row immediately
+
+Choose safest minimal-change implementation.
+
+Old attempts remain untouched.
+
+============================================================
+AUDIT LOG (MANDATORY)
+============================================================
+
+Every admin action must be logged:
+
+ActionType:
+
+- AllowNewAttemptOverride
+- AddTime
+- TerminateAttempt
+
+Log fields:
+
+- actorUserId
+- actorRole
+- candidateId
+- examId
+- oldAttemptId (if exists)
+- newAttemptId (if created)
+- reason (required)
+- timestamp
+- traceId
+
+Audit log must be visible in:
+Candidate Exam Details page (read-only history section)
+
+============================================================
+SAFETY RULES
+============================================================
+
+- DO NOT modify:
+  Submit endpoint
+  Grading background service
+  Result publish logic
+  Proctor logic
+  Existing enums if not required
+
+- Do NOT break existing DTO contracts.
+- Do NOT change styling.
+- Do NOT affect performance.
+- Do NOT introduce race conditions.
+
+# ============================================================
+
+# OUTPUT REQUIRED (MANDATORY)
+
+You MUST NOT mark the task as done until you complete a real verification checklist.
+
+Deliverables:
+
+1. Implementation approach explanation (why Option A/B chosen, and why it’s safest)
+2. List of modified / created files (exact paths)
+3. Safety validation checklist (how you ensured no existing flows are broken)
+4. Test & Verification Report (MANDATORY) ✅
+   - Provide step-by-step manual test cases executed
+   - Include expected vs actual results
+   - Cover both Candidate + Admin journeys
+   - Confirm no regression in:
+     Submit → Under Review → Grading → Publish → View Result
+     Proctor/live exam behaviors
+     Existing My Exams tabs
+
+5. Summary block at the end in a CODE BLOCK so I can copy it directly.
+
+Rules:
+
+- You may ask questions at any time.
+- Do not change any style or color till confirm with me.
+- Working on the task only.
+- After finish the task give me summary Output in once code bolck so I can take it copy.

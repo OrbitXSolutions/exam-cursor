@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getAvailableExams, type CandidateExam, AttemptStatus } from "@/lib/api/candidate"
+import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -25,6 +25,7 @@ import {
   Award,
   Target,
   User,
+  ShieldPlus,
 } from "lucide-react"
 
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -45,8 +46,9 @@ export type CandidateExamFilter =
   | "completed"
   | "expired"
   | "terminated"
+  | "resume"
 
-type ExamStatusKey = Exclude<CandidateExamFilter, "all">
+type ExamStatusKey = Exclude<CandidateExamFilter, "all" | "resume">
 
 export default function MyExamsPage() {
   const { t, language } = useI18n()
@@ -74,6 +76,9 @@ export default function MyExamsPage() {
   }
 
   const now = new Date()
+
+  // Count exams with admin overrides for the resume tab
+  const resumeExams = exams.filter((e) => e.hasAdminOverride === true)
 
   const statusLabels: Record<ExamStatusKey, string> = {
     available: t("candidateDashboard.available"),
@@ -136,12 +141,18 @@ export default function MyExamsPage() {
     completed: examsWithStatus.filter((e) => e.status === "completed").length,
     expired: examsWithStatus.filter((e) => e.status === "expired").length,
     terminated: examsWithStatus.filter((e) => e.status === "terminated").length,
+    resume: resumeExams.length,
   }
 
   const filteredExams = (() => {
-    let list = examsWithStatus
-      .filter((e) => filter === "all" || e.status === filter)
-      .map((e) => e.exam)
+    let list: CandidateExam[]
+    if (filter === "resume") {
+      list = resumeExams
+    } else {
+      list = examsWithStatus
+        .filter((e) => filter === "all" || e.status === filter)
+        .map((e) => e.exam)
+    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
@@ -182,6 +193,7 @@ export default function MyExamsPage() {
             { key: "completed" as const, labelKey: "candidateDashboard.completed" },
             { key: "expired" as const, labelKey: "candidateDashboard.expired" },
             { key: "terminated" as const, labelKey: "candidateDashboard.terminated" },
+            { key: "resume" as const, labelKey: "examOperations.resumeTab" },
           ] as const
         ).map(({ key, labelKey }) => (
           <button
@@ -229,8 +241,20 @@ export default function MyExamsPage() {
             const hasAttemptsRemaining = attemptsRemaining == null || attemptsRemaining > 0
             const startAt = exam.startAt ? new Date(exam.startAt) : null
             const endAt = exam.endAt ? new Date(exam.endAt) : null
-            const inWindow = (!startAt || now >= startAt) && (!endAt || now <= endAt)
+            const isFixed = exam.examType === ExamType.Fixed
+            const fixedGraceMinutes = 10
+            // For Fixed: allowed start window is [StartAt, StartAt + grace]
+            const fixedWindowEnd = isFixed && startAt
+              ? new Date(Math.min(
+                  startAt.getTime() + fixedGraceMinutes * 60_000,
+                  endAt ? endAt.getTime() : Infinity
+                ))
+              : null
+            const inWindow = isFixed
+              ? (!!startAt && now >= startAt && (!fixedWindowEnd || now <= fixedWindowEnd) && (!endAt || now <= endAt))
+              : ((!startAt || now >= startAt) && (!endAt || now <= endAt))
             const startsInFuture = !!startAt && now < startAt
+            const pastGraceWindow = isFixed && fixedWindowEnd && now > fixedWindowEnd && (!endAt || now <= endAt)
             const latestAttemptId = exam.latestAttemptId ?? null
             const latestPublished = exam.latestAttemptIsResultPublished === true
 
@@ -238,11 +262,12 @@ export default function MyExamsPage() {
             const canView = statusKey === "completed" && latestPublished && latestAttemptId != null
             // Use server-driven canRetake flag (falls back to FE logic for safety)
             const isPassedAndPublished = exam.myBestIsPassed === true && latestPublished
-            const canRetake = exam.canRetake ??
+            const hasOverride = exam.hasAdminOverride === true
+            const canRetake = hasOverride || (exam.canRetake ??
               ((statusKey === "completed" || statusKey === "expired" || statusKey === "terminated") &&
               hasAttemptsRemaining &&
               inWindow &&
-              !isPassedAndPublished)
+              !isPassedAndPublished))
             const canStart = statusKey === "available" && inWindow && hasAttemptsRemaining
 
             let primaryAction: {
@@ -347,6 +372,12 @@ export default function MyExamsPage() {
                     ) : null}
                   </div>
                   <Badge className={`border text-sm px-3 py-1 ${statusClass}`}>{statusLabel}</Badge>
+                  {hasOverride && (
+                    <Badge className="border border-violet-200 bg-violet-50 text-violet-700 text-xs px-2 py-0.5">
+                      <ShieldPlus className="mr-1 h-3 w-3" />
+                      {t("examOperations.adminOverride") || "Admin Override"}
+                    </Badge>
+                  )}
                 </div>
 
                 <CardContent className="space-y-5 p-5">
@@ -477,6 +508,15 @@ export default function MyExamsPage() {
                     <div className="flex items-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3 text-blue-700 dark:text-blue-400">
                       <Clock className="h-4 w-4" />
                       <span className="text-sm">{t("myExams.startsOn")} {formatDateTime(exam.startAt)}</span>
+                    </div>
+                  )}
+
+                  {pastGraceWindow && statusKey === "available" && (
+                    <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 p-3 text-amber-700 dark:text-amber-400">
+                      <AlertCircle className="h-4 w-4" />
+                      <span className="text-sm">
+                        {t("myExams.graceWindowPassed") || "The allowed start window has passed"}
+                      </span>
                     </div>
                   )}
 

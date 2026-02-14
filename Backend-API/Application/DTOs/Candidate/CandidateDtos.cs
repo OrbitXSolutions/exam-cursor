@@ -33,6 +33,11 @@ public class CandidateExamListDto
     /// within exam window, and has NOT already passed with a published result).
     /// </summary>
     public bool CanRetake { get; set; }
+
+    /// <summary>
+    /// True when admin has granted an unused override for an additional attempt.
+    /// </summary>
+    public bool HasAdminOverride { get; set; }
 }
 
 /// <summary>

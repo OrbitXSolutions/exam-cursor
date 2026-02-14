@@ -13,6 +13,11 @@ public interface ICandidateService
     Task<ApiResponse<List<CandidateExamListDto>>> GetAvailableExamsAsync(string candidateId);
 
     /// <summary>
+    /// Get exams where admin has granted an unused override for additional attempt (Resume tab)
+    /// </summary>
+    Task<ApiResponse<List<CandidateExamListDto>>> GetAdminOverrideExamsAsync(string candidateId);
+
+    /// <summary>
     /// Get exam preview with instructions and eligibility check
     /// </summary>
     Task<ApiResponse<CandidateExamPreviewDto>> GetExamPreviewAsync(int examId, string candidateId);

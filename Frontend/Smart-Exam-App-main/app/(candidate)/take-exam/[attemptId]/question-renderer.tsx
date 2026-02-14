@@ -152,7 +152,7 @@ function MCQSingleChoice({
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
   return (
-    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-3">
+    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2">
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOption === option.id.toString()
@@ -167,15 +167,15 @@ function MCQSingleChoice({
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-start gap-3 p-4"
+              className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
             >
               <RadioGroupItem
                 value={option.id.toString()}
                 id={`option-${option.id}`}
-                className="mt-1"
+                className="mt-0.5"
               />
-              <div className="flex-1 space-y-2">
-                <p className="text-base leading-relaxed">{optionText}</p>
+              <div className="flex-1 space-y-1.5">
+                <p className="text-sm leading-normal">{optionText}</p>
                 {option.attachmentPath && (
                   <div className="relative h-48 w-full overflow-hidden rounded-md border">
                     <Image
@@ -229,7 +229,7 @@ function MCQMultipleChoice({
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOptions.has(option.id)
@@ -244,16 +244,16 @@ function MCQMultipleChoice({
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-start gap-3 p-4"
+              className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
             >
               <Checkbox
                 id={`option-${option.id}`}
                 checked={isSelected}
                 onCheckedChange={(checked) => handleChange(option.id, checked as boolean)}
-                className="mt-1"
+                className="mt-0.5"
               />
-              <div className="flex-1 space-y-2">
-                <p className="text-base leading-relaxed">{optionText}</p>
+              <div className="flex-1 space-y-1.5">
+                <p className="text-sm leading-normal">{optionText}</p>
                 {option.attachmentPath && (
                   <div className="relative h-48 w-full overflow-hidden rounded-md border">
                     <Image
@@ -301,7 +301,7 @@ function TrueFalse({
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
   return (
-    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-3">
+    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2">
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOption === option.id.toString()
@@ -316,7 +316,7 @@ function TrueFalse({
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-center gap-3 p-4"
+              className="flex cursor-pointer items-center gap-3 px-4 py-2.5"
             >
               <RadioGroupItem
                 value={option.id.toString()}
