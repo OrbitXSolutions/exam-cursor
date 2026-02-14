@@ -64,6 +64,7 @@ interface ProctorSessionListDto {
   riskScore?: number;
   decisionStatus?: number;
   requiresReview: boolean;
+  isFlagged?: boolean;
   isSample?: boolean;
   latestSnapshotUrl?: string;
   snapshotCount?: number;
@@ -86,7 +87,7 @@ function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
     timeRemaining: 0,
     status,
     incidentCount: dto.totalViolations ?? 0,
-    flagged: dto.requiresReview ?? false,
+    flagged: dto.isFlagged ?? false,
     lastActivity: dto.startedAt,
     isSample: dto.isSample ?? false,
     latestSnapshotUrl: dto.latestSnapshotUrl ?? undefined,
@@ -153,6 +154,7 @@ export async function getLiveSessions(): Promise<LiveSession[]> {
     const query = new URLSearchParams();
     query.set("PageNumber", "1");
     query.set("PageSize", "100");
+    query.set("Status", "1");
     query.set("IncludeSamples", "true");
     const raw = await apiClient.get<{ items?: ProctorSessionListDto[] }>(
       `/Proctor/sessions?${query}`,
@@ -181,6 +183,7 @@ interface ProctorSessionDetailDto {
   totalViolations: number;
   riskScore?: number;
   lastHeartbeatAt?: string;
+  isFlagged?: boolean;
 }
 
 /**
@@ -227,7 +230,7 @@ export async function getSessionDetails(
           ? "Terminated"
           : "Completed",
     incidentCount: data.totalViolations ?? 0,
-    flagged: false,
+    flagged: data.isFlagged ?? false,
     lastActivity: data.lastHeartbeatAt ?? data.startedAt,
   };
   let incidents: Incident[] = [];
@@ -269,35 +272,34 @@ export async function getSessionDetails(
 }
 
 /**
- * Flag/unflag session (no backend endpoint - no-op for now)
+ * Flag/unflag session — POST /Proctor/session/{sessionId}/flag
  */
 export async function flagSession(
   sessionId: string,
-  _flagged: boolean,
+  flagged: boolean,
 ): Promise<void> {
-  await Promise.resolve();
-  console.warn("[Proctor] flagSession not implemented for session", sessionId);
+  await apiClient.post(`/Proctor/session/${sessionId}/flag`, { flagged });
 }
 
 /**
- * Send warning to candidate (no backend endpoint - no-op for now)
+ * Send warning to candidate — POST /Proctor/session/{sessionId}/warning
  */
 export async function sendWarning(
   sessionId: string,
-  _message: string,
+  message: string,
 ): Promise<void> {
-  await Promise.resolve();
-  console.warn("[Proctor] sendWarning not implemented for session", sessionId);
+  await apiClient.post(`/Proctor/session/${sessionId}/warning`, { message });
 }
 
 /**
- * Terminate session - POST /Proctor/session/{sessionId}/cancel
+ * Terminate session — POST /Proctor/session/{sessionId}/terminate
+ * This also force-ends the candidate's attempt.
  */
 export async function terminateSession(
   sessionId: string,
-  _reason: string,
+  reason: string,
 ): Promise<void> {
-  await apiClient.post(`/Proctor/session/${sessionId}/cancel`, {});
+  await apiClient.post(`/Proctor/session/${sessionId}/terminate`, { reason });
 }
 
 /**
@@ -434,4 +436,32 @@ export async function applyBulkVerificationAction(
     `/proctor/authentication/bulk-action`,
     { ids, action, reason: reason ?? undefined },
   );
+}
+
+// ============ CANDIDATE SESSION STATUS (POLLING) ============
+
+export interface CandidateSessionStatus {
+  hasWarning: boolean;
+  warningMessage?: string;
+  isTerminated: boolean;
+  terminationReason?: string;
+}
+
+/**
+ * Candidate polls this for pending proctor warnings or termination.
+ * GET /Proctor/candidate-status/{attemptId}
+ * Warning is cleared from backend after delivery.
+ */
+export async function getCandidateSessionStatus(
+  attemptId: number,
+): Promise<CandidateSessionStatus> {
+  try {
+    const res = await apiClient.get<CandidateSessionStatus>(
+      `/Proctor/candidate-status/${attemptId}`,
+    );
+    return res ?? { hasWarning: false, isTerminated: false };
+  } catch {
+    // Silent fail — don't disrupt exam if poll fails
+    return { hasWarning: false, isTerminated: false };
+  }
 }

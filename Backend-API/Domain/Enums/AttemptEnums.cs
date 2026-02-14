@@ -38,7 +38,12 @@ public enum AttemptStatus : byte
     /// <summary>
     /// Attempt was force-submitted by an administrator
     /// </summary>
-    ForceSubmitted = 7
+    ForceSubmitted = 7,
+
+    /// <summary>
+    /// Attempt was terminated by a proctor (not a submission)
+    /// </summary>
+    Terminated = 8
 }
 
 /// <summary>

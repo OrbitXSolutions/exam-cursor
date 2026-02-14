@@ -169,7 +169,8 @@ public class CandidateService : ICandidateService
                        && (latestAttempt.Status == AttemptStatus.Submitted
                         || latestAttempt.Status == AttemptStatus.Expired
                         || latestAttempt.Status == AttemptStatus.Cancelled
-                        || latestAttempt.Status == AttemptStatus.ForceSubmitted);
+                        || latestAttempt.Status == AttemptStatus.ForceSubmitted
+                        || latestAttempt.Status == AttemptStatus.Terminated);
 
                    var hasAdminOverride = overrideExamIdSet.Contains(e.Id);
 
@@ -627,7 +628,7 @@ public class CandidateService : ICandidateService
         }
 
         if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
-               attempt.Status == AttemptStatus.Cancelled)
+               attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Terminated)
         {
             return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
 $"Attempt is {attempt.Status}. Cannot resume.");
@@ -1437,7 +1438,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
     {
         if (!attempt.ExpiresAt.HasValue) return 0;
         if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
-         attempt.Status == AttemptStatus.Cancelled)
+         attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Terminated)
         {
             return 0;
         }

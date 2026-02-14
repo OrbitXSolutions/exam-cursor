@@ -379,7 +379,8 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
             AttemptStatus.Submitted,
             AttemptStatus.Expired,
             AttemptStatus.Cancelled,
-            AttemptStatus.ForceSubmitted
+            AttemptStatus.ForceSubmitted,
+            AttemptStatus.Terminated
         };
 
         if (terminalStatuses.Contains(attempt.Status))

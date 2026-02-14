@@ -32,6 +32,7 @@ public class ProctorSessionDto
     public string RiskLevel => GetRiskLevel(RiskScore);
     public DateTime? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
+    public bool IsFlagged { get; set; }
     public ProctorDecisionDto? Decision { get; set; }
     public List<ProctorEventDto> RecentEvents { get; set; } = new();
 
@@ -65,6 +66,7 @@ public class ProctorSessionListDto
     public decimal? RiskScore { get; set; }
     public ProctorDecisionStatus? DecisionStatus { get; set; }
     public bool RequiresReview { get; set; }
+    public bool IsFlagged { get; set; }
     public bool IsSample { get; set; }
     public string? LatestSnapshotUrl { get; set; }
     public int SnapshotCount { get; set; }
@@ -450,6 +452,45 @@ public class LiveMonitoringDto
     public DateTime? LastHeartbeatAt { get; set; }
     public bool IsOnline { get; set; }
     public ProctorEventDto? LastEvent { get; set; }
+}
+
+#endregion
+
+#region Proctor Action DTOs
+
+/// <summary>
+/// Toggle flag on a session
+/// </summary>
+public class FlagSessionDto
+{
+    public bool Flagged { get; set; }
+}
+
+/// <summary>
+/// Send warning to candidate
+/// </summary>
+public class SendWarningDto
+{
+    public string Message { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Terminate session with reason (also force-ends Attempt)
+/// </summary>
+public class TerminateSessionDto
+{
+    public string Reason { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Candidate session status (polled by candidate exam page)
+/// </summary>
+public class CandidateSessionStatusDto
+{
+    public bool HasWarning { get; set; }
+    public string? WarningMessage { get; set; }
+    public bool IsTerminated { get; set; }
+    public string? TerminationReason { get; set; }
 }
 
 #endregion

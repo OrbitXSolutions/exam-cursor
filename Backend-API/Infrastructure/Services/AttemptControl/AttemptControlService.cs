@@ -335,7 +335,8 @@ public class AttemptControlService : IAttemptControlService
         AttemptStatus status, DateTime? expiresAt, DateTime? submittedAt, DateTime now)
     {
         if (status == AttemptStatus.Submitted || status == AttemptStatus.ForceSubmitted
-            || status == AttemptStatus.Expired || status == AttemptStatus.Cancelled)
+            || status == AttemptStatus.Expired || status == AttemptStatus.Cancelled
+            || status == AttemptStatus.Terminated)
             return 0;
 
         if (expiresAt.HasValue)

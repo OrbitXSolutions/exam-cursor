@@ -88,6 +88,56 @@ public class ProctorController : ControllerBase
     }
 
     /// <summary>
+    /// Toggle flag on a proctor session
+    /// </summary>
+    [HttpPost("session/{sessionId}/flag")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
+    public async Task<IActionResult> FlagSession(int sessionId, [FromBody] FlagSessionDto dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _proctorService.FlagSessionAsync(sessionId, dto.Flagged, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Send a warning to a candidate during an active session
+    /// </summary>
+    [HttpPost("session/{sessionId}/warning")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer")]
+    public async Task<IActionResult> SendWarning(int sessionId, [FromBody] SendWarningDto dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _proctorService.SendWarningAsync(sessionId, dto.Message, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Terminate a session and force-end the candidate's attempt
+    /// </summary>
+    [HttpPost("session/{sessionId}/terminate")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    public async Task<IActionResult> TerminateSession(int sessionId, [FromBody] TerminateSessionDto dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _proctorService.TerminateSessionAsync(sessionId, dto.Reason, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Candidate polls this endpoint for pending warnings or termination
+    /// </summary>
+    [HttpGet("candidate-status/{attemptId}")]
+    public async Task<IActionResult> GetCandidateSessionStatus(int attemptId)
+    {
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+            return Unauthorized();
+
+        var result = await _proctorService.GetCandidateSessionStatusAsync(attemptId, candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
     /// Get all proctor sessions with filtering
     /// </summary>
     [HttpGet("sessions")]

@@ -60,7 +60,7 @@ export default function ProctorCenterPage() {
   useEffect(() => {
     loadSessions()
     // Auto-refresh every 30 seconds
-    const interval = setInterval(loadSessions, 30000)
+    const interval = setInterval(loadSessions, 5000)
     return () => clearInterval(interval)
   }, [])
 

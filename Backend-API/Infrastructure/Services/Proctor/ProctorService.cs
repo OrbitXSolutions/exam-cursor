@@ -1102,6 +1102,194 @@ UploadEvidenceDto dto, string candidateId)
 
     #endregion
 
+    #region Proctor Actions
+
+    public async Task<ApiResponse<bool>> FlagSessionAsync(int sessionId, bool flagged, string proctorUserId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
+
+        if (session == null)
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
+        var now = DateTime.UtcNow;
+        session.IsFlagged = flagged;
+        session.UpdatedDate = now;
+        session.UpdatedBy = proctorUserId;
+
+        // Log the flag/unflag event
+        var evt = new ProctorEvent
+        {
+            ProctorSessionId = sessionId,
+            AttemptId = session.AttemptId,
+            EventType = flagged ? ProctorEventType.ProctorFlagged : ProctorEventType.ProctorUnflagged,
+            Severity = 2,
+            IsViolation = false,
+            MetadataJson = System.Text.Json.JsonSerializer.Serialize(new { proctorUserId, flagged }),
+            ClientTimestamp = now,
+            OccurredAt = now,
+            SequenceNumber = session.TotalEvents + 1,
+            CreatedDate = now,
+            CreatedBy = proctorUserId
+        };
+        _context.Set<ProctorEvent>().Add(evt);
+        session.TotalEvents++;
+
+        await _context.SaveChangesAsync();
+
+        return ApiResponse<bool>.SuccessResponse(true, flagged ? "Session flagged" : "Session unflagged");
+    }
+
+    public async Task<ApiResponse<bool>> SendWarningAsync(int sessionId, string message, string proctorUserId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
+
+        if (session == null)
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
+        if (session.Status != ProctorSessionStatus.Active)
+            return ApiResponse<bool>.FailureResponse("Session is not active");
+
+        if (string.IsNullOrWhiteSpace(message))
+            return ApiResponse<bool>.FailureResponse("Warning message is required");
+
+        var now = DateTime.UtcNow;
+        session.PendingWarningMessage = message;
+        session.UpdatedDate = now;
+        session.UpdatedBy = proctorUserId;
+
+        // Log the warning event
+        var evt = new ProctorEvent
+        {
+            ProctorSessionId = sessionId,
+            AttemptId = session.AttemptId,
+            EventType = ProctorEventType.ProctorWarning,
+            Severity = 3,
+            IsViolation = false,
+            MetadataJson = System.Text.Json.JsonSerializer.Serialize(new { proctorUserId, message }),
+            ClientTimestamp = now,
+            OccurredAt = now,
+            SequenceNumber = session.TotalEvents + 1,
+            CreatedDate = now,
+            CreatedBy = proctorUserId
+        };
+        _context.Set<ProctorEvent>().Add(evt);
+        session.TotalEvents++;
+
+        await _context.SaveChangesAsync();
+
+        return ApiResponse<bool>.SuccessResponse(true, "Warning sent to candidate");
+    }
+
+    public async Task<ApiResponse<bool>> TerminateSessionAsync(int sessionId, string reason, string proctorUserId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .Include(s => s.Attempt)
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
+
+        if (session == null)
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
+        var now = DateTime.UtcNow;
+
+        // Mark session as cancelled/terminated
+        session.Status = ProctorSessionStatus.Cancelled;
+        session.EndedAt = now;
+        session.IsTerminatedByProctor = true;
+        session.TerminationReason = reason;
+        session.UpdatedDate = now;
+        session.UpdatedBy = proctorUserId;
+
+        // Log the termination event
+        var evt = new ProctorEvent
+        {
+            ProctorSessionId = sessionId,
+            AttemptId = session.AttemptId,
+            EventType = ProctorEventType.ProctorTerminated,
+            Severity = 5,
+            IsViolation = true,
+            MetadataJson = System.Text.Json.JsonSerializer.Serialize(new { proctorUserId, reason }),
+            ClientTimestamp = now,
+            OccurredAt = now,
+            SequenceNumber = session.TotalEvents + 1,
+            CreatedDate = now,
+            CreatedBy = proctorUserId
+        };
+        _context.Set<ProctorEvent>().Add(evt);
+        session.TotalEvents++;
+        session.TotalViolations++;
+
+        // Force-end the Attempt (same pattern as ExamOperationsService.TerminateAttemptAsync)
+        var attempt = session.Attempt;
+        if (attempt != null &&
+            (attempt.Status == AttemptStatus.InProgress ||
+             attempt.Status == AttemptStatus.Started ||
+             attempt.Status == AttemptStatus.Paused))
+        {
+            attempt.Status = AttemptStatus.Terminated;
+            attempt.UpdatedDate = now;
+            attempt.UpdatedBy = proctorUserId;
+
+            _context.Set<Domain.Entities.Attempt.AttemptEvent>().Add(new Domain.Entities.Attempt.AttemptEvent
+            {
+                AttemptId = attempt.Id,
+                EventType = AttemptEventType.ForceEnded,
+                OccurredAt = now,
+                MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    source = "ProctorTerminate",
+                    proctorUserId,
+                    reason,
+                    proctorSessionId = sessionId
+                }),
+                CreatedBy = proctorUserId,
+                CreatedDate = now
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        return ApiResponse<bool>.SuccessResponse(true, "Session terminated and attempt force-ended");
+    }
+
+    public async Task<ApiResponse<CandidateSessionStatusDto>> GetCandidateSessionStatusAsync(int attemptId, string candidateId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .Where(s => s.AttemptId == attemptId && s.CandidateId == candidateId)
+            .OrderByDescending(s => s.StartedAt)
+            .FirstOrDefaultAsync();
+
+        if (session == null)
+        {
+            // No proctor session — return safe defaults
+            return ApiResponse<CandidateSessionStatusDto>.SuccessResponse(new CandidateSessionStatusDto
+            {
+                HasWarning = false,
+                IsTerminated = false
+            });
+        }
+
+        var dto = new CandidateSessionStatusDto
+        {
+            HasWarning = !string.IsNullOrEmpty(session.PendingWarningMessage),
+            WarningMessage = session.PendingWarningMessage,
+            IsTerminated = session.IsTerminatedByProctor,
+            TerminationReason = session.TerminationReason
+        };
+
+        // Clear the pending warning after delivery
+        if (dto.HasWarning)
+        {
+            session.PendingWarningMessage = null;
+            await _context.SaveChangesAsync();
+        }
+
+        return ApiResponse<CandidateSessionStatusDto>.SuccessResponse(dto);
+    }
+
+    #endregion
+
     #region Cleanup
 
     public async Task<int> CleanupExpiredEvidenceAsync()
@@ -1291,6 +1479,7 @@ UploadEvidenceDto dto, string candidateId)
             RiskScore = session.RiskScore,
             LastHeartbeatAt = session.LastHeartbeatAt,
             HeartbeatMissedCount = session.HeartbeatMissedCount,
+            IsFlagged = session.IsFlagged,
             Decision = session.Decision != null ? MapToDecisionDto(session.Decision) : null,
             RecentEvents = session.Events.Select(MapToEventDto).ToList()
         };
@@ -1323,6 +1512,7 @@ UploadEvidenceDto dto, string candidateId)
             RiskScore = session.RiskScore,
             DecisionStatus = session.Decision?.Status,
             RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending,
+            IsFlagged = session.IsFlagged,
             LatestSnapshotUrl = latestUrl,
             SnapshotCount = imageEvidence?.Count ?? 0,
             LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate

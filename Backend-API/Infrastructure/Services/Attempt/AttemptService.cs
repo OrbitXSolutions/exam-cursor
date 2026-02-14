@@ -267,7 +267,7 @@ public class AttemptService : IAttemptService
     }
 
     if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
- attempt.Status == AttemptStatus.Cancelled)
+ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Terminated)
     {
       return ApiResponse<AttemptSessionDto>.FailureResponse(
          $"Attempt is {attempt.Status}. Cannot resume.");
@@ -955,7 +955,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<bool>.FailureResponse("Attempt not found");
     }
 
-    if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Cancelled)
+    if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Cancelled ||
+ attempt.Status == AttemptStatus.Terminated)
     {
       return ApiResponse<bool>.FailureResponse($"Cannot cancel. Attempt is already {attempt.Status}.");
     }
@@ -1055,7 +1056,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
   {
     if (!attempt.ExpiresAt.HasValue) return 0;
     if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
-attempt.Status == AttemptStatus.Cancelled)
+attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Terminated)
     {
       return 0;
     }

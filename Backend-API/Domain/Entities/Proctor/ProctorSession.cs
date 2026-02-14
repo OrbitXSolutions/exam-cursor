@@ -30,9 +30,9 @@ public class ProctorSession : BaseEntity
     // Runtime fingerprint
     public string? DeviceFingerprint { get; set; }
     public string? UserAgent { get; set; }
-  public string? IpAddress { get; set; }
+    public string? IpAddress { get; set; }
 
- // Browser/device info
+    // Browser/device info
     public string? BrowserName { get; set; }
     public string? BrowserVersion { get; set; }
     public string? OperatingSystem { get; set; }
@@ -49,16 +49,22 @@ public class ProctorSession : BaseEntity
     public DateTime? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
 
+    // Proctor flags & warnings
+    public bool IsFlagged { get; set; }
+    public string? PendingWarningMessage { get; set; }
+    public bool IsTerminatedByProctor { get; set; }
+    public string? TerminationReason { get; set; }
+
     // Navigation Properties
     public virtual Attempt.Attempt Attempt { get; set; } = null!;
     public virtual Exam Exam { get; set; } = null!;
-  public virtual ApplicationUser Candidate { get; set; } = null!;
+    public virtual ApplicationUser Candidate { get; set; } = null!;
 
     public virtual ICollection<ProctorEvent> Events { get; set; }
         = new List<ProctorEvent>();
 
- public virtual ICollection<ProctorEvidence> EvidenceItems { get; set; }
-        = new List<ProctorEvidence>();
+    public virtual ICollection<ProctorEvidence> EvidenceItems { get; set; }
+           = new List<ProctorEvidence>();
 
     public virtual ICollection<ProctorRiskSnapshot> RiskSnapshots { get; set; }
         = new List<ProctorRiskSnapshot>();

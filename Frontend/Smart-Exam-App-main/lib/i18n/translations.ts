@@ -587,6 +587,13 @@ export const translations = {
       sessionLoadError:
         "There was a problem loading your exam session. Please try again.",
       backToMyExams: "Back to My Exams",
+
+      // Proctor warnings (candidate side)
+      terminatedByProctor: "Your exam has been terminated by the proctor",
+      proctorWarningTitle: "Warning from Proctor",
+      proctorWarningNote:
+        "Please follow the proctor's instructions. Continued violations may result in session termination.",
+      understood: "I Understand",
     },
 
     // Grading
@@ -1855,6 +1862,13 @@ export const translations = {
       sessionLoadError:
         "حدثت مشكلة في تحميل جلسة الاختبار. يرجى المحاولة مرة أخرى.",
       backToMyExams: "العودة إلى اختباراتي",
+
+      // Proctor warnings (candidate side)
+      terminatedByProctor: "تم إنهاء اختبارك من قبل المراقب",
+      proctorWarningTitle: "تحذير من المراقب",
+      proctorWarningNote:
+        "يرجى اتباع تعليمات المراقب. قد يؤدي الاستمرار في المخالفات إلى إنهاء الجلسة.",
+      understood: "فهمت",
     },
 
     // Grading

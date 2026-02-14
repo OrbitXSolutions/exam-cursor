@@ -16,7 +16,7 @@ import {
   AttemptEventType,
   getAttemptTimer,
 } from "@/lib/api/candidate"
-import { uploadProctorSnapshot } from "@/lib/api/proctoring"
+import { uploadProctorSnapshot, getCandidateSessionStatus } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -91,6 +91,10 @@ export default function ExamPage() {
   const [lastSnapshotOk, setLastSnapshotOk] = useState<boolean | null>(null)
   const [snapshotFailStreak, setSnapshotFailStreak] = useState(0)
 
+  // Proctor warning state
+  const [proctorWarningOpen, setProctorWarningOpen] = useState(false)
+  const [proctorWarningMessage, setProctorWarningMessage] = useState("")
+
   // Refs
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const sectionTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -100,6 +104,7 @@ export default function ExamPage() {
   const activatedSectionsRef = useRef<Set<number>>(new Set()) // Track activated sections for interval callback
   const webcamStreamRef = useRef<MediaStream | null>(null) // Persistent webcam stream
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null) // Video element for webcam
+  const proctorPollRef = useRef<NodeJS.Timeout | undefined>(undefined) // Proctor warning poll
 
   // Computed values
   const sections = session?.sections || []
@@ -523,6 +528,34 @@ export default function ExamPage() {
         }
       }, 60000)
 
+      // Poll proctor warnings every 15 seconds
+      proctorPollRef.current = setInterval(async () => {
+        try {
+          const status = await getCandidateSessionStatus(sessionData.attemptId)
+          if (status.isTerminated) {
+            // Proctor terminated the session — force submit
+            stopAllBackgroundActivity()
+            toast.error(
+              status.terminationReason
+                ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
+                : t("exam.terminatedByProctor"),
+              { duration: 10000 }
+            )
+            router.push("/my-exams")
+            return
+          }
+          if (status.hasWarning && status.warningMessage) {
+            // Play alert sound
+            playWarningBeep()
+            // Show warning dialog
+            setProctorWarningMessage(status.warningMessage)
+            setProctorWarningOpen(true)
+          }
+        } catch {
+          // Silent fail — don't disrupt exam
+        }
+      }, 15000)
+
       // Log exam started event
       await logAttemptEvent(sessionData.attemptId, {
         eventType: AttemptEventType.Started,
@@ -632,12 +665,54 @@ export default function ExamPage() {
     })
   }, [])
 
+  // Play a short beep sound to alert the candidate of a proctor warning
+  function playWarningBeep() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      // First beep
+      const osc1 = ctx.createOscillator()
+      const gain1 = ctx.createGain()
+      osc1.type = "sine"
+      osc1.frequency.value = 880 // A5 note
+      gain1.gain.value = 0.3
+      osc1.connect(gain1)
+      gain1.connect(ctx.destination)
+      osc1.start(ctx.currentTime)
+      osc1.stop(ctx.currentTime + 0.15)
+      // Second beep after gap
+      const osc2 = ctx.createOscillator()
+      const gain2 = ctx.createGain()
+      osc2.type = "sine"
+      osc2.frequency.value = 880
+      gain2.gain.value = 0.3
+      osc2.connect(gain2)
+      gain2.connect(ctx.destination)
+      osc2.start(ctx.currentTime + 0.25)
+      osc2.stop(ctx.currentTime + 0.4)
+      // Third beep
+      const osc3 = ctx.createOscillator()
+      const gain3 = ctx.createGain()
+      osc3.type = "sine"
+      osc3.frequency.value = 1046.5 // C6 note
+      gain3.gain.value = 0.3
+      osc3.connect(gain3)
+      gain3.connect(ctx.destination)
+      osc3.start(ctx.currentTime + 0.5)
+      osc3.stop(ctx.currentTime + 0.8)
+      // Cleanup
+      setTimeout(() => ctx.close().catch(() => {}), 1500)
+    } catch {
+      // Silent fail — audio not critical
+    }
+  }
+
   // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
   function stopAllBackgroundActivity() {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = undefined }
     if (sectionTimerRef.current) { clearInterval(sectionTimerRef.current); sectionTimerRef.current = undefined }
     if (syncTimerRef.current) { clearInterval(syncTimerRef.current); syncTimerRef.current = undefined }
     if (snapshotIntervalRef.current) { clearInterval(snapshotIntervalRef.current); snapshotIntervalRef.current = undefined }
+    if (proctorPollRef.current) { clearInterval(proctorPollRef.current); proctorPollRef.current = undefined }
     // Stop webcam stream
     if (webcamStreamRef.current) {
       webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -1213,6 +1288,33 @@ export default function ExamPage() {
               }}
             >
               {t("exam.continueToSection") || "Continue"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Proctor Warning Dialog */}
+      <AlertDialog open={proctorWarningOpen} onOpenChange={setProctorWarningOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="h-5 w-5" />
+              {t("exam.proctorWarningTitle") || "Warning from Proctor"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                  {proctorWarningMessage}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {t("exam.proctorWarningNote") || "Please follow the proctor's instructions. Continued violations may result in session termination."}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setProctorWarningOpen(false)}>
+              {t("exam.understood") || "I Understand"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
