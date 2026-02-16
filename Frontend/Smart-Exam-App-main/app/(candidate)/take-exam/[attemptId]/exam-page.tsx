@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -79,6 +79,9 @@ export default function ExamPage() {
   const [savingAnswers, setSavingAnswers] = useState<Set<number>>(new Set())
   const [sectionChangeConfirmOpen, setSectionChangeConfirmOpen] = useState(false)
   const [pendingSectionId, setPendingSectionId] = useState<number | null>(null)
+
+  // Summary panel state
+  const [showSummary, setShowSummary] = useState(false)
 
   // Auto-save indicator state
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
@@ -855,6 +858,28 @@ export default function ExamPage() {
     return count
   }
 
+  function getFlaggedInSection(section: ExamSection): number {
+    let count = 0
+    for (const topic of section.topics || []) {
+      for (const q of topic.questions || []) {
+        if (flagged.has(q.questionId)) count++
+      }
+    }
+    for (const q of section.questions || []) {
+      if (flagged.has(q.questionId)) count++
+    }
+    return count
+  }
+
+  function getAllSectionQuestions(section: ExamSection): AttemptQuestionDto[] {
+    const questions: AttemptQuestionDto[] = []
+    for (const topic of section.topics || []) {
+      questions.push(...(topic.questions || []).sort((a, b) => a.order - b.order))
+    }
+    questions.push(...(section.questions || []).sort((a, b) => a.order - b.order))
+    return questions
+  }
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -1015,6 +1040,17 @@ export default function ExamPage() {
               </span>
             </div>
 
+            {/* Summary Toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSummary(!showSummary)}
+              className={cn("gap-1.5", showSummary && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
+            >
+              <ListChecks className="h-4 w-4" />
+              <span className="hidden sm:inline">{language === "ar" ? "ملخص" : "Summary"}</span>
+            </Button>
+
             {/* Submit Button */}
             <Button
               onClick={() => setSubmitDialogOpen(true)}
@@ -1039,7 +1075,8 @@ export default function ExamPage() {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-w-0">
         {hasSections ? (
           // Exam with sections as tabs - show ALL questions in scrollable list
           <Tabs
@@ -1176,6 +1213,205 @@ export default function ExamPage() {
                 </Button>
               </div>
             </div>
+          </div>
+        )}
+        </div>
+
+        {/* Summary Panel */}
+        {showSummary && (
+          <div className="w-72 border-l bg-muted/20 flex flex-col overflow-hidden shrink-0">
+            <div className="border-b px-4 py-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold flex items-center gap-2">
+                <ListChecks className="h-4 w-4" />
+                {language === "ar" ? "ملخص الامتحان" : "Exam Summary"}
+              </h2>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowSummary(false)}>
+                <XCircle className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            <ScrollArea className="flex-1">
+              <div className="p-3 space-y-3">
+                {/* Overall Stats */}
+                <div className="rounded-lg border bg-card p-3 space-y-2">
+                  <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
+                    {language === "ar" ? "الإجمالي" : "Overall"}
+                  </h3>
+                  <div className="space-y-1.5 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                        {language === "ar" ? "تمت الإجابة" : "Answered"}
+                      </span>
+                      <span className="font-semibold">{answeredCount}/{totalQuestions}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                        {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                      </span>
+                      <span className="font-semibold">{totalQuestions - answeredCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                        {language === "ar" ? "مُعلَّم" : "Flagged"}
+                      </span>
+                      <span className="font-semibold">{flagged.size}</span>
+                    </div>
+                  </div>
+                  <div className="pt-1">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                      <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${progress}%` }} />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-right mt-0.5">{Math.round(progress)}%</p>
+                  </div>
+                </div>
+
+                {/* Per-Section Stats */}
+                {hasSections && sections.map((section) => {
+                  const sectionTotal = getSectionQuestionsCount(section)
+                  const sectionAnswered = getAnsweredInSection(section)
+                  const sectionFlaggedCount = getFlaggedInSection(section)
+                  const sectionProgress = sectionTotal > 0 ? (sectionAnswered / sectionTotal) * 100 : 0
+                  const sectionQuestions = getAllSectionQuestions(section)
+                  const isActive = section.sectionId === currentSectionId
+                  const sectionIndex = sections.findIndex(s => s.sectionId === section.sectionId)
+                  const currentIdx = sections.findIndex(s => s.sectionId === currentSectionId)
+                  const isPrevLocked = sectionIndex < currentIdx && session?.examSettings?.lockPreviousSections
+                  const isExpired = sectionTimers[section.sectionId] !== undefined && sectionTimers[section.sectionId] <= 0
+                  const isDisabled = (isPrevLocked || isExpired) && !isActive
+
+                  return (
+                    <div
+                      key={section.sectionId}
+                      className={cn(
+                        "rounded-lg border p-3 space-y-2 transition-colors",
+                        isActive ? "border-primary bg-primary/5" : "",
+                        isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-muted/40"
+                      )}
+                      onClick={() => {
+                        if (isDisabled) {
+                          toast.warning(isExpired
+                            ? (language === "ar" ? "انتهى وقت هذا القسم" : "This section's time has expired")
+                            : t("exam.cannotGoBack"))
+                          return
+                        }
+                        if (sectionIndex > currentIdx && session?.examSettings?.lockPreviousSections) {
+                          setPendingSectionId(section.sectionId)
+                          setSectionChangeConfirmOpen(true)
+                          return
+                        }
+                        setCurrentSectionId(section.sectionId)
+                      }}
+                    >
+                      <h3 className="text-xs font-semibold truncate flex items-center gap-1.5" title={getLocalizedField(section, "title", language)}>
+                        {(isPrevLocked || isExpired) && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
+                        {getLocalizedField(section, "title", language)}
+                      </h3>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                            {language === "ar" ? "تمت الإجابة" : "Answered"}
+                          </span>
+                          <span className="font-medium">{sectionAnswered}/{sectionTotal}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-gray-300 dark:bg-gray-600" />
+                            {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                          </span>
+                          <span className="font-medium">{sectionTotal - sectionAnswered}</span>
+                        </div>
+                        {sectionFlaggedCount > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-orange-500" />
+                              {language === "ar" ? "مُعلَّم" : "Flagged"}
+                            </span>
+                            <span className="font-medium">{sectionFlaggedCount}</span>
+                          </div>
+                        )}
+                      </div>
+                      {/* Section progress bar */}
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${sectionProgress}%` }} />
+                      </div>
+                      {/* Question number grid */}
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {sectionQuestions.map((q, i) => {
+                          const isAnswered = !!answers[q.questionId]
+                          const isQFlagged = flagged.has(q.questionId)
+                          return (
+                            <div
+                              key={q.questionId}
+                              className={cn(
+                                "h-6 w-6 rounded text-[10px] font-medium flex items-center justify-center",
+                                isAnswered && !isQFlagged && "bg-emerald-500 text-white",
+                                isAnswered && isQFlagged && "bg-emerald-500 text-white ring-2 ring-orange-400",
+                                !isAnswered && isQFlagged && "bg-orange-100 text-orange-700 ring-2 ring-orange-400 dark:bg-orange-950 dark:text-orange-300",
+                                !isAnswered && !isQFlagged && "bg-muted text-muted-foreground"
+                              )}
+                              title={`Q${i + 1}${isAnswered ? " ✓" : ""}${isQFlagged ? " 🚩" : ""}`}
+                            >
+                              {i + 1}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Flat question grid */}
+                {!hasSections && flatQuestions.length > 0 && (
+                  <div className="rounded-lg border bg-card p-3 space-y-2">
+                    <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
+                      {language === "ar" ? "الأسئلة" : "Questions"}
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {flatQuestions.map((q, i) => {
+                        const isAnswered = !!answers[q.questionId]
+                        const isQFlagged = flagged.has(q.questionId)
+                        const isCurrent = i === currentQuestionIndex
+                        return (
+                          <button
+                            key={q.questionId}
+                            onClick={() => setCurrentQuestionIndex(i)}
+                            className={cn(
+                              "h-7 w-7 rounded text-xs font-medium flex items-center justify-center transition-colors cursor-pointer",
+                              isAnswered && !isQFlagged && "bg-emerald-500 text-white",
+                              isAnswered && isQFlagged && "bg-emerald-500 text-white ring-2 ring-orange-400",
+                              !isAnswered && isQFlagged && "bg-orange-100 text-orange-700 ring-2 ring-orange-400 dark:bg-orange-950 dark:text-orange-300",
+                              !isAnswered && !isQFlagged && "bg-muted text-muted-foreground",
+                              isCurrent && "ring-2 ring-primary"
+                            )}
+                            title={`Q${i + 1}${isAnswered ? " ✓" : ""}${isQFlagged ? " 🚩" : ""}`}
+                          >
+                            {i + 1}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 pt-2 text-[10px] text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <span className="h-2.5 w-2.5 rounded bg-emerald-500" />
+                        {language === "ar" ? "تمت الإجابة" : "Answered"}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-2.5 w-2.5 rounded bg-muted border" />
+                        {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-2.5 w-2.5 rounded bg-orange-100 ring-1 ring-orange-400" />
+                        {language === "ar" ? "مُعلَّم" : "Flagged"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         )}
       </div>

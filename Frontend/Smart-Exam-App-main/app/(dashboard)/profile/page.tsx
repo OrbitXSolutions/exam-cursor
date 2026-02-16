@@ -5,7 +5,6 @@ import type React from "react"
 import { useState } from "react"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -70,9 +69,11 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col">
-      <Header title={t("nav.profile")} subtitle="Manage your account settings" />
-
       <div className="flex-1 p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">{t("nav.profile")}</h1>
+          <p className="text-muted-foreground">Manage your account settings</p>
+        </div>
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
           <Card className="mb-6">

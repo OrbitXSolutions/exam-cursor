@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
+import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -195,7 +195,7 @@ export default function EditQuestionPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <Header title={t("questionBank.editQuestion")} />
+        <PageHeader title={t("questionBank.editQuestion")} />
         <PageLoader />
       </div>
     )
@@ -204,7 +204,7 @@ export default function EditQuestionPage() {
   if (!question) {
     return (
       <div className="flex flex-col">
-        <Header title="Question Not Found" />
+        <PageHeader title="Question Not Found" />
         <div className="flex-1 p-6">
           <p className="text-muted-foreground">The question you are looking for does not exist.</p>
           <Button variant="outline" asChild className="mt-4 bg-transparent">
@@ -220,7 +220,7 @@ export default function EditQuestionPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title={t("questionBank.editQuestion")} subtitle={`Question #${question.id}`} />
+      <PageHeader title={t("questionBank.editQuestion")} subtitle={`Question #${question.id}`} />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-3xl">

@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { getDashboardStats, getUpcomingExams, getDashboardIncidents } from "@/lib/api/dashboard"
 import type { Exam } from "@/lib/types"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import {
   ClipboardList,
   Users,
@@ -18,6 +20,12 @@ import {
   ArrowRight,
   FileQuestion,
   GraduationCap,
+  Award,
+  BookOpen,
+  Target,
+  Activity,
+  BarChart3,
+  UserCheck,
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -27,8 +35,13 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
+  Line,
+  LineChart,
   Pie,
   PieChart,
+  RadialBar,
+  RadialBarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -93,6 +106,54 @@ export default function DashboardPage() {
     { level: "Critical", count: 0 },
   ]
 
+  // --- Enhanced dummy data for demo ---
+  const scoreDistribution = [
+    { range: "0-20", count: 2, fill: "hsl(0, 70%, 55%)" },
+    { range: "21-40", count: 5, fill: "hsl(25, 70%, 55%)" },
+    { range: "41-60", count: 12, fill: "hsl(45, 70%, 55%)" },
+    { range: "61-80", count: 28, fill: "hsl(142, 60%, 45%)" },
+    { range: "81-100", count: 18, fill: "hsl(142, 70%, 35%)" },
+  ]
+
+  const departmentPerformance = [
+    { department: "IT", avgScore: 78, candidates: 45 },
+    { department: "Finance", avgScore: 82, candidates: 32 },
+    { department: "HR", avgScore: 71, candidates: 28 },
+    { department: "Operations", avgScore: 85, candidates: 38 },
+    { department: "Marketing", avgScore: 74, candidates: 22 },
+  ]
+
+  const monthlyTrends = [
+    { month: "Sep", exams: 3, attempts: 45, passed: 32 },
+    { month: "Oct", exams: 5, attempts: 78, passed: 58 },
+    { month: "Nov", exams: 7, attempts: 112, passed: 89 },
+    { month: "Dec", exams: 4, attempts: 65, passed: 48 },
+    { month: "Jan", exams: 8, attempts: 134, passed: 102 },
+    { month: "Feb", exams: 6, attempts: 98, passed: 76 },
+  ]
+
+  const completionData = [
+    { name: "Completed", value: 76, fill: "hsl(142, 60%, 45%)" },
+    { name: "In Progress", value: 15, fill: "hsl(45, 70%, 55%)" },
+    { name: "Not Started", value: 9, fill: "hsl(var(--muted-foreground))" },
+  ]
+
+  const topPerformers = [
+    { name: "Sara Al-Rashidi", department: "Finance", score: 98, exams: 5 },
+    { name: "Ahmed Hassan", department: "IT", score: 96, exams: 7 },
+    { name: "Nour Ahmed", department: "Operations", score: 94, exams: 4 },
+    { name: "Youssef Khalil", department: "Finance", score: 92, exams: 6 },
+    { name: "Ali Mohammed", department: "IT", score: 91, exams: 5 },
+  ]
+
+  const recentSubmissions = [
+    { candidate: "Ali Mohammed", exam: "Python Basics", score: 85, status: "Passed", time: "2 min ago" },
+    { candidate: "Nour Ahmed", exam: "Data Structures", score: 72, status: "Passed", time: "15 min ago" },
+    { candidate: "Youssef Khalil", exam: "SQL Fundamentals", score: 45, status: "Failed", time: "1 hr ago" },
+    { candidate: "Sara Al-Rashidi", exam: "Cloud Computing", score: 91, status: "Passed", time: "2 hrs ago" },
+    { candidate: "Ahmed Hassan", exam: "Cybersecurity", score: 0, status: "Pending", time: "3 hrs ago" },
+  ]
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -104,6 +165,274 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-6 p-6">
+
+        {/* Enhanced Sections - Admin Only (TOP) */}
+        {isAdmin && (
+          <>
+            {/* Summary Stats Row */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                title="Avg. Score"
+                value="76%"
+                icon={Target}
+                trend={{ value: 4, isPositive: true }}
+              />
+              <StatCard
+                title="Active Candidates"
+                value="165"
+                icon={UserCheck}
+                trend={{ value: 12, isPositive: true }}
+              />
+              <StatCard
+                title="Exams This Month"
+                value="14"
+                icon={BookOpen}
+                trend={{ value: 3, isPositive: true }}
+              />
+              <StatCard
+                title="Completion Rate"
+                value="76%"
+                icon={Award}
+                trend={{ value: 5, isPositive: true }}
+              />
+            </div>
+
+            {/* Score Distribution + Department Performance */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Score Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Score Distribution
+                  </CardTitle>
+                  <CardDescription>Distribution of candidate scores across all exams</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={scoreDistribution}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis dataKey="range" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                        <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [`${value} candidates`, "Count"]}
+                        />
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                          {scoreDistribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Department Performance */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-primary" />
+                    Department Performance
+                  </CardTitle>
+                  <CardDescription>Average scores by department</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={departmentPerformance} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+                        <XAxis type="number" domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                        <YAxis
+                          dataKey="department"
+                          type="category"
+                          width={90}
+                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number, name: string) => [
+                            name === "avgScore" ? `${value}%` : value,
+                            name === "avgScore" ? "Avg Score" : "Candidates"
+                          ]}
+                        />
+                        <Bar dataKey="avgScore" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Monthly Trends + Completion Rate */}
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Monthly Trends */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" />
+                    Monthly Trends
+                  </CardTitle>
+                  <CardDescription>Exams, attempts, and pass rates over the last 6 months</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={monthlyTrends}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis dataKey="month" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                        <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Legend />
+                        <Line type="monotone" dataKey="attempts" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} name="Attempts" />
+                        <Line type="monotone" dataKey="passed" stroke="hsl(142, 60%, 45%)" strokeWidth={2} dot={{ r: 4 }} name="Passed" />
+                        <Line type="monotone" dataKey="exams" stroke="hsl(45, 70%, 55%)" strokeWidth={2} dot={{ r: 4 }} name="Exams Created" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Completion Rate */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    Completion Rate
+                  </CardTitle>
+                  <CardDescription>Overall exam completion status</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={completionData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={55}
+                          outerRadius={85}
+                          paddingAngle={3}
+                          dataKey="value"
+                        >
+                          {completionData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value: number) => [`${value}%`, ""]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-2 mt-2">
+                    {completionData.map((item) => (
+                      <div key={item.name} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
+                          <span className="text-muted-foreground">{item.name}</span>
+                        </div>
+                        <span className="font-medium">{item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Submissions + Top Performers */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Recent Submissions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    Recent Submissions
+                  </CardTitle>
+                  <CardDescription>Latest exam submissions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {recentSubmissions.map((sub, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{sub.candidate}</p>
+                          <p className="text-xs text-muted-foreground">{sub.exam}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {sub.status !== "Pending" && (
+                            <span className="text-sm font-semibold">{sub.score}%</span>
+                          )}
+                          <Badge
+                            variant={sub.status === "Passed" ? "default" : sub.status === "Failed" ? "destructive" : "secondary"}
+                            className={sub.status === "Passed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : ""}
+                          >
+                            {sub.status}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">{sub.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Top Performers */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-primary" />
+                    Top Performers
+                  </CardTitle>
+                  <CardDescription>Highest scoring candidates this month</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {topPerformers.map((performer, idx) => (
+                      <div key={idx} className="flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{performer.name}</p>
+                          <p className="text-xs text-muted-foreground">{performer.department} &middot; {performer.exams} exams</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-primary">{performer.score}%</p>
+                        </div>
+                        <div className="w-20 hidden sm:block">
+                          <Progress value={performer.score} className="h-2" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
+
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard

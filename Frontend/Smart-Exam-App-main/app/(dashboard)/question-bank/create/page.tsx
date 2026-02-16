@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
+import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -357,7 +357,7 @@ const CreateQuestionPage = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <Header title={t("questionBank.createQuestion")} />
+        <PageHeader title={t("questionBank.createQuestion")} />
         <div className="flex items-center justify-center py-12">
           <LoadingSpinner size="lg" />
         </div>
@@ -384,7 +384,7 @@ const CreateQuestionPage = () => {
 
   return (
     <div className="flex flex-col">
-      <Header title={t("questionBank.createQuestion")} subtitle="Add a new question to your bank" />
+      <PageHeader title={t("questionBank.createQuestion")} subtitle="Add a new question to your bank" />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-4xl">

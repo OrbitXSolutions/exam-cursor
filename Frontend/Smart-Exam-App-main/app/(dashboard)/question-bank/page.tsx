@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
+import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -160,7 +160,7 @@ export default function QuestionBankPage() {
   if (loading) {
     return (
       <div className="flex flex-col">
-        <Header title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
+        <PageHeader title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
         <div className="flex-1 flex items-center justify-center p-12">
           <LoadingSpinner size="lg" />
         </div>
@@ -171,7 +171,7 @@ export default function QuestionBankPage() {
   if (error) {
     return (
       <div className="flex flex-col">
-        <Header title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
+        <PageHeader title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
         <div className="flex-1 flex items-center justify-center p-12">
           <div className="text-center space-y-4">
             <p className="text-destructive">{error}</p>
@@ -187,7 +187,7 @@ export default function QuestionBankPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
+      <PageHeader title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
 
       <div className="flex-1 space-y-6 p-6">
         {/* Actions Bar */}

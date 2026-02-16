@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -149,12 +148,11 @@ function QuestionTypesContent() {
 
   return (
     <div className="flex flex-col">
-      <Header
-        title={language === "ar" ? "أنواع الأسئلة" : "Question Types"}
-        subtitle={language === "ar" ? "إدارة أنواع الأسئلة" : "Manage question types"}
-      />
-
       <div className="flex-1 space-y-6 p-6">
+        <div>
+          <h1 className="text-2xl font-bold">{language === "ar" ? "أنواع الأسئلة" : "Question Types"}</h1>
+          <p className="text-muted-foreground">{language === "ar" ? "إدارة أنواع الأسئلة" : "Manage question types"}</p>
+        </div>
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
@@ -166,10 +164,6 @@ function QuestionTypesContent() {
               className="pl-10"
             />
           </div>
-          <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            {language === "ar" ? "إضافة نوع" : "Add Type"}
-          </Button>
         </div>
 
         {/* Results */}
@@ -182,14 +176,7 @@ function QuestionTypesContent() {
             icon={ListTree}
             title={searchQuery ? "No types found" : "No question types yet"}
             description={searchQuery ? "Try adjusting your search" : "Create your first question type"}
-            action={
-              !searchQuery && (
-                <Button onClick={handleCreate}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  {language === "ar" ? "إضافة نوع" : "Add Type"}
-                </Button>
-              )
-            }
+            action={null}
           />
         ) : (
           <Card>

@@ -122,8 +122,6 @@ const resultNavGroup: NavGroup = {
   children: [
     { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
     { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result" },
-    { icon: Award, labelKey: "nav.certificate", href: "/results/certificate" },
-    { icon: CheckCircle2, labelKey: "nav.verifyCertificate", href: "/verify-certificate" },
     { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report" },
   ],
 }

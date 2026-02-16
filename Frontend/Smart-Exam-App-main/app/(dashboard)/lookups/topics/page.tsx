@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -180,7 +179,6 @@ function TopicsContent() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1 space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>

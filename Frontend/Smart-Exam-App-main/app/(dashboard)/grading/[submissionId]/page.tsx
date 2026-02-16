@@ -79,10 +79,12 @@ export default function GradeSubmissionPage() {
         const initialGrades = new Map<number, GradeState>()
         const manualAnswers = data.answers.filter((a) => a.isManuallyGraded)
         manualAnswers.forEach((a) => {
+          // Only mark as saved if the grader has actually graded this question
+          const wasGraded = a.score > 0 || !!a.graderComment
           initialGrades.set(a.questionId, {
             points: a.score,
             feedback: a.graderComment || "",
-            saved: true,
+            saved: wasGraded,
           })
         })
         setGrades(initialGrades)

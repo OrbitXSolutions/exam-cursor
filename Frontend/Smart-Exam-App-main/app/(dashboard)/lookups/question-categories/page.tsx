@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -149,12 +148,11 @@ function QuestionCategoriesContent() {
 
   return (
     <div className="flex flex-col">
-      <Header
-        title={language === "ar" ? "فئات الأسئلة" : "Question Categories"}
-        subtitle={language === "ar" ? "إدارة فئات الأسئلة" : "Manage question categories"}
-      />
-
       <div className="flex-1 space-y-6 p-6">
+        <div>
+          <h1 className="text-2xl font-bold">{language === "ar" ? "فئات الأسئلة" : "Question Categories"}</h1>
+          <p className="text-muted-foreground">{language === "ar" ? "إدارة فئات الأسئلة" : "Manage question categories"}</p>
+        </div>
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">

@@ -368,3 +368,53 @@ Here’s an explanation of each request and the error you’re seeing:
 3. /api/Grading?PageNumber=1&PageSize=500
    Purpose: Attempts to fetch a paginated list of grading sessions or grading data.
    Why it runs: The page or a component on it is trying to load grading information, possibly for a summary, dashboard, or to check grading status.
+
+## You are my partner and senior software engineer.
+
+We have a business demo as production ready in 24 hours.
+The goal is to successfully demonstrate the system to business users and PMO — not to perfect the full backend.
+
+Time is extremely limited.
+We will work smart, professional, and production ready-focused.
+
+We have a production-ready system.
+NO breaking changes.
+NO modification of existing grading / submit / result flows.
+NO change in design styles or colors.
+Minimal API requests.
+Full backward compatibility.
+
+Task: Result > Proctor Report page (currently "Coming soon")
+
+Goal:
+When user opens Result > Proctor Report, show a simple selector (Candidate + Exam) (Full Width) then open the EXISTING AI Proctor Report page (same one used in Candidate Result > Actions > Proctor Report).
+
+Rules:
+
+- NO breaking changes.
+- NO backend changes.
+- NO changes to grading/submit/result flows.
+- NO design/colors changes.
+- Minimal API calls.
+- Full backward compatibility.
+
+Implementation:
+
+1. Go to the page that renders "Coming soon" for Result > Proctor Report.
+2. Replace it with:
+   - Title: "AI Proctor Report"
+   - Dropdown 1: Candidate (distinct candidates from existing Candidate Result list API)
+   - Dropdown 2: Exam (filtered by selected candidate, from same data)
+   - Button: "View Report" (disabled until both selected)
+3. Display Full Report:
+   as in Pages:
+   http://localhost:3000/results/ai-report/15/4530028b-b836-4457-8d0a-d6cb85600b2a?attemptId=22
+
+all / Video/ ScreenRecords any data .
+Do not make many aPI
+
+5. Empty state:
+   - If no results exist, show "No proctor reports available."
+
+Deliverable:
+Working Result > Proctor Report page that lets user select candidate+exam and opens the existing AI proctor report.

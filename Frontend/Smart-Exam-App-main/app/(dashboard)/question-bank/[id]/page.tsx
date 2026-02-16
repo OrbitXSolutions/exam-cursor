@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { useI18n } from "@/lib/i18n/context"
-import { Header } from "@/components/layout/header"
+import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -93,7 +93,7 @@ export default function QuestionDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <Header title="Question Details" />
+        <PageHeader title="Question Details" />
         <PageLoader />
       </div>
     )
@@ -102,7 +102,7 @@ export default function QuestionDetailPage() {
   if (!question) {
     return (
       <div className="flex flex-col">
-        <Header title="Question Not Found" />
+        <PageHeader title="Question Not Found" />
         <div className="flex-1 p-6">
           <p className="text-muted-foreground">The question you are looking for does not exist.</p>
           <Button variant="outline" className="mt-4 bg-transparent" asChild>
@@ -118,7 +118,7 @@ export default function QuestionDetailPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title="Question Details" subtitle={`Question #${question.id}`} />
+      <PageHeader title="Question Details" subtitle={`Question #${question.id}`} />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-3xl">
