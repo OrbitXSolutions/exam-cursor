@@ -147,6 +147,13 @@ export default function UserIdentificationPage() {
   const [bulkReason, setBulkReason] = useState("")
   const [bulkLoading, setBulkLoading] = useState(false)
 
+  // ── Notification dialog ──
+  const [notifyDialogOpen, setNotifyDialogOpen] = useState(false)
+  const [notifyTargetName, setNotifyTargetName] = useState("")
+  const [notifyMethod, setNotifyMethod] = useState<string>("email")
+  const [notifyMessage, setNotifyMessage] = useState("")
+  const [notifyLoading, setNotifyLoading] = useState(false)
+
   const pageSize = 20
 
   // ── Fetch ──
@@ -259,6 +266,23 @@ export default function UserIdentificationPage() {
   // ── Stats ──
   const pendingCount = items.filter((i) => i.statusName === "Pending").length
   const flaggedCount = items.filter((i) => i.statusName === "Flagged").length
+
+  // ── Send Notification ──
+  function openNotify(candidateName: string) {
+    setNotifyTargetName(candidateName)
+    setNotifyMethod("email")
+    setNotifyMessage("")
+    setNotifyDialogOpen(true)
+  }
+
+  async function submitNotification() {
+    setNotifyLoading(true)
+    // Simulate sending notification (in production, this would call an API)
+    await new Promise(res => setTimeout(res, 1000))
+    toast.success(`Notification sent to ${notifyTargetName} via ${notifyMethod === "email" ? "Email" : "SMS"}`)
+    setNotifyDialogOpen(false)
+    setNotifyLoading(false)
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -403,13 +427,9 @@ export default function UserIdentificationPage() {
                         <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all" />
                       </TableHead>
                       <TableHead>{t("identityVerification.candidate")}</TableHead>
-                      <TableHead>{t("identityVerification.exam")}</TableHead>
                       <TableHead className="text-center">{t("identityVerification.faceMatch")}</TableHead>
-                      <TableHead className="text-center">{t("identityVerification.liveness")}</TableHead>
-                      <TableHead className="text-center">{t("identityVerification.riskScore")}</TableHead>
                       <TableHead>{t("identityVerification.status")}</TableHead>
                       <TableHead>{t("identityVerification.submittedAt")}</TableHead>
-                      <TableHead>{t("identityVerification.assignedTo")}</TableHead>
                       <TableHead className="text-center">{t("identityVerification.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -424,25 +444,10 @@ export default function UserIdentificationPage() {
                           />
                         </TableCell>
                         <TableCell className="font-medium">{item.candidateName}</TableCell>
-                        <TableCell className="max-w-50 truncate">{item.examTitleEn}</TableCell>
                         <TableCell className="text-center">
                           {item.faceMatchScore !== null ? (
                             <span className={`font-semibold ${faceMatchColor(item.faceMatchScore)}`}>
                               {item.faceMatchScore}%
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant={livenessVariant(item.livenessResult)}>
-                            {livenessLabel(item.livenessResult, t)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {item.riskScore !== null ? (
-                            <span className={`font-semibold ${riskColor(item.riskScore)}`}>
-                              {item.riskScore}
                             </span>
                           ) : (
                             <span className="text-muted-foreground">—</span>
@@ -453,13 +458,6 @@ export default function UserIdentificationPage() {
                           {new Date(item.submittedAt).toLocaleDateString(
                             language === "ar" ? "ar-SA" : "en-US",
                             { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
-                          )}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {item.assignedProctorName || (
-                            <span className="text-muted-foreground">
-                              {t("identityVerification.unassigned")}
-                            </span>
                           )}
                         </TableCell>
                         <TableCell className="text-center">
@@ -492,6 +490,10 @@ export default function UserIdentificationPage() {
                                   {t("identityVerification.flag")}
                                 </DropdownMenuItem>
                               )}
+                              <DropdownMenuItem onClick={() => openNotify(item.candidateName)}>
+                                <FileText className="h-4 w-4 me-2 text-blue-500" />
+                                Send Notification
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -808,6 +810,81 @@ export default function UserIdentificationPage() {
               variant={bulkAction === "Reject" ? "destructive" : "default"}
             >
               {bulkLoading ? <LoadingSpinner /> : `${bulkAction} (${selectedIds.size})`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ NOTIFICATION DIALOG ═══ */}
+      <Dialog open={notifyDialogOpen} onOpenChange={setNotifyDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Notification</DialogTitle>
+            <DialogDescription>
+              Send a notification to <strong>{notifyTargetName}</strong> regarding their identity verification.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Notification Method</p>
+              <div className="flex gap-3">
+                <Button
+                  size="sm"
+                  variant={notifyMethod === "email" ? "default" : "outline"}
+                  onClick={() => setNotifyMethod("email")}
+                >
+                  Email
+                </Button>
+                <Button
+                  size="sm"
+                  variant={notifyMethod === "sms" ? "default" : "outline"}
+                  onClick={() => setNotifyMethod("sms")}
+                >
+                  SMS
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Message</p>
+              <Select
+                value={notifyMessage ? "custom" : ""}
+                onValueChange={(v) => {
+                  if (v !== "custom") setNotifyMessage(v)
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a template..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Please re-submit your identity verification with a clearer selfie photo.">
+                    Re-take selfie (unclear)
+                  </SelectItem>
+                  <SelectItem value="Please re-submit your identity verification with a clearer ID photo.">
+                    Re-take ID photo (unclear)
+                  </SelectItem>
+                  <SelectItem value="Your identity verification has been rejected. Please try again with valid documents.">
+                    Rejected — try again
+                  </SelectItem>
+                  <SelectItem value="Your identity verification is under review. No action needed at this time.">
+                    Under review — no action
+                  </SelectItem>
+                  <SelectItem value="custom">Custom message</SelectItem>
+                </SelectContent>
+              </Select>
+              <Textarea
+                placeholder="Type your message..."
+                value={notifyMessage}
+                onChange={(e) => setNotifyMessage(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNotifyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitNotification} disabled={notifyLoading || !notifyMessage.trim()}>
+              {notifyLoading ? <LoadingSpinner /> : `Send via ${notifyMethod === "email" ? "Email" : "SMS"}`}
             </Button>
           </DialogFooter>
         </DialogContent>

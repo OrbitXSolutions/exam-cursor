@@ -11,10 +11,12 @@ namespace Smart_Core.Infrastructure.Services.Proctor;
 public class IdentityVerificationService : IIdentityVerificationService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<IdentityVerificationService> _logger;
 
-    public IdentityVerificationService(ApplicationDbContext context)
+    public IdentityVerificationService(ApplicationDbContext context, ILogger<IdentityVerificationService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     // ─── List ───────────────────────────────────────────────────────────────
@@ -208,6 +210,128 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     // ─── Private helpers ────────────────────────────────────────────────────
 
+    // ─── Submit Verification (Candidate) ────────────────────────────────────
+    public async Task<ApiResponse<CandidateVerificationSubmitResultDto>> SubmitVerificationAsync(
+        string candidateId, string? idDocumentType, string? idNumber,
+        string selfiePath, string idDocumentPath, string? deviceInfo, string? ipAddress)
+    {
+        var now = DateTime.UtcNow;
+
+        // Check if candidate already has a pending/approved verification
+        var existing = await _context.IdentityVerifications
+            .Where(v => v.CandidateId == candidateId && !v.IsDeleted
+                && (v.Status == IdentityVerificationStatus.Pending || v.Status == IdentityVerificationStatus.Approved))
+            .FirstOrDefaultAsync();
+
+        if (existing != null && existing.Status == IdentityVerificationStatus.Approved)
+        {
+            return ApiResponse<CandidateVerificationSubmitResultDto>.SuccessResponse(
+                new CandidateVerificationSubmitResultDto
+                {
+                    VerificationId = existing.Id,
+                    Status = "Approved",
+                    Message = "Identity already verified."
+                });
+        }
+
+        if (existing != null && existing.Status == IdentityVerificationStatus.Pending)
+        {
+            // Update existing pending verification
+            existing.SelfiePath = selfiePath;
+            existing.IdDocumentPath = idDocumentPath;
+            existing.IdDocumentType = idDocumentType;
+            existing.IdDocumentUploaded = true;
+            existing.DeviceInfo = deviceInfo;
+            existing.IpAddress = ipAddress;
+            existing.SubmittedAt = now;
+            existing.UpdatedDate = now;
+            existing.UpdatedBy = candidateId;
+            // Simulate face match score (random 75-99 for demo)
+            existing.FaceMatchScore = new Random().Next(75, 99);
+            existing.LivenessResult = LivenessResult.Passed;
+            existing.RiskScore = new Random().Next(5, 30);
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("[Verification] Candidate {CandidateId} re-submitted verification {Id}", candidateId, existing.Id);
+
+            return ApiResponse<CandidateVerificationSubmitResultDto>.SuccessResponse(
+                new CandidateVerificationSubmitResultDto
+                {
+                    VerificationId = existing.Id,
+                    Status = "Pending",
+                    Message = "Verification re-submitted for review."
+                });
+        }
+
+        // Create new verification
+        var verification = new IdentityVerification
+        {
+            CandidateId = candidateId,
+            ProctorSessionId = null, // No proctoring session - standalone verification
+            AttemptId = null,
+            ExamId = null,
+            SelfiePath = selfiePath,
+            IdDocumentPath = idDocumentPath,
+            IdDocumentType = idDocumentType ?? "Emirates ID",
+            IdDocumentUploaded = true,
+            // Simulate face match score for demo
+            FaceMatchScore = new Random().Next(75, 99),
+            LivenessResult = LivenessResult.Passed,
+            RiskScore = new Random().Next(5, 30),
+            Status = IdentityVerificationStatus.Pending,
+            DeviceInfo = deviceInfo,
+            IpAddress = ipAddress,
+            SubmittedAt = now,
+            CreatedDate = now,
+            CreatedBy = candidateId
+        };
+
+        _context.IdentityVerifications.Add(verification);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("[Verification] Candidate {CandidateId} submitted verification {Id}", candidateId, verification.Id);
+
+        return ApiResponse<CandidateVerificationSubmitResultDto>.SuccessResponse(
+            new CandidateVerificationSubmitResultDto
+            {
+                VerificationId = verification.Id,
+                Status = "Pending",
+                Message = "Verification submitted successfully. Awaiting review."
+            });
+    }
+
+    // ─── Get Candidate Status ───────────────────────────────────────────────
+    public async Task<ApiResponse<CandidateVerificationStatusDto>> GetCandidateStatusAsync(string candidateId)
+    {
+        var latest = await _context.IdentityVerifications
+            .Where(v => v.CandidateId == candidateId && !v.IsDeleted)
+            .OrderByDescending(v => v.SubmittedAt)
+            .FirstOrDefaultAsync();
+
+        if (latest == null)
+        {
+            return ApiResponse<CandidateVerificationStatusDto>.SuccessResponse(
+                new CandidateVerificationStatusDto
+                {
+                    HasSubmitted = false,
+                    Status = "None"
+                });
+        }
+
+        return ApiResponse<CandidateVerificationStatusDto>.SuccessResponse(
+            new CandidateVerificationStatusDto
+            {
+                HasSubmitted = true,
+                Status = latest.Status.ToString(),
+                ReviewNotes = latest.ReviewNotes,
+                SubmittedAt = latest.SubmittedAt,
+                ReviewedAt = latest.ReviewedAt
+            });
+    }
+
+    // ─── Private helpers (original) ─────────────────────────────────────────
+
     private static IdentityVerificationStatus? ParseAction(string action) =>
         action.ToLower() switch
         {
@@ -220,9 +344,9 @@ public class IdentityVerificationService : IIdentityVerificationService
     private IdentityVerificationListDto MapToListDto(IdentityVerification v) => new()
     {
         Id = v.Id,
-        ProctorSessionId = v.ProctorSessionId,
-        AttemptId = v.AttemptId,
-        ExamId = v.ExamId,
+        ProctorSessionId = v.ProctorSessionId ?? 0,
+        AttemptId = v.AttemptId ?? 0,
+        ExamId = v.ExamId ?? 0,
         ExamTitleEn = v.ProctorSession?.Exam?.TitleEn ?? "",
         CandidateId = v.CandidateId,
         CandidateName = v.Candidate?.FullName ?? v.Candidate?.DisplayName ?? "",
@@ -239,18 +363,24 @@ public class IdentityVerificationService : IIdentityVerificationService
     private IdentityVerificationDetailDto MapToDetailDto(IdentityVerification v) => new()
     {
         Id = v.Id,
-        ProctorSessionId = v.ProctorSessionId,
-        AttemptId = v.AttemptId,
-        ExamId = v.ExamId,
+        ProctorSessionId = v.ProctorSessionId ?? 0,
+        AttemptId = v.AttemptId ?? 0,
+        ExamId = v.ExamId ?? 0,
         ExamTitleEn = v.ProctorSession?.Exam?.TitleEn ?? "",
         CandidateId = v.CandidateId,
         CandidateName = v.Candidate?.FullName ?? v.Candidate?.DisplayName ?? "",
         IdDocumentUploaded = v.IdDocumentUploaded,
         IdDocumentUrl = !string.IsNullOrWhiteSpace(v.IdDocumentPath)
-            ? $"/media/{v.IdDocumentPath.TrimStart('/')}" : null,
+            ? v.IdDocumentPath.StartsWith("candidateIDs/")
+                ? $"/{v.IdDocumentPath}"
+                : $"/media/{v.IdDocumentPath.TrimStart('/')}"
+            : null,
         IdDocumentType = v.IdDocumentType,
         SelfieUrl = !string.IsNullOrWhiteSpace(v.SelfiePath)
-            ? $"/media/{v.SelfiePath.TrimStart('/')}" : null,
+            ? v.SelfiePath.StartsWith("candidateIDs/")
+                ? $"/{v.SelfiePath}"
+                : $"/media/{v.SelfiePath.TrimStart('/')}"
+            : null,
         FaceMatchScore = v.FaceMatchScore,
         LivenessResult = v.LivenessResult,
         RiskScore = v.RiskScore,

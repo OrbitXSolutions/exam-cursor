@@ -314,6 +314,20 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/organization"
 });
 
+// Serve candidate identity verification photos from wwwroot/candidateIDs/
+var candidateIDsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "candidateIDs");
+if (!Directory.Exists(candidateIDsPath))
+{
+    Directory.CreateDirectory(candidateIDsPath);
+    Log.Information("Created candidateIDs directory at {Path}", candidateIDsPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(candidateIDsPath),
+    RequestPath = "/candidateIDs"
+});
+
 // Rate Limiting
 app.UseRateLimiter();
 

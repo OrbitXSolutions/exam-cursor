@@ -134,4 +134,26 @@ public class BulkActionResultDto
     public List<string> Errors { get; set; } = new();
 }
 
+/// <summary>
+/// Candidate-submitted identity verification (selfie + Emirates ID + info).
+/// </summary>
+public class CandidateVerificationSubmitResultDto
+{
+    public int VerificationId { get; set; }
+    public string Status { get; set; } = "Pending";
+    public string Message { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Candidate verification status check result.
+/// </summary>
+public class CandidateVerificationStatusDto
+{
+    public bool HasSubmitted { get; set; }
+    public string Status { get; set; } = "None";  // None, Pending, Approved, Rejected, Flagged
+    public string? ReviewNotes { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+    public DateTime? ReviewedAt { get; set; }
+}
+
 #endregion

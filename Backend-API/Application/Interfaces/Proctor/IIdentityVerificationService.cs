@@ -30,4 +30,16 @@ public interface IIdentityVerificationService
     /// </summary>
     Task<ApiResponse<BulkActionResultDto>> ApplyBulkActionAsync(
         IdentityVerificationBulkActionDto dto, string reviewerId);
+
+    /// <summary>
+    /// Submit candidate identity verification (selfie + ID document).
+    /// </summary>
+    Task<ApiResponse<CandidateVerificationSubmitResultDto>> SubmitVerificationAsync(
+        string candidateId, string? idDocumentType, string? idNumber,
+        string selfiePath, string idDocumentPath, string? deviceInfo, string? ipAddress);
+
+    /// <summary>
+    /// Get verification status for a candidate.
+    /// </summary>
+    Task<ApiResponse<CandidateVerificationStatusDto>> GetCandidateStatusAsync(string candidateId);
 }

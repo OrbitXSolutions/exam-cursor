@@ -218,13 +218,16 @@ public class ExamOperationsService : IExamOperationsService
 
         _db.Set<AdminAttemptOverride>().Add(overrideRecord);
 
-        // Audit log
+        await _db.SaveChangesAsync();
+
+        // Audit log (after save so overrideRecord.Id is populated)
         _db.AuditLogs.Add(new AuditLog
         {
             ActorId = adminUserId,
             ActorType = ActorType.User,
             Action = "AllowNewAttemptOverride",
             EntityName = "AdminAttemptOverride",
+            EntityId = overrideRecord.Id.ToString(),
             Source = AuditSource.Api,
             Channel = AuditChannel.AdminPortal,
             CorrelationId = traceId,

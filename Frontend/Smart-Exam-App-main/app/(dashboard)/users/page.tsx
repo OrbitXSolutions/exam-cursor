@@ -93,7 +93,9 @@ export default function UsersPage() {
     return () => clearTimeout(t)
   }, [search])
 
+  // Hide Candidate (separate page) and SuperDev from this list
   const filteredUsers = users.filter((user) => {
+    if (user.role === "Candidate" || user.role === "SuperDev") return false
     const name = getLocalizedField(user, "fullName", language).toLowerCase()
     const matchesSearch =
       !search || name.includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
@@ -136,10 +138,10 @@ export default function UsersPage() {
   }
 
   const stats = {
-    total: users.length,
-    active: users.filter((u) => u.isActive).length,
-    inactive: users.filter((u) => !u.isActive).length,
-    admins: users.filter((u) => u.role === "Admin" || u.role === "SuperAdmin").length,
+    total: filteredUsers.length,
+    active: filteredUsers.filter((u) => u.isActive).length,
+    inactive: filteredUsers.filter((u) => !u.isActive).length,
+    admins: filteredUsers.filter((u) => u.role === "Admin" || u.role === "SuperAdmin").length,
   }
 
   if (loading && users.length === 0) {
@@ -237,7 +239,8 @@ export default function UsersPage() {
                 <SelectItem value="all">{language === "ar" ? "جميع الأدوار" : "All Roles"}</SelectItem>
                 <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
                 <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
-                <SelectItem value="Candidate">{language === "ar" ? "مرشح" : "Candidate"}</SelectItem>
+                <SelectItem value="Examiner">{language === "ar" ? "ممتحن" : "Examiner"}</SelectItem>
+                <SelectItem value="Proctor">{language === "ar" ? "مراقب" : "Proctor"}</SelectItem>
                 <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
                 <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
               </SelectContent>
@@ -260,7 +263,7 @@ export default function UsersPage() {
                 <SelectItem value="all">{language === "ar" ? "جميع الأقسام" : "All Departments"}</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={String(dept.id)}>
-                    {language === "ar" ? dept.nameAr : dept.nameEn}
+                    {dept.code ? `${dept.code} - ` : ""}{language === "ar" ? dept.nameAr : dept.nameEn}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -438,6 +438,69 @@ export async function applyBulkVerificationAction(
   );
 }
 
+// ============ CANDIDATE IDENTITY VERIFICATION ============
+
+export interface CandidateVerificationStatus {
+  hasSubmitted: boolean;
+  status: string; // "None" | "Pending" | "Approved" | "Rejected" | "Flagged"
+  reviewNotes?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+}
+
+export interface CandidateVerificationSubmitResult {
+  verificationId: number;
+  status: string;
+  message: string;
+}
+
+/**
+ * Get verification status for the current candidate.
+ * GET /proctor/authentication/status
+ */
+export async function getCandidateVerificationStatus(): Promise<CandidateVerificationStatus> {
+  try {
+    const res = await apiClient.get<CandidateVerificationStatus>(
+      `/proctor/authentication/status`,
+    );
+    return res ?? { hasSubmitted: false, status: "None" };
+  } catch {
+    return { hasSubmitted: false, status: "None" };
+  }
+}
+
+/**
+ * Submit candidate identity verification (selfie + ID photo + info).
+ * POST /proctor/authentication/submit (multipart/form-data)
+ */
+export async function submitCandidateVerification(
+  selfiePhoto: File,
+  idPhoto: File,
+  idDocumentType?: string,
+  idNumber?: string,
+): Promise<CandidateVerificationSubmitResult> {
+  const formData = new FormData();
+  formData.append("selfiePhoto", selfiePhoto);
+  formData.append("idPhoto", idPhoto);
+  if (idDocumentType) formData.append("idDocumentType", idDocumentType);
+  if (idNumber) formData.append("idNumber", idNumber);
+
+  const token = localStorage.getItem("auth_token");
+  const baseUrl = "/api/proxy/proctor/authentication/submit";
+
+  const res = await fetch(baseUrl, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  const result = await res.json();
+  if (result.success && result.data) {
+    return result.data;
+  }
+  throw new Error(result.message || "Verification submission failed");
+}
+
 // ============ CANDIDATE SESSION STATUS (POLLING) ============
 
 export interface CandidateSessionStatus {

@@ -12,9 +12,9 @@ public class IdentityVerification : BaseEntity
     public int Id { get; set; }
 
     // Relations
-    public int ProctorSessionId { get; set; }
-    public int AttemptId { get; set; }
-    public int ExamId { get; set; }
+    public int? ProctorSessionId { get; set; }
+    public int? AttemptId { get; set; }
+    public int? ExamId { get; set; }
     public string CandidateId { get; set; } = null!;
 
     // ID document
@@ -49,7 +49,7 @@ public class IdentityVerification : BaseEntity
     public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation Properties
-    public virtual ProctorSession ProctorSession { get; set; } = null!;
+    public virtual ProctorSession? ProctorSession { get; set; }
     public virtual ApplicationUser Candidate { get; set; } = null!;
     public virtual ApplicationUser? AssignedProctor { get; set; }
     public virtual ApplicationUser? Reviewer { get; set; }

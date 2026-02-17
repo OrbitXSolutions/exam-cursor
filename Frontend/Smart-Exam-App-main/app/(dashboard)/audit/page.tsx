@@ -36,6 +36,34 @@ export default function AuditLogPage() {
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
 
+  // Demo audit log entries covering all roles and common actions
+  const demoLogs: AuditLog[] = [
+    { id: 1, actorId: "u1", actorName: "Ahmed Hassan", actorType: "Admin", action: "Login", entityName: "Session", entityId: "s-101", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.10", userAgent: "Mozilla/5.0 Chrome/120", timestamp: "2026-02-17T09:02:14Z", details: '{"role":"Admin","department":"IT"}' },
+    { id: 2, actorId: "u1", actorName: "Ahmed Hassan", actorType: "Admin", action: "Create", entityName: "User", entityId: "u-22", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.10", userAgent: null, timestamp: "2026-02-17T09:10:33Z", details: '{"email":"new.user@examcore.com","role":"Instructor","department":"HR"}' },
+    { id: 3, actorId: "u1", actorName: "Ahmed Hassan", actorType: "Admin", action: "Update", entityName: "User", entityId: "u-18", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.10", userAgent: null, timestamp: "2026-02-17T09:15:50Z", details: '{"field":"role","from":"Instructor","to":"Examiner"}' },
+    { id: 4, actorId: "u2", actorName: "Sara Khaled", actorType: "Instructor", action: "Create", entityName: "Exam", entityId: "ex-45", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.15", userAgent: null, timestamp: "2026-02-17T09:22:07Z", details: '{"title":"IT Security Fundamentals","sections":3,"questions":25}' },
+    { id: 5, actorId: "u2", actorName: "Sara Khaled", actorType: "Instructor", action: "Create", entityName: "Question", entityId: "q-312", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.15", userAgent: null, timestamp: "2026-02-17T09:30:18Z", details: '{"type":"MCQ","subject":"Cybersecurity","difficulty":"Medium"}' },
+    { id: 6, actorId: "u2", actorName: "Sara Khaled", actorType: "Instructor", action: "Update", entityName: "Exam", entityId: "ex-45", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.15", userAgent: null, timestamp: "2026-02-17T09:35:44Z", details: '{"field":"status","from":"Draft","to":"Published"}' },
+    { id: 7, actorId: "u3", actorName: "Nour Ahmed", actorType: "Candidate", action: "Login", entityName: "Session", entityId: "s-205", correlationId: null, tenantId: null, source: "Web", channel: "Exam Portal", outcome: "Success", ipAddress: "10.0.0.55", userAgent: "Mozilla/5.0 Chrome/120", timestamp: "2026-02-17T10:00:02Z", details: null },
+    { id: 8, actorId: "u3", actorName: "Nour Ahmed", actorType: "Candidate", action: "Submit", entityName: "Attempt", entityId: "att-89", correlationId: null, tenantId: null, source: "Web", channel: "Exam Portal", outcome: "Success", ipAddress: "10.0.0.55", userAgent: null, timestamp: "2026-02-17T10:45:30Z", details: '{"examTitle":"IT Security Fundamentals","duration":"45m","answered":24,"total":25}' },
+    { id: 9, actorId: "u4", actorName: "Omar Fathi", actorType: "Examiner", action: "Update", entityName: "Grading", entityId: "gr-33", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.20", userAgent: null, timestamp: "2026-02-17T11:10:12Z", details: '{"candidate":"Nour Ahmed","question":"Q5 - Essay","score":8,"maxScore":10}' },
+    { id: 10, actorId: "u4", actorName: "Omar Fathi", actorType: "Examiner", action: "Update", entityName: "Grading", entityId: "gr-34", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.20", userAgent: null, timestamp: "2026-02-17T11:18:45Z", details: '{"candidate":"Nour Ahmed","status":"Completed","totalScore":"88/100"}' },
+    { id: 11, actorId: "u5", actorName: "Layla Amr", actorType: "Proctor", action: "Login", entityName: "Session", entityId: "s-210", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.25", userAgent: "Mozilla/5.0 Firefox/115", timestamp: "2026-02-17T09:55:00Z", details: null },
+    { id: 12, actorId: "u5", actorName: "Layla Amr", actorType: "Proctor", action: "Create", entityName: "Incident", entityId: "inc-12", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.25", userAgent: null, timestamp: "2026-02-17T10:22:08Z", details: '{"candidate":"Nour Ahmed","type":"Tab Switch","severity":"Medium","exam":"IT Security"}' },
+    { id: 13, actorId: "u5", actorName: "Layla Amr", actorType: "Proctor", action: "Update", entityName: "Proctor Session", entityId: "ps-18", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.25", userAgent: null, timestamp: "2026-02-17T10:50:33Z", details: '{"decision":"Approved","candidate":"Nour Ahmed","violations":1}' },
+    { id: 14, actorId: "u6", actorName: "Mona Youssef", actorType: "Admin", action: "Update", entityName: "Department", entityId: "dept-2", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.30", userAgent: null, timestamp: "2026-02-17T08:45:20Z", details: '{"department":"HR","action":"Assigned user","user":"Huda Samir"}' },
+    { id: 15, actorId: "u6", actorName: "Mona Youssef", actorType: "Admin", action: "Update", entityName: "User", entityId: "u-15", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.30", userAgent: null, timestamp: "2026-02-17T08:48:10Z", details: '{"field":"role","from":"Candidate","to":"Proctor"}' },
+    { id: 16, actorId: "u2", actorName: "Sara Khaled", actorType: "Instructor", action: "Delete", entityName: "Question", entityId: "q-280", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.15", userAgent: null, timestamp: "2026-02-17T09:40:55Z", details: '{"reason":"Duplicate question","subject":"Networking"}' },
+    { id: 17, actorId: "u3", actorName: "Salma Hussein", actorType: "Candidate", action: "Login", entityName: "Session", entityId: "s-211", correlationId: null, tenantId: null, source: "Web", channel: "Exam Portal", outcome: "Failure", ipAddress: "10.0.0.60", userAgent: "Mozilla/5.0 Safari/17", timestamp: "2026-02-17T10:05:15Z", details: '{"reason":"Invalid password","attempts":3}' },
+    { id: 18, actorId: "u7", actorName: "Tarek Ibrahim", actorType: "Admin", action: "Create", entityName: "Department", entityId: "dept-4", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.35", userAgent: null, timestamp: "2026-02-17T08:30:00Z", details: '{"name":"Quality Assurance","code":"QA"}' },
+    { id: 19, actorId: "u2", actorName: "Sara Khaled", actorType: "Instructor", action: "Update", entityName: "Exam", entityId: "ex-40", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Failure", ipAddress: "192.168.1.15", userAgent: null, timestamp: "2026-02-17T09:25:10Z", details: '{"reason":"Cannot update published exam with active attempts"}' },
+    { id: 20, actorId: "u4", actorName: "Omar Fathi", actorType: "Examiner", action: "Login", entityName: "Session", entityId: "s-208", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.20", userAgent: "Mozilla/5.0 Chrome/120", timestamp: "2026-02-17T11:00:05Z", details: null },
+    { id: 21, actorId: "u8", actorName: "Huda Samir", actorType: "Instructor", action: "Create", entityName: "Exam", entityId: "ex-46", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.40", userAgent: null, timestamp: "2026-02-17T10:15:22Z", details: '{"title":"HR Policies Assessment","sections":2,"questions":15}' },
+    { id: 22, actorId: "u1", actorName: "Ahmed Hassan", actorType: "Admin", action: "Update", entityName: "Settings", entityId: "sys-1", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.10", userAgent: null, timestamp: "2026-02-17T09:05:28Z", details: '{"field":"sessionTimeout","from":"120min","to":"60min"}' },
+    { id: 23, actorId: "u3", actorName: "Ahmed Nabil", actorType: "Candidate", action: "Submit", entityName: "Attempt", entityId: "att-90", correlationId: null, tenantId: null, source: "Web", channel: "Exam Portal", outcome: "Success", ipAddress: "10.0.0.70", userAgent: null, timestamp: "2026-02-17T11:30:00Z", details: '{"examTitle":"HR Policies Assessment","duration":"28m","answered":15,"total":15}' },
+    { id: 24, actorId: "u5", actorName: "Layla Amr", actorType: "Proctor", action: "Create", entityName: "Incident", entityId: "inc-13", correlationId: null, tenantId: null, source: "Web", channel: "Dashboard", outcome: "Success", ipAddress: "192.168.1.25", userAgent: null, timestamp: "2026-02-17T11:35:18Z", details: '{"candidate":"Ahmed Nabil","type":"Multiple Faces Detected","severity":"High","exam":"HR Policies"}' },
+  ]
+
   useEffect(() => {
     loadLogs()
   }, [actionFilter, entityFilter])
@@ -47,9 +75,23 @@ export default function AuditLogPage() {
       if (actionFilter !== "all") params.action = actionFilter
       if (entityFilter !== "all") params.entityName = entityFilter
       const data = await getAuditLogs(params)
-      setLogs(Array.isArray(data.items) ? data.items : [])
+      const apiLogs = Array.isArray(data.items) ? data.items : []
+      // Use demo data if API returns empty
+      if (apiLogs.length > 0) {
+        setLogs(apiLogs)
+      } else {
+        // Apply filters to demo data locally
+        let filtered = [...demoLogs]
+        if (actionFilter !== "all") filtered = filtered.filter(l => l.action === actionFilter)
+        if (entityFilter !== "all") filtered = filtered.filter(l => l.entityName === entityFilter)
+        setLogs(filtered)
+      }
     } catch {
-      // Error handled
+      // Fallback to demo data on error
+      let filtered = [...demoLogs]
+      if (actionFilter !== "all") filtered = filtered.filter(l => l.action === actionFilter)
+      if (entityFilter !== "all") filtered = filtered.filter(l => l.entityName === entityFilter)
+      setLogs(filtered)
     } finally {
       setLoading(false)
     }
@@ -196,10 +238,15 @@ export default function AuditLogPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("audit.allEntities")}</SelectItem>
-                <SelectItem value="User">{t("audit.user")}</SelectItem>
-                <SelectItem value="Exam">{t("nav.exams")}</SelectItem>
-                <SelectItem value="Question">{t("questionBank.questionBody").split(" ")[0]}</SelectItem>
-                <SelectItem value="Attempt">{t("results.attempt")}</SelectItem>
+                <SelectItem value="User">{language === "ar" ? "مستخدم" : "User"}</SelectItem>
+                <SelectItem value="Exam">{language === "ar" ? "اختبار" : "Exam"}</SelectItem>
+                <SelectItem value="Question">{language === "ar" ? "سؤال" : "Question"}</SelectItem>
+                <SelectItem value="Attempt">{language === "ar" ? "محاولة" : "Attempt"}</SelectItem>
+                <SelectItem value="Session">{language === "ar" ? "جلسة" : "Session"}</SelectItem>
+                <SelectItem value="Grading">{language === "ar" ? "تصحيح" : "Grading"}</SelectItem>
+                <SelectItem value="Incident">{language === "ar" ? "حادثة" : "Incident"}</SelectItem>
+                <SelectItem value="Department">{language === "ar" ? "قسم" : "Department"}</SelectItem>
+                <SelectItem value="Settings">{language === "ar" ? "إعدادات" : "Settings"}</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -28,7 +28,7 @@ _currentUserService = currentUserService;
     /// Initiate grading for a submitted attempt (triggers auto-grading)
     /// </summary>
     [HttpPost("initiate")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> InitiateGrading([FromBody] InitiateGradingDto dto)
     {
      var graderId = _currentUserService.UserId ?? "system";
@@ -40,7 +40,7 @@ _currentUserService = currentUserService;
     /// Get grading session by ID
     /// </summary>
     [HttpGet("{gradingSessionId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSession(int gradingSessionId)
     {
       var result = await _gradingService.GetGradingSessionAsync(gradingSessionId);
@@ -51,7 +51,7 @@ _currentUserService = currentUserService;
     /// Get grading session by attempt ID
     /// </summary>
     [HttpGet("attempt/{attemptId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSessionByAttempt(int attemptId)
   {
   var result = await _gradingService.GetGradingSessionByAttemptAsync(attemptId);
@@ -62,7 +62,7 @@ _currentUserService = currentUserService;
     /// Complete grading session (finalize scores)
     /// </summary>
     [HttpPost("complete")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> CompleteGrading([FromBody] CompleteGradingDto dto)
     {
    var graderId = _currentUserService.UserId ?? "system";
@@ -78,7 +78,7 @@ _currentUserService = currentUserService;
     /// Submit manual grade for a single question
 /// </summary>
     [HttpPost("manual-grade")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> SubmitManualGrade([FromBody] ManualGradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -90,7 +90,7 @@ _currentUserService = currentUserService;
     /// Bulk submit manual grades
     /// </summary>
     [HttpPost("manual-grade/bulk")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> BulkSubmitManualGrades([FromBody] BulkManualGradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -102,7 +102,7 @@ _currentUserService = currentUserService;
     /// Get questions requiring manual grading for a session
     /// </summary>
     [HttpGet("{gradingSessionId}/manual-queue")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetManualGradingQueue(int gradingSessionId)
     {
      var result = await _gradingService.GetManualGradingQueueAsync(gradingSessionId);
@@ -117,7 +117,7 @@ _currentUserService = currentUserService;
     /// Re-grade a previously graded answer
     /// </summary>
     [HttpPost("regrade")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> RegradeAnswer([FromBody] RegradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -133,7 +133,7 @@ _currentUserService = currentUserService;
     /// Get all grading sessions with pagination and filtering
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSessions([FromQuery] GradingSearchDto searchDto)
     {
         var result = await _gradingService.GetGradingSessionsAsync(searchDto);
@@ -144,7 +144,7 @@ _currentUserService = currentUserService;
     /// Get grading sessions requiring manual grading
     /// </summary>
     [HttpGet("manual-required")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetManualGradingRequired([FromQuery] GradingSearchDto searchDto)
     {
         var result = await _gradingService.GetManualGradingRequiredAsync(searchDto);
@@ -155,7 +155,7 @@ _currentUserService = currentUserService;
     /// Get grading statistics for an exam
     /// </summary>
   [HttpGet("stats/exam/{examId}")]
- [Authorize(Roles = "Admin,Instructor")]
+ [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetExamGradingStats(int examId)
     {
         var result = await _gradingService.GetExamGradingStatsAsync(examId);
@@ -166,7 +166,7 @@ _currentUserService = currentUserService;
     /// Get question-level grading statistics for an exam
     /// </summary>
     [HttpGet("stats/exam/{examId}/questions")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetQuestionGradingStats(int examId)
     {
         var result = await _gradingService.GetQuestionGradingStatsAsync(examId);

@@ -32,6 +32,7 @@ public class IdentityVerificationConfiguration : IEntityTypeConfiguration<Identi
         builder.HasOne(x => x.ProctorSession)
             .WithMany()
             .HasForeignKey(x => x.ProctorSessionId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Candidate)

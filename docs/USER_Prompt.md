@@ -418,3 +418,146 @@ Do not make many aPI
 
 Deliverable:
 Working Result > Proctor Report page that lets user select candidate+exam and opens the existing AI proctor report.
+
+## Roles Task
+
+You are working on SmartExam (production-ready demo in 24h).
+Goal: add two new roles + seed users + show them on login page + restrict access.
+IMPORTANT CONSTRAINTS:
+
+- NO breaking changes
+- NO modification to existing grading / submit / result flows
+- NO design style/color changes
+- Minimal API requests
+- Full backward compatibility
+- Keep existing roles/authorization working exactly as-is
+
+TASK OVERVIEW
+
+1. Add two new roles:
+   - Examiner
+   - Proctor
+
+2. Seed one new users for each role (2 users total), all under IT Department.
+
+3. Update the Login page:
+   - In the “Quick login / demo users” list, add these new demo users AFTER the Instructor role users.
+   - Do not change styling, layout, colors, spacing. Just add items using the same existing UI pattern/components.
+
+4. Authorization / Access rules:
+   - Examiner user: can access Grading pages ONLY.
+   - Proctor user: can access Proctor Center pages ONLY.
+   - Both must be blocked from other secured modules (Exam management, Admin areas, etc.)
+   - SuperDev/Admin/Instructor behaviors must remain unchanged.
+
+   Hide other side menu that they do not have access to it.
+
+DETAILED IMPLEMENTATION REQUIREMENTS
+
+A) ROLES (Backend)
+
+- Add two new role constants in the existing roles/constants source of truth (e.g., AppRoles or similar):
+  AppRoles.Examiner = "Examiner"
+  AppRoles.Proctor = "Proctor"
+- Ensure any place that uses hardcoded role strings is NOT reintroduced. Use constants only.
+
+B) SEEDING (Backend)
+
+- Extend the existing seeding mechanism (whatever currently seeds roles/users).
+- Seed these roles if not exist.
+- Seed 4 users (2 Examiner, 2 Proctor) if not exist.
+- All users should have Department = "IT" (or whatever Department field exists / claim exists / profile field exists).
+- Choose safe demo credentials aligned with existing seeding format:
+  Examiner:
+  - examiner1@it.local / Password: Demo@12345
+  - examiner2@it.local / Password: Demo@12345
+    Proctor:
+  - proctor1@it.local / Password: Demo@12345
+  - proctor2@it.local / Password: Demo@12345
+- If the system requires Username instead of Email, seed accordingly but keep the same naming.
+- Ensure seeding is idempotent: running multiple times must not duplicate users or roles.
+- Assign each user to exactly one role (Examiner OR Proctor).
+- Do NOT modify existing seeded users/roles.
+
+C) AUTHORIZATION (Backend + Frontend Guards)
+We need minimal changes, safest approach:
+
+- Add role-based restrictions at routing/page guard level and at API controller authorization where applicable,
+  WITHOUT altering any grading/submit/result logic.
+
+Examiner Access:
+
+- Allowed:
+  - Grading module endpoints/pages (anything that an Instructor uses for grading/reviewing submissions).
+- Denied:
+  - Proctor Center
+  - Exam creation/management
+  - Admin dashboards
+  - Any other module not required for grading demo
+
+Proctor Access:
+
+- Allowed:
+  - Proctor Center module endpoints/pages (live sessions, incidents, proctor review/report screens already in Proctor Center).
+- Denied:
+  - Grading
+  - Exam creation/management
+  - Admin dashboards
+  - Any other module not required for proctor demo
+
+Rules must be enforced in BOTH:
+
+1. Backend [Authorize(Roles=...)] on controllers (or minimal additive checks)
+2. Frontend navigation visibility (menu items) and route protection (middleware/guard)
+   - Hide menu items the user cannot access (but do not redesign; just conditionally render existing menu items).
+   - If user tries to open a forbidden page by URL, show the existing “Not Authorized” / “Access denied” behavior (whatever exists today).
+
+IMPORTANT:
+
+- Do NOT change existing role lists for Admin/Instructor/SuperDev etc except ADDING the new roles where needed.
+- Keep backward compatibility: if a page previously allowed Instructor, it still does.
+
+D) LOGIN PAGE (Frontend)
+
+- Locate the login page section that shows demo users / quick login buttons.
+- Add 4 new entries AFTER Instructor entries, grouped similarly:
+  - Heading label: "Examiner" then two users
+  - Heading label: "Proctor" then two users
+- Use the same components and styling already used by Instructor demo entries.
+- Clicking them should fill credentials or auto-login exactly like existing demo users behavior.
+
+E) MENU / NAV
+
+- Examiner sees only:
+  - Grading-related menu item(s) (whatever already exists: “Grading”, “Results Review”, etc.)
+- Proctor sees only:
+  - “Proctor Center” menu item(s)
+- Do not reorder existing menu for other roles.
+- Do not change icons/colors/styles.
+
+F) TESTING CHECKLIST (Must-do)
+Provide a short verification report after implementation with screenshots optional, but include:
+
+1. Seed confirmed:
+   - Roles exist: Examiner, Proctor
+   - Users exist: examiner1, examiner2, proctor1, proctor2
+   - Department shows IT (where visible)
+2. Login page shows new quick users after Instructor.
+3. Access checks:
+   - examiner1 can open Grading pages successfully.
+   - examiner1 cannot open Proctor Center (gets access denied).
+   - examiner1 cannot open Exam Management/Admin pages (access denied).
+   - proctor1 can open Proctor Center successfully.
+   - proctor1 cannot open Grading (access denied).
+   - proctor1 cannot open Exam Management/Admin pages (access denied).
+4. Regression:
+   - Admin/Instructor/SuperDev flows unchanged.
+   - No changes to grading/submit/result flows.
+
+DELIVERABLES
+
+- Commit with clear message: "Add Examiner/Proctor roles + seeded IT demo users + scoped access"
+- List files changed (backend + frontend).
+- Short test report as described above.
+
+Start now. Do not ask questions. Make the safest minimal change that satisfies the demo requirements.

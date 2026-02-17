@@ -271,3 +271,46 @@ export async function getDepartmentsList(): Promise<DepartmentListItem[]> {
     return [];
   }
 }
+
+// ============ Roles API ============
+export interface RoleListItem {
+  id: string;
+  name: string;
+  description?: string;
+  userCount: number;
+}
+
+export async function getRolesList(): Promise<RoleListItem[]> {
+  try {
+    const raw = await apiClient.get<RoleListItem[]>("/Roles");
+    return raw ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function addUserToRole(
+  userId: string,
+  roleName: string,
+): Promise<void> {
+  await apiClient.post("/Roles/add-user", { userId, roleName });
+}
+
+export async function removeUserFromRole(
+  userId: string,
+  roleName: string,
+): Promise<void> {
+  await apiClient.post("/Roles/remove-user", { userId, roleName });
+}
+
+// ============ Department Assignment API ============
+export async function assignUserToDepartment(
+  userId: string,
+  departmentId: number,
+): Promise<void> {
+  await apiClient.post("/Departments/assign-user", { userId, departmentId });
+}
+
+export async function removeUserFromDepartment(userId: string): Promise<void> {
+  await apiClient.post(`/Departments/remove-user/${userId}`, {});
+}

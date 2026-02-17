@@ -8,6 +8,8 @@ export enum UserRole {
   SuperAdmin = "SuperAdmin",
   ProctorReviewer = "ProctorReviewer",
   Auditor = "Auditor",
+  Examiner = "Examiner",
+  Proctor = "Proctor",
 }
 
 export enum DifficultyLevel {

@@ -41,7 +41,11 @@ export default function LoginPage() {
         const user = JSON.parse(storedUser)
         // Redirect candidates to My Exams, others to Dashboard
         if (user.role === UserRole.Candidate) {
-          router.push("/my-exams")
+          router.push("/verify-identity")
+        } else if (user.role === "Examiner") {
+          router.push("/grading")
+        } else if (user.role === "Proctor") {
+          router.push("/proctor-center")
         } else {
           router.push("/dashboard")
         }
@@ -219,6 +223,22 @@ export default function LoginPage() {
                     >
                       <span className="font-medium text-primary">Instructor:</span>{" "}
                       <span className="text-muted-foreground">sara.it.instructor@examcore.com</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillDemoCredentials("omar.it.examiner@examcore.com")}
+                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
+                    >
+                      <span className="font-medium text-primary">Examiner:</span>{" "}
+                      <span className="text-muted-foreground">omar.it.examiner@examcore.com</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillDemoCredentials("layla.it.proctor@examcore.com")}
+                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
+                    >
+                      <span className="font-medium text-primary">Proctor:</span>{" "}
+                      <span className="text-muted-foreground">layla.it.proctor@examcore.com</span>
                     </button>
                     <button
                       type="button"

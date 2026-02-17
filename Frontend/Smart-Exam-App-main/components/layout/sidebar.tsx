@@ -48,6 +48,7 @@ import {
   ClipboardCheck,
   Building2,
   Wrench,
+  ShieldCheck,
 } from "lucide-react"
 
 interface NavItem {
@@ -57,6 +58,7 @@ interface NavItem {
   roles?: UserRole[]
   badge?: number
   hidden?: boolean
+  exact?: boolean
 }
 
 interface NavGroup {
@@ -118,11 +120,11 @@ const examsNavGroup: NavGroup = {
 const resultNavGroup: NavGroup = {
   icon: CheckCircle2,
   labelKey: "nav.result",
-  roles: [UserRole.Admin, UserRole.Instructor],
+  roles: [UserRole.Admin, UserRole.Instructor, UserRole.Examiner],
   children: [
     { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
-    { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result" },
-    { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report" },
+    { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result", roles: [UserRole.Admin, UserRole.Instructor] },
+    { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report", roles: [UserRole.Admin, UserRole.Instructor] },
   ],
 }
 
@@ -130,7 +132,7 @@ const resultNavGroup: NavGroup = {
 const proctorNavGroup: NavGroup = {
   icon: Monitor,
   labelKey: "nav.proctorCenter",
-  roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer],
+  roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer, UserRole.Proctor],
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
     { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign" },
@@ -159,7 +161,8 @@ const administrationNavGroup: NavGroup = {
   labelKey: "nav.administration",
   roles: [UserRole.Admin, UserRole.SuperAdmin],
   children: [
-    { icon: Users, labelKey: "nav.users", href: "/users" },
+    { icon: Users, labelKey: "nav.users", href: "/users", exact: true },
+    { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
     { icon: Building2, labelKey: "nav.organization", href: "/organization" },
     { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Settings, labelKey: "nav.settings", href: "/settings" },
@@ -233,7 +236,7 @@ export function Sidebar() {
   }
 
   const NavLink = ({ item }: { item: NavItem }) => {
-    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+    const isActive = item.exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(`${item.href}/`))
     const Icon = item.icon
     const label = t(item.labelKey) || item.labelKey.split(".").pop()
 

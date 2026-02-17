@@ -151,7 +151,9 @@ public class DatabaseSeeder
     {
    (Name: AppRoles.Admin, Description: "Administrator with full access to department resources"),
       (Name: AppRoles.Instructor, Description: "Instructor who can create and manage exams"),
-     (Name: AppRoles.Candidate, Description: "Candidate who can take exams")
+     (Name: AppRoles.Candidate, Description: "Candidate who can take exams"),
+      (Name: AppRoles.Examiner, Description: "Examiner who can grade and review exam submissions"),
+      (Name: AppRoles.Proctor, Description: "Proctor who can monitor and supervise exam sessions")
         };
 
     foreach (var roleInfo in rolesToSeed)
@@ -251,7 +253,13 @@ public class DatabaseSeeder
  new { Email = "nour.it.candidate@examcore.com", DisplayName = "Nour Ahmed", FullName = "Nour Ahmed", Role = AppRoles.Candidate, DepartmentCode = (string?)null },
             new { Email = "youssef.finance.candidate@examcore.com", DisplayName = "Youssef Adel", FullName = "Youssef Adel", Role = AppRoles.Candidate, DepartmentCode = (string?)null },
      new { Email = "ahmed.hr.candidate@examcore.com", DisplayName = "Ahmed Nabil", FullName = "Ahmed Nabil", Role = AppRoles.Candidate, DepartmentCode = (string?)null },
-            new { Email = "salma.hr.candidate@examcore.com", DisplayName = "Salma Hussein", FullName = "Salma Hussein", Role = AppRoles.Candidate, DepartmentCode = (string?)null }
+            new { Email = "salma.hr.candidate@examcore.com", DisplayName = "Salma Hussein", FullName = "Salma Hussein", Role = AppRoles.Candidate, DepartmentCode = (string?)null },
+
+      // Examiner (IT Department - can access grading only)
+      new { Email = "omar.it.examiner@examcore.com", DisplayName = "Omar Fathi", FullName = "Omar Fathi", Role = AppRoles.Examiner, DepartmentCode = "IT" },
+
+      // Proctor (IT Department - can access proctor center only)
+      new { Email = "layla.it.proctor@examcore.com", DisplayName = "Layla Amr", FullName = "Layla Amr", Role = AppRoles.Proctor, DepartmentCode = "IT" }
         };
 
     foreach (var userInfo in usersToSeed)

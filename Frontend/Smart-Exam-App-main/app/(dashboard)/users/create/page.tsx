@@ -116,17 +116,18 @@ export default function CreateUserPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="email">{language === "ar" ? "البريد الإلكتروني" : "Email"}</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+              />
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="email">{language === "ar" ? "البريد الإلكتروني" : "Email"}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="role">{language === "ar" ? "الدور" : "Role"}</Label>
                 <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
@@ -136,17 +137,16 @@ export default function CreateUserPage() {
                   <SelectContent>
                     <SelectItem value="Candidate">{language === "ar" ? "مرشح" : "Candidate"}</SelectItem>
                     <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
+                    <SelectItem value="Examiner">{language === "ar" ? "ممتحن" : "Examiner"}</SelectItem>
+                    <SelectItem value="Proctor">{language === "ar" ? "مراقب" : "Proctor"}</SelectItem>
                     <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
                     <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
                     <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="departmentId">{language === "ar" ? "القسم (اختياري)" : "Department (Optional)"}</Label>
+                <Label htmlFor="departmentId">{language === "ar" ? "القسم" : "Department"}</Label>
                 <Select value={formData.departmentId} onValueChange={(value) => setFormData({ ...formData, departmentId: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder={language === "ar" ? "اختر القسم" : "Select department"} />
