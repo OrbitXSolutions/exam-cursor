@@ -39,9 +39,19 @@ export default function LoginPage() {
       const storedUser = localStorage.getItem("user")
       if (storedUser) {
         const user = JSON.parse(storedUser)
-        // Redirect candidates to My Exams, others to Dashboard
+        // Redirect candidates: if already verified go to My Exams, otherwise verify-identity
         if (user.role === UserRole.Candidate) {
-          router.push("/verify-identity")
+          try {
+            const { getCandidateVerificationStatus } = await import("@/lib/api/proctoring")
+            const vs = await getCandidateVerificationStatus()
+            if (vs.status === "Approved") {
+              router.push("/my-exams")
+            } else {
+              router.push("/verify-identity")
+            }
+          } catch {
+            router.push("/verify-identity")
+          }
         } else if (user.role === "Examiner") {
           router.push("/grading")
         } else if (user.role === "Proctor") {

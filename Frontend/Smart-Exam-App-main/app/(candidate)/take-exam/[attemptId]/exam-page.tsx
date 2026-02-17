@@ -248,6 +248,7 @@ export default function ExamPage() {
             eventType: AttemptEventType.FullscreenExited,
             metadataJson: JSON.stringify({ timestamp: new Date().toISOString() }),
           }).catch(() => { })
+          playWarningBeep()
           toast.warning(t("exam.tabSwitchWarning"))
         }
       }
@@ -259,6 +260,7 @@ export default function ExamPage() {
             eventType: AttemptEventType.TabSwitched,
             metadataJson: JSON.stringify({ timestamp: new Date().toISOString() }),
           }).catch(() => { })
+          playWarningBeep()
           toast.warning(t("exam.tabSwitchWarning"))
         }
       }
@@ -270,6 +272,7 @@ export default function ExamPage() {
           eventType: AttemptEventType.CopyAttempt,
           metadataJson: JSON.stringify({ blocked: true }),
         }).catch(() => { })
+        playWarningBeep()
         toast.warning(t("exam.copyPasteBlocked"))
       }
 
@@ -279,6 +282,7 @@ export default function ExamPage() {
           eventType: AttemptEventType.PasteAttempt,
           metadataJson: JSON.stringify({ blocked: true }),
         }).catch(() => { })
+        playWarningBeep()
         toast.warning(t("exam.copyPasteBlocked"))
       }
 

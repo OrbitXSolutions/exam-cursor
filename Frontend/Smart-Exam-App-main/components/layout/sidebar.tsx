@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { UserRole } from "@/lib/types"
+import { getCandidateVerificationStatus } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -88,6 +89,7 @@ const candidateNavItems: NavItem[] = [
     labelKey: "nav.myResults",
     href: "/my-results",
     roles: [UserRole.Candidate],
+    hidden: true,
   },
 ]
 
@@ -112,7 +114,7 @@ const examsNavGroup: NavGroup = {
     { icon: ClipboardList, labelKey: "nav.exams", href: "/exams", hidden: true },
     { icon: PlusSquare, labelKey: "nav.createExam", href: "/exams/setup" },
     { icon: List, labelKey: "nav.examsList", href: "/exams/list" },
-    { icon: Calendar, labelKey: "nav.examScheduler", href: "/exams/scheduler" },
+    { icon: Calendar, labelKey: "nav.examScheduler", href: "/exams/scheduler", hidden: true },
   ],
 }
 
@@ -135,7 +137,7 @@ const proctorNavGroup: NavGroup = {
   roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer, UserRole.Proctor],
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
-    { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign" },
+    { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign", hidden: true },
     { icon: Users, labelKey: "nav.userIdentification", href: "/proctor/user-identification" },
   ],
 }
@@ -174,6 +176,15 @@ export function Sidebar() {
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
+
+  // Candidate verification status for sidebar badge
+  const [verifiedStatus, setVerifiedStatus] = useState<string | null>(null)
+  useEffect(() => {
+    if (!hasRole(UserRole.Candidate)) return
+    getCandidateVerificationStatus()
+      .then((s) => setVerifiedStatus(s.status ?? null))
+      .catch(() => setVerifiedStatus(null))
+  }, [hasRole])
 
   // All navigation groups for easy access
   const allGroups = useMemo(() => ({
@@ -381,6 +392,41 @@ export function Sidebar() {
                 {filterByRole(candidateNavItems).map((item) => (
                   <NavLink key={item.href} item={item} />
                 ))}
+                {/* Verified status link */}
+                {verifiedStatus && (
+                  <Link
+                    href="/verify-identity"
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      pathname === "/verify-identity" && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      isCollapsed && "justify-center px-2",
+                    )}
+                  >
+                    {verifiedStatus === "Approved" ? (
+                      <ShieldCheck className="h-5 w-5 shrink-0 text-green-600" />
+                    ) : verifiedStatus === "Pending" ? (
+                      <Clock className="h-5 w-5 shrink-0 text-amber-500" />
+                    ) : (
+                      <ShieldCheck className="h-5 w-5 shrink-0 text-red-500" />
+                    )}
+                    {!isCollapsed && (
+                      <span className="flex items-center gap-2 truncate">
+                        {language === "ar" ? "التحقق من الهوية" : "Identity"}
+                        <span className={cn(
+                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                          verifiedStatus === "Approved" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                          verifiedStatus === "Pending" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                          (verifiedStatus === "Rejected" || verifiedStatus === "Flagged") && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+                        )}>
+                          {verifiedStatus === "Approved" ? (language === "ar" ? "تم التحقق" : "Verified") :
+                           verifiedStatus === "Pending" ? (language === "ar" ? "قيد المراجعة" : "Pending") :
+                           (language === "ar" ? "مرفوض" : verifiedStatus)}
+                        </span>
+                      </span>
+                    )}
+                  </Link>
+                )}
               </>
             )}
 
