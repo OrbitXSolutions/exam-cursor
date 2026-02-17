@@ -200,19 +200,14 @@ export async function getSessionDetails(
   if (!sessionId) {
     throw new Error("Session ID is required");
   }
-  const sessionRes = await apiClient.get<{
-    success?: boolean;
-    data?: ProctorSessionDetailDto;
-    Data?: ProctorSessionDetailDto;
-  }>(`/Proctor/session/${sessionId}`);
-  const data =
-    (
-      sessionRes as {
-        success?: boolean;
-        data?: ProctorSessionDetailDto;
-        Data?: ProctorSessionDetailDto;
-      }
-    ).data ?? (sessionRes as { Data?: ProctorSessionDetailDto }).Data;
+  const sessionRes = await apiClient.get<ProctorSessionDetailDto>(
+    `/Proctor/session/${sessionId}`,
+  );
+  // apiClient.get already unwraps ApiResponse.data, so sessionRes IS the DTO directly
+  const data: ProctorSessionDetailDto | undefined =
+    sessionRes && typeof sessionRes === "object" && "id" in sessionRes
+      ? (sessionRes as ProctorSessionDetailDto)
+      : (sessionRes as unknown as { data?: ProctorSessionDetailDto })?.data;
   if (!data) {
     throw new Error("Session not found");
   }

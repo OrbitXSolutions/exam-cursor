@@ -113,6 +113,15 @@ public class ProctorService : IProctorService
 
     public async Task<ApiResponse<ProctorSessionDto>> GetSessionAsync(int sessionId)
     {
+        // Handle sample/demo sessions (negative IDs)
+        if (sessionId < 0)
+        {
+            var sample = GetSampleSessionDto(sessionId);
+            if (sample != null)
+                return ApiResponse<ProctorSessionDto>.SuccessResponse(sample);
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+        }
+
         var session = await GetSessionWithIncludesAsync(sessionId);
 
         if (session == null)
@@ -1106,6 +1115,10 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<bool>> FlagSessionAsync(int sessionId, bool flagged, string proctorUserId)
     {
+        // Handle sample/demo sessions
+        if (sessionId < 0)
+            return ApiResponse<bool>.SuccessResponse(true, flagged ? "Session flagged" : "Session unflagged");
+
         var session = await _context.Set<ProctorSession>()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
@@ -1142,6 +1155,10 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<bool>> SendWarningAsync(int sessionId, string message, string proctorUserId)
     {
+        // Handle sample/demo sessions
+        if (sessionId < 0)
+            return ApiResponse<bool>.SuccessResponse(true, "Warning sent to candidate");
+
         var session = await _context.Set<ProctorSession>()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
@@ -1184,6 +1201,10 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<bool>> TerminateSessionAsync(int sessionId, string reason, string proctorUserId)
     {
+        // Handle sample/demo sessions
+        if (sessionId < 0)
+            return ApiResponse<bool>.SuccessResponse(true, "Session terminated");
+
         var session = await _context.Set<ProctorSession>()
             .Include(s => s.Attempt)
             .FirstOrDefaultAsync(s => s.Id == sessionId);
@@ -1383,6 +1404,44 @@ UploadEvidenceDto dto, string candidateId)
         };
 
         return violationTypes.Contains(eventType);
+    }
+
+    /// <summary>
+    /// Returns a fake ProctorSessionDto for demo/sample sessions (negative IDs).
+    /// </summary>
+    private static ProctorSessionDto? GetSampleSessionDto(int sessionId)
+    {
+        var now = DateTime.UtcNow;
+        var samples = new Dictionary<int, ProctorSessionDto>
+        {
+            [-1] = new()
+            {
+                Id = -1, AttemptId = -1, ExamId = -1,
+                ExamTitleEn = "Introduction to Computer Science \u2014 Final",
+                CandidateId = "sample-1", CandidateName = "Sarah Ahmed",
+                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-22),
+                TotalEvents = 5, TotalViolations = 1,
+                RiskScore = 12, IsFlagged = false,
+                LastHeartbeatAt = now.AddSeconds(-10),
+                HeartbeatMissedCount = 0,
+                RecentEvents = new List<ProctorEventDto>()
+            },
+            [-2] = new()
+            {
+                Id = -2, AttemptId = -2, ExamId = -1,
+                ExamTitleEn = "Introduction to Computer Science \u2014 Final",
+                CandidateId = "sample-2", CandidateName = "Omar Khalid",
+                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-15),
+                TotalEvents = 8, TotalViolations = 3,
+                RiskScore = 35, IsFlagged = true,
+                LastHeartbeatAt = now.AddSeconds(-5),
+                HeartbeatMissedCount = 0,
+                RecentEvents = new List<ProctorEventDto>()
+            }
+        };
+        return samples.GetValueOrDefault(sessionId);
     }
 
     private static List<ProctorSessionListDto> GenerateSampleSessions()
