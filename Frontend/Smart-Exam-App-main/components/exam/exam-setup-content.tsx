@@ -1004,19 +1004,21 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={`subject-${subject.id}`}>
                           <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-3">
-                              <Checkbox
-                                id={`subject-expand-${subject.id}`}
-                                checked={selectedSubjectIds.includes(subject.id)}
-                                onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <span className="font-medium">{subject.nameEn}</span>
-                              {subject.topicsCount !== undefined && (
-                                <Badge variant="outline" className="text-xs">
-                                  {subject.topicsCount} topics
-                                </Badge>
-                              )}
+                            <div className="flex flex-1 items-center justify-between pe-2">
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  id={`subject-expand-${subject.id}`}
+                                  checked={selectedSubjectIds.includes(subject.id)}
+                                  onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="font-medium">{subject.nameEn}</span>
+                                {subject.topicsCount !== undefined && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {subject.topicsCount} topics
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </AccordionTrigger>
                           <AccordionContent>

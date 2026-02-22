@@ -4479,6 +4479,12 @@ namespace Smart_Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("EnableLiveVideo")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableVideoRecording")
+                        .HasColumnType("bit");
+
                     b.Property<string>("FooterText")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -4527,6 +4533,9 @@ namespace Smart_Core.Migrations
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("VideoRetentionDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

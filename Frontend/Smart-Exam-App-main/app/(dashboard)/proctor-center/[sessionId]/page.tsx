@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, reviewIncident, flagSession, sendWarning, terminateSession } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession } from "@/lib/api/proctoring"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
+import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
+import { getVideoConfig } from "@/lib/webrtc/video-config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,6 +34,8 @@ import {
   User,
   Camera,
   Activity,
+  Video,
+  Play,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -54,9 +58,77 @@ export default function SessionDetailPage() {
   const [terminateReason, setTerminateReason] = useState("")
   const [previewImage, setPreviewImage] = useState<{ url: string; timestamp: string } | null>(null)
 
+  // WebRTC live video state
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const viewerRef = useRef<ProctorViewer | null>(null)
+  const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("offline")
+  const [hasRemoteStream, setHasRemoteStream] = useState(false)
+
   useEffect(() => {
     loadSession()
   }, [sessionId])
+
+  // Poll for updated session data + screenshots every 15s while session is active
+  // Uses lightweight refreshSessionData (skips getIncidents to avoid 403 noise)
+  useEffect(() => {
+    if (!session || session.status !== "Active") return
+    const interval = setInterval(async () => {
+      try {
+        const data = await refreshSessionData(sessionId)
+        setSession(data.session)
+        setScreenshots(data.screenshots)
+      } catch {
+        // silent — don't redirect on poll failure
+      }
+    }, 15_000)
+    return () => clearInterval(interval)
+  }, [sessionId, session?.status])
+
+  // WebRTC live video: connect viewer when session is active and live video is enabled
+  useEffect(() => {
+    console.log(`%c[ProctorPage] WebRTC effect: session=${session?.id}, status=${session?.status}, attemptId=${session?.attemptId}`, 'color: #e91e63; font-weight: bold')
+    if (!session || session.status !== "Active" || !session.attemptId) {
+      console.warn(`[ProctorPage] Skipping WebRTC: session=${!!session}, status=${session?.status}, attemptId=${session?.attemptId}`)
+      return
+    }
+    let cancelled = false
+
+    console.log(`%c[ProctorPage] Fetching video config for attempt ${session.attemptId}...`, 'color: #e91e63; font-weight: bold')
+    getVideoConfig().then((cfg) => {
+      console.log(`%c[ProctorPage] Video config: enableLiveVideo=${cfg.enableLiveVideo}, enableVideoRecording=${cfg.enableVideoRecording}`, 'color: #e91e63; font-weight: bold')
+      if (cancelled) { console.warn('[ProctorPage] Cancelled, skipping viewer init'); return }
+      if (!cfg.enableLiveVideo) { console.warn('[ProctorPage] enableLiveVideo=false, skipping viewer'); return }
+
+      console.log(`%c[ProctorPage] ✅ Creating ProctorViewer for attempt ${session.attemptId}`, 'color: #4caf50; font-weight: bold')
+      const viewer = new ProctorViewer(session.attemptId!, {
+        onStatusChange: (status) => {
+          console.log(`%c[ProctorPage] Viewer status changed: ${status}`, status === 'live' ? 'color: #4caf50; font-weight: bold' : 'color: #ff9800')
+          setViewerStatus(status)
+        },
+        onRemoteStream: (stream) => {
+          console.log(`%c[ProctorPage] ✅ Remote stream received! tracks=${stream.getTracks().length}`, 'color: #4caf50; font-weight: bold')
+          setHasRemoteStream(true)
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream
+            videoRef.current.play().catch(() => {})
+          }
+        },
+      })
+
+      viewerRef.current = viewer
+      viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal):", e))
+    }).catch((e) => {
+      console.warn("[ProctorPage] Video config fetch failed (non-fatal):", e)
+    })
+
+    return () => {
+      cancelled = true
+      viewerRef.current?.disconnect()
+      viewerRef.current = null
+      setHasRemoteStream(false)
+      setViewerStatus("offline")
+    }
+  }, [session?.attemptId, session?.status])
 
   async function loadSession() {
     try {
@@ -198,35 +270,94 @@ export default function SessionDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Latest Snapshot */}
+          {/* Live Video / Latest Snapshot */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5" />
-                {t("proctor.liveVideo")}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  {t("proctor.liveVideo")}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {session.status === "Active" && (
+                    <Badge
+                      variant="outline"
+                      className={
+                        viewerStatus === "live"
+                          ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-600"
+                          : viewerStatus === "connecting" || viewerStatus === "reconnecting"
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-600"
+                            : "bg-muted text-muted-foreground"
+                      }
+                    >
+                      <span className={`inline-block h-2 w-2 rounded-full me-1.5 ${
+                        viewerStatus === "live" ? "bg-emerald-500 animate-pulse" :
+                        viewerStatus === "connecting" || viewerStatus === "reconnecting" ? "bg-amber-500 animate-pulse" :
+                        "bg-muted-foreground"
+                      }`} />
+                      {viewerStatus === "live" ? "LIVE" :
+                       viewerStatus === "connecting" ? "Connecting…" :
+                       viewerStatus === "reconnecting" ? "Reconnecting…" :
+                       "Offline"}
+                    </Badge>
+                  )}
+                  {session.attemptId && session.status !== "Active" && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                        <Play className="h-3.5 w-3.5 me-1.5" />
+                        View Recording
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                {screenshots.length > 0 ? (
-                  <img
-                    src={screenshots[0].url}
-                    alt="Latest snapshot"
-                    className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => setPreviewImage(screenshots[0])}
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
-                    <Camera className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">No snapshots captured yet</p>
-                  </div>
+                {/* Live WebRTC video (shown when stream is active) */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover ${hasRemoteStream ? "" : "hidden"}`}
+                />
+                {/* Snapshot fallback (shown when no live stream) */}
+                {!hasRemoteStream && (
+                  <>
+                    {screenshots.length > 0 ? (
+                      <img
+                        src={screenshots[0].url}
+                        alt="Latest snapshot"
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => setPreviewImage(screenshots[0])}
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                        <Camera className="h-12 w-12 mb-2 opacity-30" />
+                        <p className="text-sm">
+                          {session.status === "Active" ? "Waiting for candidate video…" : "No snapshots captured"}
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
-                {screenshots.length > 0 && (
-                  <div className="absolute bottom-4 end-4 flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
-                    <Camera className="h-4 w-4" />
-                    {screenshots.length} snapshots
-                  </div>
-                )}
+                {/* Overlay badges */}
+                <div className="absolute bottom-4 end-4 flex items-center gap-2">
+                  {screenshots.length > 0 && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
+                      <Camera className="h-4 w-4" />
+                      {screenshots.length} snapshots
+                    </div>
+                  )}
+                  {hasRemoteStream && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/90 text-white text-sm">
+                      <Video className="h-4 w-4" />
+                      LIVE
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -260,6 +391,11 @@ export default function SessionDetailPage() {
                           src={ss.url}
                           alt="Screenshot"
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.opacity = '0.3';
+                            img.alt = 'Image unavailable';
+                          }}
                         />
                       </div>
                       <p className="text-xs text-muted-foreground text-center truncate">

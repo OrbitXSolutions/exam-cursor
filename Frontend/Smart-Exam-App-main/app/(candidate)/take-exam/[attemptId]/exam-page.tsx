@@ -17,6 +17,9 @@ import {
   getAttemptTimer,
 } from "@/lib/api/candidate"
 import { uploadProctorSnapshot, getCandidateSessionStatus } from "@/lib/api/proctoring"
+import { CandidatePublisher } from "@/lib/webrtc/candidate-publisher"
+import { ChunkRecorder } from "@/lib/webrtc/chunk-recorder"
+import { getVideoConfig } from "@/lib/webrtc/video-config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -108,6 +111,8 @@ export default function ExamPage() {
   const webcamStreamRef = useRef<MediaStream | null>(null) // Persistent webcam stream
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null) // Video element for webcam
   const proctorPollRef = useRef<NodeJS.Timeout | undefined>(undefined) // Proctor warning poll
+  const publisherRef = useRef<CandidatePublisher | null>(null) // WebRTC live video publisher
+  const chunkRecorderRef = useRef<ChunkRecorder | null>(null) // Video chunk recorder
 
   // Computed values
   const sections = session?.sections || []
@@ -416,12 +421,75 @@ export default function ExamPage() {
         captureSnapshot()
         // Then take snapshots every 60 seconds
         snapshotIntervalRef.current = setInterval(captureSnapshot, 60000)
+
+        // Start WebRTC live video publisher (share existing stream)
+        // Guarded by feature flags — failures never block the exam
+        if (webcamStreamRef.current && session?.attemptId) {
+          console.log(`%c[ExamPage] Fetching video config for attempt ${session.attemptId}...`, 'color: #2196f3; font-weight: bold')
+          getVideoConfig().then((cfg) => {
+            console.log(`%c[ExamPage] Video config received: enableLiveVideo=${cfg.enableLiveVideo}, enableVideoRecording=${cfg.enableVideoRecording}, stunServers=${JSON.stringify(cfg.stunServers)}`, 'color: #2196f3; font-weight: bold')
+            if (!isActive || !webcamStreamRef.current || !session?.attemptId) {
+              console.warn('[ExamPage] Skipping video init: isActive=', isActive, 'stream=', !!webcamStreamRef.current, 'attemptId=', session?.attemptId)
+              return
+            }
+
+            // Live video publisher
+            if (cfg.enableLiveVideo) {
+              console.log(`%c[ExamPage] ✅ enableLiveVideo=true, starting CandidatePublisher for attempt ${session.attemptId}`, 'color: #4caf50; font-weight: bold')
+              try {
+                const publisher = new CandidatePublisher(session.attemptId, {
+                  onStatusChange: (status) => {
+                    console.log("[Proctor] WebRTC publisher status:", status)
+                  },
+                })
+                publisher.start(webcamStreamRef.current).catch((err) => {
+                  console.warn("[Proctor] WebRTC publisher failed to start (non-fatal):", err)
+                })
+                publisherRef.current = publisher
+              } catch (err) {
+                console.warn("[Proctor] WebRTC publisher init failed (non-fatal):", err)
+              }
+            } else {
+              console.warn('[ExamPage] enableLiveVideo=false, skipping WebRTC publisher')
+            }
+
+            // Chunk recording
+            if (cfg.enableVideoRecording) {
+              console.log(`[ExamPage] enableVideoRecording=true, starting ChunkRecorder`)
+              try {
+                const recorder = new ChunkRecorder(session.attemptId, {
+                  onChunkUploaded: (idx) => {
+                    console.log(`[Proctor] Chunk ${idx} uploaded`)
+                  },
+                  onChunkFailed: (idx, err) => {
+                    console.warn(`[Proctor] Chunk ${idx} failed: ${err}`)
+                  },
+                  onError: (err) => {
+                    console.error("[Proctor] ChunkRecorder error (non-fatal):", err)
+                  },
+                })
+                recorder.start(webcamStreamRef.current!)
+                chunkRecorderRef.current = recorder
+              } catch (err) {
+                console.warn("[Proctor] ChunkRecorder init failed (non-fatal):", err)
+              }
+            }
+          }).catch((err) => {
+            console.warn("[Proctor] Video config fetch failed (non-fatal):", err)
+          })
+        }
       }
     })
 
     return () => {
       isActive = false
       if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
+      // Stop WebRTC publisher
+      publisherRef.current?.stop().catch(() => {})
+      publisherRef.current = null
+      // Stop chunk recorder
+      chunkRecorderRef.current?.dispose()
+      chunkRecorderRef.current = null
       // Stop webcam stream on cleanup
       if (webcamStreamRef.current) {
         webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -720,6 +788,9 @@ export default function ExamPage() {
     if (syncTimerRef.current) { clearInterval(syncTimerRef.current); syncTimerRef.current = undefined }
     if (snapshotIntervalRef.current) { clearInterval(snapshotIntervalRef.current); snapshotIntervalRef.current = undefined }
     if (proctorPollRef.current) { clearInterval(proctorPollRef.current); proctorPollRef.current = undefined }
+    // Stop WebRTC publisher
+    publisherRef.current?.stop().catch(() => {})
+    publisherRef.current = null
     // Stop webcam stream
     if (webcamStreamRef.current) {
       webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -743,12 +814,43 @@ export default function ExamPage() {
     try {
       setSubmitting(true)
 
+      // Stop chunk recorder and flush pending uploads
+      if (chunkRecorderRef.current) {
+        try {
+          await chunkRecorderRef.current.stop()
+        } catch (e) {
+          console.warn("[Proctor] ChunkRecorder stop failed:", e)
+        }
+        chunkRecorderRef.current = null
+      }
+
       // Stop all background calls BEFORE submit to prevent race conditions
       stopAllBackgroundActivity()
 
       await logAttemptEvent(session.attemptId, {
         eventType: AttemptEventType.Submitted,
       }).catch(() => { })
+
+      // Finalize video recording in background (fire-and-forget — never delays submit)
+      // Backend returns 202 Accepted and processes FFmpeg in background
+      if (session.attemptId) {
+        try {
+          const token = localStorage.getItem("auth_token")
+          fetch(`/api/proxy/Proctor/video-finalize/${session.attemptId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          }).then(() => {
+            console.log("[Proctor] Video finalize request sent (202 accepted)")
+          }).catch((e) => {
+            console.warn("[Proctor] Video finalize request failed (non-fatal):", e)
+          })
+        } catch (e) {
+          console.warn("[Proctor] Video finalize setup failed (non-fatal):", e)
+        }
+      }
 
       const result = await submitAttempt(session.attemptId)
 

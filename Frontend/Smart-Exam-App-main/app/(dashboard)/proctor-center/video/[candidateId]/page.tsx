@@ -324,7 +324,7 @@ export default function CandidateVideoPage() {
                   </CardContent>
                 </Card>
 
-                {/* Video Placeholder */}
+                {/* Video Player */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -333,19 +333,54 @@ export default function CandidateVideoPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
-                      <VideoOff className="h-16 w-16 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground text-center">
-                        {language === "ar"
-                          ? "تسجيل الفيديو غير متوفر حالياً"
-                          : "Video recording not available"}
-                      </p>
-                      <p className="text-sm text-muted-foreground text-center mt-2">
-                        {language === "ar"
-                          ? "راجع اللقطات أدناه لعرض صور المراقبة"
-                          : "Check snapshots below for proctoring images"}
-                      </p>
-                    </div>
+                    {selectedSession?.attemptId ? (
+                      <div className="space-y-3">
+                        <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                          <video
+                            src={`/api/proxy/Proctor/video-stream/${selectedSession.attemptId}`}
+                            controls
+                            playsInline
+                            className="w-full h-full"
+                            controlsList="nodownload"
+                            onError={() => {
+                              // Video not available, show placeholder
+                              const el = document.getElementById("video-fallback")
+                              if (el) el.style.display = "flex"
+                              const vid = document.getElementById("video-player")
+                              if (vid) vid.style.display = "none"
+                            }}
+                            id="video-player"
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                          <div id="video-fallback" className="hidden aspect-video bg-muted rounded-lg flex-col items-center justify-center">
+                            <VideoOff className="h-16 w-16 text-muted-foreground mb-4" />
+                            <p className="text-muted-foreground text-center">
+                              {language === "ar"
+                                ? "تسجيل الفيديو غير متوفر حالياً"
+                                : "Video recording not available yet"}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => router.push(`/proctor-center/recording/${selectedSession.attemptId}`)}
+                        >
+                          <Play className="h-4 w-4 mr-1" />
+                          {language === "ar" ? "عرض التسجيل الكامل" : "View Full Recording"}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
+                        <VideoOff className="h-16 w-16 text-muted-foreground mb-4" />
+                        <p className="text-muted-foreground text-center">
+                          {language === "ar"
+                            ? "تسجيل الفيديو غير متوفر حالياً"
+                            : "Video recording not available"}
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

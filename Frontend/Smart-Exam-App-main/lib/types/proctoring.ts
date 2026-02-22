@@ -1,5 +1,6 @@
 export interface LiveSession {
   id: string;
+  attemptId?: number;
   candidateId: string;
   candidateName: string;
   examTitle: string;

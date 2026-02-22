@@ -213,6 +213,7 @@ export async function getSessionDetails(
   }
   const session: LiveSession = {
     id: String(data.id),
+    attemptId: data.attemptId,
     candidateId: data.candidateId ?? "",
     candidateName: data.candidateName ?? "",
     examTitle: data.examTitleEn ?? "",
@@ -264,6 +265,68 @@ export async function getSessionDetails(
     // ignore
   }
   return { session, incidents, screenshots };
+}
+
+/**
+ * Lightweight refresh — fetches session + screenshots only (no incidents).
+ * Used by polling to avoid repeated 403 noise on /Incident/cases.
+ */
+export async function refreshSessionData(
+  sessionId: string,
+): Promise<{
+  session: LiveSession;
+  screenshots: Array<{ id: string; timestamp: string; url: string }>;
+}> {
+  const sessionRes = await apiClient.get<ProctorSessionDetailDto>(
+    `/Proctor/session/${sessionId}`,
+  );
+  const data: ProctorSessionDetailDto | undefined =
+    sessionRes && typeof sessionRes === "object" && "id" in sessionRes
+      ? (sessionRes as ProctorSessionDetailDto)
+      : (sessionRes as unknown as { data?: ProctorSessionDetailDto })?.data;
+  if (!data) throw new Error("Session not found");
+  const session: LiveSession = {
+    id: String(data.id),
+    attemptId: data.attemptId,
+    candidateId: data.candidateId ?? "",
+    candidateName: data.candidateName ?? "",
+    examTitle: data.examTitleEn ?? "",
+    startedAt: data.startedAt,
+    timeRemaining: 0,
+    status:
+      data.statusName === "Active"
+        ? "Active"
+        : data.statusName === "Cancelled" || data.statusName === "Terminated"
+          ? "Terminated"
+          : "Completed",
+    incidentCount: data.totalViolations ?? 0,
+    flagged: data.isFlagged ?? false,
+    lastActivity: data.lastHeartbeatAt ?? data.startedAt,
+  };
+  let screenshots: Array<{ id: string; timestamp: string; url: string }> = [];
+  try {
+    const list = await apiClient.get<
+      Array<{
+        id: number;
+        uploadedAt?: string;
+        startAt?: string;
+        previewUrl?: string;
+        downloadUrl?: string;
+      }>
+    >(`/Proctor/session/${sessionId}/evidence`);
+    const items = Array.isArray(list) ? list : [];
+    screenshots = items
+      .filter((e) => e.previewUrl || e.downloadUrl)
+      .map((e) => ({
+        id: String(e.id),
+        timestamp: e.uploadedAt ?? e.startAt ?? "",
+        url: e.previewUrl ?? e.downloadUrl ?? "",
+      }))
+      .reverse();
+  } catch {
+    // ignore
+  }
+  return { session, screenshots };
 }
 
 /**
