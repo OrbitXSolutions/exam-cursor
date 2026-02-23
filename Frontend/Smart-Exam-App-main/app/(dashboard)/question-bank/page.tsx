@@ -29,10 +29,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import type { Question, QuestionCategory, QuestionType } from "@/lib/types"
+import type { Question, QuestionType } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { getQuestions, deleteQuestion, toggleQuestionStatus } from "@/lib/api/question-bank"
-import { getQuestionCategories, getQuestionTypes } from "@/lib/api/lookups"
+import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type QuestionSubject, type QuestionTopic } from "@/lib/api/lookups"
 import { toast } from "sonner"
 import {
   Plus,
@@ -52,13 +52,15 @@ export default function QuestionBankPage() {
   const { t, language } = useI18n()
 
   const [questions, setQuestions] = useState<Question[]>([])
-  const [categories, setCategories] = useState<QuestionCategory[]>([])
+  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
+  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [types, setTypes] = useState<QuestionType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedSubject, setSelectedSubject] = useState<string>("all")
+  const [selectedTopic, setSelectedTopic] = useState<string>("all")
   const [selectedType, setSelectedType] = useState<string>("all")
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
   const [showFilters, setShowFilters] = useState(false)
@@ -71,10 +73,10 @@ export default function QuestionBankPage() {
     setLoading(true)
     setError(null)
     try {
-      // Fetch questions, categories, and types in parallel
-      const [questionsRes, categoriesRes, typesRes] = await Promise.all([
+      // Fetch questions, subjects, and types in parallel
+      const [questionsRes, subjectsRes, typesRes] = await Promise.all([
         getQuestions({ pageSize: 100 }),
-        getQuestionCategories(),
+        getQuestionSubjects({ pageSize: 100 }),
         getQuestionTypes(),
       ])
 
@@ -82,9 +84,9 @@ export default function QuestionBankPage() {
       const items = questionsRes?.items || []
       setQuestions(Array.isArray(items) ? items : [])
 
-      // Handle categories response
-      const categoriesData = categoriesRes?.items || []
-      setCategories(Array.isArray(categoriesData) ? categoriesData : [])
+      // Handle subjects response
+      const subjectsData = subjectsRes?.items || []
+      setSubjects(Array.isArray(subjectsData) ? subjectsData : [])
 
       // Handle types response
       const typesData = typesRes?.items || []
@@ -101,6 +103,25 @@ export default function QuestionBankPage() {
   useEffect(() => {
     fetchData()
   }, [])
+
+  // Fetch topics when subject changes
+  useEffect(() => {
+    if (selectedSubject === "all") {
+      setTopics([])
+      setSelectedTopic("all")
+      return
+    }
+    const fetchTopicsForSubject = async () => {
+      try {
+        const res = await getQuestionTopics({ subjectId: Number(selectedSubject), pageSize: 100 })
+        setTopics(res?.items || [])
+        setSelectedTopic("all")
+      } catch {
+        setTopics([])
+      }
+    }
+    fetchTopicsForSubject()
+  }, [selectedSubject])
 
   const handleDelete = async () => {
     if (!questionToDelete) return
@@ -141,21 +162,23 @@ export default function QuestionBankPage() {
     const bodyAr = q.bodyAr || ""
     const searchLower = searchQuery.toLowerCase()
     const matchesSearch = !searchQuery || bodyEn.toLowerCase().includes(searchLower) || bodyAr.toLowerCase().includes(searchLower)
-    const matchesCategory = selectedCategory === "all" || q.questionCategoryId === Number(selectedCategory)
+    const matchesSubject = selectedSubject === "all" || q.subjectId === Number(selectedSubject)
+    const matchesTopic = selectedTopic === "all" || q.topicId === Number(selectedTopic)
     const matchesType = selectedType === "all" || q.questionTypeId === Number(selectedType)
     const matchesDifficulty = selectedDifficulty === "all" || q.difficultyLevel === Number(selectedDifficulty)
-    return matchesSearch && matchesCategory && matchesType && matchesDifficulty
+    return matchesSearch && matchesSubject && matchesTopic && matchesType && matchesDifficulty
   })
 
   const clearFilters = () => {
     setSearchQuery("")
-    setSelectedCategory("all")
+    setSelectedSubject("all")
+    setSelectedTopic("all")
     setSelectedType("all")
     setSelectedDifficulty("all")
   }
 
   const hasActiveFilters =
-    searchQuery || selectedCategory !== "all" || selectedType !== "all" || selectedDifficulty !== "all"
+    searchQuery || selectedSubject !== "all" || selectedTopic !== "all" || selectedType !== "all" || selectedDifficulty !== "all"
 
   if (loading) {
     return (
@@ -232,18 +255,34 @@ export default function QuestionBankPage() {
         {showFilters && (
           <Card className="animate-in slide-in-from-top-2">
             <CardContent className="pt-6">
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("questionBank.questionCategory")}</label>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <label className="text-sm font-medium">{language === "ar" ? "المادة" : "Subject"}</label>
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
                     <SelectTrigger>
-                      <SelectValue placeholder="All Categories" />
+                      <SelectValue placeholder={language === "ar" ? "جميع المواد" : "All Subjects"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={String(cat.id)}>
-                          {language === "ar" ? cat.nameAr : cat.nameEn}
+                      <SelectItem value="all">{language === "ar" ? "جميع المواد" : "All Subjects"}</SelectItem>
+                      {subjects.map((subj) => (
+                        <SelectItem key={subj.id} value={String(subj.id)}>
+                          {language === "ar" ? subj.nameAr : subj.nameEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{language === "ar" ? "الموضوع" : "Topic"}</label>
+                  <Select value={selectedTopic} onValueChange={setSelectedTopic} disabled={selectedSubject === "all" || topics.length === 0}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={language === "ar" ? "جميع المواضيع" : "All Topics"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{language === "ar" ? "جميع المواضيع" : "All Topics"}</SelectItem>
+                      {topics.map((topic) => (
+                        <SelectItem key={topic.id} value={String(topic.id)}>
+                          {language === "ar" ? topic.nameAr : topic.nameEn}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -321,7 +360,7 @@ export default function QuestionBankPage() {
                   <TableRow>
                     <TableHead>Question</TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Category</TableHead>
+                    <TableHead>{language === "ar" ? "المادة" : "Subject"}</TableHead>
                     <TableHead>Difficulty</TableHead>
                     <TableHead>Points</TableHead>
                     <TableHead>Status</TableHead>
@@ -355,13 +394,11 @@ export default function QuestionBankPage() {
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
                           {language === "ar"
-                            ? question.questionCategoryNameAr ||
-                              question.questionCategoryNameEn ||
-                              question.questionCategoryName ||
-                              "Uncategorized"
-                            : question.questionCategoryNameEn ||
-                              question.questionCategoryName ||
-                              "Uncategorized"}
+                            ? question.subjectNameAr ||
+                              question.subjectNameEn ||
+                              "—"
+                            : question.subjectNameEn ||
+                              "—"}
                         </span>
                       </TableCell>
                       <TableCell>

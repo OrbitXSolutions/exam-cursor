@@ -20,9 +20,9 @@ public class QuestionDto
     public string QuestionTypeNameEn { get; set; } = string.Empty;
     public string QuestionTypeNameAr { get; set; } = string.Empty;
 
-    public int QuestionCategoryId { get; set; }
-    public string QuestionCategoryNameEn { get; set; } = string.Empty;
-    public string QuestionCategoryNameAr { get; set; } = string.Empty;
+    public int? QuestionCategoryId { get; set; }
+    public string? QuestionCategoryNameEn { get; set; }
+    public string? QuestionCategoryNameAr { get; set; }
 
     // Subject & Topic
     public int SubjectId { get; set; }
@@ -56,8 +56,8 @@ public class QuestionListDto
     public string QuestionTypeNameEn { get; set; } = string.Empty;
     public string QuestionTypeNameAr { get; set; } = string.Empty;
 
-    public string QuestionCategoryNameEn { get; set; } = string.Empty;
-    public string QuestionCategoryNameAr { get; set; } = string.Empty;
+    public string? QuestionCategoryNameEn { get; set; }
+    public string? QuestionCategoryNameAr { get; set; }
 
     // Subject & Topic
     public int SubjectId { get; set; }
@@ -87,7 +87,7 @@ public class CreateQuestionDto
     public string? ExplanationAr { get; set; }
 
     public int QuestionTypeId { get; set; }
-    public int QuestionCategoryId { get; set; }
+    public int? QuestionCategoryId { get; set; }
     public int SubjectId { get; set; }
     public int? TopicId { get; set; }
     public decimal Points { get; set; }
@@ -109,12 +109,14 @@ public class UpdateQuestionDto
     public string? ExplanationAr { get; set; }
 
     public int QuestionTypeId { get; set; }
-    public int QuestionCategoryId { get; set; }
+    public int? QuestionCategoryId { get; set; }
     public int SubjectId { get; set; }
     public int? TopicId { get; set; }
     public decimal Points { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public bool IsActive { get; set; }
+
+    public UpdateQuestionAnswerKeyDto? AnswerKey { get; set; }
 }
 
 public class QuestionSearchDto

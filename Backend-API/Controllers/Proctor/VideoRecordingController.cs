@@ -423,6 +423,74 @@ public class VideoRecordingController : ControllerBase
         return File(stream, evidence.ContentType ?? "video/mp4", enableRangeProcessing: true);
     }
 
+    /// <summary>
+    /// List all video chunks for an attempt (for chunk-based playback).
+    /// GET /api/Proctor/video-chunks/{attemptId}
+    /// </summary>
+    [HttpGet("video-chunks/{attemptId}")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    public IActionResult GetVideoChunks(int attemptId)
+    {
+        try
+        {
+            var chunkDir = Path.Combine(_mediaBasePath, "video-chunks", attemptId.ToString());
+            if (!Directory.Exists(chunkDir))
+                return NotFound(ApiResponse<object>.FailureResponse("No video chunks found for this attempt"));
+
+            var chunkFiles = Directory.GetFiles(chunkDir, "chunk_*.webm")
+                .OrderBy(f => f)
+                .ToArray();
+
+            if (chunkFiles.Length == 0)
+                return NotFound(ApiResponse<object>.FailureResponse("No video chunks found for this attempt"));
+
+            var chunks = chunkFiles.Select((f, i) =>
+            {
+                var fi = new FileInfo(f);
+                return new
+                {
+                    index = i,
+                    filename = fi.Name,
+                    sizeBytes = fi.Length,
+                };
+            }).ToList();
+
+            return Ok(ApiResponse<object>.SuccessResponse(new
+            {
+                attemptId,
+                totalChunks = chunks.Count,
+                totalSizeBytes = chunks.Sum(c => c.sizeBytes),
+                chunkDurationMs = 3000,
+                chunks,
+            }));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to list video chunks for attempt {AttemptId}", attemptId);
+            return StatusCode(500, ApiResponse<object>.FailureResponse("Failed to list video chunks"));
+        }
+    }
+
+    /// <summary>
+    /// Serve an individual video chunk file.
+    /// GET /api/Proctor/video-chunks/{attemptId}/{filename}
+    /// </summary>
+    [HttpGet("video-chunks/{attemptId}/{filename}")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    public IActionResult GetVideoChunkFile(int attemptId, string filename)
+    {
+        // Validate filename pattern to prevent path traversal
+        if (!System.Text.RegularExpressions.Regex.IsMatch(filename, @"^chunk_\d{6}\.webm$"))
+            return BadRequest(ApiResponse<object>.FailureResponse("Invalid chunk filename"));
+
+        var chunkPath = Path.Combine(_mediaBasePath, "video-chunks", attemptId.ToString(), filename);
+        if (!System.IO.File.Exists(chunkPath))
+            return NotFound(ApiResponse<object>.FailureResponse("Chunk file not found"));
+
+        var stream = new FileStream(chunkPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return File(stream, "video/webm", enableRangeProcessing: true);
+    }
+
     // ── Helpers ──────────────────────────────────────────
 
     private async Task<bool> IsVideoRecordingEnabled()

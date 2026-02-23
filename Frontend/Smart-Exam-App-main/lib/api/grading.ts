@@ -55,6 +55,8 @@ export interface GradedAnswerItem {
   isCorrect: boolean;
   isManuallyGraded: boolean;
   graderComment: string | null;
+  modelAnswerEn: string | null;
+  modelAnswerAr: string | null;
 }
 
 export interface GradingSessionDetail {

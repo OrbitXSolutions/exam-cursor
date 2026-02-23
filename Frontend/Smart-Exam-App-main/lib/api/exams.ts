@@ -1008,3 +1008,32 @@ export async function getQuestionsCount(
   }
   return (response as QuestionsCountResponse).count ?? response;
 }
+
+// ============ CLONE EXAM (Create from Template) ============
+
+export interface CloneExamParams {
+  titleEn: string;
+  titleAr: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  examType: ExamType;
+  startAt?: string;
+  endAt?: string;
+  durationMinutes: number;
+}
+
+export async function cloneExam(
+  sourceExamId: number,
+  data: CloneExamParams,
+): Promise<Exam> {
+  const response = await apiClient.post<any>(
+    `/Assessment/exams/${sourceExamId}/clone`,
+    data,
+    null,
+  );
+
+  if (response && response.id) {
+    return response as Exam;
+  }
+  throw new Error("Failed to clone exam");
+}

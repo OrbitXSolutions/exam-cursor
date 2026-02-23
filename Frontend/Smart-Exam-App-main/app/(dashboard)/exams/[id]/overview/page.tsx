@@ -7,7 +7,11 @@ import { useI18n } from "@/lib/i18n/context"
 import type { Exam } from "@/lib/types"
 import { getExam, publishExam, unpublishExam } from "@/lib/api/exams"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
@@ -16,13 +20,13 @@ import {
   Settings,
   Send,
   Hammer,
-  Eye,
   ArrowLeft,
   Archive,
   FileText,
   Clock,
   Users,
   Hash,
+  PartyPopper,
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
@@ -44,6 +48,7 @@ export default function ExamOverviewPage() {
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false)
 
   useEffect(() => {
     if (examId) {
@@ -68,7 +73,7 @@ export default function ExamOverviewPage() {
     try {
       setActionLoading(true)
       await publishExam(exam.id)
-      toast.success(t("exams.publishSuccess") || "Exam published successfully")
+      setPublishDialogOpen(true)
       fetchExam()
     } catch (error) {
       toast.error(t("exams.publishError") || "Failed to publish exam")
@@ -121,139 +126,105 @@ export default function ExamOverviewPage() {
   const isPublished = status === "Published"
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Success Header */}
-      <Card className="border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950">
-        <CardContent className="pt-6">
+    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] p-6">
+      <Card className="w-full max-w-2xl">
+        {/* Success Header */}
+        <div className="rounded-t-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-b border-green-200 dark:border-green-900 px-6 py-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
               <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-green-800 dark:text-green-200">
                 {language === "ar" ? "تم حفظ الاختبار بنجاح!" : "Exam Saved Successfully!"}
               </h1>
-              <p className="text-green-600 dark:text-green-400">
+              <p className="text-sm text-green-600 dark:text-green-400">
                 {language === "ar" 
                   ? "يمكنك الآن نشر الاختبار أو إجراء المزيد من التعديلات" 
                   : "You can now publish the exam or make further edits"}
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Exam Info Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
+        {/* Exam Info */}
+        <CardContent className="pt-6 pb-2">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <CardTitle className="text-2xl">{getExamTitle(exam, language)}</CardTitle>
-              <CardDescription className="mt-1">
+              <h2 className="text-2xl font-bold">{getExamTitle(exam, language)}</h2>
+              <p className="text-sm text-muted-foreground mt-1">
                 {language === "ar" ? "معرف الاختبار:" : "Exam ID:"} {exam.id}
-              </CardDescription>
+              </p>
             </div>
             <StatusBadge status={status} />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                {language === "ar" ? "المدة:" : "Duration:"}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-t border-b">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "المدة" : "Duration"}
               </span>
-              <span className="font-medium">{exam.durationMinutes || 0} min</span>
+              <span className="text-sm font-semibold">{exam.durationMinutes || 0} min</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Hash className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                {language === "ar" ? "الأقسام:" : "Sections:"}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <Hash className="h-5 w-5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "الأقسام" : "Sections"}
               </span>
-              <span className="font-medium">{exam.sections?.length || exam.sectionsCount || 0}</span>
+              <span className="text-sm font-semibold">{exam.sections?.length || exam.sectionsCount || 0}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                {language === "ar" ? "المحاولات:" : "Attempts:"}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <Users className="h-5 w-5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "المحاولات" : "Max Attempts"}
               </span>
-              <span className="font-medium">{exam.maxAttempts || "∞"}</span>
+              <span className="text-sm font-semibold">{exam.maxAttempts || "∞"}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                {language === "ar" ? "درجة النجاح:" : "Pass Score:"}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <FileText className="h-5 w-5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "درجة النجاح" : "Pass Score"}
               </span>
-              <span className="font-medium">{exam.passScore || 0}%</span>
+              <span className="text-sm font-semibold">{exam.passScore || 0} pts</span>
             </div>
           </div>
         </CardContent>
-      </Card>
 
-      {/* Primary Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
-            {language === "ar" ? "الإجراءات الرئيسية" : "Primary Actions"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Go to Configuration */}
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <Link href={`/exams/${examId}/configuration`}>
-                <Settings className="h-5 w-5" />
-                <span>{language === "ar" ? "الإعدادات" : "Go to Configuration"}</span>
-              </Link>
-            </Button>
-
-            {/* Publish Exam (if Draft) */}
-            {isDraft && (
-              <Button 
-                className="h-auto py-4 flex-col gap-2"
-                onClick={handlePublish}
-                disabled={actionLoading}
-              >
-                <Send className="h-5 w-5" />
-                <span>{language === "ar" ? "نشر الاختبار" : "Publish Exam"}</span>
-              </Button>
-            )}
-
-            {/* Edit Builder */}
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <Link href={`/exams/setup/${examId}?tab=builder`}>
-                <Hammer className="h-5 w-5" />
-                <span>{language === "ar" ? "تعديل البناء" : "Edit Builder"}</span>
-              </Link>
-            </Button>
-
-            {/* Preview Exam */}
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" disabled>
-              <Eye className="h-5 w-5" />
-              <span>{language === "ar" ? "معاينة الاختبار" : "Preview Exam"}</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Secondary Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
-            {language === "ar" ? "إجراءات إضافية" : "Secondary Actions"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {/* Back to Exams List */}
+        {/* Actions Footer */}
+        <CardContent className="pt-4 pb-6">
+          <div className="flex flex-wrap gap-3 justify-center">
             <Button variant="outline" asChild>
               <Link href="/exams/list">
                 <ArrowLeft className="h-4 w-4 me-2" />
-                {language === "ar" ? "العودة لقائمة الاختبارات" : "Back to Exams List"}
+                {language === "ar" ? "العودة للقائمة" : "Back to Exams List"}
               </Link>
             </Button>
 
-            {/* Archive Exam (only if Published) */}
+            <Button variant="outline" asChild>
+              <Link href={`/exams/${examId}/configuration`}>
+                <Settings className="h-4 w-4 me-2" />
+                {language === "ar" ? "الإعدادات" : "Configuration"}
+              </Link>
+            </Button>
+
+            <Button variant="outline" asChild>
+              <Link href={`/exams/setup/${examId}?tab=builder`}>
+                <Hammer className="h-4 w-4 me-2" />
+                {language === "ar" ? "تعديل البناء" : "Edit Builder"}
+              </Link>
+            </Button>
+
+            {isDraft && (
+              <Button
+                onClick={handlePublish}
+                disabled={actionLoading}
+              >
+                <Send className="h-4 w-4 me-2" />
+                {language === "ar" ? "نشر الاختبار" : "Publish Exam"}
+              </Button>
+            )}
+
             {isPublished && (
               <Button 
                 variant="outline"
@@ -267,6 +238,31 @@ export default function ExamOverviewPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Publish Celebration Dialog */}
+      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center text-center py-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 mb-4">
+              <PartyPopper className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+            <h2 className="text-xl font-bold mb-2">
+              {language === "ar" ? "تم نشر الاختبار!" : "Exam Published!"}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              {language === "ar"
+                ? "الاختبار متاح الآن للمرشحين لأدائه."
+                : "The exam is now available for candidates to take."}
+            </p>
+            <Button
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => setPublishDialogOpen(false)}
+            >
+              {language === "ar" ? "إغلاق" : "Close"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -43,6 +43,9 @@ import {
   Plus,
   Shield,
   FileText,
+  Maximize2,
+  Minimize2,
+  CheckCircle2 as CheckCircle2Icon,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -79,9 +82,12 @@ export default function SessionDetailPage() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const viewerRef = useRef<ProctorViewer | null>(null)
   const sessionPollRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const videoContainerRef = useRef<HTMLDivElement>(null)
   const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("offline")
   const [hasRemoteStream, setHasRemoteStream] = useState(false)
   const [signalRConnected, setSignalRConnected] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [sessionEnded, setSessionEnded] = useState<{ reason: "Submitted" | "Expired" | "Terminated" } | null>(null)
 
   useEffect(() => {
     loadSession()
@@ -164,6 +170,10 @@ export default function SessionDetailPage() {
             duration: 10000,
             icon: "\u2705",
           })
+          // Show session-ended overlay and stop live video
+          setSessionEnded({ reason: "Submitted" })
+          setHasRemoteStream(false)
+          viewerRef.current?.disconnect()
           // Refresh session data to reflect updated status
           refreshSessionData(sessionId).then((data) => {
             setSession(data.session)
@@ -193,6 +203,19 @@ export default function SessionDetailPage() {
             })
           }
         },
+        onAttemptExpired: (expEvent) => {
+          toast.warning(`Exam has expired (Attempt #${expEvent.attemptId})`, {
+            duration: 10000,
+            icon: "⏰",
+          })
+          setSessionEnded({ reason: "Expired" })
+          setHasRemoteStream(false)
+          viewerRef.current?.disconnect()
+          refreshSessionData(sessionId).then((data) => {
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          }).catch(() => {})
+        },
       })
 
       viewerRef.current = viewer
@@ -209,6 +232,23 @@ export default function SessionDetailPage() {
       setViewerStatus("offline")
     }
   }, [session?.attemptId, session?.status])
+
+  // Fullscreen change listener
+  useEffect(() => {
+    const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener("fullscreenchange", handleFsChange)
+    return () => document.removeEventListener("fullscreenchange", handleFsChange)
+  }, [])
+
+  // Detect session end from polling/refresh (status changed to non-Active)
+  useEffect(() => {
+    if (session && session.status !== "Active" && !sessionEnded) {
+      const reason = session.status === "Terminated" ? "Terminated" : "Submitted"
+      setSessionEnded({ reason })
+      setHasRemoteStream(false)
+      viewerRef.current?.disconnect()
+    }
+  }, [session?.status])
 
   async function loadSession() {
     try {
@@ -453,17 +493,17 @@ export default function SessionDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
+              <div ref={videoContainerRef} className={`aspect-video bg-muted rounded-lg overflow-hidden relative ${isFullscreen ? "rounded-none" : ""}`}>
                 {/* Live WebRTC video (shown when stream is active) */}
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
-                  className={`w-full h-full object-cover ${hasRemoteStream ? "" : "hidden"}`}
+                  className={`w-full h-full object-cover ${hasRemoteStream && !sessionEnded ? "" : "hidden"}`}
                 />
-                {/* Snapshot fallback (shown when no live stream) */}
-                {!hasRemoteStream && (
+                {/* Snapshot fallback (shown when no live stream and session not ended) */}
+                {!hasRemoteStream && !sessionEnded && (
                   <>
                     {screenshots.length > 0 ? (
                       <img
@@ -483,21 +523,61 @@ export default function SessionDetailPage() {
                     )}
                   </>
                 )}
+
+                {/* Session-Ended Overlay */}
+                {sessionEnded && (
+                  <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-300">
+                    {sessionEnded.reason === "Submitted" && <CheckCircle2Icon className="h-14 w-14 mb-3 text-emerald-400" />}
+                    {sessionEnded.reason === "Expired" && <Clock className="h-14 w-14 mb-3 text-amber-400" />}
+                    {sessionEnded.reason === "Terminated" && <XCircle className="h-14 w-14 mb-3 text-red-400" />}
+                    <h3 className="text-xl font-semibold mb-1">
+                      {sessionEnded.reason === "Submitted" ? "Exam Submitted" :
+                       sessionEnded.reason === "Expired" ? "Exam Expired" :
+                       "Session Terminated"}
+                    </h3>
+                    <p className="text-sm text-white/70 mb-4">The live video stream has ended</p>
+                    {session.attemptId && (
+                      <Button variant="secondary" size="sm" asChild>
+                        <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                          <Play className="h-3.5 w-3.5 me-1.5" />
+                          View Recording
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {/* Overlay badges */}
-                <div className="absolute bottom-4 end-4 flex items-center gap-2">
-                  {screenshots.length > 0 && (
+                <div className="absolute bottom-4 end-4 flex items-center gap-2 z-20">
+                  {screenshots.length > 0 && !sessionEnded && (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
                       <Camera className="h-4 w-4" />
                       {screenshots.length} snapshots
                     </div>
                   )}
-                  {hasRemoteStream && (
+                  {hasRemoteStream && !sessionEnded && (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/90 text-white text-sm">
                       <Video className="h-4 w-4" />
                       LIVE
                     </div>
                   )}
                 </div>
+
+                {/* Fullscreen toggle */}
+                <button
+                  onClick={async () => {
+                    if (!videoContainerRef.current) return
+                    if (document.fullscreenElement) {
+                      await document.exitFullscreen()
+                    } else {
+                      await videoContainerRef.current.requestFullscreen()
+                    }
+                  }}
+                  className="absolute top-3 end-3 p-1.5 rounded bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
+                  title="Toggle fullscreen"
+                >
+                  {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
               </div>
             </CardContent>
           </Card>

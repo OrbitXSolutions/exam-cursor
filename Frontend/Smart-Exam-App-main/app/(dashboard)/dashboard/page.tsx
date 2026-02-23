@@ -482,7 +482,7 @@ export default function DashboardPage() {
                     </Link>
                   </Button>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
-                    <Link href="/exams/create">
+                    <Link href="/exams/setup">
                       <ClipboardList className="mr-3 h-5 w-5 text-primary" />
                       <div className="text-left">
                         <p className="font-medium">{t("exams.createExam")}</p>
@@ -533,7 +533,7 @@ export default function DashboardPage() {
                 <CardDescription>Scheduled examinations</CardDescription>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href={isAdmin ? "/exams" : "/my-exams"}>
+                <Link href={isAdmin ? "/exams/list" : "/my-exams"}>
                   View all
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>

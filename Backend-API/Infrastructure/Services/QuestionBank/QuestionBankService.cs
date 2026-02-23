@@ -207,11 +207,14 @@ public class QuestionBankService : IQuestionBankService
             return ApiResponse<QuestionDto>.FailureResponse("Question type not found");
         }
 
-        // Validate QuestionCategory exists
-        var questionCategoryExists = await _context.QuestionCategories.AnyAsync(x => x.Id == dto.QuestionCategoryId);
-        if (!questionCategoryExists)
+        // Validate QuestionCategory exists (if provided)
+        if (dto.QuestionCategoryId.HasValue)
         {
-            return ApiResponse<QuestionDto>.FailureResponse("Question category not found");
+            var questionCategoryExists = await _context.QuestionCategories.AnyAsync(x => x.Id == dto.QuestionCategoryId.Value);
+            if (!questionCategoryExists)
+            {
+                return ApiResponse<QuestionDto>.FailureResponse("Question category not found");
+            }
         }
 
         // Validate Subject exists
@@ -294,7 +297,9 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<QuestionDto>> UpdateQuestionAsync(int id, UpdateQuestionDto dto, string updatedBy)
     {
-        var entity = await _context.Questions.FindAsync(id);
+        var entity = await _context.Questions
+            .Include(x => x.AnswerKey)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity == null)
         {
@@ -308,11 +313,14 @@ public class QuestionBankService : IQuestionBankService
             return ApiResponse<QuestionDto>.FailureResponse("Question type not found");
         }
 
-        // Validate QuestionCategory exists
-        var questionCategoryExists = await _context.QuestionCategories.AnyAsync(x => x.Id == dto.QuestionCategoryId);
-        if (!questionCategoryExists)
+        // Validate QuestionCategory exists (if provided)
+        if (dto.QuestionCategoryId.HasValue)
         {
-            return ApiResponse<QuestionDto>.FailureResponse("Question category not found");
+            var questionCategoryExists = await _context.QuestionCategories.AnyAsync(x => x.Id == dto.QuestionCategoryId.Value);
+            if (!questionCategoryExists)
+            {
+                return ApiResponse<QuestionDto>.FailureResponse("Question category not found");
+            }
         }
 
         // Validate Subject exists
@@ -346,6 +354,44 @@ public class QuestionBankService : IQuestionBankService
         entity.IsActive = dto.IsActive;
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = updatedBy;
+
+        // Upsert answer key if provided
+        if (dto.AnswerKey != null)
+        {
+            if (entity.AnswerKey != null)
+            {
+                // Update existing
+                entity.AnswerKey.AcceptedAnswersJsonEn = dto.AnswerKey.AcceptedAnswersJsonEn;
+                entity.AnswerKey.AcceptedAnswersJsonAr = dto.AnswerKey.AcceptedAnswersJsonAr;
+                entity.AnswerKey.CaseSensitive = dto.AnswerKey.CaseSensitive;
+                entity.AnswerKey.TrimSpaces = dto.AnswerKey.TrimSpaces;
+                entity.AnswerKey.NormalizeWhitespace = dto.AnswerKey.NormalizeWhitespace;
+                entity.AnswerKey.RubricTextEn = dto.AnswerKey.RubricTextEn;
+                entity.AnswerKey.RubricTextAr = dto.AnswerKey.RubricTextAr;
+                entity.AnswerKey.NumericAnswer = dto.AnswerKey.NumericAnswer;
+                entity.AnswerKey.Tolerance = dto.AnswerKey.Tolerance;
+                entity.AnswerKey.UpdatedDate = DateTime.UtcNow;
+                entity.AnswerKey.UpdatedBy = updatedBy;
+            }
+            else
+            {
+                // Create new
+                entity.AnswerKey = new QuestionAnswerKey
+                {
+                    AcceptedAnswersJsonEn = dto.AnswerKey.AcceptedAnswersJsonEn,
+                    AcceptedAnswersJsonAr = dto.AnswerKey.AcceptedAnswersJsonAr,
+                    CaseSensitive = dto.AnswerKey.CaseSensitive,
+                    TrimSpaces = dto.AnswerKey.TrimSpaces,
+                    NormalizeWhitespace = dto.AnswerKey.NormalizeWhitespace,
+                    RubricTextEn = dto.AnswerKey.RubricTextEn,
+                    RubricTextAr = dto.AnswerKey.RubricTextAr,
+                    NumericAnswer = dto.AnswerKey.NumericAnswer,
+                    Tolerance = dto.AnswerKey.Tolerance,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = updatedBy
+                };
+            }
+        }
 
         await _context.SaveChangesAsync();
 

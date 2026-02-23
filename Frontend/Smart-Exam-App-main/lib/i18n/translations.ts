@@ -71,6 +71,7 @@ export const translations = {
       ready: "Ready",
       unsupported: "Not Supported",
       denied: "Denied",
+      ok: "OK",
     },
 
     // Status
@@ -95,6 +96,7 @@ export const translations = {
       exams: "Exams",
       examCreation: "Exam Creation",
       createExam: "Create Exam",
+      createFromTemplate: "Create from Template",
       examsList: "Exams List",
       examScheduler: "Exam Scheduler",
       examManagement: "Exam Management",
@@ -339,6 +341,13 @@ export const translations = {
         'Are you sure you want to delete "{title}"? This action cannot be undone.',
       publish: "Publish",
       archive: "Archive",
+      // Action messages
+      publishSuccess: "Exam published successfully",
+      publishError: "Failed to publish exam",
+      archiveSuccess: "Exam archived successfully",
+      archiveError: "Failed to archive exam",
+      deleteSuccess: "Exam deleted successfully",
+      deleteError: "Failed to delete exam",
       // Bilingual create/edit
       titleEn: "Title (English)",
       titleAr: "Title (Arabic)",
@@ -366,6 +375,7 @@ export const translations = {
       notScheduled: "Not scheduled",
       // Create success & active
       createSuccess: "Exam created successfully",
+      updateSuccess: "Exam updated successfully",
       isActive: "Active",
       isActiveDesc: "Allow this exam to be accessed by candidates",
       // Builder empty states
@@ -1194,6 +1204,7 @@ export const translations = {
       ready: "جاهز",
       unsupported: "غير مدعوم",
       denied: "مرفوض",
+      ok: "موافق",
     },
 
     // Status
@@ -1218,6 +1229,7 @@ export const translations = {
       exams: "الاختبارات",
       examCreation: "إنشاء اختبار",
       createExam: "إنشاء اختبار",
+      createFromTemplate: "إنشاء من قالب",
       examsList: "قائمة الاختبارات",
       examScheduler: "جدولة الاختبارات",
       examManagement: "إدارة الاختبارات",
@@ -1427,6 +1439,7 @@ export const translations = {
       errorDepartmentRequired: "الرجاء اختيار القسم",
       errorDurationRange: "يجب أن تكون المدة بين 1 و 600 دقيقة",
       createSuccess: "تم إنشاء الاختبار بنجاح",
+      updateSuccess: "تم تحديث الاختبار بنجاح",
       // Pass Score
       passScorePoints: "درجة النجاح (النقاط)",
       passScoreHint: "يجب أن تكون أقل من أو تساوي إجمالي نقاط الاختبار",

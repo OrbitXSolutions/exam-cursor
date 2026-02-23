@@ -20,6 +20,7 @@ public interface IAssessmentService
     Task<ApiResponse<bool>> PublishExamAsync(int id, string updatedBy);
     Task<ApiResponse<bool>> UnpublishExamAsync(int id, string updatedBy);
     Task<ApiResponse<bool>> ToggleExamStatusAsync(int id, string updatedBy);
+    Task<ApiResponse<ExamDto>> CloneExamAsync(int sourceExamId, CloneExamDto dto, string createdBy);
 
     #endregion
 

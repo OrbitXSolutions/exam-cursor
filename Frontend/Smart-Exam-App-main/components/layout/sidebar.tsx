@@ -50,6 +50,7 @@ import {
   Building2,
   Wrench,
   ShieldCheck,
+  Copy,
 } from "lucide-react"
 
 interface NavItem {
@@ -111,8 +112,9 @@ const examsNavGroup: NavGroup = {
   labelKey: "nav.examManagement",
   roles: [UserRole.Admin, UserRole.Instructor],
   children: [
-    { icon: ClipboardList, labelKey: "nav.exams", href: "/exams", hidden: true },
+    { icon: ClipboardList, labelKey: "nav.exams", href: "/exams/list", hidden: true },
     { icon: PlusSquare, labelKey: "nav.createExam", href: "/exams/setup" },
+    { icon: Copy, labelKey: "nav.createFromTemplate", href: "/exams/create-from-template" },
     { icon: List, labelKey: "nav.examsList", href: "/exams/list" },
     { icon: Calendar, labelKey: "nav.examScheduler", href: "/exams/scheduler", hidden: true },
   ],

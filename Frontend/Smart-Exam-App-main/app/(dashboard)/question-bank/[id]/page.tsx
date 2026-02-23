@@ -227,11 +227,11 @@ export default function QuestionDetailPage() {
                       <FileImage className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">{t("common.category")}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "المادة" : "Subject"}</p>
                       <p className="font-medium">
                         {language === "ar"
-                          ? (question.questionCategoryNameAr || question.questionCategoryNameEn || question.questionCategoryName)
-                          : (question.questionCategoryNameEn || question.questionCategoryName)}
+                          ? (question.subjectNameAr || question.subjectNameEn || "—")
+                          : (question.subjectNameEn || "—")}
                       </p>
                     </div>
                   </div>

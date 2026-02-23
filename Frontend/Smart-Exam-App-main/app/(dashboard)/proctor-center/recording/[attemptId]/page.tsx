@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { apiClient } from "@/lib/api-client"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { VideoChunkPlayer } from "@/components/ui/video-chunk-player"
 import {
   ArrowLeft,
   Video,
@@ -55,21 +56,11 @@ export default function AttemptVideoPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const router = useRouter()
   const { language, dir } = useI18n()
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   const [data, setData] = useState<VideoRecordingData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null)
-  const [videoStreamUrl, setVideoStreamUrl] = useState<string>("")
-
-  useEffect(() => {
-    // Build video stream URL with token for <video> tag authorization
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
-    if (token && attemptId) {
-      setVideoStreamUrl(`/api/video-stream/${attemptId}?token=${encodeURIComponent(token)}`)
-    }
-  }, [attemptId])
 
   useEffect(() => {
     async function loadRecording() {
@@ -181,18 +172,7 @@ export default function AttemptVideoPage() {
                 )}
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    src={videoStreamUrl || undefined}
-                    controls
-                    playsInline
-                    className="w-full h-full"
-                    controlsList="nodownload"
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
+                <VideoChunkPlayer attemptId={parseInt(attemptId)} />
                 <div className="flex items-center justify-between mt-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1">
