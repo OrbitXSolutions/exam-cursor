@@ -56,6 +56,7 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.HasOne(x => x.QuestionCategory)
             .WithMany()
             .HasForeignKey(x => x.QuestionCategoryId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Subject)

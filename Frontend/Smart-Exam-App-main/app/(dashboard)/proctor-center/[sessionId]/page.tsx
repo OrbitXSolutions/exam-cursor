@@ -1,17 +1,22 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, reviewIncident, flagSession, sendWarning, terminateSession } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, type AttemptEventDto } from "@/lib/api/proctoring"
+import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
+import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
+import { getVideoConfig } from "@/lib/webrtc/video-config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -32,6 +37,15 @@ import {
   User,
   Camera,
   Activity,
+  Video,
+  Play,
+  Clock,
+  Plus,
+  Shield,
+  FileText,
+  Maximize2,
+  Minimize2,
+  CheckCircle2 as CheckCircle2Icon,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -54,9 +68,187 @@ export default function SessionDetailPage() {
   const [terminateReason, setTerminateReason] = useState("")
   const [previewImage, setPreviewImage] = useState<{ url: string; timestamp: string } | null>(null)
 
+  // Events log state
+  const [events, setEvents] = useState<AttemptEventDto[]>([])
+  const [eventsFilter, setEventsFilter] = useState<"all" | "violations">("violations")
+
+  // Add Time dialog state
+  const [addTimeDialogOpen, setAddTimeDialogOpen] = useState(false)
+  const [addTimeMinutes, setAddTimeMinutes] = useState(10)
+  const [addTimeReason, setAddTimeReason] = useState("")
+  const [addTimeLoading, setAddTimeLoading] = useState(false)
+
+  // WebRTC live video state
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const viewerRef = useRef<ProctorViewer | null>(null)
+  const sessionPollRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const videoContainerRef = useRef<HTMLDivElement>(null)
+  const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("offline")
+  const [hasRemoteStream, setHasRemoteStream] = useState(false)
+  const [signalRConnected, setSignalRConnected] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [sessionEnded, setSessionEnded] = useState<{ reason: "Submitted" | "Expired" | "Terminated" } | null>(null)
+
   useEffect(() => {
     loadSession()
   }, [sessionId])
+
+  // ── Smart Polling: poll session data ONLY when SignalR is disconnected ──
+  // When SignalR is connected, updates arrive via push events (ExamSubmitted, etc.).
+  // When SignalR disconnects, start 15s fallback polling.
+  // On reconnect, do one sync fetch then stop polling again.
+  useEffect(() => {
+    if (!session || session.status !== "Active") return
+
+    if (signalRConnected) {
+      // SignalR is healthy — stop polling, do one sync fetch
+      if (sessionPollRef.current) {
+        console.log("[SmartPoll] SignalR connected — stopping session fallback polling")
+        clearInterval(sessionPollRef.current)
+        sessionPollRef.current = undefined
+      }
+      // One-time sync fetch on reconnect
+      refreshSessionData(sessionId).then((data) => {
+        setSession(data.session)
+        setScreenshots(data.screenshots)
+      }).catch(() => {})
+    } else {
+      // SignalR is disconnected — start 15s fallback polling
+      if (!sessionPollRef.current) {
+        console.log("[SmartPoll] SignalR disconnected — starting 15s session fallback polling")
+        sessionPollRef.current = setInterval(async () => {
+          try {
+            const data = await refreshSessionData(sessionId)
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          } catch {
+            // silent — don't redirect on poll failure
+          }
+        }, 15_000)
+      }
+    }
+
+    return () => {
+      if (sessionPollRef.current) {
+        clearInterval(sessionPollRef.current)
+        sessionPollRef.current = undefined
+      }
+    }
+  }, [sessionId, session?.status, signalRConnected])
+
+  // WebRTC live video: connect viewer when session is active and live video is enabled
+  useEffect(() => {
+    console.log(`%c[ProctorPage] WebRTC effect: session=${session?.id}, status=${session?.status}, attemptId=${session?.attemptId}`, 'color: #e91e63; font-weight: bold')
+    if (!session || session.status !== "Active" || !session.attemptId) {
+      console.warn(`[ProctorPage] Skipping WebRTC: session=${!!session}, status=${session?.status}, attemptId=${session?.attemptId}`)
+      return
+    }
+    let cancelled = false
+
+    console.log(`%c[ProctorPage] Fetching video config for attempt ${session.attemptId}...`, 'color: #e91e63; font-weight: bold')
+    getVideoConfig().then((cfg) => {
+      console.log(`%c[ProctorPage] Video config: enableLiveVideo=${cfg.enableLiveVideo}, enableVideoRecording=${cfg.enableVideoRecording}`, 'color: #e91e63; font-weight: bold')
+      if (cancelled) { console.warn('[ProctorPage] Cancelled, skipping viewer init'); return }
+      if (!cfg.enableLiveVideo) { console.warn('[ProctorPage] enableLiveVideo=false, skipping viewer'); return }
+
+      console.log(`%c[ProctorPage] ✅ Creating ProctorViewer for attempt ${session.attemptId}`, 'color: #4caf50; font-weight: bold')
+      const viewer = new ProctorViewer(session.attemptId!, {
+        onStatusChange: (status) => {
+          console.log(`%c[ProctorPage] Viewer status changed: ${status}`, status === 'live' ? 'color: #4caf50; font-weight: bold' : 'color: #ff9800')
+          setViewerStatus(status)
+        },
+        onRemoteStream: (stream) => {
+          console.log(`%c[ProctorPage] ✅ Remote stream received! tracks=${stream.getTracks().length}`, 'color: #4caf50; font-weight: bold')
+          setHasRemoteStream(true)
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream
+            videoRef.current.play().catch(() => {})
+          }
+        },
+        onExamSubmitted: (attemptId) => {
+          toast.info(`Candidate has submitted the exam (Attempt #${attemptId})`, {
+            duration: 10000,
+            icon: "\u2705",
+          })
+          // Show session-ended overlay and stop live video
+          setSessionEnded({ reason: "Submitted" })
+          setHasRemoteStream(false)
+          viewerRef.current?.disconnect()
+          // Refresh session data to reflect updated status
+          refreshSessionData(sessionId).then((data) => {
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          }).catch(() => {})
+        },
+        onSignalRStatusChange: (connected) => {
+          console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)
+          setSignalRConnected(connected)
+        },
+        onViolationEventReceived: (event) => {
+          // Real-time violation event from candidate — prepend to events log
+          const newEvent: AttemptEventDto = {
+            id: event.id,
+            attemptId: event.attemptId,
+            eventType: event.eventTypeId,
+            eventTypeName: event.eventType,
+            metadataJson: event.metadataJson,
+            occurredAt: event.occurredAt,
+          }
+          setEvents((prev) => [newEvent, ...prev])
+          // Show toast for critical events
+          if (event.severity === "Critical" || event.severity === "High") {
+            toast.warning(`Violation: ${event.eventType}`, {
+              description: `Severity: ${event.severity}`,
+              duration: 5000,
+            })
+          }
+        },
+        onAttemptExpired: (expEvent) => {
+          toast.warning(`Exam has expired (Attempt #${expEvent.attemptId})`, {
+            duration: 10000,
+            icon: "⏰",
+          })
+          setSessionEnded({ reason: "Expired" })
+          setHasRemoteStream(false)
+          viewerRef.current?.disconnect()
+          refreshSessionData(sessionId).then((data) => {
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          }).catch(() => {})
+        },
+      })
+
+      viewerRef.current = viewer
+      viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal):", e))
+    }).catch((e) => {
+      console.warn("[ProctorPage] Video config fetch failed (non-fatal):", e)
+    })
+
+    return () => {
+      cancelled = true
+      viewerRef.current?.disconnect()
+      viewerRef.current = null
+      setHasRemoteStream(false)
+      setViewerStatus("offline")
+    }
+  }, [session?.attemptId, session?.status])
+
+  // Fullscreen change listener
+  useEffect(() => {
+    const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener("fullscreenchange", handleFsChange)
+    return () => document.removeEventListener("fullscreenchange", handleFsChange)
+  }, [])
+
+  // Detect session end from polling/refresh (status changed to non-Active)
+  useEffect(() => {
+    if (session && session.status !== "Active" && !sessionEnded) {
+      const reason = session.status === "Terminated" ? "Terminated" : "Submitted"
+      setSessionEnded({ reason })
+      setHasRemoteStream(false)
+      viewerRef.current?.disconnect()
+    }
+  }, [session?.status])
 
   async function loadSession() {
     try {
@@ -65,6 +257,11 @@ export default function SessionDetailPage() {
       setSession(data.session)
       setIncidents(data.incidents)
       setScreenshots(data.screenshots)
+      // Load attempt events for events log
+      if (data.session?.attemptId) {
+        const attemptEvents = await getAttemptEvents(data.session.attemptId)
+        setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
+      }
     } catch (error) {
       toast.error("Failed to load session")
       router.push("/proctor-center")
@@ -102,6 +299,12 @@ export default function SessionDetailPage() {
     if (!session || !warningMessage.trim()) return
     try {
       await sendWarning(session.id, warningMessage)
+      // Also send instantly via SignalR (best-effort, won't fail the operation)
+      try {
+        await viewerRef.current?.signalingConnection?.sendWarningToCandidate(warningMessage)
+      } catch (e) {
+        console.warn("[ProctorPage] SignalR instant warning failed (non-fatal):", e)
+      }
       toast.success(t("proctor.warningSent"))
       setWarningDialogOpen(false)
       setWarningMessage("")
@@ -114,10 +317,49 @@ export default function SessionDetailPage() {
     if (!session || !terminateReason.trim()) return
     try {
       await terminateSession(session.id, terminateReason)
+      // Also notify candidate instantly via SignalR (best-effort)
+      try {
+        await viewerRef.current?.signalingConnection?.sendTerminationToCandidate(terminateReason)
+      } catch (e) {
+        console.warn("[ProctorPage] SignalR termination notification failed (non-fatal):", e)
+      }
       toast.success(t("proctor.sessionTerminated"))
       router.push("/proctor-center")
     } catch (error) {
       toast.error("Failed to terminate session")
+    }
+  }
+
+  async function handleAddTime() {
+    if (!session?.attemptId || addTimeMinutes <= 0) return
+    try {
+      setAddTimeLoading(true)
+      await addTimeToAttempt({
+        attemptId: session.attemptId,
+        extraMinutes: addTimeMinutes,
+        reason: addTimeReason || undefined,
+      })
+      toast.success(`${addTimeMinutes} minutes added successfully`)
+      setAddTimeDialogOpen(false)
+      setAddTimeMinutes(10)
+      setAddTimeReason("")
+      // Refresh session data to show updated time
+      loadSession()
+    } catch (error) {
+      toast.error("Failed to add time")
+    } finally {
+      setAddTimeLoading(false)
+    }
+  }
+
+  async function handleCreateIncident() {
+    if (!session) return
+    try {
+      const result = await createIncidentFromProctor(parseInt(session.id))
+      toast.success(`Incident ${result.caseNumber} created`)
+      router.push(`/proctor-center/incidents/${result.id}`)
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create incident")
     }
   }
 
@@ -180,6 +422,16 @@ export default function SessionDetailPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          {session.status === "Active" && (
+            <Button variant="outline" onClick={() => setAddTimeDialogOpen(true)}>
+              <Clock className="h-4 w-4 me-2" />
+              Add Time
+            </Button>
+          )}
+          <Button variant="outline" onClick={handleCreateIncident}>
+            <AlertTriangle className="h-4 w-4 me-2" />
+            Create Incident
+          </Button>
           <Button variant="outline" onClick={handleToggleFlag}>
             <Flag className="h-4 w-4 me-2" />
             {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
@@ -198,35 +450,134 @@ export default function SessionDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Latest Snapshot */}
+          {/* Live Video / Latest Snapshot */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5" />
-                {t("proctor.liveVideo")}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  {t("proctor.liveVideo")}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {session.status === "Active" && (
+                    <Badge
+                      variant="outline"
+                      className={
+                        viewerStatus === "live"
+                          ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-600"
+                          : viewerStatus === "connecting" || viewerStatus === "reconnecting"
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-600"
+                            : "bg-muted text-muted-foreground"
+                      }
+                    >
+                      <span className={`inline-block h-2 w-2 rounded-full me-1.5 ${
+                        viewerStatus === "live" ? "bg-emerald-500 animate-pulse" :
+                        viewerStatus === "connecting" || viewerStatus === "reconnecting" ? "bg-amber-500 animate-pulse" :
+                        "bg-muted-foreground"
+                      }`} />
+                      {viewerStatus === "live" ? "LIVE" :
+                       viewerStatus === "connecting" ? "Connecting…" :
+                       viewerStatus === "reconnecting" ? "Reconnecting…" :
+                       "Offline"}
+                    </Badge>
+                  )}
+                  {session.attemptId && session.status !== "Active" && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                        <Play className="h-3.5 w-3.5 me-1.5" />
+                        View Recording
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                {screenshots.length > 0 ? (
-                  <img
-                    src={screenshots[0].url}
-                    alt="Latest snapshot"
-                    className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => setPreviewImage(screenshots[0])}
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
-                    <Camera className="h-12 w-12 mb-2 opacity-30" />
-                    <p className="text-sm">No snapshots captured yet</p>
+              <div ref={videoContainerRef} className={`aspect-video bg-muted rounded-lg overflow-hidden relative ${isFullscreen ? "rounded-none" : ""}`}>
+                {/* Live WebRTC video (shown when stream is active) */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover ${hasRemoteStream && !sessionEnded ? "" : "hidden"}`}
+                />
+                {/* Snapshot fallback (shown when no live stream and session not ended) */}
+                {!hasRemoteStream && !sessionEnded && (
+                  <>
+                    {screenshots.length > 0 ? (
+                      <img
+                        src={screenshots[0].url}
+                        alt="Latest snapshot"
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => setPreviewImage(screenshots[0])}
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                        <Camera className="h-12 w-12 mb-2 opacity-30" />
+                        <p className="text-sm">
+                          {session.status === "Active" ? "Waiting for candidate video…" : "No snapshots captured"}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Session-Ended Overlay */}
+                {sessionEnded && (
+                  <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-300">
+                    {sessionEnded.reason === "Submitted" && <CheckCircle2Icon className="h-14 w-14 mb-3 text-emerald-400" />}
+                    {sessionEnded.reason === "Expired" && <Clock className="h-14 w-14 mb-3 text-amber-400" />}
+                    {sessionEnded.reason === "Terminated" && <XCircle className="h-14 w-14 mb-3 text-red-400" />}
+                    <h3 className="text-xl font-semibold mb-1">
+                      {sessionEnded.reason === "Submitted" ? "Exam Submitted" :
+                       sessionEnded.reason === "Expired" ? "Exam Expired" :
+                       "Session Terminated"}
+                    </h3>
+                    <p className="text-sm text-white/70 mb-4">The live video stream has ended</p>
+                    {session.attemptId && (
+                      <Button variant="secondary" size="sm" asChild>
+                        <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                          <Play className="h-3.5 w-3.5 me-1.5" />
+                          View Recording
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 )}
-                {screenshots.length > 0 && (
-                  <div className="absolute bottom-4 end-4 flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
-                    <Camera className="h-4 w-4" />
-                    {screenshots.length} snapshots
-                  </div>
-                )}
+
+                {/* Overlay badges */}
+                <div className="absolute bottom-4 end-4 flex items-center gap-2 z-20">
+                  {screenshots.length > 0 && !sessionEnded && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
+                      <Camera className="h-4 w-4" />
+                      {screenshots.length} snapshots
+                    </div>
+                  )}
+                  {hasRemoteStream && !sessionEnded && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/90 text-white text-sm">
+                      <Video className="h-4 w-4" />
+                      LIVE
+                    </div>
+                  )}
+                </div>
+
+                {/* Fullscreen toggle */}
+                <button
+                  onClick={async () => {
+                    if (!videoContainerRef.current) return
+                    if (document.fullscreenElement) {
+                      await document.exitFullscreen()
+                    } else {
+                      await videoContainerRef.current.requestFullscreen()
+                    }
+                  }}
+                  className="absolute top-3 end-3 p-1.5 rounded bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
+                  title="Toggle fullscreen"
+                >
+                  {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -260,6 +611,11 @@ export default function SessionDetailPage() {
                           src={ss.url}
                           alt="Screenshot"
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.opacity = '0.3';
+                            img.alt = 'Image unavailable';
+                          }}
                         />
                       </div>
                       <p className="text-xs text-muted-foreground text-center truncate">
@@ -269,6 +625,92 @@ export default function SessionDetailPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Events Log */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Events Log
+                  {events.filter(e => isViolationEvent(e.eventType)).length > 0 && (
+                    <Badge variant="destructive" className="ms-1">
+                      {events.filter(e => isViolationEvent(e.eventType)).length} violations
+                    </Badge>
+                  )}
+                </CardTitle>
+                <Select value={eventsFilter} onValueChange={(v) => setEventsFilter(v as "all" | "violations")}>
+                  <SelectTrigger className="w-[140px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="violations">Violations Only</SelectItem>
+                    <SelectItem value="all">All Events</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <CardDescription>Real-time activity from candidate's exam session</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const filteredEvents = eventsFilter === "violations"
+                  ? events.filter(e => isViolationEvent(e.eventType))
+                  : events
+                if (filteredEvents.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      <Shield className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                      {eventsFilter === "violations" ? "No violations detected" : "No events recorded yet"}
+                    </div>
+                  )
+                }
+                return (
+                  <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+                    {filteredEvents.map((event) => {
+                      const severity = getEventSeverity(event.eventType)
+                      const isViolation = isViolationEvent(event.eventType)
+                      return (
+                        <div
+                          key={event.id}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm border ${
+                            severity === "Critical" ? "bg-destructive/5 border-destructive/20" :
+                            severity === "High" ? "bg-orange-500/5 border-orange-500/20" :
+                            severity === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
+                            isViolation ? "bg-blue-500/5 border-blue-500/20" :
+                            "bg-muted/30 border-transparent"
+                          }`}
+                        >
+                          <div className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                            severity === "Critical" ? "bg-destructive" :
+                            severity === "High" ? "bg-orange-500" :
+                            severity === "Medium" ? "bg-amber-500" :
+                            isViolation ? "bg-blue-500" :
+                            "bg-muted-foreground"
+                          }`} />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium">{event.eventTypeName || getEventTypeName(event.eventType)}</span>
+                          </div>
+                          {isViolation && (
+                            <Badge variant="outline" className={`text-xs flex-shrink-0 ${
+                              severity === "Critical" ? "border-destructive/50 text-destructive" :
+                              severity === "High" ? "border-orange-500/50 text-orange-600" :
+                              severity === "Medium" ? "border-amber-500/50 text-amber-600" :
+                              "border-blue-500/50 text-blue-600"
+                            }`}>
+                              {severity}
+                            </Badge>
+                          )}
+                          <span className="text-xs text-muted-foreground flex-shrink-0 tabular-nums">
+                            {new Date(event.occurredAt).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </CardContent>
           </Card>
         </div>
@@ -471,6 +913,64 @@ export default function SessionDetailPage() {
             <Button variant="destructive" onClick={handleTerminate} disabled={!terminateReason.trim()}>
               <XCircle className="h-4 w-4 me-2" />
               {t("proctor.terminate")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Time Dialog */}
+      <Dialog open={addTimeDialogOpen} onOpenChange={setAddTimeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Add Time to Exam
+            </DialogTitle>
+            <DialogDescription>
+              Extend exam time for {session.candidateName}. The candidate will be notified instantly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Minutes to Add</Label>
+              <div className="flex gap-2">
+                {[5, 10, 15, 30].map((mins) => (
+                  <Button
+                    key={mins}
+                    variant={addTimeMinutes === mins ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAddTimeMinutes(mins)}
+                  >
+                    {mins} min
+                  </Button>
+                ))}
+                <Input
+                  type="number"
+                  min={1}
+                  max={480}
+                  value={addTimeMinutes}
+                  onChange={(e) => setAddTimeMinutes(Math.max(1, Math.min(480, parseInt(e.target.value) || 1)))}
+                  className="w-20"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Reason (optional)</Label>
+              <Textarea
+                value={addTimeReason}
+                onChange={(e) => setAddTimeReason(e.target.value)}
+                placeholder="e.g. Technical issue, accommodation request..."
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddTimeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddTime} disabled={addTimeLoading || addTimeMinutes <= 0}>
+              <Plus className="h-4 w-4 me-2" />
+              {addTimeLoading ? "Adding..." : `Add ${addTimeMinutes} Minutes`}
             </Button>
           </DialogFooter>
         </DialogContent>

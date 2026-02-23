@@ -916,6 +916,9 @@ namespace Smart_Core.Migrations
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte>("ExpiryReason")
+                        .HasColumnType("tinyint");
+
                     b.Property<int>("ExtraTimeSeconds")
                         .HasColumnType("int");
 
@@ -938,6 +941,9 @@ namespace Smart_Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ResumeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResumedFromAttemptId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartedAt")
@@ -4198,7 +4204,7 @@ namespace Smart_Core.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<int>("QuestionCategoryId")
+                    b.Property<int?>("QuestionCategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuestionTypeId")
@@ -4479,6 +4485,12 @@ namespace Smart_Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("EnableLiveVideo")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableVideoRecording")
+                        .HasColumnType("bit");
+
                     b.Property<string>("FooterText")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -4527,6 +4539,9 @@ namespace Smart_Core.Migrations
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("VideoRetentionDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -5261,8 +5276,7 @@ namespace Smart_Core.Migrations
                     b.HasOne("Smart_Core.Domain.Entities.Lookups.QuestionCategory", "QuestionCategory")
                         .WithMany()
                         .HasForeignKey("QuestionCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Smart_Core.Domain.Entities.Lookups.QuestionType", "QuestionType")
                         .WithMany()

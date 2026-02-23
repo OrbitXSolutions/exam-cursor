@@ -75,8 +75,8 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     endAt: "",
     durationMinutes: 60,
     maxAttempts: 1,
-    shuffleQuestions: false,
-    shuffleOptions: false,
+    shuffleQuestions: true,
+    shuffleOptions: true,
     passScore: 0,
     isActive: true,
   })
@@ -412,6 +412,14 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
 
       const result = await saveExamBuilder(examId, request)
       setLoadedBuilderData(result)
+
+      // Also save pass score to the exam
+      try {
+        await updateExam(examId, { passScore: formData.passScore })
+      } catch {
+        // Non-critical — pass score can be updated later
+      }
+
       toast.success("Builder configuration saved successfully")
       // Redirect to exam overview page
       router.push(`/exams/${examId}/overview`)
@@ -876,36 +884,6 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                 </Alert>
               )}
 
-              {/* Summary Stats */}
-              {builderSections.length > 0 && (
-                <Card>
-                  <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                          <FolderTree className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Sections:</span>
-                          <Badge variant="secondary">{builderSections.length}</Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Hash className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Total Questions:</span>
-                          <Badge variant="secondary">{getTotalQuestionsCount()}</Badge>
-                        </div>
-                      </div>
-                      <Button onClick={handleSaveBuilder} disabled={builderSaving || builderSections.length === 0}>
-                        {builderSaving ? (
-                          <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                        ) : (
-                          <Save className="h-4 w-4 me-2" />
-                        )}
-                        {builderSaving ? "Saving..." : "Save Builder"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Source Type Selection */}
               <Card>
                 <CardHeader>
@@ -1004,19 +982,21 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       {subjects.map(subject => (
                         <AccordionItem key={subject.id} value={`subject-${subject.id}`}>
                           <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-3">
-                              <Checkbox
-                                id={`subject-expand-${subject.id}`}
-                                checked={selectedSubjectIds.includes(subject.id)}
-                                onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <span className="font-medium">{subject.nameEn}</span>
-                              {subject.topicsCount !== undefined && (
-                                <Badge variant="outline" className="text-xs">
-                                  {subject.topicsCount} topics
-                                </Badge>
-                              )}
+                            <div className="flex flex-1 items-center justify-between pe-2">
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  id={`subject-expand-${subject.id}`}
+                                  checked={selectedSubjectIds.includes(subject.id)}
+                                  onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="font-medium">{subject.nameEn}</span>
+                                {subject.topicsCount !== undefined && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {subject.topicsCount} topics
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </AccordionTrigger>
                           <AccordionContent>
@@ -1162,21 +1142,72 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                 </Card>
               )}
 
-              {/* Save Button */}
+              {/* Summary Bar + Save */}
               {builderSections.length > 0 && (
-                <div className="flex justify-end gap-3">
-                  <Button variant="outline" asChild>
-                    <Link href="/exams/list">{t("common.cancel") || "Cancel"}</Link>
-                  </Button>
-                  <Button onClick={handleSaveBuilder} disabled={builderSaving}>
-                    {builderSaving ? (
-                      <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4 me-2" />
-                    )}
-                    {builderSaving ? "Saving..." : "Save Builder Configuration"}
-                  </Button>
-                </div>
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="py-5">
+                    <div className="flex flex-col gap-4">
+                      {/* Stats Row */}
+                      <div className="flex items-center gap-6 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <FolderTree className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium">Sections:</span>
+                          <Badge variant="secondary" className="text-sm">{builderSections.length}</Badge>
+                        </div>
+                        <Separator orientation="vertical" className="h-5" />
+                        <div className="flex items-center gap-2">
+                          <Hash className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium">Total Questions:</span>
+                          <Badge variant="secondary" className="text-sm">{getTotalQuestionsCount()}</Badge>
+                        </div>
+                        <Separator orientation="vertical" className="h-5" />
+                        <div className="flex items-center gap-2">
+                          <Target className="h-4 w-4 text-orange-500" />
+                          <span className="text-sm font-medium">Total Points:</span>
+                          <Badge variant="outline" className="text-sm font-semibold">{getTotalQuestionsCount()}</Badge>
+                        </div>
+                        <Separator orientation="vertical" className="h-5" />
+                        <div className="flex items-center gap-2">
+                          <Target className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium">{t("exams.passScorePoints") || "Pass Score (Points)"}:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={getTotalQuestionsCount()}
+                            value={formData.passScore}
+                            onChange={(e) => {
+                              const val = Number.parseInt(e.target.value) || 0
+                              updateField("passScore", Math.min(val, getTotalQuestionsCount()))
+                            }}
+                            className={`w-24 h-9 ${formData.passScore > getTotalQuestionsCount() ? "border-destructive" : ""}`}
+                          />
+                        </div>
+                      </div>
+                      {formData.passScore > getTotalQuestionsCount() && (
+                        <p className="text-xs text-destructive">
+                          Must be less than or equal to the exam total points ({getTotalQuestionsCount()})
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Must be ≤ total points ({getTotalQuestionsCount()})
+                      </p>
+                      {/* Action Buttons */}
+                      <div className="flex justify-end gap-3 pt-2 border-t">
+                        <Button variant="outline" asChild>
+                          <Link href="/exams/list">{t("common.cancel") || "Cancel"}</Link>
+                        </Button>
+                        <Button onClick={handleSaveBuilder} disabled={builderSaving}>
+                          {builderSaving ? (
+                            <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="h-4 w-4 me-2" />
+                          )}
+                          {builderSaving ? "Saving..." : "Save Builder Configuration"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Empty State */}

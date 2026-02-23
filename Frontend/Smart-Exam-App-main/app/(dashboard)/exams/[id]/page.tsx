@@ -166,7 +166,7 @@ export default function ExamDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-start gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/exams">
+            <Link href="/exams/list">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>

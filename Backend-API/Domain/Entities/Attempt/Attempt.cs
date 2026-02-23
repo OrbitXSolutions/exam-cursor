@@ -22,9 +22,13 @@ public class Attempt : BaseEntity
 
     // Status
     public AttemptStatus Status { get; set; }
+    public ExpiryReason ExpiryReason { get; set; } = ExpiryReason.None;
 
     // Attempts tracking
     public int AttemptNumber { get; set; }
+
+    // Resumed attempt link (set when admin grants a new attempt after expiry/termination)
+    public int? ResumedFromAttemptId { get; set; }
 
     // Scoring (filled after grading)
     public decimal? TotalScore { get; set; }

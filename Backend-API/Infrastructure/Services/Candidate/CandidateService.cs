@@ -443,7 +443,7 @@ public class CandidateService : ICandidateService
                  .FirstOrDefaultAsync(a =>
             a.ExamId == examId &&
         a.CandidateId == candidateId &&
-        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
+        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
 
         if (existingActive != null)
         {
@@ -451,6 +451,7 @@ public class CandidateService : ICandidateService
             if (existingActive.ExpiresAt.HasValue && now > existingActive.ExpiresAt.Value)
             {
                 existingActive.Status = AttemptStatus.Expired;
+                existingActive.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
                 await _context.SaveChangesAsync();
             }
             else
@@ -491,11 +492,23 @@ public class CandidateService : ICandidateService
             CandidateId = candidateId,
             StartedAt = now,
             ExpiresAt = CalculateExpiresAt(now, exam.DurationMinutes, exam.EndAt),
-            Status = AttemptStatus.Started,
+            Status = adminOverride != null ? AttemptStatus.Resumed : AttemptStatus.Started,
             AttemptNumber = attemptCount + 1,
             CreatedDate = now,
             CreatedBy = candidateId
         };
+
+        // If this is a resumed attempt (admin granted override), link to the previous attempt
+        if (adminOverride != null)
+        {
+            var previousAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                .Where(a => a.ExamId == examId && a.CandidateId == candidateId
+                    && (a.Status == AttemptStatus.Expired || a.Status == AttemptStatus.Terminated || a.Status == AttemptStatus.ForceSubmitted))
+                .OrderByDescending(a => a.CreatedDate)
+                .FirstOrDefaultAsync();
+            if (previousAttempt != null)
+                attempt.ResumedFromAttemptId = previousAttempt.Id;
+        }
 
         _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
@@ -621,9 +634,10 @@ public class CandidateService : ICandidateService
         // Check if expired
         var now = DateTime.UtcNow;
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value &&
-            (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
+            (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress || attempt.Status == AttemptStatus.Resumed))
         {
             attempt.Status = AttemptStatus.Expired;
+            attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
         }
 
@@ -665,7 +679,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var now = DateTime.UtcNow;
 
         // Validate attempt status
-        if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress)
+        if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
         {
             return ApiResponse<bool>.FailureResponse($"Cannot save answers. Attempt is {attempt.Status}.");
         }
@@ -674,6 +688,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
         {
             attempt.Status = AttemptStatus.Expired;
+            attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
             return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
@@ -1169,7 +1184,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         // Exams by status
         var activeAttemptExamIds = allAttempts
-            .Where(a => a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress)
+            .Where(a => a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
             .Select(a => a.ExamId)
   .ToHashSet();
 
@@ -1194,7 +1209,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var activeAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
             .Include(a => a.Exam)
       .Where(a => a.CandidateId == candidateId &&
-    (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress))
+    (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed))
      .ToListAsync();
 
         var quickActions = activeAttempts.Select(a =>
@@ -1412,7 +1427,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var hasActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
             .AnyAsync(a => a.ExamId == exam.Id &&
    a.CandidateId == candidateId &&
-  (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
+  (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
 
         if (hasActive)
         {
@@ -1842,7 +1857,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
             // Check for active (in-progress) attempt
             var activeAttempt = examAttempts
-                .Where(a => (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress)
+                .Where(a => (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
                             && a.ExpiresAt.HasValue && a.ExpiresAt.Value > now)
                 .OrderByDescending(a => a.CreatedDate)
                 .FirstOrDefault();

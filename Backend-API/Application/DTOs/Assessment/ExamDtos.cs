@@ -69,7 +69,7 @@ public class ExamDto
     #region Security Settings
 
     /// <summary>
- /// Prevent copy/paste operations
+    /// Prevent copy/paste operations
     /// </summary>
     public bool PreventCopyPaste { get; set; }
 
@@ -80,8 +80,8 @@ public class ExamDto
 
     /// <summary>
     /// Require fullscreen mode
-  /// </summary>
- public bool RequireFullscreen { get; set; }
+    /// </summary>
+    public bool RequireFullscreen { get; set; }
 
     /// <summary>
     /// Enable browser lockdown mode
@@ -105,7 +105,7 @@ public class ExamDto
 /// </summary>
 public class ExamListDto
 {
-  public int Id { get; set; }
+    public int Id { get; set; }
     public int DepartmentId { get; set; }
     public string? DepartmentNameEn { get; set; }
     public string? DepartmentNameAr { get; set; }
@@ -120,7 +120,7 @@ public class ExamListDto
     public bool IsActive { get; set; }
     public DateTime CreatedDate { get; set; }
     public int SectionsCount { get; set; }
-public int QuestionsCount { get; set; }
+    public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
 }
 
@@ -147,7 +147,7 @@ public class SaveExamDto
     public ExamType ExamType { get; set; } = ExamType.Flex;
     public string TitleEn { get; set; } = string.Empty;
     public string TitleAr { get; set; } = string.Empty;
-  public string? DescriptionEn { get; set; }
+    public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public DateTime? StartAt { get; set; }
     public DateTime? EndAt { get; set; }
@@ -156,7 +156,7 @@ public class SaveExamDto
     public bool ShuffleQuestions { get; set; }
     public bool ShuffleOptions { get; set; }
     public decimal PassScore { get; set; }
-  public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 
     #region Result & Review Settings
 
@@ -173,9 +173,9 @@ public class SaveExamDto
     /// <summary>
     /// Show correct answers during review
     /// </summary>
- public bool ShowCorrectAnswers { get; set; }
+    public bool ShowCorrectAnswers { get; set; }
 
- #endregion
+    #endregion
 
     #region Proctoring Settings
 
@@ -189,19 +189,19 @@ public class SaveExamDto
     /// </summary>
     public bool RequireIdVerification { get; set; }
 
-  /// <summary>
+    /// <summary>
     /// Require webcam to be enabled
     /// </summary>
     public bool RequireWebcam { get; set; }
 
- #endregion
+    #endregion
 
     #region Security Settings
 
     /// <summary>
     /// Prevent copy/paste operations
     /// </summary>
- public bool PreventCopyPaste { get; set; }
+    public bool PreventCopyPaste { get; set; }
 
     /// <summary>
     /// Prevent screen capture/screenshot
@@ -228,10 +228,10 @@ public class UpdateExamSettingsDto
 {
     #region Result & Review Settings
 
- /// <summary>
+    /// <summary>
     /// Show results to candidate after exam submission
     /// </summary>
-public bool ShowResults { get; set; } = true;
+    public bool ShowResults { get; set; } = true;
 
     /// <summary>
     /// Allow candidate to review their answers after submission
@@ -258,7 +258,7 @@ public bool ShowResults { get; set; } = true;
     public bool RequireIdVerification { get; set; }
 
     /// <summary>
-  /// Require webcam to be enabled
+    /// Require webcam to be enabled
     /// </summary>
     public bool RequireWebcam { get; set; }
 
@@ -282,11 +282,26 @@ public bool ShowResults { get; set; } = true;
     public bool RequireFullscreen { get; set; }
 
     /// <summary>
-/// Enable browser lockdown mode
+    /// Enable browser lockdown mode
     /// </summary>
     public bool BrowserLockdown { get; set; }
 
- #endregion
+    #endregion
+}
+
+/// <summary>
+/// Clone an existing exam as a new draft exam
+/// </summary>
+public class CloneExamDto
+{
+    public string TitleEn { get; set; } = string.Empty;
+    public string TitleAr { get; set; } = string.Empty;
+    public string? DescriptionEn { get; set; }
+    public string? DescriptionAr { get; set; }
+    public ExamType ExamType { get; set; } = ExamType.Flex;
+    public DateTime? StartAt { get; set; }
+    public DateTime? EndAt { get; set; }
+    public int DurationMinutes { get; set; }
 }
 
 /// <summary>
@@ -298,7 +313,7 @@ public class ExamSearchDto
     public int? DepartmentId { get; set; }
     public ExamType? ExamType { get; set; }
     public bool? IsPublished { get; set; }
-public bool? IsActive { get; set; }
+    public bool? IsActive { get; set; }
     public DateTime? StartDateFrom { get; set; }
     public DateTime? StartDateTo { get; set; }
     public bool IncludeDeleted { get; set; } = false;

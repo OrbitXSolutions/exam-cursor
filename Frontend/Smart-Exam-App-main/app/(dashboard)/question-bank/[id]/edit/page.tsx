@@ -16,7 +16,7 @@ import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LoadingSpinner, PageLoader } from "@/components/ui/loading-spinner"
 import { getQuestionById, updateQuestion } from "@/lib/api/question-bank"
-import { getQuestionCategories, getQuestionTypes, type QuestionCategory, type QuestionType } from "@/lib/api/lookups"
+import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type QuestionType, type QuestionSubject, type QuestionTopic } from "@/lib/api/lookups"
 import type { Question } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
@@ -38,7 +38,8 @@ export default function EditQuestionPage() {
   const { t, language } = useI18n()
 
   const [question, setQuestion] = useState<Question | null>(null)
-  const [categories, setCategories] = useState<QuestionCategory[]>([])
+  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
+  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [types, setTypes] = useState<QuestionType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -49,13 +50,20 @@ export default function EditQuestionPage() {
     bodyEn: "",
     bodyAr: "",
     questionTypeId: "",
-    questionCategoryId: "",
+    subjectId: "",
+    topicId: "",
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
   })
 
   const [options, setOptions] = useState<OptionInput[]>([])
+
+  // Answer key state for essay/subjective questions
+  const [answerKey, setAnswerKey] = useState({
+    rubricTextEn: "",
+    rubricTextAr: "",
+  })
 
   useEffect(() => {
     if (questionId === "create" || !isValidId) {
@@ -66,10 +74,10 @@ export default function EditQuestionPage() {
 
   const fetchData = async () => {
     try {
-      const [questionRes, categoriesRes, typesRes] = await Promise.all([
+      const [questionRes, typesRes, subjectsRes] = await Promise.all([
         getQuestionById(Number(questionId)),
-        getQuestionCategories(),
         getQuestionTypes(),
+        getQuestionSubjects({ pageSize: 100 }),
       ])
 
       const q = (questionRes as any)?.data || questionRes
@@ -79,11 +87,19 @@ export default function EditQuestionPage() {
           bodyEn: q.bodyEn || q.body || "",
           bodyAr: q.bodyAr || "",
           questionTypeId: String(q.questionTypeId || ""),
-          questionCategoryId: String(q.questionCategoryId || ""),
+          subjectId: String(q.subjectId || ""),
+          topicId: String(q.topicId || ""),
           points: q.points || 1,
           difficultyLevel: q.difficultyLevel || DifficultyLevel.Easy,
           isActive: q.isActive !== false,
         })
+        // Load answer key if present
+        if (q.answerKey) {
+          setAnswerKey({
+            rubricTextEn: q.answerKey.rubricTextEn || "",
+            rubricTextAr: q.answerKey.rubricTextAr || "",
+          })
+        }
         if (q.options) {
           setOptions(
             q.options.map((opt: any) => ({
@@ -96,21 +112,27 @@ export default function EditQuestionPage() {
             })),
           )
         }
+        // Fetch topics for the question's subject
+        if (q.subjectId) {
+          try {
+            const topicsRes = await getQuestionTopics({ subjectId: q.subjectId, pageSize: 100 })
+            setTopics(topicsRes?.items || [])
+          } catch { setTopics([]) }
+        }
       }
 
-      const cats = (categoriesRes as any)?.items || categoriesRes
       const typesList = (typesRes as any)?.items || typesRes
-
-      if (Array.isArray(cats)) {
-        setCategories(cats)
-      } else if (cats?.items) {
-        setCategories(cats.items)
-      }
-
       if (Array.isArray(typesList)) {
         setTypes(typesList)
       } else if (typesList?.items) {
         setTypes(typesList.items)
+      }
+
+      const subjectsList = (subjectsRes as any)?.items || subjectsRes
+      if (Array.isArray(subjectsList)) {
+        setSubjects(subjectsList)
+      } else if (subjectsList?.items) {
+        setSubjects(subjectsList.items)
       }
     } catch (error) {
       console.error("[v0] Failed to fetch data:", error)
@@ -118,6 +140,25 @@ export default function EditQuestionPage() {
     }
     setIsLoading(false)
   }
+
+  // Fetch topics when subject changes
+  useEffect(() => {
+    if (!formData.subjectId) {
+      setTopics([])
+      return
+    }
+    const fetchTopics = async () => {
+      try {
+        const res = await getQuestionTopics({ subjectId: Number(formData.subjectId), pageSize: 100 })
+        setTopics(res?.items || [])
+      } catch { setTopics([]) }
+    }
+    // Only fetch if subjectId changed from original (to avoid double-fetch on first load)
+    if (question && String(question.subjectId) !== formData.subjectId) {
+      setFormData((prev) => ({ ...prev, topicId: "" }))
+      fetchTopics()
+    }
+  }, [formData.subjectId])
 
   const addOption = () => {
     setOptions([
@@ -146,6 +187,7 @@ export default function EditQuestionPage() {
 
   const selectedType = types.find((t) => String(t.id) === formData.questionTypeId)
   const isEssayType = selectedType?.nameEn === "Essay"
+  const isSubjectiveType = selectedType?.nameEn === "Essay" || selectedType?.nameEn === "Short Answer"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -166,15 +208,26 @@ export default function EditQuestionPage() {
     setIsSaving(true)
 
     try {
-      const response = await updateQuestion(Number(questionId), {
+      const payload: any = {
         bodyEn: formData.bodyEn,
         bodyAr: formData.bodyAr || formData.bodyEn,
         questionTypeId: Number(formData.questionTypeId),
-        questionCategoryId: Number(formData.questionCategoryId),
+        subjectId: Number(formData.subjectId),
+        topicId: formData.topicId ? Number(formData.topicId) : undefined,
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
-      })
+      }
+
+      // Include answer key for subjective types
+      if (isSubjectiveType && (answerKey.rubricTextEn || answerKey.rubricTextAr)) {
+        payload.answerKey = {
+          rubricTextEn: answerKey.rubricTextEn || null,
+          rubricTextAr: answerKey.rubricTextAr || null,
+        }
+      }
+
+      const response = await updateQuestion(Number(questionId), payload)
 
       const isSuccess = response && (response as any).success !== false
 
@@ -293,20 +346,44 @@ export default function EditQuestionPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="category">
-                      {t("questionBank.questionCategory")} <span className="text-destructive">*</span>
+                    <Label htmlFor="subject">
+                      {language === "ar" ? "المادة" : "Subject"} <span className="text-destructive">*</span>
                     </Label>
                     <Select
-                      value={formData.questionCategoryId}
-                      onValueChange={(value) => setFormData({ ...formData, questionCategoryId: value })}
+                      value={formData.subjectId}
+                      onValueChange={(value) => setFormData({ ...formData, subjectId: value })}
                     >
-                      <SelectTrigger id="category" className="w-full">
-                        <SelectValue placeholder="Select category" />
+                      <SelectTrigger id="subject" className="w-full">
+                        <SelectValue placeholder={language === "ar" ? "اختر المادة" : "Select subject"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={String(cat.id)}>
-                            {language === "ar" ? cat.nameAr : cat.nameEn}
+                        {subjects.map((subj) => (
+                          <SelectItem key={subj.id} value={String(subj.id)}>
+                            {language === "ar" ? subj.nameAr : subj.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="topic">
+                      {language === "ar" ? "الموضوع" : "Topic"}
+                    </Label>
+                    <Select
+                      value={formData.topicId}
+                      onValueChange={(value) => setFormData({ ...formData, topicId: value })}
+                      disabled={!formData.subjectId || topics.length === 0}
+                    >
+                      <SelectTrigger id="topic" className="w-full">
+                        <SelectValue placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {topics.map((topic) => (
+                          <SelectItem key={topic.id} value={String(topic.id)}>
+                            {language === "ar" ? topic.nameAr : topic.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -425,6 +502,51 @@ export default function EditQuestionPage() {
                     <Plus className="mr-2 h-4 w-4" />
                     {t("questionBank.addOption")}
                   </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Model Answer / Rubric for subjective types */}
+            {isSubjectiveType && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{language === "ar" ? "الإجابة النموذجية / معايير التقييم" : "Model Answer / Grading Rubric"}</CardTitle>
+                  <CardDescription>
+                    {language === "ar"
+                      ? "سيستخدمها المُقيّم كمرجع أثناء التصحيح اليدوي"
+                      : "This will be shown to the grader as a reference during manual grading"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="rubricEn">
+                        {language === "ar" ? "الإجابة النموذجية (English)" : "Model Answer (English)"}
+                      </Label>
+                      <Textarea
+                        id="rubricEn"
+                        placeholder="Enter model answer or grading rubric in English..."
+                        value={answerKey.rubricTextEn}
+                        onChange={(e) => setAnswerKey({ ...answerKey, rubricTextEn: e.target.value })}
+                        rows={5}
+                        className="resize-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rubricAr">
+                        {language === "ar" ? "الإجابة النموذجية (العربية)" : "Model Answer (العربية)"}
+                      </Label>
+                      <Textarea
+                        id="rubricAr"
+                        placeholder="أدخل الإجابة النموذجية أو معايير التقييم..."
+                        value={answerKey.rubricTextAr}
+                        onChange={(e) => setAnswerKey({ ...answerKey, rubricTextAr: e.target.value })}
+                        rows={5}
+                        dir="rtl"
+                        className="resize-none"
+                      />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}

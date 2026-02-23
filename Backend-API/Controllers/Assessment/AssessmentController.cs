@@ -120,6 +120,17 @@ public class AssessmentController : ControllerBase
     }
 
     /// <summary>
+    /// Clone an existing exam as a new draft exam (Create from Template)
+    /// </summary>
+    [HttpPost("exams/{sourceExamId}/clone")]
+    public async Task<IActionResult> CloneExam(int sourceExamId, [FromBody] CloneExamDto dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _assessmentService.CloneExamAsync(sourceExamId, dto, userId);
+        return result.Success ? CreatedAtAction(nameof(GetExamById), new { id = result.Data?.Id }, result) : BadRequest(result);
+    }
+
+    /// <summary>
     /// Validate exam for publishing
     /// </summary>
     [HttpGet("exams/{id}/validate")]

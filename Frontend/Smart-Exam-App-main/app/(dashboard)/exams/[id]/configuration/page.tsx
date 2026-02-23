@@ -69,13 +69,13 @@ export default function ExamConfigurationPage() {
     allowReview: false,
     showCorrectAnswers: false,
     // Security Settings
-    requireProctoring: false,
-    requireIdVerification: false,
-    preventCopyPaste: false,
-    preventScreenCapture: false,
-    requireWebcam: false,
-    requireFullscreen: false,
-    browserLockdown: false,
+    requireProctoring: true,
+    requireIdVerification: true,
+    preventCopyPaste: true,
+    preventScreenCapture: true,
+    requireWebcam: true,
+    requireFullscreen: true,
+    browserLockdown: true,
   })
   
   // Result Message State
@@ -330,7 +330,7 @@ export default function ExamConfigurationPage() {
     <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-10">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={`/exams/${id}`}>
+          <Link href="/exams/list">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

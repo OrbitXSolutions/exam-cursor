@@ -175,7 +175,7 @@ export default function EditExamPage() {
     <div className="space-y-6 p-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={`/exams/${id}`}>
+          <Link href="/exams/list">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -458,7 +458,7 @@ export default function EditExamPage() {
 
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" asChild>
-            <Link href={`/exams/${id}`}>{t("common.cancel")}</Link>
+            <Link href="/exams/list">{t("common.cancel")}</Link>
           </Button>
           <Button type="submit" disabled={saving}>
             <Save className="h-4 w-4 me-2" />

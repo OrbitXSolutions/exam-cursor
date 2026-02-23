@@ -43,7 +43,40 @@ public enum AttemptStatus : byte
     /// <summary>
     /// Attempt was terminated by a proctor (not a submission)
     /// </summary>
-    Terminated = 8
+    Terminated = 8,
+
+    /// <summary>
+    /// New attempt granted by admin/proctor after a previous expired/terminated attempt.
+    /// Indicates a "second chance" — transitions to InProgress when candidate starts.
+    /// </summary>
+    Resumed = 9
+}
+
+/// <summary>
+/// Sub-reason for why an attempt was marked Expired.
+/// Allows proctor/admin to distinguish between different expiry scenarios.
+/// </summary>
+public enum ExpiryReason : byte
+{
+    /// <summary>
+    /// No expiry reason (attempt is not expired)
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    /// Timer ran out while candidate was actively working
+    /// </summary>
+    TimerExpiredWhileActive = 1,
+
+    /// <summary>
+    /// Timer ran out while candidate was disconnected (last heartbeat > 5 min before expiry)
+    /// </summary>
+    TimerExpiredWhileDisconnected = 2,
+
+    /// <summary>
+    /// Exam EndDateTime passed — the exam availability window closed
+    /// </summary>
+    ExamWindowClosed = 3
 }
 
 /// <summary>

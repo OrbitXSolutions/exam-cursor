@@ -393,6 +393,14 @@ public class AssessmentService : IAssessmentService
       return ApiResponse<bool>.FailureResponse("Exam not found");
     }
 
+    // Check if exam has any candidate attempts (including soft-deleted ones)
+    var hasAttempts = await _context.Attempts.IgnoreQueryFilters().AnyAsync(a => a.ExamId == id);
+    if (hasAttempts)
+    {
+      return ApiResponse<bool>.FailureResponse(
+        "Cannot delete this exam because it has candidate attempts. You can archive it instead.");
+    }
+
     // Soft delete
     entity.IsDeleted = true;
     entity.UpdatedDate = DateTime.UtcNow;
@@ -2557,11 +2565,12 @@ $"Questions not found: {string.Join(", ", missingIds)}");
       }
     }
 
-    // Soft delete existing builder sections (sections with SourceType set)
-    foreach (var existingSection in exam.Sections.Where(s => s.SourceType.HasValue))
+    // Remove existing builder sections (sections with SourceType set) to avoid unique index conflicts
+    var existingSections = exam.Sections.Where(s => s.SourceType.HasValue).ToList();
+    if (existingSections.Any())
     {
-      existingSection.IsDeleted = true;
-      existingSection.DeletedBy = userId;
+      _context.ExamSections.RemoveRange(existingSections);
+      await _context.SaveChangesAsync();
     }
 
     // Create new sections
@@ -2621,6 +2630,220 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     // Return updated builder state
     return await GetExamBuilderAsync(examId);
+  }
+
+  #endregion
+
+  #region Clone Exam (Create from Template)
+
+  public async Task<ApiResponse<ExamDto>> CloneExamAsync(int sourceExamId, CloneExamDto dto, string createdBy)
+  {
+    // 1. Load source exam with all related data
+    var source = await _context.Exams
+        .Include(x => x.Sections.OrderBy(s => s.Order))
+            .ThenInclude(s => s.Topics.OrderBy(t => t.Order))
+                .ThenInclude(t => t.Questions.OrderBy(q => q.Order))
+        .Include(x => x.Sections.OrderBy(s => s.Order))
+            .ThenInclude(s => s.Questions.OrderBy(q => q.Order))
+        .Include(x => x.Instructions.OrderBy(i => i.Order))
+        .Include(x => x.AccessPolicy)
+        .AsNoTracking()
+        .FirstOrDefaultAsync(x => x.Id == sourceExamId && !x.IsDeleted);
+
+    if (source == null)
+    {
+      return ApiResponse<ExamDto>.FailureResponse("Source exam not found");
+    }
+
+    // 2. Check department access
+    var hasAccess = await HasAccessToExamAsync(source.DepartmentId);
+    if (!hasAccess)
+    {
+      return ApiResponse<ExamDto>.FailureResponse("You do not have access to this exam");
+    }
+
+    // 3. Validate unique title within department
+    var titleExists = await _context.Exams
+        .AnyAsync(x => x.DepartmentId == source.DepartmentId &&
+            !x.IsDeleted &&
+            (x.TitleEn.ToLower() == dto.TitleEn.ToLower() ||
+             x.TitleAr.ToLower() == dto.TitleAr.ToLower()));
+
+    if (titleExists)
+    {
+      return ApiResponse<ExamDto>.FailureResponse("An exam with this title already exists in this department");
+    }
+
+    // 4. Create new exam with user-provided fields + copied settings
+    var newExam = new Exam
+    {
+      DepartmentId = source.DepartmentId,
+      ExamType = dto.ExamType,
+      TitleEn = dto.TitleEn,
+      TitleAr = dto.TitleAr,
+      DescriptionEn = dto.DescriptionEn,
+      DescriptionAr = dto.DescriptionAr,
+      StartAt = dto.StartAt,
+      EndAt = dto.EndAt,
+      DurationMinutes = dto.DurationMinutes,
+      // Copied from source
+      MaxAttempts = source.MaxAttempts,
+      ShuffleQuestions = source.ShuffleQuestions,
+      ShuffleOptions = source.ShuffleOptions,
+      PassScore = source.PassScore,
+      IsPublished = false,
+      IsActive = true,
+      // Result & Review
+      ShowResults = source.ShowResults,
+      AllowReview = source.AllowReview,
+      ShowCorrectAnswers = source.ShowCorrectAnswers,
+      // Proctoring
+      RequireProctoring = source.RequireProctoring,
+      RequireIdVerification = source.RequireIdVerification,
+      RequireWebcam = source.RequireWebcam,
+      // Security
+      PreventCopyPaste = source.PreventCopyPaste,
+      PreventScreenCapture = source.PreventScreenCapture,
+      RequireFullscreen = source.RequireFullscreen,
+      BrowserLockdown = source.BrowserLockdown,
+      CreatedDate = DateTime.UtcNow,
+      CreatedBy = createdBy
+    };
+
+    _context.Exams.Add(newExam);
+    await _context.SaveChangesAsync();
+
+    // 5. Clone Sections → Topics → Questions
+    if (source.Sections?.Any() == true)
+    {
+      foreach (var srcSection in source.Sections)
+      {
+        var newSection = new ExamSection
+        {
+          ExamId = newExam.Id,
+          TitleEn = srcSection.TitleEn,
+          TitleAr = srcSection.TitleAr,
+          DescriptionEn = srcSection.DescriptionEn,
+          DescriptionAr = srcSection.DescriptionAr,
+          Order = srcSection.Order,
+          DurationMinutes = srcSection.DurationMinutes,
+          TotalPointsOverride = srcSection.TotalPointsOverride,
+          SourceType = srcSection.SourceType,
+          QuestionSubjectId = srcSection.QuestionSubjectId,
+          QuestionTopicId = srcSection.QuestionTopicId,
+          PickCount = srcSection.PickCount,
+          CreatedDate = DateTime.UtcNow,
+          CreatedBy = createdBy
+        };
+
+        _context.ExamSections.Add(newSection);
+        await _context.SaveChangesAsync();
+
+        // Clone Topics
+        if (srcSection.Topics?.Any() == true)
+        {
+          foreach (var srcTopic in srcSection.Topics)
+          {
+            var newTopic = new ExamTopic
+            {
+              ExamSectionId = newSection.Id,
+              TitleEn = srcTopic.TitleEn,
+              TitleAr = srcTopic.TitleAr,
+              DescriptionEn = srcTopic.DescriptionEn,
+              DescriptionAr = srcTopic.DescriptionAr,
+              Order = srcTopic.Order,
+              CreatedDate = DateTime.UtcNow,
+              CreatedBy = createdBy
+            };
+
+            _context.Set<ExamTopic>().Add(newTopic);
+            await _context.SaveChangesAsync();
+
+            // Clone questions under this topic
+            if (srcTopic.Questions?.Any() == true)
+            {
+              foreach (var srcQ in srcTopic.Questions)
+              {
+                _context.ExamQuestions.Add(new ExamQuestion
+                {
+                  ExamId = newExam.Id,
+                  ExamSectionId = newSection.Id,
+                  ExamTopicId = newTopic.Id,
+                  QuestionId = srcQ.QuestionId,
+                  Order = srcQ.Order,
+                  Points = srcQ.Points,
+                  IsRequired = srcQ.IsRequired,
+                  CreatedDate = DateTime.UtcNow,
+                  CreatedBy = createdBy
+                });
+              }
+            }
+          }
+        }
+
+        // Clone section-level questions (not under any topic)
+        var sectionOnlyQuestions = srcSection.Questions?
+            .Where(q => q.ExamTopicId == null || q.ExamTopicId == 0)
+            .ToList();
+
+        if (sectionOnlyQuestions?.Any() == true)
+        {
+          foreach (var srcQ in sectionOnlyQuestions)
+          {
+            _context.ExamQuestions.Add(new ExamQuestion
+            {
+              ExamId = newExam.Id,
+              ExamSectionId = newSection.Id,
+              ExamTopicId = null,
+              QuestionId = srcQ.QuestionId,
+              Order = srcQ.Order,
+              Points = srcQ.Points,
+              IsRequired = srcQ.IsRequired,
+              CreatedDate = DateTime.UtcNow,
+              CreatedBy = createdBy
+            });
+          }
+        }
+
+        await _context.SaveChangesAsync();
+      }
+    }
+
+    // 6. Clone Instructions
+    if (source.Instructions?.Any() == true)
+    {
+      foreach (var srcInst in source.Instructions)
+      {
+        _context.Set<ExamInstruction>().Add(new ExamInstruction
+        {
+          ExamId = newExam.Id,
+          ContentEn = srcInst.ContentEn,
+          ContentAr = srcInst.ContentAr,
+          Order = srcInst.Order,
+          CreatedDate = DateTime.UtcNow,
+          CreatedBy = createdBy
+        });
+      }
+      await _context.SaveChangesAsync();
+    }
+
+    // 7. Clone Access Policy
+    if (source.AccessPolicy != null)
+    {
+      _context.Set<ExamAccessPolicy>().Add(new ExamAccessPolicy
+      {
+        ExamId = newExam.Id,
+        IsPublic = source.AccessPolicy.IsPublic,
+        AccessCode = source.AccessPolicy.AccessCode,
+        RestrictToAssignedCandidates = source.AccessPolicy.RestrictToAssignedCandidates,
+        CreatedDate = DateTime.UtcNow,
+        CreatedBy = createdBy
+      });
+      await _context.SaveChangesAsync();
+    }
+
+    // 8. Return full new exam
+    return await GetExamByIdAsync(newExam.Id);
   }
 
   #endregion

@@ -18,11 +18,9 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { createQuestion } from "@/lib/api/question-bank"
 import {
-  getQuestionCategories,
   getQuestionTypes,
   getQuestionSubjects,
   getQuestionTopics,
-  type QuestionCategory,
   type QuestionType,
   type QuestionSubject,
   type QuestionTopic,
@@ -67,7 +65,6 @@ const CreateQuestionPage = () => {
   const { t, language } = useI18n()
   const errorRef = useRef<HTMLDivElement>(null)
 
-  const [categories, setCategories] = useState<QuestionCategory[]>([])
   const [types, setTypes] = useState<QuestionType[]>([])
   const [subjects, setSubjects] = useState<QuestionSubject[]>([])
   const [topics, setTopics] = useState<QuestionTopic[]>([])
@@ -79,7 +76,6 @@ const CreateQuestionPage = () => {
     bodyEn: "",
     bodyAr: "",
     questionTypeId: "",
-    questionCategoryId: "",
     subjectId: "",
     topicId: "",
     points: 1,
@@ -97,6 +93,12 @@ const CreateQuestionPage = () => {
 
   // For Short Answer / Numeric - correct answer
   const [correctAnswer, setCorrectAnswer] = useState("")
+
+  // Answer key / rubric for essay/subjective types
+  const [answerKey, setAnswerKey] = useState({
+    rubricTextEn: "",
+    rubricTextAr: "",
+  })
 
   useEffect(() => {
     fetchLookups()
@@ -150,15 +152,10 @@ const CreateQuestionPage = () => {
 
   const fetchLookups = async () => {
     try {
-      const [categoriesRes, typesRes, subjectsRes] = await Promise.all([
-        getQuestionCategories(),
+      const [typesRes, subjectsRes] = await Promise.all([
         getQuestionTypes(),
         getQuestionSubjects({ pageSize: 100 }),
       ])
-
-      // Categories - response is PaginatedResponse<QuestionCategory>
-      const categoriesData = categoriesRes?.items || []
-      setCategories(categoriesData)
 
       // Types - response is PaginatedResponse<QuestionType>
       const typesData = typesRes?.items || []
@@ -250,9 +247,6 @@ const CreateQuestionPage = () => {
     if (!formData.questionTypeId) {
       errors.push("Question type is required")
     }
-    if (!formData.questionCategoryId) {
-      errors.push("Question category is required")
-    }
     if (!formData.subjectId) {
       errors.push("Subject is required")
     }
@@ -313,18 +307,27 @@ const CreateQuestionPage = () => {
     }
 
     try {
-      const response = await createQuestion({
+      const payload: any = {
         bodyEn: formData.bodyEn,
         bodyAr: formData.bodyAr || formData.bodyEn, // Fallback to English if Arabic is empty
         questionTypeId: Number(formData.questionTypeId),
-        questionCategoryId: Number(formData.questionCategoryId),
         subjectId: Number(formData.subjectId),
         topicId: formData.topicId ? Number(formData.topicId) : undefined,
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
         options: finalOptions,
-      })
+      }
+
+      // Include answer key for essay/subjective types
+      if ((isEssay || isShortAnswer) && (answerKey.rubricTextEn || answerKey.rubricTextAr)) {
+        payload.answerKey = {
+          rubricTextEn: answerKey.rubricTextEn || null,
+          rubricTextAr: answerKey.rubricTextAr || null,
+        }
+      }
+
+      const response = await createQuestion(payload)
 
       const responseAny = response as any
 
@@ -384,7 +387,7 @@ const CreateQuestionPage = () => {
 
   return (
     <div className="flex flex-col">
-      <PageHeader title={t("questionBank.createQuestion")} subtitle="Add a new question to your bank" />
+      <PageHeader title={t("questionBank.createQuestion")} subtitle="Add a new question to your bank" className="text-center" />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-4xl">
@@ -398,8 +401,8 @@ const CreateQuestionPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <ErrorAlert />
 
-            <Card className="border-2 shadow-sm">
-              <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
+            <Card className="border-2 shadow-sm overflow-hidden pt-0">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b py-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <FileText className="h-5 w-5 text-primary" />
@@ -440,65 +443,6 @@ const CreateQuestionPage = () => {
                       dir="rtl"
                       className="resize-none text-base border-2 focus:border-primary transition-colors"
                     />
-                  </div>
-                </div>
-
-                {/* Type and Category Row */}
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="type" className="text-sm font-semibold flex items-center gap-2">
-                      {t("questionBank.questionType")}
-                      <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={formData.questionTypeId}
-                      onValueChange={(value) => setFormData({ ...formData, questionTypeId: value })}
-                    >
-                      <SelectTrigger id="type" className="border-2 h-11 w-full">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {types.length === 0 ? (
-                          <SelectItem value="none" disabled>
-                            No types available
-                          </SelectItem>
-                        ) : (
-                          types.map((type) => (
-                            <SelectItem key={type.id} value={String(type.id)}>
-                              {language === "ar" ? type.nameAr : type.nameEn}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category" className="text-sm font-semibold flex items-center gap-2">
-                      {t("questionBank.questionCategory")}
-                      <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={formData.questionCategoryId}
-                      onValueChange={(value) => setFormData({ ...formData, questionCategoryId: value })}
-                    >
-                      <SelectTrigger id="category" className="border-2 h-11 w-full">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.length === 0 ? (
-                          <SelectItem value="none" disabled>
-                            No categories available
-                          </SelectItem>
-                        ) : (
-                          categories.map((cat) => (
-                            <SelectItem key={cat.id} value={String(cat.id)}>
-                              {language === "ar" ? cat.nameAr : cat.nameEn}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
 
@@ -610,7 +554,7 @@ const CreateQuestionPage = () => {
                       step={0.5}
                       value={formData.points}
                       onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
-                      className="border-2 h-11 w-full"
+                      className="border-2 h-11 py-2 w-full"
                     />
                   </div>
                 </div>
@@ -631,13 +575,44 @@ const CreateQuestionPage = () => {
                     onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
                   />
                 </div>
+
+                {/* Question Type */}
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="type" className="text-sm font-semibold flex items-center gap-2">
+                      {t("questionBank.questionType")}
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={formData.questionTypeId}
+                      onValueChange={(value) => setFormData({ ...formData, questionTypeId: value })}
+                    >
+                      <SelectTrigger id="type" className="border-2 h-11 w-full">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {types.length === 0 ? (
+                          <SelectItem value="none" disabled>
+                            No types available
+                          </SelectItem>
+                        ) : (
+                          types.map((type) => (
+                            <SelectItem key={type.id} value={String(type.id)}>
+                              {language === "ar" ? type.nameAr : type.nameEn}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* MCQ Single - Radio buttons for correct answer */}
             {isMCQSingle && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
                       <ListChecks className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -726,8 +701,8 @@ const CreateQuestionPage = () => {
 
             {/* MCQ Multi - Checkboxes for multiple correct answers */}
             {isMCQMulti && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-violet-50 to-violet-100 dark:from-violet-950/50 dark:to-violet-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-violet-50 to-violet-100 dark:from-violet-950/50 dark:to-violet-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
                       <ListChecks className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -822,8 +797,8 @@ const CreateQuestionPage = () => {
 
             {/* True/False */}
             {isTrueFalse && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
                       <ListChecks className="h-5 w-5 text-amber-600 dark:text-amber-400" />
@@ -861,8 +836,8 @@ const CreateQuestionPage = () => {
 
             {/* Short Answer */}
             {isShortAnswer && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-950/50 dark:to-teal-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-950/50 dark:to-teal-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-lg">
                       <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400" />
@@ -892,8 +867,8 @@ const CreateQuestionPage = () => {
 
             {/* Numeric */}
             {isNumeric && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-950/50 dark:to-indigo-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-950/50 dark:to-indigo-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
                       <Settings className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -925,26 +900,59 @@ const CreateQuestionPage = () => {
 
             {/* Essay */}
             {isEssay && (
-              <Card className="border-2 shadow-sm">
-                <CardHeader className="bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-950/50 dark:to-rose-900/30 border-b">
+              <Card className="border-2 shadow-sm overflow-hidden pt-0">
+                <CardHeader className="bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-950/50 dark:to-rose-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-rose-100 dark:bg-rose-900/50 rounded-lg">
                       <FileText className="h-5 w-5 text-rose-600 dark:text-rose-400" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Essay Question</CardTitle>
-                      <CardDescription>This question requires manual grading</CardDescription>
+                      <CardTitle className="text-lg">{language === "ar" ? "الإجابة النموذجية / معايير التقييم" : "Model Answer / Grading Rubric"}</CardTitle>
+                      <CardDescription>
+                        {language === "ar"
+                          ? "هذا السؤال يتطلب تصحيح يدوي. أدخل الإجابة النموذجية كمرجع للمُقيّم"
+                          : "This question requires manual grading. Enter a model answer as a reference for the grader"}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent className="pt-6 space-y-4">
                   <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/30">
                     <Info className="h-4 w-4 text-amber-600" />
                     <AlertDescription className="text-amber-700 dark:text-amber-300">
                       Essay questions cannot be auto-graded. Instructors will need to manually review and grade
-                      responses.
+                      responses. The model answer below will be displayed as a reference during grading.
                     </AlertDescription>
                   </Alert>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="rubricEn" className="text-sm font-semibold">
+                        {language === "ar" ? "الإجابة النموذجية (English)" : "Model Answer (English)"}
+                      </Label>
+                      <Textarea
+                        id="rubricEn"
+                        placeholder="Enter model answer or grading rubric in English..."
+                        value={answerKey.rubricTextEn}
+                        onChange={(e) => setAnswerKey({ ...answerKey, rubricTextEn: e.target.value })}
+                        rows={5}
+                        className="resize-none border-2 focus:border-primary transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rubricAr" className="text-sm font-semibold">
+                        {language === "ar" ? "الإجابة النموذجية (العربية)" : "Model Answer (العربية)"}
+                      </Label>
+                      <Textarea
+                        id="rubricAr"
+                        placeholder="أدخل الإجابة النموذجية أو معايير التقييم..."
+                        value={answerKey.rubricTextAr}
+                        onChange={(e) => setAnswerKey({ ...answerKey, rubricTextAr: e.target.value })}
+                        rows={5}
+                        dir="rtl"
+                        className="resize-none border-2 focus:border-primary transition-colors"
+                      />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}

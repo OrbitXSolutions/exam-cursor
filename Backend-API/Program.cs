@@ -50,6 +50,7 @@ using Smart_Core.Infrastructure.Services.CandidateAdmin;
 using Smart_Core.Infrastructure.Services.ExamAssignment;
 using Smart_Core.Infrastructure.Services.CandidateExamDetails;
 using Smart_Core.Infrastructure.Services.ExamOperations;
+using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Infrastructure.Storage;
 using StackExchange.Redis;
 
@@ -109,6 +110,21 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!)),
         ClockSkew = TimeSpan.Zero
+    };
+
+    // Allow SignalR to receive the JWT token from query string
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -221,9 +237,30 @@ builder.Services.AddScoped<DatabaseSeeder>();
 
 // Background Services
 builder.Services.AddHostedService<LogCleanupService>();
+builder.Services.AddHostedService<VideoRetentionService>();
+builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Background.AttemptExpiryBackgroundService>();
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
+
+// SignalR
+builder.Services.AddSignalR();
+
+// CORS policy for SignalR — allow frontend origins
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SignalRCors", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "https://localhost:3000",
+                "http://localhost:5221",
+                "https://localhost:7184")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 // Controllers
 builder.Services.AddControllers();
@@ -269,6 +306,9 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+
+// CORS — required for SignalR WebSocket from frontend origin
+app.UseCors("SignalRCors");
 
 // Global Exception Handling
 app.UseGlobalExceptionMiddleware();
@@ -336,6 +376,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// SignalR Hubs
+app.MapHub<ProctorHub>("/hubs/proctor");
 
 // Apply pending migrations and seed data in development
 if (app.Environment.IsDevelopment())

@@ -274,6 +274,21 @@ export default function GradeSubmissionPage() {
                       )}
                     </p>
                   </div>
+
+                  {/* Model Answer / Rubric Reference */}
+                  {(currentQuestion.modelAnswerEn || currentQuestion.modelAnswerAr) && (
+                    <div className="rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 p-4">
+                      <Label className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {language === "ar" ? "الإجابة النموذجية / معايير التقييم" : "Model Answer / Grading Rubric"}
+                      </Label>
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-blue-900 dark:text-blue-200">
+                        {language === "ar"
+                          ? (currentQuestion.modelAnswerAr || currentQuestion.modelAnswerEn)
+                          : (currentQuestion.modelAnswerEn || currentQuestion.modelAnswerAr)}
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
             </CardContent>

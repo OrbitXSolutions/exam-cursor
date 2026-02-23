@@ -23,4 +23,11 @@ public class SystemSettings
     public string PrimaryColor { get; set; } = "#0d9488";
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedDate { get; set; }
+
+    // Video Recording Retention
+    public int VideoRetentionDays { get; set; } = 30;
+
+    // Video Feature Flags (overrides appsettings at DB level if set)
+    public bool EnableLiveVideo { get; set; } = true;
+    public bool EnableVideoRecording { get; set; } = true;
 }

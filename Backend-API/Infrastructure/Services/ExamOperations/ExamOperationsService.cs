@@ -184,7 +184,7 @@ public class ExamOperationsService : IExamOperationsService
             a.ExamId == dto.ExamId &&
             a.CandidateId == dto.CandidateId &&
             !a.IsDeleted &&
-            (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
+            (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
 
         if (hasActive)
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse(

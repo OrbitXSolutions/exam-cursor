@@ -112,14 +112,38 @@ export async function resetUserPassword(
 interface AuditLogListDto {
   id: number;
   actorDisplayName?: string;
+  actorType?: number;
   action: string;
   entityName: string;
   entityId: string;
   outcomeName?: string;
+  source?: number;
+  channel?: number;
   occurredAt: string;
   beforeJson?: string;
   afterJson?: string;
+  metadataJson?: string;
 }
+
+const ACTOR_TYPE_MAP: Record<number, string> = {
+  1: "User",
+  2: "System",
+  3: "Service",
+};
+const SOURCE_MAP: Record<number, string> = {
+  1: "Api",
+  2: "BackgroundJob",
+  3: "Scheduler",
+  4: "MessageHandler",
+  5: "DatabaseTrigger",
+};
+const CHANNEL_MAP: Record<number, string> = {
+  1: "Web",
+  2: "Mobile",
+  3: "AdminPortal",
+  4: "ApiClient",
+  5: "Internal",
+};
 
 export async function getAuditLogs(params?: {
   actorId?: string;
@@ -151,19 +175,19 @@ export async function getAuditLogs(params?: {
       id: log.id,
       actorId: "",
       actorName: log.actorDisplayName ?? "",
-      actorType: "User",
+      actorType: ACTOR_TYPE_MAP[log.actorType ?? 1] ?? "User",
       action: log.action,
       entityName: log.entityName,
       entityId: log.entityId,
       correlationId: null,
       tenantId: null,
-      source: "Web",
-      channel: "Dashboard",
+      source: SOURCE_MAP[log.source ?? 1] ?? "Api",
+      channel: CHANNEL_MAP[log.channel ?? 1] ?? "Web",
       outcome: log.outcomeName ?? "Success",
       ipAddress: null,
       userAgent: null,
       timestamp: log.occurredAt,
-      details: log.beforeJson ?? log.afterJson ?? null,
+      details: log.metadataJson ?? log.beforeJson ?? log.afterJson ?? null,
     }));
     return { items: mapped, totalCount };
   } catch {

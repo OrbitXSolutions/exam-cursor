@@ -60,6 +60,9 @@ public class SettingsController : ControllerBase
             entity.PrimaryColor = dto.Brand.PrimaryColor ?? "#0d9488";
         }
         entity.UpdatedDate = DateTime.UtcNow;
+        entity.EnableLiveVideo = dto.EnableLiveVideo;
+        entity.EnableVideoRecording = dto.EnableVideoRecording;
+        entity.VideoRetentionDays = dto.VideoRetentionDays > 0 ? dto.VideoRetentionDays : 30;
         await _db.SaveChangesAsync();
         var result = MapToDto(entity);
         return Ok(ApiResponse<SystemSettingsDto>.SuccessResponse(result));
@@ -117,6 +120,9 @@ public class SettingsController : ControllerBase
                 SupportUrl = e.SupportUrl,
                 PrimaryColor = e.PrimaryColor,
             },
+            EnableLiveVideo = e.EnableLiveVideo,
+            EnableVideoRecording = e.EnableVideoRecording,
+            VideoRetentionDays = e.VideoRetentionDays,
         };
     }
 }
@@ -130,6 +136,10 @@ public class SystemSettingsDto
     public int SessionTimeoutMinutes { get; set; }
     public PasswordPolicyDto? PasswordPolicy { get; set; }
     public BrandSettingsDto? Brand { get; set; }
+    // Video proctoring feature flags
+    public bool EnableLiveVideo { get; set; } = true;
+    public bool EnableVideoRecording { get; set; } = true;
+    public int VideoRetentionDays { get; set; } = 30;
 }
 
 public class PasswordPolicyDto

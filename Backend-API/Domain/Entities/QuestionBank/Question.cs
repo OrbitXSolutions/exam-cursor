@@ -17,7 +17,7 @@ public class Question : BaseEntity
 
     // Lookups
     public int QuestionTypeId { get; set; }
-    public int QuestionCategoryId { get; set; }
+    public int? QuestionCategoryId { get; set; }
 
     // Subject & Topic (Subject required, Topic optional)
     public int SubjectId { get; set; }
@@ -32,7 +32,7 @@ public class Question : BaseEntity
 
     // Navigation Properties
     public virtual Lookups.QuestionType QuestionType { get; set; } = null!;
-    public virtual Lookups.QuestionCategory QuestionCategory { get; set; } = null!;
+    public virtual Lookups.QuestionCategory? QuestionCategory { get; set; }
     public virtual Lookups.QuestionSubject Subject { get; set; } = null!;
     public virtual Lookups.QuestionTopic? Topic { get; set; }
 

@@ -24,6 +24,17 @@ export enum AttemptStatus {
   Submitted = 3,
   Expired = 4,
   Cancelled = 5,
+  Paused = 6,
+  ForceSubmitted = 7,
+  Terminated = 8,
+  Resumed = 9,
+}
+
+export enum ExpiryReason {
+  None = 0,
+  TimerExpiredWhileActive = 1,
+  TimerExpiredWhileDisconnected = 2,
+  ExamWindowClosed = 3,
 }
 
 export enum GradingStatus {
