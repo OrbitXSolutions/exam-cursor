@@ -14,6 +14,8 @@ public class AttemptControlItemDto
     public DateTime StartedAt { get; set; }
     public int RemainingSeconds { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string? ExpiryReason { get; set; }
+    public int? ResumedFromAttemptId { get; set; }
     public DateTime? LastActivityAt { get; set; }
     public int ExtraTimeSeconds { get; set; }
     public int ResumeCount { get; set; }

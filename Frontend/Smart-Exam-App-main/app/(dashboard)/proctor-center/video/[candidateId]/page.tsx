@@ -337,7 +337,10 @@ export default function CandidateVideoPage() {
                       <div className="space-y-3">
                         <div className="aspect-video bg-black rounded-lg overflow-hidden">
                           <video
-                            src={`/api/proxy/Proctor/video-stream/${selectedSession.attemptId}`}
+                            src={(() => {
+                              const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
+                              return token ? `/api/video-stream/${selectedSession.attemptId}?token=${encodeURIComponent(token)}` : undefined
+                            })()}
                             controls
                             playsInline
                             className="w-full h-full"

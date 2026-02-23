@@ -271,9 +271,7 @@ export async function getSessionDetails(
  * Lightweight refresh — fetches session + screenshots only (no incidents).
  * Used by polling to avoid repeated 403 noise on /Incident/cases.
  */
-export async function refreshSessionData(
-  sessionId: string,
-): Promise<{
+export async function refreshSessionData(sessionId: string): Promise<{
   session: LiveSession;
   screenshots: Array<{ id: string; timestamp: string; url: string }>;
 }> {
@@ -584,5 +582,421 @@ export async function getCandidateSessionStatus(
   } catch {
     // Silent fail — don't disrupt exam if poll fails
     return { hasWarning: false, isTerminated: false };
+  }
+}
+
+// ============ INCIDENT CASE MANAGEMENT ============
+
+/** Full incident case detail (from GET /Incident/case/{id}) */
+export interface IncidentCaseDetailDto {
+  id: number;
+  caseNumber: string;
+  examId: number;
+  examTitleEn: string;
+  attemptId: number;
+  attemptNumber: number;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail?: string;
+  proctorSessionId?: number;
+  status: number;
+  statusName: string;
+  severity: number;
+  severityName: string;
+  source: number;
+  sourceName: string;
+  titleEn: string;
+  titleAr: string;
+  summaryEn?: string;
+  summaryAr?: string;
+  riskScoreAtCreate?: number;
+  totalViolationsAtCreate?: number;
+  assignedTo?: string;
+  assigneeName?: string;
+  assignedAt?: string;
+  outcome?: number;
+  outcomeName?: string;
+  resolutionNoteEn?: string;
+  resolvedBy?: string;
+  resolverName?: string;
+  resolvedAt?: string;
+  createdAt: string;
+  timeline: IncidentTimelineEventDto[];
+  evidenceLinks: IncidentEvidenceLinkDto[];
+  decisions: IncidentDecisionDto[];
+  commentCount: number;
+}
+
+export interface IncidentTimelineEventDto {
+  id: number;
+  eventType: number;
+  eventTypeName: string;
+  actorId?: string;
+  actorName?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  metadataJson?: string;
+  occurredAt: string;
+}
+
+export interface IncidentEvidenceLinkDto {
+  id: number;
+  proctorEvidenceId?: number;
+  proctorEventId?: number;
+  evidenceType: string;
+  evidenceDescription?: string;
+  previewUrl?: string;
+  noteEn?: string;
+  noteAr?: string;
+  order: number;
+  linkedBy?: string;
+  linkedAt?: string;
+}
+
+export interface IncidentDecisionDto {
+  id: number;
+  outcome: number;
+  outcomeName: string;
+  reasonEn?: string;
+  reasonAr?: string;
+  decidedBy: string;
+  deciderName?: string;
+  decidedAt: string;
+  riskScoreAtDecision?: number;
+}
+
+export interface IncidentCommentDto {
+  id: number;
+  authorId: string;
+  authorName?: string;
+  body: string;
+  isEdited: boolean;
+  createdAt: string;
+  editedAt?: string;
+}
+
+export interface IncidentDashboardDto {
+  examId: number;
+  examTitleEn: string;
+  totalCases: number;
+  openCases: number;
+  inReviewCases: number;
+  resolvedCases: number;
+  closedCases: number;
+  unassignedCases: number;
+  criticalSeverityCases: number;
+  highSeverityCases: number;
+  clearedCount: number;
+  suspiciousCount: number;
+  invalidatedCount: number;
+  escalatedCount: number;
+}
+
+/** Create an incident case manually (POST /Incident/case) */
+export async function createIncidentCase(dto: {
+  attemptId: number;
+  proctorSessionId?: number;
+  source?: number; // 1=Proctor, 2=System, 3=Manual
+  severity: number; // 1=Low, 2=Medium, 3=High, 4=Critical
+  titleEn: string;
+  titleAr?: string;
+  summaryEn?: string;
+  summaryAr?: string;
+}): Promise<{ id: number; caseNumber: string }> {
+  const res = await apiClient.post<{ id: number; caseNumber: string }>(
+    "/Incident/case",
+    {
+      ...dto,
+      source: dto.source ?? 3, // Manual by default
+      titleAr: dto.titleAr ?? dto.titleEn,
+    },
+  );
+  return res;
+}
+
+/** Create case from proctor session (POST /Incident/case/from-proctor/{id}) */
+export async function createIncidentFromProctor(
+  proctorSessionId: number,
+): Promise<{ id: number; caseNumber: string }> {
+  return await apiClient.post<{ id: number; caseNumber: string }>(
+    `/Incident/case/from-proctor/${proctorSessionId}`,
+    {},
+  );
+}
+
+/** Get incident case detail (GET /Incident/case/{id}) */
+export async function getIncidentCase(
+  caseId: number,
+): Promise<IncidentCaseDetailDto | null> {
+  try {
+    const res = await apiClient.get<IncidentCaseDetailDto>(
+      `/Incident/case/${caseId}`,
+    );
+    return res ?? null;
+  } catch (err) {
+    console.warn("[Incident] getIncidentCase failed:", err);
+    return null;
+  }
+}
+
+/** Get case by attempt (GET /Incident/case/by-attempt/{attemptId}) */
+export async function getIncidentByAttempt(
+  attemptId: number,
+): Promise<IncidentCaseDetailDto | null> {
+  try {
+    const res = await apiClient.get<IncidentCaseDetailDto>(
+      `/Incident/case/by-attempt/${attemptId}`,
+    );
+    return res ?? null;
+  } catch (err) {
+    return null;
+  }
+}
+
+/** Get timeline (GET /Incident/case/{id}/timeline) */
+export async function getIncidentTimeline(
+  caseId: number,
+): Promise<IncidentTimelineEventDto[]> {
+  try {
+    const res = await apiClient.get<IncidentTimelineEventDto[]>(
+      `/Incident/case/${caseId}/timeline`,
+    );
+    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
+/** Get evidence (GET /Incident/case/{id}/evidence) */
+export async function getIncidentEvidence(
+  caseId: number,
+): Promise<IncidentEvidenceLinkDto[]> {
+  try {
+    const res = await apiClient.get<IncidentEvidenceLinkDto[]>(
+      `/Incident/case/${caseId}/evidence`,
+    );
+    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
+/** Link evidence to a case (POST /Incident/evidence/link) */
+export async function linkIncidentEvidence(dto: {
+  caseId: number;
+  proctorEvidenceId?: number;
+  proctorEventId?: number;
+  noteEn?: string;
+  noteAr?: string;
+}): Promise<void> {
+  await apiClient.post("/Incident/evidence/link", dto);
+}
+
+/** Record a decision (POST /Incident/decision) */
+export async function recordIncidentDecision(dto: {
+  caseId: number;
+  outcome: number; // 1=Cleared, 2=Suspicious, 3=Invalidated, 4=Escalated
+  reasonEn?: string;
+  reasonAr?: string;
+  internalNotes?: string;
+  closeCase?: boolean;
+}): Promise<void> {
+  await apiClient.post("/Incident/decision", dto);
+}
+
+/** Get decision history (GET /Incident/case/{id}/decisions) */
+export async function getIncidentDecisions(
+  caseId: number,
+): Promise<IncidentDecisionDto[]> {
+  try {
+    const res = await apiClient.get<IncidentDecisionDto[]>(
+      `/Incident/case/${caseId}/decisions`,
+    );
+    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
+/** Add comment (POST /Incident/comment) */
+export async function addIncidentComment(dto: {
+  caseId: number;
+  body: string;
+  isVisibleToCandidate?: boolean;
+}): Promise<void> {
+  await apiClient.post("/Incident/comment", {
+    ...dto,
+    isVisibleToCandidate: false, // never visible to candidate
+  });
+}
+
+/** Get comments (GET /Incident/case/{id}/comments) */
+export async function getIncidentComments(
+  caseId: number,
+): Promise<IncidentCommentDto[]> {
+  try {
+    const res = await apiClient.get<IncidentCommentDto[]>(
+      `/Incident/case/${caseId}/comments`,
+    );
+    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+  } catch {
+    return [];
+  }
+}
+
+/** Close case (POST /Incident/case/{id}/close) */
+export async function closeIncidentCase(caseId: number): Promise<void> {
+  await apiClient.post(`/Incident/case/${caseId}/close`, {});
+}
+
+/** Reopen case (POST /Incident/case/{id}/reopen) */
+export async function reopenIncidentCase(
+  caseId: number,
+  reason: string,
+): Promise<void> {
+  await apiClient.post(
+    `/Incident/case/${caseId}/reopen?reason=${encodeURIComponent(reason)}`,
+    {},
+  );
+}
+
+/** Assign case (POST /Incident/case/assign) */
+export async function assignIncidentCase(
+  caseId: number,
+  assigneeId: string,
+): Promise<void> {
+  await apiClient.post("/Incident/case/assign", { caseId, assigneeId });
+}
+
+/** Change status (POST /Incident/case/status) */
+export async function changeIncidentStatus(
+  caseId: number,
+  newStatus: number,
+  reason?: string,
+): Promise<void> {
+  await apiClient.post("/Incident/case/status", { caseId, newStatus, reason });
+}
+
+/** Get dashboard (GET /Incident/dashboard or /Incident/dashboard/exam/{id}) */
+export async function getIncidentDashboard(
+  examId?: number,
+): Promise<IncidentDashboardDto | null> {
+  try {
+    const url = examId
+      ? `/Incident/dashboard/exam/${examId}`
+      : "/Incident/dashboard";
+    return await apiClient.get<IncidentDashboardDto>(url);
+  } catch {
+    return null;
+  }
+}
+
+// Incident status/severity/outcome label helpers
+export const INCIDENT_STATUS_LABELS: Record<number, string> = {
+  1: "Open",
+  2: "In Review",
+  3: "Resolved",
+  4: "Closed",
+  5: "Escalated",
+};
+
+export const INCIDENT_SEVERITY_LABELS: Record<number, string> = {
+  1: "Low",
+  2: "Medium",
+  3: "High",
+  4: "Critical",
+};
+
+export const INCIDENT_OUTCOME_LABELS: Record<number, string> = {
+  1: "Cleared",
+  2: "Suspicious",
+  3: "Invalidated",
+  4: "Escalated",
+};
+
+export const INCIDENT_SOURCE_LABELS: Record<number, string> = {
+  1: "Proctor",
+  2: "System",
+  3: "Manual",
+};
+
+// ============ ATTEMPT EVENTS (VIOLATIONS LOG) ============
+
+export interface AttemptEventDto {
+  id: number;
+  attemptId: number;
+  eventType: number;
+  eventTypeName?: string;
+  metadataJson?: string;
+  occurredAt: string;
+}
+
+const EVENT_TYPE_NAMES: Record<number, string> = {
+  1: "Started",
+  2: "Answer Saved",
+  3: "Navigated",
+  4: "Tab Switched",
+  5: "Fullscreen Exited",
+  6: "Submitted",
+  7: "Timed Out",
+  8: "Window Blur",
+  9: "Window Focus",
+  10: "Copy Attempt",
+  11: "Paste Attempt",
+  12: "Right Click Attempt",
+  13: "Force Ended",
+  14: "Admin Resumed",
+  15: "Time Added",
+  16: "Webcam Denied",
+  17: "Snapshot Failed",
+};
+
+const VIOLATION_TYPES = new Set([4, 5, 8, 10, 11, 12, 16, 17]);
+
+export function getEventTypeName(eventType: number): string {
+  return EVENT_TYPE_NAMES[eventType] ?? `Event ${eventType}`;
+}
+
+export function isViolationEvent(eventType: number): boolean {
+  return VIOLATION_TYPES.has(eventType);
+}
+
+export function getEventSeverity(eventType: number): string {
+  switch (eventType) {
+    case 16:
+      return "Critical"; // Webcam Denied
+    case 4:
+    case 5:
+      return "High"; // Tab Switch, Fullscreen Exit
+    case 8:
+    case 10:
+    case 11:
+    case 17:
+      return "Medium"; // Window Blur, Copy, Paste, Snapshot Fail
+    case 12:
+      return "Low"; // Right Click
+    default:
+      return "Info";
+  }
+}
+
+/**
+ * Fetch all attempt events (admin/proctor).
+ * GET /Attempt/{attemptId}/events
+ */
+export async function getAttemptEvents(
+  attemptId: number,
+): Promise<AttemptEventDto[]> {
+  try {
+    const res = await apiClient.get<{ data: AttemptEventDto[] }>(
+      `/Attempt/${attemptId}/events`,
+    );
+    const events = (res as any)?.data ?? res ?? [];
+    return (Array.isArray(events) ? events : []).map((e: any) => ({
+      ...e,
+      eventTypeName: getEventTypeName(e.eventType),
+    }));
+  } catch {
+    return [];
   }
 }

@@ -20,6 +20,9 @@ public class AttemptDto
     public DateTime? ExpiresAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
+    public ExpiryReason ExpiryReason { get; set; }
+    public string ExpiryReasonName => ExpiryReason.ToString();
+    public int? ResumedFromAttemptId { get; set; }
     public int AttemptNumber { get; set; }
     public decimal? TotalScore { get; set; }
     public bool? IsPassed { get; set; }
@@ -44,6 +47,9 @@ public class AttemptListDto
     public DateTime? SubmittedAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
+    public ExpiryReason ExpiryReason { get; set; }
+    public string ExpiryReasonName => ExpiryReason.ToString();
+    public int? ResumedFromAttemptId { get; set; }
     public int AttemptNumber { get; set; }
     public decimal? TotalScore { get; set; }
     public bool? IsPassed { get; set; }

@@ -162,6 +162,40 @@ public class ProctorHub : Hub
     }
 
     /// <summary>
+    /// Candidate notifies proctor that the exam has been submitted.
+    /// </summary>
+    public async Task NotifyExamSubmitted(int attemptId)
+    {
+        var group = $"attempt_{attemptId}";
+        _logger.LogInformation("ProctorHub: NotifyExamSubmitted from {ConnId} for attempt {AttemptId}",
+            Context.ConnectionId, attemptId);
+        await Clients.OthersInGroup(group).SendAsync("ExamSubmitted", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            attemptId
+        });
+    }
+
+    /// <summary>
+    /// Proctor sends a warning message to the candidate instantly via SignalR.
+    /// This supplements the existing HTTP polling — not a replacement.
+    /// </summary>
+    public async Task SendWarningToCandidate(int attemptId, string message)
+    {
+        var group = $"attempt_{attemptId}";
+        _logger.LogInformation("ProctorHub: SendWarningToCandidate from {ConnId} for attempt {AttemptId}: {Message}",
+            Context.ConnectionId, attemptId, message);
+        await Clients.OthersInGroup(group).SendAsync("ReceiveWarning", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            message,
+            attemptId
+        });
+    }
+
+    /// <summary>
     /// Candidate notifies proctor about connection status changes.
     /// </summary>
     public async Task NotifyConnectionStatus(int attemptId, string status)
@@ -175,6 +209,42 @@ public class ProctorHub : Hub
             fromUserId = Context.UserIdentifier,
             status, // "connected", "reconnecting", "disconnected"
             attemptId
+        });
+    }
+
+    /// <summary>
+    /// Proctor sends a termination notification to the candidate instantly via SignalR.
+    /// This supplements the existing HTTP polling — candidate doesn't need to wait for next poll.
+    /// </summary>
+    public async Task SendTerminationToCandidate(int attemptId, string reason)
+    {
+        var group = $"attempt_{attemptId}";
+        _logger.LogInformation("ProctorHub: SendTerminationToCandidate from {ConnId} for attempt {AttemptId}: {Reason}",
+            Context.ConnectionId, attemptId, reason);
+        await Clients.OthersInGroup(group).SendAsync("SessionTerminated", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            reason,
+            attemptId
+        });
+    }
+
+    /// <summary>
+    /// Proctor notifies the candidate that their exam time has been extended.
+    /// Candidate's timer updates instantly without waiting for next server sync.
+    /// </summary>
+    public async Task NotifyTimeExtended(int attemptId, int extraMinutes, int newRemainingSeconds)
+    {
+        var group = $"attempt_{attemptId}";
+        _logger.LogInformation("ProctorHub: NotifyTimeExtended for attempt {AttemptId}: +{Extra}min, remaining={Remaining}s",
+            attemptId, extraMinutes, newRemainingSeconds);
+        await Clients.Group(group).SendAsync("TimeExtended", new
+        {
+            attemptId,
+            extraMinutes,
+            newRemainingSeconds,
+            message = $"Your exam time has been extended by {extraMinutes} minute(s)."
         });
     }
 }

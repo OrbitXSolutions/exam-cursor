@@ -101,6 +101,9 @@ export default function ExamPage() {
   const [proctorWarningOpen, setProctorWarningOpen] = useState(false)
   const [proctorWarningMessage, setProctorWarningMessage] = useState("")
 
+  // SignalR connection state — drives smart polling
+  const [signalRConnected, setSignalRConnected] = useState(false)
+
   // Refs
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const sectionTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -441,6 +444,59 @@ export default function ExamPage() {
                   onStatusChange: (status) => {
                     console.log("[Proctor] WebRTC publisher status:", status)
                   },
+                  onWarningReceived: (message) => {
+                    // Instant warning via SignalR — same UI as polled warnings
+                    playWarningBeep()
+                    setProctorWarningMessage(message)
+                    setProctorWarningOpen(true)
+                  },
+                  onSignalRStatusChange: (connected) => {
+                    console.log(`[SmartPoll] SignalR status changed: connected=${connected}`)
+                    setSignalRConnected(connected)
+                  },
+                  onTerminationReceived: (reason) => {
+                    console.log(`[SmartPoll] Termination received via SignalR: "${reason}"`)
+                    stopAllBackgroundActivity()
+                    toast.error(
+                      reason
+                        ? `${t("exam.terminatedByProctor")}: ${reason}`
+                        : t("exam.terminatedByProctor"),
+                      { duration: 10000 }
+                    )
+                    router.push("/my-exams")
+                  },
+                  onTimeExtended: (event) => {
+                    console.log(`[SmartPoll] Time extended via SignalR: +${event.extraMinutes}min, new remaining=${event.newRemainingSeconds}s`)
+                    // Update the exam timer with new remaining seconds
+                    setExamTimeRemaining(event.newRemainingSeconds)
+                    // Play a gentle notification sound (different from warning beep)
+                    try {
+                      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
+                      const osc = audioCtx.createOscillator()
+                      const gain = audioCtx.createGain()
+                      osc.connect(gain)
+                      gain.connect(audioCtx.destination)
+                      osc.frequency.value = 523.25 // C5 - pleasant tone
+                      gain.gain.value = 0.15
+                      osc.start()
+                      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5)
+                      osc.stop(audioCtx.currentTime + 0.5)
+                    } catch {}
+                    // Show notification toast
+                    toast.success(
+                      `Your exam time has been extended by ${event.extraMinutes} minute(s)`,
+                      { duration: 8000, icon: "⏰" }
+                    )
+                  },
+                  onAttemptExpired: (event) => {
+                    console.log(`[SmartPoll] Attempt expired via SignalR: type=${event.eventType}, reason=${event.reason}`)
+                    stopAllBackgroundActivity()
+                    const message = event.eventType === "ExamWindowClosed"
+                      ? t("exam.examWindowClosed") || "The exam schedule window has closed. Your attempt has been ended."
+                      : t("exam.timeExpired") || "Your exam time has expired."
+                    toast.error(message, { duration: 10000 })
+                    router.push("/my-exams")
+                  },
                 })
                 publisher.start(webcamStreamRef.current).catch((err) => {
                   console.warn("[Proctor] WebRTC publisher failed to start (non-fatal):", err)
@@ -603,33 +659,30 @@ export default function ExamPage() {
         }
       }, 60000)
 
-      // Poll proctor warnings every 15 seconds
-      proctorPollRef.current = setInterval(async () => {
-        try {
-          const status = await getCandidateSessionStatus(sessionData.attemptId)
-          if (status.isTerminated) {
-            // Proctor terminated the session — force submit
-            stopAllBackgroundActivity()
-            toast.error(
-              status.terminationReason
-                ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-                : t("exam.terminatedByProctor"),
-              { duration: 10000 }
-            )
-            router.push("/my-exams")
-            return
-          }
-          if (status.hasWarning && status.warningMessage) {
-            // Play alert sound
-            playWarningBeep()
-            // Show warning dialog
-            setProctorWarningMessage(status.warningMessage)
-            setProctorWarningOpen(true)
-          }
-        } catch {
-          // Silent fail — don't disrupt exam
+      // Initial proctor status check (one-time HTTP snapshot — source of truth)
+      try {
+        const status = await getCandidateSessionStatus(sessionData.attemptId)
+        if (status.isTerminated) {
+          stopAllBackgroundActivity()
+          toast.error(
+            status.terminationReason
+              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
+              : t("exam.terminatedByProctor"),
+            { duration: 10000 }
+          )
+          router.push("/my-exams")
+          return
         }
-      }, 15000)
+        if (status.hasWarning && status.warningMessage) {
+          playWarningBeep()
+          setProctorWarningMessage(status.warningMessage)
+          setProctorWarningOpen(true)
+        }
+      } catch {
+        // Silent fail — don't disrupt exam start
+      }
+      // Note: Continuous polling is managed by the smart-poll useEffect below,
+      // which only polls when SignalR is disconnected (signalRConnected === false).
 
       // Log exam started event
       await logAttemptEvent(sessionData.attemptId, {
@@ -798,6 +851,77 @@ export default function ExamPage() {
     }
   }
 
+  // ── Smart Polling: poll proctor status ONLY when SignalR is disconnected ──
+  // When SignalR is connected, warnings + termination arrive instantly via push.
+  // When SignalR disconnects, start 15s fallback polling.
+  // On reconnect, do one sync fetch then stop polling again.
+  useEffect(() => {
+    if (!session) return
+
+    if (signalRConnected) {
+      // SignalR is healthy — stop polling, do one sync fetch to catch anything missed
+      if (proctorPollRef.current) {
+        console.log("[SmartPoll] SignalR connected — stopping fallback polling")
+        clearInterval(proctorPollRef.current)
+        proctorPollRef.current = undefined
+      }
+      // One-time sync fetch on reconnect
+      getCandidateSessionStatus(session.attemptId).then((status) => {
+        if (status.isTerminated) {
+          stopAllBackgroundActivity()
+          toast.error(
+            status.terminationReason
+              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
+              : t("exam.terminatedByProctor"),
+            { duration: 10000 }
+          )
+          router.push("/my-exams")
+          return
+        }
+        if (status.hasWarning && status.warningMessage) {
+          playWarningBeep()
+          setProctorWarningMessage(status.warningMessage)
+          setProctorWarningOpen(true)
+        }
+      }).catch(() => {})
+    } else {
+      // SignalR is disconnected — start 15s fallback polling
+      if (!proctorPollRef.current) {
+        console.log("[SmartPoll] SignalR disconnected — starting 15s fallback polling")
+        proctorPollRef.current = setInterval(async () => {
+          try {
+            const status = await getCandidateSessionStatus(session.attemptId)
+            if (status.isTerminated) {
+              stopAllBackgroundActivity()
+              toast.error(
+                status.terminationReason
+                  ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
+                  : t("exam.terminatedByProctor"),
+                { duration: 10000 }
+              )
+              router.push("/my-exams")
+              return
+            }
+            if (status.hasWarning && status.warningMessage) {
+              playWarningBeep()
+              setProctorWarningMessage(status.warningMessage)
+              setProctorWarningOpen(true)
+            }
+          } catch {
+            // Silent fail — don't disrupt exam
+          }
+        }, 15000)
+      }
+    }
+
+    return () => {
+      if (proctorPollRef.current) {
+        clearInterval(proctorPollRef.current)
+        proctorPollRef.current = undefined
+      }
+    }
+  }, [session?.attemptId, signalRConnected])
+
   async function handleAutoSubmit() {
     if (!session) return
     toast.warning(t("exam.timeExpired"))
@@ -849,6 +973,16 @@ export default function ExamPage() {
           })
         } catch (e) {
           console.warn("[Proctor] Video finalize setup failed (non-fatal):", e)
+        }
+      }
+
+      // Notify proctor via SignalR that exam was submitted
+      if (publisherRef.current?.signalingConnection) {
+        try {
+          await publisherRef.current.signalingConnection.notifyExamSubmitted()
+          console.log('[ExamPage] Proctor notified of exam submission')
+        } catch (e) {
+          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
         }
       }
 

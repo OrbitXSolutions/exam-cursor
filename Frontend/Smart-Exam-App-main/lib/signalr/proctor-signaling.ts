@@ -46,6 +46,44 @@ export interface SignalingCallbacks {
     status: string;
     attemptId: number;
   }) => void;
+  onExamSubmitted?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    attemptId: number;
+  }) => void;
+  onWarningReceived?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    message: string;
+    attemptId: number;
+  }) => void;
+  onTerminationReceived?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    reason: string;
+    attemptId: number;
+  }) => void;
+  onViolationEventReceived?: (event: {
+    id: number;
+    attemptId: number;
+    eventType: string;
+    eventTypeId: number;
+    metadataJson: string;
+    occurredAt: string;
+    severity: string;
+  }) => void;
+  onTimeExtended?: (event: {
+    attemptId: number;
+    extraMinutes: number;
+    newRemainingSeconds: number;
+    message: string;
+  }) => void;
+  onAttemptExpired?: (event: {
+    attemptId: number;
+    eventType: string;
+    reason: string;
+    message: string;
+  }) => void;
   onReconnecting?: () => void;
   onReconnected?: () => void;
   onDisconnected?: (error?: Error) => void;
@@ -71,7 +109,10 @@ export class ProctorSignaling {
   async connect(): Promise<void> {
     if (this.disposed) return;
 
-    console.log(`%c[SignalR] Connecting as ${this.role} for attempt ${this.attemptId}...`, 'color: #00bcd4; font-weight: bold');
+    console.log(
+      `%c[SignalR] Connecting as ${this.role} for attempt ${this.attemptId}...`,
+      "color: #00bcd4; font-weight: bold",
+    );
 
     const token =
       typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
@@ -119,8 +160,34 @@ export class ProctorSignaling {
     });
 
     this.connection.on("ReceiveIceCandidate", (event) => {
-      console.log(`[SignalR] ReceiveIceCandidate from: ${event.fromConnectionId}`);
+      console.log(
+        `[SignalR] ReceiveIceCandidate from: ${event.fromConnectionId}`,
+      );
       this.callbacks.onReceiveIceCandidate?.(event);
+    });
+
+    this.connection.on("ExamSubmitted", (event) => {
+      console.log(
+        `%c[SignalR] ExamSubmitted by candidate for attempt ${event.attemptId}`,
+        "color: #ff5722; font-weight: bold",
+      );
+      this.callbacks.onExamSubmitted?.(event);
+    });
+
+    this.connection.on("ReceiveWarning", (event) => {
+      console.log(
+        `%c[SignalR] ReceiveWarning from proctor: "${event.message}"`,
+        "color: #ff9800; font-weight: bold",
+      );
+      this.callbacks.onWarningReceived?.(event);
+    });
+
+    this.connection.on("SessionTerminated", (event) => {
+      console.log(
+        `%c[SignalR] SessionTerminated by proctor for attempt ${event.attemptId}: "${event.reason}"`,
+        "color: #f44336; font-weight: bold",
+      );
+      this.callbacks.onTerminationReceived?.(event);
     });
 
     this.connection.on("RenegotiationRequested", (event) => {
@@ -131,6 +198,30 @@ export class ProctorSignaling {
     this.connection.on("ConnectionStatusChanged", (event) => {
       console.log("[SignalR] ConnectionStatusChanged:", event.status);
       this.callbacks.onConnectionStatusChanged?.(event);
+    });
+
+    this.connection.on("ViolationEventReceived", (event) => {
+      console.log(
+        `%c[SignalR] ViolationEventReceived: ${event.eventType} (severity=${event.severity})`,
+        "color: #ff5722; font-weight: bold",
+      );
+      this.callbacks.onViolationEventReceived?.(event);
+    });
+
+    this.connection.on("TimeExtended", (event) => {
+      console.log(
+        `%c[SignalR] TimeExtended: +${event.extraMinutes}min, remaining=${event.newRemainingSeconds}s`,
+        "color: #4caf50; font-weight: bold",
+      );
+      this.callbacks.onTimeExtended?.(event);
+    });
+
+    this.connection.on("AttemptExpired", (event) => {
+      console.log(
+        `%c[SignalR] AttemptExpired: type=${event.eventType}, reason=${event.reason}`,
+        "color: #f44336; font-weight: bold",
+      );
+      this.callbacks.onAttemptExpired?.(event);
     });
 
     this.connection.onreconnecting(() => {
@@ -160,16 +251,24 @@ export class ProctorSignaling {
     // Start connection
     try {
       await this.connection.start();
-      console.log(`%c[SignalR] ✅ Connected to ProctorHub as ${this.role}`, 'color: #4caf50; font-weight: bold');
+      console.log(
+        `%c[SignalR] ✅ Connected to ProctorHub as ${this.role}`,
+        "color: #4caf50; font-weight: bold",
+      );
     } catch (err) {
-      console.error(`%c[SignalR] ❌ Failed to start connection!`, 'color: red; font-weight: bold', err);
+      console.error(
+        `%c[SignalR] ❌ Failed to start connection!`,
+        "color: red; font-weight: bold",
+        err,
+      );
       throw err;
     }
 
     // Join the attempt room
     await this.connection.invoke("JoinAttemptRoom", this.attemptId, this.role);
     console.log(
-      `%c[SignalR] ✅ Joined room attempt_${this.attemptId} as ${this.role}`, 'color: #4caf50; font-weight: bold',
+      `%c[SignalR] ✅ Joined room attempt_${this.attemptId} as ${this.role}`,
+      "color: #4caf50; font-weight: bold",
     );
   }
 
@@ -190,13 +289,17 @@ export class ProctorSignaling {
   }
 
   async sendOffer(sdp: string): Promise<void> {
-    console.log(`[SignalR] Sending SDP offer for attempt ${this.attemptId} (${sdp.length} chars)`);
+    console.log(
+      `[SignalR] Sending SDP offer for attempt ${this.attemptId} (${sdp.length} chars)`,
+    );
     await this.connection?.invoke("SendOffer", this.attemptId, sdp);
     console.log(`[SignalR] ✅ Offer sent`);
   }
 
   async sendAnswer(sdp: string, targetConnectionId: string): Promise<void> {
-    console.log(`[SignalR] Sending SDP answer to ${targetConnectionId} (${sdp.length} chars)`);
+    console.log(
+      `[SignalR] Sending SDP answer to ${targetConnectionId} (${sdp.length} chars)`,
+    );
     await this.connection?.invoke(
       "SendAnswer",
       this.attemptId,
@@ -210,7 +313,9 @@ export class ProctorSignaling {
     candidate: string,
     targetConnectionId?: string,
   ): Promise<void> {
-    console.log(`[SignalR] Sending ICE candidate (target=${targetConnectionId ?? 'broadcast'})`);
+    console.log(
+      `[SignalR] Sending ICE candidate (target=${targetConnectionId ?? "broadcast"})`,
+    );
     await this.connection?.invoke(
       "SendIceCandidate",
       this.attemptId,
@@ -220,7 +325,9 @@ export class ProctorSignaling {
   }
 
   async requestRenegotiation(): Promise<void> {
-    console.log(`[SignalR] Requesting renegotiation for attempt ${this.attemptId}`);
+    console.log(
+      `[SignalR] Requesting renegotiation for attempt ${this.attemptId}`,
+    );
     await this.connection?.invoke("RequestRenegotiation", this.attemptId);
     console.log(`[SignalR] ✅ Renegotiation requested`);
   }
@@ -233,6 +340,38 @@ export class ProctorSignaling {
       this.attemptId,
       status,
     );
+  }
+
+  async notifyExamSubmitted(): Promise<void> {
+    console.log(
+      `[SignalR] Notifying exam submitted for attempt ${this.attemptId}`,
+    );
+    await this.connection?.invoke("NotifyExamSubmitted", this.attemptId);
+    console.log(`[SignalR] \u2705 Exam submitted notification sent`);
+  }
+
+  async sendWarningToCandidate(message: string): Promise<void> {
+    console.log(
+      `[SignalR] Sending warning to candidate for attempt ${this.attemptId}`,
+    );
+    await this.connection?.invoke(
+      "SendWarningToCandidate",
+      this.attemptId,
+      message,
+    );
+    console.log(`[SignalR] \u2705 Warning sent to candidate`);
+  }
+
+  async sendTerminationToCandidate(reason: string): Promise<void> {
+    console.log(
+      `[SignalR] Sending termination to candidate for attempt ${this.attemptId}`,
+    );
+    await this.connection?.invoke(
+      "SendTerminationToCandidate",
+      this.attemptId,
+      reason,
+    );
+    console.log(`[SignalR] \u2705 Termination sent to candidate`);
   }
 
   async disconnect(): Promise<void> {

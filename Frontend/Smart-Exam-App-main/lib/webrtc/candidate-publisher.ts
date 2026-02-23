@@ -18,6 +18,21 @@ export type PublisherStatus =
 
 export interface CandidatePublisherCallbacks {
   onStatusChange?: (status: PublisherStatus) => void;
+  onWarningReceived?: (message: string) => void;
+  onSignalRStatusChange?: (connected: boolean) => void;
+  onTerminationReceived?: (reason: string) => void;
+  onTimeExtended?: (event: {
+    attemptId: number;
+    extraMinutes: number;
+    newRemainingSeconds: number;
+    message: string;
+  }) => void;
+  onAttemptExpired?: (event: {
+    attemptId: number;
+    eventType: string;
+    reason: string;
+    message: string;
+  }) => void;
 }
 
 export class CandidatePublisher {
@@ -32,6 +47,11 @@ export class CandidatePublisher {
   private maxReconnectAttempts = 5;
   private proctorConnectionId: string | null = null;
 
+  /** Expose signaling for sending notifications (e.g. exam submitted) */
+  get signalingConnection(): ProctorSignaling | null {
+    return this.signaling;
+  }
+
   constructor(attemptId: number, callbacks: CandidatePublisherCallbacks = {}) {
     this.attemptId = attemptId;
     this.callbacks = callbacks;
@@ -44,15 +64,18 @@ export class CandidatePublisher {
   async start(existingStream?: MediaStream): Promise<void> {
     if (this.disposed) return;
 
-    console.log(`%c[WebRTC Publisher] Starting for attempt ${this.attemptId}`, 'color: #9c27b0; font-weight: bold');
+    console.log(
+      `%c[WebRTC Publisher] Starting for attempt ${this.attemptId}`,
+      "color: #9c27b0; font-weight: bold",
+    );
     this.setStatus("connecting");
 
     try {
       // Load STUN config from server
       const config = await getVideoConfig();
-      console.log('[WebRTC Publisher] Video config:', JSON.stringify(config));
+      console.log("[WebRTC Publisher] Video config:", JSON.stringify(config));
       _rtcConfig = buildRtcConfig(config);
-      console.log('[WebRTC Publisher] RTC config:', JSON.stringify(_rtcConfig));
+      console.log("[WebRTC Publisher] RTC config:", JSON.stringify(_rtcConfig));
 
       // Reuse existing webcam stream or create new one
       if (existingStream) {
@@ -67,9 +90,15 @@ export class CandidatePublisher {
       // Create signaling connection
       this.signaling = new ProctorSignaling(this.attemptId, "candidate", {
         onPeerJoined: async (event) => {
-          console.log(`%c[WebRTC Publisher] PeerJoined event: role=${event.role}, connId=${event.connectionId}`, 'color: #ff9800; font-weight: bold');
+          console.log(
+            `%c[WebRTC Publisher] PeerJoined event: role=${event.role}, connId=${event.connectionId}`,
+            "color: #ff9800; font-weight: bold",
+          );
           if (event.role === "proctor") {
-            console.log(`%c[WebRTC Publisher] ✅ Proctor joined! Creating offer...`, 'color: #4caf50; font-weight: bold');
+            console.log(
+              `%c[WebRTC Publisher] ✅ Proctor joined! Creating offer...`,
+              "color: #4caf50; font-weight: bold",
+            );
             this.proctorConnectionId = event.connectionId;
             await this.createAndSendOffer();
           }
@@ -85,9 +114,14 @@ export class CandidatePublisher {
               await this.pc.setRemoteDescription(
                 new RTCSessionDescription({ type: "answer", sdp: event.sdp }),
               );
-              console.log(`%c[WebRTC Publisher] \u2705 Remote answer set successfully`, 'color: #4caf50; font-weight: bold');
+              console.log(
+                `%c[WebRTC Publisher] \u2705 Remote answer set successfully`,
+                "color: #4caf50; font-weight: bold",
+              );
             } else {
-              console.warn(`[WebRTC Publisher] Cannot set answer: pc=${!!this.pc}, remoteDesc already set=${!!this.pc?.remoteDescription}`);
+              console.warn(
+                `[WebRTC Publisher] Cannot set answer: pc=${!!this.pc}, remoteDesc already set=${!!this.pc?.remoteDescription}`,
+              );
             }
           } catch (error) {
             console.error(
@@ -103,7 +137,9 @@ export class CandidatePublisher {
               await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
               console.log(`[WebRTC Publisher] Remote ICE candidate added`);
             } else {
-              console.warn(`[WebRTC Publisher] Cannot add ICE: pc=${!!this.pc}, hasRemoteDesc=${!!this.pc?.remoteDescription}`);
+              console.warn(
+                `[WebRTC Publisher] Cannot add ICE: pc=${!!this.pc}, hasRemoteDesc=${!!this.pc?.remoteDescription}`,
+              );
             }
           } catch (error) {
             console.error(
@@ -113,21 +149,55 @@ export class CandidatePublisher {
           }
         },
         onRenegotiationRequested: async () => {
-          console.log(`%c[WebRTC Publisher] ⚡ Renegotiation requested by proctor, creating offer...`, 'color: #ff9800; font-weight: bold');
+          console.log(
+            `%c[WebRTC Publisher] ⚡ Renegotiation requested by proctor, creating offer...`,
+            "color: #ff9800; font-weight: bold",
+          );
           await this.createAndSendOffer();
+        },
+        onWarningReceived: (event) => {
+          console.log(
+            `%c[WebRTC Publisher] \u26a0\ufe0f Warning received from proctor: "${event.message}"`,
+            "color: #ff9800; font-weight: bold",
+          );
+          this.callbacks.onWarningReceived?.(event.message);
+        },
+        onTerminationReceived: (event) => {
+          console.log(
+            `%c[WebRTC Publisher] \u274c Termination received from proctor: "${event.reason}"`,
+            "color: #f44336; font-weight: bold",
+          );
+          this.callbacks.onTerminationReceived?.(event.reason);
+        },
+        onTimeExtended: (event) => {
+          console.log(
+            `%c[WebRTC Publisher] \u23f0 Time extended: +${event.extraMinutes}min`,
+            "color: #4caf50; font-weight: bold",
+          );
+          this.callbacks.onTimeExtended?.(event);
+        },
+        onAttemptExpired: (event) => {
+          console.log(
+            `%c[WebRTC Publisher] \u274c AttemptExpired: type=${event.eventType}, reason=${event.reason}`,
+            "color: #f44336; font-weight: bold",
+          );
+          this.callbacks.onAttemptExpired?.(event);
         },
         onReconnecting: () => {
           this.setStatus("reconnecting");
+          this.callbacks.onSignalRStatusChange?.(false);
         },
         onReconnected: async () => {
           console.log(
             "[WebRTC Publisher] SignalR reconnected, resending offer...",
           );
+          this.callbacks.onSignalRStatusChange?.(true);
           // Recreate peer connection with fresh ICE
           await this.resetPeerConnection();
         },
         onDisconnected: () => {
           if (!this.disposed) {
+            this.callbacks.onSignalRStatusChange?.(false);
             this.setStatus("reconnecting");
             this.attemptReconnect();
           }
@@ -135,12 +205,18 @@ export class CandidatePublisher {
       });
 
       await this.signaling.connect();
-      console.log('[WebRTC Publisher] SignalR connected, creating PeerConnection...');
+      this.callbacks.onSignalRStatusChange?.(true);
+      console.log(
+        "[WebRTC Publisher] SignalR connected, creating PeerConnection...",
+      );
       this.createPeerConnection();
       this.reconnectAttempts = 0;
 
       // Don't set "live" yet — wait for ICE connected state
-      console.log(`%c[WebRTC Publisher] ✅ Ready, waiting for proctor to join room attempt_${this.attemptId}...`, 'color: #4caf50; font-weight: bold');
+      console.log(
+        `%c[WebRTC Publisher] ✅ Ready, waiting for proctor to join room attempt_${this.attemptId}...`,
+        "color: #4caf50; font-weight: bold",
+      );
     } catch (error) {
       console.error("[WebRTC Publisher] Start failed:", error);
       this.setStatus("failed");
@@ -148,28 +224,32 @@ export class CandidatePublisher {
   }
 
   private createPeerConnection(): void {
-    console.log('[WebRTC Publisher] Creating RTCPeerConnection...');
+    console.log("[WebRTC Publisher] Creating RTCPeerConnection...");
     if (this.pc) {
       this.pc.close();
     }
 
     this.pc = new RTCPeerConnection(_rtcConfig);
-    console.log('[WebRTC Publisher] RTCPeerConnection created');
+    console.log("[WebRTC Publisher] RTCPeerConnection created");
 
     // Add tracks from stream
     if (this.stream) {
       for (const track of this.stream.getTracks()) {
         this.pc.addTrack(track, this.stream);
-        console.log(`[WebRTC Publisher] Added track: kind=${track.kind}, id=${track.id}, enabled=${track.enabled}`);
+        console.log(
+          `[WebRTC Publisher] Added track: kind=${track.kind}, id=${track.id}, enabled=${track.enabled}`,
+        );
       }
     } else {
-      console.warn('[WebRTC Publisher] No stream to add tracks from!');
+      console.warn("[WebRTC Publisher] No stream to add tracks from!");
     }
 
     // ICE candidate handling
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log(`[WebRTC Publisher] Local ICE candidate: ${event.candidate.candidate.substring(0, 60)}...`);
+        console.log(
+          `[WebRTC Publisher] Local ICE candidate: ${event.candidate.candidate.substring(0, 60)}...`,
+        );
         this.signaling
           ?.sendIceCandidate(
             JSON.stringify(event.candidate.toJSON()),
@@ -183,20 +263,31 @@ export class CandidatePublisher {
 
     // Connection state monitoring
     this.pc.onicegatheringstatechange = () => {
-      console.log(`[WebRTC Publisher] ICE gathering state: ${this.pc?.iceGatheringState}`);
+      console.log(
+        `[WebRTC Publisher] ICE gathering state: ${this.pc?.iceGatheringState}`,
+      );
     };
 
     this.pc.oniceconnectionstatechange = () => {
-      console.log(`[WebRTC Publisher] ICE connection state: ${this.pc?.iceConnectionState}`);
+      console.log(
+        `[WebRTC Publisher] ICE connection state: ${this.pc?.iceConnectionState}`,
+      );
     };
 
     this.pc.onsignalingstatechange = () => {
-      console.log(`[WebRTC Publisher] Signaling state: ${this.pc?.signalingState}`);
+      console.log(
+        `[WebRTC Publisher] Signaling state: ${this.pc?.signalingState}`,
+      );
     };
 
     this.pc.onconnectionstatechange = () => {
       const state = this.pc?.connectionState;
-      console.log(`%c[WebRTC Publisher] Connection state: ${state}`, state === 'connected' ? 'color: #4caf50; font-weight: bold' : 'color: #ff5722; font-weight: bold');
+      console.log(
+        `%c[WebRTC Publisher] Connection state: ${state}`,
+        state === "connected"
+          ? "color: #4caf50; font-weight: bold"
+          : "color: #ff5722; font-weight: bold",
+      );
       switch (state) {
         case "connected":
           this.setStatus("live");
@@ -236,20 +327,36 @@ export class CandidatePublisher {
 
   private async createAndSendOffer(): Promise<void> {
     if (!this.pc || !this.signaling) {
-      console.error('[WebRTC Publisher] Cannot create offer: pc=', !!this.pc, 'signaling=', !!this.signaling);
+      console.error(
+        "[WebRTC Publisher] Cannot create offer: pc=",
+        !!this.pc,
+        "signaling=",
+        !!this.signaling,
+      );
       return;
     }
 
     try {
-      console.log('[WebRTC Publisher] Creating SDP offer...');
+      console.log("[WebRTC Publisher] Creating SDP offer...");
       const offer = await this.pc.createOffer();
-      console.log(`[WebRTC Publisher] Offer created (${offer.sdp?.length} chars), setting local description...`);
+      console.log(
+        `[WebRTC Publisher] Offer created (${offer.sdp?.length} chars), setting local description...`,
+      );
       await this.pc.setLocalDescription(offer);
-      console.log('[WebRTC Publisher] Local description set, sending offer via SignalR...');
+      console.log(
+        "[WebRTC Publisher] Local description set, sending offer via SignalR...",
+      );
       await this.signaling.sendOffer(offer.sdp!);
-      console.log(`%c[WebRTC Publisher] \u2705 Offer sent successfully`, 'color: #4caf50; font-weight: bold');
+      console.log(
+        `%c[WebRTC Publisher] \u2705 Offer sent successfully`,
+        "color: #4caf50; font-weight: bold",
+      );
     } catch (error) {
-      console.error("%c[WebRTC Publisher] \u274c Error creating/sending offer:", 'color: red; font-weight: bold', error);
+      console.error(
+        "%c[WebRTC Publisher] \u274c Error creating/sending offer:",
+        "color: red; font-weight: bold",
+        error,
+      );
     }
   }
 
@@ -323,6 +430,7 @@ export class CandidatePublisher {
 
   async stop(): Promise<void> {
     this.disposed = true;
+    this.callbacks.onSignalRStatusChange?.(false);
 
     if (this.pc) {
       this.pc.close();

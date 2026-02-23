@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, type AttemptEventDto } from "@/lib/api/proctoring"
+import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
 import { getVideoConfig } from "@/lib/webrtc/video-config"
@@ -12,8 +13,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -36,6 +39,10 @@ import {
   Activity,
   Video,
   Play,
+  Clock,
+  Plus,
+  Shield,
+  FileText,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -58,31 +65,70 @@ export default function SessionDetailPage() {
   const [terminateReason, setTerminateReason] = useState("")
   const [previewImage, setPreviewImage] = useState<{ url: string; timestamp: string } | null>(null)
 
+  // Events log state
+  const [events, setEvents] = useState<AttemptEventDto[]>([])
+  const [eventsFilter, setEventsFilter] = useState<"all" | "violations">("violations")
+
+  // Add Time dialog state
+  const [addTimeDialogOpen, setAddTimeDialogOpen] = useState(false)
+  const [addTimeMinutes, setAddTimeMinutes] = useState(10)
+  const [addTimeReason, setAddTimeReason] = useState("")
+  const [addTimeLoading, setAddTimeLoading] = useState(false)
+
   // WebRTC live video state
   const videoRef = useRef<HTMLVideoElement>(null)
   const viewerRef = useRef<ProctorViewer | null>(null)
+  const sessionPollRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("offline")
   const [hasRemoteStream, setHasRemoteStream] = useState(false)
+  const [signalRConnected, setSignalRConnected] = useState(false)
 
   useEffect(() => {
     loadSession()
   }, [sessionId])
 
-  // Poll for updated session data + screenshots every 15s while session is active
-  // Uses lightweight refreshSessionData (skips getIncidents to avoid 403 noise)
+  // ── Smart Polling: poll session data ONLY when SignalR is disconnected ──
+  // When SignalR is connected, updates arrive via push events (ExamSubmitted, etc.).
+  // When SignalR disconnects, start 15s fallback polling.
+  // On reconnect, do one sync fetch then stop polling again.
   useEffect(() => {
     if (!session || session.status !== "Active") return
-    const interval = setInterval(async () => {
-      try {
-        const data = await refreshSessionData(sessionId)
+
+    if (signalRConnected) {
+      // SignalR is healthy — stop polling, do one sync fetch
+      if (sessionPollRef.current) {
+        console.log("[SmartPoll] SignalR connected — stopping session fallback polling")
+        clearInterval(sessionPollRef.current)
+        sessionPollRef.current = undefined
+      }
+      // One-time sync fetch on reconnect
+      refreshSessionData(sessionId).then((data) => {
         setSession(data.session)
         setScreenshots(data.screenshots)
-      } catch {
-        // silent — don't redirect on poll failure
+      }).catch(() => {})
+    } else {
+      // SignalR is disconnected — start 15s fallback polling
+      if (!sessionPollRef.current) {
+        console.log("[SmartPoll] SignalR disconnected — starting 15s session fallback polling")
+        sessionPollRef.current = setInterval(async () => {
+          try {
+            const data = await refreshSessionData(sessionId)
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          } catch {
+            // silent — don't redirect on poll failure
+          }
+        }, 15_000)
       }
-    }, 15_000)
-    return () => clearInterval(interval)
-  }, [sessionId, session?.status])
+    }
+
+    return () => {
+      if (sessionPollRef.current) {
+        clearInterval(sessionPollRef.current)
+        sessionPollRef.current = undefined
+      }
+    }
+  }, [sessionId, session?.status, signalRConnected])
 
   // WebRTC live video: connect viewer when session is active and live video is enabled
   useEffect(() => {
@@ -113,6 +159,40 @@ export default function SessionDetailPage() {
             videoRef.current.play().catch(() => {})
           }
         },
+        onExamSubmitted: (attemptId) => {
+          toast.info(`Candidate has submitted the exam (Attempt #${attemptId})`, {
+            duration: 10000,
+            icon: "\u2705",
+          })
+          // Refresh session data to reflect updated status
+          refreshSessionData(sessionId).then((data) => {
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          }).catch(() => {})
+        },
+        onSignalRStatusChange: (connected) => {
+          console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)
+          setSignalRConnected(connected)
+        },
+        onViolationEventReceived: (event) => {
+          // Real-time violation event from candidate — prepend to events log
+          const newEvent: AttemptEventDto = {
+            id: event.id,
+            attemptId: event.attemptId,
+            eventType: event.eventTypeId,
+            eventTypeName: event.eventType,
+            metadataJson: event.metadataJson,
+            occurredAt: event.occurredAt,
+          }
+          setEvents((prev) => [newEvent, ...prev])
+          // Show toast for critical events
+          if (event.severity === "Critical" || event.severity === "High") {
+            toast.warning(`Violation: ${event.eventType}`, {
+              description: `Severity: ${event.severity}`,
+              duration: 5000,
+            })
+          }
+        },
       })
 
       viewerRef.current = viewer
@@ -137,6 +217,11 @@ export default function SessionDetailPage() {
       setSession(data.session)
       setIncidents(data.incidents)
       setScreenshots(data.screenshots)
+      // Load attempt events for events log
+      if (data.session?.attemptId) {
+        const attemptEvents = await getAttemptEvents(data.session.attemptId)
+        setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
+      }
     } catch (error) {
       toast.error("Failed to load session")
       router.push("/proctor-center")
@@ -174,6 +259,12 @@ export default function SessionDetailPage() {
     if (!session || !warningMessage.trim()) return
     try {
       await sendWarning(session.id, warningMessage)
+      // Also send instantly via SignalR (best-effort, won't fail the operation)
+      try {
+        await viewerRef.current?.signalingConnection?.sendWarningToCandidate(warningMessage)
+      } catch (e) {
+        console.warn("[ProctorPage] SignalR instant warning failed (non-fatal):", e)
+      }
       toast.success(t("proctor.warningSent"))
       setWarningDialogOpen(false)
       setWarningMessage("")
@@ -186,10 +277,49 @@ export default function SessionDetailPage() {
     if (!session || !terminateReason.trim()) return
     try {
       await terminateSession(session.id, terminateReason)
+      // Also notify candidate instantly via SignalR (best-effort)
+      try {
+        await viewerRef.current?.signalingConnection?.sendTerminationToCandidate(terminateReason)
+      } catch (e) {
+        console.warn("[ProctorPage] SignalR termination notification failed (non-fatal):", e)
+      }
       toast.success(t("proctor.sessionTerminated"))
       router.push("/proctor-center")
     } catch (error) {
       toast.error("Failed to terminate session")
+    }
+  }
+
+  async function handleAddTime() {
+    if (!session?.attemptId || addTimeMinutes <= 0) return
+    try {
+      setAddTimeLoading(true)
+      await addTimeToAttempt({
+        attemptId: session.attemptId,
+        extraMinutes: addTimeMinutes,
+        reason: addTimeReason || undefined,
+      })
+      toast.success(`${addTimeMinutes} minutes added successfully`)
+      setAddTimeDialogOpen(false)
+      setAddTimeMinutes(10)
+      setAddTimeReason("")
+      // Refresh session data to show updated time
+      loadSession()
+    } catch (error) {
+      toast.error("Failed to add time")
+    } finally {
+      setAddTimeLoading(false)
+    }
+  }
+
+  async function handleCreateIncident() {
+    if (!session) return
+    try {
+      const result = await createIncidentFromProctor(parseInt(session.id))
+      toast.success(`Incident ${result.caseNumber} created`)
+      router.push(`/proctor-center/incidents/${result.id}`)
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create incident")
     }
   }
 
@@ -252,6 +382,16 @@ export default function SessionDetailPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          {session.status === "Active" && (
+            <Button variant="outline" onClick={() => setAddTimeDialogOpen(true)}>
+              <Clock className="h-4 w-4 me-2" />
+              Add Time
+            </Button>
+          )}
+          <Button variant="outline" onClick={handleCreateIncident}>
+            <AlertTriangle className="h-4 w-4 me-2" />
+            Create Incident
+          </Button>
           <Button variant="outline" onClick={handleToggleFlag}>
             <Flag className="h-4 w-4 me-2" />
             {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
@@ -405,6 +545,92 @@ export default function SessionDetailPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Events Log */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Events Log
+                  {events.filter(e => isViolationEvent(e.eventType)).length > 0 && (
+                    <Badge variant="destructive" className="ms-1">
+                      {events.filter(e => isViolationEvent(e.eventType)).length} violations
+                    </Badge>
+                  )}
+                </CardTitle>
+                <Select value={eventsFilter} onValueChange={(v) => setEventsFilter(v as "all" | "violations")}>
+                  <SelectTrigger className="w-[140px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="violations">Violations Only</SelectItem>
+                    <SelectItem value="all">All Events</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <CardDescription>Real-time activity from candidate's exam session</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const filteredEvents = eventsFilter === "violations"
+                  ? events.filter(e => isViolationEvent(e.eventType))
+                  : events
+                if (filteredEvents.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      <Shield className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                      {eventsFilter === "violations" ? "No violations detected" : "No events recorded yet"}
+                    </div>
+                  )
+                }
+                return (
+                  <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+                    {filteredEvents.map((event) => {
+                      const severity = getEventSeverity(event.eventType)
+                      const isViolation = isViolationEvent(event.eventType)
+                      return (
+                        <div
+                          key={event.id}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm border ${
+                            severity === "Critical" ? "bg-destructive/5 border-destructive/20" :
+                            severity === "High" ? "bg-orange-500/5 border-orange-500/20" :
+                            severity === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
+                            isViolation ? "bg-blue-500/5 border-blue-500/20" :
+                            "bg-muted/30 border-transparent"
+                          }`}
+                        >
+                          <div className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                            severity === "Critical" ? "bg-destructive" :
+                            severity === "High" ? "bg-orange-500" :
+                            severity === "Medium" ? "bg-amber-500" :
+                            isViolation ? "bg-blue-500" :
+                            "bg-muted-foreground"
+                          }`} />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium">{event.eventTypeName || getEventTypeName(event.eventType)}</span>
+                          </div>
+                          {isViolation && (
+                            <Badge variant="outline" className={`text-xs flex-shrink-0 ${
+                              severity === "Critical" ? "border-destructive/50 text-destructive" :
+                              severity === "High" ? "border-orange-500/50 text-orange-600" :
+                              severity === "Medium" ? "border-amber-500/50 text-amber-600" :
+                              "border-blue-500/50 text-blue-600"
+                            }`}>
+                              {severity}
+                            </Badge>
+                          )}
+                          <span className="text-xs text-muted-foreground flex-shrink-0 tabular-nums">
+                            {new Date(event.occurredAt).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </CardContent>
           </Card>
         </div>
@@ -607,6 +833,64 @@ export default function SessionDetailPage() {
             <Button variant="destructive" onClick={handleTerminate} disabled={!terminateReason.trim()}>
               <XCircle className="h-4 w-4 me-2" />
               {t("proctor.terminate")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Time Dialog */}
+      <Dialog open={addTimeDialogOpen} onOpenChange={setAddTimeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Add Time to Exam
+            </DialogTitle>
+            <DialogDescription>
+              Extend exam time for {session.candidateName}. The candidate will be notified instantly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Minutes to Add</Label>
+              <div className="flex gap-2">
+                {[5, 10, 15, 30].map((mins) => (
+                  <Button
+                    key={mins}
+                    variant={addTimeMinutes === mins ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAddTimeMinutes(mins)}
+                  >
+                    {mins} min
+                  </Button>
+                ))}
+                <Input
+                  type="number"
+                  min={1}
+                  max={480}
+                  value={addTimeMinutes}
+                  onChange={(e) => setAddTimeMinutes(Math.max(1, Math.min(480, parseInt(e.target.value) || 1)))}
+                  className="w-20"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Reason (optional)</Label>
+              <Textarea
+                value={addTimeReason}
+                onChange={(e) => setAddTimeReason(e.target.value)}
+                placeholder="e.g. Technical issue, accommodation request..."
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddTimeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddTime} disabled={addTimeLoading || addTimeMinutes <= 0}>
+              <Plus className="h-4 w-4 me-2" />
+              {addTimeLoading ? "Adding..." : `Add ${addTimeMinutes} Minutes`}
             </Button>
           </DialogFooter>
         </DialogContent>

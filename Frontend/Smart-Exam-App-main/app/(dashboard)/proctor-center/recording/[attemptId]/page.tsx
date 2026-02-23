@@ -61,6 +61,15 @@ export default function AttemptVideoPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null)
+  const [videoStreamUrl, setVideoStreamUrl] = useState<string>("")
+
+  useEffect(() => {
+    // Build video stream URL with token for <video> tag authorization
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
+    if (token && attemptId) {
+      setVideoStreamUrl(`/api/video-stream/${attemptId}?token=${encodeURIComponent(token)}`)
+    }
+  }, [attemptId])
 
   useEffect(() => {
     async function loadRecording() {
@@ -175,7 +184,7 @@ export default function AttemptVideoPage() {
                 <div className="aspect-video bg-black rounded-lg overflow-hidden">
                   <video
                     ref={videoRef}
-                    src={`/api/proxy/Proctor/video-stream/${attemptId}`}
+                    src={videoStreamUrl || undefined}
                     controls
                     playsInline
                     className="w-full h-full"

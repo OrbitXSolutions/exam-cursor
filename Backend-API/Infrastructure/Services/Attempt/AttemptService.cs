@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Attempt;
 using Smart_Core.Application.DTOs.Common;
@@ -7,16 +8,32 @@ using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Hubs;
 
 namespace Smart_Core.Infrastructure.Services.Attempt;
 
 public class AttemptService : IAttemptService
 {
   private readonly ApplicationDbContext _context;
+  private readonly IHubContext<ProctorHub> _proctorHub;
 
-  public AttemptService(ApplicationDbContext context)
+  // Violation event types that should be pushed to proctor in real time
+  private static readonly HashSet<AttemptEventType> ViolationEventTypes = new()
+  {
+    AttemptEventType.TabSwitched,
+    AttemptEventType.FullscreenExited,
+    AttemptEventType.CopyAttempt,
+    AttemptEventType.PasteAttempt,
+    AttemptEventType.RightClickAttempt,
+    AttemptEventType.WindowBlur,
+    AttemptEventType.WebcamDenied,
+    AttemptEventType.SnapshotFailed,
+  };
+
+  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub)
   {
     _context = context;
+    _proctorHub = proctorHub;
   }
 
   #region Attempt Lifecycle
@@ -93,7 +110,7 @@ public class AttemptService : IAttemptService
 .FirstOrDefaultAsync(a =>
   a.ExamId == dto.ExamId &&
  a.CandidateId == candidateId &&
-(a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress));
+(a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
 
     if (existingActiveAttempt != null)
     {
@@ -101,6 +118,7 @@ public class AttemptService : IAttemptService
       if (existingActiveAttempt.ExpiresAt.HasValue && now > existingActiveAttempt.ExpiresAt.Value)
       {
         existingActiveAttempt.Status = AttemptStatus.Expired;
+        existingActiveAttempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
         await _context.SaveChangesAsync();
         // Continue to create new attempt if allowed
       }
@@ -253,6 +271,7 @@ public class AttemptService : IAttemptService
 (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
     {
       attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       // Close proctor session on expiry
       var proctorSession = await _context.Set<ProctorSession>()
           .FirstOrDefaultAsync(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active);
@@ -311,6 +330,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
     {
       attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       await _context.SaveChangesAsync();
       return ApiResponse<AttemptSubmittedDto>.FailureResponse(
       "Attempt has expired. Your answers have been saved but late submission is not allowed.");
@@ -388,6 +408,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
           (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
     {
       attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       // Close proctor session on expiry
       var proctorSession = await _context.Set<ProctorSession>()
           .FirstOrDefaultAsync(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active);
@@ -417,7 +438,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
     var overdueAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
 .Where(a =>
- (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress) &&
+ (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed) &&
         a.ExpiresAt.HasValue &&
    a.ExpiresAt.Value < now)
      .ToListAsync();
@@ -429,12 +450,24 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       attempt.Status = AttemptStatus.Expired;
       attempt.UpdatedDate = now;
 
+      // Determine expiry reason based on heartbeat gap
+      // If LastActivityAt is within 5 minutes of ExpiresAt, candidate was likely active
+      var disconnectedThreshold = attempt.ExpiresAt!.Value.AddMinutes(-5);
+      if (attempt.LastActivityAt.HasValue && attempt.LastActivityAt.Value >= disconnectedThreshold)
+      {
+        attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+      }
+      else
+      {
+        attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileDisconnected;
+      }
+
       var expiredEvent = new AttemptEvent
       {
         AttemptId = attempt.Id,
         EventType = AttemptEventType.TimedOut,
         OccurredAt = now,
-        MetadataJson = JsonSerializer.Serialize(new { expiredAt = attempt.ExpiresAt }),
+        MetadataJson = JsonSerializer.Serialize(new { expiredAt = attempt.ExpiresAt, expiryReason = attempt.ExpiryReason.ToString() }),
         CreatedDate = now,
         CreatedBy = "system"
       };
@@ -487,7 +520,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     var now = DateTime.UtcNow;
 
     // Validate attempt status
-    if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress)
+    if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
     {
       return ApiResponse<AnswerSavedDto>.FailureResponse(
           $"Cannot save answers. Attempt is {attempt.Status}.");
@@ -497,6 +530,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
     {
       attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       await _context.SaveChangesAsync();
       return ApiResponse<AnswerSavedDto>.FailureResponse("Attempt has expired. Cannot save answers.");
     }
@@ -677,8 +711,44 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     _context.Set<AttemptEvent>().Add(attemptEvent);
     await _context.SaveChangesAsync();
 
+    // Push violation events to proctor in real time via SignalR
+    if (ViolationEventTypes.Contains(dto.EventType))
+    {
+      _ = Task.Run(async () =>
+      {
+        try
+        {
+          var group = $"attempt_{attemptId}";
+          await _proctorHub.Clients.Group(group).SendAsync("ViolationEventReceived", new
+          {
+            id = attemptEvent.Id,
+            attemptId,
+            eventType = dto.EventType.ToString(),
+            eventTypeId = (int)dto.EventType,
+            metadataJson = dto.MetadataJson,
+            occurredAt = now.ToString("o"),
+            severity = GetViolationSeverity(dto.EventType),
+          });
+        }
+        catch { /* fire-and-forget — never block the candidate */ }
+      });
+    }
+
     return ApiResponse<bool>.SuccessResponse(true, "Event logged");
   }
+
+  private static string GetViolationSeverity(AttemptEventType eventType) => eventType switch
+  {
+    AttemptEventType.TabSwitched => "High",
+    AttemptEventType.FullscreenExited => "High",
+    AttemptEventType.CopyAttempt => "Medium",
+    AttemptEventType.PasteAttempt => "Medium",
+    AttemptEventType.RightClickAttempt => "Low",
+    AttemptEventType.WindowBlur => "Medium",
+    AttemptEventType.WebcamDenied => "Critical",
+    AttemptEventType.SnapshotFailed => "Medium",
+    _ => "Low",
+  };
 
   public async Task<ApiResponse<List<AttemptEventDto>>> GetAttemptEventsAsync(int attemptId)
   {
@@ -827,6 +897,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       SubmittedAt = attempt.SubmittedAt,
       ExpiresAt = attempt.ExpiresAt,
       Status = attempt.Status,
+      ExpiryReason = attempt.ExpiryReason,
+      ResumedFromAttemptId = attempt.ResumedFromAttemptId,
       AttemptNumber = attempt.AttemptNumber,
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed,
@@ -1261,6 +1333,8 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       SubmittedAt = attempt.SubmittedAt,
       ExpiresAt = attempt.ExpiresAt,
       Status = attempt.Status,
+      ExpiryReason = attempt.ExpiryReason,
+      ResumedFromAttemptId = attempt.ResumedFromAttemptId,
       AttemptNumber = attempt.AttemptNumber,
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed,
@@ -1286,6 +1360,8 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       StartedAt = attempt.StartedAt,
       SubmittedAt = attempt.SubmittedAt,
       Status = attempt.Status,
+      ExpiryReason = attempt.ExpiryReason,
+      ResumedFromAttemptId = attempt.ResumedFromAttemptId,
       AttemptNumber = attempt.AttemptNumber,
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed

@@ -1,20 +1,28 @@
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.AttemptControl;
+using Smart_Core.Application.DTOs.Audit;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces.AttemptControl;
+using Smart_Core.Application.Interfaces.Audit;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Hubs;
 
 namespace Smart_Core.Infrastructure.Services.AttemptControl;
 
 public class AttemptControlService : IAttemptControlService
 {
     private readonly ApplicationDbContext _db;
+    private readonly IHubContext<ProctorHub> _proctorHub;
+    private readonly IAuditService _auditService;
 
-    public AttemptControlService(ApplicationDbContext db)
+    public AttemptControlService(ApplicationDbContext db, IHubContext<ProctorHub> proctorHub, IAuditService auditService)
     {
         _db = db;
+        _proctorHub = proctorHub;
+        _auditService = auditService;
     }
 
     // ── List active attempts with enriched flags ───────────────
@@ -26,7 +34,8 @@ public class AttemptControlService : IAttemptControlService
         {
             AttemptStatus.Started,
             AttemptStatus.InProgress,
-            AttemptStatus.Paused
+            AttemptStatus.Paused,
+            AttemptStatus.Resumed
         };
 
         var query = _db.Attempts
@@ -97,6 +106,8 @@ public class AttemptControlService : IAttemptControlService
                 a.ResumeCount,
                 a.IPAddress,
                 a.DeviceInfo,
+                a.ExpiryReason,
+                a.ResumedFromAttemptId,
                 ExamEndAt = a.Exam.EndAt,
             })
             .ToListAsync();
@@ -126,13 +137,15 @@ public class AttemptControlService : IAttemptControlService
                 ResumeCount = a.ResumeCount,
                 IPAddress = a.IPAddress,
                 DeviceInfo = a.DeviceInfo,
+                ExpiryReason = a.ExpiryReason != Domain.Enums.ExpiryReason.None ? a.ExpiryReason.ToString() : null,
+                ResumedFromAttemptId = a.ResumedFromAttemptId,
 
                 // Business rule flags
-                CanForceEnd = a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Paused,
+                CanForceEnd = a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Paused || a.Status == AttemptStatus.Resumed,
                 CanResume = a.Status == AttemptStatus.Paused
                             && remaining > 0
                             && (a.ExamEndAt == null || a.ExamEndAt > now),
-                CanAddTime = a.Status == AttemptStatus.InProgress,
+                CanAddTime = a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed,
             };
         }).ToList();
 
@@ -156,9 +169,9 @@ public class AttemptControlService : IAttemptControlService
         if (attempt == null)
             return ApiResponse<ForceEndResultDto>.FailureResponse("Attempt not found.");
 
-        if (attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Paused)
+        if (attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Paused && attempt.Status != AttemptStatus.Resumed)
             return ApiResponse<ForceEndResultDto>.FailureResponse(
-                $"Cannot force-end an attempt with status '{attempt.Status}'. Only InProgress or Paused attempts can be force-ended.");
+                $"Cannot force-end an attempt with status '{attempt.Status}'. Only InProgress, Paused, or Resumed attempts can be force-ended.");
 
         var now = DateTime.UtcNow;
 
@@ -197,6 +210,19 @@ public class AttemptControlService : IAttemptControlService
         }
 
         await _db.SaveChangesAsync();
+
+        // Audit log (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _auditService.LogSuccessAsync(
+                AuditActions.AttemptForceSubmitted, "Attempt", attempt.Id.ToString(),
+                actorId: adminUserId,
+                metadata: new { attemptId = attempt.Id, reason = dto.Reason });
+            }
+            catch { }
+        });
 
         return ApiResponse<ForceEndResultDto>.SuccessResponse(
             new ForceEndResultDto
@@ -283,9 +309,9 @@ public class AttemptControlService : IAttemptControlService
         if (attempt == null)
             return ApiResponse<AddTimeResultDto>.FailureResponse("Attempt not found.");
 
-        if (attempt.Status != AttemptStatus.InProgress)
+        if (attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
             return ApiResponse<AddTimeResultDto>.FailureResponse(
-                $"Cannot add time to an attempt with status '{attempt.Status}'. Only InProgress attempts can receive extra time.");
+                $"Cannot add time to an attempt with status '{attempt.Status}'. Only InProgress or Resumed attempts can receive extra time.");
 
         var now = DateTime.UtcNow;
         var extraSeconds = dto.ExtraMinutes * 60;
@@ -319,6 +345,36 @@ public class AttemptControlService : IAttemptControlService
         await _db.SaveChangesAsync();
 
         var remaining = CalculateRemainingSeconds(attempt.Status, attempt.ExpiresAt, attempt.SubmittedAt, now);
+
+        // Audit log (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _auditService.LogSuccessAsync(
+                "AttemptControl.AddTime", "Attempt", attempt.Id.ToString(),
+                actorId: adminUserId,
+                metadata: new { attemptId = attempt.Id, extraMinutes = dto.ExtraMinutes, reason = dto.Reason });
+            }
+            catch { }
+        });
+
+        // Push time extension to candidate via SignalR (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var group = $"attempt_{attempt.Id}";
+                await _proctorHub.Clients.Group(group).SendAsync("TimeExtended", new
+                {
+                    attemptId = attempt.Id,
+                    extraMinutes = dto.ExtraMinutes,
+                    newRemainingSeconds = remaining,
+                    message = $"Your exam time has been extended by {dto.ExtraMinutes} minute(s)."
+                });
+            }
+            catch { /* fire-and-forget */ }
+        });
 
         return ApiResponse<AddTimeResultDto>.SuccessResponse(
             new AddTimeResultDto

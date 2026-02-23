@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getIncidents, reviewIncident } from "@/lib/api/proctoring"
+import {
+  getIncidents,
+  reviewIncident,
+  createIncidentCase,
+  INCIDENT_SEVERITY_LABELS,
+  INCIDENT_STATUS_LABELS,
+  INCIDENT_OUTCOME_LABELS,
+} from "@/lib/api/proctoring"
 import type { Incident } from "@/lib/types/proctoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -25,7 +32,7 @@ import { DataTable, type Column } from "@/components/ui/data-table"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
-import { ArrowLeft, Search, AlertTriangle, CheckCircle2, Clock, Eye } from "lucide-react"
+import { ArrowLeft, Search, AlertTriangle, CheckCircle2, Clock, Eye, Plus, FileText } from "lucide-react"
 
 export default function IncidentsPage() {
   const { t, dir, locale } = useI18n()
@@ -39,6 +46,16 @@ export default function IncidentsPage() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [reviewAction, setReviewAction] = useState<"dismiss" | "flag" | "terminate">("dismiss")
   const [reviewNotes, setReviewNotes] = useState("")
+
+  // Create Incident state
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [createLoading, setCreateLoading] = useState(false)
+  const [newIncident, setNewIncident] = useState({
+    attemptId: "",
+    severity: "2",
+    titleEn: "",
+    summaryEn: "",
+  })
 
   useEffect(() => {
     loadIncidents()
@@ -67,6 +84,31 @@ export default function IncidentsPage() {
       loadIncidents()
     } catch (error) {
       toast.error("Failed to review incident")
+    }
+  }
+
+  async function handleCreateIncident() {
+    const attemptId = parseInt(newIncident.attemptId)
+    if (!attemptId || !newIncident.titleEn.trim()) {
+      toast.error("Attempt ID and title are required")
+      return
+    }
+    try {
+      setCreateLoading(true)
+      const result = await createIncidentCase({
+        attemptId,
+        severity: parseInt(newIncident.severity),
+        titleEn: newIncident.titleEn.trim(),
+        summaryEn: newIncident.summaryEn.trim() || undefined,
+      })
+      toast.success(`Incident ${result.caseNumber} created`)
+      setCreateDialogOpen(false)
+      setNewIncident({ attemptId: "", severity: "2", titleEn: "", summaryEn: "" })
+      loadIncidents()
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create incident")
+    } finally {
+      setCreateLoading(false)
     }
   }
 
@@ -172,10 +214,15 @@ export default function IncidentsPage() {
     {
       key: "actions",
       header: "",
-      className: "w-24",
+      className: "w-32",
       render: (inc) => (
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild title="View Details">
+            <Link href={`/proctor-center/incidents/${inc.id}`}>
+              <FileText className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild title="View Session">
             <Link href={`/proctor-center/${inc.sessionId}`}>
               <Eye className="h-4 w-4" />
             </Link>
@@ -207,16 +254,22 @@ export default function IncidentsPage() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/proctor-center">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{t("proctor.allIncidents")}</h1>
-          <p className="text-muted-foreground mt-1">{t("proctor.allIncidentsDesc")}</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/proctor-center">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{t("proctor.allIncidents")}</h1>
+            <p className="text-muted-foreground mt-1">{t("proctor.allIncidentsDesc")}</p>
+          </div>
         </div>
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <Plus className="h-4 w-4 me-2" />
+          Create Incident
+        </Button>
       </div>
 
       <Card>
@@ -319,6 +372,72 @@ export default function IncidentsPage() {
               {t("common.cancel")}
             </Button>
             <Button onClick={handleReviewIncident}>{t("proctor.submitReview")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Incident Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create Incident Case</DialogTitle>
+            <DialogDescription>
+              Manually create an incident case for investigation
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Attempt ID *</Label>
+              <Input
+                type="number"
+                placeholder="Enter attempt ID"
+                value={newIncident.attemptId}
+                onChange={(e) => setNewIncident(prev => ({ ...prev, attemptId: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Severity *</Label>
+              <Select
+                value={newIncident.severity}
+                onValueChange={(v) => setNewIncident(prev => ({ ...prev, severity: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Low</SelectItem>
+                  <SelectItem value="2">Medium</SelectItem>
+                  <SelectItem value="3">High</SelectItem>
+                  <SelectItem value="4">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Title *</Label>
+              <Input
+                placeholder="Brief incident title"
+                value={newIncident.titleEn}
+                onChange={(e) => setNewIncident(prev => ({ ...prev, titleEn: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Summary</Label>
+              <Textarea
+                placeholder="Describe what happened..."
+                value={newIncident.summaryEn}
+                onChange={(e) => setNewIncident(prev => ({ ...prev, summaryEn: e.target.value }))}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={handleCreateIncident} disabled={createLoading}>
+              {createLoading ? <LoadingSpinner size="sm" className="me-2" /> : null}
+              Create Incident
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

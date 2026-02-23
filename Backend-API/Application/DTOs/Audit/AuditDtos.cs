@@ -18,19 +18,19 @@ public class AuditLogDto
     public string EntityName { get; set; } = string.Empty;
     public string EntityId { get; set; } = string.Empty;
     public string? CorrelationId { get; set; }
-  public string? TenantId { get; set; }
+    public string? TenantId { get; set; }
     public AuditSource? Source { get; set; }
     public string? SourceName => Source?.ToString();
     public AuditChannel? Channel { get; set; }
     public string? ChannelName => Channel?.ToString();
-  public string? IpAddress { get; set; }
+    public string? IpAddress { get; set; }
     public string? UserAgent { get; set; }
     public string? BeforeJson { get; set; }
     public string? AfterJson { get; set; }
     public string? MetadataJson { get; set; }
     public AuditOutcome Outcome { get; set; }
     public string OutcomeName => Outcome.ToString();
-  public string? ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
     public DateTime OccurredAt { get; set; }
     public int? DurationMs { get; set; }
 }
@@ -54,6 +54,7 @@ public class AuditLogListDto
     public bool HasSnapshot => !string.IsNullOrEmpty(BeforeJson) || !string.IsNullOrEmpty(AfterJson);
     public string? BeforeJson { get; set; }
     public string? AfterJson { get; set; }
+    public string? MetadataJson { get; set; }
 }
 
 /// <summary>
@@ -62,7 +63,7 @@ public class AuditLogListDto
 public class CreateAuditLogDto
 {
     public string? ActorId { get; set; }
- public ActorType ActorType { get; set; } = ActorType.User;
+    public ActorType ActorType { get; set; } = ActorType.User;
     public string? ActorDisplayName { get; set; }
     public string Action { get; set; } = string.Empty;
     public string EntityName { get; set; } = string.Empty;
@@ -75,7 +76,7 @@ public class CreateAuditLogDto
     public string? UserAgent { get; set; }
     public object? Before { get; set; }
     public object? After { get; set; }
-  public object? Metadata { get; set; }
+    public object? Metadata { get; set; }
     public AuditOutcome Outcome { get; set; } = AuditOutcome.Success;
     public string? ErrorMessage { get; set; }
     public int? DurationMs { get; set; }
@@ -87,7 +88,7 @@ public class CreateAuditLogDto
 public class AuditLogSearchDto
 {
     public string? ActorId { get; set; }
- public ActorType? ActorType { get; set; }
+    public ActorType? ActorType { get; set; }
     public string? Action { get; set; }
     public string? ActionPrefix { get; set; }
     public string? EntityName { get; set; }
@@ -137,7 +138,7 @@ public class UserActivityRequestDto
 public class AuditRetentionPolicyDto
 {
     public int Id { get; set; }
-  public string NameEn { get; set; } = string.Empty;
+    public string NameEn { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
@@ -167,7 +168,7 @@ public class CreateRetentionPolicyDto
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public bool IsActive { get; set; } = true;
-  public int Priority { get; set; } = 100;
+    public int Priority { get; set; } = 100;
     public int RetentionDays { get; set; }
     public string? EntityName { get; set; }
     public string? ActionPrefix { get; set; }
@@ -184,13 +185,13 @@ public class CreateRetentionPolicyDto
 public class UpdateRetentionPolicyDto
 {
     public int Id { get; set; }
- public string? NameEn { get; set; }
+    public string? NameEn { get; set; }
     public string? NameAr { get; set; }
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public bool? IsActive { get; set; }
     public int? Priority { get; set; }
- public int? RetentionDays { get; set; }
+    public int? RetentionDays { get; set; }
     public string? EntityName { get; set; }
     public string? ActionPrefix { get; set; }
     public string? Channel { get; set; }
@@ -210,14 +211,14 @@ public class UpdateRetentionPolicyDto
 public class AuditExportJobDto
 {
     public int Id { get; set; }
-  public DateTime FromDate { get; set; }
+    public DateTime FromDate { get; set; }
     public DateTime ToDate { get; set; }
-  public string? TenantId { get; set; }
+    public string? TenantId { get; set; }
     public string? EntityName { get; set; }
     public string? ActionPrefix { get; set; }
     public string? ActorId { get; set; }
- public AuditOutcome? Outcome { get; set; }
-  public string? OutcomeName => Outcome?.ToString();
+    public AuditOutcome? Outcome { get; set; }
+    public string? OutcomeName => Outcome?.ToString();
     public string? FilterJson { get; set; }
     public ExportFormat Format { get; set; }
     public string FormatName => Format.ToString();
@@ -231,7 +232,7 @@ public class AuditExportJobDto
     public long? FileSize { get; set; }
     public int? TotalRecords { get; set; }
     public DateTime? CompletedAt { get; set; }
-  public DateTime? ExpiresAt { get; set; }
+    public DateTime? ExpiresAt { get; set; }
     public string? ErrorMessage { get; set; }
     public string? DownloadUrl { get; set; }
 }
@@ -245,7 +246,7 @@ public class AuditExportJobListDto
     public DateTime FromDate { get; set; }
     public DateTime ToDate { get; set; }
     public ExportFormat Format { get; set; }
-public string FormatName => Format.ToString();
+    public string FormatName => Format.ToString();
     public ExportStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public string? RequesterName { get; set; }
@@ -281,7 +282,7 @@ public class ExportJobSearchDto
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
     public int PageNumber { get; set; } = 1;
- public int PageSize { get; set; } = 20;
+    public int PageSize { get; set; } = 20;
 }
 
 #endregion
@@ -301,7 +302,7 @@ public class AuditDashboardDto
     public long FailureCount { get; set; }
     public decimal SuccessRate { get; set; }
     public List<AuditActionSummaryDto> TopActions { get; set; } = new();
-  public List<AuditEntitySummaryDto> TopEntities { get; set; } = new();
+    public List<AuditEntitySummaryDto> TopEntities { get; set; } = new();
     public List<AuditActorSummaryDto> TopActors { get; set; } = new();
     public List<AuditChannelSummaryDto> ChannelDistribution { get; set; } = new();
     public List<AuditTimeSeriesDto> HourlyDistribution { get; set; } = new();
@@ -348,7 +349,7 @@ public class AuditChannelSummaryDto
     public AuditChannel? Channel { get; set; }
     public string? ChannelName => Channel?.ToString() ?? "Unknown";
     public long Count { get; set; }
-public decimal Percentage { get; set; }
+    public decimal Percentage { get; set; }
 }
 
 /// <summary>
@@ -389,7 +390,7 @@ public static class AuditActions
     // Auth
     public const string AuthLogin = "Auth.Login";
     public const string AuthLogout = "Auth.Logout";
-  public const string AuthLoginFailed = "Auth.LoginFailed";
+    public const string AuthLoginFailed = "Auth.LoginFailed";
     public const string AuthPasswordChanged = "Auth.PasswordChanged";
     public const string AuthPasswordReset = "Auth.PasswordReset";
     public const string AuthRoleChanged = "Auth.RoleChanged";
@@ -403,7 +404,7 @@ public static class AuditActions
 
     // Assessment
     public const string ExamCreated = "Exam.Created";
-  public const string ExamUpdated = "Exam.Updated";
+    public const string ExamUpdated = "Exam.Updated";
     public const string ExamPublished = "Exam.Published";
     public const string ExamUnpublished = "Exam.Unpublished";
     public const string ExamDeleted = "Exam.Deleted";
@@ -413,9 +414,11 @@ public static class AuditActions
     public const string AttemptSubmitted = "Attempt.Submitted";
     public const string AttemptExpired = "Attempt.Expired";
     public const string AttemptForceSubmitted = "Attempt.ForceSubmitted";
+    public const string AttemptResumed = "Attempt.Resumed";
+    public const string AttemptExamWindowClosed = "Attempt.ExamWindowClosed";
 
     // Grading
- public const string GradingStarted = "Grading.Started";
+    public const string GradingStarted = "Grading.Started";
     public const string GradingCompleted = "Grading.Completed";
     public const string ManualGradeRecorded = "Grading.ManualGrade";
     public const string GradingRegraded = "Grading.Regraded";
@@ -438,7 +441,7 @@ public static class AuditActions
     // Incident
     public const string IncidentCreated = "Incident.Created";
     public const string IncidentAssigned = "Incident.Assigned";
- public const string IncidentStatusChanged = "Incident.StatusChanged";
+    public const string IncidentStatusChanged = "Incident.StatusChanged";
     public const string IncidentDecisionMade = "Incident.DecisionMade";
     public const string IncidentClosed = "Incident.Closed";
     public const string IncidentReopened = "Incident.Reopened";

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType } from "@/lib/api/candidate"
+import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType, ExpiryReason } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -102,13 +102,13 @@ export default function MyExamsPage() {
     const latestStatus = exam.latestAttemptStatus ?? null
     const latestPublished = exam.latestAttemptIsResultPublished === true
 
-    if (latestStatus === AttemptStatus.Started || latestStatus === AttemptStatus.InProgress) {
+    if (latestStatus === AttemptStatus.Started || latestStatus === AttemptStatus.InProgress || latestStatus === AttemptStatus.Resumed) {
       return "inProgress"
     }
-    if (latestStatus === AttemptStatus.Submitted) {
+    if (latestStatus === AttemptStatus.Submitted || latestStatus === AttemptStatus.ForceSubmitted) {
       return latestPublished ? "completed" : "submitted"
     }
-    if (latestStatus === AttemptStatus.Cancelled) {
+    if (latestStatus === AttemptStatus.Cancelled || latestStatus === AttemptStatus.Terminated) {
       return "terminated"
     }
     if (latestStatus === AttemptStatus.Expired) {
@@ -189,11 +189,11 @@ export default function MyExamsPage() {
             { key: "all" as const, labelKey: "candidateDashboard.all" },
             { key: "available" as const, labelKey: "candidateDashboard.available" },
             { key: "inProgress" as const, labelKey: "candidateDashboard.inProgress" },
+            { key: "resume" as const, labelKey: "examOperations.resumeTab" },
             { key: "submitted" as const, labelKey: "candidateDashboard.submitted" },
             { key: "completed" as const, labelKey: "candidateDashboard.completed" },
             { key: "expired" as const, labelKey: "candidateDashboard.expired" },
             { key: "terminated" as const, labelKey: "candidateDashboard.terminated" },
-            { key: "resume" as const, labelKey: "examOperations.resumeTab" },
           ] as const
         ).map(({ key, labelKey }) => (
           <button

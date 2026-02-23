@@ -238,6 +238,7 @@ builder.Services.AddScoped<DatabaseSeeder>();
 // Background Services
 builder.Services.AddHostedService<LogCleanupService>();
 builder.Services.AddHostedService<VideoRetentionService>();
+builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Background.AttemptExpiryBackgroundService>();
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
