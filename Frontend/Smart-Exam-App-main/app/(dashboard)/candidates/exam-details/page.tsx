@@ -65,6 +65,7 @@ function statusBadgeVariant(statusName: string): "default" | "secondary" | "dest
     case "Submitted": return "secondary"
     case "Paused": return "outline"
     case "ForceSubmitted": return "destructive"
+    case "Terminated": return "destructive"
     case "Expired": return "destructive"
     case "Cancelled": return "destructive"
     default: return "outline"
@@ -78,6 +79,7 @@ function getStatusIcon(statusName: string) {
     case "Submitted": return <CheckCircle className="h-3 w-3" />
     case "Paused": return <Pause className="h-3 w-3" />
     case "ForceSubmitted": return <XCircle className="h-3 w-3" />
+    case "Terminated": return <XCircle className="h-3 w-3" />
     case "Expired": return <TimerOff className="h-3 w-3" />
     case "Cancelled": return <Ban className="h-3 w-3" />
     default: return null

@@ -109,6 +109,7 @@ export default function AttemptVideoPage() {
     if (eventType.includes("Terminated")) return "🛑"
     if (eventType.includes("Network")) return "🌐"
     if (eventType.includes("Face")) return "👤"
+    if (eventType.includes("Head")) return "🔄"
     return "📌"
   }
 

@@ -36,26 +36,36 @@ interface VideoChunkPlayerProps {
   className?: string
 }
 
+/**
+ * MSE-based video chunk player.
+ *
+ * Uses MediaSource Extensions to stitch WebM chunks together in the browser.
+ * Chunk 0 contains the WebM EBML header + initialization segment; subsequent
+ * chunks contain only Cluster data. MSE handles this seamlessly by appending
+ * each chunk's ArrayBuffer into a single SourceBuffer.
+ */
 export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const progressIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const [chunkData, setChunkData] = useState<ChunkListResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [currentChunkIndex, setCurrentChunkIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(0.8)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  // Progress – expressed as total seconds across all chunks
   const [currentTime, setCurrentTime] = useState(0)
   const [totalDuration, setTotalDuration] = useState(0)
+  const [loadingProgress, setLoadingProgress] = useState(0) // 0-100
 
   const tokenRef = useRef<string>("")
+  const mediaSourceRef = useRef<MediaSource | null>(null)
+  const sourceBufferRef = useRef<SourceBuffer | null>(null)
+  const appendedChunksRef = useRef<number>(0)
+  const allBufferedRef = useRef(false)
 
   // Build chunk URL
   const getChunkUrl = useCallback(
@@ -82,7 +92,6 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         const json = await res.json()
         const data: ChunkListResponse = json.data || json
         setChunkData(data)
-        setTotalDuration((data.totalChunks * data.chunkDurationMs) / 1000)
       } catch (err: any) {
         setError(err?.message || "Failed to load video chunks")
       } finally {
@@ -93,69 +102,177 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     if (attemptId) fetchChunks()
   }, [attemptId])
 
-  // Load a specific chunk into the video element
-  const loadChunk = useCallback(
-    (index: number, autoPlay = false) => {
-      if (!chunkData || index < 0 || index >= chunkData.totalChunks) return
-      const video = videoRef.current
-      if (!video) return
-
-      const chunk = chunkData.chunks[index]
-      video.src = getChunkUrl(chunk.filename)
-      video.load()
-      setCurrentChunkIndex(index)
-
-      if (autoPlay) {
-        video.play().catch(() => {})
-      }
-    },
-    [chunkData, getChunkUrl],
-  )
-
-  // Load first chunk once data arrives
+  // Set up MSE and append all chunks once chunkData arrives
   useEffect(() => {
-    if (chunkData && chunkData.totalChunks > 0) {
-      loadChunk(0, false)
-    }
-  }, [chunkData]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!chunkData || chunkData.totalChunks === 0) return
+    const video = videoRef.current
+    if (!video) return
 
-  // Update progress based on video timeupdate
+    // Check MSE support
+    if (!("MediaSource" in window)) {
+      setError("Your browser does not support MediaSource Extensions (MSE). Please use Chrome, Edge, or Firefox.")
+      return
+    }
+
+    // Find supported MSE codec
+    const codecs = [
+      'video/webm; codecs="vp9"',
+      'video/webm; codecs="vp8"',
+      'video/webm; codecs="vp8, vorbis"',
+      'video/webm; codecs="vp9, opus"',
+      'video/webm',
+    ]
+    let mimeCodec = ""
+    for (const c of codecs) {
+      if (MediaSource.isTypeSupported(c)) {
+        mimeCodec = c
+        break
+      }
+    }
+    if (!mimeCodec) {
+      setError("No supported WebM codec found for MSE playback.")
+      return
+    }
+
+    const mediaSource = new MediaSource()
+    mediaSourceRef.current = mediaSource
+    appendedChunksRef.current = 0
+    allBufferedRef.current = false
+
+    const objectUrl = URL.createObjectURL(mediaSource)
+    video.src = objectUrl
+
+    mediaSource.addEventListener("sourceopen", async () => {
+      try {
+        // Revoke object URL early — source is already attached
+        URL.revokeObjectURL(objectUrl)
+
+        const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec)
+        sourceBufferRef.current = sourceBuffer
+        sourceBuffer.mode = "sequence" // Append in order, browser calculates timestamps
+
+        // Fetch and append all chunks sequentially
+        for (let i = 0; i < chunkData.chunks.length; i++) {
+          const chunk = chunkData.chunks[i]
+          const url = getChunkUrl(chunk.filename)
+
+          const response = await fetch(url)
+          if (!response.ok) {
+            console.warn(`[MSE] Failed to fetch chunk ${i}: ${response.status}`)
+            continue
+          }
+
+          const arrayBuffer = await response.arrayBuffer()
+
+          // Wait for sourceBuffer to be ready
+          await new Promise<void>((resolve, reject) => {
+            if (!sourceBuffer.updating) {
+              resolve()
+              return
+            }
+            const onUpdateEnd = () => {
+              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+              sourceBuffer.removeEventListener("error", onError)
+              resolve()
+            }
+            const onError = () => {
+              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+              sourceBuffer.removeEventListener("error", onError)
+              reject(new Error(`SourceBuffer error before chunk ${i}`))
+            }
+            sourceBuffer.addEventListener("updateend", onUpdateEnd)
+            sourceBuffer.addEventListener("error", onError)
+          })
+
+          // Append the buffer
+          sourceBuffer.appendBuffer(arrayBuffer)
+
+          // Wait for append to complete
+          await new Promise<void>((resolve, reject) => {
+            const onUpdateEnd = () => {
+              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+              sourceBuffer.removeEventListener("error", onError)
+              resolve()
+            }
+            const onError = () => {
+              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+              sourceBuffer.removeEventListener("error", onError)
+              reject(new Error(`SourceBuffer error appending chunk ${i}`))
+            }
+            sourceBuffer.addEventListener("updateend", onUpdateEnd)
+            sourceBuffer.addEventListener("error", onError)
+          })
+
+          appendedChunksRef.current = i + 1
+          setLoadingProgress(Math.round(((i + 1) / chunkData.chunks.length) * 100))
+        }
+
+        // All chunks appended — signal end of stream
+        allBufferedRef.current = true
+        if (mediaSource.readyState === "open") {
+          mediaSource.endOfStream()
+        }
+
+        // Use the actual buffered duration from the browser
+        if (video.duration && isFinite(video.duration)) {
+          setTotalDuration(video.duration)
+        } else {
+          // Wait for durationchange
+          const onDuration = () => {
+            if (video.duration && isFinite(video.duration)) {
+              setTotalDuration(video.duration)
+            }
+            video.removeEventListener("durationchange", onDuration)
+          }
+          video.addEventListener("durationchange", onDuration)
+        }
+      } catch (err: any) {
+        console.error("[MSE] Error during chunk loading:", err)
+        setError(err?.message || "Error loading video chunks via MSE")
+      }
+    })
+
+    return () => {
+      // Cleanup
+      mediaSourceRef.current = null
+      sourceBufferRef.current = null
+      if (video) {
+        video.src = ""
+      }
+    }
+  }, [chunkData, getChunkUrl])
+
+  // Update currentTime from video element
   useEffect(() => {
     const video = videoRef.current
-    if (!video || !chunkData) return
-
-    const chunkDurationSec = chunkData.chunkDurationMs / 1000
+    if (!video) return
 
     const handleTimeUpdate = () => {
-      const globalTime = currentChunkIndex * chunkDurationSec + video.currentTime
-      setCurrentTime(globalTime)
+      setCurrentTime(video.currentTime)
     }
-
-    const handleEnded = () => {
-      // Auto-advance to next chunk
-      if (currentChunkIndex < chunkData.totalChunks - 1) {
-        loadChunk(currentChunkIndex + 1, true)
-      } else {
-        // Reached end of all chunks
-        setIsPlaying(false)
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+    const handleEnded = () => setIsPlaying(false)
+    const handleDurationChange = () => {
+      if (video.duration && isFinite(video.duration)) {
+        setTotalDuration(video.duration)
       }
     }
 
-    const handlePlay = () => setIsPlaying(true)
-    const handlePause = () => setIsPlaying(false)
-
     video.addEventListener("timeupdate", handleTimeUpdate)
-    video.addEventListener("ended", handleEnded)
     video.addEventListener("play", handlePlay)
     video.addEventListener("pause", handlePause)
+    video.addEventListener("ended", handleEnded)
+    video.addEventListener("durationchange", handleDurationChange)
 
     return () => {
       video.removeEventListener("timeupdate", handleTimeUpdate)
-      video.removeEventListener("ended", handleEnded)
       video.removeEventListener("play", handlePlay)
       video.removeEventListener("pause", handlePause)
+      video.removeEventListener("ended", handleEnded)
+      video.removeEventListener("durationchange", handleDurationChange)
     }
-  }, [chunkData, currentChunkIndex, loadChunk])
+  }, [])
 
   // Fullscreen change listener
   useEffect(() => {
@@ -201,49 +318,22 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
   }
 
   const seekToGlobalTime = (values: number[]) => {
-    if (!chunkData) return
-    const targetTime = values[0]
-    const chunkDurationSec = chunkData.chunkDurationMs / 1000
-    const targetChunk = Math.min(
-      Math.floor(targetTime / chunkDurationSec),
-      chunkData.totalChunks - 1,
-    )
-    const withinChunkTime = targetTime - targetChunk * chunkDurationSec
-
-    if (targetChunk === currentChunkIndex) {
-      // Same chunk — just seek within
-      const video = videoRef.current
-      if (video) {
-        video.currentTime = withinChunkTime
-      }
-    } else {
-      // Different chunk — load it, then seek
-      const video = videoRef.current
-      if (!video) return
-      const chunk = chunkData.chunks[targetChunk]
-      video.src = getChunkUrl(chunk.filename)
-      video.load()
-      setCurrentChunkIndex(targetChunk)
-
-      const onCanPlay = () => {
-        video.currentTime = withinChunkTime
-        if (isPlaying) video.play().catch(() => {})
-        video.removeEventListener("canplay", onCanPlay)
-      }
-      video.addEventListener("canplay", onCanPlay)
-    }
-
-    setCurrentTime(targetTime)
+    const video = videoRef.current
+    if (!video) return
+    video.currentTime = values[0]
+    setCurrentTime(values[0])
   }
 
-  const skipNext = () => {
-    if (!chunkData || currentChunkIndex >= chunkData.totalChunks - 1) return
-    loadChunk(currentChunkIndex + 1, isPlaying)
+  const skipForward = () => {
+    const video = videoRef.current
+    if (!video) return
+    video.currentTime = Math.min(video.currentTime + 10, totalDuration)
   }
 
-  const skipPrev = () => {
-    if (!chunkData || currentChunkIndex <= 0) return
-    loadChunk(currentChunkIndex - 1, isPlaying)
+  const skipBackward = () => {
+    const video = videoRef.current
+    if (!video) return
+    video.currentTime = Math.max(video.currentTime - 10, 0)
   }
 
   const toggleFullscreen = async () => {
@@ -286,13 +376,11 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
           onClick={() => {
             setError(null)
             setLoading(true)
-            // Re-fetch
             fetch(`/api/video-chunks/${attemptId}?token=${encodeURIComponent(tokenRef.current)}`)
               .then((r) => r.json())
               .then((json) => {
                 const data = json.data || json
                 setChunkData(data)
-                setTotalDuration((data.totalChunks * data.chunkDurationMs) / 1000)
               })
               .catch((e) => setError(e?.message || "Retry failed"))
               .finally(() => setLoading(false))
@@ -320,6 +408,14 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         />
       </div>
 
+      {/* Loading overlay while chunks are being buffered */}
+      {!allBufferedRef.current && loadingProgress > 0 && loadingProgress < 100 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white gap-2 pointer-events-none">
+          <LoadingSpinner size="lg" />
+          <p className="text-sm">Buffering chunks... {loadingProgress}%</p>
+        </div>
+      )}
+
       {/* Controls overlay – shows on hover or when paused */}
       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-10 pb-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
            style={{ opacity: !isPlaying ? 1 : undefined }}>
@@ -342,11 +438,11 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           </button>
 
-          {/* Skip prev/next */}
-          <button onClick={skipPrev} className="p-1.5 hover:bg-white/20 rounded transition-colors" title="Previous chunk">
+          {/* Skip -10s / +10s */}
+          <button onClick={skipBackward} className="p-1.5 hover:bg-white/20 rounded transition-colors" title="Back 10s">
             <SkipBack className="h-4 w-4" />
           </button>
-          <button onClick={skipNext} className="p-1.5 hover:bg-white/20 rounded transition-colors" title="Next chunk">
+          <button onClick={skipForward} className="p-1.5 hover:bg-white/20 rounded transition-colors" title="Forward 10s">
             <SkipForward className="h-4 w-4" />
           </button>
 
@@ -370,9 +466,9 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
             {formatTime(currentTime)} / {formatTime(totalDuration)}
           </span>
 
-          {/* Chunk indicator */}
+          {/* Chunk progress indicator */}
           <span className="text-xs tabular-nums ms-1.5 px-1.5 py-0.5 rounded bg-white/15 select-none">
-            {currentChunkIndex + 1}/{chunkData.totalChunks}
+            {appendedChunksRef.current}/{chunkData.totalChunks}
           </span>
 
           {/* Spacer */}

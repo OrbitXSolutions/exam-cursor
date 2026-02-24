@@ -949,9 +949,16 @@ const EVENT_TYPE_NAMES: Record<number, string> = {
   15: "Time Added",
   16: "Webcam Denied",
   17: "Snapshot Failed",
+  18: "Face Not Detected",
+  19: "Multiple Faces",
+  20: "Face Out of Frame",
+  21: "Camera Blocked",
+  22: "Head Turned Away",
 };
 
-const VIOLATION_TYPES = new Set([4, 5, 8, 10, 11, 12, 16, 17]);
+const VIOLATION_TYPES = new Set([
+  4, 5, 8, 10, 11, 12, 16, 17, 18, 19, 20, 21, 22,
+]);
 
 export function getEventTypeName(eventType: number): string {
   return EVENT_TYPE_NAMES[eventType] ?? `Event ${eventType}`;
@@ -965,14 +972,20 @@ export function getEventSeverity(eventType: number): string {
   switch (eventType) {
     case 16:
       return "Critical"; // Webcam Denied
+    case 19:
+      return "Critical"; // Multiple Faces
     case 4:
     case 5:
-      return "High"; // Tab Switch, Fullscreen Exit
+    case 18:
+    case 21:
+      return "High"; // Tab Switch, Fullscreen Exit, Face Not Detected, Camera Blocked
     case 8:
     case 10:
     case 11:
     case 17:
-      return "Medium"; // Window Blur, Copy, Paste, Snapshot Fail
+    case 20:
+    case 22:
+      return "Medium"; // Window Blur, Copy, Paste, Snapshot Fail, Face Out of Frame, Head Turned
     case 12:
       return "Low"; // Right Click
     default:

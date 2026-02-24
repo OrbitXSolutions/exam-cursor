@@ -167,5 +167,30 @@ public enum AttemptEventType : byte
     /// <summary>
     /// Proctor snapshot upload failed
     /// </summary>
-    SnapshotFailed = 17
+    SnapshotFailed = 17,
+
+    /// <summary>
+    /// AI: No face detected in camera
+    /// </summary>
+    FaceNotDetected = 18,
+
+    /// <summary>
+    /// AI: Multiple faces detected in camera
+    /// </summary>
+    MultipleFacesDetected = 19,
+
+    /// <summary>
+    /// AI: Face is out of frame / not centred
+    /// </summary>
+    FaceOutOfFrame = 20,
+
+    /// <summary>
+    /// AI: Camera appears blocked or covered
+    /// </summary>
+    CameraBlocked = 21,
+
+    /// <summary>
+    /// AI: Candidate head turned away from screen
+    /// </summary>
+    HeadTurnDetected = 22
 }

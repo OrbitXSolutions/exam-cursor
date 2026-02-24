@@ -20,6 +20,7 @@ import { uploadProctorSnapshot, getCandidateSessionStatus } from "@/lib/api/proc
 import { CandidatePublisher } from "@/lib/webrtc/candidate-publisher"
 import { ChunkRecorder } from "@/lib/webrtc/chunk-recorder"
 import { getVideoConfig } from "@/lib/webrtc/video-config"
+import { SmartMonitoring, type ViolationType } from "@/lib/ai/smart-monitoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -116,6 +117,7 @@ export default function ExamPage() {
   const proctorPollRef = useRef<NodeJS.Timeout | undefined>(undefined) // Proctor warning poll
   const publisherRef = useRef<CandidatePublisher | null>(null) // WebRTC live video publisher
   const chunkRecorderRef = useRef<ChunkRecorder | null>(null) // Video chunk recorder
+  const smartMonitoringRef = useRef<SmartMonitoring | null>(null) // AI face detection
 
   // Computed values
   const sections = session?.sections || []
@@ -530,6 +532,58 @@ export default function ExamPage() {
                 console.warn("[Proctor] ChunkRecorder init failed (non-fatal):", err)
               }
             }
+
+            // Smart Monitoring (AI face detection)
+            if (cfg.enableSmartMonitoring && webcamVideoRef.current) {
+              console.log(`%c[ExamPage] ✅ enableSmartMonitoring=true, starting AI detection`, 'color: #9c27b0; font-weight: bold')
+              try {
+                // Map ViolationType → AttemptEventType
+                const violationToEventType: Record<ViolationType, AttemptEventType> = {
+                  FaceNotDetected: AttemptEventType.FaceNotDetected,
+                  MultipleFacesDetected: AttemptEventType.MultipleFacesDetected,
+                  FaceOutOfFrame: AttemptEventType.FaceOutOfFrame,
+                  CameraBlocked: AttemptEventType.CameraBlocked,
+                  HeadTurnDetected: AttemptEventType.HeadTurnDetected,
+                }
+
+                const monitor = new SmartMonitoring({
+                  onViolation: (event) => {
+                    console.log(`%c[SmartMonitoring] 🚨 Violation: ${event.type} — ${event.message}`, 'color: #f44336; font-weight: bold')
+
+                    // 1. Show warning overlay (centred AlertDialog + beep)
+                    playWarningBeep()
+                    setProctorWarningMessage(event.message)
+                    setProctorWarningOpen(true)
+
+                    // 2. Log event to backend (auto-pushes to proctor via SignalR)
+                    const eventType = violationToEventType[event.type]
+                    if (eventType !== undefined) {
+                      logAttemptEvent(session.attemptId, {
+                        eventType,
+                        metadataJson: JSON.stringify({
+                          ...event.metadata,
+                          source: "smart_monitoring",
+                          timestamp: new Date().toISOString(),
+                        }),
+                      }).catch(() => {})
+                    }
+                  },
+                })
+
+                monitor.start(webcamVideoRef.current).then((ok) => {
+                  if (ok) {
+                    console.log(`%c[ExamPage] ✅ SmartMonitoring started successfully`, 'color: #4caf50; font-weight: bold')
+                  } else {
+                    console.warn('[ExamPage] SmartMonitoring failed to start (non-fatal)')
+                  }
+                })
+                smartMonitoringRef.current = monitor
+              } catch (err) {
+                console.warn("[SmartMonitoring] Init failed (non-fatal):", err)
+              }
+            } else if (!cfg.enableSmartMonitoring) {
+              console.log('[ExamPage] enableSmartMonitoring=false, skipping AI detection')
+            }
           }).catch((err) => {
             console.warn("[Proctor] Video config fetch failed (non-fatal):", err)
           })
@@ -546,6 +600,9 @@ export default function ExamPage() {
       // Stop chunk recorder
       chunkRecorderRef.current?.dispose()
       chunkRecorderRef.current = null
+      // Stop smart monitoring
+      smartMonitoringRef.current?.dispose()
+      smartMonitoringRef.current = null
       // Stop webcam stream on cleanup
       if (webcamStreamRef.current) {
         webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -844,6 +901,9 @@ export default function ExamPage() {
     // Stop WebRTC publisher
     publisherRef.current?.stop().catch(() => {})
     publisherRef.current = null
+    // Stop smart monitoring
+    smartMonitoringRef.current?.dispose()
+    smartMonitoringRef.current = null
     // Stop webcam stream
     if (webcamStreamRef.current) {
       webcamStreamRef.current.getTracks().forEach((t) => t.stop())

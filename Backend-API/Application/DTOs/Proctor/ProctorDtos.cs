@@ -68,6 +68,8 @@ public class ProctorSessionListDto
     public bool RequiresReview { get; set; }
     public bool IsFlagged { get; set; }
     public bool IsSample { get; set; }
+    public bool IsTerminatedByProctor { get; set; }
+    public string? TerminationReason { get; set; }
     public string? LatestSnapshotUrl { get; set; }
     public int SnapshotCount { get; set; }
     public DateTime? LastSnapshotAt { get; set; }

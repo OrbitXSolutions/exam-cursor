@@ -62,6 +62,7 @@ public class SettingsController : ControllerBase
         entity.UpdatedDate = DateTime.UtcNow;
         entity.EnableLiveVideo = dto.EnableLiveVideo;
         entity.EnableVideoRecording = dto.EnableVideoRecording;
+        entity.EnableSmartMonitoring = dto.EnableSmartMonitoring;
         entity.VideoRetentionDays = dto.VideoRetentionDays > 0 ? dto.VideoRetentionDays : 30;
         await _db.SaveChangesAsync();
         var result = MapToDto(entity);
@@ -122,6 +123,7 @@ public class SettingsController : ControllerBase
             },
             EnableLiveVideo = e.EnableLiveVideo,
             EnableVideoRecording = e.EnableVideoRecording,
+            EnableSmartMonitoring = e.EnableSmartMonitoring,
             VideoRetentionDays = e.VideoRetentionDays,
         };
     }
@@ -139,6 +141,7 @@ public class SystemSettingsDto
     // Video proctoring feature flags
     public bool EnableLiveVideo { get; set; } = true;
     public bool EnableVideoRecording { get; set; } = true;
+    public bool EnableSmartMonitoring { get; set; } = true;
     public int VideoRetentionDays { get; set; } = 30;
 }
 

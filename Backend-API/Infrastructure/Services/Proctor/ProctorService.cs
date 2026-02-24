@@ -1572,6 +1572,8 @@ UploadEvidenceDto dto, string candidateId)
             DecisionStatus = session.Decision?.Status,
             RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending,
             IsFlagged = session.IsFlagged,
+            IsTerminatedByProctor = session.IsTerminatedByProctor,
+            TerminationReason = session.TerminationReason,
             LatestSnapshotUrl = latestUrl,
             SnapshotCount = imageEvidence?.Count ?? 0,
             LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate

@@ -217,6 +217,9 @@ export interface SystemSettings {
     requireNumbers: boolean;
     requireSpecialChars: boolean;
   };
+  enableLiveVideo: boolean;
+  enableVideoRecording: boolean;
+  enableSmartMonitoring: boolean;
   brand?: BrandSettings;
 }
 
@@ -241,6 +244,9 @@ const defaultSettings: SystemSettings = {
     requireNumbers: true,
     requireSpecialChars: false,
   },
+  enableLiveVideo: true,
+  enableVideoRecording: true,
+  enableSmartMonitoring: true,
   brand: defaultBrand,
 };
 

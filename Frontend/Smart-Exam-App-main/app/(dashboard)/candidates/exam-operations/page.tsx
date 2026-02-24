@@ -215,6 +215,7 @@ export default function ExamOperationsPage() {
       Expired: "border-rose-200 bg-rose-50 text-rose-700",
       Cancelled: "border-gray-200 bg-gray-100 text-gray-700",
       ForceSubmitted: "border-red-200 bg-red-50 text-red-700",
+      Terminated: "border-red-200 bg-red-50 text-red-700",
       Paused: "border-purple-200 bg-purple-50 text-purple-700",
     }
     return (

@@ -75,10 +75,22 @@ public class VideoRecordingController : ControllerBase
             enableVideoRecording = _configuration.GetValue("Proctoring:EnableVideoRecording", true);
         }
 
+        // Smart Monitoring flag
+        bool enableSmartMonitoring;
+        if (settings != null)
+        {
+            enableSmartMonitoring = settings.EnableSmartMonitoring;
+        }
+        else
+        {
+            enableSmartMonitoring = _configuration.GetValue("Proctoring:EnableSmartMonitoring", true);
+        }
+
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             enableLiveVideo,
             enableVideoRecording,
+            enableSmartMonitoring,
             stunServers
         }));
     }
@@ -202,7 +214,8 @@ public class VideoRecordingController : ControllerBase
     }
 
     /// <summary>
-    /// Background method: merges chunks + converts to MP4 using a fresh DbContext scope.
+    /// Background method: creates evidence record from chunks (no FFmpeg needed).
+    /// The frontend uses MediaSource Extensions (MSE) to stitch WebM chunks in-browser.
     /// </summary>
     private async Task ProcessVideoFinalization(int attemptId, string candidateId, DateTime startedAt, string mediaBasePath, string contentRootPath)
     {
@@ -221,56 +234,26 @@ public class VideoRecordingController : ControllerBase
             return;
         }
 
-        // Output directory
-        var outputDir = Path.Combine(mediaBasePath, "video-recordings", attemptId.ToString());
-        Directory.CreateDirectory(outputDir);
+        // Calculate total size from all chunks
+        long totalSize = chunkFiles.Sum(f => new FileInfo(f).Length);
 
-        var concatListPath = Path.Combine(chunkDir, "concat_list.txt");
-        var mergedWebmPath = Path.Combine(outputDir, "merged.webm");
-        var mp4Path = Path.Combine(outputDir, "recording.mp4");
-
-        // Step 1: Create FFmpeg concat list
-        var concatLines = chunkFiles.Select(f => $"file '{f.Replace("\\", "/")}'");
-        await System.IO.File.WriteAllLinesAsync(concatListPath, concatLines);
-
-        // Step 2: Merge WebM chunks
-        var mergeResult = await RunFFmpeg($"-f concat -safe 0 -i \"{concatListPath}\" -c copy \"{mergedWebmPath}\"", contentRootPath);
-        if (!mergeResult.success)
-        {
-            logger.LogError("FFmpeg merge failed for attempt {AttemptId}: {Error}", attemptId, mergeResult.error);
-            await BinaryConcatChunks(chunkFiles, mergedWebmPath);
-        }
-
-        // Step 3: Convert to MP4
-        var convertResult = await RunFFmpeg($"-i \"{mergedWebmPath}\" -c:v libx264 -preset fast -crf 28 -movflags +faststart -an \"{mp4Path}\"", contentRootPath);
-        if (!convertResult.success)
-        {
-            logger.LogWarning("FFmpeg MP4 conversion failed for attempt {AttemptId}: {Error}. Serving WebM.", attemptId, convertResult.error);
-            if (System.IO.File.Exists(mergedWebmPath))
-                mp4Path = mergedWebmPath;
-        }
-
-        // Step 4: File info
-        long fileSize = 0;
-        if (System.IO.File.Exists(mp4Path))
-            fileSize = new FileInfo(mp4Path).Length;
-
-        // Step 5: Find ProctorSession
+        // Find ProctorSession
         var proctorSession = await db.ProctorSessions
             .FirstOrDefaultAsync(s => s.AttemptId == attemptId);
         int sessionId = proctorSession?.Id ?? 0;
 
-        // Step 6: Create evidence record
-        var relativePath = Path.GetRelativePath(mediaBasePath, mp4Path).Replace("\\", "/");
+        // Create evidence record pointing to chunks directory
+        // The frontend MSE player will fetch and stitch chunks in-browser
+        var relativePath = $"video-chunks/{attemptId}";
         var evidence = new ProctorEvidence
         {
             ProctorSessionId = sessionId,
             AttemptId = attemptId,
             Type = EvidenceType.Video,
-            FileName = Path.GetFileName(mp4Path),
+            FileName = $"chunks_{attemptId}",
             FilePath = relativePath,
-            FileSize = fileSize,
-            ContentType = mp4Path.EndsWith(".mp4") ? "video/mp4" : "video/webm",
+            FileSize = totalSize,
+            ContentType = "video/webm",
             StartAt = startedAt,
             EndAt = DateTime.UtcNow,
             DurationSeconds = (int)(DateTime.UtcNow - startedAt).TotalSeconds,
@@ -280,8 +263,8 @@ public class VideoRecordingController : ControllerBase
             MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
             {
                 totalChunks = chunkFiles.Length,
-                format = mp4Path.EndsWith(".mp4") ? "mp4" : "webm",
-                ffmpegUsed = convertResult.success
+                format = "webm-chunks",
+                playbackMode = "mse"
             })
         };
 
@@ -297,7 +280,7 @@ public class VideoRecordingController : ControllerBase
         await db.SaveChangesAsync();
 
         logger.LogInformation("Video finalized (background) for attempt {AttemptId}: {Path} ({Size}KB, {Chunks} chunks)",
-            attemptId, relativePath, fileSize / 1024, chunkFiles.Length);
+            attemptId, relativePath, totalSize / 1024, chunkFiles.Length);
     }
 
     /// <summary>
@@ -502,9 +485,6 @@ public class VideoRecordingController : ControllerBase
 
     private int GetRetentionDays(SystemSettings settings)
     {
-        // Check if we have VideoRetentionDays property via reflection or metadata
-        // For MVP, use a default or check MetadataJson-style approach
-        // We'll add VideoRetentionDays to SystemSettings in a separate step
         try
         {
             var prop = settings.GetType().GetProperty("VideoRetentionDays");
@@ -515,93 +495,5 @@ public class VideoRecordingController : ControllerBase
         }
         catch { }
         return 30; // Default 30 days
-    }
-
-    private async Task<(bool success, string error)> RunFFmpeg(string arguments, string? contentRootPath = null)
-    {
-        try
-        {
-            var ffmpegPath = FindFFmpeg(contentRootPath ?? _env.ContentRootPath);
-            if (ffmpegPath == null)
-            {
-                return (false, "FFmpeg not found. Install FFmpeg and ensure it's in PATH.");
-            }
-
-            using var process = new System.Diagnostics.Process();
-            process.StartInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = ffmpegPath,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            process.Start();
-            var stderr = await process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync();
-
-            if (process.ExitCode != 0)
-            {
-                return (false, stderr);
-            }
-
-            return (true, string.Empty);
-        }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
-    }
-
-    private string? FindFFmpeg(string? contentRootPath = null)
-    {
-        var root = contentRootPath ?? _env.ContentRootPath;
-        // Check common locations on Windows
-        var candidates = new[]
-        {
-            "ffmpeg",
-            "ffmpeg.exe",
-            @"C:\ffmpeg\bin\ffmpeg.exe",
-            @"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-            Path.Combine(root, "tools", "ffmpeg.exe"),
-        };
-
-        foreach (var candidate in candidates)
-        {
-            try
-            {
-                var p = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = candidate,
-                    Arguments = "-version",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
-                p?.WaitForExit(5000);
-                if (p?.ExitCode == 0)
-                    return candidate;
-                p?.Dispose();
-            }
-            catch
-            {
-                // Not found, try next
-            }
-        }
-
-        return null;
-    }
-
-    private async Task BinaryConcatChunks(string[] chunkFiles, string outputPath)
-    {
-        await using var output = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
-        foreach (var chunkFile in chunkFiles)
-        {
-            await using var input = new FileStream(chunkFile, FileMode.Open, FileAccess.Read);
-            await input.CopyToAsync(output);
-        }
     }
 }

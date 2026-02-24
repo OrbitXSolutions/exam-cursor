@@ -99,6 +99,165 @@ export default function AIReportPage() {
     return url
   }
 
+  // ── Compute AI analysis scores from real event data ────────────────────────
+  function computeAnalysis(
+    events: AttemptEvent[],
+    sess: ProctorSession,
+  ): AIAnalysis {
+    // Count events per type (eventType is numeric)
+    const counts: Record<number, number> = {}
+    for (const e of events) {
+      counts[e.eventType] = (counts[e.eventType] || 0) + 1
+    }
+    const c = (t: number) => counts[t] || 0
+
+    // ── Face Detection Score (100 → 0) ──
+    // Penalties: FaceNotDetected(18)=8, MultipleFaces(19)=12, CameraBlocked(21)=10, WebcamDenied(16)=25
+    const faceDetPenalty =
+      c(18) * 8 + c(19) * 12 + c(21) * 10 + c(16) * 25
+    const faceDetectionScore = Math.max(0, Math.min(100, 100 - faceDetPenalty))
+
+    // ── Eye Tracking Score (100 → 0) ──
+    // Penalties: HeadTurned(22)=7, FaceOutOfFrame(20)=6
+    const eyePenalty = c(22) * 7 + c(20) * 6
+    const eyeTrackingScore = Math.max(0, Math.min(100, 100 - eyePenalty))
+
+    // ── Behavior Score (100 → 0) ──
+    // Penalties: TabSwitched(4)=8, WindowBlur(8)=4, CopyAttempt(10)=10, PasteAttempt(11)=10, RightClick(12)=5
+    const behaviorPenalty =
+      c(4) * 8 + c(8) * 4 + c(10) * 10 + c(11) * 10 + c(12) * 5
+    const behaviorScore = Math.max(0, Math.min(100, 100 - behaviorPenalty))
+
+    // ── Environment Score (100 → 0) ──
+    // Penalties: FullscreenExited(5)=10, CameraBlocked(21)=12, SnapshotFailed(17)=8
+    const envPenalty = c(5) * 10 + c(21) * 12 + c(17) * 8
+    const environmentScore = Math.max(0, Math.min(100, 100 - envPenalty))
+
+    // ── Overall Risk Score ──
+    // Weighted inverse: higher risk when scores are lower
+    // Face 35%, Behavior 30%, Eye 20%, Environment 15%
+    const overallRiskScore = Math.min(100, Math.max(0,
+      (100 - faceDetectionScore) * 0.35 +
+      (100 - behaviorScore) * 0.30 +
+      (100 - eyeTrackingScore) * 0.20 +
+      (100 - environmentScore) * 0.15
+    ))
+
+    // ── Suspicious Activities (built from real counts) ──
+    const suspiciousActivities: string[] = []
+    if (c(18) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `لم يتم اكتشاف الوجه ${c(18)} مرة`
+        : `Face not detected ${c(18)} time${c(18) > 1 ? "s" : ""}`
+    )
+    if (c(19) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `اكتشاف وجوه متعددة ${c(19)} مرة`
+        : `Multiple faces detected ${c(19)} time${c(19) > 1 ? "s" : ""}`
+    )
+    if (c(22) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `التفات الرأس ${c(22)} مرة`
+        : `Head turned away ${c(22)} time${c(22) > 1 ? "s" : ""}`
+    )
+    if (c(20) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `الوجه خارج الإطار ${c(20)} مرة`
+        : `Face out of frame ${c(20)} time${c(20) > 1 ? "s" : ""}`
+    )
+    if (c(21) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `الكاميرا محجوبة ${c(21)} مرة`
+        : `Camera blocked ${c(21)} time${c(21) > 1 ? "s" : ""}`
+    )
+    if (c(4) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `تبديل التبويب ${c(4)} مرة`
+        : `Tab switched ${c(4)} time${c(4) > 1 ? "s" : ""}`
+    )
+    if (c(5) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `خروج من الشاشة الكاملة ${c(5)} مرة`
+        : `Fullscreen exited ${c(5)} time${c(5) > 1 ? "s" : ""}`
+    )
+    if (c(8) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `فقدان تركيز النافذة ${c(8)} مرة`
+        : `Window lost focus ${c(8)} time${c(8) > 1 ? "s" : ""}`
+    )
+    if (c(10) + c(11) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `محاولة نسخ/لصق ${c(10) + c(11)} مرة`
+        : `Copy/paste attempt ${c(10) + c(11)} time${c(10) + c(11) > 1 ? "s" : ""}`
+    )
+    if (c(16) > 0) suspiciousActivities.push(
+      language === "ar"
+        ? `تم رفض الكاميرا`
+        : `Webcam access denied`
+    )
+
+    // ── Recommendations ──
+    const recommendations: string[] = []
+    if (overallRiskScore >= 50) {
+      recommendations.push(
+        language === "ar"
+          ? "مخاطر عالية — يوصى بمراجعة يدوية فورية ومراجعة التسجيلات"
+          : "High risk — immediate manual review and recording review recommended"
+      )
+    } else if (overallRiskScore >= 25) {
+      recommendations.push(
+        language === "ar"
+          ? "مخاطر متوسطة — يوصى بمراجعة أحداث التنبيه"
+          : "Medium risk — review alert events recommended"
+      )
+    }
+    if (c(19) > 0) {
+      recommendations.push(
+        language === "ar"
+          ? "تم اكتشاف وجوه متعددة — تحقق من وجود مساعدة خارجية"
+          : "Multiple faces detected — verify no external assistance"
+      )
+    }
+    if (c(4) >= 3) {
+      recommendations.push(
+        language === "ar"
+          ? `تبديل التبويب المتكرر (${c(4)} مرات) — تحقق من عدم استخدام مصادر خارجية`
+          : `Frequent tab switching (${c(4)} times) — verify no external resources used`
+      )
+    }
+    if (c(18) >= 3) {
+      recommendations.push(
+        language === "ar"
+          ? `غياب الوجه المتكرر (${c(18)} مرات) — قد يشير إلى وجود شخص آخر`
+          : `Frequent face absence (${c(18)} times) — may indicate another person present`
+      )
+    }
+    if (c(21) > 0) {
+      recommendations.push(
+        language === "ar"
+          ? "تم حظر الكاميرا — تحقق من سلامة التسجيل"
+          : "Camera was blocked — verify recording integrity"
+      )
+    }
+    if (recommendations.length === 0) {
+      recommendations.push(
+        language === "ar"
+          ? "لا توجد مخاوف كبيرة — الجلسة تبدو طبيعية"
+          : "No major concerns — session appears normal"
+      )
+    }
+
+    return {
+      overallRiskScore,
+      faceDetectionScore,
+      eyeTrackingScore,
+      behaviorScore,
+      environmentScore,
+      suspiciousActivities,
+      recommendations,
+    }
+  }
+
 
 
   useEffect(() => {
@@ -126,30 +285,15 @@ export default function AIReportPage() {
         if (selectedSession) {
           setSession(selectedSession)
 
-          // Generate mock AI analysis based on session data
-          // In a real implementation, this would come from an AI analysis endpoint
-          const mockAnalysis: AIAnalysis = {
-            overallRiskScore: selectedSession.riskScore ?? Math.random() * 30,
-            faceDetectionScore: 85 + Math.random() * 15,
-            eyeTrackingScore: 80 + Math.random() * 20,
-            behaviorScore: 75 + Math.random() * 25,
-            environmentScore: 90 + Math.random() * 10,
-            suspiciousActivities: selectedSession.totalViolations > 0
-              ? [
-                  language === "ar" ? "تم اكتشاف خروج من التبويب" : "Tab switch detected",
-                  ...(selectedSession.totalViolations > 1 ? [language === "ar" ? "حركة غير عادية" : "Unusual movement detected"] : []),
-                ]
-              : [],
-            recommendations: selectedSession.requiresReview
-              ? [language === "ar" ? "يوصى بمراجعة يدوية" : "Manual review recommended"]
-              : [language === "ar" ? "لا توجد مخاوف كبيرة" : "No major concerns"],
-          }
-          setAnalysis(mockAnalysis)
-
-          await Promise.all([
-            loadAttemptEvents(resolvedAttemptId),
+          // Load events + evidence first, then compute real analysis from events
+          const [evts] = await Promise.all([
+            loadAttemptEvents(selectedSession.attemptId ?? resolvedAttemptId),
             loadEvidence(selectedSession.id),
           ])
+
+          // Compute AI analysis from real event data
+          const realAnalysis = computeAnalysis(evts, selectedSession)
+          setAnalysis(realAnalysis)
         } else {
           setError(language === "ar" ? "لا توجد بيانات مراقبة" : "No proctoring data found")
         }
@@ -166,13 +310,16 @@ export default function AIReportPage() {
     }
   }, [examId, candidateId, language, attemptIdFromQuery])
 
-  async function loadAttemptEvents(attemptId: number) {
+  async function loadAttemptEvents(attemptId: number): Promise<AttemptEvent[]> {
     try {
       const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
-      setAttemptEvents(normalizeList<AttemptEvent>(res))
+      const evts = normalizeList<AttemptEvent>(res)
+      setAttemptEvents(evts)
+      return evts
     } catch (err) {
       console.warn("Failed to load attempt events:", err)
       setAttemptEvents([])
+      return []
     }
   }
 
@@ -215,6 +362,20 @@ export default function AIReportPage() {
   }
 
   const riskLevel = analysis ? getRiskLevel(analysis.overallRiskScore) : null
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return "text-green-600"
+    if (score >= 70) return "text-primary"
+    if (score >= 50) return "text-orange-600"
+    return "text-red-600"
+  }
+  const getProgressColor = (score: number) => {
+    if (score >= 90) return "[&>div]:bg-green-500"
+    if (score >= 70) return ""
+    if (score >= 50) return "[&>div]:bg-orange-500"
+    return "[&>div]:bg-red-500"
+  }
+
   const snapshotEvidence = evidence.filter(
     (e) =>
       e.type === 3 ||
@@ -272,60 +433,60 @@ export default function AIReportPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <Camera className="h-5 w-5 text-primary" />
+                  <Camera className={`h-5 w-5 ${getScoreColor(analysis.faceDetectionScore)}`} />
                   <span className="font-medium">
                     {language === "ar" ? "كشف الوجه" : "Face Detection"}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-primary mb-2">
+                <div className={`text-3xl font-bold ${getScoreColor(analysis.faceDetectionScore)} mb-2`}>
                   {analysis.faceDetectionScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.faceDetectionScore} className="h-2" />
+                <Progress value={analysis.faceDetectionScore} className={`h-2 ${getProgressColor(analysis.faceDetectionScore)}`} />
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <Eye className="h-5 w-5 text-primary" />
+                  <Eye className={`h-5 w-5 ${getScoreColor(analysis.eyeTrackingScore)}`} />
                   <span className="font-medium">
                     {language === "ar" ? "تتبع العين" : "Eye Tracking"}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-primary mb-2">
+                <div className={`text-3xl font-bold ${getScoreColor(analysis.eyeTrackingScore)} mb-2`}>
                   {analysis.eyeTrackingScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.eyeTrackingScore} className="h-2" />
+                <Progress value={analysis.eyeTrackingScore} className={`h-2 ${getProgressColor(analysis.eyeTrackingScore)}`} />
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <Clock className="h-5 w-5 text-primary" />
+                  <Clock className={`h-5 w-5 ${getScoreColor(analysis.behaviorScore)}`} />
                   <span className="font-medium">
                     {language === "ar" ? "السلوك" : "Behavior"}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-primary mb-2">
+                <div className={`text-3xl font-bold ${getScoreColor(analysis.behaviorScore)} mb-2`}>
                   {analysis.behaviorScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.behaviorScore} className="h-2" />
+                <Progress value={analysis.behaviorScore} className={`h-2 ${getProgressColor(analysis.behaviorScore)}`} />
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <Monitor className="h-5 w-5 text-primary" />
+                  <Monitor className={`h-5 w-5 ${getScoreColor(analysis.environmentScore)}`} />
                   <span className="font-medium">
                     {language === "ar" ? "البيئة" : "Environment"}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-primary mb-2">
+                <div className={`text-3xl font-bold ${getScoreColor(analysis.environmentScore)} mb-2`}>
                   {analysis.environmentScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.environmentScore} className="h-2" />
+                <Progress value={analysis.environmentScore} className={`h-2 ${getProgressColor(analysis.environmentScore)}`} />
               </CardContent>
             </Card>
           </div>
