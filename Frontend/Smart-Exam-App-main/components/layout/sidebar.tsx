@@ -50,6 +50,7 @@ import {
   Building2,
   Wrench,
   ShieldCheck,
+  ShieldAlert,
   Copy,
 } from "lucide-react"
 
@@ -128,6 +129,7 @@ const resultNavGroup: NavGroup = {
   children: [
     { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
     { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result", roles: [UserRole.Admin, UserRole.Instructor] },
+    { icon: ShieldAlert, labelKey: "nav.terminatedAttempts", href: "/results/terminated-attempts", roles: [UserRole.Admin, UserRole.Instructor] },
     { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report", roles: [UserRole.Admin, UserRole.Instructor] },
   ],
 }

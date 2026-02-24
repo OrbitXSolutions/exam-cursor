@@ -25,6 +25,8 @@ namespace Smart_Core.Application.DTOs.ExamResult
         public string GradingStatus { get; set; } = string.Empty;
         public DateTime? GradedAt { get; set; }
         public DateTime? LastAttemptAt { get; set; }
+        public string? AttemptStatusName { get; set; }
+        public string? ExpiryReasonName { get; set; }
     }
 
     public class CandidateResultListSummaryDto

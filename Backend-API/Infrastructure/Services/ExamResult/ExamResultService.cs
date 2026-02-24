@@ -772,7 +772,8 @@ Id = r.Id,
         var attemptsQuery = _context.Attempts
             .Include(a => a.Candidate)
             .Include(a => a.Exam)
-            .Where(a => a.Status == AttemptStatus.Submitted || a.Status == AttemptStatus.Expired)
+            .Where(a => a.Status == AttemptStatus.Submitted || a.Status == AttemptStatus.Expired
+                     || a.Status == AttemptStatus.ForceSubmitted || a.Status == AttemptStatus.Terminated)
             .AsQueryable();
 
         if (examId.HasValue && examId.Value > 0)
@@ -908,7 +909,9 @@ Id = r.Id,
                     GradingStatusCode = gradingStatusCode,
                     GradingStatus = gradingStatus,
                     GradedAt = gradingSession?.GradedAt,
-                    LastAttemptAt = grouped.LastAttemptAt
+                    LastAttemptAt = grouped.LastAttemptAt,
+                    AttemptStatusName = a.Status.ToString(),
+                    ExpiryReasonName = a.ExpiryReason != ExpiryReason.None ? a.ExpiryReason.ToString() : null
                 };
             })
             .OrderByDescending(x => x.LastAttemptAt)

@@ -121,10 +121,17 @@ export default function CandidateResultPage() {
     return () => { cancelled = true }
   }, [selectedExamId, refreshKey, fromGrading])
 
+  // Hide expired/terminated/force-submitted (shown on Terminated Attempts page)
+  const nonTerminatedCandidates = useMemo(() => {
+    return candidates.filter(
+      (c) => c.attemptStatusName !== "Terminated" && c.attemptStatusName !== "ForceSubmitted" && c.attemptStatusName !== "Expired"
+    )
+  }, [candidates])
+
   const statusFilteredCandidates = useMemo(() => {
-    if (resultStatus === RESULT_STATUS_ALL) return candidates
+    if (resultStatus === RESULT_STATUS_ALL) return nonTerminatedCandidates
     
-    return candidates.filter((c) => {
+    return nonTerminatedCandidates.filter((c) => {
       switch (resultStatus) {
         case RESULT_STATUS_PASSED:
           return c.isPassed === true
@@ -142,7 +149,7 @@ export default function CandidateResultPage() {
           return true
       }
     })
-  }, [candidates, resultStatus])
+  }, [nonTerminatedCandidates, resultStatus])
 
   const filteredCandidates = useMemo(() => {
     if (!searchQuery.trim()) return statusFilteredCandidates
@@ -371,6 +378,7 @@ export default function CandidateResultPage() {
                     <TableHead>{language === "ar" ? "المرشح" : "Candidate"}</TableHead>
                     <TableHead>{language === "ar" ? "الدرجة" : "Score"}</TableHead>
                     <TableHead>{language === "ar" ? "النسبة" : "Percentage"}</TableHead>
+                    <TableHead>{language === "ar" ? "حالة المحاولة" : "Attempt Status"}</TableHead>
                     <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                     <TableHead>{language === "ar" ? "حالة التصحيح" : "Grading Status"}</TableHead>
                     <TableHead>{language === "ar" ? "منشور" : "Published"}</TableHead>
@@ -403,6 +411,19 @@ export default function CandidateResultPage() {
                         </TableCell>
                         <TableCell>{row.score != null ? `${row.score.toFixed(1)}/${row.maxPossibleScore ?? 100}` : "—"}</TableCell>
                         <TableCell>{row.percentage != null ? `${row.percentage.toFixed(2)}%` : "—"}</TableCell>
+                        <TableCell>
+                          {(() => {
+                            const s = row.attemptStatusName ?? "Submitted"
+                            const map: Record<string, { label: string; labelAr: string; cls: string }> = {
+                              Submitted: { label: "Submitted", labelAr: "مُقدَّم", cls: "bg-amber-50 text-amber-700 border-amber-200" },
+                              Expired: { label: "Expired", labelAr: "منتهي", cls: "bg-rose-50 text-rose-700 border-rose-200" },
+                              ForceSubmitted: { label: "Force Ended", labelAr: "أُنهي قسراً", cls: "bg-red-50 text-red-700 border-red-200" },
+                              Terminated: { label: "Terminated", labelAr: "أُنهي بواسطة المراقب", cls: "bg-red-50 text-red-700 border-red-200" },
+                            }
+                            const entry = map[s] ?? { label: s, labelAr: s, cls: "" }
+                            return <Badge className={`border ${entry.cls}`}>{language === "ar" ? entry.labelAr : entry.label}</Badge>
+                          })()}
+                        </TableCell>
                         <TableCell>
                           {row.isPassed == null ? (
                             <Badge variant="outline" className="text-muted-foreground">—</Badge>

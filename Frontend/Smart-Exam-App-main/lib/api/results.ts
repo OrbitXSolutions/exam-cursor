@@ -45,6 +45,8 @@ export interface CandidateResultListItem {
   gradingStatus: string;
   gradedAt?: string;
   lastAttemptAt?: string;
+  attemptStatusName?: string;
+  expiryReasonName?: string;
 }
 
 export interface CandidateResultListSummary {

@@ -22,6 +22,9 @@ import {
   Pause,
   Download,
   Info,
+  Monitor,
+  MonitorOff,
+  Maximize2,
 } from "lucide-react"
 
 interface ProctorSession {
@@ -75,7 +78,9 @@ export default function CandidateVideoPage() {
   const { language, dir } = useI18n()
 
   const [sessions, setSessions] = useState<ProctorSession[]>([])
-  const [snapshots, setSnapshots] = useState<ProctorSnapshot[]>([])
+  const [snapshots, setSnapshots] = useState<ProctorSnapshot[]>([])  
+  const [screenSnapshots, setScreenSnapshots] = useState<ProctorSnapshot[]>([])
+  const [selectedImage, setSelectedImage] = useState<ProctorSnapshot | null>(null)
   const [attemptEvents, setAttemptEvents] = useState<AttemptEvent[]>([])
   const [selectedSession, setSelectedSession] = useState<ProctorSession | null>(null)
   const [loading, setLoading] = useState(true)
@@ -164,6 +169,15 @@ export default function CandidateVideoPage() {
       }))
 
       setSnapshots(snapshotList)
+
+      // Filter screen captures for the screen section
+      const screenOnly = snapshotList.filter(
+        (s) =>
+          s.snapshotType === 4 ||
+          s.snapshotTypeName?.toLowerCase().includes("screen")
+      )
+      setScreenSnapshots(screenOnly.length > 0 ? screenOnly : snapshotList)
+      setSelectedImage(null)
     } catch (err) {
       console.warn("Failed to load snapshots:", err)
       setSnapshots([])
@@ -387,48 +401,96 @@ export default function CandidateVideoPage() {
                   </CardContent>
                 </Card>
 
-                {/* Snapshots */}
+                {/* Screen Captures */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>
-                      {language === "ar" ? "اللقطات" : "Snapshots"}
+                    <CardTitle className="flex items-center gap-2">
+                      <Monitor className="h-5 w-5" />
+                      {language === "ar" ? "لقطات الشاشة" : "Screen Captures"}
                     </CardTitle>
                     <CardDescription>
                       {language === "ar"
-                        ? `${snapshots.length} لقطة مسجلة`
-                        : `${snapshots.length} snapshots captured`}
+                        ? `${screenSnapshots.length} لقطة شاشة مسجلة`
+                        : `${screenSnapshots.length} screen captures recorded`}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {snapshots.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        {language === "ar" ? "لا توجد لقطات متاحة" : "No snapshots available"}
+                    {screenSnapshots.length === 0 ? (
+                      <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
+                        <MonitorOff className="h-16 w-16 text-muted-foreground mb-4" />
+                        <p className="text-muted-foreground">
+                          {language === "ar"
+                            ? "لا تتوفر لقطات شاشة"
+                            : "No screen captures available"}
+                        </p>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {snapshots.map((snapshot) => (
-                          <div key={snapshot.id} className="relative group">
-                            <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                      <div className="space-y-4">
+                        {/* Main display */}
+                        {selectedImage ? (
+                          <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                            {selectedImage.fileUrl ? (
+                              <img
+                                src={selectedImage.fileUrl}
+                                alt={`Screen ${selectedImage.id}`}
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Monitor className="h-16 w-16 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded text-sm">
+                              {new Date(selectedImage.capturedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                            </div>
+                            <Button
+                              variant="secondary"
+                              size="icon"
+                              className="absolute top-4 right-4"
+                              onClick={() => setSelectedImage(null)}
+                            >
+                              <Maximize2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                            <div className="text-center">
+                              <Monitor className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                              <p className="text-muted-foreground">
+                                {language === "ar"
+                                  ? "انقر على لقطة لعرضها"
+                                  : "Click a capture to view"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Thumbnail grid */}
+                        <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                          {screenSnapshots.map((snapshot) => (
+                            <button
+                              key={snapshot.id}
+                              onClick={() => setSelectedImage(snapshot)}
+                              className={`aspect-video rounded overflow-hidden border-2 transition-colors ${
+                                selectedImage?.id === snapshot.id
+                                  ? "border-primary"
+                                  : "border-transparent hover:border-primary/50"
+                              }`}
+                            >
                               {snapshot.fileUrl ? (
                                 <img
                                   src={snapshot.fileUrl}
-                                  alt={`Snapshot ${snapshot.id}`}
+                                  alt={`Screen ${snapshot.id}`}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Video className="h-8 w-8 text-muted-foreground" />
+                                <div className="w-full h-full bg-muted flex items-center justify-center">
+                                  <Monitor className="h-4 w-4 text-muted-foreground" />
                                 </div>
                               )}
-                            </div>
-                            <div className="mt-1 text-xs text-muted-foreground">
-                              {new Date(snapshot.capturedAt).toLocaleTimeString(language === "ar" ? "ar-SA" : "en-US")}
-                            </div>
-                            <Badge variant="outline" className="absolute top-2 right-2 text-xs">
-                              {snapshot.snapshotTypeName}
-                            </Badge>
-                          </div>
-                        ))}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </CardContent>

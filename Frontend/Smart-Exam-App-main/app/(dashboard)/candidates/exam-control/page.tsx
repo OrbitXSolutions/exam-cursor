@@ -54,6 +54,7 @@ function statusVariant(status: string): "default" | "secondary" | "destructive" 
     case "Started": return "secondary"
     case "Paused": return "outline"
     case "ForceSubmitted": return "destructive"
+    case "Terminated": return "destructive"
     default: return "outline"
   }
 }
@@ -206,6 +207,7 @@ export default function ExamControlPage() {
       InProgress: { en: "In Progress", ar: "قيد التنفيذ" },
       Paused: { en: "Paused", ar: "متوقف" },
       ForceSubmitted: { en: "Force Ended", ar: "أُنهي قسراً" },
+      Terminated: { en: "Terminated", ar: "أُنهي بواسطة المراقب" },
       Submitted: { en: "Submitted", ar: "مُقدَّم" },
       Expired: { en: "Expired", ar: "منتهي" },
       Cancelled: { en: "Cancelled", ar: "ملغي" },
