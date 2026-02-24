@@ -34,7 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle } from "lucide-react"
+import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck } from "lucide-react"
 
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
@@ -481,6 +481,48 @@ export default function ExamConfigurationPage() {
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
                 <div className="grid gap-4">
+                  {/* Activate All Toggle */}
+                  <div className="flex items-center justify-between p-4 border-2 rounded-lg bg-linear-to-r from-teal-50/80 to-emerald-50/80 dark:from-teal-950/30 dark:to-emerald-950/30 border-teal-300 dark:border-teal-800">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-5 w-5 text-teal-600" />
+                        <Label className="text-base font-bold">
+                          {language === "ar" ? "تفعيل جميع إعدادات الأمان" : "Activate All Security Settings"}
+                        </Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {language === "ar"
+                          ? "تبديل جميع خيارات الأمان دفعة واحدة"
+                          : "Toggle all security options at once"}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={
+                        formData.requireProctoring &&
+                        formData.requireIdVerification &&
+                        formData.preventCopyPaste &&
+                        formData.preventScreenCapture &&
+                        formData.requireWebcam &&
+                        formData.requireFullscreen &&
+                        formData.browserLockdown
+                      }
+                      onCheckedChange={(checked) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          requireProctoring: checked,
+                          requireIdVerification: checked,
+                          preventCopyPaste: checked,
+                          preventScreenCapture: checked,
+                          requireWebcam: checked,
+                          requireFullscreen: checked,
+                          browserLockdown: checked,
+                        }))
+                      }}
+                    />
+                  </div>
+
+                  <div className="border-b" />
+
                   <div className="flex items-center justify-between p-4 border rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">

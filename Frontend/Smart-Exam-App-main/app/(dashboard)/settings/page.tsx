@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Save, Loader2, Settings, Shield, Lock, Globe, Palette } from "lucide-react"
+import { Save, Loader2, Settings, Shield, Lock, Globe, Palette, Video, Brain, Radio } from "lucide-react"
 import { toast } from "sonner"
 
 export default function SettingsPage() {
@@ -300,6 +300,66 @@ export default function SettingsPage() {
                     ? "وضع المراقبة الافتراضي للاختبارات الجديدة"
                     : "Default proctoring mode for new exams"}
                 </p>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Radio className="h-4 w-4 text-green-600" />
+                    <Label className="text-base font-medium">
+                      {language === "ar" ? "تفعيل البث المباشر" : "Enable Live Video"}
+                    </Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "السماح بالبث المباشر للفيديو أثناء المراقبة"
+                      : "Allow live video streaming during proctoring sessions"}
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.enableLiveVideo}
+                  onCheckedChange={(checked) => setSettings({ ...settings, enableLiveVideo: checked })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Video className="h-4 w-4 text-blue-600" />
+                    <Label className="text-base font-medium">
+                      {language === "ar" ? "تفعيل تسجيل الفيديو" : "Enable Video Recording"}
+                    </Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "تسجيل جلسات الامتحان لمراجعتها لاحقاً"
+                      : "Record exam sessions for later review"}
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.enableVideoRecording}
+                  onCheckedChange={(checked) => setSettings({ ...settings, enableVideoRecording: checked })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-purple-600" />
+                    <Label className="text-base font-medium">
+                      {language === "ar" ? "تفعيل المراقبة الذكية (AI)" : "Enable Smart Monitoring (AI)"}
+                    </Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar"
+                      ? "استخدام الذكاء الاصطناعي لكشف الوجه وتحليل السلوك تلقائياً"
+                      : "Use AI-powered face detection and behavior analysis automatically"}
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.enableSmartMonitoring}
+                  onCheckedChange={(checked) => setSettings({ ...settings, enableSmartMonitoring: checked })}
+                />
               </div>
             </CardContent>
           </Card>
