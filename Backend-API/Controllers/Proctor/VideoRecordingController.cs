@@ -75,10 +75,22 @@ public class VideoRecordingController : ControllerBase
             enableVideoRecording = _configuration.GetValue("Proctoring:EnableVideoRecording", true);
         }
 
+        // Smart Monitoring flag
+        bool enableSmartMonitoring;
+        if (settings != null)
+        {
+            enableSmartMonitoring = settings.EnableSmartMonitoring;
+        }
+        else
+        {
+            enableSmartMonitoring = _configuration.GetValue("Proctoring:EnableSmartMonitoring", true);
+        }
+
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             enableLiveVideo,
             enableVideoRecording,
+            enableSmartMonitoring,
             stunServers
         }));
     }

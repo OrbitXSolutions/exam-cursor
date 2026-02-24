@@ -23,6 +23,11 @@ import {
   Shield,
   Filter,
   FileText,
+  UserX,
+  Users,
+  Move,
+  VideoOff,
+  RotateCcw,
 } from "lucide-react"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -56,6 +61,11 @@ const ALERT_EVENT_TYPES = new Set([
   "PasteAttempt",
   "RightClickAttempt",
   "TimedOut",
+  "FaceNotDetected",
+  "MultipleFacesDetected",
+  "FaceOutOfFrame",
+  "CameraBlocked",
+  "HeadTurnDetected",
 ])
 
 const LIFECYCLE_EVENT_TYPES = new Set([
@@ -92,6 +102,16 @@ function getEventIcon(eventTypeName: string) {
       return <ClipboardPaste className="h-4 w-4" />
     case "RightClickAttempt":
       return <MousePointer className="h-4 w-4" />
+    case "FaceNotDetected":
+      return <UserX className="h-4 w-4" />
+    case "MultipleFacesDetected":
+      return <Users className="h-4 w-4" />
+    case "FaceOutOfFrame":
+      return <Move className="h-4 w-4" />
+    case "CameraBlocked":
+      return <VideoOff className="h-4 w-4" />
+    case "HeadTurnDetected":
+      return <RotateCcw className="h-4 w-4" />
     default:
       return <FileText className="h-4 w-4" />
   }
@@ -173,6 +193,11 @@ function getEventLabel(eventTypeName: string, language: string): string {
       case "CopyAttempt": return "Copy Attempt"
       case "PasteAttempt": return "Paste Attempt"
       case "RightClickAttempt": return "Right Click Attempt"
+      case "FaceNotDetected": return "Face Not Detected"
+      case "MultipleFacesDetected": return "Multiple Faces"
+      case "FaceOutOfFrame": return "Face Out of Frame"
+      case "CameraBlocked": return "Camera Blocked"
+      case "HeadTurnDetected": return "Head Turned Away"
       default: return eventTypeName
     }
   }
@@ -189,6 +214,11 @@ function getEventLabel(eventTypeName: string, language: string): string {
     case "CopyAttempt": return "محاولة نسخ"
     case "PasteAttempt": return "محاولة لصق"
     case "RightClickAttempt": return "محاولة نقر يمين"
+    case "FaceNotDetected": return "لم يتم اكتشاف الوجه"
+    case "MultipleFacesDetected": return "وجوه متعددة"
+    case "FaceOutOfFrame": return "الوجه خارج الإطار"
+    case "CameraBlocked": return "الكاميرا محجوبة"
+    case "HeadTurnDetected": return "التفات الرأس"
     default: return eventTypeName
   }
 }
@@ -248,10 +278,13 @@ function getEventDescription(
     } catch {}
   }
 
-  // For alert events with timestamps
+  // For AI Smart Monitoring events — show detailed reason
   if (ALERT_EVENT_TYPES.has(event.eventTypeName) && event.metadataJson) {
     try {
       const meta = JSON.parse(event.metadataJson)
+      if (meta.source === "smart_monitoring" && meta.detail) {
+        return meta.detail
+      }
       if (meta.blocked) {
         return language === "ar" ? "تم الحظر" : "Blocked"
       }

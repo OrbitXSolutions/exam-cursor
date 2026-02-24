@@ -30,4 +30,7 @@ public class SystemSettings
     // Video Feature Flags (overrides appsettings at DB level if set)
     public bool EnableLiveVideo { get; set; } = true;
     public bool EnableVideoRecording { get; set; } = true;
+
+    // Smart Monitoring (AI face detection)
+    public bool EnableSmartMonitoring { get; set; } = true;
 }

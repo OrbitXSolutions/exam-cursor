@@ -47,6 +47,11 @@ export enum AttemptEventType {
   TimeAdded = 15,
   WebcamDenied = 16,
   SnapshotFailed = 17,
+  FaceNotDetected = 18,
+  MultipleFacesDetected = 19,
+  FaceOutOfFrame = 20,
+  CameraBlocked = 21,
+  HeadTurnDetected = 22,
 }
 
 // Journey Stage - mapped from internal statuses

@@ -28,6 +28,11 @@ public class AttemptService : IAttemptService
     AttemptEventType.WindowBlur,
     AttemptEventType.WebcamDenied,
     AttemptEventType.SnapshotFailed,
+    AttemptEventType.FaceNotDetected,
+    AttemptEventType.MultipleFacesDetected,
+    AttemptEventType.FaceOutOfFrame,
+    AttemptEventType.CameraBlocked,
+    AttemptEventType.HeadTurnDetected,
   };
 
   public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub)
@@ -747,6 +752,11 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     AttemptEventType.WindowBlur => "Medium",
     AttemptEventType.WebcamDenied => "Critical",
     AttemptEventType.SnapshotFailed => "Medium",
+    AttemptEventType.FaceNotDetected => "High",
+    AttemptEventType.MultipleFacesDetected => "Critical",
+    AttemptEventType.FaceOutOfFrame => "Medium",
+    AttemptEventType.CameraBlocked => "High",
+    AttemptEventType.HeadTurnDetected => "Medium",
     _ => "Low",
   };
 

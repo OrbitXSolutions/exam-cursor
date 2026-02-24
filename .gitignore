@@ -20,3 +20,6 @@ appsettings.*.json
 # ===== OS =====
 .DS_Store
 Thumbs.db
+
+# ===== Media Storage =====
+Backend-API/MediaStorage/

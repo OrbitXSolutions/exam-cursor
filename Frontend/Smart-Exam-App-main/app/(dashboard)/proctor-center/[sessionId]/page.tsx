@@ -691,6 +691,16 @@ export default function SessionDetailPage() {
                           }`} />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">{event.eventTypeName || getEventTypeName(event.eventType)}</span>
+                            {(() => {
+                              if (!event.metadataJson) return null
+                              try {
+                                const meta = JSON.parse(event.metadataJson)
+                                if (meta.source === "smart_monitoring" && meta.detail) {
+                                  return <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{meta.detail}</p>
+                                }
+                              } catch {}
+                              return null
+                            })()}
                           </div>
                           {isViolation && (
                             <Badge variant="outline" className={`text-xs flex-shrink-0 ${
