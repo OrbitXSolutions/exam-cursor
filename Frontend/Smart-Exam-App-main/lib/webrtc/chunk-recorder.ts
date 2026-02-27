@@ -4,7 +4,7 @@
  * Implements retry with exponential backoff for reliability.
  */
 
-const CHUNK_DURATION_MS = 3000; // 3 seconds per chunk
+const CHUNK_DURATION_MS = 10000; // 10 seconds per chunk
 const MAX_UPLOAD_RETRIES = 3;
 const BASE_RETRY_DELAY_MS = 1000;
 

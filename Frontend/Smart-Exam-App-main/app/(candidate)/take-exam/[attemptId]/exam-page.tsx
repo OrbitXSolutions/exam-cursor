@@ -550,12 +550,41 @@ export default function ExamPage() {
                   onViolation: (event) => {
                     console.log(`%c[SmartMonitoring] 🚨 Violation: ${event.type} — ${event.message}`, 'color: #f44336; font-weight: bold')
 
-                    // 1. Show warning overlay (centred AlertDialog + beep)
-                    playWarningBeep()
-                    setProctorWarningMessage(event.message)
-                    setProctorWarningOpen(true)
+                    // Play a single soft alert beep (not the aggressive 3-beep used for proctor warnings)
+                    try {
+                      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+                      const osc = ctx.createOscillator()
+                      const gain = ctx.createGain()
+                      osc.type = "sine"
+                      osc.frequency.value = 660
+                      gain.gain.value = 0.2
+                      osc.connect(gain)
+                      gain.connect(ctx.destination)
+                      osc.start(ctx.currentTime)
+                      osc.stop(ctx.currentTime + 0.2)
+                      setTimeout(() => ctx.close().catch(() => {}), 500)
+                    } catch {}
 
-                    // 2. Log event to backend (auto-pushes to proctor via SignalR)
+                    // Show styled non-blocking toast for AI-detected violations
+                    // (the full "Warning from Proctor" popup is reserved for real proctor warnings)
+                    toast.warning(event.message, {
+                      duration: 8000,
+                      id: `smart-monitoring-${event.type}`,
+                      icon: "⚠️",
+                      style: {
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        padding: "14px 18px",
+                        borderLeft: "4px solid #f59e0b",
+                        background: "#fffbeb",
+                        color: "#92400e",
+                      },
+                      description: language === "ar"
+                        ? "يرجى الالتزام بتعليمات الاختبار"
+                        : "Please follow the exam guidelines",
+                    })
+
+                    // Log event to backend (auto-pushes to proctor via SignalR)
                     const eventType = violationToEventType[event.type]
                     if (eventType !== undefined) {
                       logAttemptEvent(session.attemptId, {

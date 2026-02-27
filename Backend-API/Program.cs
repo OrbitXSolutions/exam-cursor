@@ -255,7 +255,9 @@ builder.Services.AddCors(options =>
                 "http://localhost:3000",
                 "https://localhost:3000",
                 "http://localhost:5221",
-                "https://localhost:7184")
+                "https://localhost:7184",
+                "https://smartexam-sable.vercel.app",
+                "https://zoolker-003-site8.jtempurl.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

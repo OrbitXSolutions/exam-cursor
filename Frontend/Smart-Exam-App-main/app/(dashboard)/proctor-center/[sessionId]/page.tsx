@@ -166,10 +166,6 @@ export default function SessionDetailPage() {
           }
         },
         onExamSubmitted: (attemptId) => {
-          toast.info(`Candidate has submitted the exam (Attempt #${attemptId})`, {
-            duration: 10000,
-            icon: "\u2705",
-          })
           // Show session-ended overlay and stop live video
           setSessionEnded({ reason: "Submitted" })
           setHasRemoteStream(false)
@@ -179,6 +175,28 @@ export default function SessionDetailPage() {
             setSession(data.session)
             setScreenshots(data.screenshots)
           }).catch(() => {})
+
+          // Build the redirect URL — video page with all session evidence
+          const reportUrl = `/proctor-center/video/${session?.candidateId ?? "unknown"}?attemptId=${attemptId}`
+
+          // Prominent toast with 15s duration + action button
+          toast.success(
+            `Candidate has submitted the exam (Attempt #${attemptId})`,
+            {
+              description: "Redirecting to candidate report in 15 seconds…",
+              duration: 15000,
+              icon: "✅",
+              action: {
+                label: "View Report Now",
+                onClick: () => router.push(reportUrl),
+              },
+            }
+          )
+
+          // Auto-redirect after 15 seconds
+          setTimeout(() => {
+            router.push(reportUrl)
+          }, 15000)
         },
         onSignalRStatusChange: (connected) => {
           console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)

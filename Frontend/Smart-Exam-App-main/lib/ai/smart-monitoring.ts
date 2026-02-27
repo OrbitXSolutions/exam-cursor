@@ -63,8 +63,8 @@ export interface SmartMonitoringConfig {
 
 const DEFAULTS: Required<SmartMonitoringConfig> = {
   continuousThresholdMs: 2000,
-  cooldownMs: 10000,
-  detectionIntervalMs: 200,
+  cooldownMs: 30000,
+  detectionIntervalMs: 2000,
   outOfFrameMargin: 0.3,
   headYawThresholdDeg: 30,
   headPitchThresholdDeg: 25,
