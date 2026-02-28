@@ -182,6 +182,12 @@ public interface IProctorService
   /// </summary>
   Task<int> CheckMissedHeartbeatsAsync(int thresholdSeconds);
 
+  /// <summary>
+  /// Get top triage recommendations for the proctor assistant.
+  /// Returns active sessions ranked by risk with human-readable reasons.
+  /// </summary>
+  Task<ApiResponse<List<TriageRecommendationDto>>> GetTriageRecommendationsAsync(int top = 5, bool includeSample = true);
+
   #endregion
 
   #region Proctor Actions

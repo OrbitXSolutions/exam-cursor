@@ -13,13 +13,3 @@ I have few tasks to working on it,
 
 Let's start Task1
 first dicusess with you only the situation and what to do the implement OK?
-
-For Subjective Questions We agreed to use QuestionAnswer table
-
-to store the answer, Done
-
-in grading page should shows here if not null to help the exmanier to grade the answers right?
-
-and we agreed to use AI model to grade and suggest grade and comment for examnier
-
-and you asked me for Credential for model AI right?

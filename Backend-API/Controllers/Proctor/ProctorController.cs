@@ -457,5 +457,17 @@ public class ProctorController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    /// <summary>
+    /// Get top triage recommendations for the proctor AI assistant.
+    /// Returns active sessions ranked by risk with human-readable reasons.
+    /// </summary>
+    [HttpGet("triage")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    public async Task<IActionResult> GetTriageRecommendations([FromQuery] int top = 5, [FromQuery] bool includeSample = true)
+    {
+        var result = await _proctorService.GetTriageRecommendationsAsync(top, includeSample);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     #endregion
 }

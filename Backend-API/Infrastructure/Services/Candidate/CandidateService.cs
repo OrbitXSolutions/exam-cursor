@@ -1312,7 +1312,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 ExamTitleEn = exam?.TitleEn ?? "Exam",
                 ExamTitleAr = exam?.TitleAr ?? "??????",
                 AttemptId = result.AttemptId,
-                ActivityDate = result.PublishedAt.Value,
+                ActivityDate = result.PublishedAt ?? DateTime.UtcNow,
                 Description = result.IsPassed ? "Passed" : "Not Passed",
                 Score = result.TotalScore,
                 IsPassed = result.IsPassed

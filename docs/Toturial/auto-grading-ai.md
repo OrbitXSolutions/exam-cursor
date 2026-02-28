@@ -31,3 +31,9 @@ Scenario How AI grades
 With model answer/rubric Compares student answer against the rubric — higher accuracy
 Without model answer Uses its own subject knowledge to evaluate — still reliable
 The confidence % reflects how sure the AI is. With a rubric it'll typically be 80-95%. Without one (like here), it can still be 100% for straightforward questions
+
+## For Push Code
+
+Done. Your API key is now in appsettings.Development.json, which is already gitignored (line 18 of your .gitignore has appsettings.\*.json). It will never be pushed to GitHub.
+
+.NET automatically merges appsettings.Development.json over appsettings.json when running in Development mode, so the placeholder in appsettings.json gets overridden with your real key at runtime. No code changes needed.
