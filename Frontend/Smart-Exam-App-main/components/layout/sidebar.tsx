@@ -53,6 +53,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Copy,
+  Sparkles,
 } from "lucide-react"
 
 interface NavItem {

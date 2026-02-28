@@ -107,6 +107,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     availableQuestionsCount: number
   }>>([])
   const [loadedBuilderData, setLoadedBuilderData] = useState<ExamBuilderDto | null>(null)
+  const [examTotalPoints, setExamTotalPoints] = useState<number>(0)
 
   // Load exam data in edit mode
   useEffect(() => {
@@ -142,6 +143,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         passScore: exam.passScore,
         isActive: exam.isActive,
       })
+
+      // Store actual total points from backend (sum of individual question points)
+      setExamTotalPoints(exam.totalPoints ?? 0)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to load exam"
       setError(errorMessage)
@@ -435,6 +439,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   // Get total questions count from all sections
   const getTotalQuestionsCount = () => {
     return builderSections.reduce((sum, s) => sum + s.pickCount, 0)
+  }
+
+  // Get total points from the exam (sum of individual question points)
+  const getTotalPoints = () => {
+    return examTotalPoints
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -1164,7 +1173,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                         <div className="flex items-center gap-2">
                           <Target className="h-4 w-4 text-orange-500" />
                           <span className="text-sm font-medium">Total Points:</span>
-                          <Badge variant="outline" className="text-sm font-semibold">{getTotalQuestionsCount()}</Badge>
+                          <Badge variant="outline" className="text-sm font-semibold">{getTotalPoints()}</Badge>
                         </div>
                         <Separator orientation="vertical" className="h-5" />
                         <div className="flex items-center gap-2">
@@ -1173,23 +1182,23 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                           <Input
                             type="number"
                             min="0"
-                            max={getTotalQuestionsCount()}
+                            max={getTotalPoints()}
                             value={formData.passScore}
                             onChange={(e) => {
                               const val = Number.parseInt(e.target.value) || 0
-                              updateField("passScore", Math.min(val, getTotalQuestionsCount()))
+                              updateField("passScore", Math.min(val, getTotalPoints()))
                             }}
-                            className={`w-24 h-9 ${formData.passScore > getTotalQuestionsCount() ? "border-destructive" : ""}`}
+                            className={`w-24 h-9 ${formData.passScore > getTotalPoints() ? "border-destructive" : ""}`}
                           />
                         </div>
                       </div>
-                      {formData.passScore > getTotalQuestionsCount() && (
+                      {formData.passScore > getTotalPoints() && (
                         <p className="text-xs text-destructive">
-                          Must be less than or equal to the exam total points ({getTotalQuestionsCount()})
+                          Must be less than or equal to the exam total points ({getTotalPoints()})
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Must be ≤ total points ({getTotalQuestionsCount()})
+                        Must be ≤ total points ({getTotalPoints()})
                       </p>
                       {/* Action Buttons */}
                       <div className="flex justify-end gap-3 pt-2 border-t">

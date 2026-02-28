@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
 import { UserRole } from "@/lib/types"
-import { useBranding } from "@/lib/hooks/use-branding"
+import { useBranding, useApplyBrandingColor } from "@/lib/hooks/use-branding"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,6 +24,9 @@ export default function CandidateLoginPage() {
   const { login, isLoading } = useAuth()
   const { t, isRTL, language } = useI18n()
   const { branding, loading: brandingLoading, hasOrgBranding, logoSrc, orgName } = useBranding()
+
+  // Apply organization primary color
+  useApplyBrandingColor()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -108,9 +111,6 @@ export default function CandidateLoginPage() {
         )}
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight">{orgName}</h1>
-          {hasOrgBranding && branding.footerText && (
-            <p className="mt-1 text-sm text-muted-foreground max-w-sm">{branding.footerText}</p>
-          )}
         </div>
       </div>
 

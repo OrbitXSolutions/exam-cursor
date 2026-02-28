@@ -9,6 +9,8 @@ import { useI18n } from "@/lib/i18n/context"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { FullPageLoader } from "@/components/ui/loading-spinner"
+import { useApplyBrandingColor } from "@/lib/hooks/use-branding"
+import { UserRole } from "@/lib/types"
 
 export default function DashboardLayout({
   children,
@@ -16,8 +18,12 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, hasRole } = useAuth()
   const { isRTL } = useI18n()
+
+  // Apply organization primary color for candidate users
+  const isCandidate = hasRole(UserRole.Candidate)
+  useApplyBrandingColor(isCandidate)
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

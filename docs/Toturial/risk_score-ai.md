@@ -157,3 +157,10 @@ AI Response panel → slides in with purple border + gradient background, ✨ AI
 Demo checkbox → top-right corner, checked by default. When checked, backend returns sample data if no real sessions exist. Unchecked = production mode (real data only).
 Sample indicator → small pulsing dot with "Sample data" label only shows when demo data is displayed
 To your question: No, this does not use an actual AI model. It's a rule-based engine — the backend queries active sessions, groups recent events by type, and builds human-readable reasons from the event counts. It looks and feels AI-powered in the demo, but it's deterministic logic. Integrating a real LLM can be done later if needed.
+
+How it works in the demo:
+Proctor opens session details → sees the new "AI Proctor Report" card in the sidebar
+Clicks "Generate AI Analysis" → loading spinner while GPT-4o analyzes
+Gets back: risk level badge, confidence %, risk explanation, suspicious behaviors list, actionable recommendation, collapsible detailed analysis
+Can "Regenerate" anytime for updated analysis
+Everything is advisory only — exactly like AI grading

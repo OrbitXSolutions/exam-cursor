@@ -395,6 +395,30 @@ export async function terminateSession(
   await apiClient.post(`/Proctor/session/${sessionId}/terminate`, { reason });
 }
 
+// ============ AI PROCTOR ANALYSIS ============
+
+export interface AiProctorAnalysis {
+  riskLevel: string;
+  riskExplanation: string;
+  suspiciousBehaviors: string[];
+  recommendation: string;
+  confidence: number;
+  detailedAnalysis: string;
+  model: string;
+  generatedAt: string;
+}
+
+/**
+ * Generate AI-powered risk analysis for a proctoring session.
+ * Uses GPT-4o to analyze events, violations, and patterns.
+ * Advisory only — the proctor always has final authority.
+ * GET /Proctor/session/{sessionId}/ai-analysis
+ */
+export async function getAiProctorAnalysis(sessionId: string): Promise<AiProctorAnalysis> {
+  const res = await apiClient.get(`/Proctor/session/${sessionId}/ai-analysis`);
+  return res.data;
+}
+
 /**
  * Upload webcam snapshot during exam (for proctoring).
  * Returns { success, error? } — does NOT swallow errors.
