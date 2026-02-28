@@ -199,6 +199,9 @@ public class GradingService : IGradingService
     .Include(gs => gs.Answers)
                 .ThenInclude(ga => ga.Question)
            .ThenInclude(q => q.Options)
+    .Include(gs => gs.Answers)
+                .ThenInclude(ga => ga.Question)
+           .ThenInclude(q => q.AnswerKey)
      .FirstOrDefaultAsync(gs => gs.Id == gradingSessionId);
 
         if (session == null)
@@ -225,6 +228,9 @@ public class GradingService : IGradingService
          .Include(gs => gs.Answers)
            .ThenInclude(ga => ga.Question)
          .ThenInclude(q => q.Options)
+         .Include(gs => gs.Answers)
+           .ThenInclude(ga => ga.Question)
+         .ThenInclude(q => q.AnswerKey)
     .FirstOrDefaultAsync(gs => gs.AttemptId == attemptId);
 
         if (session == null)

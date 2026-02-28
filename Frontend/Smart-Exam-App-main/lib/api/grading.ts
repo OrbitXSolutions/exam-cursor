@@ -284,3 +284,36 @@ export async function finalizeResult(
     return false;
   }
 }
+
+// ============================================
+// AI GRADING SUGGESTION
+// ============================================
+
+export interface AiGradeSuggestion {
+  suggestedScore: number;
+  suggestedComment: string;
+  confidence: number;
+  model: string;
+}
+
+/**
+ * Get AI-suggested grade and feedback for a subjective/essay question.
+ * Uses GPT-4o to analyze the student's answer against the question and rubric.
+ * The examiner always has final authority over the grade.
+ */
+export async function getAiGradeSuggestion(
+  gradingSessionId: number,
+  questionId: number,
+): Promise<{ data: AiGradeSuggestion | null; error?: string }> {
+  try {
+    const result = await apiClient.post<AiGradeSuggestion>(
+      "/Grading/ai-suggest",
+      { gradingSessionId, questionId },
+    );
+    return { data: result ?? null };
+  } catch (err) {
+    const msg = (err as Error)?.message ?? "AI service unavailable";
+    console.warn("[getAiGradeSuggestion] Failed:", msg);
+    return { data: null, error: msg };
+  }
+}

@@ -191,6 +191,10 @@ MappingConfig.RegisterMappings();
 
 // Media Storage Configuration
 builder.Services.Configure<MediaStorageSettings>(builder.Configuration.GetSection("MediaStorage"));
+
+// OpenAI Configuration
+builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
+builder.Services.AddHttpClient();
 var mediaStorageProvider = builder.Configuration.GetValue<string>("MediaStorage:Provider") ?? "Local";
 
 if (mediaStorageProvider.Equals("S3", StringComparison.OrdinalIgnoreCase))
@@ -216,6 +220,7 @@ builder.Services.AddScoped<IQuestionBankService, QuestionBankService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
 builder.Services.AddScoped<IGradingService, GradingService>();
+builder.Services.AddScoped<IAiGradingService, AiGradingService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IProctorService, ProctorService>();

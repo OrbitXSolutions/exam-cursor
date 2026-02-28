@@ -175,3 +175,21 @@ Overlay appears on the live video showing "Exam Submitted" with a green checkmar
 Green success toast (15 seconds) appears: "Candidate has submitted the exam (Attempt #X)" with a "View Report Now" action button the proctor can click immediately
 Auto-redirect after 15 seconds to /proctor-center/video/{candidateId}?attemptId={attemptId} — the candidate's full session evidence page (video recording, snapshots, screen captures, events log)
 The proctor can either click "View Report Now" on the toast to go immediately, or wait 15 seconds for the auto-redirect. They won't stay stuck on the dead session details page.
+
+##
+
+Issue 2: No STUN/TURN servers configured (CRITICAL for WebRTC)
+StunServers: [] in appsettings — works on localhost because both browsers are on the same network. On the server, candidate and proctor are on different networks, so WebRTC peer-to-peer can't discover public IPs without STUN, and can't relay through NAT without TURN.
+
+3. No Transport Fallback
+   Problem: skipNegotiation: true + WebSockets only — if IIS WebSocket module has any issue, connection dies with no fallback.
+   Fix: In production, the client now uses accessTokenFactory with negotiate enabled, allowing automatic fallback to ServerSentEvents → LongPolling. Localhost keeps the fast skipNegotiation path.
+
+4. No STUN Servers (WebRTC breaks across networks)
+   Problem: StunServers: [] — works on localhost (same network), fails on server (candidate and proctor on different networks, NAT can't be traversed).
+   Fix: Added Google STUN servers in appsettings.json:
+
+stun:stun.l.google.com:19302
+stun:stun1.l.google.com:19302
+stun:stun2.l.google.com:19302 5. IIS WebSocket Config
+Created web.config with <webSocket enabled="true" /> for SmarterASP IIS hosting.
