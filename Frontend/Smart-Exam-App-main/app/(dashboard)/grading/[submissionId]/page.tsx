@@ -9,8 +9,10 @@ import {
   initiateGrading,
   submitManualGrade,
   completeGrading,
+  getAiGradeSuggestion,
   type GradingSessionDetail,
   type GradedAnswerItem,
+  type AiGradeSuggestion,
 } from "@/lib/api/grading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { ArrowLeft, CheckCircle2, Clock, User, Save, Send, FileText, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Clock, User, Save, Send, FileText, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 
 interface GradeState {
   points: number
@@ -57,6 +59,8 @@ export default function GradeSubmissionPage() {
   const [finalizeDialogOpen, setFinalizeDialogOpen] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [grades, setGrades] = useState<Map<number, GradeState>>(new Map())
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiSuggestion, setAiSuggestion] = useState<AiGradeSuggestion | null>(null)
 
   useEffect(() => {
     if (!Number.isNaN(attemptId)) {
@@ -151,6 +155,32 @@ export default function GradeSubmissionPage() {
     } finally {
       setFinalizing(false)
       setFinalizeDialogOpen(false)
+    }
+  }
+
+  async function handleAiSuggest() {
+    if (!session || !currentQuestion) return
+    try {
+      setAiLoading(true)
+      setAiSuggestion(null)
+      const { data: suggestion, error } = await getAiGradeSuggestion(session.id, currentQuestion.questionId)
+      if (suggestion) {
+        setAiSuggestion(suggestion)
+        updateGrade(currentQuestion.questionId, {
+          points: suggestion.suggestedScore,
+          feedback: suggestion.suggestedComment,
+        })
+        toast.success(
+          language === "ar" ? "تم إنشاء اقتراح الذكاء الاصطناعي" : "AI suggestion generated",
+          { description: language === "ar" ? `الثقة: ${suggestion.confidence}%` : `Confidence: ${suggestion.confidence}%` }
+        )
+      } else {
+        toast.error(error || (language === "ar" ? "فشل إنشاء اقتراح الذكاء الاصطناعي" : "Failed to generate AI suggestion"))
+      }
+    } catch {
+      toast.error(language === "ar" ? "خدمة الذكاء الاصطناعي غير متاحة" : "AI service unavailable")
+    } finally {
+      setAiLoading(false)
     }
   }
 
@@ -305,6 +335,58 @@ export default function GradeSubmissionPage() {
             <CardContent className="space-y-4">
               {currentQuestion && (
                 <>
+                  {/* AI Suggest Button */}
+                  <Button
+                    variant="outline"
+                    onClick={handleAiSuggest}
+                    disabled={aiLoading || isUnanswered}
+                    className="w-full border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 hover:from-purple-100 hover:to-indigo-100 dark:hover:from-purple-950/50 dark:hover:to-indigo-950/50 text-purple-700 dark:text-purple-300 transition-all duration-300"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <LoadingSpinner size="sm" className="me-2" />
+                        <span className="animate-pulse">
+                          {language === "ar" ? "يحلل الذكاء الاصطناعي..." : "AI Analyzing..."}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 me-2" />
+                        {language === "ar" ? "اقتراح الذكاء الاصطناعي" : "AI Suggest Grade"}
+                      </>
+                    )}
+                  </Button>
+
+                  {/* AI Suggestion Result */}
+                  {aiSuggestion && (
+                    <div className="rounded-lg border-2 border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50/80 to-indigo-50/80 dark:from-purple-950/40 dark:to-indigo-950/40 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                          <Sparkles className="h-3 w-3" />
+                          {language === "ar" ? "اقتراح الذكاء الاصطناعي" : "AI Suggestion"}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className={`text-xs ${
+                            aiSuggestion.confidence >= 80
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              : aiSuggestion.confidence >= 50
+                              ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                          }`}
+                        >
+                          {aiSuggestion.confidence}%{" "}
+                          {language === "ar" ? "ثقة" : "confidence"}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {language === "ar"
+                          ? "يمكنك تعديل الدرجة والتعليق أدناه قبل الحفظ"
+                          : "You can adjust the score and feedback below before saving"}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="points">{t("grading.points")}</Label>
                     <Input
@@ -358,7 +440,7 @@ export default function GradeSubmissionPage() {
         <div className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
+            onClick={() => { setAiSuggestion(null); setCurrentQuestionIndex((i) => Math.max(0, i - 1)); }}
             disabled={currentQuestionIndex === 0}
           >
             <ChevronLeft className={`h-4 w-4 ${dir === "rtl" ? "order-2" : "me-2"}`} />
@@ -366,9 +448,10 @@ export default function GradeSubmissionPage() {
           </Button>
           <Button
             variant="outline"
-            onClick={() =>
-              setCurrentQuestionIndex((i) => Math.min(manualQuestions.length - 1, i + 1))
-            }
+            onClick={() => {
+              setAiSuggestion(null);
+              setCurrentQuestionIndex((i) => Math.min(manualQuestions.length - 1, i + 1));
+            }}
             disabled={currentQuestionIndex === manualQuestions.length - 1}
           >
             {t("common.next")}

@@ -12,14 +12,17 @@ namespace Smart_Core.Controllers.Grading;
 public class GradingController : ControllerBase
 {
     private readonly IGradingService _gradingService;
+    private readonly IAiGradingService _aiGradingService;
     private readonly ICurrentUserService _currentUserService;
 
     public GradingController(
-    IGradingService gradingService,
+        IGradingService gradingService,
+        IAiGradingService aiGradingService,
         ICurrentUserService currentUserService)
-  {
-    _gradingService = gradingService;
-_currentUserService = currentUserService;
+    {
+        _gradingService = gradingService;
+        _aiGradingService = aiGradingService;
+        _currentUserService = currentUserService;
     }
 
     #region Grading Lifecycle
@@ -198,8 +201,26 @@ _currentUserService = currentUserService;
     /// </summary>
     [HttpGet("is-complete/{attemptId}")]
     public async Task<IActionResult> IsGradingComplete(int attemptId)
-  {
-  var result = await _gradingService.IsGradingCompleteAsync(attemptId);
+    {
+        var result = await _gradingService.IsGradingCompleteAsync(attemptId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    #endregion
+
+    #region AI Grading
+
+    /// <summary>
+    /// Get AI-suggested grade and feedback for a subjective question.
+    /// The AI analyzes the student's answer against the question and rubric,
+    /// then returns a suggested score and professional feedback.
+    /// The examiner always has the final decision.
+    /// </summary>
+    [HttpPost("ai-suggest")]
+    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    public async Task<IActionResult> GetAiGradeSuggestion([FromBody] AiGradeSuggestRequestDto dto)
+    {
+        var result = await _aiGradingService.GetAiGradeSuggestionAsync(dto);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

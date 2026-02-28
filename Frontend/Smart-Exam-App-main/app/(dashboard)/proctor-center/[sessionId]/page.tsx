@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, type AttemptEventDto } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
@@ -46,6 +46,9 @@ import {
   Maximize2,
   Minimize2,
   CheckCircle2 as CheckCircle2Icon,
+  Brain,
+  Sparkles,
+  Loader2,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -88,6 +91,11 @@ export default function SessionDetailPage() {
   const [signalRConnected, setSignalRConnected] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [sessionEnded, setSessionEnded] = useState<{ reason: "Submitted" | "Expired" | "Terminated" } | null>(null)
+
+  // AI Proctor Analysis state
+  const [aiAnalysis, setAiAnalysis] = useState<AiProctorAnalysis | null>(null)
+  const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
+  const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null)
 
   useEffect(() => {
     loadSession()
@@ -166,10 +174,6 @@ export default function SessionDetailPage() {
           }
         },
         onExamSubmitted: (attemptId) => {
-          toast.info(`Candidate has submitted the exam (Attempt #${attemptId})`, {
-            duration: 10000,
-            icon: "\u2705",
-          })
           // Show session-ended overlay and stop live video
           setSessionEnded({ reason: "Submitted" })
           setHasRemoteStream(false)
@@ -179,6 +183,28 @@ export default function SessionDetailPage() {
             setSession(data.session)
             setScreenshots(data.screenshots)
           }).catch(() => {})
+
+          // Build the redirect URL — video page with all session evidence
+          const reportUrl = `/proctor-center/video/${session?.candidateId ?? "unknown"}?attemptId=${attemptId}`
+
+          // Prominent toast with 15s duration + action button
+          toast.success(
+            `Candidate has submitted the exam (Attempt #${attemptId})`,
+            {
+              description: "Redirecting to candidate report in 15 seconds…",
+              duration: 15000,
+              icon: "✅",
+              action: {
+                label: "View Report Now",
+                onClick: () => router.push(reportUrl),
+              },
+            }
+          )
+
+          // Auto-redirect after 15 seconds
+          setTimeout(() => {
+            router.push(reportUrl)
+          }, 15000)
         },
         onSignalRStatusChange: (connected) => {
           console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)
@@ -360,6 +386,23 @@ export default function SessionDetailPage() {
       router.push(`/proctor-center/incidents/${result.id}`)
     } catch (error: any) {
       toast.error(error?.message || "Failed to create incident")
+    }
+  }
+
+  async function handleGenerateAiAnalysis() {
+    if (!session) return
+    try {
+      setAiAnalysisLoading(true)
+      setAiAnalysisError(null)
+      const analysis = await getAiProctorAnalysis(session.id)
+      setAiAnalysis(analysis)
+      toast.success("AI analysis generated successfully")
+    } catch (error: any) {
+      const msg = error?.message || "Failed to generate AI analysis"
+      setAiAnalysisError(msg)
+      toast.error(msg)
+    } finally {
+      setAiAnalysisLoading(false)
     }
   }
 
@@ -813,6 +856,125 @@ export default function SessionDetailPage() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* AI Proctor Analysis */}
+          <Card className="border-purple-500/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Brain className="h-4 w-4 text-purple-500" />
+                AI Proctor Report
+                <Badge variant="outline" className="ms-auto bg-purple-500/10 border-purple-500/30 text-purple-600 text-[10px]">
+                  <Sparkles className="h-3 w-3 me-1" />
+                  GPT-4o
+                </Badge>
+              </CardTitle>
+              <CardDescription className="text-xs">AI-powered risk analysis — advisory only</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!aiAnalysis && !aiAnalysisLoading && (
+                <div className="text-center py-4">
+                  <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500/30" />
+                  <p className="text-xs text-muted-foreground mb-3">Generate an AI-powered analysis of this session's risk and behavior patterns</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateAiAnalysis}
+                    className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                    Generate AI Analysis
+                  </Button>
+                  {aiAnalysisError && (
+                    <p className="text-xs text-destructive mt-2">{aiAnalysisError}</p>
+                  )}
+                </div>
+              )}
+
+              {aiAnalysisLoading && (
+                <div className="text-center py-6">
+                  <Loader2 className="h-6 w-6 mx-auto mb-2 text-purple-500 animate-spin" />
+                  <p className="text-xs text-muted-foreground">Analyzing session with AI...</p>
+                </div>
+              )}
+
+              {aiAnalysis && !aiAnalysisLoading && (
+                <div className="space-y-3">
+                  {/* Risk Level Badge */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Risk Level</span>
+                    <Badge variant="outline" className={
+                      aiAnalysis.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                      aiAnalysis.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
+                      aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
+                      "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+                    }>
+                      {aiAnalysis.riskLevel}
+                    </Badge>
+                  </div>
+
+                  {/* Confidence */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Confidence</span>
+                    <span className="text-xs font-medium">{aiAnalysis.confidence}%</span>
+                  </div>
+
+                  {/* Risk Explanation */}
+                  <div className="pt-2 border-t">
+                    <p className="text-xs font-medium mb-1">Risk Explanation</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.riskExplanation}</p>
+                  </div>
+
+                  {/* Suspicious Behaviors */}
+                  {aiAnalysis.suspiciousBehaviors.length > 0 && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs font-medium mb-1.5">Suspicious Behaviors</p>
+                      <ul className="space-y-1">
+                        {aiAnalysis.suspiciousBehaviors.map((behavior, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                            <AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0 text-amber-500" />
+                            <span>{behavior}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Recommendation */}
+                  <div className="pt-2 border-t">
+                    <p className="text-xs font-medium mb-1">Recommendation</p>
+                    <div className="flex items-start gap-1.5 p-2 rounded-md bg-purple-500/5 border border-purple-500/10">
+                      <Shield className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-purple-500" />
+                      <p className="text-xs text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
+                    </div>
+                  </div>
+
+                  {/* Detailed Analysis (collapsible) */}
+                  <details className="pt-2 border-t">
+                    <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">
+                      Detailed Analysis
+                    </summary>
+                    <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis.detailedAnalysis}</p>
+                  </details>
+
+                  {/* Regenerate button */}
+                  <div className="pt-2 border-t flex items-center justify-between">
+                    <span className="text-[10px] text-muted-foreground">
+                      {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleTimeString() : ""}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleGenerateAiAnalysis}
+                      className="h-7 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-500/10"
+                    >
+                      <Sparkles className="h-3 w-3 me-1" />
+                      Regenerate
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>

@@ -93,6 +93,8 @@ function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
     latestSnapshotUrl: dto.latestSnapshotUrl ?? undefined,
     snapshotCount: dto.snapshotCount ?? 0,
     lastSnapshotAt: dto.lastSnapshotAt ?? undefined,
+    riskScore: dto.riskScore ?? undefined,
+    totalViolations: dto.totalViolations ?? 0,
   };
 }
 
@@ -165,6 +167,41 @@ export async function getLiveSessions(): Promise<LiveSession[]> {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[Proctor] getLiveSessions failed:", msg, err);
     throw err; // let caller show toast instead of silently returning []
+  }
+}
+
+// ── Triage / AI Assistant ────────────────────────────────────────────────────
+
+export interface TriageRecommendation {
+  sessionId: number;
+  candidateName: string;
+  examTitle: string;
+  riskScore: number;
+  riskLevel: string;
+  totalViolations: number;
+  reasonEn: string;
+  reasonAr: string;
+}
+
+/**
+ * Get top triage recommendations for the proctor AI assistant (GET /Proctor/triage)
+ */
+export async function getTriageRecommendations(top = 5, includeSample = true): Promise<TriageRecommendation[]> {
+  try {
+    const raw = await apiClient.get<TriageRecommendation[] | { data?: TriageRecommendation[] }>(
+      `/Proctor/triage?top=${top}&includeSample=${includeSample}`,
+    );
+    if (Array.isArray(raw)) return raw;
+    if (raw && typeof raw === "object" && Array.isArray((raw as any).data)) return (raw as any).data;
+    if (raw && typeof raw === "object") {
+      const record = raw as Record<string, unknown>;
+      const items = (record.items ?? record.Items ?? record.data ?? record.Data) as TriageRecommendation[] | undefined;
+      if (Array.isArray(items)) return items;
+    }
+    return [];
+  } catch (err) {
+    console.warn("[Proctor] getTriageRecommendations failed:", err);
+    return [];
   }
 }
 
@@ -356,6 +393,30 @@ export async function terminateSession(
   reason: string,
 ): Promise<void> {
   await apiClient.post(`/Proctor/session/${sessionId}/terminate`, { reason });
+}
+
+// ============ AI PROCTOR ANALYSIS ============
+
+export interface AiProctorAnalysis {
+  riskLevel: string;
+  riskExplanation: string;
+  suspiciousBehaviors: string[];
+  recommendation: string;
+  confidence: number;
+  detailedAnalysis: string;
+  model: string;
+  generatedAt: string;
+}
+
+/**
+ * Generate AI-powered risk analysis for a proctoring session.
+ * Uses GPT-4o to analyze events, violations, and patterns.
+ * Advisory only — the proctor always has final authority.
+ * GET /Proctor/session/{sessionId}/ai-analysis
+ */
+export async function getAiProctorAnalysis(sessionId: string): Promise<AiProctorAnalysis> {
+  const res = await apiClient.get(`/Proctor/session/${sessionId}/ai-analysis`);
+  return res.data;
 }
 
 /**

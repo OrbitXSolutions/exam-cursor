@@ -46,6 +46,7 @@ import {
   FileQuestion,
   X,
   RefreshCw,
+  Sparkles,
 } from "lucide-react"
 
 export default function QuestionBankPage() {
@@ -243,6 +244,12 @@ export default function QuestionBankPage() {
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
+          <Button asChild variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950/30">
+            <Link href="/question-bank/ai-studio">
+              <Sparkles className="mr-2 h-4 w-4" />
+              {language === "ar" ? "استوديو الأسئلة الذكي" : "AI Question Studio"}
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/question-bank/create">
               <Plus className="mr-2 h-4 w-4" />

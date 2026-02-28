@@ -147,7 +147,7 @@ export default function CreateFromTemplatePage() {
       })
 
       toast.success("Exam created from template successfully!")
-      router.push(`/exams/${result.id}`)
+      router.push(`/exams/${result.id}/overview`)
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || "Failed to create exam from template"
       setError(msg)

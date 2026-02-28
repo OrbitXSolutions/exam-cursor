@@ -134,14 +134,17 @@ export default function AIReportPage() {
     const environmentScore = Math.max(0, Math.min(100, 100 - envPenalty))
 
     // ── Overall Risk Score ──
-    // Weighted inverse: higher risk when scores are lower
-    // Face 35%, Behavior 30%, Eye 20%, Environment 15%
-    const overallRiskScore = Math.min(100, Math.max(0,
+    // Source of truth: Backend Rule Engine (ProctorSession.RiskScore)
+    // Fallback: client-side weighted formula if backend hasn't calculated yet
+    const clientFallback = Math.min(100, Math.max(0,
       (100 - faceDetectionScore) * 0.35 +
       (100 - behaviorScore) * 0.30 +
       (100 - eyeTrackingScore) * 0.20 +
       (100 - environmentScore) * 0.15
     ))
+    const overallRiskScore = (sess.riskScore != null && sess.riskScore !== undefined)
+      ? Number(sess.riskScore)
+      : clientFallback
 
     // ── Suspicious Activities (built from real counts) ──
     const suspiciousActivities: string[] = []

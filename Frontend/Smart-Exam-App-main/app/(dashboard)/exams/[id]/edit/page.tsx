@@ -145,7 +145,7 @@ export default function EditExamPage() {
 
       await updateExam(id, requestBody)
       toast.success(t("common.saved"))
-      router.push(`/exams/${id}`)
+      router.push(`/exams/${id}/overview`)
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update exam"
       setError(errorMessage)

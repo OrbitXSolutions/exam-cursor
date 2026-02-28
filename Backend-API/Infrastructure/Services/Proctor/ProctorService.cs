@@ -1109,6 +1109,138 @@ UploadEvidenceDto dto, string candidateId)
         return missedSessions.Count;
     }
 
+    /// <inheritdoc />
+    public async Task<ApiResponse<List<TriageRecommendationDto>>> GetTriageRecommendationsAsync(int top = 5, bool includeSample = true)
+    {
+        var now = DateTime.UtcNow;
+        var windowStart = now.AddMinutes(-5); // recent events window
+
+        // Get active sessions ordered by risk score descending
+        var sessions = await _context.Set<ProctorSession>()
+            .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0)
+            .OrderByDescending(s => s.RiskScore)
+            .ThenByDescending(s => s.TotalViolations)
+            .Take(top)
+            .Select(s => new
+            {
+                s.Id,
+                CandidateName = s.Candidate != null ? (s.Candidate.FullName ?? s.Candidate.DisplayName ?? "") : "",
+                ExamTitle = s.Exam != null ? s.Exam.TitleEn : "",
+                s.RiskScore,
+                s.TotalViolations,
+                // Count recent events by type (last 5 minutes)
+                RecentEvents = s.Events
+                    .Where(e => e.OccurredAt >= windowStart)
+                    .GroupBy(e => e.EventType)
+                    .Select(g => new { EventType = g.Key, Count = g.Count() })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        // Include sample sessions if not enough real data
+        var recommendations = new List<TriageRecommendationDto>();
+
+        foreach (var s in sessions)
+        {
+            var reasons = BuildTriageReasons(s.RecentEvents?.ToDictionary(e => e.EventType, e => e.Count)
+                ?? new Dictionary<ProctorEventType, int>(), s.TotalViolations);
+
+            recommendations.Add(new TriageRecommendationDto
+            {
+                SessionId = s.Id,
+                CandidateName = s.CandidateName ?? "",
+                ExamTitle = s.ExamTitle ?? "",
+                RiskScore = s.RiskScore ?? 0,
+                RiskLevel = GetRiskLevel(s.RiskScore ?? 0),
+                TotalViolations = s.TotalViolations,
+                ReasonEn = reasons.en,
+                ReasonAr = reasons.ar
+            });
+        }
+
+        // If no real sessions and sample flag is on, generate from samples
+        if (recommendations.Count == 0 && includeSample)
+        {
+            recommendations = GenerateSampleTriageRecommendations();
+        }
+
+        return ApiResponse<List<TriageRecommendationDto>>.SuccessResponse(recommendations);
+    }
+
+    private static (string en, string ar) BuildTriageReasons(
+        Dictionary<ProctorEventType, int> recentEvents, int totalViolations)
+    {
+        var partsEn = new List<string>();
+        var partsAr = new List<string>();
+
+        if (recentEvents.TryGetValue(ProctorEventType.MultipleFacesDetected, out var mf) && mf > 0)
+        { partsEn.Add($"Multiple faces ({mf})"); partsAr.Add($"وجوه متعددة ({mf})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.FaceNotDetected, out var fnd) && fnd > 0)
+        { partsEn.Add($"Face not detected ({fnd})"); partsAr.Add($"لم يتم اكتشاف الوجه ({fnd})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.TabSwitched, out var ts) && ts > 0)
+        { partsEn.Add($"Tab switches ({ts})"); partsAr.Add($"تبديل التبويب ({ts})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.CameraBlocked, out var cb) && cb > 0)
+        { partsEn.Add($"Camera blocked ({cb})"); partsAr.Add($"الكاميرا محجوبة ({cb})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.FullscreenExited, out var fe) && fe > 0)
+        { partsEn.Add($"Fullscreen exited ({fe})"); partsAr.Add($"خروج من الشاشة الكاملة ({fe})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.CopyAttempt, out var ca) && ca > 0)
+        { partsEn.Add($"Copy attempt ({ca})"); partsAr.Add($"محاولة نسخ ({ca})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.PasteAttempt, out var pa) && pa > 0)
+        { partsEn.Add($"Paste attempt ({pa})"); partsAr.Add($"محاولة لصق ({pa})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.DevToolsOpened, out var dt) && dt > 0)
+        { partsEn.Add($"DevTools opened ({dt})"); partsAr.Add($"فتح أدوات المطور ({dt})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.WindowBlurred, out var wb) && wb > 0)
+        { partsEn.Add($"Window blur ({wb})"); partsAr.Add($"فقدان تركيز النافذة ({wb})"); }
+
+        if (recentEvents.TryGetValue(ProctorEventType.FaceOutOfFrame, out var fof) && fof > 0)
+        { partsEn.Add($"Face out of frame ({fof})"); partsAr.Add($"الوجه خارج الإطار ({fof})"); }
+
+        if (partsEn.Count == 0)
+        {
+            partsEn.Add($"Total violations: {totalViolations}");
+            partsAr.Add($"إجمالي المخالفات: {totalViolations}");
+        }
+
+        return (string.Join(" + ", partsEn), string.Join(" + ", partsAr));
+    }
+
+    private static List<TriageRecommendationDto> GenerateSampleTriageRecommendations()
+    {
+        return new List<TriageRecommendationDto>
+        {
+            new()
+            {
+                SessionId = -2,
+                CandidateName = "Omar Khalid",
+                ExamTitle = "Introduction to Computer Science — Final",
+                RiskScore = 68,
+                RiskLevel = "High",
+                TotalViolations = 8,
+                ReasonEn = "Multiple faces (3) + Tab switches (4) + Camera blocked (1)",
+                ReasonAr = "وجوه متعددة (3) + تبديل التبويب (4) + الكاميرا محجوبة (1)"
+            },
+            new()
+            {
+                SessionId = -3,
+                CandidateName = "Ali Mahmoud",
+                ExamTitle = "IT Exam App",
+                RiskScore = 42,
+                RiskLevel = "Medium",
+                TotalViolations = 3,
+                ReasonEn = "Fullscreen exited (2) + Window blur (1)",
+                ReasonAr = "خروج من الشاشة الكاملة (2) + فقدان تركيز النافذة (1)"
+            }
+        };
+    }
+
     #endregion
 
     #region Proctor Actions
@@ -1434,9 +1566,22 @@ UploadEvidenceDto dto, string candidateId)
                 CandidateId = "sample-2", CandidateName = "Omar Khalid",
                 Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-15),
-                TotalEvents = 8, TotalViolations = 3,
-                RiskScore = 35, IsFlagged = true,
+                TotalEvents = 18, TotalViolations = 8,
+                RiskScore = 68, IsFlagged = true,
                 LastHeartbeatAt = now.AddSeconds(-5),
+                HeartbeatMissedCount = 0,
+                RecentEvents = new List<ProctorEventDto>()
+            },
+            [-3] = new()
+            {
+                Id = -3, AttemptId = -3, ExamId = -1,
+                ExamTitleEn = "IT Exam App",
+                CandidateId = "sample-3", CandidateName = "Ali Mahmoud",
+                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-10),
+                TotalEvents = 10, TotalViolations = 3,
+                RiskScore = 42, IsFlagged = false,
+                LastHeartbeatAt = now.AddSeconds(-8),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
             }
@@ -1463,6 +1608,7 @@ UploadEvidenceDto dto, string candidateId)
                 TotalViolations = 1,
                 RiskScore = 12,
                 RequiresReview = false,
+                IsFlagged = false,
                 IsSample = true
             },
             new()
@@ -1476,9 +1622,27 @@ UploadEvidenceDto dto, string candidateId)
                 Mode = ProctorMode.Soft,
                 Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-15),
-                TotalViolations = 3,
-                RiskScore = 35,
+                TotalViolations = 8,
+                RiskScore = 68,
                 RequiresReview = true,
+                IsFlagged = true,
+                IsSample = true
+            },
+            new()
+            {
+                Id = -3,
+                AttemptId = -3,
+                ExamId = -1,
+                ExamTitleEn = "IT Exam App",
+                CandidateId = "sample-3",
+                CandidateName = "Ali Mahmoud",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
+                StartedAt = now.AddMinutes(-10),
+                TotalViolations = 3,
+                RiskScore = 42,
+                RequiresReview = false,
+                IsFlagged = false,
                 IsSample = true
             }
         };

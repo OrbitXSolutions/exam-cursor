@@ -10,6 +10,7 @@ import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { UserRole } from "@/lib/types"
 import { getCandidateVerificationStatus } from "@/lib/api/proctoring"
+import { useBranding } from "@/lib/hooks/use-branding"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -52,6 +53,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Copy,
+  Sparkles,
 } from "lucide-react"
 
 interface NavItem {
@@ -180,6 +182,8 @@ export function Sidebar() {
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
+  const isCandidate = hasRole(UserRole.Candidate)
+  const { branding, hasOrgBranding, logoSrc, orgName } = useBranding()
 
   // Candidate verification status for sidebar badge
   const [verifiedStatus, setVerifiedStatus] = useState<string | null>(null)
@@ -350,11 +354,17 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b px-4">
           {!isCollapsed && (
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Shield className="h-5 w-5" />
-              </div>
-              <span className="text-lg font-bold">SmartExam</span>
+            <Link href={isCandidate ? "/my-exams" : "/dashboard"} className="flex items-center gap-2">
+              {isCandidate && hasOrgBranding && logoSrc ? (
+                <img src={logoSrc} alt={orgName} className="h-8 w-8 rounded-lg object-contain" />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Shield className="h-5 w-5" />
+                </div>
+              )}
+              <span className="text-lg font-bold truncate">
+                {isCandidate && hasOrgBranding ? orgName : "SmartExam"}
+              </span>
             </Link>
           )}
           <Button
@@ -507,6 +517,24 @@ export function Sidebar() {
             )}
           </nav>
         </ScrollArea>
+
+        {/* Candidate Org Footer */}
+        {isCandidate && hasOrgBranding && !isCollapsed && (branding.supportEmail || branding.mobileNumber) && (
+          <div className="border-t px-3 py-2 space-y-1">
+            {branding.supportEmail && (
+              <a href={`mailto:${branding.supportEmail}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground truncate">
+                <span className="shrink-0">📧</span>
+                {branding.supportEmail}
+              </a>
+            )}
+            {branding.mobileNumber && (
+              <a href={`tel:${branding.mobileNumber}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">
+                <span className="shrink-0">📱</span>
+                {branding.mobileNumber}
+              </a>
+            )}
+          </div>
+        )}
 
         {/* User Section */}
         <div className="border-t p-3">

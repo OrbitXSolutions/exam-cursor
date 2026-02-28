@@ -15,13 +15,16 @@ public class ProctorController : ControllerBase
 {
     private readonly IProctorService _proctorService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IAiProctorService _aiProctorService;
 
     public ProctorController(
   IProctorService proctorService,
-  ICurrentUserService currentUserService)
+  ICurrentUserService currentUserService,
+  IAiProctorService aiProctorService)
     {
         _proctorService = proctorService;
         _currentUserService = currentUserService;
+        _aiProctorService = aiProctorService;
     }
 
     #region Session Management
@@ -454,6 +457,35 @@ public class ProctorController : ControllerBase
     public async Task<IActionResult> GetLiveMonitoring(int examId)
     {
         var result = await _proctorService.GetLiveMonitoringAsync(examId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Get top triage recommendations for the proctor AI assistant.
+    /// Returns active sessions ranked by risk with human-readable reasons.
+    /// </summary>
+    [HttpGet("triage")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    public async Task<IActionResult> GetTriageRecommendations([FromQuery] int top = 5, [FromQuery] bool includeSample = true)
+    {
+        var result = await _proctorService.GetTriageRecommendationsAsync(top, includeSample);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    #endregion
+
+    #region AI Proctor Analysis
+
+    /// <summary>
+    /// Generate an AI-powered risk analysis for a proctoring session.
+    /// Uses GPT-4o to analyze events, violations, and patterns.
+    /// Advisory only — the proctor always has final authority.
+    /// </summary>
+    [HttpGet("session/{sessionId}/ai-analysis")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    public async Task<IActionResult> GetAiRiskAnalysis(int sessionId)
+    {
+        var result = await _aiProctorService.GetAiRiskAnalysisAsync(sessionId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

@@ -14,6 +14,8 @@ export interface LiveSession {
   latestSnapshotUrl?: string;
   snapshotCount?: number;
   lastSnapshotAt?: string;
+  riskScore?: number;
+  totalViolations?: number;
 }
 
 export interface Incident {

@@ -82,5 +82,50 @@ export async function deleteQuestionAttachment(attachmentId: number): Promise<bo
   return true
 }
 
+// AI Question Generation
+export interface AiGenerateQuestionsRequest {
+  subjectId: number
+  topicId?: number | null
+  questionTypeId: number
+  difficultyLevel: number
+  numberOfQuestions: number
+  points: number
+  customTopic?: string
+  language: string
+}
+
+export interface AiGeneratedOption {
+  textEn: string
+  textAr: string
+  isCorrect: boolean
+  order: number
+}
+
+export interface AiGeneratedQuestion {
+  bodyEn: string
+  bodyAr: string
+  explanationEn?: string
+  explanationAr?: string
+  questionTypeId: number
+  difficultyLevel: number
+  points: number
+  options: AiGeneratedOption[]
+}
+
+export interface AiGenerateQuestionsResponse {
+  questions: AiGeneratedQuestion[]
+  totalGenerated: number
+  model: string
+  subjectName: string
+  topicName?: string
+  questionTypeName: string
+}
+
+export async function generateQuestionsWithAi(
+  data: AiGenerateQuestionsRequest,
+): Promise<AiGenerateQuestionsResponse> {
+  return apiClient.post<AiGenerateQuestionsResponse>("/QuestionBank/ai-generate", data)
+}
+
 // Re-export lookup functions for backward compatibility
 export { getQuestionCategories, getQuestionTypes } from "./lookups"

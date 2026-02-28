@@ -126,3 +126,70 @@ You must implement these 5 checks on the candidate side, based on the already-ru
 Begin with Discovery Report + TODO plan. Do not start coding until you confirm the discovery findings and the exact integration points you will use.
 
 - The warning same as cuurent sound but may appears centered in the candidate page/ or bigger size with longer duration.
+
+## Performance Issue
+
+Yes — I know exactly what's happening. The performance issue is the SmartMonitoring AI face detection running MediaPipe FaceLandmarker at 200ms intervals (5 FPS) on the candidate's browser. When you're screen-sharing via Teams + running two browsers side by side, the candidate tab is doing:
+
+WebRTC video publishing (encoding + sending webcam)
+Video chunk recording (MediaRecorder encoding 3s WebM chunks)
+MediaPipe FaceLandmarker AI inference every 200ms ← the heavy one
+Canvas frame analysis (brightness/variance for camera-blocked detection)
+All of this on the same machine that's also running Teams screen share + the proctor browser with WebRTC video decoding.
+
+Quick fixes to discuss:
+Option A: Reduce detection frequency (safest)
+Change detection interval from 200ms (5 FPS) to 500ms (2 FPS) or even 1000ms (1 FPS). Face detection doesn't need 5 FPS — checking once per second is plenty for proctoring.
+
+Option B: Disable SmartMonitoring for the demo
+Since you already have the proctor watching the live video, the AI detection is supplementary. You can turn it off from the backend settings (it's a toggle). Zero code changes.
+
+Option C: Both — reduce frequency now, let admin toggle it off if needed
+My recommendation for the demo: Go with Option C — reduce to 1 FPS in code (still works but 5x lighter), and if it's still slow during the demo, the admin can disable it from Settings with one click.
+
+Current: 200ms (5 FPS) — way too heavy.
+
+My recommendation: 1000ms (1 FPS). Here's why:
+
+Interval FPS CPU Load Detection Quality
+200ms 5 Heavy ← current Overkill for proctoring
+500ms 2 Medium Good
+1000ms 1 Light Perfectly fine — 2s threshold means you still catch violations within 3s
+2000ms 0.5 Very light Might feel sluggish with the 2s continuous threshold
+1 FPS is the sweet spot — the 2-second continuous threshold still works (needs 2 consecutive detections to fire), and it's 5x lighter on CPU. The candidate won't notice any difference in behavior, but CPU usage drops massively.
+
+Want me to go with 1000ms?
+
+FPS = Frames Per Second — how many times per second the AI analyzes a video frame from the webcam.
+200ms interval = 5 FPS → AI checks the webcam image 5 times every second
+1000ms interval = 1 FPS → AI checks once per second
+More checks = more CPU usage. For proctoring (detecting if a face is missing), once per second is more than enough. You don't need 5 checks per second to notice someone walked away from the screen.
+
+That works too — 2000ms (once every 2 seconds). Even lighter on CPU. The only tradeoff: with a 2s continuous threshold, it takes ~4 seconds to fire a violation instead of ~3s. Totally fine for a demo.
+
+Done. Detection interval changed from 200ms → 2000ms (once every 2 seconds). That's a 10x reduction in CPU usage from the AI module.
+
+Done. Here's what happens now when a candidate submits:
+
+Overlay appears on the live video showing "Exam Submitted" with a green checkmark
+Green success toast (15 seconds) appears: "Candidate has submitted the exam (Attempt #X)" with a "View Report Now" action button the proctor can click immediately
+Auto-redirect after 15 seconds to /proctor-center/video/{candidateId}?attemptId={attemptId} — the candidate's full session evidence page (video recording, snapshots, screen captures, events log)
+The proctor can either click "View Report Now" on the toast to go immediately, or wait 15 seconds for the auto-redirect. They won't stay stuck on the dead session details page.
+
+##
+
+Issue 2: No STUN/TURN servers configured (CRITICAL for WebRTC)
+StunServers: [] in appsettings — works on localhost because both browsers are on the same network. On the server, candidate and proctor are on different networks, so WebRTC peer-to-peer can't discover public IPs without STUN, and can't relay through NAT without TURN.
+
+3. No Transport Fallback
+   Problem: skipNegotiation: true + WebSockets only — if IIS WebSocket module has any issue, connection dies with no fallback.
+   Fix: In production, the client now uses accessTokenFactory with negotiate enabled, allowing automatic fallback to ServerSentEvents → LongPolling. Localhost keeps the fast skipNegotiation path.
+
+4. No STUN Servers (WebRTC breaks across networks)
+   Problem: StunServers: [] — works on localhost (same network), fails on server (candidate and proctor on different networks, NAT can't be traversed).
+   Fix: Added Google STUN servers in appsettings.json:
+
+stun:stun.l.google.com:19302
+stun:stun1.l.google.com:19302
+stun:stun2.l.google.com:19302 5. IIS WebSocket Config
+Created web.config with <webSocket enabled="true" /> for SmarterASP IIS hosting.

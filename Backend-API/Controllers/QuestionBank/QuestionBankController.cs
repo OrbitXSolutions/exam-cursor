@@ -15,11 +15,16 @@ public class QuestionBankController : ControllerBase
 {
     private readonly IQuestionBankService _questionBankService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IAiQuestionGeneratorService _aiQuestionGeneratorService;
 
-    public QuestionBankController(IQuestionBankService questionBankService, ICurrentUserService currentUserService)
+    public QuestionBankController(
+        IQuestionBankService questionBankService,
+        ICurrentUserService currentUserService,
+        IAiQuestionGeneratorService aiQuestionGeneratorService)
     {
         _questionBankService = questionBankService;
         _currentUserService = currentUserService;
+        _aiQuestionGeneratorService = aiQuestionGeneratorService;
     }
 
     #region Question Endpoints
@@ -107,6 +112,22 @@ public class QuestionBankController : ControllerBase
     {
         var result = await _questionBankService.GetQuestionsCountAsync(subjectId, topicId);
         return Ok(result);
+    }
+
+    #endregion
+
+    #region AI Question Generation
+
+    /// <summary>
+    /// Generate questions using AI (MCQ Single, MCQ Multi, True/False only)
+    /// </summary>
+    [HttpPost("ai-generate")]
+    [ProducesResponseType(typeof(ApiResponse<AiGenerateQuestionsResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<AiGenerateQuestionsResponseDto>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GenerateQuestionsWithAi([FromBody] AiGenerateQuestionsRequestDto request)
+    {
+        var result = await _aiQuestionGeneratorService.GenerateQuestionsAsync(request);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion

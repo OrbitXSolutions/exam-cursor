@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-log"
+import { VideoChunkPlayer } from "@/components/ui/video-chunk-player"
 import {
   ArrowLeft,
   Video,
@@ -349,44 +350,7 @@ export default function CandidateVideoPage() {
                   <CardContent>
                     {selectedSession?.attemptId ? (
                       <div className="space-y-3">
-                        <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                          <video
-                            src={(() => {
-                              const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
-                              return token ? `/api/video-stream/${selectedSession.attemptId}?token=${encodeURIComponent(token)}` : undefined
-                            })()}
-                            controls
-                            playsInline
-                            className="w-full h-full"
-                            controlsList="nodownload"
-                            onError={() => {
-                              // Video not available, show placeholder
-                              const el = document.getElementById("video-fallback")
-                              if (el) el.style.display = "flex"
-                              const vid = document.getElementById("video-player")
-                              if (vid) vid.style.display = "none"
-                            }}
-                            id="video-player"
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                          <div id="video-fallback" className="hidden aspect-video bg-muted rounded-lg flex-col items-center justify-center">
-                            <VideoOff className="h-16 w-16 text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground text-center">
-                              {language === "ar"
-                                ? "تسجيل الفيديو غير متوفر حالياً"
-                                : "Video recording not available yet"}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => router.push(`/proctor-center/recording/${selectedSession.attemptId}`)}
-                        >
-                          <Play className="h-4 w-4 mr-1" />
-                          {language === "ar" ? "عرض التسجيل الكامل" : "View Full Recording"}
-                        </Button>
+                        <VideoChunkPlayer attemptId={selectedSession.attemptId} />
                       </div>
                     ) : (
                       <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">

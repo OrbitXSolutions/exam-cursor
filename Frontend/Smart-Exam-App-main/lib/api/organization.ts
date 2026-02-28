@@ -67,7 +67,7 @@ export async function uploadOrganizationImage(
   formData.append("file", file);
 
   const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
 
   const response = await fetch(`/api/proxy/Organization/upload/${type}`, {
     method: "POST",

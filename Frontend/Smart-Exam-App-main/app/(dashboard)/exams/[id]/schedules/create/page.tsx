@@ -70,7 +70,7 @@ export default function CreateSchedulePage() {
         endTime: new Date(formData.endTime).toISOString(),
       })
       toast.success("Schedule created successfully")
-      router.push(`/exams/${id}`)
+      router.push(`/exams/${id}/overview`)
     } catch (error) {
       toast.error("Failed to create schedule")
     } finally {

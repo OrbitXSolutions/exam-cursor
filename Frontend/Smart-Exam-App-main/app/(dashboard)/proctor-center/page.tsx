@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getLiveSessions, flagSession, sendWarning, terminateSession } from "@/lib/api/proctoring"
+import { getLiveSessions, flagSession, sendWarning, terminateSession, getTriageRecommendations } from "@/lib/api/proctoring"
 import type { LiveSession } from "@/lib/types/proctoring"
+import type { TriageRecommendation } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -43,7 +44,14 @@ import {
   RefreshCw,
   Monitor,
   Camera,
+  ArrowUpDown,
+  Shield,
+  Brain,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
 } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function ProctorCenterPage() {
   const { t, dir, locale } = useI18n()
@@ -56,6 +64,20 @@ export default function ProctorCenterPage() {
   const [warningMessage, setWarningMessage] = useState("")
   const [terminateReason, setTerminateReason] = useState("")
   const [refreshing, setRefreshing] = useState(false)
+  const [sortMode, setSortMode] = useState<"default" | "risk-desc" | "risk-asc">("default")
+  const [filterMode, setFilterMode] = useState<"all" | "flagged">("all")
+  const [triageItems, setTriageItems] = useState<TriageRecommendation[]>([])
+  const [triageOpen, setTriageOpen] = useState(false)
+  const [triageLoading, setTriageLoading] = useState(false)
+  const [useSampleData, setUseSampleData] = useState(true)
+  // Risk level helper — matches backend GetRiskLevel thresholds
+  function getRiskBadge(score?: number) {
+    if (score == null) return null
+    if (score <= 20) return { label: "Low", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }
+    if (score <= 50) return { label: "Medium", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30" }
+    if (score <= 75) return { label: "High", color: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30" }
+    return { label: "Critical", color: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30" }
+  }
 
   useEffect(() => {
     loadSessions()
@@ -68,12 +90,34 @@ export default function ProctorCenterPage() {
     try {
       if (!loading) setRefreshing(true)
       const data = await getLiveSessions()
-      setSessions(data)
+      // Auto-flag sessions with > 5 violations
+      const flagged = data.map((s) => {
+        if ((s.totalViolations ?? 0) > 5 && !s.flagged) {
+          return { ...s, flagged: true }
+        }
+        return s
+      })
+      setSessions(flagged)
     } catch (error) {
       toast.error("Failed to load sessions")
     } finally {
       setLoading(false)
       setRefreshing(false)
+    }
+  }
+
+  async function loadTriage() {
+    setTriageLoading(true)
+    setTriageItems([])
+    try {
+      // Simulate AI thinking delay for better UX
+      await new Promise(r => setTimeout(r, 1500))
+      const triage = await getTriageRecommendations(3, useSampleData)
+      setTriageItems(triage)
+    } catch {
+      // silent — keep existing items
+    } finally {
+      setTriageLoading(false)
     }
   }
 
@@ -128,14 +172,28 @@ export default function ProctorCenterPage() {
     return t("proctor.minutesAgo", { minutes })
   }
 
-  const filteredSessions = sessions.filter(
-    (s) =>
+  const filteredSessions = sessions.filter((s) => {
+    const matchesSearch =
       s.candidateName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.examTitle.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      s.examTitle.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesFilter = filterMode === "all" || s.flagged
+    return matchesSearch && matchesFilter
+  })
 
-  const activeSessions = filteredSessions.filter((s) => s.status === "Active")
-  const flaggedSessions = filteredSessions.filter((s) => s.flagged)
+  // Apply user-selected sort (only when explicitly chosen — no auto-reorder)
+  const sortedSessions = (() => {
+    if (sortMode === "default") return filteredSessions
+    const sorted = [...filteredSessions]
+    sorted.sort((a, b) => {
+      const aScore = a.riskScore ?? 0
+      const bScore = b.riskScore ?? 0
+      return sortMode === "risk-desc" ? bScore - aScore : aScore - bScore
+    })
+    return sorted
+  })()
+
+  const activeSessions = sessions.filter((s) => s.status === "Active")
+  const flaggedSessions = sessions.filter((s) => s.flagged)
   const totalIncidents = sessions.reduce((acc, s) => acc + s.incidentCount, 0)
 
   if (loading) {
@@ -167,7 +225,7 @@ export default function ProctorCenterPage() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats + AI Assistant */}
       <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <CardContent className="flex items-center gap-4 p-4">
@@ -191,47 +249,176 @@ export default function ProctorCenterPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        {/* AI Proctor Assistant — compact card, same height as KPIs */}
+        <Card className="sm:col-span-2 border-purple-200/60 dark:border-purple-800/40 bg-white dark:bg-card">
           <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-destructive/10">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple-500/10">
+              <Brain className="h-6 w-6 text-purple-600" />
             </div>
-            <div>
-              <p className="text-2xl font-bold">{totalIncidents}</p>
-              <p className="text-sm text-muted-foreground">{t("proctor.totalIncidents")}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-purple-800 dark:text-purple-300">{locale === "ar" ? "مساعد المراقب الذكي" : "AI Proctor Assistant"}</p>
+              <p className="text-xs text-muted-foreground">{locale === "ar" ? "من يحتاج مراجعة الآن؟" : "Who needs review now?"}</p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
-              <Users className="h-6 w-6 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{new Set(sessions.map((s) => s.examTitle)).size}</p>
-              <p className="text-sm text-muted-foreground">{t("proctor.activeExams")}</p>
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <Checkbox
+                  id="useSampleData"
+                  checked={useSampleData}
+                  onCheckedChange={(checked) => setUseSampleData(!!checked)}
+                  className="h-3.5 w-3.5"
+                />
+                <label htmlFor="useSampleData" className="text-[10px] text-muted-foreground cursor-pointer select-none">
+                  {locale === "ar" ? "تجريبي" : "Demo"}
+                </label>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setTriageOpen(true); loadTriage() }}
+                disabled={triageLoading}
+                className="h-8 border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 hover:from-purple-100 hover:to-indigo-100 dark:hover:from-purple-950/50 dark:hover:to-indigo-950/50 text-purple-700 dark:text-purple-300 transition-all duration-300 px-3"
+              >
+                {triageLoading ? (
+                  <>
+                    <LoadingSpinner size="sm" className="me-1.5" />
+                    <span className="animate-pulse text-xs">{locale === "ar" ? "يفكر..." : "Thinking..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                    <span className="text-xs">{locale === "ar" ? "اسأل" : "Ask AI"}</span>
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={t("proctor.searchPlaceholder")}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="ps-9"
-        />
+      {/* AI Response — full-width panel below stats, slides in when open */}
+      {triageOpen && !triageLoading && (
+        <div className="rounded-xl border border-purple-200 dark:border-purple-800/50 bg-white dark:bg-card p-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4" />
+              {locale === "ar" ? "توصيات الذكاء الاصطناعي" : "AI Recommendations"}
+            </span>
+            <div className="flex items-center gap-3">
+              {useSampleData && triageItems.some(i => i.sessionId < 0) && (
+                <span className="flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse inline-block" />
+                  <span className="text-[10px] text-purple-500 font-medium">{locale === "ar" ? "بيانات تجريبية" : "Sample data"}</span>
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => setTriageOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          {triageItems.length === 0 ? (
+            <div className="text-sm text-muted-foreground py-3 text-center">
+              {locale === "ar" ? "لا توجد جلسات تحتاج مراجعة عاجلة" : "All clear — no sessions need urgent review"}
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {triageItems.map((item) => {
+                const levelColor = item.riskLevel === "Critical"
+                  ? "text-red-600 bg-red-500/10 border-red-500/30"
+                  : item.riskLevel === "High"
+                    ? "text-orange-600 bg-orange-500/10 border-orange-500/30"
+                    : item.riskLevel === "Medium"
+                      ? "text-amber-600 bg-amber-500/10 border-amber-500/30"
+                      : "text-emerald-600 bg-emerald-500/10 border-emerald-500/30"
+                return (
+                  <div key={item.sessionId} className="flex items-start gap-3 rounded-lg border p-3 bg-muted/30">
+                    <Badge variant="outline" className={`shrink-0 text-sm font-bold mt-0.5 px-2.5 py-0.5 ${levelColor}`}>
+                      {Math.round(item.riskScore)}
+                    </Badge>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate">{item.candidateName}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {locale === "ar" ? item.reasonAr : item.reasonEn}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0 h-8 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-500/10 px-3"
+                      asChild
+                    >
+                      <Link href={`/proctor-center/${item.sessionId}`}>
+                        <Eye className="h-3.5 w-3.5 me-1" />
+                        {locale === "ar" ? "مراجعة" : "Review"}
+                      </Link>
+                    </Button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Search & Sort Controls */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative max-w-md flex-1">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t("proctor.searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="ps-9"
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowUpDown className="h-4 w-4" />
+              {sortMode === "default"
+                ? (locale === "ar" ? "الترتيب الافتراضي" : "Default Order")
+                : sortMode === "risk-desc"
+                  ? (locale === "ar" ? "المخاطر: الأعلى أولاً" : "Risk: High → Low")
+                  : (locale === "ar" ? "المخاطر: الأدنى أولاً" : "Risk: Low → High")}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={dir === "rtl" ? "start" : "end"}>
+            <DropdownMenuItem onClick={() => setSortMode("default")}>
+              {locale === "ar" ? "الترتيب الافتراضي" : "Default Order"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortMode("risk-desc")}>
+              <Shield className="h-4 w-4 me-2 text-red-500" />
+              {locale === "ar" ? "المخاطر: الأعلى أولاً" : "Risk: High → Low"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSortMode("risk-asc")}>
+              <Shield className="h-4 w-4 me-2 text-emerald-500" />
+              {locale === "ar" ? "المخاطر: الأدنى أولاً" : "Risk: Low → High"}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {/* Flagged Filter */}
+        <Button
+          variant={filterMode === "flagged" ? "default" : "outline"}
+          size="sm"
+          className="gap-2"
+          onClick={() => setFilterMode(filterMode === "flagged" ? "all" : "flagged")}
+        >
+          <Flag className="h-4 w-4" />
+          {locale === "ar" ? `المُعلَّمة (${flaggedSessions.length})` : `Flagged (${flaggedSessions.length})`}
+        </Button>
       </div>
 
       {/* Sessions Grid */}
-      {filteredSessions.length === 0 ? (
+      {sortedSessions.length === 0 ? (
         <EmptyState icon={Video} title={t("proctor.noSessions")} description={t("proctor.noSessionsDesc")} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredSessions.map((session) => (
+          {sortedSessions.map((session) => {
+            const risk = getRiskBadge(session.riskScore)
+            return (
             <Card
               key={session.id}
               className={`overflow-hidden transition-shadow hover:shadow-md ${
@@ -280,6 +467,15 @@ export default function ProctorCenterPage() {
                     <Badge variant="destructive" className="gap-1">
                       <AlertTriangle className="h-3 w-3" />
                       {session.incidentCount}
+                    </Badge>
+                  </div>
+                )}
+                {/* Risk Score Badge */}
+                {risk && (
+                  <div className={`absolute ${session.incidentCount > 0 ? "top-9" : "top-2"} end-2`}>
+                    <Badge variant="outline" className={`gap-1 text-xs font-semibold ${risk.color}`}>
+                      <Shield className="h-3 w-3" />
+                      {Math.round(session.riskScore!)} · {risk.label}
                     </Badge>
                   </div>
                 )}
@@ -351,9 +547,42 @@ export default function ProctorCenterPage() {
                     {t("proctor.lastActivity")}: {getTimeSince(session.lastActivity)}
                   </span>
                 </div>
+                {/* Violations Count */}
+                {(session.totalViolations ?? 0) > 0 && (
+                  <div className="flex items-center gap-2 mt-1.5 text-xs">
+                    <AlertTriangle className="h-3 w-3 text-destructive" />
+                    <span className="text-destructive font-medium">
+                      {locale === "ar" ? `المخالفات: ${session.totalViolations}` : `Violations: ${session.totalViolations}`}
+                    </span>
+                  </div>
+                )}
+                {/* Card Actions */}
+                {!session.isSample && (
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" asChild>
+                      <Link href={`/proctor-center/${session.id}`}>
+                        <Eye className="h-3.5 w-3.5 me-1.5" />
+                        {t("proctor.viewDetails")}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 text-xs text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
+                      onClick={() => {
+                        setSelectedSession(session)
+                        setWarningDialogOpen(true)
+                      }}
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 me-1.5" />
+                      {t("proctor.sendWarning")}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
 

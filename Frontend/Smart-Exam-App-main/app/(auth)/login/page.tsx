@@ -215,6 +215,15 @@ export default function LoginPage() {
                   {t("auth.login")}
                 </Button>
 
+                <div className="text-center">
+                  <Link
+                    href="/candidate-login"
+                    className="text-sm text-primary hover:underline font-medium"
+                  >
+                    {isRTL ? "تسجيل الدخول كمرشح →" : "Login as Candidate →"}
+                  </Link>
+                </div>
+
                 <div className="mt-4 rounded-lg bg-muted p-4 text-sm">
                   <p className="font-medium mb-3">Demo Credentials (click to fill):</p>
                   <div className="space-y-2">

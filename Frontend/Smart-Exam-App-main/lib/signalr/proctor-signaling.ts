@@ -125,13 +125,26 @@ export class ProctorSignaling {
     // Build hub URL — go through Next.js proxy is not needed for SignalR,
     // connect directly to backend
     const backendUrl = this.getBackendUrl();
-    const hubUrl = `${backendUrl}/hubs/proctor?access_token=${encodeURIComponent(token)}`;
-    console.log(`[SignalR] Hub URL: ${backendUrl}/hubs/proctor`);
+    const hubUrl = `${backendUrl}/hubs/proctor`;
+    console.log(`[SignalR] Hub URL: ${hubUrl}`);
+
+    // In production, allow negotiate+fallback transports (ServerSentEvents/LongPolling)
+    // so connection works even if WebSocket module is restricted on host.
+    // Locally, skip negotiation for speed.
+    const isLocalhost =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1");
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
+        accessTokenFactory: () => token,
+        ...(isLocalhost
+          ? {
+              skipNegotiation: true,
+              transport: signalR.HttpTransportType.WebSockets,
+            }
+          : {}),
       })
       .withAutomaticReconnect([0, 1000, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Information)
@@ -277,7 +290,10 @@ export class ProctorSignaling {
     // In production, the backend runs on the same host or a configured URL
     // Check for env variable first
     const envUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    if (envUrl) return envUrl.replace(/\/+$/, "");
+    if (envUrl) {
+      // Strip trailing /api or /api/ — SignalR hubs are at root path, not under /api
+      return envUrl.replace(/\/+$/, "").replace(/\/api\/?$/, "");
+    }
     // Default: same origin (assumes reverse proxy) or localhost for dev
     if (
       window.location.hostname === "localhost" ||

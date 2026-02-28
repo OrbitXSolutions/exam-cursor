@@ -164,6 +164,9 @@ export default function MyExamsPage() {
       )
     }
 
+    // Sort newest to oldest by id (auto-incremented, so higher id = newer exam)
+    list.sort((a, b) => b.id - a.id)
+
     return list
   })()
 

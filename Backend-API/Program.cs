@@ -191,6 +191,10 @@ MappingConfig.RegisterMappings();
 
 // Media Storage Configuration
 builder.Services.Configure<MediaStorageSettings>(builder.Configuration.GetSection("MediaStorage"));
+
+// OpenAI Configuration
+builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
+builder.Services.AddHttpClient();
 var mediaStorageProvider = builder.Configuration.GetValue<string>("MediaStorage:Provider") ?? "Local";
 
 if (mediaStorageProvider.Equals("S3", StringComparison.OrdinalIgnoreCase))
@@ -213,9 +217,12 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ILookupsService, LookupsService>();
 builder.Services.AddScoped<IQuestionBankService, QuestionBankService>();
+builder.Services.AddScoped<IAiQuestionGeneratorService, AiQuestionGeneratorService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
 builder.Services.AddScoped<IGradingService, GradingService>();
+builder.Services.AddScoped<IAiGradingService, AiGradingService>();
+builder.Services.AddScoped<IAiProctorService, AiProctorService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IProctorService, ProctorService>();
@@ -255,7 +262,9 @@ builder.Services.AddCors(options =>
                 "http://localhost:3000",
                 "https://localhost:3000",
                 "http://localhost:5221",
-                "https://localhost:7184")
+                "https://localhost:7184",
+                "https://smartexam-sable.vercel.app",
+                "https://zoolker-003-site8.jtempurl.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

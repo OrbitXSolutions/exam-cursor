@@ -496,3 +496,22 @@ public class CandidateSessionStatusDto
 }
 
 #endregion
+
+#region Triage / AI Assistant DTOs
+
+/// <summary>
+/// A single triage recommendation for the proctor assistant
+/// </summary>
+public class TriageRecommendationDto
+{
+    public int SessionId { get; set; }
+    public string CandidateName { get; set; } = string.Empty;
+    public string ExamTitle { get; set; } = string.Empty;
+    public decimal RiskScore { get; set; }
+    public string RiskLevel { get; set; } = string.Empty;
+    public int TotalViolations { get; set; }
+    public string ReasonEn { get; set; } = string.Empty;
+    public string ReasonAr { get; set; } = string.Empty;
+}
+
+#endregion
