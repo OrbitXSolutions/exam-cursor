@@ -236,6 +236,22 @@ export default function QuestionDetailPage() {
                     </div>
                   </div>
 
+                  {(question.topicNameEn || question.topicNameAr) && (
+                    <div className="flex items-center gap-3 rounded-lg border p-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <FileImage className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">{language === "ar" ? "الموضوع" : "Topic"}</p>
+                        <p className="font-medium">
+                          {language === "ar"
+                            ? (question.topicNameAr || question.topicNameEn || "—")
+                            : (question.topicNameEn || "—")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-3 rounded-lg border p-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Calendar className="h-5 w-5" />

@@ -2479,18 +2479,31 @@ $"Questions not found: {string.Join(", ", missingIds)}");
     // Determine overall source type (Subject or Topic)
     var sourceType = builderSections.FirstOrDefault()?.SourceType ?? Domain.Enums.SectionSourceType.Subject;
 
-    // Get available questions count for each section
+    // Get available questions count and estimated total points for each section
     foreach (var section in builderSections)
     {
-      var countQuery = _context.Questions
+      var poolQuery = _context.Questions
           .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == section.QuestionSubjectId);
 
       if (section.QuestionTopicId.HasValue)
       {
-        countQuery = countQuery.Where(q => q.TopicId == section.QuestionTopicId);
+        poolQuery = poolQuery.Where(q => q.TopicId == section.QuestionTopicId);
       }
 
-      section.AvailableQuestionsCount = await countQuery.CountAsync();
+      var availableCount = await poolQuery.CountAsync();
+      section.AvailableQuestionsCount = availableCount;
+
+      // Calculate estimated total points: pickCount × avg points per question
+      if (availableCount > 0)
+      {
+        var pointsSum = await poolQuery.SumAsync(q => q.Points);
+        var avgPoints = pointsSum / availableCount;
+        section.EstimatedTotalPoints = section.PickCount * avgPoints;
+      }
+      else
+      {
+        section.EstimatedTotalPoints = section.PickCount; // fallback: 1 point per question
+      }
     }
 
     var result = new ExamBuilderDto

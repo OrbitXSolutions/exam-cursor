@@ -152,7 +152,7 @@ public class AiQuestionGeneratorService : IAiQuestionGeneratorService
 
         if (request.QuestionTypeId == 2)
         {
-            sb.AppendLine("- For Multiple Choice (Multiple Answers): each question should have 2-3 correct answers out of 4-5 options");
+            sb.AppendLine("- For Multiple Choice (Multiple Answers): each question MUST have at least 2 correct answers (2-3 correct) out of 4-5 options");
         }
 
         sb.AppendLine("- Wrong options (distractors) should be plausible but clearly incorrect");
@@ -196,7 +196,7 @@ public class AiQuestionGeneratorService : IAiQuestionGeneratorService
             sb.AppendLine("- Each question must have exactly 4 options");
             sb.AppendLine($"- For single answer: exactly 1 option with isCorrect: true");
             if (request.QuestionTypeId == 2)
-                sb.AppendLine($"- For multiple answers: 2-3 options with isCorrect: true");
+                sb.AppendLine($"- For multiple answers: MUST have at least 2 options with isCorrect: true (2-3 correct answers required)");
             sb.AppendLine();
         }
 

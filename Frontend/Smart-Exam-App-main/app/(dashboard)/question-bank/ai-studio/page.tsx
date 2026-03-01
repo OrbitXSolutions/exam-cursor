@@ -93,7 +93,7 @@ export default function AiStudioPage() {
     numberOfQuestions: 5,
     points: 1,
     customTopic: "",
-    language: "en",
+    language: "both",
   })
 
   // Generation
@@ -250,6 +250,20 @@ export default function AiStudioPage() {
       return
     }
 
+    // Validate MCQ Multi must have at least 2 correct answers
+    const invalidMulti = selected.filter(
+      (q) => q.questionTypeId === QUESTION_TYPE.MCQ_MULTI &&
+        q.options.filter((o) => o.isCorrect).length < 2
+    )
+    if (invalidMulti.length > 0) {
+      toast.error(
+        language === "ar"
+          ? "أسئلة الاختيار المتعدد يجب أن تحتوي على إجابتين صحيحتين على الأقل"
+          : "MCQ Multi questions must have at least 2 correct answers"
+      )
+      return
+    }
+
     setIsSavingAll(true)
     let saved = 0
 
@@ -262,7 +276,7 @@ export default function AiStudioPage() {
           bodyEn: question.bodyEn || "",
           bodyAr: question.bodyAr || "",
           questionTypeId: question.questionTypeId,
-          questionCategoryId: 1, // Default category
+          questionCategoryId: null, // No category - nullable in backend
           subjectId: formData.subjectId,
           topicId: formData.topicId || undefined,
           points: question.points,
@@ -403,19 +417,21 @@ export default function AiStudioPage() {
 
               {/* Topic */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">{language === "ar" ? "الموضوع" : "Topic"}</Label>
+                <Label className="text-sm font-semibold flex items-center gap-1">
+                  {language === "ar" ? "الموضوع" : "Topic"}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Select
-                  value={formData.topicId ? String(formData.topicId) : "none"}
+                  value={formData.topicId ? String(formData.topicId) : ""}
                   onValueChange={(val) =>
-                    setFormData((prev) => ({ ...prev, topicId: val === "none" ? null : Number(val) }))
+                    setFormData((prev) => ({ ...prev, topicId: Number(val) }))
                   }
                   disabled={topics.length === 0}
                 >
                   <SelectTrigger className="border-2 h-11 w-full">
-                    <SelectValue placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"} />
+                    <SelectValue placeholder={language === "ar" ? "اختر الموضوع" : "Select topic"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">{language === "ar" ? "الكل" : "All Topics"}</SelectItem>
                     {topics.map((tp) => (
                       <SelectItem key={tp.id} value={String(tp.id)}>
                         {language === "ar" ? tp.nameAr || tp.nameEn : tp.nameEn || tp.nameAr}
@@ -518,26 +534,6 @@ export default function AiStudioPage() {
                 />
               </div>
 
-              {/* Language */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">{language === "ar" ? "لغة الأسئلة" : "Question Language"}</Label>
-                <Select
-                  value={formData.language}
-                  onValueChange={(val) =>
-                    setFormData((prev) => ({ ...prev, language: val }))
-                  }
-                >
-                  <SelectTrigger className="border-2 h-11 w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="ar">العربية</SelectItem>
-                    <SelectItem value="both">{language === "ar" ? "كلاهما" : "Both (EN & AR)"}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Custom Topic */}
               <div className="space-y-2 sm:col-span-2">
                 <Label className="text-sm font-semibold">{language === "ar" ? "تعليمات إضافية (اختياري)" : "Custom Instructions (optional)"}</Label>
@@ -567,7 +563,7 @@ export default function AiStudioPage() {
               </Button>
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating || !formData.subjectId}
+                disabled={isGenerating || !formData.subjectId || !formData.topicId}
                 className="bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white min-w-50"
                 size="lg"
               >
@@ -822,22 +818,25 @@ function QuestionCard({
                 rows={2}
               />
             </div>
-            {(question.bodyAr || language === "ar") && (
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Question (Arabic)</Label>
-                <Textarea
-                  value={question.bodyAr}
-                  onChange={(e) => onUpdate({ bodyAr: e.target.value })}
-                  rows={2}
-                  dir="rtl"
-                />
-              </div>
-            )}
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Question (Arabic)</Label>
+              <Textarea
+                value={question.bodyAr}
+                onChange={(e) => onUpdate({ bodyAr: e.target.value })}
+                rows={2}
+                dir="rtl"
+              />
+            </div>
           </div>
         ) : (
-          <p className="text-sm mb-4 font-medium">
-            {language === "ar" && question.bodyAr ? question.bodyAr : question.bodyEn || question.bodyAr}
-          </p>
+          <div className="mb-4 space-y-1">
+            {question.bodyEn && (
+              <p className="text-sm font-medium">{question.bodyEn}</p>
+            )}
+            {question.bodyAr && (
+              <p className="text-sm font-medium text-muted-foreground" dir="rtl">{question.bodyAr}</p>
+            )}
+          </div>
         )}
 
         {/* Options */}
@@ -872,20 +871,27 @@ function QuestionCard({
                     placeholder="Option text (English)"
                     className="h-8 text-sm"
                   />
-                  {(opt.textAr || language === "ar") && (
-                    <Input
-                      value={opt.textAr}
-                      onChange={(e) => onUpdateOption(optIdx, { textAr: e.target.value })}
-                      placeholder="Option text (Arabic)"
-                      className="h-8 text-sm"
-                      dir="rtl"
-                    />
-                  )}
+                  <Input
+                    value={opt.textAr}
+                    onChange={(e) => onUpdateOption(optIdx, { textAr: e.target.value })}
+                    placeholder="Option text (Arabic)"
+                    className="h-8 text-sm"
+                    dir="rtl"
+                  />
                 </div>
               ) : (
-                <span className={`text-sm flex-1 ${opt.isCorrect ? "font-medium text-green-700 dark:text-green-300" : ""}`}>
-                  {language === "ar" && opt.textAr ? opt.textAr : opt.textEn || opt.textAr}
-                </span>
+                <div className="flex-1">
+                  {opt.textEn && (
+                    <span className={`text-sm block ${opt.isCorrect ? "font-medium text-green-700 dark:text-green-300" : ""}`}>
+                      {opt.textEn}
+                    </span>
+                  )}
+                  {opt.textAr && (
+                    <span className={`text-sm block text-muted-foreground ${opt.isCorrect ? "font-medium text-green-700 dark:text-green-300" : ""}`} dir="rtl">
+                      {opt.textAr}
+                    </span>
+                  )}
+                </div>
               )}
 
               {opt.isCorrect && (
@@ -902,22 +908,32 @@ function QuestionCard({
               {language === "ar" ? "الشرح:" : "Explanation:"}
             </p>
             {question._editing ? (
-              <Textarea
-                value={language === "ar" && question.explanationAr ? question.explanationAr : question.explanationEn || ""}
-                onChange={(e) => {
-                  if (language === "ar") {
-                    onUpdate({ explanationAr: e.target.value })
-                  } else {
-                    onUpdate({ explanationEn: e.target.value })
-                  }
-                }}
-                rows={2}
-                className="text-sm"
-              />
+              <div className="space-y-2">
+                <Textarea
+                  value={question.explanationEn || ""}
+                  onChange={(e) => onUpdate({ explanationEn: e.target.value })}
+                  rows={2}
+                  className="text-sm"
+                  placeholder="Explanation (English)"
+                />
+                <Textarea
+                  value={question.explanationAr || ""}
+                  onChange={(e) => onUpdate({ explanationAr: e.target.value })}
+                  rows={2}
+                  className="text-sm"
+                  dir="rtl"
+                  placeholder="الشرح (عربي)"
+                />
+              </div>
             ) : (
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                {language === "ar" && question.explanationAr ? question.explanationAr : question.explanationEn || question.explanationAr}
-              </p>
+              <div className="space-y-1">
+                {question.explanationEn && (
+                  <p className="text-xs text-blue-700 dark:text-blue-300">{question.explanationEn}</p>
+                )}
+                {question.explanationAr && (
+                  <p className="text-xs text-blue-700 dark:text-blue-300" dir="rtl">{question.explanationAr}</p>
+                )}
+              </div>
             )}
           </div>
         )}
