@@ -105,6 +105,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     pickCount: number
     sourceType: SectionSourceType
     availableQuestionsCount: number
+    estimatedTotalPoints: number
   }>>([])
   const [loadedBuilderData, setLoadedBuilderData] = useState<ExamBuilderDto | null>(null)
   const [examTotalPoints, setExamTotalPoints] = useState<number>(0)
@@ -232,6 +233,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           pickCount: s.pickCount,
           sourceType: s.sourceType,
           availableQuestionsCount: s.availableQuestionsCount,
+          estimatedTotalPoints: s.estimatedTotalPoints ?? s.pickCount,
         }))
         
         setBuilderSections(loadedSections)
@@ -292,6 +294,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           pickCount: Math.min(10, count),
           sourceType: SectionSourceType.Subject,
           availableQuestionsCount: count,
+          estimatedTotalPoints: Math.min(10, count), // default: 1 point per question until backend recalculates
         }])
       } else {
         // Load topics for this subject
@@ -334,6 +337,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         pickCount: Math.min(10, count),
         sourceType: SectionSourceType.Topic,
         availableQuestionsCount: count,
+        estimatedTotalPoints: Math.min(10, count),
       }])
     } else {
       setSelectedTopicIds(prev => prev.filter(id => id !== topic.id))
@@ -441,8 +445,12 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     return builderSections.reduce((sum, s) => sum + s.pickCount, 0)
   }
 
-  // Get total points from the exam (sum of individual question points)
+  // Get total points: sum of estimated points from all builder sections
   const getTotalPoints = () => {
+    if (builderSections.length > 0) {
+      const estimated = builderSections.reduce((sum, s) => sum + (s.estimatedTotalPoints || 0), 0)
+      if (estimated > 0) return Math.round(estimated)
+    }
     return examTotalPoints
   }
 

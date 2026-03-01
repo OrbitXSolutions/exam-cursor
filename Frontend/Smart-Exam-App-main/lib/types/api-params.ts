@@ -31,7 +31,7 @@ export interface CreateQuestionRequest {
   bodyEn: string;
   bodyAr: string;
   questionTypeId: number;
-  questionCategoryId: number;
+  questionCategoryId?: number | null;
   subjectId: number;
   topicId?: number;
   points: number;

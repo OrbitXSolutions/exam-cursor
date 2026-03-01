@@ -32,6 +32,10 @@ public class BuilderSectionDto
 
     // Read-only fields returned by GET
     public int AvailableQuestionsCount { get; set; }
+    /// <summary>
+    /// Estimated total points for this section: PickCount × average points per question in the pool
+    /// </summary>
+    public decimal EstimatedTotalPoints { get; set; }
     public string? SubjectNameEn { get; set; }
     public string? SubjectNameAr { get; set; }
     public string? TopicNameEn { get; set; }

@@ -364,6 +364,7 @@ export interface BuilderSectionDto {
   durationMinutes: number | null;
   pickCount: number;
   availableQuestionsCount: number;
+  estimatedTotalPoints: number;
 }
 
 export interface SaveExamBuilderRequest {
