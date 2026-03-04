@@ -52,3 +52,10 @@ Step 2 — Link it to the question via POST /api/QuestionBank/questions/{id}/att
 The QuestionBank controller doesn't accept file uploads directly — it only accepts JSON metadata ([FromBody] CreateQuestionAttachmentDto). So MediaController is the correct upload mechanism — it's not proctoring-specific, it's a shared file storage service that serves any module.
 
 The current implementation in the create page does exactly this two-step flow correctly. No changes needed — MediaController is the right tool for the job.
+
+## Question Attachment
+
+now support only image
+easily can support audio/video. (addsOn)
+
+## Question with Excel

@@ -30,6 +30,9 @@ public class Question : BaseEntity
     // Status
     public bool IsActive { get; set; } = true;
 
+    // Calculator
+    public bool IsCalculatorAllowed { get; set; } = false;
+
     // Navigation Properties
     public virtual Lookups.QuestionType QuestionType { get; set; } = null!;
     public virtual Lookups.QuestionCategory? QuestionCategory { get; set; }

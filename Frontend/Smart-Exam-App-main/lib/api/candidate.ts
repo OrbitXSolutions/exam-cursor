@@ -367,6 +367,7 @@ export interface AttemptQuestionDto {
   bodyAr: string;
   questionTypeName: string;
   questionTypeId: number;
+  isCalculatorAllowed?: boolean;
   sectionId?: number | null;
   topicId?: number | null;
   options: AttemptQuestionOptionDto[];

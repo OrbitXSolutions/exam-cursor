@@ -109,8 +109,8 @@ public class QuestionBankService : IQuestionBankService
             Points = x.Points,
             DifficultyLevel = x.DifficultyLevel,
             IsActive = x.IsActive,
+            IsCalculatorAllowed = x.IsCalculatorAllowed,
             CreatedDate = x.CreatedDate,
-            OptionsCount = x.Options.Count,
             AttachmentsCount = x.Attachments.Count
         }).ToList();
 
@@ -164,8 +164,8 @@ public class QuestionBankService : IQuestionBankService
             Points = entity.Points,
             DifficultyLevel = entity.DifficultyLevel,
             IsActive = entity.IsActive,
+            IsCalculatorAllowed = entity.IsCalculatorAllowed,
             CreatedDate = entity.CreatedDate,
-            UpdatedDate = entity.UpdatedDate,
             IsDeleted = entity.IsDeleted,
             Options = entity.Options.Select(o => new QuestionOptionDto
             {
@@ -248,8 +248,8 @@ public class QuestionBankService : IQuestionBankService
             Points = dto.Points,
             DifficultyLevel = dto.DifficultyLevel,
             IsActive = dto.IsActive,
+            IsCalculatorAllowed = dto.IsCalculatorAllowed,
             CreatedDate = DateTime.UtcNow,
-            CreatedBy = createdBy
         };
 
         // Add options if provided
@@ -352,8 +352,8 @@ public class QuestionBankService : IQuestionBankService
         entity.Points = dto.Points;
         entity.DifficultyLevel = dto.DifficultyLevel;
         entity.IsActive = dto.IsActive;
+        entity.IsCalculatorAllowed = dto.IsCalculatorAllowed;
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = updatedBy;
 
         // Upsert answer key if provided
         if (dto.AnswerKey != null)

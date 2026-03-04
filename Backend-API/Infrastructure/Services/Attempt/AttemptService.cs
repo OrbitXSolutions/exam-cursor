@@ -1275,6 +1275,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
         BodyAr = aq.Question.BodyAr,
         QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
         QuestionTypeId = aq.Question.QuestionTypeId,
+        IsCalculatorAllowed = aq.Question.IsCalculatorAllowed,
         Options = options,
         Attachments = aq.Question.Attachments.Select(a => new AttemptQuestionAttachmentDto
         {

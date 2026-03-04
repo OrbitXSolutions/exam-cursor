@@ -21,7 +21,7 @@ import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type Question
 import type { Question } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
-import { ArrowLeft, Plus, Trash2, GripVertical, ImageIcon, Upload, X } from "lucide-react"
+import { ArrowLeft, Plus, Trash2, GripVertical, ImageIcon, Upload, X, Calculator } from "lucide-react"
 import type { QuestionAttachment } from "@/lib/types"
 import { addQuestionAttachment, deleteQuestionAttachment } from "@/lib/api/question-bank"
 
@@ -61,6 +61,7 @@ export default function EditQuestionPage() {
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
+    isCalculatorAllowed: false,
   })
 
   const [options, setOptions] = useState<OptionInput[]>([])
@@ -105,6 +106,7 @@ export default function EditQuestionPage() {
           points: q.points || 1,
           difficultyLevel: q.difficultyLevel || DifficultyLevel.Easy,
           isActive: q.isActive !== false,
+          isCalculatorAllowed: q.isCalculatorAllowed || false,
         })
         // Load answer key if present
         if (q.answerKey) {
@@ -295,6 +297,7 @@ export default function EditQuestionPage() {
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
+        isCalculatorAllowed: formData.isCalculatorAllowed,
       }
 
       // Include answer key for subjective types
@@ -697,6 +700,21 @@ export default function EditQuestionPage() {
                   <Switch
                     checked={formData.isActive}
                     onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  />
+                </div>
+
+                {/* Calculator Toggle */}
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-3">
+                    <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <p className="font-medium">Allow Calculator</p>
+                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.isCalculatorAllowed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isCalculatorAllowed: checked })}
                   />
                 </div>
               </CardContent>

@@ -42,6 +42,7 @@ import {
   ImageIcon,
   Upload,
   X,
+  Calculator,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -85,6 +86,7 @@ const CreateQuestionPage = () => {
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
+    isCalculatorAllowed: false,
   })
 
   const [options, setOptions] = useState<OptionInput[]>([
@@ -390,6 +392,7 @@ const CreateQuestionPage = () => {
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
+        isCalculatorAllowed: formData.isCalculatorAllowed,
         options: finalOptions,
       }
 
@@ -743,6 +746,23 @@ const CreateQuestionPage = () => {
                   <Switch
                     checked={formData.isActive}
                     onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  />
+                </div>
+
+                {/* Calculator Toggle */}
+                <div className="flex items-center justify-between rounded-xl border-2 p-4 bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Allow Calculator</p>
+                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.isCalculatorAllowed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isCalculatorAllowed: checked })}
                   />
                 </div>
 

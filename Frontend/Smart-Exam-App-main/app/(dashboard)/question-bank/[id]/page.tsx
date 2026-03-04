@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getQuestionById, deleteQuestion } from "@/lib/api/question-bank"
 import type { Question } from "@/lib/types"
-import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2 } from "lucide-react"
+import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2, Calculator } from "lucide-react"
 import { toast } from "sonner"
 
 // Dynamically import the create page component
@@ -185,6 +185,12 @@ export default function QuestionDetailPage() {
                   <div className="flex items-center gap-2">
                     <StatusBadge status={question.difficultyLevelName} />
                     <StatusBadge status={question.isActive ? "Active" : "Inactive"} />
+                    {question.isCalculatorAllowed && (
+                      <Badge variant="outline" className="gap-1 border-blue-300 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <Calculator className="h-3 w-3" />
+                        Calculator
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>

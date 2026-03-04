@@ -323,6 +323,7 @@ public class CandidateQuestionDto
     public string BodyAr { get; set; } = string.Empty;
     public string QuestionTypeName { get; set; } = string.Empty;
     public int QuestionTypeId { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
 
     /// <summary>
     /// Section ID this question belongs to (for reference)

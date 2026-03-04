@@ -232,8 +232,8 @@ export interface Question {
   difficultyLevel: DifficultyLevel;
   difficultyLevelName: string;
   isActive: boolean;
+  isCalculatorAllowed: boolean;
   createdDate: string;
-  updatedDate: string | null;
   isDeleted: boolean;
   options: QuestionOption[];
   attachments: QuestionAttachment[];

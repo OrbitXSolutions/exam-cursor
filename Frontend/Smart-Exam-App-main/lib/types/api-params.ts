@@ -37,6 +37,7 @@ export interface CreateQuestionRequest {
   points: number;
   difficultyLevel: DifficultyLevel;
   isActive: boolean;
+  isCalculatorAllowed?: boolean;
   options: {
     textEn: string;
     textAr: string;
@@ -56,6 +57,7 @@ export interface UpdateQuestionRequest {
   points: number;
   difficultyLevel: DifficultyLevel;
   isActive: boolean;
+  isCalculatorAllowed?: boolean;
 }
 
 // ============ EXAM ============

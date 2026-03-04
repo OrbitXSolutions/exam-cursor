@@ -38,9 +38,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks, Calculator } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { ImageZoomModal } from "./image-zoom-modal"
+import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -87,6 +88,9 @@ export default function ExamPage() {
 
   // Summary panel state
   const [showSummary, setShowSummary] = useState(false)
+
+  // Calculator state
+  const [showCalculator, setShowCalculator] = useState(false)
 
   // Auto-save indicator state
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
@@ -137,6 +141,21 @@ export default function ExamPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const flatQuestions = session?.questions || []
   const currentFlatQuestion = flatQuestions[currentQuestionIndex]
+
+  // Calculator context: check if calculator is allowed in the current view
+  const isCalculatorAllowedInContext = hasSections
+    ? !!(currentSection && (
+        currentSection.questions?.some(q => q.isCalculatorAllowed) ||
+        currentSection.topics?.some(t => t.questions?.some(q => q.isCalculatorAllowed))
+      ))
+    : !!(currentFlatQuestion?.isCalculatorAllowed)
+
+  // Auto-hide calculator when navigating to context that doesn't allow it
+  useEffect(() => {
+    if (!isCalculatorAllowedInContext && showCalculator) {
+      setShowCalculator(false)
+    }
+  }, [isCalculatorAllowedInContext, currentSectionId, currentQuestionIndex])
 
   // Check if can navigate back
   const canNavigateBack = useCallback(() => {
@@ -1370,6 +1389,19 @@ export default function ExamPage() {
               </span>
             </div>
 
+            {/* Calculator Toggle - shown only when current section/question allows it */}
+            {isCalculatorAllowedInContext && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCalculator(!showCalculator)}
+                className={cn("gap-1.5", showCalculator && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
+              >
+                <Calculator className="h-4 w-4" />
+                <span className="hidden sm:inline">{language === "ar" ? "آلة حاسبة" : "Calculator"}</span>
+              </Button>
+            )}
+
             {/* Summary Toggle */}
             <Button
               variant="outline"
@@ -1515,7 +1547,14 @@ export default function ExamPage() {
                   {t("common.previous")}
                 </Button>
 
-                <div className="text-center">
+                <div className="flex items-center gap-3">
+                  {/* Calculator button — only if current question allows it */}
+                  {currentFlatQuestion?.isCalculatorAllowed && (
+                    <CalculatorButton
+                      isOpen={showCalculator}
+                      onClick={() => setShowCalculator(prev => !prev)}
+                    />
+                  )}
                   <p className="text-sm font-medium">
                     Question {currentQuestionIndex + 1} {t("exam.of")} {flatQuestions.length}
                   </p>
@@ -1745,6 +1784,11 @@ export default function ExamPage() {
           </div>
         )}
       </div>
+
+      {/* Floating Calculator */}
+      {showCalculator && (
+        <ExamCalculator onClose={() => setShowCalculator(false)} />
+      )}
 
       {/* Submit confirmation dialog */}
       <AlertDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>

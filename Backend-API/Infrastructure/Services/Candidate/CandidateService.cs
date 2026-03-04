@@ -1771,6 +1771,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 BodyAr = aq.Question.BodyAr,
                 QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
                 QuestionTypeId = aq.Question.QuestionTypeId,
+                IsCalculatorAllowed = aq.Question.IsCalculatorAllowed,
                 SectionId = sectionId,
                 TopicId = topicId,
                 Options = options,
