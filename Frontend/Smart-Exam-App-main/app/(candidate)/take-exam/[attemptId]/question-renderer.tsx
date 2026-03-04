@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import type { AttemptQuestionDto, SaveAnswerRequest } from "@/lib/api/candidate"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
+import { ImageZoomModal } from "./image-zoom-modal"
 
 // Helper function to get localized field
 function getLocalizedField(
@@ -27,9 +27,7 @@ const QUESTION_TYPES = {
   MCQ_SINGLE: { id: 1, names: ["MCQ_Single", "MCQ Single Choice", "SingleChoice", "Multiple Choice", "MCQ Single"] },
   MCQ_MULTI: { id: 2, names: ["MCQ_Multi", "MCQ Multiple Choice", "MCQ_Multiple", "MultipleChoice", "Multiple Select", "MCQ Multiple"] },
   TRUE_FALSE: { id: 3, names: ["TrueFalse", "True_False", "True/False"] },
-  SHORT_ANSWER: { id: 4, names: ["ShortAnswer", "Short_Answer", "Short Answer"] },
-  ESSAY: { id: 5, names: ["Essay"] },
-  NUMERIC: { id: 6, names: ["Numeric"] },
+  SUBJECTIVE: { id: 4, names: ["Subjective", "ShortAnswer", "Short_Answer", "Short Answer", "Essay", "Numeric"] },
 }
 
 // Helper function to detect question type from ID or name
@@ -63,6 +61,22 @@ export function QuestionRenderer({
 }: QuestionRendererProps) {
   const questionType = getQuestionType(question.questionTypeId, question.questionTypeName)
 
+  return (
+    <div className="space-y-4">
+      {/* Answer Area — question image is now displayed in the parent card header */}
+      {renderAnswerComponent(questionType, question, answer, language, onAnswerChange)}
+    </div>
+  )
+}
+
+function renderAnswerComponent(
+  questionType: keyof typeof QUESTION_TYPES,
+  question: AttemptQuestionDto,
+  answer: SaveAnswerRequest | undefined,
+  language: string,
+  onAnswerChange: (questionId: number, answer: SaveAnswerRequest) => void,
+) {
+
   // Render based on question type
   switch (questionType) {
     case "MCQ_SINGLE":
@@ -92,27 +106,9 @@ export function QuestionRenderer({
           onAnswerChange={onAnswerChange}
         />
       )
-    case "SHORT_ANSWER":
+    case "SUBJECTIVE":
       return (
-        <ShortAnswer
-          question={question}
-          answer={answer}
-          language={language}
-          onAnswerChange={onAnswerChange}
-        />
-      )
-    case "ESSAY":
-      return (
-        <Essay
-          question={question}
-          answer={answer}
-          language={language}
-          onAnswerChange={onAnswerChange}
-        />
-      )
-    case "NUMERIC":
-      return (
-        <Numeric
+        <Subjective
           question={question}
           answer={answer}
           language={language}
@@ -177,12 +173,11 @@ function MCQSingleChoice({
               <div className="flex-1 space-y-1.5">
                 <p className="text-sm leading-normal">{optionText}</p>
                 {option.attachmentPath && (
-                  <div className="relative h-48 w-full overflow-hidden rounded-md border">
-                    <Image
+                  <div className="mt-1 flex justify-center overflow-hidden rounded-md border bg-muted/20">
+                    <ImageZoomModal
                       src={option.attachmentPath}
                       alt={optionText}
-                      fill
-                      className="object-contain"
+                      thumbnailClassName="max-h-40 w-auto object-contain"
                     />
                   </div>
                 )}
@@ -255,12 +250,11 @@ function MCQMultipleChoice({
               <div className="flex-1 space-y-1.5">
                 <p className="text-sm leading-normal">{optionText}</p>
                 {option.attachmentPath && (
-                  <div className="relative h-48 w-full overflow-hidden rounded-md border">
-                    <Image
+                  <div className="mt-1 flex justify-center overflow-hidden rounded-md border bg-muted/20">
+                    <ImageZoomModal
                       src={option.attachmentPath}
                       alt={optionText}
-                      fill
-                      className="object-contain"
+                      thumbnailClassName="max-h-40 w-auto object-contain"
                     />
                   </div>
                 )}
@@ -331,62 +325,8 @@ function TrueFalse({
   )
 }
 
-// Short Answer Component
-function ShortAnswer({
-  question,
-  answer,
-  language,
-  onAnswerChange,
-}: QuestionRendererProps) {
-  const [text, setText] = useState(answer?.textAnswer || "")
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout>()
-
-  useEffect(() => {
-    setText(answer?.textAnswer || "")
-  }, [answer])
-
-  const handleChange = (value: string) => {
-    setText(value)
-
-    // Debounce the save
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-
-    const timeout = setTimeout(() => {
-      onAnswerChange(question.questionId, {
-        questionId: question.questionId,
-        selectedOptionIds: null,
-        textAnswer: value,
-      })
-    }, 1000) // Save after 1 second of no typing
-
-    setDebounceTimeout(timeout)
-  }
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={`answer-${question.questionId}`}>
-        {language === "ar" ? "اكتب إجابتك هنا" : "Type your answer here"}
-      </Label>
-      <Input
-        id={`answer-${question.questionId}`}
-        value={text}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder={language === "ar" ? "أدخل إجابتك" : "Enter your answer"}
-        className="text-base"
-      />
-      <p className="text-xs text-muted-foreground">
-        {language === "ar" 
-          ? "سيتم حفظ إجابتك تلقائيًا" 
-          : "Your answer will be saved automatically"}
-      </p>
-    </div>
-  )
-}
-
-// Essay Component
-function Essay({
+// Subjective Component (replaces ShortAnswer, Essay, Numeric)
+function Subjective({
   question,
   answer,
   language,
@@ -443,63 +383,6 @@ function Essay({
           {wordCount} {language === "ar" ? "كلمة" : "words"}
         </p>
       </div>
-    </div>
-  )
-}
-
-// Numeric Component
-function Numeric({
-  question,
-  answer,
-  language,
-  onAnswerChange,
-}: QuestionRendererProps) {
-  const [text, setText] = useState(answer?.textAnswer || "")
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout>()
-
-  useEffect(() => {
-    setText(answer?.textAnswer || "")
-  }, [answer])
-
-  const handleChange = (value: string) => {
-    // Only allow numbers, decimals, and negative signs
-    const numericValue = value.replace(/[^0-9.-]/g, "")
-    setText(numericValue)
-
-    // Debounce the save
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-
-    const timeout = setTimeout(() => {
-      onAnswerChange(question.questionId, {
-        questionId: question.questionId,
-        selectedOptionIds: null,
-        textAnswer: numericValue,
-      })
-    }, 1000) // Save after 1 second of no typing
-
-    setDebounceTimeout(timeout)
-  }
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={`answer-${question.questionId}`}>
-        {language === "ar" ? "أدخل الإجابة الرقمية" : "Enter numeric answer"}
-      </Label>
-      <Input
-        id={`answer-${question.questionId}`}
-        type="text"
-        value={text}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder={language === "ar" ? "مثال: 42 أو 3.14" : "e.g., 42 or 3.14"}
-        className="text-base font-mono"
-      />
-      <p className="text-xs text-muted-foreground">
-        {language === "ar" 
-          ? "سيتم حفظ إجابتك تلقائيًا" 
-          : "Your answer will be saved automatically"}
-      </p>
     </div>
   )
 }

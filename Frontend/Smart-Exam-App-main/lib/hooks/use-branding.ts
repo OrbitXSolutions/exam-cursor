@@ -111,11 +111,11 @@ export function useBranding() {
   const hasOrgBranding =
     branding.isActive && branding.name !== "" && branding.name !== "SmartExam";
 
-  // Build the logo URL — org logos are served as static files from backend at /organization/logo.png
+  // Build the logo URL — proxy through /api/backend-files to avoid hardcoding backend host
   const logoSrc = branding.logoUrl
     ? branding.logoUrl.startsWith("http")
       ? branding.logoUrl
-      : `http://localhost:5221${branding.logoUrl}`
+      : `/api/backend-files${branding.logoUrl}`
     : "";
 
   return {

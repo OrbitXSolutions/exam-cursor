@@ -44,14 +44,13 @@ const QUESTION_TYPE_DISPLAY: Record<string, string> = {
   "TrueFalse": "True/False",
   "True_False": "True/False",
   "True/False": "True/False",
-  // Short Answer variants
-  "ShortAnswer": "Short Answer",
-  "Short_Answer": "Short Answer",
-  "Short Answer": "Short Answer",
-  // Essay
-  "Essay": "Essay",
-  // Numeric
-  "Numeric": "Numeric",
+  // Subjective (replaces ShortAnswer, Essay, Numeric)
+  "Subjective": "Subjective",
+  "ShortAnswer": "Subjective",
+  "Short_Answer": "Subjective",
+  "Short Answer": "Subjective",
+  "Essay": "Subjective",
+  "Numeric": "Subjective",
 }
 
 // Helper function to get question type display name

@@ -40,6 +40,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
+import { ImageZoomModal } from "./image-zoom-modal"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -2148,6 +2149,11 @@ function QuestionCard({
 }) {
   const questionBody = getLocalizedField(question, "body", language)
 
+  // Find primary image attachment for the question
+  const primaryImage = question.attachments?.find((a: any) => a.isPrimary && a.fileType?.toLowerCase().includes('image'))
+  const anyImage = !primaryImage ? question.attachments?.find((a: any) => a.fileType?.toLowerCase().includes('image')) : null
+  const questionImage = primaryImage || anyImage
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="border-b bg-muted/20 py-3">
@@ -2176,6 +2182,17 @@ function QuestionCard({
             <Flag className={cn("h-4 w-4", isFlagged && "fill-orange-600 text-orange-600")} />
           </Button>
         </div>
+
+        {/* Question Image — shown inside the question area, above options */}
+        {questionImage && (
+          <div className="mt-3 flex justify-center overflow-hidden rounded-lg border bg-muted/30">
+            <ImageZoomModal
+              src={questionImage.filePath}
+              alt="Question image"
+              thumbnailClassName="max-h-64 w-auto object-contain"
+            />
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="py-4">
