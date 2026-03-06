@@ -5,6 +5,9 @@ public class QuestionSubjectDto
     public int Id { get; set; }
     public string NameEn { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
+    public int DepartmentId { get; set; }
+    public string DepartmentNameEn { get; set; } = string.Empty;
+    public string DepartmentNameAr { get; set; } = string.Empty;
     public int TopicsCount { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }

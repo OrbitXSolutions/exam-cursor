@@ -584,6 +584,19 @@ export default function ExamInstructionsPage() {
             </Card>
           )}
 
+          {/* Auto-Termination Warning */}
+          {examPreview.accessPolicy.maxViolationWarnings > 0 && (
+            <Card className="border-orange-500/50 bg-orange-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-orange-600 text-base">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t("instructions.autoTerminationWarning")?.replace("{count}", String(examPreview.accessPolicy.maxViolationWarnings))
+                    || `Your exam will be automatically terminated after ${examPreview.accessPolicy.maxViolationWarnings} violations`}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          )}
+
           {/* Cannot Start - Show Reasons */}
           {!canStart && examPreview.eligibility.reasons.length > 0 && (
             <Card className="border-red-500/50 bg-red-500/5">

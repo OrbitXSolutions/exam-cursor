@@ -18,7 +18,7 @@ export type PublisherStatus =
 
 export interface CandidatePublisherCallbacks {
   onStatusChange?: (status: PublisherStatus) => void;
-  onWarningReceived?: (message: string) => void;
+  onWarningReceived?: (message: string, isLastWarning?: boolean) => void;
   onSignalRStatusChange?: (connected: boolean) => void;
   onTerminationReceived?: (reason: string) => void;
   onTimeExtended?: (event: {
@@ -160,7 +160,10 @@ export class CandidatePublisher {
             `%c[WebRTC Publisher] \u26a0\ufe0f Warning received from proctor: "${event.message}"`,
             "color: #ff9800; font-weight: bold",
           );
-          this.callbacks.onWarningReceived?.(event.message);
+          this.callbacks.onWarningReceived?.(
+            event.message,
+            event.isLastWarning,
+          );
         },
         onTerminationReceived: (event) => {
           console.log(

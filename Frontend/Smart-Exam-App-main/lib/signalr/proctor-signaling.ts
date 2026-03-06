@@ -56,6 +56,7 @@ export interface SignalingCallbacks {
     fromUserId: string;
     message: string;
     attemptId: number;
+    isLastWarning?: boolean;
   }) => void;
   onTerminationReceived?: (event: {
     fromConnectionId: string;
@@ -201,6 +202,35 @@ export class ProctorSignaling {
         "color: #f44336; font-weight: bold",
       );
       this.callbacks.onTerminationReceived?.(event);
+    });
+
+    // Auto-termination warning from backend (different from manual proctor "ReceiveWarning")
+    this.connection.on("ProctorWarning", (event) => {
+      console.log(
+        `%c[SignalR] ProctorWarning (auto): "${event.message}", isLastWarning=${event.isLastWarning}`,
+        "color: #ff9800; font-weight: bold",
+      );
+      this.callbacks.onWarningReceived?.({
+        fromConnectionId: "",
+        fromUserId: "system",
+        message: event.message,
+        attemptId: this.attemptId,
+        isLastWarning: event.isLastWarning ?? false,
+      });
+    });
+
+    // Auto-termination from backend (different from manual proctor "SessionTerminated")
+    this.connection.on("ExamTerminated", (event) => {
+      console.log(
+        `%c[SignalR] ExamTerminated (auto): "${event.reason}"`,
+        "color: #f44336; font-weight: bold",
+      );
+      this.callbacks.onTerminationReceived?.({
+        fromConnectionId: "",
+        fromUserId: "system",
+        reason: event.reason,
+        attemptId: this.attemptId,
+      });
     });
 
     this.connection.on("RenegotiationRequested", (event) => {

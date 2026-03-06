@@ -42,6 +42,12 @@ public class ProctorSession : BaseEntity
     public int TotalEvents { get; set; }
     public int TotalViolations { get; set; }
 
+    /// <summary>
+    /// Count of violations that are "countable" toward auto-termination.
+    /// Subset of TotalViolations (excludes FullscreenExited, Copy/Paste, RightClick, etc.).
+    /// </summary>
+    public int CountableViolationCount { get; set; }
+
     // Risk score (0..100)
     public decimal? RiskScore { get; set; }
 

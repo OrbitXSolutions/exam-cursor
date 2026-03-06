@@ -106,6 +106,8 @@ export default function ExamPage() {
   // Proctor warning state
   const [proctorWarningOpen, setProctorWarningOpen] = useState(false)
   const [proctorWarningMessage, setProctorWarningMessage] = useState("")
+  const [lastWarningOpen, setLastWarningOpen] = useState(false)
+  const [lastWarningMessage, setLastWarningMessage] = useState("")
 
   // SignalR connection state — drives smart polling
   const [signalRConnected, setSignalRConnected] = useState(false)
@@ -466,11 +468,16 @@ export default function ExamPage() {
                   onStatusChange: (status) => {
                     console.log("[Proctor] WebRTC publisher status:", status)
                   },
-                  onWarningReceived: (message) => {
+                  onWarningReceived: (message, isLastWarning) => {
                     // Instant warning via SignalR — same UI as polled warnings
                     playWarningBeep()
-                    setProctorWarningMessage(message)
-                    setProctorWarningOpen(true)
+                    if (isLastWarning) {
+                      setLastWarningMessage(message)
+                      setLastWarningOpen(true)
+                    } else {
+                      setProctorWarningMessage(message)
+                      setProctorWarningOpen(true)
+                    }
                   },
                   onSignalRStatusChange: (connected) => {
                     console.log(`[SmartPoll] SignalR status changed: connected=${connected}`)
@@ -480,9 +487,7 @@ export default function ExamPage() {
                     console.log(`[SmartPoll] Termination received via SignalR: "${reason}"`)
                     stopAllBackgroundActivity()
                     toast.error(
-                      reason
-                        ? `${t("exam.terminatedByProctor")}: ${reason}`
-                        : t("exam.terminatedByProctor"),
+                      reason ?? t("exam.terminatedByProctor"),
                       { duration: 10000 }
                     )
                     router.push("/my-exams")
@@ -771,9 +776,7 @@ export default function ExamPage() {
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason
-              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-              : t("exam.terminatedByProctor"),
+            status.terminationReason ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
@@ -781,8 +784,13 @@ export default function ExamPage() {
         }
         if (status.hasWarning && status.warningMessage) {
           playWarningBeep()
-          setProctorWarningMessage(status.warningMessage)
-          setProctorWarningOpen(true)
+          if (status.warningMessage.includes("LAST WARNING")) {
+            setLastWarningMessage(status.warningMessage)
+            setLastWarningOpen(true)
+          } else {
+            setProctorWarningMessage(status.warningMessage)
+            setProctorWarningOpen(true)
+          }
         }
       } catch {
         // Silent fail — don't disrupt exam start
@@ -979,9 +987,7 @@ export default function ExamPage() {
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason
-              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-              : t("exam.terminatedByProctor"),
+            status.terminationReason ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
@@ -989,8 +995,13 @@ export default function ExamPage() {
         }
         if (status.hasWarning && status.warningMessage) {
           playWarningBeep()
-          setProctorWarningMessage(status.warningMessage)
-          setProctorWarningOpen(true)
+          if (status.warningMessage.includes("LAST WARNING")) {
+            setLastWarningMessage(status.warningMessage)
+            setLastWarningOpen(true)
+          } else {
+            setProctorWarningMessage(status.warningMessage)
+            setProctorWarningOpen(true)
+          }
         }
       }).catch(() => {})
     } else {
@@ -1003,9 +1014,7 @@ export default function ExamPage() {
             if (status.isTerminated) {
               stopAllBackgroundActivity()
               toast.error(
-                status.terminationReason
-                  ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-                  : t("exam.terminatedByProctor"),
+                status.terminationReason ?? t("exam.terminatedByProctor"),
                 { duration: 10000 }
               )
               router.push("/my-exams")
@@ -1013,8 +1022,13 @@ export default function ExamPage() {
             }
             if (status.hasWarning && status.warningMessage) {
               playWarningBeep()
-              setProctorWarningMessage(status.warningMessage)
-              setProctorWarningOpen(true)
+              if (status.warningMessage.includes("LAST WARNING")) {
+                setLastWarningMessage(status.warningMessage)
+                setLastWarningOpen(true)
+              } else {
+                setProctorWarningMessage(status.warningMessage)
+                setProctorWarningOpen(true)
+              }
             }
           } catch {
             // Silent fail — don't disrupt exam
@@ -1924,6 +1938,36 @@ export default function ExamPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setProctorWarningOpen(false)}>
+              {t("exam.understood") || "I Understand"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Last Warning Dialog — blocking modal before auto-termination */}
+      <AlertDialog open={lastWarningOpen}>
+        <AlertDialogContent className="border-red-300 dark:border-red-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-6 w-6" />
+              {t("exam.lastWarningTitle") || "⚠ FINAL WARNING"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                  {lastWarningMessage}
+                </div>
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  {t("exam.lastWarningNote") || "The next violation will automatically terminate your exam. Please correct your behavior immediately."}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setLastWarningOpen(false)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
               {t("exam.understood") || "I Understand"}
             </AlertDialogAction>
           </AlertDialogFooter>

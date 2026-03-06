@@ -115,6 +115,18 @@ export function TutorialLayout({ children, currentModuleSlug }: TutorialLayoutPr
       if (el) observer.observe(el)
     })
 
+    // Scroll to hash section on initial load
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hashId = window.location.hash.slice(1) // remove #
+      setTimeout(() => {
+        const el = document.getElementById(hashId)
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" })
+          setActiveSectionId(hashId.replace("section-", ""))
+        }
+      }, 300)
+    }
+
     return () => observer.disconnect()
   }, [currentModule])
 

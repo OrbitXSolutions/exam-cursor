@@ -1,8 +1,12 @@
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.QuestionBank;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.QuestionBank;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,10 +15,29 @@ namespace Smart_Core.Infrastructure.Services.QuestionBank;
 public class QuestionBankService : IQuestionBankService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public QuestionBankService(ApplicationDbContext context)
+    public QuestionBankService(
+        ApplicationDbContext context,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
     }
 
     #region Questions
@@ -34,6 +57,16 @@ public class QuestionBankService : IQuestionBankService
         if (searchDto.IncludeDeleted)
         {
             query = query.IgnoreQueryFilters();
+        }
+
+        // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(x => x.Subject.DepartmentId == userDepartmentId.Value);
+            }
         }
 
         // Search filter (searches both English and Arabic)
@@ -140,6 +173,16 @@ public class QuestionBankService : IQuestionBankService
         if (entity == null)
         {
             return ApiResponse<QuestionDto>.FailureResponse("Question not found");
+        }
+
+        // Department isolation check via Subject
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.Subject != null && entity.Subject.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionDto>.FailureResponse("You do not have access to this question");
+            }
         }
 
         var dto = new QuestionDto
@@ -440,7 +483,19 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<int>> GetQuestionsCountAsync(int? subjectId, int? topicId)
     {
-        var query = _context.Questions.Where(q => q.IsActive && !q.IsDeleted);
+        var query = _context.Questions
+            .Include(q => q.Subject)
+            .Where(q => q.IsActive && !q.IsDeleted);
+
+        // Department isolation
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(q => q.Subject.DepartmentId == userDepartmentId.Value);
+            }
+        }
 
         if (subjectId.HasValue)
         {

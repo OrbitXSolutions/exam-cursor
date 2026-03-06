@@ -8,6 +8,10 @@ public class QuestionSubject : BaseEntity
     public string NameEn { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
 
+    // Department isolation
+    public int DepartmentId { get; set; }
+
     // Navigation Properties
+    public virtual Department Department { get; set; } = null!;
     public virtual ICollection<QuestionTopic> Topics { get; set; } = new List<QuestionTopic>();
 }

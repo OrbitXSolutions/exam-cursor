@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Smart_Core.Infrastructure.Data;
 namespace Smart_Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306031036_AddMaxViolationWarningsAndCountableViolationCount")]
+    partial class AddMaxViolationWarningsAndCountableViolationCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3111,9 +3114,6 @@ namespace Smart_Core.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -3136,16 +3136,13 @@ namespace Smart_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId")
-                        .HasDatabaseName("IX_QuestionSubjects_DepartmentId");
-
-                    b.HasIndex("DepartmentId", "NameAr")
+                    b.HasIndex("NameAr")
                         .IsUnique()
-                        .HasDatabaseName("IX_QuestionSubjects_DepartmentId_NameAr");
+                        .HasDatabaseName("IX_QuestionSubjects_NameAr");
 
-                    b.HasIndex("DepartmentId", "NameEn")
+                    b.HasIndex("NameEn")
                         .IsUnique()
-                        .HasDatabaseName("IX_QuestionSubjects_DepartmentId_NameEn");
+                        .HasDatabaseName("IX_QuestionSubjects_NameEn");
 
                     b.ToTable("QuestionSubjects", (string)null);
                 });
@@ -5427,17 +5424,6 @@ namespace Smart_Core.Migrations
                         .IsRequired();
 
                     b.Navigation("IncidentCase");
-                });
-
-            modelBuilder.Entity("Smart_Core.Domain.Entities.Lookups.QuestionSubject", b =>
-                {
-                    b.HasOne("Smart_Core.Domain.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Lookups.QuestionTopic", b =>

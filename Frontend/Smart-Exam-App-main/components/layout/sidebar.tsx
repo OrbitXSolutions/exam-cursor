@@ -49,6 +49,7 @@ import {
   PlayCircle,
   ClipboardCheck,
   Building2,
+  Landmark,
   Wrench,
   ShieldCheck,
   ShieldAlert,
@@ -175,6 +176,7 @@ const administrationNavGroup: NavGroup = {
   children: [
     { icon: Users, labelKey: "nav.users", href: "/users", exact: true },
     { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
+    { icon: Landmark, labelKey: "nav.departments", href: "/departments" },
     { icon: Building2, labelKey: "nav.organization", href: "/organization" },
     { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Settings, labelKey: "nav.settings", href: "/settings" },

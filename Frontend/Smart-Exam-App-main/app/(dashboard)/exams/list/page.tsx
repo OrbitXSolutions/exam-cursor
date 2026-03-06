@@ -293,7 +293,7 @@ export default function ExamsListPage() {
                           )}
                         </TableCell>
 
-                        {/* Configuration Button */}}
+                        {/* Configuration Button */}
                         <TableCell className="text-center">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={`/exams/${exam.id}/configuration`}>

@@ -344,7 +344,8 @@ export const questionBankTutorial: TutorialModule = {
               required: false,
               descriptionEn:
                 "Default: 1. Minimum 0.5, step 0.5 (e.g., 0.5, 1, 1.5, 2, 5.5)",
-              descriptionAr: "افتراضي: 1. الحد الأدنى 0.5، بخطوات 0.5 (مثل 0.5، 1، 1.5، 2، 5.5)",
+              descriptionAr:
+                "افتراضي: 1. الحد الأدنى 0.5، بخطوات 0.5 (مثل 0.5، 1، 1.5، 2، 5.5)",
             },
           ],
           tipEn:
@@ -380,8 +381,10 @@ export const questionBankTutorial: TutorialModule = {
               nameEn: "Attachment (Image)",
               nameAr: "المرفق (صورة)",
               required: false,
-              descriptionEn: "Optional image file (JPEG, PNG, GIF, WebP, SVG — max 10 MB)",
-              descriptionAr: "ملف صورة اختياري (JPEG، PNG، GIF، WebP، SVG — حد أقصى 10 ميجابايت)",
+              descriptionEn:
+                "Optional image file (JPEG, PNG, GIF, WebP, SVG — max 10 MB)",
+              descriptionAr:
+                "ملف صورة اختياري (JPEG، PNG، GIF، WebP، SVG — حد أقصى 10 ميجابايت)",
             },
           ],
           noteEn:
@@ -621,8 +624,10 @@ export const aiStudioTutorial: TutorialModule = {
               nameEn: "Question Type",
               nameAr: "نوع السؤال",
               required: true,
-              descriptionEn: "MCQ Single, MCQ Multi, or True/False only (Subjective not supported)",
-              descriptionAr: "اختيار فردي، اختيار متعدد، أو صح/خطأ فقط (المقالي غير مدعوم)",
+              descriptionEn:
+                "MCQ Single, MCQ Multi, or True/False only (Subjective not supported)",
+              descriptionAr:
+                "اختيار فردي، اختيار متعدد، أو صح/خطأ فقط (المقالي غير مدعوم)",
             },
             {
               nameEn: "Difficulty",
@@ -649,8 +654,10 @@ export const aiStudioTutorial: TutorialModule = {
               nameEn: "Custom Instructions",
               nameAr: "تعليمات مخصصة",
               required: false,
-              descriptionEn: "Optional: guide AI focus (e.g., 'Focus on OOP concepts in Java')",
-              descriptionAr: "اختياري: توجيه تركيز AI (مثل: 'ركز على مفاهيم البرمجة الكائنية في Java')",
+              descriptionEn:
+                "Optional: guide AI focus (e.g., 'Focus on OOP concepts in Java')",
+              descriptionAr:
+                "اختياري: توجيه تركيز AI (مثل: 'ركز على مفاهيم البرمجة الكائنية في Java')",
             },
           ],
         },
@@ -763,10 +770,34 @@ export const examManagementTutorial: TutorialModule = {
             "أدخل عنوان الاختبار والوصف بالإنجليزية واختيارياً بالعربية.",
           imagePlaceholder: "/tutorials/exam-basic-info.png",
           fields: [
-            { nameEn: "Title (English)", nameAr: "العنوان (إنجليزي)", required: true, descriptionEn: "Exam title in English (max 500 characters)", descriptionAr: "عنوان الاختبار بالإنجليزية (حد أقصى 500 حرف)" },
-            { nameEn: "Title (Arabic)", nameAr: "العنوان (عربي)", required: false, descriptionEn: "Optional Arabic title", descriptionAr: "عنوان عربي اختياري" },
-            { nameEn: "Description (English)", nameAr: "الوصف (إنجليزي)", required: false, descriptionEn: "Optional description (max 2000 characters)", descriptionAr: "وصف اختياري (حد أقصى 2000 حرف)" },
-            { nameEn: "Description (Arabic)", nameAr: "الوصف (عربي)", required: false, descriptionEn: "Optional Arabic description", descriptionAr: "وصف عربي اختياري" },
+            {
+              nameEn: "Title (English)",
+              nameAr: "العنوان (إنجليزي)",
+              required: true,
+              descriptionEn: "Exam title in English (max 500 characters)",
+              descriptionAr: "عنوان الاختبار بالإنجليزية (حد أقصى 500 حرف)",
+            },
+            {
+              nameEn: "Title (Arabic)",
+              nameAr: "العنوان (عربي)",
+              required: false,
+              descriptionEn: "Optional Arabic title",
+              descriptionAr: "عنوان عربي اختياري",
+            },
+            {
+              nameEn: "Description (English)",
+              nameAr: "الوصف (إنجليزي)",
+              required: false,
+              descriptionEn: "Optional description (max 2000 characters)",
+              descriptionAr: "وصف اختياري (حد أقصى 2000 حرف)",
+            },
+            {
+              nameEn: "Description (Arabic)",
+              nameAr: "الوصف (عربي)",
+              required: false,
+              descriptionEn: "Optional Arabic description",
+              descriptionAr: "وصف عربي اختياري",
+            },
           ],
         },
         {
@@ -779,12 +810,32 @@ export const examManagementTutorial: TutorialModule = {
             "اختر بين نوعي الاختبار المرن والثابت:\n• مرن: يمكن للمرشحين البدء في أي وقت ضمن نافذة التوفر (تاريخ البداية → النهاية).\n• ثابت: يجب على جميع المرشحين البدء في وقت البداية المحدد بالضبط.",
           imagePlaceholder: "/tutorials/exam-type.png",
           fields: [
-            { nameEn: "Exam Type", nameAr: "نوع الاختبار", required: false, descriptionEn: "Flexible (default) or Fixed", descriptionAr: "مرن (افتراضي) أو ثابت" },
-            { nameEn: "Start Date & Time", nameAr: "تاريخ ووقت البداية", required: true, descriptionEn: "When the exam becomes available", descriptionAr: "متى يصبح الاختبار متاحاً" },
-            { nameEn: "End Date & Time", nameAr: "تاريخ ووقت النهاية", required: true, descriptionEn: "Must be after start date", descriptionAr: "يجب أن يكون بعد تاريخ البداية" },
+            {
+              nameEn: "Exam Type",
+              nameAr: "نوع الاختبار",
+              required: false,
+              descriptionEn: "Flexible (default) or Fixed",
+              descriptionAr: "مرن (افتراضي) أو ثابت",
+            },
+            {
+              nameEn: "Start Date & Time",
+              nameAr: "تاريخ ووقت البداية",
+              required: true,
+              descriptionEn: "When the exam becomes available",
+              descriptionAr: "متى يصبح الاختبار متاحاً",
+            },
+            {
+              nameEn: "End Date & Time",
+              nameAr: "تاريخ ووقت النهاية",
+              required: true,
+              descriptionEn: "Must be after start date",
+              descriptionAr: "يجب أن يكون بعد تاريخ البداية",
+            },
           ],
-          tipEn: "For Flexible type: candidates can start at any time between Start and End. For Fixed type: all must start exactly at the Start time.",
-          tipAr: "للنوع المرن: يمكن للمرشحين البدء في أي وقت بين البداية والنهاية. للنوع الثابت: يجب على الجميع البدء في وقت البداية بالضبط.",
+          tipEn:
+            "For Flexible type: candidates can start at any time between Start and End. For Fixed type: all must start exactly at the Start time.",
+          tipAr:
+            "للنوع المرن: يمكن للمرشحين البدء في أي وقت بين البداية والنهاية. للنوع الثابت: يجب على الجميع البدء في وقت البداية بالضبط.",
         },
         {
           id: "exam-timing-scoring",
@@ -796,12 +847,34 @@ export const examManagementTutorial: TutorialModule = {
             "حدد مدة الاختبار ودرجة النجاح وعدد المحاولات المسموحة.",
           imagePlaceholder: "/tutorials/exam-timing.png",
           fields: [
-            { nameEn: "Duration (minutes)", nameAr: "المدة (دقائق)", required: true, descriptionEn: "Default: 60. Range: 1–600 minutes", descriptionAr: "افتراضي: 60. النطاق: 1–600 دقيقة" },
-            { nameEn: "Pass Score (Points)", nameAr: "درجة النجاح (نقاط)", required: false, descriptionEn: "Default: 0. Minimum passing score. 0 means all candidates pass", descriptionAr: "افتراضي: 0. درجة النجاح الدنيا. 0 تعني أن جميع المرشحين ينجحون" },
-            { nameEn: "Max Attempts", nameAr: "عدد المحاولات", required: false, descriptionEn: "Default: 1. Set to 0 for unlimited attempts", descriptionAr: "افتراضي: 1. اضبط على 0 لمحاولات غير محدودة" },
+            {
+              nameEn: "Duration (minutes)",
+              nameAr: "المدة (دقائق)",
+              required: true,
+              descriptionEn: "Default: 60. Range: 1–600 minutes",
+              descriptionAr: "افتراضي: 60. النطاق: 1–600 دقيقة",
+            },
+            {
+              nameEn: "Pass Score (Points)",
+              nameAr: "درجة النجاح (نقاط)",
+              required: false,
+              descriptionEn:
+                "Default: 0. Minimum passing score. 0 means all candidates pass",
+              descriptionAr:
+                "افتراضي: 0. درجة النجاح الدنيا. 0 تعني أن جميع المرشحين ينجحون",
+            },
+            {
+              nameEn: "Max Attempts",
+              nameAr: "عدد المحاولات",
+              required: false,
+              descriptionEn: "Default: 1. Set to 0 for unlimited attempts",
+              descriptionAr: "افتراضي: 1. اضبط على 0 لمحاولات غير محدودة",
+            },
           ],
-          noteEn: "If Pass Score is 0, all candidates will pass regardless of their score. A warning is shown during publish.",
-          noteAr: "إذا كانت درجة النجاح 0، سينجح جميع المرشحين بغض النظر عن درجاتهم. يظهر تحذير أثناء النشر.",
+          noteEn:
+            "If Pass Score is 0, all candidates will pass regardless of their score. A warning is shown during publish.",
+          noteAr:
+            "إذا كانت درجة النجاح 0، سينجح جميع المرشحين بغض النظر عن درجاتهم. يظهر تحذير أثناء النشر.",
         },
         {
           id: "exam-display-options",
@@ -813,9 +886,29 @@ export const examManagementTutorial: TutorialModule = {
             "أعدَّ كيفية ظهور الأسئلة والخيارات للمرشحين أثناء الاختبار.",
           imagePlaceholder: "/tutorials/exam-display.png",
           fields: [
-            { nameEn: "Shuffle Questions", nameAr: "خلط الأسئلة", required: false, descriptionEn: "Default: ON. Randomize question order for each candidate", descriptionAr: "افتراضي: مفعّل. ترتيب عشوائي للأسئلة لكل مرشح" },
-            { nameEn: "Shuffle Options", nameAr: "خلط الخيارات", required: false, descriptionEn: "Default: ON. Randomize answer option order", descriptionAr: "افتراضي: مفعّل. ترتيب عشوائي لخيارات الإجابة" },
-            { nameEn: "Is Active", nameAr: "نشط", required: false, descriptionEn: "Default: ON. Whether exam is visible to candidates", descriptionAr: "افتراضي: مفعّل. هل الاختبار مرئي للمرشحين" },
+            {
+              nameEn: "Shuffle Questions",
+              nameAr: "خلط الأسئلة",
+              required: false,
+              descriptionEn:
+                "Default: ON. Randomize question order for each candidate",
+              descriptionAr: "افتراضي: مفعّل. ترتيب عشوائي للأسئلة لكل مرشح",
+            },
+            {
+              nameEn: "Shuffle Options",
+              nameAr: "خلط الخيارات",
+              required: false,
+              descriptionEn: "Default: ON. Randomize answer option order",
+              descriptionAr: "افتراضي: مفعّل. ترتيب عشوائي لخيارات الإجابة",
+            },
+            {
+              nameEn: "Is Active",
+              nameAr: "نشط",
+              required: false,
+              descriptionEn:
+                "Default: ON. Whether exam is visible to candidates",
+              descriptionAr: "افتراضي: مفعّل. هل الاختبار مرئي للمرشحين",
+            },
           ],
         },
         {
@@ -827,7 +920,8 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             'انقر "حفظ والمتابعة". يتم حفظ الاختبار كمسودة ويتم توجيهك إلى تبويب المُنشئ لإضافة الأسئلة.',
           imagePlaceholder: "/tutorials/exam-save-continue.png",
-          tipEn: "The Builder tab is locked until you save the configuration first.",
+          tipEn:
+            "The Builder tab is locked until you save the configuration first.",
           tipAr: "تبويب المُنشئ مقفل حتى تحفظ الإعداد أولاً.",
         },
       ],
@@ -852,8 +946,10 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "اختر كيفية تنظيم أقسام الاختبار:\n• حسب المادة: ينشئ قسماً لكل مادة مختارة. يختار النظام الأسئلة عشوائياً من تلك المادة.\n• حسب الموضوع: ينشئ قسماً لكل موضوع مختار تحت مادة. تحكم أكثر دقة.",
           imagePlaceholder: "/tutorials/builder-source-type.png",
-          noteEn: "Changing the build mode clears all existing sections. Choose carefully before adding sections.",
-          noteAr: "تغيير وضع البناء يمسح جميع الأقسام الموجودة. اختر بعناية قبل إضافة الأقسام.",
+          noteEn:
+            "Changing the build mode clears all existing sections. Choose carefully before adding sections.",
+          noteAr:
+            "تغيير وضع البناء يمسح جميع الأقسام الموجودة. اختر بعناية قبل إضافة الأقسام.",
         },
         {
           id: "builder-select-subjects",
@@ -864,8 +960,10 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "حدد المواد (أو المواضيع) التي تريد تضمينها. كل عنصر محدد ينشئ قسماً تلقائياً. يعرض شارة عدد الأسئلة المتاحة في البنك لكل عنصر.",
           imagePlaceholder: "/tutorials/builder-select.png",
-          tipEn: "In Topic mode, click the subject accordion to expand it and see its topics.",
-          tipAr: "في وضع الموضوع، انقر على مادة الأكورديون لتوسيعها ورؤية مواضيعها.",
+          tipEn:
+            "In Topic mode, click the subject accordion to expand it and see its topics.",
+          tipAr:
+            "في وضع الموضوع، انقر على مادة الأكورديون لتوسيعها ورؤية مواضيعها.",
         },
         {
           id: "builder-configure-sections",
@@ -877,24 +975,46 @@ export const examManagementTutorial: TutorialModule = {
             "لكل قسم، أعدَّ:\n• عنوان القسم: يملأ تلقائياً من اسم المادة/الموضوع (قابل للتعديل)\n• المدة (دقائق): حد زمني اختياري لكل قسم\n• عدد الأسئلة المختارة: كم سؤال يتم اختياره عشوائياً (افتراضي: الأقل بين 10 والمتاح)",
           imagePlaceholder: "/tutorials/builder-section-config.png",
           fields: [
-            { nameEn: "Section Title", nameAr: "عنوان القسم", required: false, descriptionEn: "Auto-filled, editable", descriptionAr: "يملأ تلقائياً، قابل للتعديل" },
-            { nameEn: "Duration (minutes)", nameAr: "المدة (دقائق)", required: false, descriptionEn: "Optional per-section time limit", descriptionAr: "حد زمني اختياري لكل قسم" },
-            { nameEn: "Questions to Pick", nameAr: "عدد الأسئلة المختارة", required: true, descriptionEn: "Min 1, max = available questions in bank", descriptionAr: "حد أدنى 1، حد أقصى = الأسئلة المتاحة في البنك" },
+            {
+              nameEn: "Section Title",
+              nameAr: "عنوان القسم",
+              required: false,
+              descriptionEn: "Auto-filled, editable",
+              descriptionAr: "يملأ تلقائياً، قابل للتعديل",
+            },
+            {
+              nameEn: "Duration (minutes)",
+              nameAr: "المدة (دقائق)",
+              required: false,
+              descriptionEn: "Optional per-section time limit",
+              descriptionAr: "حد زمني اختياري لكل قسم",
+            },
+            {
+              nameEn: "Questions to Pick",
+              nameAr: "عدد الأسئلة المختارة",
+              required: true,
+              descriptionEn: "Min 1, max = available questions in bank",
+              descriptionAr: "حد أدنى 1، حد أقصى = الأسئلة المتاحة في البنك",
+            },
           ],
-          noteEn: "The system randomly picks questions from the bank when a candidate starts the exam. Different candidates may get different questions.",
-          noteAr: "يختار النظام أسئلة عشوائياً من البنك عندما يبدأ المرشح الاختبار. قد يحصل مرشحون مختلفون على أسئلة مختلفة.",
+          noteEn:
+            "The system randomly picks questions from the bank when a candidate starts the exam. Different candidates may get different questions.",
+          noteAr:
+            "يختار النظام أسئلة عشوائياً من البنك عندما يبدأ المرشح الاختبار. قد يحصل مرشحون مختلفون على أسئلة مختلفة.",
         },
         {
           id: "builder-summary",
           titleEn: "Review Summary & Save",
           titleAr: "مراجعة الملخص والحفظ",
           descriptionEn:
-            "The summary bar shows: Total Sections, Total Questions, Total Points, and Pass Score. You can adjust the Pass Score here. Click \"Save Builder\" to save and proceed to the Overview page.",
+            'The summary bar shows: Total Sections, Total Questions, Total Points, and Pass Score. You can adjust the Pass Score here. Click "Save Builder" to save and proceed to the Overview page.',
           descriptionAr:
-            "يعرض شريط الملخص: إجمالي الأقسام، إجمالي الأسئلة، إجمالي النقاط، ودرجة النجاح. يمكنك تعديل درجة النجاح هنا. انقر \"حفظ المُنشئ\" للحفظ والانتقال لصفحة النظرة العامة.",
+            'يعرض شريط الملخص: إجمالي الأقسام، إجمالي الأسئلة، إجمالي النقاط، ودرجة النجاح. يمكنك تعديل درجة النجاح هنا. انقر "حفظ المُنشئ" للحفظ والانتقال لصفحة النظرة العامة.',
           imagePlaceholder: "/tutorials/builder-summary.png",
-          tipEn: "Pass Score must not exceed Total Points. If it does, a warning will appear.",
-          tipAr: "درجة النجاح يجب ألا تتجاوز إجمالي النقاط. إذا تجاوزت، سيظهر تحذير.",
+          tipEn:
+            "Pass Score must not exceed Total Points. If it does, a warning will appear.",
+          tipAr:
+            "درجة النجاح يجب ألا تتجاوز إجمالي النقاط. إذا تجاوزت، سيظهر تحذير.",
         },
       ],
     },
@@ -919,36 +1039,122 @@ export const examManagementTutorial: TutorialModule = {
             "تحكم في كيفية عرض النتائج والإجابات للمرشحين بعد إتمام الاختبار.",
           imagePlaceholder: "/tutorials/config-settings.png",
           fields: [
-            { nameEn: "Shuffle Questions", nameAr: "خلط الأسئلة", required: false, descriptionEn: "Randomize question order", descriptionAr: "ترتيب عشوائي للأسئلة" },
-            { nameEn: "Shuffle Options", nameAr: "خلط الخيارات", required: false, descriptionEn: "Randomize answer option order", descriptionAr: "ترتيب عشوائي لخيارات الإجابة" },
-            { nameEn: "Show Results", nameAr: "إظهار النتائج", required: false, descriptionEn: "Default: ON. Show score to candidate after submission", descriptionAr: "افتراضي: مفعّل. عرض الدرجة للمرشح بعد التقديم" },
-            { nameEn: "Allow Review", nameAr: "السماح بالمراجعة", required: false, descriptionEn: "Allow candidates to review their answers after submission", descriptionAr: "السماح للمرشحين بمراجعة إجاباتهم بعد التقديم" },
-            { nameEn: "Show Correct Answers", nameAr: "إظهار الإجابات الصحيحة", required: false, descriptionEn: "Show correct answers during review. Requires 'Allow Review' to be ON", descriptionAr: "عرض الإجابات الصحيحة أثناء المراجعة. يتطلب تفعيل 'السماح بالمراجعة'" },
+            {
+              nameEn: "Shuffle Questions",
+              nameAr: "خلط الأسئلة",
+              required: false,
+              descriptionEn: "Randomize question order",
+              descriptionAr: "ترتيب عشوائي للأسئلة",
+            },
+            {
+              nameEn: "Shuffle Options",
+              nameAr: "خلط الخيارات",
+              required: false,
+              descriptionEn: "Randomize answer option order",
+              descriptionAr: "ترتيب عشوائي لخيارات الإجابة",
+            },
+            {
+              nameEn: "Show Results",
+              nameAr: "إظهار النتائج",
+              required: false,
+              descriptionEn:
+                "Default: ON. Show score to candidate after submission",
+              descriptionAr: "افتراضي: مفعّل. عرض الدرجة للمرشح بعد التقديم",
+            },
+            {
+              nameEn: "Allow Review",
+              nameAr: "السماح بالمراجعة",
+              required: false,
+              descriptionEn:
+                "Allow candidates to review their answers after submission",
+              descriptionAr: "السماح للمرشحين بمراجعة إجاباتهم بعد التقديم",
+            },
+            {
+              nameEn: "Show Correct Answers",
+              nameAr: "إظهار الإجابات الصحيحة",
+              required: false,
+              descriptionEn:
+                "Show correct answers during review. Requires 'Allow Review' to be ON",
+              descriptionAr:
+                "عرض الإجابات الصحيحة أثناء المراجعة. يتطلب تفعيل 'السماح بالمراجعة'",
+            },
           ],
-          noteEn: "Show Correct Answers is disabled if Allow Review is OFF. Turning OFF Allow Review automatically turns OFF Show Correct Answers.",
-          noteAr: "إظهار الإجابات الصحيحة معطل إذا كانت المراجعة مغلقة. إيقاف المراجعة يغلق تلقائياً إظهار الإجابات الصحيحة.",
+          noteEn:
+            "Show Correct Answers is disabled if Allow Review is OFF. Turning OFF Allow Review automatically turns OFF Show Correct Answers.",
+          noteAr:
+            "إظهار الإجابات الصحيحة معطل إذا كانت المراجعة مغلقة. إيقاف المراجعة يغلق تلقائياً إظهار الإجابات الصحيحة.",
         },
         {
           id: "config-tab2-security",
           titleEn: "Tab 2: Security Settings",
           titleAr: "تبويب 2: إعدادات الأمان",
           descriptionEn:
-            "Configure exam security and proctoring measures. Use the \"Activate All\" master toggle to enable all settings at once.",
+            'Configure exam security and proctoring measures. Use the "Activate All" master toggle to enable all settings at once.',
           descriptionAr:
-            "أعدَّ إجراءات أمان الاختبار والمراقبة. استخدم مفتاح \"تفعيل الكل\" الرئيسي لتفعيل جميع الإعدادات دفعة واحدة.",
+            'أعدَّ إجراءات أمان الاختبار والمراقبة. استخدم مفتاح "تفعيل الكل" الرئيسي لتفعيل جميع الإعدادات دفعة واحدة.',
           imagePlaceholder: "/tutorials/config-security.png",
           fields: [
-            { nameEn: "Activate All (Master Toggle)", nameAr: "تفعيل الكل (المفتاح الرئيسي)", required: false, descriptionEn: "Enables/disables all 7 security settings at once", descriptionAr: "يفعّل/يعطّل جميع إعدادات الأمان الـ 7 دفعة واحدة" },
-            { nameEn: "Require Proctoring", nameAr: "طلب المراقبة", required: false, descriptionEn: "Enable proctoring for this exam", descriptionAr: "تفعيل المراقبة لهذا الاختبار" },
-            { nameEn: "Require ID Verification", nameAr: "طلب التحقق من الهوية", required: false, descriptionEn: "Candidates must verify identity before exam", descriptionAr: "يجب على المرشحين التحقق من هويتهم قبل الاختبار" },
-            { nameEn: "Prevent Copy/Paste", nameAr: "منع النسخ/اللصق", required: false, descriptionEn: "Block copy-paste during exam", descriptionAr: "حظر النسخ واللصق أثناء الاختبار" },
-            { nameEn: "Prevent Screen Capture", nameAr: "منع لقطة الشاشة", required: false, descriptionEn: "Block screenshots during exam", descriptionAr: "حظر لقطات الشاشة أثناء الاختبار" },
-            { nameEn: "Require Webcam", nameAr: "طلب كاميرا الويب", required: false, descriptionEn: "Candidate must enable webcam", descriptionAr: "يجب على المرشح تفعيل كاميرا الويب" },
-            { nameEn: "Require Fullscreen", nameAr: "طلب ملء الشاشة", required: false, descriptionEn: "Exam runs in fullscreen mode", descriptionAr: "يعمل الاختبار في وضع ملء الشاشة" },
-            { nameEn: "Browser Lockdown", nameAr: "قفل المتصفح", required: false, descriptionEn: "Lock the browser to prevent tab switching", descriptionAr: "قفل المتصفح لمنع التبديل بين التبويبات" },
+            {
+              nameEn: "Activate All (Master Toggle)",
+              nameAr: "تفعيل الكل (المفتاح الرئيسي)",
+              required: false,
+              descriptionEn: "Enables/disables all 7 security settings at once",
+              descriptionAr: "يفعّل/يعطّل جميع إعدادات الأمان الـ 7 دفعة واحدة",
+            },
+            {
+              nameEn: "Require Proctoring",
+              nameAr: "طلب المراقبة",
+              required: false,
+              descriptionEn: "Enable proctoring for this exam",
+              descriptionAr: "تفعيل المراقبة لهذا الاختبار",
+            },
+            {
+              nameEn: "Require ID Verification",
+              nameAr: "طلب التحقق من الهوية",
+              required: false,
+              descriptionEn: "Candidates must verify identity before exam",
+              descriptionAr: "يجب على المرشحين التحقق من هويتهم قبل الاختبار",
+            },
+            {
+              nameEn: "Prevent Copy/Paste",
+              nameAr: "منع النسخ/اللصق",
+              required: false,
+              descriptionEn: "Block copy-paste during exam",
+              descriptionAr: "حظر النسخ واللصق أثناء الاختبار",
+            },
+            {
+              nameEn: "Prevent Screen Capture",
+              nameAr: "منع لقطة الشاشة",
+              required: false,
+              descriptionEn: "Block screenshots during exam",
+              descriptionAr: "حظر لقطات الشاشة أثناء الاختبار",
+            },
+            {
+              nameEn: "Require Webcam",
+              nameAr: "طلب كاميرا الويب",
+              required: false,
+              descriptionEn: "Candidate must enable webcam",
+              descriptionAr: "يجب على المرشح تفعيل كاميرا الويب",
+            },
+            {
+              nameEn: "Require Fullscreen",
+              nameAr: "طلب ملء الشاشة",
+              required: false,
+              descriptionEn: "Exam runs in fullscreen mode",
+              descriptionAr: "يعمل الاختبار في وضع ملء الشاشة",
+            },
+            {
+              nameEn: "Browser Lockdown",
+              nameAr: "قفل المتصفح",
+              required: false,
+              descriptionEn: "Lock the browser to prevent tab switching",
+              descriptionAr: "قفل المتصفح لمنع التبديل بين التبويبات",
+            },
           ],
-          tipEn: "Require Proctoring is highlighted in amber. Browser Lockdown is highlighted in red — it's the most restrictive setting.",
-          tipAr: "طلب المراقبة مميز بالأصفر. قفل المتصفح مميز بالأحمر — إنه الإعداد الأكثر تقييداً.",
+          tipEn:
+            "Require Proctoring is highlighted in amber. Browser Lockdown is highlighted in red — it's the most restrictive setting.",
+          tipAr:
+            "طلب المراقبة مميز بالأصفر. قفل المتصفح مميز بالأحمر — إنه الإعداد الأكثر تقييداً.",
         },
         {
           id: "config-tab3-instructions",
@@ -960,25 +1166,55 @@ export const examManagementTutorial: TutorialModule = {
             "أضف تعليمات الاختبار المعروضة للمرشحين قبل البدء. التعليمات مرتبة وثنائية اللغة (EN/AR).",
           imagePlaceholder: "/tutorials/config-instructions.png",
           fields: [
-            { nameEn: "Instruction (English)", nameAr: "التعليمات (إنجليزي)", required: true, descriptionEn: "Instruction text in English", descriptionAr: "نص التعليمات بالإنجليزية" },
-            { nameEn: "Instruction (Arabic)", nameAr: "التعليمات (عربي)", required: false, descriptionEn: "Optional Arabic translation", descriptionAr: "ترجمة عربية اختيارية" },
+            {
+              nameEn: "Instruction (English)",
+              nameAr: "التعليمات (إنجليزي)",
+              required: true,
+              descriptionEn: "Instruction text in English",
+              descriptionAr: "نص التعليمات بالإنجليزية",
+            },
+            {
+              nameEn: "Instruction (Arabic)",
+              nameAr: "التعليمات (عربي)",
+              required: false,
+              descriptionEn: "Optional Arabic translation",
+              descriptionAr: "ترجمة عربية اختيارية",
+            },
           ],
-          tipEn: "Instructions appear on the exam start page. Add clear rules like 'No external resources allowed' or 'Time limit is strictly enforced'.",
-          tipAr: "تظهر التعليمات في صفحة بدء الاختبار. أضف قواعد واضحة مثل 'لا يُسمح بالموارد الخارجية' أو 'الحد الزمني مطبق بصرامة'.",
+          tipEn:
+            "Instructions appear on the exam start page. Add clear rules like 'No external resources allowed' or 'Time limit is strictly enforced'.",
+          tipAr:
+            "تظهر التعليمات في صفحة بدء الاختبار. أضف قواعد واضحة مثل 'لا يُسمح بالموارد الخارجية' أو 'الحد الزمني مطبق بصرامة'.",
         },
         {
           id: "config-tab4-access",
           titleEn: "Tab 4: Access Policy",
           titleAr: "تبويب 4: سياسة الوصول",
-          descriptionEn:
-            "Control who can access and take the exam.",
-          descriptionAr:
-            "تحكم في من يمكنه الوصول للاختبار وتقديمه.",
+          descriptionEn: "Control who can access and take the exam.",
+          descriptionAr: "تحكم في من يمكنه الوصول للاختبار وتقديمه.",
           imagePlaceholder: "/tutorials/config-access.png",
           fields: [
-            { nameEn: "Is Public", nameAr: "عام", required: false, descriptionEn: "Anyone can access the exam (no restrictions)", descriptionAr: "يمكن لأي شخص الوصول للاختبار (بدون قيود)" },
-            { nameEn: "Access Code", nameAr: "رمز الوصول", required: false, descriptionEn: "Optional code required to start the exam", descriptionAr: "رمز اختياري مطلوب لبدء الاختبار" },
-            { nameEn: "Restrict to Assigned", nameAr: "تقييد للمعينين", required: false, descriptionEn: "Only assigned candidates can take the exam", descriptionAr: "فقط المرشحون المعينون يمكنهم تقديم الاختبار" },
+            {
+              nameEn: "Is Public",
+              nameAr: "عام",
+              required: false,
+              descriptionEn: "Anyone can access the exam (no restrictions)",
+              descriptionAr: "يمكن لأي شخص الوصول للاختبار (بدون قيود)",
+            },
+            {
+              nameEn: "Access Code",
+              nameAr: "رمز الوصول",
+              required: false,
+              descriptionEn: "Optional code required to start the exam",
+              descriptionAr: "رمز اختياري مطلوب لبدء الاختبار",
+            },
+            {
+              nameEn: "Restrict to Assigned",
+              nameAr: "تقييد للمعينين",
+              required: false,
+              descriptionEn: "Only assigned candidates can take the exam",
+              descriptionAr: "فقط المرشحون المعينون يمكنهم تقديم الاختبار",
+            },
           ],
         },
       ],
@@ -1013,7 +1249,8 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "يتحقق النظام من هذه القواعد قبل السماح بالنشر:\n• يجب وجود قسم واحد على الأقل\n• كل قسم يجب أن يحتوي أسئلة (عدد > 0 أو أسئلة يدوية)\n• يجب توفر أسئلة كافية في البنك لكل قسم\n• جميع الأسئلة يجب أن تكون نشطة\n• أسئلة MCQ يجب أن تحتوي ≥ 2 خيارات\n• MCQ فردي يجب أن يحتوي إجابة صحيحة واحدة بالضبط\n• MCQ متعدد يجب أن يحتوي ≥ 1 إجابة صحيحة\n• صح/خطأ يجب أن يحتوي خيارين بالضبط\n• جميع نقاط الأسئلة يجب أن تكون > 0\n• درجة النجاح يجب ألا تتجاوز إجمالي نقاط الاختبار",
           imagePlaceholder: "/tutorials/publish-rules.png",
-          noteEn: "If any rule fails, publish is blocked and the specific error is shown.",
+          noteEn:
+            "If any rule fails, publish is blocked and the specific error is shown.",
           noteAr: "إذا فشلت أي قاعدة، يتم حظر النشر ويُعرض الخطأ المحدد.",
         },
         {
@@ -1035,16 +1272,20 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "بعد نشر الاختبار:\n✗ لا يمكن تغيير المدة أو درجة النجاح (يجب إلغاء النشر أولاً)\n✗ لا يمكن حذف الأقسام (يجب إلغاء النشر أولاً)\n✗ لا يمكن إزالة الأسئلة من الأقسام (يجب إلغاء النشر أولاً)\n✓ يمكن إضافة أسئلة وأقسام جديدة\n✓ يمكن تغيير العنوان والوصف والتواريخ وإعدادات الأمان\n✓ يمكن تغيير إعدادات عرض المراجعة/النتائج\n✓ يمكن أرشفة (إلغاء نشر) الاختبار في أي وقت",
           imagePlaceholder: "/tutorials/publish-restrictions.png",
-          tipEn: "To modify duration, pass score, or remove questions — archive the exam first, make changes, then re-publish.",
-          tipAr: "لتعديل المدة أو درجة النجاح أو إزالة الأسئلة — أرشف الاختبار أولاً، أجرِ التعديلات، ثم أعد النشر.",
+          tipEn:
+            "To modify duration, pass score, or remove questions — archive the exam first, make changes, then re-publish.",
+          tipAr:
+            "لتعديل المدة أو درجة النجاح أو إزالة الأسئلة — أرشف الاختبار أولاً، أجرِ التعديلات، ثم أعد النشر.",
         },
       ],
       examples: [
         {
           titleEn: "Publish Status Flow",
           titleAr: "مسار حالة النشر",
-          contentEn: "Draft → Publish → Published\nPublished → Archive → Draft\nDraft → Publish → Published (re-publish)\n\nDeleting: Only possible if no candidate attempts exist.\nIf attempts exist, you can only Archive.",
-          contentAr: "مسودة → نشر → منشور\nمنشور → أرشفة → مسودة\nمسودة → نشر → منشور (إعادة نشر)\n\nالحذف: ممكن فقط إذا لم تكن هناك محاولات مرشحين.\nإذا وُجدت محاولات، يمكنك الأرشفة فقط.",
+          contentEn:
+            "Draft → Publish → Published\nPublished → Archive → Draft\nDraft → Publish → Published (re-publish)\n\nDeleting: Only possible if no candidate attempts exist.\nIf attempts exist, you can only Archive.",
+          contentAr:
+            "مسودة → نشر → منشور\nمنشور → أرشفة → مسودة\nمسودة → نشر → منشور (إعادة نشر)\n\nالحذف: ممكن فقط إذا لم تكن هناك محاولات مرشحين.\nإذا وُجدت محاولات، يمكنك الأرشفة فقط.",
         },
       ],
     },
@@ -1079,9 +1320,27 @@ export const examManagementTutorial: TutorialModule = {
             "أدخل عنواناً جديداً (مطلوب) واختيارياً وصفاً باللغتين.",
           imagePlaceholder: "/tutorials/template-info.png",
           fields: [
-            { nameEn: "Title (English)", nameAr: "العنوان (إنجليزي)", required: true, descriptionEn: "New exam title", descriptionAr: "عنوان الاختبار الجديد" },
-            { nameEn: "Title (Arabic)", nameAr: "العنوان (عربي)", required: false, descriptionEn: "Optional", descriptionAr: "اختياري" },
-            { nameEn: "Description (EN/AR)", nameAr: "الوصف (EN/AR)", required: false, descriptionEn: "Optional bilingual description", descriptionAr: "وصف ثنائي اللغة اختياري" },
+            {
+              nameEn: "Title (English)",
+              nameAr: "العنوان (إنجليزي)",
+              required: true,
+              descriptionEn: "New exam title",
+              descriptionAr: "عنوان الاختبار الجديد",
+            },
+            {
+              nameEn: "Title (Arabic)",
+              nameAr: "العنوان (عربي)",
+              required: false,
+              descriptionEn: "Optional",
+              descriptionAr: "اختياري",
+            },
+            {
+              nameEn: "Description (EN/AR)",
+              nameAr: "الوصف (EN/AR)",
+              required: false,
+              descriptionEn: "Optional bilingual description",
+              descriptionAr: "وصف ثنائي اللغة اختياري",
+            },
           ],
         },
         {
@@ -1094,11 +1353,30 @@ export const examManagementTutorial: TutorialModule = {
             "حدد نوع الاختبار (مرن/ثابت، مملوء مسبقاً من المصدر)، تواريخ البداية/النهاية، والمدة (مملوءة مسبقاً من المصدر، قابلة للتعديل).",
           imagePlaceholder: "/tutorials/template-timing.png",
           fields: [
-            { nameEn: "Exam Type", nameAr: "نوع الاختبار", required: false, descriptionEn: "Pre-filled from source exam", descriptionAr: "مملوء مسبقاً من الاختبار المصدر" },
-            { nameEn: "Duration", nameAr: "المدة", required: true, descriptionEn: "Pre-filled, range 1–600 minutes", descriptionAr: "مملوء مسبقاً، النطاق 1–600 دقيقة" },
-            { nameEn: "Start/End Dates", nameAr: "تواريخ البداية/النهاية", required: false, descriptionEn: "New schedule for the cloned exam", descriptionAr: "جدول جديد للاختبار المنسوخ" },
+            {
+              nameEn: "Exam Type",
+              nameAr: "نوع الاختبار",
+              required: false,
+              descriptionEn: "Pre-filled from source exam",
+              descriptionAr: "مملوء مسبقاً من الاختبار المصدر",
+            },
+            {
+              nameEn: "Duration",
+              nameAr: "المدة",
+              required: true,
+              descriptionEn: "Pre-filled, range 1–600 minutes",
+              descriptionAr: "مملوء مسبقاً، النطاق 1–600 دقيقة",
+            },
+            {
+              nameEn: "Start/End Dates",
+              nameAr: "تواريخ البداية/النهاية",
+              required: false,
+              descriptionEn: "New schedule for the cloned exam",
+              descriptionAr: "جدول جديد للاختبار المنسوخ",
+            },
           ],
-          tipEn: "The cloned exam is always created as Draft — you must publish it separately.",
+          tipEn:
+            "The cloned exam is always created as Draft — you must publish it separately.",
           tipAr: "الاختبار المنسوخ يُنشأ دائماً كمسودة — يجب نشره بشكل منفصل.",
         },
         {
@@ -1110,8 +1388,10 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "يتم نسخ كل شيء من الاختبار المصدر:\n✓ جميع الأقسام والأسئلة (نفس مراجع الأسئلة)\n✓ إعدادات الأمان (المراقبة، القفل، إلخ)\n✓ إعدادات النتائج والمراجعة\n✓ التعليمات\n✓ سياسة الوصول\n✓ إعدادات التسجيل (المحاولات، درجة النجاح، الخلط)",
           imagePlaceholder: "/tutorials/template-copies.png",
-          noteEn: "The new exam starts as Draft with IsActive = true. No candidate assignments are copied.",
-          noteAr: "يبدأ الاختبار الجديد كمسودة مع IsActive = صحيح. لا يتم نسخ تعيينات المرشحين.",
+          noteEn:
+            "The new exam starts as Draft with IsActive = true. No candidate assignments are copied.",
+          noteAr:
+            "يبدأ الاختبار الجديد كمسودة مع IsActive = صحيح. لا يتم نسخ تعيينات المرشحين.",
         },
       ],
     },
@@ -1165,16 +1445,336 @@ export const examManagementTutorial: TutorialModule = {
           descriptionAr:
             "الإجراءات المتاحة تعتمد على حالة الاختبار:\n\n• مسودة: عرض، تعديل، نشر، حذف\n• منشور: عرض، تعديل، أرشفة، حذف*\n• مؤرشف: عرض، تعديل، حذف\n\n* الحذف ممكن فقط إذا لم تكن هناك محاولات مرشحين. إذا وُجدت محاولات، يمكنك الأرشفة فقط.",
           imagePlaceholder: "/tutorials/exam-list-actions.png",
-          tipEn: "Successful publish shows a celebration dialog. Failed delete (due to attempts) shows an error dialog with the backend message.",
-          tipAr: "النشر الناجح يعرض حوار احتفال. فشل الحذف (بسبب المحاولات) يعرض حوار خطأ برسالة الخادم.",
+          tipEn:
+            "Successful publish shows a celebration dialog. Failed delete (due to attempts) shows an error dialog with the backend message.",
+          tipAr:
+            "النشر الناجح يعرض حوار احتفال. فشل الحذف (بسبب المحاولات) يعرض حوار خطأ برسالة الخادم.",
         },
       ],
       examples: [
         {
           titleEn: "Exam Status Meanings",
           titleAr: "معاني حالات الاختبار",
-          contentEn: "| Status | Meaning | Can Publish? | Can Archive? |\n|--------|---------|-------------|-------------|\n| Draft | Saved but not yet available to candidates | ✓ Yes | ✗ No |\n| Published | Live — candidates can take this exam | ✗ Already published | ✓ Yes |\n| Archived | Was published, now deactivated | ✓ Yes (re-publish) | ✗ Already archived |",
-          contentAr: "| الحالة | المعنى | يمكن النشر؟ | يمكن الأرشفة؟ |\n|--------|---------|-------------|-------------|\n| مسودة | محفوظ لكن غير متاح للمرشحين | ✓ نعم | ✗ لا |\n| منشور | مباشر — يمكن للمرشحين تقديمه | ✗ منشور بالفعل | ✓ نعم |\n| مؤرشف | كان منشوراً، الآن معطل | ✓ نعم (إعادة نشر) | ✗ مؤرشف بالفعل |",
+          contentEn:
+            "| Status | Meaning | Can Publish? | Can Archive? |\n|--------|---------|-------------|-------------|\n| Draft | Saved but not yet available to candidates | ✓ Yes | ✗ No |\n| Published | Live — candidates can take this exam | ✗ Already published | ✓ Yes |\n| Archived | Was published, now deactivated | ✓ Yes (re-publish) | ✗ Already archived |",
+          contentAr:
+            "| الحالة | المعنى | يمكن النشر؟ | يمكن الأرشفة؟ |\n|--------|---------|-------------|-------------|\n| مسودة | محفوظ لكن غير متاح للمرشحين | ✓ نعم | ✗ لا |\n| منشور | مباشر — يمكن للمرشحين تقديمه | ✗ منشور بالفعل | ✓ نعم |\n| مؤرشف | كان منشوراً، الآن معطل | ✓ نعم (إعادة نشر) | ✗ مؤرشف بالفعل |",
+        },
+      ],
+    },
+    // ─── Section 7: Violation Events & Auto-Termination ────
+    {
+      id: "violation-events",
+      titleEn: "7. Violation Events & Auto-Termination",
+      titleAr: "7. أحداث المخالفات والإنهاء التلقائي",
+      descriptionEn:
+        "All monitored events during exams, which ones count toward auto-termination, and how the warning system works.",
+      descriptionAr:
+        "جميع الأحداث المراقبة أثناء الاختبارات، وأيها يُحتسب ضمن الإنهاء التلقائي، وكيف يعمل نظام التحذيرات.",
+      steps: [
+        {
+          id: "all-violation-events",
+          titleEn: "All Violation Events",
+          titleAr: "جميع أحداث المخالفات",
+          descriptionEn:
+            "The system monitors 13 events during exams. Each event is logged in real-time and visible to the proctor. Events are split into two categories:\n\nSecurity / Behavioral Events (Soft Proctoring):",
+          descriptionAr:
+            "يراقب النظام 13 حدثاً أثناء الاختبارات. يتم تسجيل كل حدث في الوقت الفعلي ويكون مرئياً للمراقب. تنقسم الأحداث إلى فئتين:\n\nأحداث الأمان / السلوك (المراقبة الخفيفة):",
+          fields: [
+            {
+              nameEn: "1. TabSwitched",
+              nameAr: "1. تبديل التبويب",
+              required: true,
+              descriptionEn:
+                'visibilitychange listener — Candidate switched to another browser tab  ·  Severity: Medium  ·  Warning: "Tab switch detected — please stay on the exam tab"',
+              descriptionAr:
+                'مستمع visibilitychange — المرشح انتقل إلى تبويب متصفح آخر  ·  الشدة: متوسط  ·  تحذير: "تم اكتشاف تبديل تبويب — يرجى البقاء في تبويب الاختبار"',
+            },
+            {
+              nameEn: "2. WindowBlur",
+              nameAr: "2. فقدان تركيز النافذة",
+              required: false,
+              descriptionEn:
+                "blur event — Window lost focus (fires with TabSwitched)  ·  Severity: Low  ·  Deduplicated with TabSwitched — does not count separately",
+              descriptionAr:
+                "حدث blur — النافذة فقدت التركيز (يُطلق مع تبديل التبويب)  ·  الشدة: منخفض  ·  مدمج مع تبديل التبويب — لا يُحتسب منفصلاً",
+            },
+            {
+              nameEn: "3. FullscreenExited",
+              nameAr: "3. الخروج من ملء الشاشة",
+              required: false,
+              descriptionEn:
+                "fullscreenchange listener — Candidate left fullscreen mode  ·  Severity: Medium  ·  Warning: toast notification + re-prompt to fullscreen",
+              descriptionAr:
+                "مستمع fullscreenchange — المرشح خرج من وضع ملء الشاشة  ·  الشدة: متوسط  ·  تحذير: إشعار + إعادة طلب ملء الشاشة",
+            },
+            {
+              nameEn: "4. CopyAttempt",
+              nameAr: "4. محاولة نسخ",
+              required: false,
+              descriptionEn:
+                'copy event — Blocked by prevention policy, no actual data copied  ·  Severity: Low  ·  Warning: toast "Copy is not allowed"',
+              descriptionAr:
+                'حدث copy — محظور بموجب سياسة المنع، لا يتم نسخ بيانات  ·  الشدة: منخفض  ·  تحذير: إشعار "النسخ غير مسموح"',
+            },
+            {
+              nameEn: "5. PasteAttempt",
+              nameAr: "5. محاولة لصق",
+              required: false,
+              descriptionEn:
+                'paste event — Blocked by prevention policy, no data pasted  ·  Severity: Low  ·  Warning: toast "Paste is not allowed"',
+              descriptionAr:
+                'حدث paste — محظور بموجب سياسة المنع، لا يتم لصق بيانات  ·  الشدة: منخفض  ·  تحذير: إشعار "اللصق غير مسموح"',
+            },
+            {
+              nameEn: "6. RightClickAttempt",
+              nameAr: "6. محاولة نقر يمين",
+              required: false,
+              descriptionEn:
+                "contextmenu event — Right-click blocked  ·  Severity: Low  ·  Warning: none (silently blocked)",
+              descriptionAr:
+                "حدث contextmenu — النقر الأيمن محظور  ·  الشدة: منخفض  ·  تحذير: لا يوجد (يُحظر بصمت)",
+            },
+          ],
+          noteEn:
+            "Camera/AI Events (Advanced Proctoring) are listed in the next step below.",
+          noteAr:
+            "أحداث الكاميرا/الذكاء الاصطناعي (المراقبة المتقدمة) مدرجة في الخطوة التالية أدناه.",
+        },
+        {
+          id: "camera-ai-events",
+          titleEn: "Camera / AI Events (Advanced Proctoring)",
+          titleAr: "أحداث الكاميرا / الذكاء الاصطناعي (المراقبة المتقدمة)",
+          descriptionEn:
+            "These events are detected by the SmartMonitoring AI engine which analyzes the webcam feed in real-time:",
+          descriptionAr:
+            "يتم اكتشاف هذه الأحداث بواسطة محرك المراقبة الذكية الذي يحلل بث الكاميرا في الوقت الفعلي:",
+          fields: [
+            {
+              nameEn: "7. FaceNotDetected",
+              nameAr: "7. عدم اكتشاف وجه",
+              required: true,
+              descriptionEn:
+                'SmartMonitoring (2s continuous) — No face found in webcam  ·  Severity: High  ·  Warning: "Face not detected — please face the camera"',
+              descriptionAr:
+                'المراقبة الذكية (2 ثانية مستمرة) — لم يُكتشف وجه في الكاميرا  ·  الشدة: عالي  ·  تحذير: "لم يُكتشف وجه — يرجى مواجهة الكاميرا"',
+            },
+            {
+              nameEn: "8. MultipleFacesDetected",
+              nameAr: "8. اكتشاف وجوه متعددة",
+              required: true,
+              descriptionEn:
+                'SmartMonitoring (2s continuous) — More than one person detected  ·  Severity: High  ·  Warning: "Multiple faces detected — only one person allowed"',
+              descriptionAr:
+                'المراقبة الذكية (2 ثانية مستمرة) — تم اكتشاف أكثر من شخص  ·  الشدة: عالي  ·  تحذير: "تم اكتشاف وجوه متعددة — يُسمح بشخص واحد فقط"',
+            },
+            {
+              nameEn: "9. FaceOutOfFrame",
+              nameAr: "9. الوجه خارج الإطار",
+              required: false,
+              descriptionEn:
+                'SmartMonitoring (30% margin) — Face near edge of frame  ·  Severity: Medium  ·  Warning: toast "Please center your face"',
+              descriptionAr:
+                'المراقبة الذكية (هامش 30%) — الوجه قريب من حافة الإطار  ·  الشدة: متوسط  ·  تحذير: إشعار "يرجى توسيط وجهك"',
+            },
+            {
+              nameEn: "10. HeadTurnDetected",
+              nameAr: "10. اكتشاف دوران الرأس",
+              required: false,
+              descriptionEn:
+                'SmartMonitoring (yaw>30°, pitch>25°) — Head turned away  ·  Severity: Medium  ·  Warning: toast "Please face the screen"',
+              descriptionAr:
+                'المراقبة الذكية (انحراف>30°، ميل>25°) — دوران الرأس بعيداً  ·  الشدة: متوسط  ·  تحذير: إشعار "يرجى مواجهة الشاشة"',
+            },
+            {
+              nameEn: "11. CameraBlocked",
+              nameAr: "11. حجب الكاميرا",
+              required: true,
+              descriptionEn:
+                'SmartMonitoring (dark+low variance) — Webcam obstructed or covered  ·  Severity: High  ·  Warning: "Camera blocked — please uncover your webcam"',
+              descriptionAr:
+                'المراقبة الذكية (ظلام+تباين منخفض) — الكاميرا محجوبة أو مغطاة  ·  الشدة: عالي  ·  تحذير: "الكاميرا محجوبة — يرجى كشف الكاميرا"',
+            },
+            {
+              nameEn: "12. WebcamDenied",
+              nameAr: "12. رفض الكاميرا",
+              required: false,
+              descriptionEn:
+                "getUserMedia failure — Candidate denied camera permission  ·  Severity: Critical  ·  Warning: permission denied screen shown",
+              descriptionAr:
+                "فشل getUserMedia — المرشح رفض إذن الكاميرا  ·  الشدة: حرج  ·  تحذير: عرض شاشة رفض الإذن",
+            },
+            {
+              nameEn: "13. SnapshotFailed",
+              nameAr: "13. فشل اللقطة",
+              required: false,
+              descriptionEn:
+                "Snapshot upload failure — Technical/network issue  ·  Severity: Low  ·  Warning: none (silent, logged only)",
+              descriptionAr:
+                "فشل رفع اللقطة — مشكلة تقنية/شبكة  ·  الشدة: منخفض  ·  تحذير: لا يوجد (صامت، يُسجّل فقط)",
+            },
+          ],
+          tipEn:
+            'The "Required" badge in the table above means the event COUNTS toward auto-termination. "Optional" means it is logged only.',
+          tipAr:
+            'علامة "مطلوب" في الجدول أعلاه تعني أن الحدث يُحتسب ضمن الإنهاء التلقائي. "اختياري" تعني أنه يُسجّل فقط.',
+        },
+        {
+          id: "count-vs-no-count",
+          titleEn: "What Counts vs. What Doesn't",
+          titleAr: "ما يُحتسب مقابل ما لا يُحتسب",
+          descriptionEn:
+            "Summary of which events increment the violation counter and the reasoning behind each decision:",
+          descriptionAr:
+            "ملخص الأحداث التي تزيد عداد المخالفات والمبررات وراء كل قرار:",
+          fields: [
+            {
+              nameEn: "TabSwitched",
+              nameAr: "تبديل التبويب",
+              required: true,
+              descriptionEn: "Intentional — candidate left the exam tab",
+              descriptionAr: "مقصود — المرشح غادر تبويب الاختبار",
+            },
+            {
+              nameEn: "FaceNotDetected",
+              nameAr: "عدم اكتشاف وجه",
+              required: true,
+              descriptionEn: "Candidate moved away from camera",
+              descriptionAr: "المرشح ابتعد عن الكاميرا",
+            },
+            {
+              nameEn: "MultipleFacesDetected",
+              nameAr: "اكتشاف وجوه متعددة",
+              required: true,
+              descriptionEn: "Someone else is at the screen",
+              descriptionAr: "شخص آخر موجود أمام الشاشة",
+            },
+            {
+              nameEn: "CameraBlocked",
+              nameAr: "حجب الكاميرا",
+              required: true,
+              descriptionEn: "Intentional covering of camera",
+              descriptionAr: "تغطية مقصودة للكاميرا",
+            },
+            {
+              nameEn: "WindowBlur",
+              nameAr: "فقدان تركيز النافذة",
+              required: false,
+              descriptionEn:
+                "Same as TabSwitched — deduplicated, they fire together",
+              descriptionAr: "نفس تبديل التبويب — مدمج، يُطلقان معاً",
+            },
+            {
+              nameEn: "FullscreenExited",
+              nameAr: "الخروج من ملء الشاشة",
+              required: false,
+              descriptionEn:
+                "Could be accidental (Esc key) or technical. Already re-prompts to fullscreen",
+              descriptionAr:
+                "قد يكون عرضياً (مفتاح Esc) أو تقني. يُعاد طلب ملء الشاشة تلقائياً",
+            },
+            {
+              nameEn: "CopyAttempt / PasteAttempt",
+              nameAr: "محاولة نسخ / لصق",
+              required: false,
+              descriptionEn:
+                "Already blocked — action is prevented, no actual cheating occurred",
+              descriptionAr: "محظور بالفعل — الإجراء ممنوع، لم يحدث غش فعلي",
+            },
+            {
+              nameEn: "RightClickAttempt",
+              nameAr: "محاولة نقر يمين",
+              required: false,
+              descriptionEn: "Already blocked — context menu prevented",
+              descriptionAr: "محظور بالفعل — قائمة السياق ممنوعة",
+            },
+            {
+              nameEn: "FaceOutOfFrame",
+              nameAr: "الوجه خارج الإطار",
+              required: false,
+              descriptionEn: "Too sensitive — could be minor posture shift",
+              descriptionAr: "حساس جداً — قد يكون تغيير بسيط في الوضعية",
+            },
+            {
+              nameEn: "HeadTurnDetected",
+              nameAr: "اكتشاف دوران الرأس",
+              required: false,
+              descriptionEn: "Too sensitive — looking at keyboard, stretching",
+              descriptionAr: "حساس جداً — النظر إلى لوحة المفاتيح، التمدد",
+            },
+            {
+              nameEn: "WebcamDenied",
+              nameAr: "رفض الكاميرا",
+              required: false,
+              descriptionEn:
+                "Technical issue — handle separately via permission flow",
+              descriptionAr:
+                "مشكلة تقنية — يُعالج بشكل منفصل عبر تدفق الأذونات",
+            },
+            {
+              nameEn: "SnapshotFailed",
+              nameAr: "فشل اللقطة",
+              required: false,
+              descriptionEn:
+                "Technical/network issue — not the candidate's fault",
+              descriptionAr: "مشكلة تقنية/شبكة — ليس خطأ المرشح",
+            },
+          ],
+          noteEn:
+            'The "Required" badge = COUNTS toward termination. "Optional" badge = logged only, does NOT count.',
+          noteAr:
+            'علامة "مطلوب" = يُحتسب ضمن الإنهاء. علامة "اختياري" = يُسجّل فقط، لا يُحتسب.',
+        },
+        {
+          id: "auto-termination-flow",
+          titleEn: "How Auto-Termination Works",
+          titleAr: "كيف يعمل الإنهاء التلقائي",
+          descriptionEn:
+            "1. Set Max Violation Warnings in the exam's Security tab (default: 10, set to 0 to disable)\n2. Each countable violation increments the counter\n3. At count = Max − 1: A blocking LAST WARNING modal appears telling the candidate this is their final chance\n4. At count = Max: The exam is automatically terminated, recorded as a terminated attempt with full details\n5. The terminated attempt appears in the Terminated Attempts list with the reason and violation count",
+          descriptionAr:
+            "1. حدد الحد الأقصى لتحذيرات المخالفات في تبويب الأمان للاختبار (الافتراضي: 10، اضبطه على 0 للتعطيل)\n2. كل مخالفة قابلة للحساب تزيد العداد\n3. عند العدد = الحد − 1: يظهر تحذير أخير حاجب للمرشح يخبره أن هذه فرصته الأخيرة\n4. عند العدد = الحد: يتم إنهاء الاختبار تلقائياً ويُسجّل كمحاولة منتهية مع التفاصيل الكاملة\n5. تظهر المحاولة المنتهية في قائمة المحاولات المنتهية مع السبب وعدد المخالفات",
+          tipEn:
+            "Setting Max Violation Warnings to 0 disables auto-termination entirely. Violations are still logged.",
+          tipAr:
+            "تعيين الحد الأقصى لتحذيرات المخالفات إلى 0 يعطّل الإنهاء التلقائي بالكامل. لا تزال المخالفات مُسجّلة.",
+        },
+        {
+          id: "warning-messages",
+          titleEn: "Warning Messages Shown to Candidate",
+          titleAr: "رسائل التحذير المعروضة للمرشح",
+          descriptionEn:
+            "When a countable violation is detected, the candidate sees a warning dialog. Here are the messages at each stage:",
+          descriptionAr:
+            "عند اكتشاف مخالفة قابلة للحساب، يرى المرشح نافذة تحذير. إليك الرسائل في كل مرحلة:",
+          fields: [
+            {
+              nameEn: "Regular Warning (amber dialog)",
+              nameAr: "تحذير عادي (نافذة كهرمانية)",
+              required: false,
+              descriptionEn:
+                '"Warning from Proctor" — Please follow the proctor\'s instructions. Continued violations may result in session termination.',
+              descriptionAr:
+                '"تحذير من المراقب" — يرجى اتباع تعليمات المراقب. استمرار المخالفات قد يؤدي إلى إنهاء الجلسة.',
+            },
+            {
+              nameEn: "Last Warning (red blocking dialog)",
+              nameAr: "تحذير أخير (نافذة حمراء حاجبة)",
+              required: true,
+              descriptionEn:
+                '"⚠ FINAL WARNING" — This is your final warning. You have reached X of Y allowed violations. The NEXT violation will automatically terminate your exam.',
+              descriptionAr:
+                '"⚠ تحذير أخير" — هذا تحذيرك الأخير. لقد وصلت إلى X من Y مخالفات مسموحة. المخالفة التالية ستنهي اختبارك تلقائياً.',
+            },
+            {
+              nameEn: "Auto-Terminated (redirect)",
+              nameAr: "إنهاء تلقائي (إعادة توجيه)",
+              required: true,
+              descriptionEn:
+                '"Auto-terminated: exceeded maximum violations (X)" — Candidate is redirected to My Exams page. Attempt appears in Terminated Attempts list.',
+              descriptionAr:
+                '"تم الإنهاء التلقائي: تجاوز الحد الأقصى للمخالفات (X)" — يتم إعادة توجيه المرشح إلى صفحة اختباراتي. تظهر المحاولة في قائمة المحاولات المنتهية.',
+            },
+          ],
         },
       ],
     },

@@ -1,10 +1,14 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Grading;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.ExamResult;
 using Smart_Core.Application.Interfaces.Grading;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Domain.Entities.Grading;
@@ -18,15 +22,33 @@ public class GradingService : IGradingService
     private readonly ApplicationDbContext _context;
     private readonly IExamResultService _examResultService;
     private readonly ILogger<GradingService> _logger;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public GradingService(
         ApplicationDbContext context,
         IExamResultService examResultService,
-        ILogger<GradingService> logger)
+        ILogger<GradingService> logger,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _examResultService = examResultService;
         _logger = logger;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
     }
 
     #region Grading Lifecycle
@@ -543,6 +565,16 @@ public class GradingService : IGradingService
      .Include(gs => gs.Answers)
  .AsQueryable();
 
+        // Department isolation: filter grading sessions via Exam.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(gs => gs.Attempt.Exam.DepartmentId == userDepartmentId.Value);
+            }
+        }
+
         // Filters
         if (searchDto.ExamId.HasValue)
         {
@@ -621,6 +653,16 @@ public class GradingService : IGradingService
             return ApiResponse<ExamGradingStatsDto>.FailureResponse("Exam not found");
         }
 
+        // Department isolation check
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<ExamGradingStatsDto>.FailureResponse("You do not have access to this exam's grading stats");
+            }
+        }
+
         var gradingSessions = await _context.Set<GradingSession>()
  .Include(gs => gs.Attempt)
         .Include(gs => gs.Answers)
@@ -653,6 +695,20 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<List<QuestionGradingStatsDto>>> GetQuestionGradingStatsAsync(int examId)
     {
+        // Department isolation check
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
+            if (exam != null)
+            {
+                var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+                if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
+                {
+                    return ApiResponse<List<QuestionGradingStatsDto>>.FailureResponse("You do not have access to this exam's grading stats");
+                }
+            }
+        }
+
         var gradedAnswers = await _context.Set<GradedAnswer>()
                .Include(ga => ga.Question)
                    .ThenInclude(q => q.QuestionType)

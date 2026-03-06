@@ -1,11 +1,13 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Proctor;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
@@ -17,13 +19,33 @@ public class ProctorService : IProctorService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMediaStorageService _mediaStorage;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
     private const int DefaultHeartbeatIntervalSeconds = 15;
     private const int HeartbeatMissedThresholdSeconds = 45;
 
-    public ProctorService(ApplicationDbContext context, IMediaStorageService mediaStorage)
+    public ProctorService(
+        ApplicationDbContext context,
+        IMediaStorageService mediaStorage,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _mediaStorage = mediaStorage;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
     }
 
     #region Session Management
@@ -210,6 +232,16 @@ public class ProctorService : IProctorService
                   .Include(s => s.Decision)
                   .Include(s => s.EvidenceItems)
                   .AsQueryable();
+
+        // Department isolation: filter proctor sessions via Exam.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
+            }
+        }
 
         query = ApplySessionFilters(query, searchDto);
         query = query.OrderByDescending(s => s.StartedAt);
@@ -1181,8 +1213,20 @@ UploadEvidenceDto dto, string candidateId)
         var windowStart = now.AddMinutes(-5); // recent events window
 
         // Get active sessions ordered by risk score descending
-        var sessions = await _context.Set<ProctorSession>()
-            .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0)
+        var query = _context.Set<ProctorSession>()
+            .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0);
+
+        // Department isolation
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
+            }
+        }
+
+        var sessions = await query
             .OrderByDescending(s => s.RiskScore)
             .ThenByDescending(s => s.TotalViolations)
             .Take(top)

@@ -35,6 +35,20 @@ public class AttemptService : IAttemptService
     AttemptEventType.HeadTurnDetected,
   };
 
+  /// <summary>
+  /// Violation types that count toward the MaxViolationWarnings auto-termination threshold.
+  /// Hardcoded by design — admin should NOT choose these (to avoid misconfiguration).
+  /// TabSwitched + WindowBlur are deduplicated at the frontend (WindowBlur fires with TabSwitched);
+  /// backend counts them independently but only TabSwitched is sent when both fire together.
+  /// </summary>
+  private static readonly HashSet<AttemptEventType> CountableViolationTypes = new()
+  {
+    AttemptEventType.TabSwitched,      // Intentional — candidate left the exam
+    AttemptEventType.FaceNotDetected,  // Candidate moved away from camera
+    AttemptEventType.MultipleFacesDetected, // Someone else is at the screen
+    AttemptEventType.CameraBlocked,    // Intentional covering of camera
+  };
+
   public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub)
   {
     _context = context;
@@ -764,6 +778,131 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
         }
         catch { /* fire-and-forget — never block the candidate */ }
       });
+    }
+
+    // ── Auto-termination: count countable violations toward MaxViolationWarnings ──
+    if (CountableViolationTypes.Contains(dto.EventType))
+    {
+      try
+      {
+        // Load the exam to get MaxViolationWarnings setting
+        var exam = await _context.Set<Domain.Entities.Assessment.Exam>()
+          .AsNoTracking()
+          .Where(e => e.Id == attempt.ExamId)
+          .Select(e => new { e.MaxViolationWarnings })
+          .FirstOrDefaultAsync();
+
+        var maxWarnings = exam?.MaxViolationWarnings ?? 0;
+
+        // Only proceed if auto-termination is enabled (maxWarnings > 0)
+        if (maxWarnings > 0)
+        {
+          // Load the proctor session for this attempt
+          var proctorSession = await _context.Set<ProctorSession>()
+            .Where(s => s.AttemptId == attemptId && s.CandidateId == candidateId)
+            .OrderByDescending(s => s.StartedAt)
+            .FirstOrDefaultAsync();
+
+          if (proctorSession != null)
+          {
+            // Increment countable violation count
+            proctorSession.CountableViolationCount++;
+            var currentCount = proctorSession.CountableViolationCount;
+
+            if (currentCount >= maxWarnings)
+            {
+              // ── TERMINATE: reached max violations ──
+              proctorSession.Status = ProctorSessionStatus.Cancelled;
+              proctorSession.EndedAt = now;
+              proctorSession.IsTerminatedByProctor = true;
+              proctorSession.TerminationReason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})";
+              proctorSession.PendingWarningMessage = null; // Clear any pending warning
+              proctorSession.UpdatedDate = now;
+              proctorSession.UpdatedBy = "System";
+
+              // Terminate the attempt
+              attempt.Status = AttemptStatus.Terminated;
+              attempt.UpdatedDate = now;
+              attempt.UpdatedBy = "System";
+
+              // Log termination event for audit
+              _context.Set<AttemptEvent>().Add(new AttemptEvent
+              {
+                AttemptId = attemptId,
+                EventType = AttemptEventType.ForceEnded,
+                OccurredAt = now,
+                MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                  source = "AutoTermination",
+                  reason = $"Exceeded maximum violations ({maxWarnings})",
+                  countableViolationCount = currentCount,
+                  maxViolationWarnings = maxWarnings,
+                  triggerEvent = dto.EventType.ToString()
+                }),
+                CreatedBy = "System",
+                CreatedDate = now
+              });
+
+              await _context.SaveChangesAsync();
+
+              // Notify candidate instantly via SignalR
+              _ = Task.Run(async () =>
+              {
+                try
+                {
+                  var group = $"attempt_{attemptId}";
+                  await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
+                  {
+                    reason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})",
+                    countableViolationCount = currentCount,
+                    maxViolationWarnings = maxWarnings
+                  });
+                }
+                catch { /* fire-and-forget */ }
+              });
+
+              return ApiResponse<bool>.SuccessResponse(true, "Event logged — attempt auto-terminated");
+            }
+            else if (currentCount == maxWarnings - 1)
+            {
+              // ── LAST WARNING: one violation away from termination ──
+              proctorSession.PendingWarningMessage =
+                $"⚠ LAST WARNING: This is your final warning. You have reached {currentCount} of {maxWarnings} allowed violations. The NEXT violation will automatically terminate your exam.";
+              proctorSession.UpdatedDate = now;
+
+              await _context.SaveChangesAsync();
+
+              // Push last warning instantly via SignalR
+              _ = Task.Run(async () =>
+              {
+                try
+                {
+                  var group = $"attempt_{attemptId}";
+                  await _proctorHub.Clients.Group(group).SendAsync("ProctorWarning", new
+                  {
+                    message = proctorSession.PendingWarningMessage,
+                    isLastWarning = true,
+                    currentCount,
+                    maxWarnings
+                  });
+                }
+                catch { /* fire-and-forget */ }
+              });
+            }
+            else
+            {
+              // Just save the incremented count
+              proctorSession.UpdatedDate = now;
+              await _context.SaveChangesAsync();
+            }
+          }
+        }
+      }
+      catch
+      {
+        // Auto-termination logic should never block the candidate's event logging
+        // If it fails, the event is already saved — fail silently
+      }
     }
 
     return ApiResponse<bool>.SuccessResponse(true, "Event logged");

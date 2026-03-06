@@ -45,3 +45,5 @@ and
 Section mode: Only shows when the current section has at least one question with isCalculatorAllowed
 Flat question mode: Only shows when the current question has isCalculatorAllowed
 Auto-hides: When you navigate to a section/question that doesn't allow calculator, the calculator closes automatically
+
+Exam.MaxViolationWarnings property (default 10, 0 = disabled)

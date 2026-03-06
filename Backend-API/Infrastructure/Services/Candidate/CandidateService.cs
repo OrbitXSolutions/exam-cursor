@@ -307,7 +307,8 @@ public class CandidateService : ICandidateService
             PreventCopyPaste = exam.PreventCopyPaste,
             PreventScreenCapture = exam.PreventScreenCapture,
             RequireFullscreen = exam.RequireFullscreen,
-            BrowserLockdown = exam.BrowserLockdown
+            BrowserLockdown = exam.BrowserLockdown,
+            MaxViolationWarnings = exam.MaxViolationWarnings
         };
 
         // Check eligibility

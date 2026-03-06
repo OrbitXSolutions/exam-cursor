@@ -86,6 +86,10 @@ public class CandidateAccessPolicyDto
     public bool PreventScreenCapture { get; set; }
     public bool RequireFullscreen { get; set; }
     public bool BrowserLockdown { get; set; }
+    /// <summary>
+    /// Max countable violations before auto-termination (0 = disabled)
+    /// </summary>
+    public int MaxViolationWarnings { get; set; }
 }
 
 /// <summary>

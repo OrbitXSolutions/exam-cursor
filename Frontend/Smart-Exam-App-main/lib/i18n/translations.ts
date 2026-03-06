@@ -150,6 +150,7 @@ export const translations = {
       candidateExamDetails: "Candidate Exam Details",
       // Administration group
       administration: "Administration",
+      departments: "Departments",
       // Notifications group
       notifications: "Notifications",
       notificationSettings: "Notification Settings",
@@ -320,6 +321,8 @@ export const translations = {
       securityDesc1:
         "This exam is proctored. Your webcam and screen may be monitored.",
       securityDesc2: "Any suspicious activity will be flagged for review.",
+      autoTerminationWarning:
+        "This exam has automatic termination enabled. After {count} countable violations (such as tab switching, camera blocked, etc.), your exam will be automatically terminated.",
       agreement:
         "I have read and understood all instructions and agree to follow the exam rules.",
       pleaseAgree: "Please agree to the terms before starting",
@@ -477,6 +480,10 @@ export const translations = {
       browserLockdown: "Browser Lockdown",
       browserLockdownDesc:
         "Restrict browser features (requires lockdown browser)",
+      maxViolationWarnings: "Max Violation Warnings",
+      maxViolationWarningsDesc:
+        "Maximum number of countable violations before the exam is auto-terminated. Set to 0 to disable auto-termination.",
+      maxViolationWarningsLearnMore: "Which violations count?",
       notFound: "Exam not found",
       editSection: "Edit Section",
       // Publish dialogs
@@ -609,6 +616,11 @@ export const translations = {
 
       // Proctor warnings (candidate side)
       terminatedByProctor: "Your exam has been terminated by the proctor",
+      autoTerminated:
+        "Your exam has been automatically terminated due to exceeding the maximum number of allowed violations",
+      lastWarningTitle: "⚠ FINAL WARNING",
+      lastWarningNote:
+        "This is your LAST warning. The next violation will automatically terminate your exam. Please stay focused and follow all exam rules.",
       proctorWarningTitle: "Warning from Proctor",
       proctorWarningNote:
         "Please follow the proctor's instructions. Continued violations may result in session termination.",
@@ -1291,6 +1303,7 @@ export const translations = {
       candidateExamDetails: "تفاصيل اختبار المرشح",
       // Administration group
       administration: "الإدارة",
+      departments: "الأقسام",
       // Notifications group
       notifications: "الإشعارات",
       notificationSettings: "إعدادات الإشعارات",
@@ -1634,6 +1647,10 @@ export const translations = {
       requireFullscreenDesc: "فرض وضع ملء الشاشة أثناء الاختبار",
       browserLockdown: "قفل المتصفح",
       browserLockdownDesc: "تقييد وظائف المتصفح (يتطلب متصفح القفل)",
+      maxViolationWarnings: "الحد الأقصى لتحذيرات المخالفات",
+      maxViolationWarningsDesc:
+        "الحد الأقصى لعدد المخالفات المحسوبة قبل إنهاء الاختبار تلقائيًا. اضبط على 0 لتعطيل الإنهاء التلقائي.",
+      maxViolationWarningsLearnMore: "أي المخالفات تُحسب؟",
       // Instructions
       addInstruction: "إضافة تعليمات",
       editInstruction: "تعديل التعليمات",
@@ -1815,6 +1832,8 @@ export const translations = {
       securityNotice: "إشعار أمني",
       securityDesc1: "هذا الاختبار مراقب. قد تتم مراقبة كاميرا الويب والشاشة.",
       securityDesc2: "سيتم الإبلاغ عن أي نشاط مشبوه للمراجعة.",
+      autoTerminationWarning:
+        "هذا الاختبار يحتوي على إنهاء تلقائي. بعد {count} مخالفة محسوبة (مثل تبديل علامات التبويب، حجب الكاميرا، إلخ)، سيتم إنهاء اختبارك تلقائيًا.",
       agreement:
         "لقد قرأت وفهمت جميع التعليمات وأوافق على اتباع قواعد الاختبار.",
       pleaseAgree: "يرجى الموافقة على الشروط قبل البدء",
@@ -1896,6 +1915,11 @@ export const translations = {
 
       // Proctor warnings (candidate side)
       terminatedByProctor: "تم إنهاء اختبارك من قبل المراقب",
+      autoTerminated:
+        "تم إنهاء اختبارك تلقائيًا بسبب تجاوز الحد الأقصى المسموح به من المخالفات",
+      lastWarningTitle: "⚠ تحذير أخير",
+      lastWarningNote:
+        "هذا هو تحذيرك الأخير. المخالفة التالية ستنهي اختبارك تلقائيًا. يرجى التركيز واتباع جميع قواعد الاختبار.",
       proctorWarningTitle: "تحذير من المراقب",
       proctorWarningNote:
         "يرجى اتباع تعليمات المراقب. قد يؤدي الاستمرار في المخالفات إلى إنهاء الجلسة.",
