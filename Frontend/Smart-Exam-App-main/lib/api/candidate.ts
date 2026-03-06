@@ -266,6 +266,7 @@ export interface AccessPolicy {
   preventScreenCapture: boolean;
   requireFullscreen: boolean;
   browserLockdown: boolean;
+  maxViolationWarnings: number;
 }
 
 export interface Eligibility {
@@ -367,6 +368,7 @@ export interface AttemptQuestionDto {
   bodyAr: string;
   questionTypeName: string;
   questionTypeId: number;
+  isCalculatorAllowed?: boolean;
   sectionId?: number | null;
   topicId?: number | null;
   options: AttemptQuestionOptionDto[];

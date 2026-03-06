@@ -88,6 +88,11 @@ public class ExamDto
     /// </summary>
     public bool BrowserLockdown { get; set; }
 
+    /// <summary>
+    /// Max countable violations before auto-termination (0 = disabled)
+    /// </summary>
+    public int MaxViolationWarnings { get; set; }
+
     #endregion
 
     public DateTime CreatedDate { get; set; }
@@ -122,6 +127,11 @@ public class ExamListDto
     public int SectionsCount { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
+
+    /// <summary>
+    /// Access policy status: "Public" or "Assigned"
+    /// </summary>
+    public string AccessPolicyStatus { get; set; } = "Public";
 }
 
 /// <summary>
@@ -218,6 +228,11 @@ public class SaveExamDto
     /// </summary>
     public bool BrowserLockdown { get; set; }
 
+    /// <summary>
+    /// Max countable violations before auto-termination (0 = disabled, default 10)
+    /// </summary>
+    public int MaxViolationWarnings { get; set; } = 10;
+
     #endregion
 }
 
@@ -285,6 +300,11 @@ public class UpdateExamSettingsDto
     /// Enable browser lockdown mode
     /// </summary>
     public bool BrowserLockdown { get; set; }
+
+    /// <summary>
+    /// Max countable violations before auto-termination (0 = disabled, default 10)
+    /// </summary>
+    public int MaxViolationWarnings { get; set; } = 10;
 
     #endregion
 }

@@ -156,3 +156,18 @@ When admin/proctor grants a new attempt:
 NEW attempt → Status = Resumed (not NotStarted) — so candidate knows it's a second chance
 ORIGINAL attempt → stays as Expired (with its ExpiryReason) — preserved for audit
 Add ResumedFromAttemptId field on new attempt to link back to original
+
+##
+
+Image/Attachment is now a property of ANY question type (Option B):
+
+When creating a question, admins can attach an image/chart (drag-drop or click) — the image goes to wwwroot/QuestionAttachments via the existing POST /api/Media/upload?folder=QuestionAttachments endpoint, then gets linked as a primary attachment
+On the question detail page: primary image displays inline right after the question body, plus enhanced attachment cards with image previews
+During exam taking: candidates see the question image/chart prominently displayed above the answer area
+This works for all 4 types — MCQ, True/False, and Subjective questions can all have images
+Backward compatibility maintained:
+
+Backend services (GradingService, AttemptService, AssessmentService) untouched — name-based matching still works
+Edit page detects old names ("Essay", "Short Answer") and maps them to Subjective behavior
+Exam renderer and review page map old type names to Subjective
+No database migration needed — seed data already updated in DB

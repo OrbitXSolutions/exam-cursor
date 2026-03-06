@@ -13,10 +13,19 @@ namespace Smart_Core.Infrastructure.Services;
 public class UserService : IUserService
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly ICacheService _cache;
 
-  public UserService(UserManager<ApplicationUser> userManager)
+  public UserService(UserManager<ApplicationUser> userManager, ICacheService cache)
   {
     _userManager = userManager;
+    _cache = cache;
+  }
+
+  private void InvalidateUserCache()
+  {
+    _cache.RemoveByPrefix(CacheKeys.UsersPrefix);
+    _cache.RemoveByPrefix(CacheKeys.DepartmentsPrefix);
+    _cache.RemoveByPrefix(CacheKeys.RolesPrefix);
   }
 
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter)
@@ -47,6 +56,20 @@ public class UserService : IUserService
       query = query.Where(u => u.DepartmentId == filter.DepartmentId.Value);
     }
 
+    // Filter by role BEFORE pagination so counts and pages are accurate
+    if (!string.IsNullOrWhiteSpace(filter.Role))
+    {
+      var userIdsInRole = await _cache.GetOrCreateAsync(
+        CacheKeys.UsersInRole(filter.Role),
+        async () =>
+        {
+          var usersInRole = await _userManager.GetUsersInRoleAsync(filter.Role);
+          return usersInRole.Select(u => u.Id).ToHashSet();
+        },
+        CacheKeys.Medium);
+      query = query.Where(u => userIdsInRole.Contains(u.Id));
+    }
+
     var totalCount = await query.CountAsync();
 
     var users = await query
@@ -66,14 +89,6 @@ public class UserService : IUserService
       userDto.DepartmentNameEn = user.Department?.NameEn;
       userDto.DepartmentNameAr = user.Department?.NameAr;
       userDtos.Add(userDto);
-    }
-
-    // Filter by role if specified (done after getting users due to Identity limitations)
-    if (!string.IsNullOrWhiteSpace(filter.Role))
-    {
-      var usersInRole = await _userManager.GetUsersInRoleAsync(filter.Role);
-      var userIdsInRole = usersInRole.Select(u => u.Id).ToHashSet();
-      userDtos = userDtos.Where(u => userIdsInRole.Contains(u.Id)).ToList();
     }
 
     return ApiResponse<PaginatedResponse<UserDto>>.SuccessResponse(new PaginatedResponse<UserDto>
@@ -173,6 +188,7 @@ public class UserService : IUserService
     userDto.Roles = roles.ToList();
     userDto.Status = user.Status.ToString();
 
+    InvalidateUserCache();
     return ApiResponse<UserDetailDto>.SuccessResponse(userDto, "User updated successfully.");
   }
 
@@ -201,6 +217,7 @@ public class UserService : IUserService
     user.RefreshTokenExpiryTime = null;
     await _userManager.UpdateAsync(user);
 
+    InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User blocked successfully.");
   }
 
@@ -218,6 +235,7 @@ public class UserService : IUserService
 
     await _userManager.UpdateAsync(user);
 
+    InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User unblocked successfully.");
   }
 
@@ -235,6 +253,7 @@ public class UserService : IUserService
 
     await _userManager.UpdateAsync(user);
 
+    InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User activated successfully.");
   }
 
@@ -258,6 +277,7 @@ public class UserService : IUserService
 
     await _userManager.UpdateAsync(user);
 
+    InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User deactivated successfully.");
   }
 
@@ -282,6 +302,7 @@ public class UserService : IUserService
 
     await _userManager.UpdateAsync(user);
 
+    InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User deleted successfully.");
   }
 }

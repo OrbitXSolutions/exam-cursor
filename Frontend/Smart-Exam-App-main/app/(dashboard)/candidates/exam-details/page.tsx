@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,18 +12,21 @@ import { Separator } from "@/components/ui/separator"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import {
   Search, ClipboardCheck, User, BookOpen, Clock, Shield, Camera, Video, FileText,
   AlertTriangle, Activity, ExternalLink, RefreshCw, ChevronDown, ChevronUp,
   Play, CheckCircle, XCircle, Pause, TimerOff, Ban, Loader2, Image as ImageIcon,
+  ChevronsUpDown, Check, Brain, Sparkles,
 } from "lucide-react"
 import {
   getCandidateExamDetails, getCandidateExams,
   type CandidateExamDetailsDto, type CandidateExamBriefDto,
 } from "@/lib/api/candidate-exam-details"
 import { getCandidates, type CandidateDto } from "@/lib/api/candidate-admin"
+import { getAiProctorAnalysis, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-log"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -104,20 +107,27 @@ export default function CandidateExamDetailsPage() {
   const isRtl = language === "ar"
 
   // ── Search State ──
-  const [searchTerm, setSearchTerm] = useState("")
-  const [searchResults, setSearchResults] = useState<CandidateDto[]>([])
+  const [candidateSearch, setCandidateSearch] = useState("")
+  const [candidateList, setCandidateList] = useState<CandidateDto[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [candidateDropdownOpen, setCandidateDropdownOpen] = useState(false)
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>("")
   const [selectedCandidateName, setSelectedCandidateName] = useState<string>("")
   const [candidateExams, setCandidateExams] = useState<CandidateExamBriefDto[]>([])
   const [selectedExamId, setSelectedExamId] = useState<number>(0)
   const [showSearch, setShowSearch] = useState(true)
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Data State ──
   const [data, setData] = useState<CandidateExamDetailsDto | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedAttemptId, setSelectedAttemptId] = useState<number | undefined>()
   const [screenshotPreview, setScreenshotPreview] = useState<number | null>(null)
+
+  // ── AI Analysis State ──
+  const [aiAnalysis, setAiAnalysis] = useState<AiProctorAnalysis | null>(null)
+  const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
+  const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null)
 
   // ── Initialize from query params ──
   useEffect(() => {
@@ -149,22 +159,34 @@ export default function CandidateExamDetailsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCandidateId])
 
+  // ── Load initial candidates on mount ──
+  useEffect(() => {
+    loadCandidateList()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Debounced search when typing in dropdown ──
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+    searchDebounceRef.current = setTimeout(() => {
+      loadCandidateList(candidateSearch)
+    }, 300)
+    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidateSearch])
+
   // ── Search Candidates ──
-  const searchCandidates = useCallback(async () => {
-    if (!searchTerm.trim()) return
+  const loadCandidateList = useCallback(async (search?: string) => {
     setIsSearching(true)
     try {
-      const result = await getCandidates({ search: searchTerm.trim(), pageSize: 10 })
-      setSearchResults(result.items)
-      if (result.items.length === 0) {
-        toast.info(isRtl ? "لا توجد نتائج" : "No candidates found")
-      }
+      const result = await getCandidates({ search: search?.trim() || undefined, pageSize: 20 })
+      setCandidateList(result.items)
     } catch {
-      toast.error(isRtl ? "فشل البحث" : "Search failed")
+      // silent fail for search
     } finally {
       setIsSearching(false)
     }
-  }, [searchTerm, isRtl])
+  }, [])
 
   // ── Load Candidate Exams ──
   const loadCandidateExams = async (candidateId: string) => {
@@ -179,6 +201,8 @@ export default function CandidateExamDetailsPage() {
   // ── Load Details ──
   const loadDetails = async () => {
     setIsLoading(true)
+    setAiAnalysis(null)
+    setAiAnalysisError(null)
     try {
       const result = await getCandidateExamDetails({
         candidateId: selectedCandidateId,
@@ -199,14 +223,14 @@ export default function CandidateExamDetailsPage() {
     }
   }
 
-  // ── Select Candidate from Search ──
+  // ── Select Candidate from List ──
   const handleSelectCandidate = (c: CandidateDto) => {
     setSelectedCandidateId(c.id)
     setSelectedCandidateName(isRtl ? (c.fullNameAr || c.fullName || "") : (c.fullName || ""))
     setSelectedExamId(0)
     setData(null)
-    setSearchResults([])
-    setSearchTerm("")
+    setCandidateDropdownOpen(false)
+    setCandidateSearch("")
   }
 
   // ── Select Exam ──
@@ -225,6 +249,24 @@ export default function CandidateExamDetailsPage() {
   // ── Refresh ──
   const handleRefresh = () => {
     if (selectedCandidateId && selectedExamId > 0) loadDetails()
+  }
+
+  // ── AI Analysis ──
+  const handleGenerateAiAnalysis = async () => {
+    if (!data?.proctor?.sessionId) return
+    try {
+      setAiAnalysisLoading(true)
+      setAiAnalysisError(null)
+      const analysis = await getAiProctorAnalysis(String(data.proctor.sessionId))
+      setAiAnalysis(analysis)
+      toast.success(isRtl ? "تم إنشاء تحليل الذكاء الاصطناعي" : "AI analysis generated successfully")
+    } catch (error: any) {
+      const msg = error?.message || (isRtl ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
+      setAiAnalysisError(msg)
+      toast.error(msg)
+    } finally {
+      setAiAnalysisLoading(false)
+    }
   }
 
   // ── Map events to shared component shape ──
@@ -271,42 +313,66 @@ export default function CandidateExamDetailsPage() {
       {showSearch && (
         <Card>
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Candidate Search */}
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] gap-4">
+              {/* Candidate Searchable Dropdown */}
               <div className="space-y-2">
-                <Label>{isRtl ? "البحث عن مرشح" : "Search Candidate"}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={isRtl ? "الاسم، البريد، الرقم..." : "Name, email, roll no..."}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && searchCandidates()}
-                  />
-                  <Button size="sm" onClick={searchCandidates} disabled={isSearching}>
-                    {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                  </Button>
-                </div>
-                {/* Search Results Dropdown */}
-                {searchResults.length > 0 && (
-                  <div className="border rounded-md max-h-48 overflow-y-auto bg-background shadow-sm">
-                    {searchResults.map(c => (
-                      <button
-                        key={c.id}
-                        className="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm border-b last:border-b-0 transition-colors"
-                        onClick={() => handleSelectCandidate(c)}
-                      >
-                        <div className="font-medium">{isRtl ? (c.fullNameAr || c.fullName) : c.fullName}</div>
-                        <div className="text-muted-foreground text-xs">{c.email} {c.rollNo ? `· ${c.rollNo}` : ""}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {selectedCandidateName && (
-                  <div className="text-sm text-muted-foreground flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    <span className="font-medium">{selectedCandidateName}</span>
-                  </div>
-                )}
+                <Label>{isRtl ? "اختر المرشح" : "Select Candidate"}</Label>
+                <Popover open={candidateDropdownOpen} onOpenChange={setCandidateDropdownOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={candidateDropdownOpen}
+                      className="w-full justify-between font-normal"
+                    >
+                      {selectedCandidateName ? (
+                        <span className="truncate">{selectedCandidateName}</span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {isRtl ? "اختر مرشح..." : "Select candidate..."}
+                        </span>
+                      )}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <div className="flex items-center border-b px-3">
+                      <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      <input
+                        className="flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                        placeholder={isRtl ? "ابحث بالاسم، البريد، الرقم..." : "Search name, email, roll no..."}
+                        value={candidateSearch}
+                        onChange={e => setCandidateSearch(e.target.value)}
+                      />
+                      {isSearching && <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />}
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {candidateList.length === 0 ? (
+                        <div className="py-6 text-center text-sm text-muted-foreground">
+                          {isRtl ? "لا توجد نتائج" : "No candidates found"}
+                        </div>
+                      ) : (
+                        candidateList.map(c => (
+                          <button
+                            key={c.id}
+                            className={`w-full text-left px-3 py-2 text-sm transition-colors flex items-start gap-2 ${
+                              selectedCandidateId === c.id
+                                ? "bg-primary/10"
+                                : "hover:bg-muted/50"
+                            }`}
+                            onClick={() => handleSelectCandidate(c)}
+                          >
+                            <Check className={`mt-0.5 h-4 w-4 shrink-0 ${selectedCandidateId === c.id ? "opacity-100 text-primary" : "opacity-0"}`} />
+                            <div className="min-w-0">
+                              <div className="font-medium truncate">{isRtl ? (c.fullNameAr || c.fullName) : c.fullName}</div>
+                              <div className="text-muted-foreground text-xs truncate">{c.email}{c.rollNo ? ` · ${c.rollNo}` : ""}</div>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Exam Selector */}
@@ -317,7 +383,7 @@ export default function CandidateExamDetailsPage() {
                   onValueChange={handleSelectExam}
                   disabled={!selectedCandidateId}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={isRtl ? "اختر اختبار..." : "Choose exam..."} />
                   </SelectTrigger>
                   <SelectContent>
@@ -346,7 +412,7 @@ export default function CandidateExamDetailsPage() {
                   onValueChange={v => handleSwitchAttempt(v === "latest" ? "0" : v)}
                   disabled={!data?.hasAttempts}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={isRtl ? "الأحدث" : "Latest"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -492,12 +558,10 @@ export default function CandidateExamDetailsPage() {
 
                   {/* Quick Navigation Links */}
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {data.resultInfo?.resultId && (
+                    {data.attemptSummary && (
                       <Button variant="outline" size="sm" asChild>
                         <a
-                          href={`/results/view/${data.exam.examId}/${data.candidate.candidateId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={`/results/review/${data.exam.examId}/${data.candidate.candidateId}`}
                         >
                           <FileText className="h-3 w-3 mr-1" />
                           {isRtl ? "النتيجة" : "Result"}
@@ -508,25 +572,10 @@ export default function CandidateExamDetailsPage() {
                     {data.resultInfo?.gradingSessionId && (
                       <Button variant="outline" size="sm" asChild>
                         <a
-                          href={`/grading/review/${data.resultInfo.gradingSessionId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={`/grading/${data.resultInfo.gradingSessionId}`}
                         >
                           <CheckCircle className="h-3 w-3 mr-1" />
-                          {isRtl ? "التصحيح" : "Grading"}
-                          <ExternalLink className="h-3 w-3 ml-1" />
-                        </a>
-                      </Button>
-                    )}
-                    {data.resultInfo?.certificateId && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={`/certificates/${data.resultInfo.certificateId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ClipboardCheck className="h-3 w-3 mr-1" />
-                          {isRtl ? "الشهادة" : "Certificate"}
+                          {isRtl ? "التصحيح" : "Grade"}
                           <ExternalLink className="h-3 w-3 ml-1" />
                         </a>
                       </Button>
@@ -538,7 +587,7 @@ export default function CandidateExamDetailsPage() {
           </Card>
 
           {/* ── Section B: Attempt Overview ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Status & Timing */}
             <Card>
               <CardHeader className="pb-2">
@@ -563,12 +612,13 @@ export default function CandidateExamDetailsPage() {
                   <span className="text-muted-foreground">{isRtl ? "المدة الكلية" : "Total Duration"}</span>
                   <span>{formatSeconds(data.attemptSummary.totalDurationSeconds)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{isRtl ? "المتبقي" : "Remaining"}</span>
-                  <span className={data.attemptSummary.remainingSeconds > 0 && data.attemptSummary.remainingSeconds <= 300 ? "text-red-500 font-medium" : ""}>
-                    {formatSeconds(data.attemptSummary.remainingSeconds)}
-                  </span>
-                </div>
+                {/* Expiry Reason (when status is Expired) */}
+                {data.attemptSummary.statusName === "Expired" && data.attemptSummary.expiryReasonName && data.attemptSummary.expiryReasonName !== "None" && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{isRtl ? "سبب الانتهاء" : "Expiry Reason"}</span>
+                    <span className="text-red-500 text-xs font-medium">{data.attemptSummary.expiryReasonName}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -611,42 +661,6 @@ export default function CandidateExamDetailsPage() {
               </CardContent>
             </Card>
 
-            {/* Schedule / Assignment */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {isRtl ? "الجدول الزمني" : "Schedule"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                {data.assignment ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{isRtl ? "من" : "From"}</span>
-                      <span>{formatDateTime(data.assignment.scheduleFrom, language)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{isRtl ? "إلى" : "To"}</span>
-                      <span>{formatDateTime(data.assignment.scheduleTo, language)}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{isRtl ? "معيّن من" : "Assigned By"}</span>
-                      <span>{data.assignment.assignedBy || "—"}</span>
-                    </div>
-                    <Badge variant={data.assignment.isActive ? "default" : "outline"} className="text-xs">
-                      {data.assignment.isActive ? (isRtl ? "فعال" : "Active") : (isRtl ? "غير فعال" : "Inactive")}
-                    </Badge>
-                  </>
-                ) : (
-                  <p className="text-muted-foreground italic">
-                    {isRtl ? "لا يوجد تعيين" : "No assignment record"}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Proctor Summary Counters */}
             <Card>
               <CardHeader className="pb-2">
@@ -660,7 +674,7 @@ export default function CandidateExamDetailsPage() {
                   <>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">{isRtl ? "الوضع" : "Mode"}</span>
-                      <span>{data.proctor.modeName}</span>
+                      <span>{isRtl ? "كامل" : "Full"}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">{isRtl ? "الأحداث" : "Events"}</span>
@@ -739,6 +753,138 @@ export default function CandidateExamDetailsPage() {
             </Card>
           )}
 
+          {/* ── AI Proctor Report ── */}
+          {data.proctor && (
+            <Card className="border-purple-500/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Brain className="h-5 w-5 text-purple-500" />
+                  {isRtl ? "تقرير المراقبة بالذكاء الاصطناعي" : "AI Proctor Report"}
+                  <Badge variant="outline" className="ms-auto bg-purple-500/10 border-purple-500/30 text-purple-600 text-[10px]">
+                    <Sparkles className="h-3 w-3 me-1" />
+                    GPT-4o
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {isRtl ? "تحليل المخاطر بالذكاء الاصطناعي — استشاري فقط" : "AI-powered risk analysis — advisory only"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Generate Button */}
+                {!aiAnalysis && !aiAnalysisLoading && (
+                  <div className="text-center py-4">
+                    <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500/30" />
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {isRtl
+                        ? "إنشاء تحليل بالذكاء الاصطناعي لأنماط المخاطر والسلوك في هذه الجلسة"
+                        : "Generate an AI-powered analysis of this session's risk and behavior patterns"}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateAiAnalysis}
+                      className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                      {isRtl ? "إنشاء تحليل الذكاء الاصطناعي" : "Generate AI Analysis"}
+                    </Button>
+                    {aiAnalysisError && (
+                      <p className="text-xs text-destructive mt-2">{aiAnalysisError}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Loading */}
+                {aiAnalysisLoading && (
+                  <div className="text-center py-6">
+                    <Loader2 className="h-6 w-6 mx-auto mb-2 text-purple-500 animate-spin" />
+                    <p className="text-xs text-muted-foreground">
+                      {isRtl ? "جارٍ تحليل الجلسة بالذكاء الاصطناعي..." : "Analyzing session with AI..."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Analysis Results */}
+                {aiAnalysis && !aiAnalysisLoading && (
+                  <div className="space-y-3">
+                    {/* Risk Level & Confidence */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{isRtl ? "مستوى الخطورة" : "Risk Level"}</span>
+                      <Badge variant="outline" className={
+                        aiAnalysis.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                        aiAnalysis.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
+                        aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
+                        "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+                      }>
+                        {aiAnalysis.riskLevel}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{isRtl ? "الثقة" : "Confidence"}</span>
+                      <span className="text-sm font-medium">{aiAnalysis.confidence}%</span>
+                    </div>
+
+                    {/* Risk Explanation */}
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">{isRtl ? "شرح الخطورة" : "Risk Explanation"}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis.riskExplanation}</p>
+                    </div>
+
+                    {/* Suspicious Behaviors */}
+                    {aiAnalysis.suspiciousBehaviors?.length > 0 && (
+                      <div className="pt-2 border-t">
+                        <p className="text-sm font-medium mb-1.5">{isRtl ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}</p>
+                        <ul className="space-y-1">
+                          {aiAnalysis.suspiciousBehaviors.map((behavior, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
+                              <span>{behavior}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Recommendation */}
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">{isRtl ? "التوصية" : "Recommendation"}</p>
+                      <div className="flex items-start gap-1.5 p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
+                        <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
+                        <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
+                      </div>
+                    </div>
+
+                    {/* Detailed Analysis (collapsible) */}
+                    {aiAnalysis.detailedAnalysis && (
+                      <details className="pt-2 border-t">
+                        <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors">
+                          {isRtl ? "التحليل التفصيلي" : "Detailed Analysis"}
+                        </summary>
+                        <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis.detailedAnalysis}</p>
+                      </details>
+                    )}
+
+                    {/* Regenerate */}
+                    <div className="pt-2 border-t flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">
+                        {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleString(isRtl ? "ar-SA" : "en-US") : ""}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleGenerateAiAnalysis}
+                        className="h-7 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-500/10"
+                      >
+                        <Sparkles className="h-3 w-3 me-1" />
+                        {isRtl ? "إعادة إنشاء" : "Regenerate"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* ── Section C: Proctor Media ── */}
           {data.proctor && (data.proctor.video || data.proctor.screenshots.length > 0) && (
             <Card>
@@ -804,8 +950,21 @@ export default function CandidateExamDetailsPage() {
                           className="group relative border rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
                           onClick={() => setScreenshotPreview(screenshotPreview === ss.id ? null : ss.id)}
                         >
-                          <div className="aspect-video bg-muted flex items-center justify-center">
-                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
+                            {ss.previewUrl ? (
+                              <img
+                                src={ss.previewUrl}
+                                alt={ss.fileName || "Screenshot"}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const el = e.target as HTMLImageElement;
+                                  el.style.display = "none";
+                                  el.parentElement!.querySelector(".fallback-icon")?.classList.remove("hidden");
+                                }}
+                              />
+                            ) : null}
+                            <ImageIcon className={`h-6 w-6 text-muted-foreground fallback-icon ${ss.previewUrl ? "hidden" : ""}`} />
                           </div>
                           <div className="p-1.5">
                             <p className="text-[10px] text-muted-foreground truncate">

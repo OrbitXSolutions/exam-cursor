@@ -47,6 +47,20 @@ public class ProctorController : ControllerBase
     }
 
     /// <summary>
+    /// Update device info for an existing proctor session (client-side fields)
+    /// </summary>
+    [HttpPatch("session/device-info")]
+    public async Task<IActionResult> UpdateSessionDeviceInfo([FromBody] UpdateSessionDeviceInfoDto dto)
+    {
+        var candidateId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(candidateId))
+            return Unauthorized();
+
+        var result = await _proctorService.UpdateSessionDeviceInfoAsync(dto, candidateId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
     /// Get proctor session by ID
     /// </summary>
     [HttpGet("session/{sessionId}")]

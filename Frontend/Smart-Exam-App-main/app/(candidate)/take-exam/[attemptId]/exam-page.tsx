@@ -38,8 +38,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks, Calculator } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
+import { ImageZoomModal } from "./image-zoom-modal"
+import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -87,6 +89,9 @@ export default function ExamPage() {
   // Summary panel state
   const [showSummary, setShowSummary] = useState(false)
 
+  // Calculator state
+  const [showCalculator, setShowCalculator] = useState(false)
+
   // Auto-save indicator state
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
   const saveStatusTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -101,6 +106,8 @@ export default function ExamPage() {
   // Proctor warning state
   const [proctorWarningOpen, setProctorWarningOpen] = useState(false)
   const [proctorWarningMessage, setProctorWarningMessage] = useState("")
+  const [lastWarningOpen, setLastWarningOpen] = useState(false)
+  const [lastWarningMessage, setLastWarningMessage] = useState("")
 
   // SignalR connection state — drives smart polling
   const [signalRConnected, setSignalRConnected] = useState(false)
@@ -136,6 +143,21 @@ export default function ExamPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const flatQuestions = session?.questions || []
   const currentFlatQuestion = flatQuestions[currentQuestionIndex]
+
+  // Calculator context: check if calculator is allowed in the current view
+  const isCalculatorAllowedInContext = hasSections
+    ? !!(currentSection && (
+        currentSection.questions?.some(q => q.isCalculatorAllowed) ||
+        currentSection.topics?.some(t => t.questions?.some(q => q.isCalculatorAllowed))
+      ))
+    : !!(currentFlatQuestion?.isCalculatorAllowed)
+
+  // Auto-hide calculator when navigating to context that doesn't allow it
+  useEffect(() => {
+    if (!isCalculatorAllowedInContext && showCalculator) {
+      setShowCalculator(false)
+    }
+  }, [isCalculatorAllowedInContext, currentSectionId, currentQuestionIndex])
 
   // Check if can navigate back
   const canNavigateBack = useCallback(() => {
@@ -446,11 +468,16 @@ export default function ExamPage() {
                   onStatusChange: (status) => {
                     console.log("[Proctor] WebRTC publisher status:", status)
                   },
-                  onWarningReceived: (message) => {
+                  onWarningReceived: (message, isLastWarning) => {
                     // Instant warning via SignalR — same UI as polled warnings
                     playWarningBeep()
-                    setProctorWarningMessage(message)
-                    setProctorWarningOpen(true)
+                    if (isLastWarning) {
+                      setLastWarningMessage(message)
+                      setLastWarningOpen(true)
+                    } else {
+                      setProctorWarningMessage(message)
+                      setProctorWarningOpen(true)
+                    }
                   },
                   onSignalRStatusChange: (connected) => {
                     console.log(`[SmartPoll] SignalR status changed: connected=${connected}`)
@@ -460,9 +487,7 @@ export default function ExamPage() {
                     console.log(`[SmartPoll] Termination received via SignalR: "${reason}"`)
                     stopAllBackgroundActivity()
                     toast.error(
-                      reason
-                        ? `${t("exam.terminatedByProctor")}: ${reason}`
-                        : t("exam.terminatedByProctor"),
+                      reason ?? t("exam.terminatedByProctor"),
                       { duration: 10000 }
                     )
                     router.push("/my-exams")
@@ -751,9 +776,7 @@ export default function ExamPage() {
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason
-              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-              : t("exam.terminatedByProctor"),
+            status.terminationReason ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
@@ -761,8 +784,13 @@ export default function ExamPage() {
         }
         if (status.hasWarning && status.warningMessage) {
           playWarningBeep()
-          setProctorWarningMessage(status.warningMessage)
-          setProctorWarningOpen(true)
+          if (status.warningMessage.includes("LAST WARNING")) {
+            setLastWarningMessage(status.warningMessage)
+            setLastWarningOpen(true)
+          } else {
+            setProctorWarningMessage(status.warningMessage)
+            setProctorWarningOpen(true)
+          }
         }
       } catch {
         // Silent fail — don't disrupt exam start
@@ -959,9 +987,7 @@ export default function ExamPage() {
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason
-              ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-              : t("exam.terminatedByProctor"),
+            status.terminationReason ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
@@ -969,8 +995,13 @@ export default function ExamPage() {
         }
         if (status.hasWarning && status.warningMessage) {
           playWarningBeep()
-          setProctorWarningMessage(status.warningMessage)
-          setProctorWarningOpen(true)
+          if (status.warningMessage.includes("LAST WARNING")) {
+            setLastWarningMessage(status.warningMessage)
+            setLastWarningOpen(true)
+          } else {
+            setProctorWarningMessage(status.warningMessage)
+            setProctorWarningOpen(true)
+          }
         }
       }).catch(() => {})
     } else {
@@ -983,9 +1014,7 @@ export default function ExamPage() {
             if (status.isTerminated) {
               stopAllBackgroundActivity()
               toast.error(
-                status.terminationReason
-                  ? `${t("exam.terminatedByProctor")}: ${status.terminationReason}`
-                  : t("exam.terminatedByProctor"),
+                status.terminationReason ?? t("exam.terminatedByProctor"),
                 { duration: 10000 }
               )
               router.push("/my-exams")
@@ -993,8 +1022,13 @@ export default function ExamPage() {
             }
             if (status.hasWarning && status.warningMessage) {
               playWarningBeep()
-              setProctorWarningMessage(status.warningMessage)
-              setProctorWarningOpen(true)
+              if (status.warningMessage.includes("LAST WARNING")) {
+                setLastWarningMessage(status.warningMessage)
+                setLastWarningOpen(true)
+              } else {
+                setProctorWarningMessage(status.warningMessage)
+                setProctorWarningOpen(true)
+              }
             }
           } catch {
             // Silent fail — don't disrupt exam
@@ -1369,6 +1403,19 @@ export default function ExamPage() {
               </span>
             </div>
 
+            {/* Calculator Toggle - shown only when current section/question allows it */}
+            {isCalculatorAllowedInContext && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCalculator(!showCalculator)}
+                className={cn("gap-1.5", showCalculator && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
+              >
+                <Calculator className="h-4 w-4" />
+                <span className="hidden sm:inline">{language === "ar" ? "آلة حاسبة" : "Calculator"}</span>
+              </Button>
+            )}
+
             {/* Summary Toggle */}
             <Button
               variant="outline"
@@ -1514,7 +1561,14 @@ export default function ExamPage() {
                   {t("common.previous")}
                 </Button>
 
-                <div className="text-center">
+                <div className="flex items-center gap-3">
+                  {/* Calculator button — only if current question allows it */}
+                  {currentFlatQuestion?.isCalculatorAllowed && (
+                    <CalculatorButton
+                      isOpen={showCalculator}
+                      onClick={() => setShowCalculator(prev => !prev)}
+                    />
+                  )}
                   <p className="text-sm font-medium">
                     Question {currentQuestionIndex + 1} {t("exam.of")} {flatQuestions.length}
                   </p>
@@ -1745,6 +1799,11 @@ export default function ExamPage() {
         )}
       </div>
 
+      {/* Floating Calculator */}
+      {showCalculator && (
+        <ExamCalculator onClose={() => setShowCalculator(false)} />
+      )}
+
       {/* Submit confirmation dialog */}
       <AlertDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
         <AlertDialogContent>
@@ -1879,6 +1938,36 @@ export default function ExamPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setProctorWarningOpen(false)}>
+              {t("exam.understood") || "I Understand"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Last Warning Dialog — blocking modal before auto-termination */}
+      <AlertDialog open={lastWarningOpen}>
+        <AlertDialogContent className="border-red-300 dark:border-red-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-6 w-6" />
+              {t("exam.lastWarningTitle") || "⚠ FINAL WARNING"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                  {lastWarningMessage}
+                </div>
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  {t("exam.lastWarningNote") || "The next violation will automatically terminate your exam. Please correct your behavior immediately."}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setLastWarningOpen(false)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
               {t("exam.understood") || "I Understand"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -2148,6 +2237,11 @@ function QuestionCard({
 }) {
   const questionBody = getLocalizedField(question, "body", language)
 
+  // Find primary image attachment for the question
+  const primaryImage = question.attachments?.find((a: any) => a.isPrimary && a.fileType?.toLowerCase().includes('image'))
+  const anyImage = !primaryImage ? question.attachments?.find((a: any) => a.fileType?.toLowerCase().includes('image')) : null
+  const questionImage = primaryImage || anyImage
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="border-b bg-muted/20 py-3">
@@ -2176,6 +2270,17 @@ function QuestionCard({
             <Flag className={cn("h-4 w-4", isFlagged && "fill-orange-600 text-orange-600")} />
           </Button>
         </div>
+
+        {/* Question Image — shown inside the question area, above options */}
+        {questionImage && (
+          <div className="mt-3 flex justify-center overflow-hidden rounded-lg border bg-muted/30">
+            <ImageZoomModal
+              src={questionImage.filePath}
+              alt="Question image"
+              thumbnailClassName="max-h-64 w-auto object-contain"
+            />
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="py-4">

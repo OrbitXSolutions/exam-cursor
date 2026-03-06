@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import dynamic from "next/dynamic"
 import { useI18n } from "@/lib/i18n/context"
 import { PageHeader } from "@/components/layout/page-header"
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getQuestionById, deleteQuestion } from "@/lib/api/question-bank"
 import type { Question } from "@/lib/types"
-import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2 } from "lucide-react"
+import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2, Calculator } from "lucide-react"
 import { toast } from "sonner"
 
 // Dynamically import the create page component
@@ -184,6 +185,12 @@ export default function QuestionDetailPage() {
                   <div className="flex items-center gap-2">
                     <StatusBadge status={question.difficultyLevelName} />
                     <StatusBadge status={question.isActive ? "Active" : "Inactive"} />
+                    {question.isCalculatorAllowed && (
+                      <Badge variant="outline" className="gap-1 border-blue-300 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <Calculator className="h-3 w-3" />
+                        Calculator
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -201,6 +208,25 @@ export default function QuestionDetailPage() {
                       <p className="text-lg leading-relaxed">{question.bodyAr}</p>
                     </div>
                   )}
+                  {/* Primary Image / Chart Attachment */}
+                  {question.attachments?.some((a) => a.isPrimary || a.fileType?.toLowerCase().includes("image")) && (() => {
+                    const img = question.attachments.find((a) => a.isPrimary && a.fileType?.toLowerCase().includes("image"))
+                      || question.attachments.find((a) => a.fileType?.toLowerCase().includes("image"))
+                    return img ? (
+                      <div className="mt-3">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">
+                          {language === "ar" ? "صورة / مخطط السؤال" : "Question Image / Chart"}
+                        </p>
+                        <div className="flex justify-center overflow-hidden rounded-lg border bg-muted/30">
+                          <img
+                            src={img.filePath}
+                            alt="Question image"
+                            className="max-h-64 w-auto object-contain"
+                          />
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               </CardContent>
             </Card>
@@ -314,6 +340,15 @@ export default function QuestionDetailPage() {
                           {language === "en" && option.textAr && (
                             <p className="text-sm text-muted-foreground mt-1" dir="rtl">{option.textAr}</p>
                           )}
+                          {option.attachmentPath && (
+                            <div className="mt-2">
+                              <img
+                                src={option.attachmentPath.startsWith('/') || option.attachmentPath.startsWith('http') ? option.attachmentPath : `/media/${option.attachmentPath}`}
+                                alt={`Option ${index + 1} image`}
+                                className="h-20 max-w-[200px] object-cover rounded-md border"
+                              />
+                            </div>
+                          )}
                         </div>
                         {option.isCorrect ? (
                           <Check className="h-5 w-5 text-green-500" />
@@ -335,13 +370,30 @@ export default function QuestionDetailPage() {
                 <CardContent>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {question.attachments.map((attachment) => (
-                      <div key={attachment.id} className="flex items-center gap-3 rounded-lg border p-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                          <FileImage className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{attachment.fileName}</p>
-                          <p className="text-xs text-muted-foreground">{(attachment.fileSize / 1024).toFixed(1)} KB</p>
+                      <div key={attachment.id} className="rounded-lg border overflow-hidden">
+                        {attachment.fileType?.toLowerCase().includes("image") ? (
+                          <div className="relative w-full h-40 bg-muted/30">
+                            <Image
+                              src={attachment.filePath}
+                              alt={attachment.fileName}
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
+                        ) : null}
+                        <div className="flex items-center gap-3 p-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                            <FileImage className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{attachment.fileName}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-muted-foreground">{(attachment.fileSize / 1024).toFixed(1)} KB</p>
+                              {attachment.isPrimary && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Primary</Badge>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}

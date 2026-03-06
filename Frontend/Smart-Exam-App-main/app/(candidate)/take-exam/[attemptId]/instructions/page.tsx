@@ -14,6 +14,7 @@ import {
   logAttemptEvent,
   AttemptEventType,
 } from "@/lib/api/candidate"
+import { updateSessionDeviceInfo } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -167,6 +168,33 @@ export default function ExamInstructionsPage() {
       const request: { accessCode?: string } = accessCode.trim() ? { accessCode: accessCode.trim() } : {}
       const session = await startExam(examId, request)
       console.log("[v0] Exam started, attemptId:", session.attemptId)
+
+      // Send device info to backend (fire-and-forget)
+      try {
+        const ua = navigator.userAgent
+        // Parse browser name/version from UA
+        let browserName = "Unknown"
+        let browserVersion = ""
+        if (ua.includes("Edg/")) { browserName = "Edge"; browserVersion = ua.match(/Edg\/(\S+)/)?.[1] ?? "" }
+        else if (ua.includes("Chrome/")) { browserName = "Chrome"; browserVersion = ua.match(/Chrome\/(\S+)/)?.[1] ?? "" }
+        else if (ua.includes("Firefox/")) { browserName = "Firefox"; browserVersion = ua.match(/Firefox\/(\S+)/)?.[1] ?? "" }
+        else if (ua.includes("Safari/") && !ua.includes("Chrome")) { browserName = "Safari"; browserVersion = ua.match(/Version\/(\S+)/)?.[1] ?? "" }
+        // Parse OS
+        let os = "Unknown"
+        if (ua.includes("Windows NT 10")) os = "Windows 10/11"
+        else if (ua.includes("Windows")) os = "Windows"
+        else if (ua.includes("Mac OS X")) os = "macOS " + (ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, ".") ?? "")
+        else if (ua.includes("Linux")) os = "Linux"
+        else if (ua.includes("Android")) os = "Android"
+        else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
+        updateSessionDeviceInfo({
+          attemptId: session.attemptId,
+          browserName: browserName.trim(),
+          browserVersion: browserVersion.split(" ")[0],
+          operatingSystem: os.trim(),
+          screenResolution: `${screen.width}x${screen.height}`,
+        }).catch((e) => console.warn("[v0] Device info update failed:", e))
+      } catch (e) { console.warn("[v0] Device info collection failed:", e) }
       
       // Request fullscreen before navigating to exam page
       try {
@@ -581,6 +609,19 @@ export default function ExamInstructionsPage() {
                 <p>{t("instructions.securityDesc1")}</p>
                 <p>{t("instructions.securityDesc2")}</p>
               </CardContent>
+            </Card>
+          )}
+
+          {/* Auto-Termination Warning */}
+          {examPreview.accessPolicy.maxViolationWarnings > 0 && (
+            <Card className="border-orange-500/50 bg-orange-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-orange-600 text-base">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t("instructions.autoTerminationWarning")?.replace("{count}", String(examPreview.accessPolicy.maxViolationWarnings))
+                    || `Your exam will be automatically terminated after ${examPreview.accessPolicy.maxViolationWarnings} violations`}
+                </CardTitle>
+              </CardHeader>
             </Card>
           )}
 

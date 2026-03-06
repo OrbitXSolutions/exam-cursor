@@ -34,7 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck } from "lucide-react"
+import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle } from "lucide-react"
 
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
@@ -76,6 +76,7 @@ export default function ExamConfigurationPage() {
     requireWebcam: true,
     requireFullscreen: true,
     browserLockdown: true,
+    maxViolationWarnings: 10,
   })
   
   // Result Message State
@@ -118,6 +119,7 @@ export default function ExamConfigurationPage() {
           requireWebcam: examData.requireWebcam || false,
           requireFullscreen: examData.requireFullscreen || false,
           browserLockdown: examData.browserLockdown || false,
+          maxViolationWarnings: examData.maxViolationWarnings ?? 10,
         })
       }
       
@@ -203,6 +205,7 @@ export default function ExamConfigurationPage() {
         requireWebcam: formData.requireWebcam,
         requireFullscreen: formData.requireFullscreen,
         browserLockdown: formData.browserLockdown,
+        maxViolationWarnings: formData.maxViolationWarnings,
       }
       
       console.log("[v0] Saving exam settings (full payload):", updatePayload)
@@ -607,6 +610,43 @@ export default function ExamConfigurationPage() {
                       checked={formData.browserLockdown}
                       onCheckedChange={(checked) => updateField("browserLockdown", checked)}
                     />
+                  </div>
+
+                  <div className="border-b" />
+
+                  {/* Max Violation Warnings */}
+                  <div className="p-4 border-2 rounded-lg bg-linear-to-r from-orange-50/80 to-red-50/80 dark:from-orange-950/30 dark:to-red-950/30 border-orange-300 dark:border-orange-800">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-orange-600" />
+                        <Label className="text-base font-bold">{t("exams.maxViolationWarnings")}</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{t("exams.maxViolationWarningsDesc")}</p>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={formData.maxViolationWarnings}
+                          onChange={(e) => updateField("maxViolationWarnings", Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+                          className="w-24 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-center font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {formData.maxViolationWarnings === 0
+                            ? (language === "ar" ? "معطل (بدون إنهاء تلقائي)" : "Disabled (no auto-termination)")
+                            : (language === "ar" ? `سيتم إنهاء الاختبار بعد ${formData.maxViolationWarnings} مخالفة` : `Exam will terminate after ${formData.maxViolationWarnings} violations`)}
+                        </span>
+                      </div>
+                      <a
+                        href="/tutorials/exams#section-violation-events"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700 underline underline-offset-2"
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        {t("exams.maxViolationWarningsLearnMore")}
+                      </a>
+                    </div>
                   </div>
                 </div>
                 

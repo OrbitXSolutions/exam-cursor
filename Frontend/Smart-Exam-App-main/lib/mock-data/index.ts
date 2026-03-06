@@ -14,7 +14,7 @@ import type {
   IncidentCase,
   AuditLog,
   ExamSchedule,
-} from "@/lib/types"
+} from "@/lib/types";
 import {
   DifficultyLevel,
   AttemptStatus,
@@ -24,7 +24,7 @@ import {
   IncidentSource,
   IncidentSeverity,
   IncidentStatus,
-} from "@/lib/types"
+} from "@/lib/types";
 
 // Question Categories
 export const mockQuestionCategories: QuestionCategory[] = [
@@ -68,7 +68,7 @@ export const mockQuestionCategories: QuestionCategory[] = [
     updatedDate: null,
     isDeleted: false,
   },
-]
+];
 
 // Question Types
 export const mockQuestionTypes: QuestionType[] = [
@@ -98,29 +98,13 @@ export const mockQuestionTypes: QuestionType[] = [
   },
   {
     id: 4,
-    nameEn: "Short Answer",
-    nameAr: "إجابة قصيرة",
+    nameEn: "Subjective",
+    nameAr: "سؤال مقالي",
     createdDate: "2024-01-01T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
   },
-  {
-    id: 5,
-    nameEn: "Essay",
-    nameAr: "مقالي",
-    createdDate: "2024-01-01T00:00:00Z",
-    updatedDate: null,
-    isDeleted: false,
-  },
-  {
-    id: 6,
-    nameEn: "Numeric",
-    nameAr: "رقمي",
-    createdDate: "2024-01-01T00:00:00Z",
-    updatedDate: null,
-    isDeleted: false,
-  },
-]
+];
 
 // Questions
 export const mockQuestions: Question[] = [
@@ -349,7 +333,7 @@ export const mockQuestions: Question[] = [
     optionsCount: 4,
     attachmentsCount: 0,
   },
-]
+];
 
 // Exam Sections
 export const mockSections: ExamSection[] = [
@@ -383,7 +367,7 @@ export const mockSections: ExamSection[] = [
     totalPoints: 30,
     questions: [],
   },
-]
+];
 
 // Exam Schedules
 export const mockSchedules: ExamSchedule[] = [
@@ -417,7 +401,7 @@ export const mockSchedules: ExamSchedule[] = [
     registeredCount: 20,
     isActive: true,
   },
-]
+];
 
 // Exams
 export const mockExams: Exam[] = [
@@ -566,7 +550,7 @@ export const mockExams: Exam[] = [
     instructions: [],
     accessPolicy: undefined,
   },
-]
+];
 
 // Attempts
 export const mockAttempts: Attempt[] = [
@@ -622,7 +606,7 @@ export const mockAttempts: Attempt[] = [
     score: 65,
     isPassed: true,
   },
-]
+];
 
 // Grading Sessions
 export const mockGradingSessions: GradingSession[] = [
@@ -662,7 +646,7 @@ export const mockGradingSessions: GradingSession[] = [
     manualGradingRequired: 3,
     answers: [],
   },
-]
+];
 
 // Exam Results
 export const mockExamResults: ExamResult[] = [
@@ -682,7 +666,7 @@ export const mockExamResults: ExamResult[] = [
     finalizedAt: "2024-02-01T11:00:00Z",
     publishedAt: "2024-02-02T09:00:00Z",
   },
-]
+];
 
 // Proctor Sessions
 export const mockProctorSessions: ProctorSession[] = [
@@ -728,7 +712,7 @@ export const mockProctorSessions: ProctorSession[] = [
     decisionStatus: ProctorDecisionStatus.RequiresReview,
     decisionStatusName: "Requires Review",
   },
-]
+];
 
 // Incident Cases
 export const mockIncidentCases: IncidentCase[] = [
@@ -750,14 +734,16 @@ export const mockIncidentCases: IncidentCase[] = [
     outcomeName: null,
     titleEn: "Multiple Tab Switches Detected",
     titleAr: "تم اكتشاف تبديل متعدد للتبويبات",
-    summaryEn: "Candidate switched tabs 12 times during the exam, triggering high risk alert",
-    summaryAr: "قام المرشح بتبديل التبويبات 12 مرة أثناء الاختبار مما أدى إلى تنبيه عالي المخاطر",
+    summaryEn:
+      "Candidate switched tabs 12 times during the exam, triggering high risk alert",
+    summaryAr:
+      "قام المرشح بتبديل التبويبات 12 مرة أثناء الاختبار مما أدى إلى تنبيه عالي المخاطر",
     assignedToId: null,
     assignedToName: null,
     createdDate: "2024-02-01T09:30:00Z",
     resolvedDate: null,
   },
-]
+];
 
 // Audit Logs
 export const mockAuditLogs: AuditLog[] = [
@@ -797,19 +783,19 @@ export const mockAuditLogs: AuditLog[] = [
     timestamp: "2024-02-01T09:05:00Z",
     details: '{"examId": 1}',
   },
-]
+];
 
 // Dashboard Stats
 export interface DashboardStats {
-  totalExams: number
-  activeExams: number
-  totalAttempts: number
-  passRate: number
-  pendingGrading: number
-  openIncidents: number
-  attemptsOverTime: { date: string; count: number }[]
-  riskDistribution: { level: string; count: number }[]
-  passRateByExam: { examTitle: string; passRate: number }[]
+  totalExams: number;
+  activeExams: number;
+  totalAttempts: number;
+  passRate: number;
+  pendingGrading: number;
+  openIncidents: number;
+  attemptsOverTime: { date: string; count: number }[];
+  riskDistribution: { level: string; count: number }[];
+  passRateByExam: { examTitle: string; passRate: number }[];
 }
 
 export const mockDashboardStats: DashboardStats = {
@@ -841,4 +827,4 @@ export const mockDashboardStats: DashboardStats = {
     { examTitle: "History", passRate: 71 },
     { examTitle: "Computer Science", passRate: 69 },
   ],
-}
+};

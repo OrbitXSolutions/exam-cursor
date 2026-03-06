@@ -123,8 +123,8 @@ export default function OrganizationPage() {
 
   function getImageUrl(path: string | null): string {
     if (!path) return ""
-    // Path is like /organization/logo.png — proxy through backend
-    return `http://localhost:5221${path}`
+    // Path is like /organization/logo.png — proxy through Next.js API route
+    return `/api/backend-files${path}`
   }
 
   if (loading) {

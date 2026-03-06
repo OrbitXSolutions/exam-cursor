@@ -469,17 +469,11 @@ export default function CandidateResultPage() {
                                 {isPublishing ? <LoadingSpinner size="sm" className="mr-2" /> : <Send className="h-4 w-4 mr-2" />}
                                 {language === "ar" ? "نشر النتيجة" : "Publish Result"}
                               </DropdownMenuItem>
-                              {effectiveExamId && (
-                                <DropdownMenuItem asChild disabled={!canGenerateCertificate(row)} className={!canGenerateCertificate(row) ? "opacity-50" : ""}>
-                                  <Link href={canGenerateCertificate(row) ? `/results/certificate/${effectiveExamId}/${row.candidateId}` : "#"} onClick={(e) => !canGenerateCertificate(row) && e.preventDefault()}>
-                                    <Award className="h-4 w-4 mr-2" />{language === "ar" ? "إنشاء شهادة" : "Generate Certificate"}
-                                  </Link>
-                                </DropdownMenuItem>
-                              )}
+                
                               {row.attemptId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/grading/${row.attemptId}`}>
-                                    <ClipboardCheck className="h-4 w-4 mr-2" />{language === "ar" ? "عرض المحاولة" : "View Attempt"}
+                                    <ClipboardCheck className="h-4 w-4 mr-2" />{language === "ar" ? "عرض التصحيح" : "View Grading"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
@@ -487,18 +481,13 @@ export default function CandidateResultPage() {
                               {effectiveExamId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/results/ai-report/${effectiveExamId}/${row.candidateId}${attemptQuery}`}>
-                                    <Bot className="h-4 w-4 mr-2" />{language === "ar" ? "تقرير المراقبة" : "Proctor Report"}
+                                    <Bot className="h-4 w-4 mr-2" />{language === "ar" ? "تقرير الذكاء الاصطناعي" : "AI Report"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem asChild>
                                 <Link href={`/proctor-center/video/${row.candidateId}${attemptQuery}`}>
-                                  <Video className="h-4 w-4 mr-2" />{language === "ar" ? "فيديو المرشح" : "Candidate Video"}
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link href={`/proctor-center/stream/${row.candidateId}${attemptQuery}`}>
-                                  <Monitor className="h-4 w-4 mr-2" />{language === "ar" ? "بث الشاشة" : "Screen Streaming"}
+                                  <Video className="h-4 w-4 mr-2" />{language === "ar" ? "وسائط المحاولة" : "Attempt Media"}
                                 </Link>
                               </DropdownMenuItem>
                             </DropdownMenuContent>

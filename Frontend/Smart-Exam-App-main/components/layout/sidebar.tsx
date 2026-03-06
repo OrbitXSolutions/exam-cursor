@@ -49,11 +49,18 @@ import {
   PlayCircle,
   ClipboardCheck,
   Building2,
+  Landmark,
   Wrench,
   ShieldCheck,
   ShieldAlert,
   Copy,
   Sparkles,
+  HelpCircle,
+  Bell,
+  Send,
+  ScrollText,
+  Bug,
+  Activity,
 } from "lucide-react"
 
 interface NavItem {
@@ -157,7 +164,6 @@ const candidatesNavGroup: NavGroup = {
     { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
     { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
     { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
-    { icon: Shield, labelKey: "nav.examControl", href: "/candidates/exam-control" },
     { icon: Wrench, labelKey: "nav.examOperations", href: "/candidates/exam-operations" },
     { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
   ],
@@ -171,10 +177,44 @@ const administrationNavGroup: NavGroup = {
   children: [
     { icon: Users, labelKey: "nav.users", href: "/users", exact: true },
     { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
+    { icon: Landmark, labelKey: "nav.departments", href: "/departments" },
     { icon: Building2, labelKey: "nav.organization", href: "/organization" },
-    { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Settings, labelKey: "nav.settings", href: "/settings" },
   ],
+}
+
+// NEW: Notifications group
+const notificationsNavGroup: NavGroup = {
+  icon: Bell,
+  labelKey: "nav.notifications",
+  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  children: [
+    { icon: Settings, labelKey: "nav.notificationSettings", href: "/notifications/settings" },
+    { icon: FileText, labelKey: "nav.notificationTemplates", href: "/notifications/templates" },
+    { icon: ScrollText, labelKey: "nav.notificationLog", href: "/notifications/logs" },
+  ],
+}
+
+// NEW: System Logs group
+const logsNavGroup: NavGroup = {
+  icon: Activity,
+  labelKey: "nav.logs",
+  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  children: [
+    { icon: FileText, labelKey: "nav.audit", href: "/audit" },
+    { icon: Users, labelKey: "nav.candidateLogs", href: "/logs/candidate" },
+    { icon: Eye, labelKey: "nav.proctorLogs", href: "/logs/proctor" },
+    { icon: UserCog, labelKey: "nav.userLogs", href: "/logs/users" },
+    { icon: Bug, labelKey: "nav.developerLogs", href: "/logs/developer" },
+  ],
+}
+
+// User Guide / Tutorials - visible to all non-candidate roles
+const userGuideNavItem: NavItem = {
+  icon: HelpCircle,
+  labelKey: "nav.userGuide",
+  href: "/tutorials",
+  roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor, UserRole.Proctor, UserRole.ProctorReviewer, UserRole.Examiner, UserRole.Auditor],
 }
 
 export function Sidebar() {
@@ -202,6 +242,8 @@ export function Sidebar() {
     proctor: proctorNavGroup,
     candidates: candidatesNavGroup,
     administration: administrationNavGroup,
+    notifications: notificationsNavGroup,
+    logs: logsNavGroup,
   }), [])
 
   // Compute which groups should be expanded based on current route
@@ -213,6 +255,8 @@ export function Sidebar() {
       proctor: false,
       candidates: false,
       administration: false,
+      notifications: false,
+      logs: false,
     }
     
     // Check if current route is inside any group
@@ -253,6 +297,9 @@ export function Sidebar() {
       return item.roles.some((role) => hasRole(role))
     })
   }
+
+  // Check if user guide should show (must be after filterByRole)
+  const showUserGuide = !hasRole(UserRole.Candidate) && filterByRole([userGuideNavItem]).length > 0
 
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = item.exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(`${item.href}/`))
@@ -513,6 +560,42 @@ export function Sidebar() {
                   </div>
                 )}
                 <NavGroupBlock group={administrationNavGroup} groupKey="administration" />
+              </>
+            )}
+
+            {/* Notifications (expandable) */}
+            {showGroup(notificationsNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "الإشعارات" : "Notifications"}
+                  </div>
+                )}
+                <NavGroupBlock group={notificationsNavGroup} groupKey="notifications" />
+              </>
+            )}
+
+            {/* System Logs (expandable) */}
+            {showGroup(logsNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "سجلات النظام" : "System Logs"}
+                  </div>
+                )}
+                <NavGroupBlock group={logsNavGroup} groupKey="logs" />
+              </>
+            )}
+
+            {/* User Guide */}
+            {showUserGuide && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "المساعدة" : "Help"}
+                  </div>
+                )}
+                <NavLink item={userGuideNavItem} />
               </>
             )}
           </nav>

@@ -232,8 +232,8 @@ export interface Question {
   difficultyLevel: DifficultyLevel;
   difficultyLevelName: string;
   isActive: boolean;
+  isCalculatorAllowed: boolean;
   createdDate: string;
-  updatedDate: string | null;
   isDeleted: boolean;
   options: QuestionOption[];
   attachments: QuestionAttachment[];
@@ -428,6 +428,7 @@ export interface Exam {
   sectionsCount: number;
   questionsCount: number;
   totalPoints: number;
+  accessPolicyStatus?: string; // "Public" | "Assigned"
   sections: ExamSection[];
   instructions: ExamInstruction[];
   accessPolicy: ExamAccessPolicy | null;

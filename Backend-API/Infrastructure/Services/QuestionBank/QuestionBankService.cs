@@ -1,8 +1,12 @@
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.QuestionBank;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.QuestionBank;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,10 +15,38 @@ namespace Smart_Core.Infrastructure.Services.QuestionBank;
 public class QuestionBankService : IQuestionBankService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
-    public QuestionBankService(ApplicationDbContext context)
+    public QuestionBankService(
+        ApplicationDbContext context,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+        _cache = cache;
+    }
+
+    private void InvalidateQuestionCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.QuestionsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
     }
 
     #region Questions
@@ -34,6 +66,16 @@ public class QuestionBankService : IQuestionBankService
         if (searchDto.IncludeDeleted)
         {
             query = query.IgnoreQueryFilters();
+        }
+
+        // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(x => x.Subject.DepartmentId == userDepartmentId.Value);
+            }
         }
 
         // Search filter (searches both English and Arabic)
@@ -109,8 +151,8 @@ public class QuestionBankService : IQuestionBankService
             Points = x.Points,
             DifficultyLevel = x.DifficultyLevel,
             IsActive = x.IsActive,
+            IsCalculatorAllowed = x.IsCalculatorAllowed,
             CreatedDate = x.CreatedDate,
-            OptionsCount = x.Options.Count,
             AttachmentsCount = x.Attachments.Count
         }).ToList();
 
@@ -142,6 +184,16 @@ public class QuestionBankService : IQuestionBankService
             return ApiResponse<QuestionDto>.FailureResponse("Question not found");
         }
 
+        // Department isolation check via Subject
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.Subject != null && entity.Subject.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionDto>.FailureResponse("You do not have access to this question");
+            }
+        }
+
         var dto = new QuestionDto
         {
             Id = entity.Id,
@@ -164,8 +216,8 @@ public class QuestionBankService : IQuestionBankService
             Points = entity.Points,
             DifficultyLevel = entity.DifficultyLevel,
             IsActive = entity.IsActive,
+            IsCalculatorAllowed = entity.IsCalculatorAllowed,
             CreatedDate = entity.CreatedDate,
-            UpdatedDate = entity.UpdatedDate,
             IsDeleted = entity.IsDeleted,
             Options = entity.Options.Select(o => new QuestionOptionDto
             {
@@ -248,8 +300,8 @@ public class QuestionBankService : IQuestionBankService
             Points = dto.Points,
             DifficultyLevel = dto.DifficultyLevel,
             IsActive = dto.IsActive,
+            IsCalculatorAllowed = dto.IsCalculatorAllowed,
             CreatedDate = DateTime.UtcNow,
-            CreatedBy = createdBy
         };
 
         // Add options if provided
@@ -291,6 +343,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.Questions.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionByIdAsync(entity.Id);
     }
@@ -352,8 +405,8 @@ public class QuestionBankService : IQuestionBankService
         entity.Points = dto.Points;
         entity.DifficultyLevel = dto.DifficultyLevel;
         entity.IsActive = dto.IsActive;
+        entity.IsCalculatorAllowed = dto.IsCalculatorAllowed;
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = updatedBy;
 
         // Upsert answer key if provided
         if (dto.AnswerKey != null)
@@ -394,6 +447,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionByIdAsync(entity.Id);
     }
@@ -415,6 +469,7 @@ public class QuestionBankService : IQuestionBankService
         // Hard delete - cascade will handle options, attachments, and answer key
         _context.Questions.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Question deleted successfully");
     }
@@ -433,6 +488,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var status = entity.IsActive ? "activated" : "deactivated";
         return ApiResponse<bool>.SuccessResponse(true, $"Question {status} successfully");
@@ -440,7 +496,19 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<int>> GetQuestionsCountAsync(int? subjectId, int? topicId)
     {
-        var query = _context.Questions.Where(q => q.IsActive && !q.IsDeleted);
+        var query = _context.Questions
+            .Include(q => q.Subject)
+            .Where(q => q.IsActive && !q.IsDeleted);
+
+        // Department isolation
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(q => q.Subject.DepartmentId == userDepartmentId.Value);
+            }
+        }
 
         if (subjectId.HasValue)
         {
@@ -510,6 +578,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionOptions.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var resultDto = new QuestionOptionDto
         {
@@ -544,6 +613,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var resultDto = new QuestionOptionDto
         {
@@ -573,6 +643,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionOptions.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Option deleted successfully");
     }
@@ -623,6 +694,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionOptionsAsync(dto.QuestionId);
     }
@@ -683,6 +755,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionAttachments.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<QuestionAttachmentDto>.SuccessResponse(
    entity.Adapt<QuestionAttachmentDto>(),
@@ -720,6 +793,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<QuestionAttachmentDto>.SuccessResponse(
             entity.Adapt<QuestionAttachmentDto>(),
@@ -739,6 +813,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionAttachments.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Attachment deleted successfully");
     }
@@ -769,6 +844,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Primary attachment set successfully");
     }

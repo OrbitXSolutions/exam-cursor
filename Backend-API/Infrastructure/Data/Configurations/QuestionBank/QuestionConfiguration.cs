@@ -38,6 +38,9 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.Property(x => x.IsActive)
             .HasDefaultValue(true);
 
+        builder.Property(x => x.IsCalculatorAllowed)
+            .HasDefaultValue(false);
+
         builder.Property(x => x.CreatedBy)
             .HasMaxLength(450);
 

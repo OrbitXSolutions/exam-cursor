@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.CandidateAdmin;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces.CandidateAdmin;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
@@ -17,15 +18,18 @@ public class CandidateAdminService : ICandidateAdminService
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IEncryptionService _encryption;
 
     public CandidateAdminService(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        IEncryptionService encryption)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
+        _encryption = encryption;
     }
 
     // ── List ───────────────────────────────────────────────────
@@ -163,7 +167,8 @@ public class CandidateAdminService : ICandidateAdminService
             IsBlocked = false,
             EmailConfirmed = true,
             CreatedBy = createdBy,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            EncryptedPassword = _encryption.Encrypt(password)
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -465,7 +470,8 @@ public class CandidateAdminService : ICandidateAdminService
                 IsBlocked = false,
                 EmailConfirmed = true,
                 CreatedBy = createdBy,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                EncryptedPassword = _encryption.Encrypt(finalPassword)
             };
 
             var createResult = await _userManager.CreateAsync(user, finalPassword);

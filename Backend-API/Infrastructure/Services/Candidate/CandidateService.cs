@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Candidate;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Grading;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Candidate;
 using Smart_Core.Application.Interfaces.ExamResult;
 using Smart_Core.Application.Interfaces.Grading;
@@ -24,6 +25,7 @@ public class CandidateService : ICandidateService
     private readonly IExamResultService _examResultService;
     private readonly ILogger<CandidateService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ICacheService _cache;
 
     public CandidateService(
         ApplicationDbContext context,
@@ -31,7 +33,8 @@ public class CandidateService : ICandidateService
         IGradingService gradingService,
         IExamResultService examResultService,
         ILogger<CandidateService> logger,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        ICacheService cache)
     {
         _context = context;
         _userManager = userManager;
@@ -39,6 +42,12 @@ public class CandidateService : ICandidateService
         _examResultService = examResultService;
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
+        _cache = cache;
+    }
+
+    private void InvalidateCandidateCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
     }
 
     #region Exam Discovery & Preview
@@ -60,9 +69,27 @@ public class CandidateService : ICandidateService
         // Build query for published + active exams
         var query = _context.Exams
           .Include(e => e.Department)
+          .Include(e => e.AccessPolicy)
  .Include(e => e.Sections.Where(s => !s.IsDeleted))
         .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
-            .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted);
+            .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted)
+            // Double safety: no AccessPolicy record = not visible to candidates
+            .Where(e => e.AccessPolicy != null);
+
+        // Access Policy enforcement:
+        // - If RestrictToAssignedCandidates = true, only show to candidates with ExamAssignment
+        if (isCandidate)
+        {
+            var assignedExamIds = await _context.Set<Domain.Entities.ExamAssignment.ExamAssignment>()
+                .Where(a => a.CandidateId == candidateId && a.IsActive && !a.IsDeleted)
+                .Select(a => a.ExamId)
+                .ToListAsync();
+
+            query = query.Where(e =>
+                e.AccessPolicy!.IsPublic ||
+                (!e.AccessPolicy.RestrictToAssignedCandidates) ||
+                assignedExamIds.Contains(e.Id));
+        }
 
         // Department filtering logic:
         // - If user is Candidate role AND has no department => list all exams (no filter)
@@ -289,7 +316,8 @@ public class CandidateService : ICandidateService
             PreventCopyPaste = exam.PreventCopyPaste,
             PreventScreenCapture = exam.PreventScreenCapture,
             RequireFullscreen = exam.RequireFullscreen,
-            BrowserLockdown = exam.BrowserLockdown
+            BrowserLockdown = exam.BrowserLockdown,
+            MaxViolationWarnings = exam.MaxViolationWarnings
         };
 
         // Check eligibility
@@ -453,6 +481,7 @@ public class CandidateService : ICandidateService
                 existingActive.Status = AttemptStatus.Expired;
                 existingActive.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
                 await _context.SaveChangesAsync();
+                InvalidateCandidateCache();
             }
             else
             {
@@ -512,6 +541,7 @@ public class CandidateService : ICandidateService
 
         _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
+        InvalidateCandidateCache();
 
         // Mark admin override as used (if applicable)
         if (adminOverride != null)
@@ -522,6 +552,7 @@ public class CandidateService : ICandidateService
             adminOverride.UpdatedDate = now;
             adminOverride.UpdatedBy = candidateId;
             await _context.SaveChangesAsync();
+            InvalidateCandidateCache();
         }
 
         // Generate attempt questions
@@ -597,6 +628,7 @@ public class CandidateService : ICandidateService
         _context.Set<AttemptEvent>().Add(startEvent);
 
         await _context.SaveChangesAsync();
+        InvalidateCandidateCache();
 
         // Reload with questions
         var createdAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -639,6 +671,7 @@ public class CandidateService : ICandidateService
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
+            InvalidateCandidateCache();
         }
 
         if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
@@ -690,6 +723,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
+            InvalidateCandidateCache();
             return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
 
@@ -739,6 +773,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         }
 
         await _context.SaveChangesAsync();
+        InvalidateCandidateCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Answers saved successfully");
     }
@@ -800,6 +835,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             attempt.UpdatedDate = now;
             attempt.UpdatedBy = candidateId;
             await _context.SaveChangesAsync();
+            InvalidateCandidateCache();
 
             // Still trigger background grading for expired-then-submitted
             _ = TriggerBackgroundGradingAsync(attemptId, candidateId, attempt.Exam.ShowResults);
@@ -851,6 +887,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         }
 
         await _context.SaveChangesAsync();
+        InvalidateCandidateCache();
 
         _logger.LogInformation("Submit succeeded: Attempt {AttemptId} submitted | CandidateId={CandidateId} | ExamId={ExamId}",
             attemptId, candidateId, attempt.ExamId);
@@ -1771,6 +1808,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 BodyAr = aq.Question.BodyAr,
                 QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
                 QuestionTypeId = aq.Question.QuestionTypeId,
+                IsCalculatorAllowed = aq.Question.IsCalculatorAllowed,
                 SectionId = sectionId,
                 TopicId = topicId,
                 Options = options,

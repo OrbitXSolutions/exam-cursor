@@ -1,114 +1,85 @@
-using System.Text.Json;
-using Microsoft.Extensions.Caching.Distributed;
+using System.Collections.Concurrent;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Smart_Core.Application.Interfaces;
-using StackExchange.Redis;
 
 namespace Smart_Core.Infrastructure.Services;
 
 public class CacheService : ICacheService
 {
-    private readonly IDistributedCache _distributedCache;
-    private readonly IConnectionMultiplexer? _connectionMultiplexer;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<CacheService> _logger;
-    private static readonly TimeSpan DefaultExpiration = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan DefaultExpiration = TimeSpan.FromMinutes(5);
 
-    public CacheService(
-        IDistributedCache distributedCache,
-        ILogger<CacheService> logger,
-        IConnectionMultiplexer? connectionMultiplexer = null)
+    // Track keys so we can support RemoveByPrefix
+    private static readonly ConcurrentDictionary<string, byte> _keys = new();
+
+    public CacheService(IMemoryCache cache, ILogger<CacheService> logger)
     {
-        _distributedCache = distributedCache;
-        _connectionMultiplexer = connectionMultiplexer;
+        _cache = cache;
         _logger = logger;
     }
 
-    public async Task<T?> GetAsync<T>(string key)
+    public T? Get<T>(string key)
     {
-        try
-        {
-            var cachedValue = await _distributedCache.GetStringAsync(key);
-            if (string.IsNullOrEmpty(cachedValue))
-            {
-                return default;
-            }
+        _cache.TryGetValue(key, out T? value);
+        return value;
+    }
 
-            return JsonSerializer.Deserialize<T>(cachedValue);
-        }
-        catch (Exception ex)
+    public bool TryGet<T>(string key, out T? value)
+    {
+        return _cache.TryGetValue(key, out value);
+    }
+
+    public void Set<T>(string key, T value, TimeSpan? expiration = null)
+    {
+        var options = new MemoryCacheEntryOptions
         {
-            _logger.LogWarning(ex, "Failed to get cache for key {Key}", key);
-            return default;
+            AbsoluteExpirationRelativeToNow = expiration ?? DefaultExpiration
+        };
+
+        options.RegisterPostEvictionCallback((evictedKey, _, _, _) =>
+        {
+            _keys.TryRemove(evictedKey.ToString()!, out _);
+        });
+
+        _cache.Set(key, value, options);
+        _keys.TryAdd(key, 0);
+    }
+
+    public void Remove(string key)
+    {
+        _cache.Remove(key);
+        _keys.TryRemove(key, out _);
+    }
+
+    public void RemoveByPrefix(string prefix)
+    {
+        var keysToRemove = _keys.Keys
+            .Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        foreach (var key in keysToRemove)
+        {
+            _cache.Remove(key);
+            _keys.TryRemove(key, out _);
+        }
+
+        if (keysToRemove.Count > 0)
+        {
+            _logger.LogDebug("Removed {Count} cache entries with prefix '{Prefix}'", keysToRemove.Count, prefix);
         }
     }
 
-    public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null)
+    public async Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null)
     {
-        try
+        if (TryGet<T>(key, out var cached) && cached is not null)
         {
-            var options = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = expiration ?? DefaultExpiration
-            };
+            return cached;
+        }
 
-            var serializedValue = JsonSerializer.Serialize(value);
-            await _distributedCache.SetStringAsync(key, serializedValue, options);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to set cache for key {Key}", key);
-        }
-    }
-
-    public async Task RemoveAsync(string key)
-    {
-        try
-        {
-            await _distributedCache.RemoveAsync(key);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to remove cache for key {Key}", key);
-        }
-    }
-
-    public async Task RemoveByPrefixAsync(string prefix)
-    {
-        try
-        {
-            // Only works with Redis - skip if using in-memory cache
-            if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
-            {
-                _logger.LogDebug("RemoveByPrefix skipped - Redis not available. Using in-memory cache.");
-                return;
-            }
-
-            var server = _connectionMultiplexer.GetServer(_connectionMultiplexer.GetEndPoints().First());
-            var keys = server.Keys(pattern: $"SmartCore_{prefix}*").ToArray();
-
-            if (keys.Length > 0)
-            {
-                var db = _connectionMultiplexer.GetDatabase();
-                await db.KeyDeleteAsync(keys);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to remove cache by prefix {Prefix}", prefix);
-        }
-    }
-
-    public async Task<bool> ExistsAsync(string key)
-    {
-        try
-        {
-            var cachedValue = await _distributedCache.GetStringAsync(key);
-            return !string.IsNullOrEmpty(cachedValue);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to check cache existence for key {Key}", key);
-            return false;
-        }
+        var value = await factory();
+        Set(key, value, expiration);
+        return value;
     }
 }

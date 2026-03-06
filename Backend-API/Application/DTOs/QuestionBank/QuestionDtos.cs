@@ -36,6 +36,7 @@ public class QuestionDto
     public DifficultyLevel DifficultyLevel { get; set; }
     public string DifficultyLevelName => DifficultyLevel.ToString();
     public bool IsActive { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
     public bool IsDeleted { get; set; }
@@ -71,6 +72,7 @@ public class QuestionListDto
     public DifficultyLevel DifficultyLevel { get; set; }
     public string DifficultyLevelName => DifficultyLevel.ToString();
     public bool IsActive { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
     public DateTime CreatedDate { get; set; }
     public int OptionsCount { get; set; }
     public int AttachmentsCount { get; set; }
@@ -93,6 +95,7 @@ public class CreateQuestionDto
     public decimal Points { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsCalculatorAllowed { get; set; } = false;
 
     public List<CreateQuestionOptionDto> Options { get; set; } = new();
     public CreateQuestionAnswerKeyDto? AnswerKey { get; set; }
@@ -115,6 +118,7 @@ public class UpdateQuestionDto
     public decimal Points { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public bool IsActive { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
 
     public UpdateQuestionAnswerKeyDto? AnswerKey { get; set; }
 }

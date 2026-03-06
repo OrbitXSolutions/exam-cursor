@@ -74,7 +74,7 @@ export async function addQuestionAttachment(
   questionId: number,
   data: Omit<QuestionAttachment, "id" | "questionId" | "createdDate">,
 ): Promise<QuestionAttachment> {
-  return apiClient.post<QuestionAttachment>(`/QuestionBank/questions/${questionId}/attachments`, data)
+  return apiClient.post<QuestionAttachment>(`/QuestionBank/questions/${questionId}/attachments`, { ...data, questionId })
 }
 
 export async function deleteQuestionAttachment(attachmentId: number): Promise<boolean> {

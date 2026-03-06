@@ -86,6 +86,10 @@ public class CandidateAccessPolicyDto
     public bool PreventScreenCapture { get; set; }
     public bool RequireFullscreen { get; set; }
     public bool BrowserLockdown { get; set; }
+    /// <summary>
+    /// Max countable violations before auto-termination (0 = disabled)
+    /// </summary>
+    public int MaxViolationWarnings { get; set; }
 }
 
 /// <summary>
@@ -323,6 +327,7 @@ public class CandidateQuestionDto
     public string BodyAr { get; set; } = string.Empty;
     public string QuestionTypeName { get; set; } = string.Empty;
     public int QuestionTypeId { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
 
     /// <summary>
     /// Section ID this question belongs to (for reference)

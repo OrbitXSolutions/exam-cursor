@@ -25,9 +25,15 @@ function hexToHSL(hex: string): string | null {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-      case g: h = ((b - r) / d + 2) / 6; break;
-      case b: h = ((r - g) / d + 4) / 6; break;
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
     }
   }
 
@@ -111,11 +117,11 @@ export function useBranding() {
   const hasOrgBranding =
     branding.isActive && branding.name !== "" && branding.name !== "SmartExam";
 
-  // Build the logo URL — org logos are served as static files from backend at /organization/logo.png
+  // Build the logo URL — proxy through /api/backend-files to avoid hardcoding backend host
   const logoSrc = branding.logoUrl
     ? branding.logoUrl.startsWith("http")
       ? branding.logoUrl
-      : `http://localhost:5221${branding.logoUrl}`
+      : `/api/backend-files${branding.logoUrl}`
     : "";
 
   return {

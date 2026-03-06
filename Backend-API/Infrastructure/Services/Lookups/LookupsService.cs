@@ -1,8 +1,12 @@
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Lookups;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Lookups;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Lookups;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,10 +15,40 @@ namespace Smart_Core.Infrastructure.Services.Lookups;
 public class LookupsService : ILookupsService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
-    public LookupsService(ApplicationDbContext context)
+    public LookupsService(
+        ApplicationDbContext context,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+        _cache = cache;
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+    }
+
+    private void InvalidateLookupCache(string prefix)
+    {
+        _cache.RemoveByPrefix(prefix);
+        // Lookups changes may affect question/exam list displays
+        _cache.RemoveByPrefix(CacheKeys.QuestionsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
     }
 
     #region Question Category
@@ -102,6 +136,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionCategories.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<QuestionCategoryDto>.SuccessResponse(
           entity.Adapt<QuestionCategoryDto>(),
@@ -143,6 +178,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<QuestionCategoryDto>.SuccessResponse(
  entity.Adapt<QuestionCategoryDto>(),
@@ -163,6 +199,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionCategories.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question category deleted successfully");
     }
@@ -254,6 +291,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionTypes.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<QuestionTypeDto>.SuccessResponse(
               entity.Adapt<QuestionTypeDto>(),
@@ -295,6 +333,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<QuestionTypeDto>.SuccessResponse(
  entity.Adapt<QuestionTypeDto>(),
@@ -315,6 +354,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionTypes.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question type deleted successfully");
     }
@@ -327,12 +367,23 @@ public class LookupsService : ILookupsService
     {
         var query = _context.QuestionSubjects
             .Include(x => x.Topics)
+            .Include(x => x.Department)
             .AsQueryable();
 
         // Include deleted if requested
         if (searchDto.IncludeDeleted)
         {
             query = query.IgnoreQueryFilters();
+        }
+
+        // Department isolation: filter by user's department (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(x => x.DepartmentId == userDepartmentId.Value);
+            }
         }
 
         // Search filter
@@ -358,6 +409,9 @@ public class LookupsService : ILookupsService
             Id = x.Id,
             NameEn = x.NameEn,
             NameAr = x.NameAr,
+            DepartmentId = x.DepartmentId,
+            DepartmentNameEn = x.Department?.NameEn ?? string.Empty,
+            DepartmentNameAr = x.Department?.NameAr ?? string.Empty,
             TopicsCount = x.Topics.Count(t => !t.IsDeleted),
             CreatedDate = x.CreatedDate,
             UpdatedDate = x.UpdatedDate,
@@ -379,6 +433,7 @@ public class LookupsService : ILookupsService
     {
         var entity = await _context.QuestionSubjects
             .Include(x => x.Topics)
+            .Include(x => x.Department)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity == null)
@@ -386,11 +441,24 @@ public class LookupsService : ILookupsService
             return ApiResponse<QuestionSubjectDto>.FailureResponse("Question subject not found");
         }
 
+        // Department isolation check
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionSubjectDto>.FailureResponse("You do not have access to this subject");
+            }
+        }
+
         var dto = new QuestionSubjectDto
         {
             Id = entity.Id,
             NameEn = entity.NameEn,
             NameAr = entity.NameAr,
+            DepartmentId = entity.DepartmentId,
+            DepartmentNameEn = entity.Department?.NameEn ?? string.Empty,
+            DepartmentNameAr = entity.Department?.NameAr ?? string.Empty,
             TopicsCount = entity.Topics.Count(t => !t.IsDeleted),
             CreatedDate = entity.CreatedDate,
             UpdatedDate = entity.UpdatedDate,
@@ -402,42 +470,59 @@ public class LookupsService : ILookupsService
 
     public async Task<ApiResponse<QuestionSubjectDto>> CreateQuestionSubjectAsync(CreateQuestionSubjectDto dto, string createdBy)
     {
-        // Check for duplicate NameEn
+        // Auto-set DepartmentId from current user's department
+        var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+        if (!userDepartmentId.HasValue)
+        {
+            return ApiResponse<QuestionSubjectDto>.FailureResponse("You must be assigned to a department to create a subject");
+        }
+
+        var departmentId = userDepartmentId.Value;
+
+        // Check for duplicate NameEn within the same department
         var existingEn = await _context.QuestionSubjects
             .IgnoreQueryFilters()
-            .AnyAsync(x => x.NameEn == dto.NameEn);
+            .AnyAsync(x => x.DepartmentId == departmentId && x.NameEn == dto.NameEn);
 
         if (existingEn)
         {
-            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this English name already exists");
+            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this English name already exists in your department");
         }
 
-        // Check for duplicate NameAr
+        // Check for duplicate NameAr within the same department
         var existingAr = await _context.QuestionSubjects
             .IgnoreQueryFilters()
-            .AnyAsync(x => x.NameAr == dto.NameAr);
+            .AnyAsync(x => x.DepartmentId == departmentId && x.NameAr == dto.NameAr);
 
         if (existingAr)
         {
-            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this Arabic name already exists");
+            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this Arabic name already exists in your department");
         }
+
+        // Get department for response
+        var department = await _context.Departments.FindAsync(departmentId);
 
         var entity = new QuestionSubject
         {
             NameEn = dto.NameEn,
             NameAr = dto.NameAr,
+            DepartmentId = departmentId,
             CreatedDate = DateTime.UtcNow,
             CreatedBy = createdBy
         };
 
         _context.QuestionSubjects.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         var resultDto = new QuestionSubjectDto
         {
             Id = entity.Id,
             NameEn = entity.NameEn,
             NameAr = entity.NameAr,
+            DepartmentId = entity.DepartmentId,
+            DepartmentNameEn = department?.NameEn ?? string.Empty,
+            DepartmentNameAr = department?.NameAr ?? string.Empty,
             TopicsCount = 0,
             CreatedDate = entity.CreatedDate,
             UpdatedDate = entity.UpdatedDate,
@@ -451,6 +536,7 @@ public class LookupsService : ILookupsService
     {
         var entity = await _context.QuestionSubjects
             .Include(x => x.Topics)
+            .Include(x => x.Department)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity == null)
@@ -458,24 +544,34 @@ public class LookupsService : ILookupsService
             return ApiResponse<QuestionSubjectDto>.FailureResponse("Question subject not found");
         }
 
-        // Check for duplicate NameEn (excluding current entity)
+        // Department isolation check
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionSubjectDto>.FailureResponse("You do not have access to this subject");
+            }
+        }
+
+        // Check for duplicate NameEn within the same department (excluding current entity)
         var existingEn = await _context.QuestionSubjects
             .IgnoreQueryFilters()
-            .AnyAsync(x => x.NameEn == dto.NameEn && x.Id != id);
+            .AnyAsync(x => x.DepartmentId == entity.DepartmentId && x.NameEn == dto.NameEn && x.Id != id);
 
         if (existingEn)
         {
-            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this English name already exists");
+            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this English name already exists in your department");
         }
 
-        // Check for duplicate NameAr (excluding current entity)
+        // Check for duplicate NameAr within the same department (excluding current entity)
         var existingAr = await _context.QuestionSubjects
             .IgnoreQueryFilters()
-            .AnyAsync(x => x.NameAr == dto.NameAr && x.Id != id);
+            .AnyAsync(x => x.DepartmentId == entity.DepartmentId && x.NameAr == dto.NameAr && x.Id != id);
 
         if (existingAr)
         {
-            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this Arabic name already exists");
+            return ApiResponse<QuestionSubjectDto>.FailureResponse("A question subject with this Arabic name already exists in your department");
         }
 
         entity.NameEn = dto.NameEn;
@@ -484,12 +580,16 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         var resultDto = new QuestionSubjectDto
         {
             Id = entity.Id,
             NameEn = entity.NameEn,
             NameAr = entity.NameAr,
+            DepartmentId = entity.DepartmentId,
+            DepartmentNameEn = entity.Department?.NameEn ?? string.Empty,
+            DepartmentNameAr = entity.Department?.NameAr ?? string.Empty,
             TopicsCount = entity.Topics.Count(t => !t.IsDeleted),
             CreatedDate = entity.CreatedDate,
             UpdatedDate = entity.UpdatedDate,
@@ -527,6 +627,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionSubjects.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question subject deleted successfully");
     }
@@ -545,6 +646,16 @@ public class LookupsService : ILookupsService
         if (searchDto.IncludeDeleted)
         {
             query = query.IgnoreQueryFilters();
+        }
+
+        // Department isolation: filter topics via Subject.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(x => x.Subject.DepartmentId == userDepartmentId.Value);
+            }
         }
 
         // Filter by subject
@@ -606,6 +717,16 @@ public class LookupsService : ILookupsService
             return ApiResponse<QuestionTopicDto>.FailureResponse("Question topic not found");
         }
 
+        // Department isolation check via Subject
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this topic");
+            }
+        }
+
         var dto = new QuestionTopicDto
         {
             Id = entity.Id,
@@ -629,6 +750,16 @@ public class LookupsService : ILookupsService
         if (subject == null)
         {
             return ApiResponse<QuestionTopicDto>.FailureResponse("Subject not found");
+        }
+
+        // Department isolation: ensure subject belongs to user's department
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && subject.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this subject");
+            }
         }
 
         // Check for duplicate NameEn within same subject
@@ -662,6 +793,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionTopics.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         var resultDto = new QuestionTopicDto
         {
@@ -690,6 +822,16 @@ public class LookupsService : ILookupsService
             return ApiResponse<QuestionTopicDto>.FailureResponse("Question topic not found");
         }
 
+        // Department isolation check via Subject
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
+            {
+                return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this topic");
+            }
+        }
+
         // Check if new subject exists (if changed)
         QuestionSubject? subject = entity.Subject;
         if (dto.SubjectId != entity.SubjectId)
@@ -698,6 +840,16 @@ public class LookupsService : ILookupsService
             if (subject == null)
             {
                 return ApiResponse<QuestionTopicDto>.FailureResponse("Subject not found");
+            }
+
+            // Ensure new subject also belongs to user's department
+            if (!await IsCurrentUserSuperDevAsync())
+            {
+                var userDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+                if (userDeptId.HasValue && subject.DepartmentId != userDeptId.Value)
+                {
+                    return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to the target subject");
+                }
             }
         }
 
@@ -728,6 +880,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         var resultDto = new QuestionTopicDto
         {
@@ -766,6 +919,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionTopics.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question topic deleted successfully");
     }

@@ -76,7 +76,12 @@ public enum ExpiryReason : byte
     /// <summary>
     /// Exam EndDateTime passed — the exam availability window closed
     /// </summary>
-    ExamWindowClosed = 3
+    ExamWindowClosed = 3,
+
+    /// <summary>
+    /// Cumulative disconnect time exceeded the allowed budget
+    /// </summary>
+    DisconnectTimeout = 4
 }
 
 /// <summary>
@@ -192,5 +197,10 @@ public enum AttemptEventType : byte
     /// <summary>
     /// AI: Candidate head turned away from screen
     /// </summary>
-    HeadTurnDetected = 22
+    HeadTurnDetected = 22,
+
+    /// <summary>
+    /// Attempt expired due to exceeding disconnect time budget
+    /// </summary>
+    DisconnectExpired = 23
 }

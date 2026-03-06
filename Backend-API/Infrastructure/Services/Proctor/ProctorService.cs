@@ -1,10 +1,14 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Proctor;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Proctor;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
+using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
@@ -15,13 +19,33 @@ public class ProctorService : IProctorService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMediaStorageService _mediaStorage;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
     private const int DefaultHeartbeatIntervalSeconds = 15;
     private const int HeartbeatMissedThresholdSeconds = 45;
 
-    public ProctorService(ApplicationDbContext context, IMediaStorageService mediaStorage)
+    public ProctorService(
+        ApplicationDbContext context,
+        IMediaStorageService mediaStorage,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _mediaStorage = mediaStorage;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+    }
+
+    private async Task<bool> IsCurrentUserSuperDevAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
     }
 
     #region Session Management
@@ -109,6 +133,24 @@ public class ProctorService : IProctorService
             HeartbeatIntervalSeconds = DefaultHeartbeatIntervalSeconds,
             Message = "Proctor session started successfully"
         });
+    }
+
+    public async Task<ApiResponse<bool>> UpdateSessionDeviceInfoAsync(UpdateSessionDeviceInfoDto dto, string candidateId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.AttemptId == dto.AttemptId && s.CandidateId == candidateId);
+
+        if (session == null)
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
+        if (!string.IsNullOrEmpty(dto.BrowserName)) session.BrowserName = dto.BrowserName;
+        if (!string.IsNullOrEmpty(dto.BrowserVersion)) session.BrowserVersion = dto.BrowserVersion;
+        if (!string.IsNullOrEmpty(dto.OperatingSystem)) session.OperatingSystem = dto.OperatingSystem;
+        if (!string.IsNullOrEmpty(dto.ScreenResolution)) session.ScreenResolution = dto.ScreenResolution;
+        if (!string.IsNullOrEmpty(dto.DeviceFingerprint)) session.DeviceFingerprint = dto.DeviceFingerprint;
+
+        await _context.SaveChangesAsync();
+        return ApiResponse<bool>.SuccessResponse(true, "Device info updated");
     }
 
     public async Task<ApiResponse<ProctorSessionDto>> GetSessionAsync(int sessionId)
@@ -207,7 +249,18 @@ public class ProctorService : IProctorService
       .Include(s => s.Candidate)
                   .Include(s => s.Decision)
                   .Include(s => s.EvidenceItems)
+                  .Include(s => s.Attempt)
                   .AsQueryable();
+
+        // Department isolation: filter proctor sessions via Exam.DepartmentId (SuperDev sees all)
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
+            }
+        }
 
         query = ApplySessionFilters(query, searchDto);
         query = query.OrderByDescending(s => s.StartedAt);
@@ -376,6 +429,69 @@ public class ProctorService : IProctorService
         }
 
         var now = DateTime.UtcNow;
+
+        // --- Disconnect budget check ---
+        // If previous heartbeat was stale (gap > threshold), candidate was disconnected
+        if (session.LastHeartbeatAt.HasValue)
+        {
+            var gapSeconds = (int)(now - session.LastHeartbeatAt.Value).TotalSeconds;
+            if (gapSeconds > ExamDefaults.HeartbeatStaleThresholdSeconds)
+            {
+                // Candidate was disconnected — accumulate gap on attempt
+                var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                    .FirstOrDefaultAsync(a => a.Id == session.AttemptId);
+
+                if (attempt != null &&
+                    (attempt.Status == AttemptStatus.InProgress ||
+                     attempt.Status == AttemptStatus.Started ||
+                     attempt.Status == AttemptStatus.Resumed))
+                {
+                    attempt.TotalDisconnectSeconds += gapSeconds;
+                    attempt.DisconnectDetectedAt = null; // candidate is back now
+                    attempt.LastActivityAt = now;
+
+                    // Budget exceeded → expire
+                    if (attempt.TotalDisconnectSeconds > ExamDefaults.MaxDisconnectSeconds)
+                    {
+                        attempt.Status = AttemptStatus.Expired;
+                        attempt.ExpiryReason = ExpiryReason.DisconnectTimeout;
+
+                        session.Status = ProctorSessionStatus.Completed;
+                        session.EndedAt = now;
+                        session.UpdatedDate = now;
+                        session.UpdatedBy = "system";
+
+                        _context.Set<AttemptEvent>().Add(new AttemptEvent
+                        {
+                            AttemptId = attempt.Id,
+                            EventType = AttemptEventType.DisconnectExpired,
+                            OccurredAt = now,
+                            MetadataJson = JsonSerializer.Serialize(new
+                            {
+                                totalDisconnectSeconds = attempt.TotalDisconnectSeconds,
+                                lastGapSeconds = gapSeconds,
+                                maxAllowed = ExamDefaults.MaxDisconnectSeconds
+                            }),
+                            CreatedDate = now,
+                            CreatedBy = "system"
+                        });
+
+                        await _context.SaveChangesAsync();
+
+                        return ApiResponse<HeartbeatResponseDto>.SuccessResponse(new HeartbeatResponseDto
+                        {
+                            Success = true,
+                            ServerTime = now,
+                            CurrentRiskScore = session.RiskScore,
+                            TotalViolations = session.TotalViolations,
+                            HasWarning = true,
+                            WarningMessage = "Exam expired: disconnect time exceeded allowed limit.",
+                            IsExpired = true
+                        });
+                    }
+                }
+            }
+        }
 
         // Log heartbeat event
         var heartbeatEvent = new ProctorEvent
@@ -1116,8 +1232,20 @@ UploadEvidenceDto dto, string candidateId)
         var windowStart = now.AddMinutes(-5); // recent events window
 
         // Get active sessions ordered by risk score descending
-        var sessions = await _context.Set<ProctorSession>()
-            .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0)
+        var query = _context.Set<ProctorSession>()
+            .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0);
+
+        // Department isolation
+        if (!await IsCurrentUserSuperDevAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (userDepartmentId.HasValue)
+            {
+                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
+            }
+        }
+
+        var sessions = await query
             .OrderByDescending(s => s.RiskScore)
             .ThenByDescending(s => s.TotalViolations)
             .Take(top)
@@ -1548,39 +1676,57 @@ UploadEvidenceDto dto, string candidateId)
         {
             [-1] = new()
             {
-                Id = -1, AttemptId = -1, ExamId = -1,
+                Id = -1,
+                AttemptId = -1,
+                ExamId = -1,
                 ExamTitleEn = "Introduction to Computer Science \u2014 Final",
-                CandidateId = "sample-1", CandidateName = "Sarah Ahmed",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-1",
+                CandidateName = "Sarah Ahmed",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-22),
-                TotalEvents = 5, TotalViolations = 1,
-                RiskScore = 12, IsFlagged = false,
+                TotalEvents = 5,
+                TotalViolations = 1,
+                RiskScore = 12,
+                IsFlagged = false,
                 LastHeartbeatAt = now.AddSeconds(-10),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
             },
             [-2] = new()
             {
-                Id = -2, AttemptId = -2, ExamId = -1,
+                Id = -2,
+                AttemptId = -2,
+                ExamId = -1,
                 ExamTitleEn = "Introduction to Computer Science \u2014 Final",
-                CandidateId = "sample-2", CandidateName = "Omar Khalid",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-2",
+                CandidateName = "Omar Khalid",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-15),
-                TotalEvents = 18, TotalViolations = 8,
-                RiskScore = 68, IsFlagged = true,
+                TotalEvents = 18,
+                TotalViolations = 8,
+                RiskScore = 68,
+                IsFlagged = true,
                 LastHeartbeatAt = now.AddSeconds(-5),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
             },
             [-3] = new()
             {
-                Id = -3, AttemptId = -3, ExamId = -1,
+                Id = -3,
+                AttemptId = -3,
+                ExamId = -1,
                 ExamTitleEn = "IT Exam App",
-                CandidateId = "sample-3", CandidateName = "Ali Mahmoud",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-3",
+                CandidateName = "Ali Mahmoud",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-10),
-                TotalEvents = 10, TotalViolations = 3,
-                RiskScore = 42, IsFlagged = false,
+                TotalEvents = 10,
+                TotalViolations = 3,
+                RiskScore = 42,
+                IsFlagged = false,
                 LastHeartbeatAt = now.AddSeconds(-8),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
@@ -1731,7 +1877,10 @@ UploadEvidenceDto dto, string candidateId)
             Mode = session.Mode,
             Status = session.Status,
             StartedAt = session.StartedAt,
+            EndedAt = session.EndedAt,
             TotalViolations = session.TotalViolations,
+            CountableViolationCount = session.CountableViolationCount,
+            MaxViolationWarnings = session.Exam?.MaxViolationWarnings ?? 0,
             RiskScore = session.RiskScore,
             DecisionStatus = session.Decision?.Status,
             RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending,
@@ -1740,7 +1889,17 @@ UploadEvidenceDto dto, string candidateId)
             TerminationReason = session.TerminationReason,
             LatestSnapshotUrl = latestUrl,
             SnapshotCount = imageEvidence?.Count ?? 0,
-            LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate
+            LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate,
+            // Device & Environment
+            IpAddress = session.IpAddress,
+            UserAgent = session.UserAgent,
+            BrowserName = session.BrowserName,
+            BrowserVersion = session.BrowserVersion,
+            OperatingSystem = session.OperatingSystem,
+            ScreenResolution = session.ScreenResolution,
+            DeviceFingerprint = session.DeviceFingerprint,
+            AttemptIpAddress = session.Attempt?.IPAddress,
+            AttemptDeviceInfo = session.Attempt?.DeviceInfo
         };
     }
 

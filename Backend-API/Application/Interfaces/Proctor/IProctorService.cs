@@ -47,6 +47,11 @@ public interface IProctorService
   /// </summary>
   Task<ApiResponse<PaginatedResponse<ProctorSessionListDto>>> GetExamSessionsAsync(int examId, ProctorSessionSearchDto searchDto);
 
+  /// <summary>
+  /// Update device info for a session (client-side fields)
+  /// </summary>
+  Task<ApiResponse<bool>> UpdateSessionDeviceInfoAsync(UpdateSessionDeviceInfoDto dto, string candidateId);
+
   #endregion
 
   #region Events

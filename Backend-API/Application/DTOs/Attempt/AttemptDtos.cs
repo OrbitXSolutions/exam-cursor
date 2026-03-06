@@ -132,6 +132,7 @@ public class AttemptQuestionDto
 
     public string QuestionTypeName { get; set; } = string.Empty;
     public int QuestionTypeId { get; set; }
+    public bool IsCalculatorAllowed { get; set; }
     public List<AttemptQuestionOptionDto> Options { get; set; } = new();
     public List<AttemptQuestionAttachmentDto> Attachments { get; set; } = new();
     public AttemptAnswerDto? CurrentAnswer { get; set; }

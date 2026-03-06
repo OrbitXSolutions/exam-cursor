@@ -9,6 +9,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Proctor;
 using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Application.Settings;
+using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
@@ -56,15 +57,22 @@ public class AiProctorService : IAiProctorService
                 .Include(s => s.Candidate)
                 .Include(s => s.Events)
                 .Include(s => s.Decision)
+                .Include(s => s.Attempt)
                 .FirstOrDefaultAsync(s => s.Id == sessionId);
 
             if (session == null)
                 return ApiResponse<AiProctorAnalysisResponseDto>.FailureResponse("Session not found");
 
-            // 2. Build event summary for the AI prompt
-            var eventSummary = BuildEventSummary(session);
+            // 2. Load attempt events for answer behavior analysis
+            var attemptEvents = await _context.Set<AttemptEvent>()
+                .Where(e => e.AttemptId == session.AttemptId)
+                .OrderBy(e => e.OccurredAt)
+                .ToListAsync();
 
-            // 3. If no events at all, return a quick response without calling AI
+            // 3. Build event summary for the AI prompt
+            var eventSummary = BuildEventSummary(session, attemptEvents);
+
+            // 4. If no events at all, return a quick response without calling AI
             if (session.TotalEvents == 0)
             {
                 return ApiResponse<AiProctorAnalysisResponseDto>.SuccessResponse(new AiProctorAnalysisResponseDto
@@ -80,10 +88,10 @@ public class AiProctorService : IAiProctorService
                 }, "No events to analyze");
             }
 
-            // 4. Build the analysis prompt
+            // 5. Build the analysis prompt
             var prompt = BuildAnalysisPrompt(session, eventSummary);
 
-            // 5. Call OpenAI
+            // 6. Call OpenAI
             var (aiResult, errorMessage) = await CallOpenAiAsync(prompt);
 
             if (aiResult == null)
@@ -109,7 +117,7 @@ public class AiProctorService : IAiProctorService
 
     #region Private Methods
 
-    private static EventSummaryData BuildEventSummary(ProctorSession session)
+    private static EventSummaryData BuildEventSummary(ProctorSession session, List<AttemptEvent> attemptEvents)
     {
         var events = session.Events.OrderBy(e => e.OccurredAt).ToList();
         var violations = events.Where(e => e.IsViolation).ToList();
@@ -145,6 +153,70 @@ public class AiProctorService : IAiProctorService
             ? session.EndedAt.Value - session.StartedAt
             : DateTime.UtcNow - session.StartedAt;
 
+        // --- Answer Behavior Analysis from AttemptEvents ---
+        var answerEvents = attemptEvents
+            .Where(e => e.EventType == AttemptEventType.AnswerSaved)
+            .OrderBy(e => e.OccurredAt)
+            .ToList();
+
+        // Track unique questions answered and answer changes
+        var questionTimestamps = new Dictionary<string, List<DateTime>>();
+        foreach (var ae in answerEvents)
+        {
+            var questionId = "unknown";
+            if (!string.IsNullOrEmpty(ae.MetadataJson))
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(ae.MetadataJson);
+                    if (doc.RootElement.TryGetProperty("questionId", out var qIdProp))
+                        questionId = qIdProp.ToString();
+                }
+                catch { /* ignore malformed metadata */ }
+            }
+            if (!questionTimestamps.ContainsKey(questionId))
+                questionTimestamps[questionId] = new List<DateTime>();
+            questionTimestamps[questionId].Add(ae.OccurredAt);
+        }
+
+        var totalQuestionsAnswered = questionTimestamps.Count;
+        var answerChangesCount = answerEvents.Count - totalQuestionsAnswered; // re-saves = changes
+        if (answerChangesCount < 0) answerChangesCount = 0;
+
+        // Time between consecutive answer saves per question (rough "time spent")
+        var questionDurations = new List<(string QuestionId, double Seconds)>();
+        var orderedAnswerTimes = answerEvents.Select(e => e.OccurredAt).ToList();
+        for (int i = 1; i < orderedAnswerTimes.Count; i++)
+        {
+            var gap = (orderedAnswerTimes[i] - orderedAnswerTimes[i - 1]).TotalSeconds;
+            if (gap > 0 && gap < 600) // ignore gaps > 10 min (likely idle)
+                questionDurations.Add(("q" + i, gap));
+        }
+
+        double avgTimePerQuestion = questionDurations.Count > 0 ? questionDurations.Average(d => d.Seconds) : 0;
+        double fastestAnswerSeconds = questionDurations.Count > 0 ? questionDurations.Min(d => d.Seconds) : 0;
+        double slowestAnswerSeconds = questionDurations.Count > 0 ? questionDurations.Max(d => d.Seconds) : 0;
+
+        // Rapid-fire answers (< 3 seconds) — possible guessing
+        var rapidAnswerCount = questionDurations.Count(d => d.Seconds < 3);
+
+        // --- Attempt Event Breakdown (non-proctor events) ---
+        var attemptEventCounts = attemptEvents
+            .GroupBy(e => e.EventType)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        // --- Countable Violations ---
+        var countableViolationCount = session.CountableViolationCount;
+        var maxViolationWarnings = session.Exam?.MaxViolationWarnings ?? 0;
+
+        // Check for answer-change patterns
+        var questionsWithMultipleChanges = questionTimestamps.Where(q => q.Value.Count >= 3).ToList();
+        if (questionsWithMultipleChanges.Count > 0)
+            patterns.Add($"{questionsWithMultipleChanges.Count} question(s) had 3+ answer changes (possible indecision or answer-sharing)");
+
+        if (rapidAnswerCount >= 3)
+            patterns.Add($"{rapidAnswerCount} answers submitted in under 3 seconds each (possible guessing or pre-known answers)");
+
         return new EventSummaryData
         {
             TotalEvents = session.TotalEvents,
@@ -158,7 +230,21 @@ public class AiProctorService : IAiProctorService
             IsTerminated = session.IsTerminatedByProctor,
             HeartbeatMissedCount = session.HeartbeatMissedCount,
             HasDecision = session.Decision != null,
-            DecisionStatus = session.Decision?.Status.ToString()
+            DecisionStatus = session.Decision?.Status.ToString(),
+            // Answer behavior
+            TotalQuestionsAnswered = totalQuestionsAnswered,
+            AnswerChangesCount = answerChangesCount,
+            AvgTimePerQuestionSeconds = Math.Round(avgTimePerQuestion, 1),
+            FastestAnswerSeconds = Math.Round(fastestAnswerSeconds, 1),
+            SlowestAnswerSeconds = Math.Round(slowestAnswerSeconds, 1),
+            RapidAnswerCount = rapidAnswerCount,
+            // Attempt events
+            AttemptEventCounts = attemptEventCounts,
+            TotalAttemptEvents = attemptEvents.Count,
+            // Countable violations
+            CountableViolationCount = countableViolationCount,
+            MaxViolationWarnings = maxViolationWarnings,
+            TerminationReason = session.TerminationReason
         };
     }
 
@@ -190,10 +276,38 @@ public class AiProctorService : IAiProctorService
             sb.AppendLine($"- Current Decision: {summary.DecisionStatus}");
         sb.AppendLine();
 
+        sb.AppendLine("DEVICE & ENVIRONMENT:");
+        sb.AppendLine($"- IP Address: {session.IpAddress ?? "N/A"}");
+        sb.AppendLine($"- Browser: {session.BrowserName ?? "N/A"} {session.BrowserVersion ?? ""}".Trim());
+        sb.AppendLine($"- Operating System: {session.OperatingSystem ?? "N/A"}");
+        sb.AppendLine($"- Screen Resolution: {session.ScreenResolution ?? "N/A"}");
+        sb.AppendLine($"- Device Fingerprint: {session.DeviceFingerprint ?? "N/A"}");
+        if (session.Attempt != null)
+        {
+            if (!string.IsNullOrEmpty(session.Attempt.IPAddress) && session.Attempt.IPAddress != session.IpAddress)
+                sb.AppendLine($"- Attempt IP Address (differs from session): {session.Attempt.IPAddress}");
+            if (!string.IsNullOrEmpty(session.Attempt.DeviceInfo))
+                sb.AppendLine($"- Device Info: {session.Attempt.DeviceInfo}");
+        }
+        sb.AppendLine();
+
         sb.AppendLine("METRICS:");
         sb.AppendLine($"- Current Risk Score: {summary.RiskScore}/100");
-        sb.AppendLine($"- Total Events: {summary.TotalEvents}");
-        sb.AppendLine($"- Total Violations: {summary.TotalViolations}");
+        sb.AppendLine($"- Total Proctor Events: {summary.TotalEvents}");
+        sb.AppendLine($"- Total Proctor Violations: {summary.TotalViolations}");
+        sb.AppendLine($"- Total Attempt Events: {summary.TotalAttemptEvents}");
+        sb.AppendLine();
+
+        sb.AppendLine("VIOLATION THRESHOLD:");
+        sb.AppendLine($"- Countable Violations: {summary.CountableViolationCount}");
+        sb.AppendLine($"- Max Allowed Warnings: {(summary.MaxViolationWarnings > 0 ? summary.MaxViolationWarnings.ToString() : "Disabled (no auto-termination)")}");
+        if (summary.MaxViolationWarnings > 0)
+        {
+            var ratio = (double)summary.CountableViolationCount / summary.MaxViolationWarnings * 100;
+            sb.AppendLine($"- Threshold Usage: {ratio:F0}% ({summary.CountableViolationCount}/{summary.MaxViolationWarnings})");
+        }
+        if (!string.IsNullOrEmpty(summary.TerminationReason))
+            sb.AppendLine($"- Termination Reason: {summary.TerminationReason}");
         sb.AppendLine();
 
         sb.AppendLine("EVENT BREAKDOWN:");
@@ -208,6 +322,27 @@ public class AiProctorService : IAiProctorService
         {
             sb.AppendLine("- No significant events recorded");
         }
+        sb.AppendLine();
+
+        // Attempt Event Breakdown
+        if (summary.AttemptEventCounts.Count > 0)
+        {
+            sb.AppendLine("ATTEMPT EVENT BREAKDOWN:");
+            foreach (var evt in summary.AttemptEventCounts.OrderByDescending(e => e.Value))
+            {
+                sb.AppendLine($"- {evt.Key}: {evt.Value} occurrences");
+            }
+            sb.AppendLine();
+        }
+
+        // Answer Behavior Section
+        sb.AppendLine("ANSWER BEHAVIOR:");
+        sb.AppendLine($"- Questions Answered: {summary.TotalQuestionsAnswered}");
+        sb.AppendLine($"- Answer Changes (re-submissions): {summary.AnswerChangesCount}");
+        sb.AppendLine($"- Average Time per Question: {summary.AvgTimePerQuestionSeconds}s");
+        sb.AppendLine($"- Fastest Answer: {summary.FastestAnswerSeconds}s");
+        sb.AppendLine($"- Slowest Answer: {summary.SlowestAnswerSeconds}s");
+        sb.AppendLine($"- Rapid Answers (<3s, possible guessing): {summary.RapidAnswerCount}");
         sb.AppendLine();
 
         if (summary.Patterns.Count > 0)
@@ -346,6 +481,20 @@ public class AiProctorService : IAiProctorService
         public int HeartbeatMissedCount { get; set; }
         public bool HasDecision { get; set; }
         public string? DecisionStatus { get; set; }
+        // Answer behavior
+        public int TotalQuestionsAnswered { get; set; }
+        public int AnswerChangesCount { get; set; }
+        public double AvgTimePerQuestionSeconds { get; set; }
+        public double FastestAnswerSeconds { get; set; }
+        public double SlowestAnswerSeconds { get; set; }
+        public int RapidAnswerCount { get; set; }
+        // Attempt events
+        public Dictionary<AttemptEventType, int> AttemptEventCounts { get; set; } = new();
+        public int TotalAttemptEvents { get; set; }
+        // Countable violations
+        public int CountableViolationCount { get; set; }
+        public int MaxViolationWarnings { get; set; }
+        public string? TerminationReason { get; set; }
     }
 
     private class OpenAiChatResponse

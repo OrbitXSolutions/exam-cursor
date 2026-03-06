@@ -1,9 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { useI18n } from "@/lib/i18n/context"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
@@ -20,7 +21,9 @@ import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type Question
 import type { Question } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
-import { ArrowLeft, Plus, Trash2, GripVertical } from "lucide-react"
+import { ArrowLeft, Plus, Trash2, GripVertical, ImageIcon, Upload, X, Calculator } from "lucide-react"
+import type { QuestionAttachment } from "@/lib/types"
+import { addQuestionAttachment, deleteQuestionAttachment } from "@/lib/api/question-bank"
 
 interface OptionInput {
   id: string
@@ -29,6 +32,9 @@ interface OptionInput {
   isCorrect: boolean
   order: number
   originalId?: number
+  imageFile?: File | null
+  imagePreview?: string | null
+  attachmentPath?: string | null
 }
 
 export default function EditQuestionPage() {
@@ -55,9 +61,17 @@ export default function EditQuestionPage() {
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
+    isCalculatorAllowed: false,
   })
 
   const [options, setOptions] = useState<OptionInput[]>([])
+
+  // Image attachment state
+  const [existingAttachments, setExistingAttachments] = useState<QuestionAttachment[]>([])
+  const [newImage, setNewImage] = useState<File | null>(null)
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   // Answer key state for essay/subjective questions
   const [answerKey, setAnswerKey] = useState({
@@ -92,6 +106,7 @@ export default function EditQuestionPage() {
           points: q.points || 1,
           difficultyLevel: q.difficultyLevel || DifficultyLevel.Easy,
           isActive: q.isActive !== false,
+          isCalculatorAllowed: q.isCalculatorAllowed || false,
         })
         // Load answer key if present
         if (q.answerKey) {
@@ -109,8 +124,14 @@ export default function EditQuestionPage() {
               isCorrect: opt.isCorrect,
               order: opt.order,
               originalId: opt.id,
+              attachmentPath: opt.attachmentPath || null,
+              imagePreview: opt.attachmentPath || null,
             })),
           )
+        }
+        // Load existing attachments
+        if (q.attachments && q.attachments.length > 0) {
+          setExistingAttachments(q.attachments)
         }
         // Fetch topics for the question's subject
         if (q.subjectId) {
@@ -186,8 +207,67 @@ export default function EditQuestionPage() {
   }
 
   const selectedType = types.find((t) => String(t.id) === formData.questionTypeId)
-  const isEssayType = selectedType?.nameEn === "Essay"
-  const isSubjectiveType = selectedType?.nameEn === "Essay" || selectedType?.nameEn === "Short Answer"
+  const isSubjectiveType = selectedType?.nameEn === "Subjective" || selectedType?.nameEn === "Essay" || selectedType?.nameEn === "Short Answer"
+  const isEssayType = isSubjectiveType
+
+  // Image handlers
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size must be less than 10MB')
+      return
+    }
+    setNewImage(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setNewImagePreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const removeNewImage = () => {
+    setNewImage(null)
+    setNewImagePreview(null)
+    if (imageInputRef.current) imageInputRef.current.value = ''
+  }
+
+  // Per-option image handlers
+  const handleOptionImageSelect = (optionId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size must be less than 10MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      updateOption(optionId, { imageFile: file, imagePreview: ev.target?.result as string })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeOptionImage = (optionId: string) => {
+    updateOption(optionId, { imageFile: null, imagePreview: null, attachmentPath: null })
+  }
+
+  const handleDeleteAttachment = async (attachment: QuestionAttachment) => {
+    try {
+      await deleteQuestionAttachment(attachment.id)
+      setExistingAttachments(prev => prev.filter(a => a.id !== attachment.id))
+      toast.success('Attachment removed')
+    } catch {
+      toast.error('Failed to remove attachment')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -217,6 +297,7 @@ export default function EditQuestionPage() {
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
+        isCalculatorAllowed: formData.isCalculatorAllowed,
       }
 
       // Include answer key for subjective types
@@ -230,6 +311,98 @@ export default function EditQuestionPage() {
       const response = await updateQuestion(Number(questionId), payload)
 
       const isSuccess = response && (response as any).success !== false
+
+      // Upload new image if selected
+      if (isSuccess && newImage) {
+        try {
+          setIsUploadingImage(true)
+          const formDataUpload = new FormData()
+          formDataUpload.append('file', newImage)
+          const apiBase = '/api/proxy'
+          const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+          const uploadRes = await fetch(`${apiBase}/Media/upload?folder=QuestionAttachments`, {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: formDataUpload,
+          })
+          if (uploadRes.ok) {
+            const uploadResult = await uploadRes.json()
+            const filePath = uploadResult.file?.url || uploadResult.file?.path || uploadResult.filePath
+            if (filePath) {
+              await addQuestionAttachment(Number(questionId), {
+                fileName: newImage.name,
+                filePath: filePath,
+                fileType: 'Image',
+                fileSize: newImage.size,
+                isPrimary: existingAttachments.filter(a => a.fileType?.toLowerCase().includes('image')).length === 0,
+              })
+            }
+          }
+        } catch (imgErr) {
+          console.warn('Image upload failed:', imgErr)
+          toast.warning('Question updated but image upload failed.')
+        } finally {
+          setIsUploadingImage(false)
+        }
+      }
+
+      // Upload option images and bulk update options
+      if (isSuccess && !isEssayType && options.length > 0) {
+        try {
+          const apiBase = '/api/proxy'
+          const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+
+          // Upload new option images
+          const updatedOptions = await Promise.all(
+            options.map(async (opt) => {
+              let uploadedPath: string | null = opt.attachmentPath || null
+              if (opt.imageFile) {
+                try {
+                  const fd = new FormData()
+                  fd.append('file', opt.imageFile)
+                  const res = await fetch(`${apiBase}/Media/upload?folder=QuestionAttachments`, {
+                    method: 'POST',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                    body: fd,
+                  })
+                  if (res.ok) {
+                    const result = await res.json()
+                    uploadedPath = result.file?.url || result.file?.path || result.filePath || null
+                  }
+                } catch (err) {
+                  console.warn('Option image upload failed:', err)
+                }
+              }
+              return { ...opt, attachmentPath: uploadedPath }
+            })
+          )
+
+          // Bulk update options with attachmentPath
+          const bulkPayload = updatedOptions
+            .filter(opt => opt.originalId)
+            .map(opt => ({
+              id: opt.originalId!,
+              textEn: opt.textEn,
+              textAr: opt.textAr || opt.textEn,
+              isCorrect: opt.isCorrect,
+              order: opt.order,
+              attachmentPath: opt.attachmentPath || null,
+            }))
+
+          if (bulkPayload.length > 0) {
+            await fetch(`${apiBase}/QuestionBank/questions/${questionId}/options/bulk`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify(bulkPayload),
+            })
+          }
+        } catch (optErr) {
+          console.warn('Option update failed:', optErr)
+        }
+      }
 
       if (isSuccess) {
         toast.success("Question updated successfully")
@@ -321,6 +494,102 @@ export default function EditQuestionPage() {
                       className="resize-none"
                     />
                   </div>
+                </div>
+
+                {/* Question Image / Chart Attachment */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" />
+                    {language === "ar" ? "صورة السؤال / مخطط (اختياري)" : "Question Image / Chart (Optional)"}
+                  </Label>
+
+                  {/* Existing Attachments */}
+                  {existingAttachments.filter(a => a.fileType?.toLowerCase().includes('image')).map((att) => (
+                    <div key={att.id} className="relative rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4">
+                      <div className="relative w-full max-h-64 overflow-hidden rounded-lg">
+                        <Image
+                          src={att.filePath}
+                          alt={att.fileName}
+                          width={800}
+                          height={400}
+                          className="w-full h-auto max-h-60 object-contain rounded-lg"
+                        />
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-muted-foreground">
+                            {att.fileName} ({(att.fileSize / 1024).toFixed(1)} KB)
+                          </p>
+                          {att.isPrimary && (
+                            <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">Primary</span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteAttachment(att)}
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          {language === "ar" ? "إزالة" : "Remove"}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* New Image Upload */}
+                  {newImagePreview ? (
+                    <div className="relative rounded-xl border-2 border-dashed border-green-500/30 bg-green-50/50 dark:bg-green-950/20 p-4">
+                      <div className="relative w-full max-h-64 overflow-hidden rounded-lg">
+                        <img
+                          src={newImagePreview}
+                          alt="New image preview"
+                          className="w-full h-auto max-h-60 object-contain rounded-lg"
+                        />
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">
+                          <span className="text-green-600 dark:text-green-400 font-medium">New: </span>
+                          {newImage?.name} ({((newImage?.size || 0) / 1024).toFixed(1)} KB)
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeNewImage}
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          {language === "ar" ? "إلغاء" : "Cancel"}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      <div className="p-3 bg-muted rounded-full">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium text-sm">
+                          {language === "ar" ? "اضغط لرفع صورة أو مخطط" : "Click to upload an image or chart"}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          JPEG, PNG, GIF, WebP, SVG — Max 10MB
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -433,6 +702,21 @@ export default function EditQuestionPage() {
                     onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
                   />
                 </div>
+
+                {/* Calculator Toggle */}
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-3">
+                    <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <p className="font-medium">Allow Calculator</p>
+                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.isCalculatorAllowed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isCalculatorAllowed: checked })}
+                  />
+                </div>
               </CardContent>
             </Card>
 
@@ -485,6 +769,36 @@ export default function EditQuestionPage() {
                             {t("questionBank.correctAnswer")}
                           </p>
                         )}
+                        {/* Option Image */}
+                        <div className="flex items-center gap-2">
+                          {option.imagePreview ? (
+                            <div className="relative group">
+                              <img
+                                src={option.imagePreview.startsWith('data:') || option.imagePreview.startsWith('/') || option.imagePreview.startsWith('http') ? option.imagePreview : `/media/${option.imagePreview}`}
+                                alt={`Option ${index + 1}`}
+                                className="h-16 w-24 object-cover rounded-md border"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeOptionImage(option.id)}
+                                className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
+                              <ImageIcon className="h-3.5 w-3.5" />
+                              <span>Add Image</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleOptionImageSelect(option.id, e)}
+                              />
+                            </label>
+                          )}
+                        </div>
                       </div>
                       <Button
                         type="button"

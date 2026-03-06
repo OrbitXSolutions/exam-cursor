@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Attempt;
@@ -16,6 +17,7 @@ public class AttemptService : IAttemptService
 {
   private readonly ApplicationDbContext _context;
   private readonly IHubContext<ProctorHub> _proctorHub;
+  private readonly IHttpContextAccessor _httpContextAccessor;
 
   // Violation event types that should be pushed to proctor in real time
   private static readonly HashSet<AttemptEventType> ViolationEventTypes = new()
@@ -35,10 +37,25 @@ public class AttemptService : IAttemptService
     AttemptEventType.HeadTurnDetected,
   };
 
-  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub)
+  /// <summary>
+  /// Violation types that count toward the MaxViolationWarnings auto-termination threshold.
+  /// Hardcoded by design — admin should NOT choose these (to avoid misconfiguration).
+  /// TabSwitched + WindowBlur are deduplicated at the frontend (WindowBlur fires with TabSwitched);
+  /// backend counts them independently but only TabSwitched is sent when both fire together.
+  /// </summary>
+  private static readonly HashSet<AttemptEventType> CountableViolationTypes = new()
+  {
+    AttemptEventType.TabSwitched,      // Intentional — candidate left the exam
+    AttemptEventType.FaceNotDetected,  // Candidate moved away from camera
+    AttemptEventType.MultipleFacesDetected, // Someone else is at the screen
+    AttemptEventType.CameraBlocked,    // Intentional covering of camera
+  };
+
+  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub, IHttpContextAccessor httpContextAccessor)
   {
     _context = context;
     _proctorHub = proctorHub;
+    _httpContextAccessor = httpContextAccessor;
   }
 
   #region Attempt Lifecycle
@@ -213,6 +230,8 @@ public class AttemptService : IAttemptService
         Mode = ProctorMode.Soft,
         StartedAt = now,
         Status = ProctorSessionStatus.Active,
+        IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
+        UserAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString(),
         TotalEvents = 0,
         TotalViolations = 0,
         RiskScore = 0,
@@ -268,6 +287,13 @@ public class AttemptService : IAttemptService
     if (attempt.CandidateId != candidateId)
     {
       return ApiResponse<AttemptSessionDto>.FailureResponse("You do not have access to this attempt");
+    }
+
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AttemptSessionDto>.FailureResponse(
+         "Attempt expired: disconnect time exceeded allowed limit. Cannot resume.");
     }
 
     // Check if expired
@@ -400,6 +426,19 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptTimerDto>.FailureResponse("You do not have access to this attempt");
     }
 
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AttemptTimerDto>.SuccessResponse(new AttemptTimerDto
+      {
+        AttemptId = attemptId,
+        ServerTime = DateTime.UtcNow,
+        ExpiresAt = attempt.ExpiresAt ?? DateTime.UtcNow,
+        RemainingSeconds = 0,
+        Status = AttemptStatus.Expired
+      });
+    }
+
     var now = DateTime.UtcNow;
     var remainingSeconds = 0;
 
@@ -520,6 +559,13 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     if (attempt.CandidateId != candidateId)
     {
       return ApiResponse<AnswerSavedDto>.FailureResponse("You do not have access to this attempt");
+    }
+
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AnswerSavedDto>.FailureResponse(
+          "Attempt expired: disconnect time exceeded allowed limit. Cannot save answers.");
     }
 
     var now = DateTime.UtcNow;
@@ -737,6 +783,131 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
         }
         catch { /* fire-and-forget — never block the candidate */ }
       });
+    }
+
+    // ── Auto-termination: count countable violations toward MaxViolationWarnings ──
+    if (CountableViolationTypes.Contains(dto.EventType))
+    {
+      try
+      {
+        // Load the exam to get MaxViolationWarnings setting
+        var exam = await _context.Set<Domain.Entities.Assessment.Exam>()
+          .AsNoTracking()
+          .Where(e => e.Id == attempt.ExamId)
+          .Select(e => new { e.MaxViolationWarnings })
+          .FirstOrDefaultAsync();
+
+        var maxWarnings = exam?.MaxViolationWarnings ?? 0;
+
+        // Only proceed if auto-termination is enabled (maxWarnings > 0)
+        if (maxWarnings > 0)
+        {
+          // Load the proctor session for this attempt
+          var proctorSession = await _context.Set<ProctorSession>()
+            .Where(s => s.AttemptId == attemptId && s.CandidateId == candidateId)
+            .OrderByDescending(s => s.StartedAt)
+            .FirstOrDefaultAsync();
+
+          if (proctorSession != null)
+          {
+            // Increment countable violation count
+            proctorSession.CountableViolationCount++;
+            var currentCount = proctorSession.CountableViolationCount;
+
+            if (currentCount >= maxWarnings)
+            {
+              // ── TERMINATE: reached max violations ──
+              proctorSession.Status = ProctorSessionStatus.Cancelled;
+              proctorSession.EndedAt = now;
+              proctorSession.IsTerminatedByProctor = true;
+              proctorSession.TerminationReason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})";
+              proctorSession.PendingWarningMessage = null; // Clear any pending warning
+              proctorSession.UpdatedDate = now;
+              proctorSession.UpdatedBy = "System";
+
+              // Terminate the attempt
+              attempt.Status = AttemptStatus.Terminated;
+              attempt.UpdatedDate = now;
+              attempt.UpdatedBy = "System";
+
+              // Log termination event for audit
+              _context.Set<AttemptEvent>().Add(new AttemptEvent
+              {
+                AttemptId = attemptId,
+                EventType = AttemptEventType.ForceEnded,
+                OccurredAt = now,
+                MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                  source = "AutoTermination",
+                  reason = $"Exceeded maximum violations ({maxWarnings})",
+                  countableViolationCount = currentCount,
+                  maxViolationWarnings = maxWarnings,
+                  triggerEvent = dto.EventType.ToString()
+                }),
+                CreatedBy = "System",
+                CreatedDate = now
+              });
+
+              await _context.SaveChangesAsync();
+
+              // Notify candidate instantly via SignalR
+              _ = Task.Run(async () =>
+              {
+                try
+                {
+                  var group = $"attempt_{attemptId}";
+                  await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
+                  {
+                    reason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})",
+                    countableViolationCount = currentCount,
+                    maxViolationWarnings = maxWarnings
+                  });
+                }
+                catch { /* fire-and-forget */ }
+              });
+
+              return ApiResponse<bool>.SuccessResponse(true, "Event logged — attempt auto-terminated");
+            }
+            else if (currentCount == maxWarnings - 1)
+            {
+              // ── LAST WARNING: one violation away from termination ──
+              proctorSession.PendingWarningMessage =
+                $"⚠ LAST WARNING: This is your final warning. You have reached {currentCount} of {maxWarnings} allowed violations. The NEXT violation will automatically terminate your exam.";
+              proctorSession.UpdatedDate = now;
+
+              await _context.SaveChangesAsync();
+
+              // Push last warning instantly via SignalR
+              _ = Task.Run(async () =>
+              {
+                try
+                {
+                  var group = $"attempt_{attemptId}";
+                  await _proctorHub.Clients.Group(group).SendAsync("ProctorWarning", new
+                  {
+                    message = proctorSession.PendingWarningMessage,
+                    isLastWarning = true,
+                    currentCount,
+                    maxWarnings
+                  });
+                }
+                catch { /* fire-and-forget */ }
+              });
+            }
+            else
+            {
+              // Just save the incremented count
+              proctorSession.UpdatedDate = now;
+              await _context.SaveChangesAsync();
+            }
+          }
+        }
+      }
+      catch
+      {
+        // Auto-termination logic should never block the candidate's event logging
+        // If it fails, the event is already saved — fail silently
+      }
     }
 
     return ApiResponse<bool>.SuccessResponse(true, "Event logged");
@@ -1122,6 +1293,82 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
   #region Private Helper Methods
 
+  /// <summary>
+  /// Checks if a candidate has exceeded the disconnect budget.
+  /// Call on every candidate API interaction (save answer, get session, get timer).
+  /// Detects disconnect gaps via ProctorSession.LastHeartbeatAt staleness.
+  /// Returns true if the attempt was expired due to disconnect timeout.
+  /// </summary>
+  private async Task<bool> CheckAndApplyDisconnectBudgetAsync(Domain.Entities.Attempt.Attempt attempt)
+  {
+    if (attempt.Status != AttemptStatus.Started &&
+        attempt.Status != AttemptStatus.InProgress &&
+        attempt.Status != AttemptStatus.Resumed)
+      return false;
+
+    var now = DateTime.UtcNow;
+
+    // Check ProctorSession heartbeat to detect current disconnect gap
+    var proctorSession = await _context.Set<ProctorSession>()
+        .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Status == ProctorSessionStatus.Active);
+
+    if (proctorSession?.LastHeartbeatAt != null)
+    {
+      var heartbeatGap = (int)(now - proctorSession.LastHeartbeatAt.Value).TotalSeconds;
+      if (heartbeatGap > Domain.Constants.ExamDefaults.HeartbeatStaleThresholdSeconds)
+      {
+        // Candidate was disconnected — accumulate the gap
+        attempt.TotalDisconnectSeconds += heartbeatGap;
+        // Update LastHeartbeatAt to now so we don't double-count this gap
+        proctorSession.LastHeartbeatAt = now;
+      }
+    }
+
+    // Also accumulate any previously tracked disconnect
+    if (attempt.DisconnectDetectedAt.HasValue)
+    {
+      var disconnectDuration = (int)(now - attempt.DisconnectDetectedAt.Value).TotalSeconds;
+      attempt.TotalDisconnectSeconds += disconnectDuration;
+      attempt.DisconnectDetectedAt = null;
+    }
+
+    // Check if budget exceeded
+    if (attempt.TotalDisconnectSeconds > Domain.Constants.ExamDefaults.MaxDisconnectSeconds)
+    {
+      attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.DisconnectTimeout;
+
+      // Close proctor session
+      if (proctorSession != null)
+      {
+        proctorSession.Status = ProctorSessionStatus.Completed;
+        proctorSession.EndedAt = now;
+        proctorSession.UpdatedDate = now;
+        proctorSession.UpdatedBy = "system";
+      }
+
+      // Log event
+      _context.Set<AttemptEvent>().Add(new AttemptEvent
+      {
+        AttemptId = attempt.Id,
+        EventType = AttemptEventType.DisconnectExpired,
+        OccurredAt = now,
+        MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+        {
+          totalDisconnectSeconds = attempt.TotalDisconnectSeconds,
+          maxAllowed = Domain.Constants.ExamDefaults.MaxDisconnectSeconds
+        }),
+        CreatedDate = now,
+        CreatedBy = "system"
+      });
+
+      await _context.SaveChangesAsync();
+      return true;
+    }
+
+    return false;
+  }
+
   private DateTime CalculateExpiresAt(DateTime startedAt, int durationMinutes, DateTime? examEndAt)
   {
     var durationExpiry = startedAt.AddMinutes(durationMinutes);
@@ -1275,6 +1522,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
         BodyAr = aq.Question.BodyAr,
         QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
         QuestionTypeId = aq.Question.QuestionTypeId,
+        IsCalculatorAllowed = aq.Question.IsCalculatorAllowed,
         Options = options,
         Attachments = aq.Question.Attachments.Select(a => new AttemptQuestionAttachmentDto
         {

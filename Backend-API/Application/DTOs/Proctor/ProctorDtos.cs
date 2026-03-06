@@ -62,7 +62,10 @@ public class ProctorSessionListDto
     public ProctorSessionStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public DateTime StartedAt { get; set; }
+    public DateTime? EndedAt { get; set; }
     public int TotalViolations { get; set; }
+    public int CountableViolationCount { get; set; }
+    public int MaxViolationWarnings { get; set; }
     public decimal? RiskScore { get; set; }
     public ProctorDecisionStatus? DecisionStatus { get; set; }
     public bool RequiresReview { get; set; }
@@ -73,6 +76,17 @@ public class ProctorSessionListDto
     public string? LatestSnapshotUrl { get; set; }
     public int SnapshotCount { get; set; }
     public DateTime? LastSnapshotAt { get; set; }
+    // Device & Environment
+    public string? IpAddress { get; set; }
+    public string? UserAgent { get; set; }
+    public string? BrowserName { get; set; }
+    public string? BrowserVersion { get; set; }
+    public string? OperatingSystem { get; set; }
+    public string? ScreenResolution { get; set; }
+    public string? DeviceFingerprint { get; set; }
+    // From Attempt entity
+    public string? AttemptIpAddress { get; set; }
+    public string? AttemptDeviceInfo { get; set; }
 }
 
 /// <summary>
@@ -88,6 +102,19 @@ public class CreateProctorSessionDto
     public string? BrowserVersion { get; set; }
     public string? OperatingSystem { get; set; }
     public string? ScreenResolution { get; set; }
+}
+
+/// <summary>
+/// Update device info for an existing session (client-side fields)
+/// </summary>
+public class UpdateSessionDeviceInfoDto
+{
+    public int AttemptId { get; set; }
+    public string? BrowserName { get; set; }
+    public string? BrowserVersion { get; set; }
+    public string? OperatingSystem { get; set; }
+    public string? ScreenResolution { get; set; }
+    public string? DeviceFingerprint { get; set; }
 }
 
 /// <summary>
@@ -207,6 +234,7 @@ public class HeartbeatResponseDto
     public int TotalViolations { get; set; }
     public bool HasWarning { get; set; }
     public string? WarningMessage { get; set; }
+    public bool IsExpired { get; set; }
 }
 
 #endregion

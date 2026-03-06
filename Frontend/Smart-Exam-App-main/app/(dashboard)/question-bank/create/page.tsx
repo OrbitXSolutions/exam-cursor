@@ -39,6 +39,10 @@ import {
   FileText,
   Settings,
   ListChecks,
+  ImageIcon,
+  Upload,
+  X,
+  Calculator,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -47,9 +51,7 @@ const QUESTION_TYPE = {
   MCQ_SINGLE: 1,
   MCQ_MULTI: 2,
   TRUE_FALSE: 3,
-  SHORT_ANSWER: 4,
-  ESSAY: 5,
-  NUMERIC: 6,
+  SUBJECTIVE: 4,
 }
 
 interface OptionInput {
@@ -58,6 +60,9 @@ interface OptionInput {
   textAr: string
   isCorrect: boolean
   order: number
+  imageFile?: File | null
+  imagePreview?: string | null
+  attachmentPath?: string | null
 }
 
 const CreateQuestionPage = () => {
@@ -81,6 +86,7 @@ const CreateQuestionPage = () => {
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     isActive: true,
+    isCalculatorAllowed: false,
   })
 
   const [options, setOptions] = useState<OptionInput[]>([
@@ -91,14 +97,70 @@ const CreateQuestionPage = () => {
   // For True/False
   const [trueFalseAnswer, setTrueFalseAnswer] = useState<"true" | "false" | "">("")
 
-  // For Short Answer / Numeric - correct answer
-  const [correctAnswer, setCorrectAnswer] = useState("")
-
-  // Answer key / rubric for essay/subjective types
+  // Answer key / rubric for subjective types
   const [answerKey, setAnswerKey] = useState({
     rubricTextEn: "",
     rubricTextAr: "",
   })
+
+  // Image attachment for question body
+  const [questionImage, setQuestionImage] = useState<File | null>(null)
+  const [questionImagePreview, setQuestionImagePreview] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size must be less than 10MB')
+      return
+    }
+
+    setQuestionImage(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setQuestionImagePreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const removeQuestionImage = () => {
+    setQuestionImage(null)
+    setQuestionImagePreview(null)
+    if (imageInputRef.current) imageInputRef.current.value = ''
+  }
+
+  // Per-option image handlers
+  const handleOptionImageSelect = (optionId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size must be less than 10MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      updateOption(optionId, { imageFile: file, imagePreview: ev.target?.result as string })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeOptionImage = (optionId: string) => {
+    updateOption(optionId, { imageFile: null, imagePreview: null, attachmentPath: null })
+  }
 
   useEffect(() => {
     fetchLookups()
@@ -231,12 +293,10 @@ const CreateQuestionPage = () => {
   const isMCQSingle = selectedTypeId === QUESTION_TYPE.MCQ_SINGLE
   const isMCQMulti = selectedTypeId === QUESTION_TYPE.MCQ_MULTI
   const isTrueFalse = selectedTypeId === QUESTION_TYPE.TRUE_FALSE
-  const isShortAnswer = selectedTypeId === QUESTION_TYPE.SHORT_ANSWER
-  const isEssay = selectedTypeId === QUESTION_TYPE.ESSAY
-  const isNumeric = selectedTypeId === QUESTION_TYPE.NUMERIC
+  const isSubjective = selectedTypeId === QUESTION_TYPE.SUBJECTIVE
 
   const needsOptions = isMCQSingle || isMCQMulti || isTrueFalse
-  const isTextBased = isShortAnswer || isEssay || isNumeric
+  const isTextBased = isSubjective
 
   const validateForm = (): string[] => {
     const errors: string[] = []
@@ -265,9 +325,7 @@ const CreateQuestionPage = () => {
       }
     }
 
-    if ((isShortAnswer || isNumeric) && !correctAnswer.trim()) {
-      errors.push("Please provide the correct answer")
-    }
+
 
     return errors
   }
@@ -287,23 +345,41 @@ const CreateQuestionPage = () => {
     let finalOptions: { textEn: string; textAr: string; isCorrect: boolean; order: number; attachmentPath: string | null }[] = []
 
     if (needsOptions) {
-      finalOptions = options.map((opt) => ({
+      // Upload option images first
+      const apiBase = '/api/proxy'
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+
+      const uploadedOptions = await Promise.all(
+        options.map(async (opt) => {
+          let uploadedPath: string | null = opt.attachmentPath || null
+          if (opt.imageFile) {
+            try {
+              const fd = new FormData()
+              fd.append('file', opt.imageFile)
+              const res = await fetch(`${apiBase}/Media/upload?folder=QuestionAttachments`, {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                body: fd,
+              })
+              if (res.ok) {
+                const result = await res.json()
+                uploadedPath = result.file?.url || result.file?.path || result.filePath || null
+              }
+            } catch (err) {
+              console.warn('Option image upload failed:', err)
+            }
+          }
+          return { ...opt, attachmentPath: uploadedPath }
+        })
+      )
+
+      finalOptions = uploadedOptions.map((opt) => ({
         textEn: opt.textEn,
-        textAr: opt.textAr || opt.textEn, // Fallback to English if Arabic is empty
+        textAr: opt.textAr || opt.textEn,
         isCorrect: opt.isCorrect,
         order: opt.order,
-        attachmentPath: null,
+        attachmentPath: opt.attachmentPath || null,
       }))
-    } else if (isShortAnswer || isNumeric) {
-      finalOptions = [
-        {
-          textEn: correctAnswer,
-          textAr: correctAnswer, // Use same value for both languages for short answer
-          isCorrect: true,
-          order: 0,
-          attachmentPath: null,
-        },
-      ]
     }
 
     try {
@@ -316,11 +392,12 @@ const CreateQuestionPage = () => {
         points: formData.points,
         difficultyLevel: formData.difficultyLevel,
         isActive: formData.isActive,
+        isCalculatorAllowed: formData.isCalculatorAllowed,
         options: finalOptions,
       }
 
-      // Include answer key for essay/subjective types
-      if ((isEssay || isShortAnswer) && (answerKey.rubricTextEn || answerKey.rubricTextAr)) {
+      // Include answer key for subjective types
+      if (isSubjective && (answerKey.rubricTextEn || answerKey.rubricTextAr)) {
         payload.answerKey = {
           rubricTextEn: answerKey.rubricTextEn || null,
           rubricTextAr: answerKey.rubricTextAr || null,
@@ -330,8 +407,46 @@ const CreateQuestionPage = () => {
       const response = await createQuestion(payload)
 
       const responseAny = response as any
+      const createdQuestionId = responseAny.id || responseAny.data?.id
 
-      if (responseAny.id) {
+      // Upload question image if selected
+      if (createdQuestionId && questionImage) {
+        try {
+          const formDataUpload = new FormData()
+          formDataUpload.append('file', questionImage)
+          formDataUpload.append('folder', 'QuestionAttachments')
+
+          const apiBase = '/api/proxy'
+          const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+          const uploadRes = await fetch(`${apiBase}/Media/upload?folder=QuestionAttachments`, {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: formDataUpload,
+          })
+
+          if (uploadRes.ok) {
+            const uploadResult = await uploadRes.json()
+            const filePath = uploadResult.file?.url || uploadResult.file?.path || uploadResult.filePath
+
+            // Add attachment to the created question
+            if (filePath) {
+              const { addQuestionAttachment } = await import('@/lib/api/question-bank')
+              await addQuestionAttachment(createdQuestionId, {
+                fileName: questionImage.name,
+                filePath: filePath,
+                fileType: 'Image',
+                fileSize: questionImage.size,
+                isPrimary: true,
+              })
+            }
+          }
+        } catch (imgErr) {
+          console.warn('Image upload failed, question was created:', imgErr)
+          toast.warning('Question created but image upload failed. You can add the image later.')
+        }
+      }
+
+      if (createdQuestionId) {
         // Response is the Question directly
         toast.success("Question created successfully")
         router.replace("/question-bank")
@@ -444,6 +559,64 @@ const CreateQuestionPage = () => {
                       className="resize-none text-base border-2 focus:border-primary transition-colors"
                     />
                   </div>
+                </div>
+
+                {/* Question Image / Chart Attachment (Optional) */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" />
+                    {language === "ar" ? "صورة السؤال / مخطط (اختياري)" : "Question Image / Chart (Optional)"}
+                  </Label>
+                  {questionImagePreview ? (
+                    <div className="relative rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4">
+                      <div className="relative w-full max-h-64 overflow-hidden rounded-lg">
+                        <img
+                          src={questionImagePreview}
+                          alt="Question image preview"
+                          className="w-full h-auto max-h-60 object-contain rounded-lg"
+                        />
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">
+                          {questionImage?.name} ({((questionImage?.size || 0) / 1024).toFixed(1)} KB)
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeQuestionImage}
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          {language === "ar" ? "إزالة" : "Remove"}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      <div className="p-3 bg-muted rounded-full">
+                        <Upload className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium text-sm">
+                          {language === "ar" ? "اضغط لرفع صورة أو مخطط" : "Click to upload an image or chart"}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          JPEG, PNG, GIF, WebP, SVG — Max 10MB
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
                 </div>
 
                 {/* Subject and Topic Row */}
@@ -576,6 +749,23 @@ const CreateQuestionPage = () => {
                   />
                 </div>
 
+                {/* Calculator Toggle */}
+                <div className="flex items-center justify-between rounded-xl border-2 p-4 bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Allow Calculator</p>
+                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.isCalculatorAllowed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isCalculatorAllowed: checked })}
+                  />
+                </div>
+
                 {/* Question Type */}
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
                   <div className="space-y-2">
@@ -673,6 +863,32 @@ const CreateQuestionPage = () => {
                             {t("questionBank.correctAnswer")}
                           </p>
                         )}
+                        {/* Option Image */}
+                        <div className="flex items-center gap-2">
+                          {option.imagePreview ? (
+                            <div className="relative group">
+                              <img src={option.imagePreview} alt={`Option ${index + 1}`} className="h-16 w-24 object-cover rounded-md border" />
+                              <button
+                                type="button"
+                                onClick={() => removeOptionImage(option.id)}
+                                className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
+                              <ImageIcon className="h-3.5 w-3.5" />
+                              <span>Add Image</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleOptionImageSelect(option.id, e)}
+                              />
+                            </label>
+                          )}
+                        </div>
                       </div>
                       <Button
                         type="button"
@@ -769,6 +985,32 @@ const CreateQuestionPage = () => {
                             {t("questionBank.correctAnswer")}
                           </p>
                         )}
+                        {/* Option Image */}
+                        <div className="flex items-center gap-2">
+                          {option.imagePreview ? (
+                            <div className="relative group">
+                              <img src={option.imagePreview} alt={`Option ${index + 1}`} className="h-16 w-24 object-cover rounded-md border" />
+                              <button
+                                type="button"
+                                onClick={() => removeOptionImage(option.id)}
+                                className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
+                              <ImageIcon className="h-3.5 w-3.5" />
+                              <span>Add Image</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleOptionImageSelect(option.id, e)}
+                              />
+                            </label>
+                          )}
+                        </div>
                       </div>
                       <Button
                         type="button"
@@ -834,72 +1076,8 @@ const CreateQuestionPage = () => {
               </Card>
             )}
 
-            {/* Short Answer */}
-            {isShortAnswer && (
-              <Card className="border-2 shadow-sm overflow-hidden pt-0">
-                <CardHeader className="bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-950/50 dark:to-teal-900/30 border-b py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-lg">
-                      <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Expected Answer</CardTitle>
-                      <CardDescription>Provide the correct answer for auto-grading</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="shortAnswer" className="text-sm font-semibold">
-                      Correct Answer <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="shortAnswer"
-                      placeholder="Enter the expected answer"
-                      value={correctAnswer}
-                      onChange={(e) => setCorrectAnswer(e.target.value)}
-                      className="border-2 h-11"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Numeric */}
-            {isNumeric && (
-              <Card className="border-2 shadow-sm overflow-hidden pt-0">
-                <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-950/50 dark:to-indigo-900/30 border-b py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
-                      <Settings className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Numeric Answer</CardTitle>
-                      <CardDescription>Provide the correct numeric value</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="numericAnswer" className="text-sm font-semibold">
-                      Correct Value <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="numericAnswer"
-                      type="number"
-                      step="any"
-                      placeholder="Enter the numeric answer"
-                      value={correctAnswer}
-                      onChange={(e) => setCorrectAnswer(e.target.value)}
-                      className="border-2 h-11"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Essay */}
-            {isEssay && (
+            {/* Subjective - Manual Grading with AI Suggestion */}
+            {isSubjective && (
               <Card className="border-2 shadow-sm overflow-hidden pt-0">
                 <CardHeader className="bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-950/50 dark:to-rose-900/30 border-b py-4">
                   <div className="flex items-center gap-3">
@@ -910,8 +1088,8 @@ const CreateQuestionPage = () => {
                       <CardTitle className="text-lg">{language === "ar" ? "الإجابة النموذجية / معايير التقييم" : "Model Answer / Grading Rubric"}</CardTitle>
                       <CardDescription>
                         {language === "ar"
-                          ? "هذا السؤال يتطلب تصحيح يدوي. أدخل الإجابة النموذجية كمرجع للمُقيّم"
-                          : "This question requires manual grading. Enter a model answer as a reference for the grader"}
+                          ? "هذا السؤال يتطلب تصحيح يدوي مع اقتراح ذكاء اصطناعي. أدخل الإجابة النموذجية كمرجع للمُقيّم"
+                          : "This question requires manual grading with AI suggestion. Enter a model answer as a reference for the grader"}
                       </CardDescription>
                     </div>
                   </div>
@@ -920,8 +1098,9 @@ const CreateQuestionPage = () => {
                   <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/30">
                     <Info className="h-4 w-4 text-amber-600" />
                     <AlertDescription className="text-amber-700 dark:text-amber-300">
-                      Essay questions cannot be auto-graded. Instructors will need to manually review and grade
-                      responses. The model answer below will be displayed as a reference during grading.
+                      {language === "ar"
+                        ? "الأسئلة الذاتية تحتاج تصحيح يدوي مع دعم اقتراح الذكاء الاصطناعي. الإجابة النموذجية أدناه ستظهر كمرجع أثناء التصحيح."
+                        : "Subjective questions require manual grading with AI suggestion support. The model answer below will be displayed as a reference during grading."}
                     </AlertDescription>
                   </Alert>
                   <div className="space-y-4">
