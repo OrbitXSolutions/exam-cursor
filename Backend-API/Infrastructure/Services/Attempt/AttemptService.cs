@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Attempt;
@@ -16,6 +17,7 @@ public class AttemptService : IAttemptService
 {
   private readonly ApplicationDbContext _context;
   private readonly IHubContext<ProctorHub> _proctorHub;
+  private readonly IHttpContextAccessor _httpContextAccessor;
 
   // Violation event types that should be pushed to proctor in real time
   private static readonly HashSet<AttemptEventType> ViolationEventTypes = new()
@@ -49,10 +51,11 @@ public class AttemptService : IAttemptService
     AttemptEventType.CameraBlocked,    // Intentional covering of camera
   };
 
-  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub)
+  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub, IHttpContextAccessor httpContextAccessor)
   {
     _context = context;
     _proctorHub = proctorHub;
+    _httpContextAccessor = httpContextAccessor;
   }
 
   #region Attempt Lifecycle
@@ -227,6 +230,8 @@ public class AttemptService : IAttemptService
         Mode = ProctorMode.Soft,
         StartedAt = now,
         Status = ProctorSessionStatus.Active,
+        IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
+        UserAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString(),
         TotalEvents = 0,
         TotalViolations = 0,
         RiskScore = 0,

@@ -52,7 +52,8 @@ using Smart_Core.Infrastructure.Services.CandidateExamDetails;
 using Smart_Core.Infrastructure.Services.ExamOperations;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Infrastructure.Storage;
-using StackExchange.Redis;
+using Smart_Core.Application.Interfaces.Logs;
+using Smart_Core.Infrastructure.Services.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -130,34 +131,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Redis Caching (optional - falls back to in-memory cache)
-var redisConnection = builder.Configuration.GetConnectionString("Redis");
-if (!string.IsNullOrWhiteSpace(redisConnection))
-{
-    try
-    {
-        builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-            ConnectionMultiplexer.Connect(redisConnection));
-
-        builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = redisConnection;
-            options.InstanceName = "SmartCore_";
-        });
-
-        Log.Information("Redis cache configured successfully");
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "Failed to connect to Redis, falling back to in-memory cache");
-        builder.Services.AddDistributedMemoryCache();
-    }
-}
-else
-{
-    Log.Information("Redis not configured, using in-memory distributed cache");
-    builder.Services.AddDistributedMemoryCache();
-}
+// In-Memory Caching
+builder.Services.AddMemoryCache();
+Log.Information("In-memory cache configured");
 
 // Rate Limiting
 var rateLimitSettings = builder.Configuration.GetSection("RateLimiting");
@@ -240,15 +216,20 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<INotificationService, Smart_Core.Infrastructure.Services.Notification.NotificationService>();
-builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<DatabaseSeeder>();
+
+// System Logs (Channel + Background persistence)
+builder.Services.AddSingleton<SystemLogChannel>();
+builder.Services.AddScoped<ISystemLogService, SystemLogService>();
 
 // Background Services
 builder.Services.AddHostedService<LogCleanupService>();
 builder.Services.AddHostedService<VideoRetentionService>();
 builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Background.AttemptExpiryBackgroundService>();
 builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Notification.NotificationBackgroundService>();
+builder.Services.AddHostedService<LogPersistenceService>();
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
@@ -321,6 +302,9 @@ var app = builder.Build();
 
 // CORS — required for SignalR WebSocket from frontend origin
 app.UseCors("SignalRCors");
+
+// Request/Response Logging (writes to Channel — zero blocking)
+app.UseRequestResponseLogging();
 
 // Global Exception Handling
 app.UseGlobalExceptionMiddleware();

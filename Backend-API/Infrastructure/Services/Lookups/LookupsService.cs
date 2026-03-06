@@ -18,17 +18,20 @@ public class LookupsService : ILookupsService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
     public LookupsService(
         ApplicationDbContext context,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _cache = cache;
     }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
@@ -38,6 +41,14 @@ public class LookupsService : ILookupsService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
         return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+    }
+
+    private void InvalidateLookupCache(string prefix)
+    {
+        _cache.RemoveByPrefix(prefix);
+        // Lookups changes may affect question/exam list displays
+        _cache.RemoveByPrefix(CacheKeys.QuestionsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
     }
 
     #region Question Category
@@ -125,6 +136,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionCategories.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<QuestionCategoryDto>.SuccessResponse(
           entity.Adapt<QuestionCategoryDto>(),
@@ -166,6 +178,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<QuestionCategoryDto>.SuccessResponse(
  entity.Adapt<QuestionCategoryDto>(),
@@ -186,6 +199,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionCategories.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.CategoriesPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question category deleted successfully");
     }
@@ -277,6 +291,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionTypes.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<QuestionTypeDto>.SuccessResponse(
               entity.Adapt<QuestionTypeDto>(),
@@ -318,6 +333,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<QuestionTypeDto>.SuccessResponse(
  entity.Adapt<QuestionTypeDto>(),
@@ -338,6 +354,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionTypes.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.QuestionTypesPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question type deleted successfully");
     }
@@ -496,6 +513,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionSubjects.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         var resultDto = new QuestionSubjectDto
         {
@@ -562,6 +580,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         var resultDto = new QuestionSubjectDto
         {
@@ -608,6 +627,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionSubjects.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.SubjectsPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question subject deleted successfully");
     }
@@ -773,6 +793,7 @@ public class LookupsService : ILookupsService
 
         _context.QuestionTopics.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         var resultDto = new QuestionTopicDto
         {
@@ -859,6 +880,7 @@ public class LookupsService : ILookupsService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         var resultDto = new QuestionTopicDto
         {
@@ -897,6 +919,7 @@ public class LookupsService : ILookupsService
         // Hard delete
         _context.QuestionTopics.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateLookupCache(CacheKeys.TopicsPrefix);
 
         return ApiResponse<bool>.SuccessResponse(true, "Question topic deleted successfully");
     }

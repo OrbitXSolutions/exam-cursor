@@ -40,7 +40,6 @@ import {
   MessageSquare,
   XCircle,
   Clock,
-  Activity,
   RefreshCw,
   Monitor,
   Camera,
@@ -69,7 +68,8 @@ export default function ProctorCenterPage() {
   const [triageItems, setTriageItems] = useState<TriageRecommendation[]>([])
   const [triageOpen, setTriageOpen] = useState(false)
   const [triageLoading, setTriageLoading] = useState(false)
-  const [useSampleData, setUseSampleData] = useState(true)
+  const [useSampleData, setUseSampleData] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
   // Risk level helper — matches backend GetRiskLevel thresholds
   function getRiskBadge(score?: number) {
     if (score == null) return null
@@ -84,12 +84,12 @@ export default function ProctorCenterPage() {
     // Auto-refresh every 30 seconds
     const interval = setInterval(loadSessions, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [demoMode])
 
   async function loadSessions() {
     try {
       if (!loading) setRefreshing(true)
-      const data = await getLiveSessions()
+      const data = await getLiveSessions(demoMode)
       // Auto-flag sessions with > 5 violations
       const flagged = data.map((s) => {
         if ((s.totalViolations ?? 0) > 5 && !s.flagged) {
@@ -162,14 +162,6 @@ export default function ProctorCenterPage() {
     const hrs = Math.floor(minutes / 60)
     const mins = minutes % 60
     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`
-  }
-
-  function getTimeSince(dateString: string) {
-    const diff = Date.now() - new Date(dateString).getTime()
-    const seconds = Math.floor(diff / 1000)
-    if (seconds < 60) return t("proctor.secondsAgo", { seconds })
-    const minutes = Math.floor(seconds / 60)
-    return t("proctor.minutesAgo", { minutes })
   }
 
   const filteredSessions = sessions.filter((s) => {
@@ -409,6 +401,17 @@ export default function ProctorCenterPage() {
           <Flag className="h-4 w-4" />
           {locale === "ar" ? `المُعلَّمة (${flaggedSessions.length})` : `Flagged (${flaggedSessions.length})`}
         </Button>
+        {/* Demo Mode Toggle */}
+        <div className="flex items-center gap-2 ms-auto">
+          <Checkbox
+            id="demoMode"
+            checked={demoMode}
+            onCheckedChange={(checked) => setDemoMode(!!checked)}
+          />
+          <label htmlFor="demoMode" className="text-sm text-muted-foreground cursor-pointer select-none">
+            {locale === "ar" ? "بيانات تجريبية" : "Demo"}
+          </label>
+        </div>
       </div>
 
       {/* Sessions Grid */}
@@ -427,7 +430,7 @@ export default function ProctorCenterPage() {
             >
               {/* Snapshot Preview / Placeholder */}
               <div className="relative aspect-video bg-muted">
-                {session.latestSnapshotUrl && !session.isSample ? (
+                {session.latestSnapshotUrl ? (
                   <img
                     src={session.latestSnapshotUrl}
                     alt={session.candidateName}
@@ -479,7 +482,7 @@ export default function ProctorCenterPage() {
                     </Badge>
                   </div>
                 )}
-                {!session.isSample && (session.snapshotCount ?? 0) > 0 && (
+                {(session.snapshotCount ?? 0) > 0 && (
                   <div className="absolute bottom-2 start-2 flex items-center gap-1 px-2 py-1 rounded bg-black/70 text-white text-xs">
                     <Camera className="h-3 w-3" />
                     {session.snapshotCount}
@@ -497,10 +500,7 @@ export default function ProctorCenterPage() {
                     <p className="font-medium truncate">{session.candidateName}</p>
                     <p className="text-sm text-muted-foreground truncate">{session.examTitle}</p>
                   </div>
-                  {session.isSample ? (
-                    <Badge variant="outline" className="text-xs shrink-0">Sample</Badge>
-                  ) : (
-                    <DropdownMenu>
+                  <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
                           <MoreVertical className="h-4 w-4" />
@@ -539,26 +539,25 @@ export default function ProctorCenterPage() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                  <Activity className="h-3 w-3" />
-                  <span>
-                    {t("proctor.lastActivity")}: {getTimeSince(session.lastActivity)}
-                  </span>
                 </div>
                 {/* Violations Count */}
-                {(session.totalViolations ?? 0) > 0 && (
-                  <div className="flex items-center gap-2 mt-1.5 text-xs">
-                    <AlertTriangle className="h-3 w-3 text-destructive" />
-                    <span className="text-destructive font-medium">
-                      {locale === "ar" ? `المخالفات: ${session.totalViolations}` : `Violations: ${session.totalViolations}`}
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 mt-3 text-xs">
+                  <AlertTriangle className={`h-3 w-3 ${(session.totalViolations ?? 0) > 0 ? "text-destructive" : "text-muted-foreground"}`} />
+                  <span className={`font-medium ${(session.totalViolations ?? 0) > 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                    {locale === "ar" ? `المخالفات: ${session.totalViolations ?? 0}` : `Violations: ${session.totalViolations ?? 0}`}
+                  </span>
+                </div>
+                {/* Warnings Count */}
+                <div className="flex items-center gap-2 mt-1.5 text-xs">
+                  <MessageSquare className={`h-3 w-3 ${(session.countableViolationCount ?? 0) > 0 ? "text-amber-600" : "text-muted-foreground"}`} />
+                  <span className={`font-medium ${(session.countableViolationCount ?? 0) > 0 ? "text-amber-600" : "text-muted-foreground"}`}>
+                    {locale === "ar"
+                      ? `التحذيرات: ${session.countableViolationCount ?? 0}${session.maxViolationWarnings ? ` / ${session.maxViolationWarnings}` : ""}`
+                      : `Warnings: ${session.countableViolationCount ?? 0}${session.maxViolationWarnings ? ` / ${session.maxViolationWarnings}` : ""}`}
+                  </span>
+                </div>
                 {/* Card Actions */}
-                {!session.isSample && (
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t">
                     <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" asChild>
                       <Link href={`/proctor-center/${session.id}`}>
                         <Eye className="h-3.5 w-3.5 me-1.5" />
@@ -578,7 +577,6 @@ export default function ProctorCenterPage() {
                       {t("proctor.sendWarning")}
                     </Button>
                   </div>
-                )}
               </CardContent>
             </Card>
             )

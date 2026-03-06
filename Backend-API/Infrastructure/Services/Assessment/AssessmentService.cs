@@ -19,6 +19,7 @@ public class AssessmentService : IAssessmentService
   private readonly ICurrentUserService _currentUserService;
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly INotificationService _notificationService;
+  private readonly ICacheService _cache;
   private const int MaxDurationMinutes = 600;
   private const int MinAccessCodeLength = 6;
 
@@ -27,25 +28,28 @@ public class AssessmentService : IAssessmentService
    IDepartmentService departmentService,
       ICurrentUserService currentUserService,
       UserManager<ApplicationUser> userManager,
-      INotificationService notificationService)
+      INotificationService notificationService,
+      ICacheService cache)
   {
     _context = context;
     _departmentService = departmentService;
     _currentUserService = currentUserService;
     _userManager = userManager;
     _notificationService = notificationService;
+    _cache = cache;
+  }
+
+  private void InvalidateExamCache()
+  {
+    _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
+    _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
   }
 
   #region Exams
 
   public async Task<ApiResponse<PaginatedResponse<ExamListDto>>> GetAllExamsAsync(ExamSearchDto searchDto)
   {
-    var query = _context.Exams
-     .Include(x => x.Department)
-        .Include(x => x.AccessPolicy)
-        .Include(x => x.Sections)
-.ThenInclude(s => s.Questions)
-.AsQueryable();
+    var query = _context.Exams.AsQueryable();
 
     // Include deleted if requested
     if (searchDto.IncludeDeleted)
@@ -128,12 +132,35 @@ public class AssessmentService : IAssessmentService
 
     // Pagination
     var totalCount = await query.CountAsync();
-    var items = await query
+
+    // Project directly to DTO — avoids loading Sections/Questions entities into memory
+    var itemDtos = await query
         .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
         .Take(searchDto.PageSize)
-.ToListAsync();
-
-    var itemDtos = items.Select(MapToExamListDto).ToList();
+        .Select(x => new ExamListDto
+        {
+          Id = x.Id,
+          DepartmentId = x.DepartmentId,
+          DepartmentNameEn = x.Department != null ? x.Department.NameEn : null,
+          DepartmentNameAr = x.Department != null ? x.Department.NameAr : null,
+          ExamType = x.ExamType,
+          TitleEn = x.TitleEn,
+          TitleAr = x.TitleAr,
+          StartAt = x.StartAt,
+          EndAt = x.EndAt,
+          DurationMinutes = x.DurationMinutes,
+          PassScore = x.PassScore,
+          IsPublished = x.IsPublished,
+          IsActive = x.IsActive,
+          CreatedDate = x.CreatedDate,
+          SectionsCount = x.Sections.Count,
+          QuestionsCount = x.Sections.SelectMany(s => s.Questions).Count(),
+          TotalPoints = x.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
+          AccessPolicyStatus = x.AccessPolicy != null && x.AccessPolicy.RestrictToAssignedCandidates
+              ? "Assigned"
+              : "Public"
+        })
+        .ToListAsync();
 
     var response = new PaginatedResponse<ExamListDto>
     {
@@ -290,6 +317,7 @@ public class AssessmentService : IAssessmentService
 
     _context.Exams.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     // Auto-create default AccessPolicy (Public by default)
     var defaultAccessPolicy = new ExamAccessPolicy
@@ -303,6 +331,7 @@ public class AssessmentService : IAssessmentService
     };
     _context.Set<ExamAccessPolicy>().Add(defaultAccessPolicy);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return await GetExamByIdAsync(entity.Id);
   }
@@ -395,6 +424,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return await GetExamByIdAsync(entity.Id);
   }
@@ -423,6 +453,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedDate = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Exam deleted successfully");
   }
@@ -449,6 +480,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     // Queue notifications for candidates (runs in background)
     try
@@ -477,6 +509,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Exam unpublished successfully");
   }
@@ -495,6 +528,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var status = entity.IsActive ? "activated" : "deactivated";
     return ApiResponse<bool>.SuccessResponse(true, $"Exam {status} successfully");
@@ -545,6 +579,7 @@ public class AssessmentService : IAssessmentService
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return await GetExamByIdAsync(entity.Id);
   }
@@ -636,6 +671,7 @@ public class AssessmentService : IAssessmentService
 
     _context.ExamSections.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetSectionByIdAsync(entity.Id);
 
@@ -693,6 +729,7 @@ x.Order == dto.Order &&
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetSectionByIdAsync(entity.Id);
 
@@ -727,6 +764,7 @@ x.Order == dto.Order &&
     entity.UpdatedDate = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Section deleted successfully");
   }
@@ -770,6 +808,7 @@ x.Order == dto.Order &&
     }
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Sections reordered successfully");
   }
@@ -866,6 +905,7 @@ x.Order == dto.Order &&
 
     _context.ExamQuestions.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     // Reload with includes
     var result = await _context.ExamQuestions
@@ -954,6 +994,7 @@ x.Order == dto.Order &&
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetSectionQuestionsAsync(sectionId);
 
@@ -1010,6 +1051,7 @@ x.Order == dto.Order &&
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<ExamQuestionDto>.SuccessResponse(
 MapToExamQuestionDto(entity),
@@ -1039,6 +1081,7 @@ warningMessage ?? "Exam question updated successfully");
     entity.UpdatedDate = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Question removed from exam successfully");
   }
@@ -1082,6 +1125,7 @@ warningMessage ?? "Exam question updated successfully");
     }
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Questions reordered successfully");
   }
@@ -1148,6 +1192,7 @@ warningMessage ?? "Exam question updated successfully");
 
       _context.ExamAccessPolicies.Add(entity);
       await _context.SaveChangesAsync();
+      InvalidateExamCache();
 
       return ApiResponse<ExamAccessPolicyDto>.SuccessResponse(
     entity.Adapt<ExamAccessPolicyDto>(),
@@ -1163,6 +1208,7 @@ warningMessage ?? "Exam question updated successfully");
       existingPolicy.UpdatedBy = userId;
 
       await _context.SaveChangesAsync();
+      InvalidateExamCache();
 
       return ApiResponse<ExamAccessPolicyDto>.SuccessResponse(
       existingPolicy.Adapt<ExamAccessPolicyDto>(),
@@ -1231,6 +1277,7 @@ warningMessage ?? "Exam question updated successfully");
 
     _context.ExamInstructions.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<ExamInstructionDto>.SuccessResponse(
 entity.Adapt<ExamInstructionDto>(),
@@ -1276,6 +1323,7 @@ x.Order == dto.Order &&
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<ExamInstructionDto>.SuccessResponse(
 entity.Adapt<ExamInstructionDto>(),
@@ -1298,6 +1346,7 @@ entity.Adapt<ExamInstructionDto>(),
     entity.UpdatedDate = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Instruction deleted successfully");
   }
@@ -1341,6 +1390,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     }
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Instructions reordered successfully");
   }
@@ -1799,6 +1849,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
     _context.ExamTopics.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetTopicByIdAsync(entity.Id);
     if (warningMessage != null && result.Success)
@@ -1847,6 +1898,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetTopicByIdAsync(entity.Id);
     if (warningMessage != null && result.Success)
@@ -1869,6 +1921,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     entity.UpdatedDate = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Topic deleted successfully");
   }
@@ -1910,6 +1963,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     }
 
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return ApiResponse<bool>.SuccessResponse(true, "Topics reordered successfully");
   }
@@ -2004,6 +2058,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
     _context.ExamQuestions.Add(entity);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await _context.ExamQuestions
     .Include(x => x.Question)
@@ -2091,6 +2146,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetTopicQuestionsAsync(topicId);
     if (existingQuestionIds.Any())
@@ -2178,6 +2234,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetSectionQuestionsAsync(sectionId);
     if (existingQuestionIds.Any())
@@ -2267,6 +2324,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     var result = await GetTopicQuestionsAsync(topicId);
     if (existingQuestionIds.Any())
@@ -2362,6 +2420,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return await GetSectionQuestionsAsync(sectionId);
   }
@@ -2453,6 +2512,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamQuestions.AddRange(entities);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     return await GetTopicQuestionsAsync(topicId);
   }
@@ -2614,6 +2674,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
     {
       _context.ExamSections.RemoveRange(existingSections);
       await _context.SaveChangesAsync();
+      InvalidateExamCache();
     }
 
     // Create new sections
@@ -2670,6 +2731,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
     _context.ExamSections.AddRange(newSections);
     await _context.SaveChangesAsync();
+    InvalidateExamCache();
 
     // Return updated builder state
     return await GetExamBuilderAsync(examId);
@@ -2886,6 +2948,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
     }
 
     // 8. Return full new exam
+    InvalidateExamCache();
     return await GetExamByIdAsync(newExam.Id);
   }
 

@@ -30,6 +30,15 @@ import {
   Loader2,
   Video,
   ExternalLink,
+  BarChart3,
+  Target,
+  HelpCircle,
+  Hash,
+  RefreshCw,
+  Timer,
+  Laptop,
+  Globe,
+  Fingerprint,
 } from "lucide-react"
 
 interface ProctorSession {
@@ -43,8 +52,22 @@ interface ProctorSession {
   startedAt: string
   endedAt?: string
   totalViolations: number
+  countableViolationCount?: number
+  maxViolationWarnings?: number
   riskScore?: number
   requiresReview: boolean
+  isTerminatedByProctor?: boolean
+  terminationReason?: string
+  // Device & Environment
+  ipAddress?: string
+  userAgent?: string
+  browserName?: string
+  browserVersion?: string
+  operatingSystem?: string
+  screenResolution?: string
+  deviceFingerprint?: string
+  attemptIpAddress?: string
+  attemptDeviceInfo?: string
 }
 
 interface AIAnalysis {
@@ -91,6 +114,7 @@ export default function AIReportPage() {
   const [aiAnalysis2, setAiAnalysis2] = useState<AiProctorAnalysis | null>(null)
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
   const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null)
+  const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null)
 
   const normalizeList = <T,>(res: unknown): T[] => {
     if (Array.isArray(res)) return res as T[]
@@ -666,71 +690,461 @@ export default function AIReportPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">{language === "ar" ? "النهاية" : "Ended"}</p>
                   <p className="font-medium">
-                    {session.endedAt
-                      ? new Date(session.endedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")
-                      : "—"}
+                    {(() => {
+                      const endDate = session.endedAt
+                        || attemptEvents.find(e => e.eventType === 6 || e.eventType === 7 || e.eventType === 13)?.occurredAt
+                      return endDate
+                        ? new Date(endDate).toLocaleString(language === "ar" ? "ar-SA" : "en-US")
+                        : "—"
+                    })()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">{language === "ar" ? "المخالفات" : "Violations"}</p>
-                  <p className="font-medium">{session.totalViolations}</p>
+                  <p className="text-sm text-muted-foreground">{language === "ar" ? "المدة" : "Duration"}</p>
+                  <p className="font-medium">
+                    {(() => {
+                      const endDate = session.endedAt
+                        || attemptEvents.find(e => e.eventType === 6 || e.eventType === 7 || e.eventType === 13)?.occurredAt
+                      if (!endDate) return "—"
+                      const diffMs = new Date(endDate).getTime() - new Date(session.startedAt).getTime()
+                      const mins = Math.floor(diffMs / 60000)
+                      const secs = Math.floor((diffMs % 60000) / 1000)
+                      return `${mins}m ${secs}s`
+                    })()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{language === "ar" ? "الحالة" : "Status"}</p>
-                  <Badge variant={session.statusName === "Active" ? "default" : "secondary"}>
-                    {session.statusName}
+                  <Badge variant={
+                    session.statusName === "Active" ? "default"
+                    : session.statusName === "Cancelled" || session.isTerminatedByProctor ? "destructive"
+                    : "secondary"
+                  }>
+                    {session.isTerminatedByProctor
+                      ? (language === "ar" ? "تم الإنهاء تلقائياً" : "Auto-Terminated")
+                      : session.statusName}
                   </Badge>
                 </div>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">{language === "ar" ? "إجمالي المخالفات" : "Total Violations"}</p>
+                  <p className={`font-bold text-lg ${session.totalViolations > 0 ? "text-orange-600" : "text-green-600"}`}>
+                    {session.totalViolations || attemptEvents.filter(e => [4,5,8,10,11,12,16,17,18,19,20,21,22].includes(e.eventType)).length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar" ? "المخالفات المحتسبة" : "Countable Violations"}
+                  </p>
+                  <p className="font-bold text-lg">
+                    {session.countableViolationCount ?? attemptEvents.filter(e => [4,18,19,21].includes(e.eventType)).length}
+                    {(session.maxViolationWarnings ?? 0) > 0 && (
+                      <span className="text-sm font-normal text-muted-foreground">
+                        {" / "}{session.maxViolationWarnings}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">{language === "ar" ? "إجمالي الأحداث" : "Total Events"}</p>
+                  <p className="font-medium text-lg">{attemptEvents.length}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {language === "ar" ? "الإنهاء التلقائي" : "Auto-Termination"}
+                  </p>
+                  <Badge variant="outline" className={
+                    (session.maxViolationWarnings ?? 0) > 0
+                      ? "bg-green-500/10 border-green-500/30 text-green-600"
+                      : "bg-muted"
+                  }>
+                    {(session.maxViolationWarnings ?? 0) > 0
+                      ? (language === "ar" ? `مفعّل (${session.maxViolationWarnings} تحذير)` : `Enabled (${session.maxViolationWarnings} warnings)`)
+                      : (language === "ar" ? "معطّل" : "Disabled")}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Termination Info Banner */}
+              {session.isTerminatedByProctor && session.terminationReason && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-destructive" />
+                    <div>
+                      <p className="text-sm font-medium text-destructive">
+                        {language === "ar" ? "سبب الإنهاء" : "Termination Reason"}
+                      </p>
+                      <p className="text-sm text-destructive/80">{session.terminationReason}</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Device & Environment */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Laptop className="h-5 w-5" />
+                {language === "ar" ? "الجهاز والبيئة" : "Device & Environment"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* IP Address */}
+                <div className="flex items-start gap-3">
+                  <Globe className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">{language === "ar" ? "عنوان IP" : "IP Address"}</p>
+                    <p className="font-medium font-mono text-sm">{session.ipAddress || "—"}</p>
+                    {session.attemptIpAddress && session.attemptIpAddress !== session.ipAddress && (
+                      <p className="text-xs text-amber-600 mt-0.5">
+                        {language === "ar" ? "IP المحاولة يختلف:" : "Attempt IP differs:"} {session.attemptIpAddress}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {/* Browser */}
+                <div className="flex items-start gap-3">
+                  <Globe className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">{language === "ar" ? "المتصفح" : "Browser"}</p>
+                    <p className="font-medium text-sm">
+                      {session.browserName
+                        ? `${session.browserName}${session.browserVersion ? " " + session.browserVersion : ""}`
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+                {/* Operating System */}
+                <div className="flex items-start gap-3">
+                  <Monitor className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">{language === "ar" ? "نظام التشغيل" : "Operating System"}</p>
+                    <p className="font-medium text-sm">{session.operatingSystem || "—"}</p>
+                  </div>
+                </div>
+                {/* Screen Resolution */}
+                <div className="flex items-start gap-3">
+                  <Monitor className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">{language === "ar" ? "دقة الشاشة" : "Screen Resolution"}</p>
+                    <p className="font-medium text-sm font-mono">{session.screenResolution || "—"}</p>
+                  </div>
+                </div>
+                {/* Device Fingerprint */}
+                {session.deviceFingerprint && (
+                  <div className="flex items-start gap-3 md:col-span-2">
+                    <Fingerprint className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "بصمة الجهاز" : "Device Fingerprint"}</p>
+                      <p className="font-medium text-xs font-mono break-all">{session.deviceFingerprint}</p>
+                    </div>
+                  </div>
+                )}
+                {/* Device Info from Attempt */}
+                {session.attemptDeviceInfo && (
+                  <div className="flex items-start gap-3 md:col-span-2">
+                    <Laptop className="h-4 w-4 mt-1 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "معلومات الجهاز" : "Device Info"}</p>
+                      <p className="font-medium text-xs font-mono break-all">{session.attemptDeviceInfo}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
+          {/* Candidate Answer Behavior */}
+          {(() => {
+            const answerEvents = attemptEvents.filter(e => e.eventType === 2)
+            if (answerEvents.length === 0) return null
+
+            // Group by questionId to detect answer changes
+            const questionMap = new Map<number, { count: number; times: string[]; text?: string }>()
+            for (const evt of answerEvents) {
+              try {
+                const meta = evt.metadataJson ? JSON.parse(evt.metadataJson) : {}
+                const qId = meta.questionId
+                if (!qId) continue
+                const existing = questionMap.get(qId)
+                if (existing) {
+                  existing.count++
+                  existing.times.push(evt.occurredAt)
+                } else {
+                  questionMap.set(qId, { count: 1, times: [evt.occurredAt], text: evt.questionTextEn })
+                }
+              } catch { /* skip malformed metadata */ }
+            }
+
+            const totalAnswered = questionMap.size
+            const changedAnswers = Array.from(questionMap.values()).filter(q => q.count > 1)
+            const totalChanges = changedAnswers.reduce((sum, q) => sum + q.count - 1, 0)
+
+            // Time analysis: gap between consecutive answer events
+            const sortedAnswers = [...answerEvents].sort((a, b) =>
+              new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
+            )
+            const questionTimes: { qId: number; text?: string; seconds: number }[] = []
+            for (let i = 0; i < sortedAnswers.length; i++) {
+              try {
+                const meta = sortedAnswers[i].metadataJson ? JSON.parse(sortedAnswers[i].metadataJson) : {}
+                const qId = meta.questionId
+                if (!qId) continue
+                // Only count first answer per question for time analysis
+                if (questionTimes.some(qt => qt.qId === qId)) continue
+                const prevTime = i > 0
+                  ? new Date(sortedAnswers[i - 1].occurredAt).getTime()
+                  : new Date(session.startedAt).getTime()
+                const curTime = new Date(sortedAnswers[i].occurredAt).getTime()
+                const seconds = Math.max(0, Math.round((curTime - prevTime) / 1000))
+                if (seconds > 0 && seconds < 7200) { // sanity: max 2hr per question
+                  questionTimes.push({ qId, text: sortedAnswers[i].questionTextEn, seconds })
+                }
+              } catch { /* skip */ }
+            }
+
+            const slowest = [...questionTimes].sort((a, b) => b.seconds - a.seconds).slice(0, 3)
+            const fastest = [...questionTimes].sort((a, b) => a.seconds - b.seconds).slice(0, 3)
+            const avgTime = questionTimes.length > 0
+              ? Math.round(questionTimes.reduce((s, q) => s + q.seconds, 0) / questionTimes.length)
+              : 0
+
+            const formatTime = (s: number) => {
+              if (s < 60) return `${s}s`
+              const m = Math.floor(s / 60)
+              const sec = s % 60
+              return sec > 0 ? `${m}m ${sec}s` : `${m}m`
+            }
+
+            return (
+              <Card className="border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <BarChart3 className="h-5 w-5 text-indigo-500" />
+                    {language === "ar" ? "سلوك إجابة المرشح" : "Candidate Answer Behavior"}
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    {language === "ar"
+                      ? "تحليل أنماط الإجابة والسلوك أثناء الاختبار"
+                      : "Analysis of answering patterns and behavior during the exam"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Target className="h-5 w-5 text-indigo-500" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {language === "ar" ? "الأسئلة المجابة" : "Questions Answered"}
+                        </p>
+                        <p className="text-lg font-bold">{totalAnswered}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <RefreshCw className="h-5 w-5 text-amber-500" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {language === "ar" ? "تغييرات الإجابة" : "Answer Changes"}
+                        </p>
+                        <p className={`text-lg font-bold ${totalChanges > 0 ? "text-amber-600" : ""}`}>
+                          {totalChanges}
+                          {totalChanges > 0 && (
+                            <span className="text-xs font-normal text-muted-foreground ms-1">
+                              ({changedAnswers.length} {language === "ar" ? "سؤال" : "questions"})
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Timer className="h-5 w-5 text-blue-500" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {language === "ar" ? "متوسط الوقت" : "Avg. Time/Question"}
+                        </p>
+                        <p className="text-lg font-bold">{avgTime > 0 ? formatTime(avgTime) : "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Hash className="h-5 w-5 text-green-500" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {language === "ar" ? "إجمالي الإجابات" : "Total Submissions"}
+                        </p>
+                        <p className="text-lg font-bold">{answerEvents.length}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slowest Questions */}
+                  {slowest.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-orange-500" />
+                        {language === "ar" ? "الأسئلة الأبطأ" : "Slowest Questions"}
+                      </p>
+                      <div className="space-y-1.5">
+                        {slowest.map((q, i) => (
+                          <div key={q.qId} className="flex items-center justify-between p-2 rounded-md bg-muted/30 text-sm">
+                            <span className="text-muted-foreground truncate max-w-[70%]">
+                              {q.text || `Q#${q.qId}`}
+                            </span>
+                            <Badge variant="outline" className="bg-orange-500/10 border-orange-500/20 text-orange-600 text-xs">
+                              {formatTime(q.seconds)}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fastest Questions */}
+                  {fastest.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                        <HelpCircle className="h-3.5 w-3.5 text-green-500" />
+                        {language === "ar" ? "الأسئلة الأسرع" : "Fastest Questions"}
+                        <span className="text-[10px] text-muted-foreground font-normal">
+                          ({language === "ar" ? "قد تشير إلى تخمين" : "may indicate guessing"})
+                        </span>
+                      </p>
+                      <div className="space-y-1.5">
+                        {fastest.map((q, i) => (
+                          <div key={q.qId} className="flex items-center justify-between p-2 rounded-md bg-muted/30 text-sm">
+                            <span className="text-muted-foreground truncate max-w-[70%]">
+                              {q.text || `Q#${q.qId}`}
+                            </span>
+                            <Badge variant="outline" className={`text-xs ${
+                              q.seconds <= 5
+                                ? "bg-red-500/10 border-red-500/20 text-red-600"
+                                : "bg-green-500/10 border-green-500/20 text-green-600"
+                            }`}>
+                              {formatTime(q.seconds)}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Changed Answers */}
+                  {changedAnswers.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                        <RefreshCw className="h-3.5 w-3.5 text-amber-500" />
+                        {language === "ar" ? "أسئلة تم تغيير إجابتها" : "Questions with Changed Answers"}
+                      </p>
+                      <div className="space-y-1.5">
+                        {changedAnswers.slice(0, 5).map((q, i) => {
+                          const entry = Array.from(questionMap.entries()).find(([, v]) => v === q)
+                          return (
+                            <div key={i} className="flex items-center justify-between p-2 rounded-md bg-amber-500/5 border border-amber-500/10 text-sm">
+                              <span className="text-muted-foreground truncate max-w-[70%]">
+                                {q.text || `Q#${entry?.[0]}`}
+                              </span>
+                              <Badge variant="outline" className="bg-amber-500/10 border-amber-500/20 text-amber-600 text-xs">
+                                {q.count - 1} {language === "ar" ? "تغيير" : q.count - 1 === 1 ? "change" : "changes"}
+                              </Badge>
+                            </div>
+                          )
+                        })}
+                        {changedAnswers.length > 5 && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            +{changedAnswers.length - 5} {language === "ar" ? "أسئلة أخرى" : "more questions"}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })()}
+
           {/* Attempt Events */}
           <AttemptEventLog events={attemptEvents} />
 
-          {/* Evidence / Snapshots */}
+          {/* Screen Captures */}
           <Card>
             <CardHeader>
-              <CardTitle>{language === "ar" ? "اللقطات" : "Snapshots"}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Monitor className="h-5 w-5" />
+                {language === "ar" ? "لقطات الشاشة" : "Screen Captures"}
+              </CardTitle>
               <CardDescription>
                 {language === "ar"
-                  ? `${snapshotEvidence.length} لقطة مسجلة`
-                  : `${snapshotEvidence.length} snapshots captured`}
+                  ? `${snapshotEvidence.length} لقطة شاشة مسجلة`
+                  : `${snapshotEvidence.length} screen captures recorded`}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {snapshotEvidence.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">
-                  {language === "ar" ? "لا توجد لقطات متاحة" : "No snapshots available"}
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <Monitor className="h-10 w-10 mb-2" />
+                  <p>{language === "ar" ? "لا توجد لقطات متاحة" : "No screen captures available"}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {snapshotEvidence.map((snap) => (
-                    <div key={snap.id} className="relative">
-                      <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                        {snap.previewUrl || snap.downloadUrl ? (
-                          <img
-                            src={normalizeEvidenceUrl(snap.previewUrl ?? snap.downloadUrl)}
-                            alt={`Snapshot ${snap.id}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Camera className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {new Date(snap.startAt ?? snap.uploadedAt ?? snap.endAt ?? new Date().toISOString()).toLocaleTimeString(
-                          language === "ar" ? "ar-SA" : "en-US"
-                        )}
-                      </div>
-                      <Badge variant="outline" className="absolute top-2 right-2 text-xs">
-                        {snap.typeName ?? "Evidence"}
-                      </Badge>
+                <>
+                  {/* Enlarged view */}
+                  <div className="mb-4">
+                    <div
+                      className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center cursor-pointer"
+                      onClick={() => selectedScreenshot && setSelectedScreenshot(null)}
+                    >
+                      {selectedScreenshot ? (
+                        <img
+                          src={selectedScreenshot}
+                          alt="Screen capture enlarged"
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center text-muted-foreground">
+                          <Monitor className="h-10 w-10 mb-2" />
+                          <p className="text-sm">{language === "ar" ? "اضغط على لقطة لعرضها" : "Click a capture to view"}</p>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                  {/* Thumbnail strip */}
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {snapshotEvidence.map((snap) => {
+                      const url = normalizeEvidenceUrl(snap.previewUrl ?? snap.downloadUrl)
+                      return (
+                        <div
+                          key={snap.id}
+                          className={`shrink-0 w-24 cursor-pointer rounded overflow-hidden border-2 transition-all ${
+                            selectedScreenshot === url
+                              ? "border-primary ring-2 ring-primary/30"
+                              : "border-transparent hover:border-primary/50"
+                          }`}
+                          onClick={() => url && setSelectedScreenshot(url)}
+                        >
+                          {url ? (
+                            <img
+                              src={url}
+                              alt={`${language === "ar" ? "شاشة" : "Screen"} ${snap.id}`}
+                              className="w-full aspect-video object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full aspect-video bg-muted flex items-center justify-center">
+                              <Camera className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

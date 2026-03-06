@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Department;
 using Smart_Core.Application.Interfaces;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
 
@@ -15,17 +16,25 @@ public class DepartmentService : IDepartmentService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<DepartmentService> _logger;
+    private readonly ICacheService _cache;
 
     public DepartmentService(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-      ICurrentUserService currentUserService,
-        ILogger<DepartmentService> logger)
+        ICurrentUserService currentUserService,
+        ILogger<DepartmentService> logger,
+        ICacheService cache)
     {
         _context = context;
         _userManager = userManager;
         _currentUserService = currentUserService;
         _logger = logger;
+        _cache = cache;
+    }
+
+    private void InvalidateDepartmentCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.DepartmentsPrefix);
     }
 
     public async Task<ApiResponse<DepartmentResponse>> CreateAsync(CreateDepartmentRequest request)
@@ -68,6 +77,7 @@ public class DepartmentService : IDepartmentService
             await _context.SaveChangesAsync();
 
             _logger.LogInformation("Department created: {DepartmentId} - {NameEn}", department.Id, department.NameEn);
+            InvalidateDepartmentCache();
 
             return ApiResponse<DepartmentResponse>.SuccessResponse(MapToResponse(department, 0), "Department created successfully.");
         }
@@ -81,34 +91,39 @@ public class DepartmentService : IDepartmentService
     public async Task<ApiResponse<DepartmentResponse>> GetByIdAsync(int id)
     {
         var department = await _context.Departments
-    .Include(d => d.Users)
           .FirstOrDefaultAsync(d => d.Id == id);
 
         if (department == null)
             return ApiResponse<DepartmentResponse>.FailureResponse("Department not found.");
 
-        var userCount = department.Users?.Count(u => !u.IsDeleted) ?? 0;
+        var userCount = await _context.Users
+            .CountAsync(u => u.DepartmentId == id && !u.IsDeleted);
         return ApiResponse<DepartmentResponse>.SuccessResponse(MapToResponse(department, userCount));
     }
 
     public async Task<ApiResponse<List<DepartmentListResponse>>> GetAllAsync(bool includeInactive = false)
     {
-        var query = _context.Departments.AsQueryable();
+        var cacheKey = includeInactive ? CacheKeys.DepartmentsAllInactive : CacheKeys.DepartmentsAll;
 
-        if (!includeInactive)
-            query = query.Where(d => d.IsActive);
+        var departments = await _cache.GetOrCreateAsync(cacheKey, async () =>
+        {
+            var query = _context.Departments.AsQueryable();
 
-        var departments = await query
-            .OrderBy(d => d.NameEn)
-            .Select(d => new DepartmentListResponse(
-                d.Id,
-                d.NameEn,
-                d.NameAr,
-                d.Code,
-                d.IsActive,
-                d.Users.Count(u => !u.IsDeleted)
-            ))
-            .ToListAsync();
+            if (!includeInactive)
+                query = query.Where(d => d.IsActive);
+
+            return await query
+                .OrderBy(d => d.NameEn)
+                .Select(d => new DepartmentListResponse(
+                    d.Id,
+                    d.NameEn,
+                    d.NameAr,
+                    d.Code,
+                    d.IsActive,
+                    d.Users.Count(u => !u.IsDeleted)
+                ))
+                .ToListAsync();
+        }, CacheKeys.Medium);
 
         return ApiResponse<List<DepartmentListResponse>>.SuccessResponse(departments);
     }
@@ -118,7 +133,6 @@ public class DepartmentService : IDepartmentService
         try
         {
             var department = await _context.Departments
-       .Include(d => d.Users)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (department == null)
@@ -157,7 +171,8 @@ public class DepartmentService : IDepartmentService
 
             _logger.LogInformation("Department updated: {DepartmentId}", id);
 
-            var userCount = department.Users?.Count(u => !u.IsDeleted) ?? 0;
+            var userCount = await _context.Users
+                .CountAsync(u => u.DepartmentId == id && !u.IsDeleted);
             return ApiResponse<DepartmentResponse>.SuccessResponse(MapToResponse(department, userCount), "Department updated successfully.");
         }
         catch (Exception ex)
@@ -172,14 +187,14 @@ public class DepartmentService : IDepartmentService
         try
         {
             var department = await _context.Departments
-                   .Include(d => d.Users)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (department == null)
                 return ApiResponse<bool>.FailureResponse("Department not found.");
 
             // Check if department has users
-            var hasUsers = department.Users?.Any(u => !u.IsDeleted) ?? false;
+            var hasUsers = await _context.Users
+                .AnyAsync(u => u.DepartmentId == id && !u.IsDeleted);
             if (hasUsers)
                 return ApiResponse<bool>.FailureResponse("Cannot delete department with assigned users. Please reassign users first.");
 
@@ -191,6 +206,7 @@ public class DepartmentService : IDepartmentService
             await _context.SaveChangesAsync();
 
             _logger.LogInformation("Department deleted: {DepartmentId}", id);
+            InvalidateDepartmentCache();
 
             return ApiResponse<bool>.SuccessResponse(true, "Department deleted successfully.");
         }
@@ -212,6 +228,7 @@ public class DepartmentService : IDepartmentService
         department.UpdatedBy = _currentUserService.UserId;
 
         await _context.SaveChangesAsync();
+        InvalidateDepartmentCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Department activated successfully.");
     }
@@ -227,6 +244,7 @@ public class DepartmentService : IDepartmentService
         department.UpdatedBy = _currentUserService.UserId;
 
         await _context.SaveChangesAsync();
+        InvalidateDepartmentCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Department deactivated successfully.");
     }
@@ -253,6 +271,8 @@ public class DepartmentService : IDepartmentService
             await _userManager.UpdateAsync(user);
 
             _logger.LogInformation("User {UserId} assigned to department {DepartmentId}", userId, departmentId);
+            InvalidateDepartmentCache();
+            _cache.RemoveByPrefix(CacheKeys.UsersPrefix);
 
             return ApiResponse<bool>.SuccessResponse(true, "User assigned to department successfully.");
         }
@@ -278,6 +298,8 @@ public class DepartmentService : IDepartmentService
             await _userManager.UpdateAsync(user);
 
             _logger.LogInformation("User {UserId} removed from department", userId);
+            InvalidateDepartmentCache();
+            _cache.RemoveByPrefix(CacheKeys.UsersPrefix);
 
             return ApiResponse<bool>.SuccessResponse(true, "User removed from department successfully.");
         }
@@ -332,12 +354,17 @@ public class DepartmentService : IDepartmentService
         if (string.IsNullOrEmpty(userId))
             return null;
 
-        var user = await _context.Users
+        var cacheKey = CacheKeys.UserDepartmentId(userId);
+        if (_cache.TryGet<int?>(cacheKey, out var cached))
+            return cached;
+
+        var deptId = await _context.Users
             .Where(u => u.Id == userId)
             .Select(u => u.DepartmentId)
-   .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync();
 
-        return user;
+        _cache.Set(cacheKey, deptId, CacheKeys.Medium);
+        return deptId;
     }
 
     public async Task<bool> UserBelongsToDepartmentAsync(string userId, int departmentId)

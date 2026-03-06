@@ -59,6 +59,8 @@ import {
   Bell,
   Send,
   ScrollText,
+  Bug,
+  Activity,
 } from "lucide-react"
 
 interface NavItem {
@@ -177,7 +179,6 @@ const administrationNavGroup: NavGroup = {
     { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
     { icon: Landmark, labelKey: "nav.departments", href: "/departments" },
     { icon: Building2, labelKey: "nav.organization", href: "/organization" },
-    { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Settings, labelKey: "nav.settings", href: "/settings" },
   ],
 }
@@ -191,6 +192,20 @@ const notificationsNavGroup: NavGroup = {
     { icon: Settings, labelKey: "nav.notificationSettings", href: "/notifications/settings" },
     { icon: FileText, labelKey: "nav.notificationTemplates", href: "/notifications/templates" },
     { icon: ScrollText, labelKey: "nav.notificationLog", href: "/notifications/logs" },
+  ],
+}
+
+// NEW: System Logs group
+const logsNavGroup: NavGroup = {
+  icon: Activity,
+  labelKey: "nav.logs",
+  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  children: [
+    { icon: FileText, labelKey: "nav.audit", href: "/audit" },
+    { icon: Users, labelKey: "nav.candidateLogs", href: "/logs/candidate" },
+    { icon: Eye, labelKey: "nav.proctorLogs", href: "/logs/proctor" },
+    { icon: UserCog, labelKey: "nav.userLogs", href: "/logs/users" },
+    { icon: Bug, labelKey: "nav.developerLogs", href: "/logs/developer" },
   ],
 }
 
@@ -228,6 +243,7 @@ export function Sidebar() {
     candidates: candidatesNavGroup,
     administration: administrationNavGroup,
     notifications: notificationsNavGroup,
+    logs: logsNavGroup,
   }), [])
 
   // Compute which groups should be expanded based on current route
@@ -240,6 +256,7 @@ export function Sidebar() {
       candidates: false,
       administration: false,
       notifications: false,
+      logs: false,
     }
     
     // Check if current route is inside any group
@@ -555,6 +572,18 @@ export function Sidebar() {
                   </div>
                 )}
                 <NavGroupBlock group={notificationsNavGroup} groupKey="notifications" />
+              </>
+            )}
+
+            {/* System Logs (expandable) */}
+            {showGroup(logsNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "سجلات النظام" : "System Logs"}
+                  </div>
+                )}
+                <NavGroupBlock group={logsNavGroup} groupKey="logs" />
               </>
             )}
 

@@ -155,6 +155,12 @@ export const translations = {
       notificationSettings: "Notification Settings",
       notificationTemplates: "Email Templates",
       notificationLog: "Notification Log",
+      // System Logs group
+      logs: "System Logs",
+      candidateLogs: "Candidate Logs",
+      proctorLogs: "Proctor Logs",
+      userLogs: "Users Logs",
+      developerLogs: "Developer Logs",
       // Roles
       roleAdmin: "Administrator",
       roleInstructor: "Instructor",
@@ -1307,6 +1313,12 @@ export const translations = {
       notificationSettings: "إعدادات الإشعارات",
       notificationTemplates: "قوالب البريد",
       notificationLog: "سجل الإشعارات",
+      // System Logs group
+      logs: "سجلات النظام",
+      candidateLogs: "سجلات المرشحين",
+      proctorLogs: "سجلات المراقبين",
+      userLogs: "سجلات المستخدمين",
+      developerLogs: "سجلات المطورين",
       // Roles
       roleAdmin: "مدير النظام",
       roleInstructor: "مدرب",

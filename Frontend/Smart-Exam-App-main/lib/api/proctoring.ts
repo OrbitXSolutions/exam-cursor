@@ -69,6 +69,8 @@ interface ProctorSessionListDto {
   latestSnapshotUrl?: string;
   snapshotCount?: number;
   lastSnapshotAt?: string;
+  countableViolationCount?: number;
+  maxViolationWarnings?: number;
 }
 
 function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
@@ -95,6 +97,8 @@ function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
     lastSnapshotAt: dto.lastSnapshotAt ?? undefined,
     riskScore: dto.riskScore ?? undefined,
     totalViolations: dto.totalViolations ?? 0,
+    countableViolationCount: dto.countableViolationCount ?? 0,
+    maxViolationWarnings: dto.maxViolationWarnings ?? 0,
   };
 }
 
@@ -151,13 +155,15 @@ export async function reviewIncident(
 /**
  * Get live proctor sessions (GET /Proctor/sessions)
  */
-export async function getLiveSessions(): Promise<LiveSession[]> {
+export async function getLiveSessions(
+  includeSamples = false,
+): Promise<LiveSession[]> {
   try {
     const query = new URLSearchParams();
     query.set("PageNumber", "1");
     query.set("PageSize", "100");
     query.set("Status", "1");
-    query.set("IncludeSamples", "true");
+    query.set("IncludeSamples", String(includeSamples));
     const raw = await apiClient.get<{ items?: ProctorSessionListDto[] }>(
       `/Proctor/sessions?${query}`,
     );
@@ -426,6 +432,21 @@ export async function getAiProctorAnalysis(
 ): Promise<AiProctorAnalysis> {
   const res = await apiClient.get(`/Proctor/session/${sessionId}/ai-analysis`);
   return res;
+}
+
+/**
+ * Update device info for a proctor session (client-side fields).
+ * PATCH /Proctor/session/device-info
+ */
+export async function updateSessionDeviceInfo(data: {
+  attemptId: number;
+  browserName?: string;
+  browserVersion?: string;
+  operatingSystem?: string;
+  screenResolution?: string;
+  deviceFingerprint?: string;
+}): Promise<void> {
+  await apiClient.patch("/Proctor/session/device-info", data);
 }
 
 /**

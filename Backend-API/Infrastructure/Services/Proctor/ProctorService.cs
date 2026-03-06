@@ -135,6 +135,24 @@ public class ProctorService : IProctorService
         });
     }
 
+    public async Task<ApiResponse<bool>> UpdateSessionDeviceInfoAsync(UpdateSessionDeviceInfoDto dto, string candidateId)
+    {
+        var session = await _context.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.AttemptId == dto.AttemptId && s.CandidateId == candidateId);
+
+        if (session == null)
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
+        if (!string.IsNullOrEmpty(dto.BrowserName)) session.BrowserName = dto.BrowserName;
+        if (!string.IsNullOrEmpty(dto.BrowserVersion)) session.BrowserVersion = dto.BrowserVersion;
+        if (!string.IsNullOrEmpty(dto.OperatingSystem)) session.OperatingSystem = dto.OperatingSystem;
+        if (!string.IsNullOrEmpty(dto.ScreenResolution)) session.ScreenResolution = dto.ScreenResolution;
+        if (!string.IsNullOrEmpty(dto.DeviceFingerprint)) session.DeviceFingerprint = dto.DeviceFingerprint;
+
+        await _context.SaveChangesAsync();
+        return ApiResponse<bool>.SuccessResponse(true, "Device info updated");
+    }
+
     public async Task<ApiResponse<ProctorSessionDto>> GetSessionAsync(int sessionId)
     {
         // Handle sample/demo sessions (negative IDs)
@@ -231,6 +249,7 @@ public class ProctorService : IProctorService
       .Include(s => s.Candidate)
                   .Include(s => s.Decision)
                   .Include(s => s.EvidenceItems)
+                  .Include(s => s.Attempt)
                   .AsQueryable();
 
         // Department isolation: filter proctor sessions via Exam.DepartmentId (SuperDev sees all)
@@ -1858,7 +1877,10 @@ UploadEvidenceDto dto, string candidateId)
             Mode = session.Mode,
             Status = session.Status,
             StartedAt = session.StartedAt,
+            EndedAt = session.EndedAt,
             TotalViolations = session.TotalViolations,
+            CountableViolationCount = session.CountableViolationCount,
+            MaxViolationWarnings = session.Exam?.MaxViolationWarnings ?? 0,
             RiskScore = session.RiskScore,
             DecisionStatus = session.Decision?.Status,
             RequiresReview = session.Decision == null || session.Decision.Status == ProctorDecisionStatus.Pending,
@@ -1867,7 +1889,17 @@ UploadEvidenceDto dto, string candidateId)
             TerminationReason = session.TerminationReason,
             LatestSnapshotUrl = latestUrl,
             SnapshotCount = imageEvidence?.Count ?? 0,
-            LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate
+            LastSnapshotAt = latest?.UploadedAt ?? latest?.CreatedDate,
+            // Device & Environment
+            IpAddress = session.IpAddress,
+            UserAgent = session.UserAgent,
+            BrowserName = session.BrowserName,
+            BrowserVersion = session.BrowserVersion,
+            OperatingSystem = session.OperatingSystem,
+            ScreenResolution = session.ScreenResolution,
+            DeviceFingerprint = session.DeviceFingerprint,
+            AttemptIpAddress = session.Attempt?.IPAddress,
+            AttemptDeviceInfo = session.Attempt?.DeviceInfo
         };
     }
 

@@ -18,17 +18,26 @@ public class QuestionBankService : IQuestionBankService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
     public QuestionBankService(
         ApplicationDbContext context,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _cache = cache;
+    }
+
+    private void InvalidateQuestionCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.QuestionsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
     }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
@@ -334,6 +343,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.Questions.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionByIdAsync(entity.Id);
     }
@@ -437,6 +447,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionByIdAsync(entity.Id);
     }
@@ -458,6 +469,7 @@ public class QuestionBankService : IQuestionBankService
         // Hard delete - cascade will handle options, attachments, and answer key
         _context.Questions.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Question deleted successfully");
     }
@@ -476,6 +488,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var status = entity.IsActive ? "activated" : "deactivated";
         return ApiResponse<bool>.SuccessResponse(true, $"Question {status} successfully");
@@ -565,6 +578,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionOptions.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var resultDto = new QuestionOptionDto
         {
@@ -599,6 +613,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         var resultDto = new QuestionOptionDto
         {
@@ -628,6 +643,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionOptions.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Option deleted successfully");
     }
@@ -678,6 +694,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return await GetQuestionOptionsAsync(dto.QuestionId);
     }
@@ -738,6 +755,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionAttachments.Add(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<QuestionAttachmentDto>.SuccessResponse(
    entity.Adapt<QuestionAttachmentDto>(),
@@ -775,6 +793,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<QuestionAttachmentDto>.SuccessResponse(
             entity.Adapt<QuestionAttachmentDto>(),
@@ -794,6 +813,7 @@ public class QuestionBankService : IQuestionBankService
 
         _context.QuestionAttachments.Remove(entity);
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Attachment deleted successfully");
     }
@@ -824,6 +844,7 @@ public class QuestionBankService : IQuestionBankService
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
+        InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Primary attachment set successfully");
     }
