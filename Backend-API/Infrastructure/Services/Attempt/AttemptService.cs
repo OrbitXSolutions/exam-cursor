@@ -270,6 +270,13 @@ public class AttemptService : IAttemptService
       return ApiResponse<AttemptSessionDto>.FailureResponse("You do not have access to this attempt");
     }
 
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AttemptSessionDto>.FailureResponse(
+         "Attempt expired: disconnect time exceeded allowed limit. Cannot resume.");
+    }
+
     // Check if expired
     var now = DateTime.UtcNow;
     if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value &&
@@ -400,6 +407,19 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptTimerDto>.FailureResponse("You do not have access to this attempt");
     }
 
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AttemptTimerDto>.SuccessResponse(new AttemptTimerDto
+      {
+        AttemptId = attemptId,
+        ServerTime = DateTime.UtcNow,
+        ExpiresAt = attempt.ExpiresAt ?? DateTime.UtcNow,
+        RemainingSeconds = 0,
+        Status = AttemptStatus.Expired
+      });
+    }
+
     var now = DateTime.UtcNow;
     var remainingSeconds = 0;
 
@@ -520,6 +540,13 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     if (attempt.CandidateId != candidateId)
     {
       return ApiResponse<AnswerSavedDto>.FailureResponse("You do not have access to this attempt");
+    }
+
+    // Check disconnect budget before anything else
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    {
+      return ApiResponse<AnswerSavedDto>.FailureResponse(
+          "Attempt expired: disconnect time exceeded allowed limit. Cannot save answers.");
     }
 
     var now = DateTime.UtcNow;
@@ -1121,6 +1148,82 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
   #endregion
 
   #region Private Helper Methods
+
+  /// <summary>
+  /// Checks if a candidate has exceeded the disconnect budget.
+  /// Call on every candidate API interaction (save answer, get session, get timer).
+  /// Detects disconnect gaps via ProctorSession.LastHeartbeatAt staleness.
+  /// Returns true if the attempt was expired due to disconnect timeout.
+  /// </summary>
+  private async Task<bool> CheckAndApplyDisconnectBudgetAsync(Domain.Entities.Attempt.Attempt attempt)
+  {
+    if (attempt.Status != AttemptStatus.Started &&
+        attempt.Status != AttemptStatus.InProgress &&
+        attempt.Status != AttemptStatus.Resumed)
+      return false;
+
+    var now = DateTime.UtcNow;
+
+    // Check ProctorSession heartbeat to detect current disconnect gap
+    var proctorSession = await _context.Set<ProctorSession>()
+        .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Status == ProctorSessionStatus.Active);
+
+    if (proctorSession?.LastHeartbeatAt != null)
+    {
+      var heartbeatGap = (int)(now - proctorSession.LastHeartbeatAt.Value).TotalSeconds;
+      if (heartbeatGap > Domain.Constants.ExamDefaults.HeartbeatStaleThresholdSeconds)
+      {
+        // Candidate was disconnected — accumulate the gap
+        attempt.TotalDisconnectSeconds += heartbeatGap;
+        // Update LastHeartbeatAt to now so we don't double-count this gap
+        proctorSession.LastHeartbeatAt = now;
+      }
+    }
+
+    // Also accumulate any previously tracked disconnect
+    if (attempt.DisconnectDetectedAt.HasValue)
+    {
+      var disconnectDuration = (int)(now - attempt.DisconnectDetectedAt.Value).TotalSeconds;
+      attempt.TotalDisconnectSeconds += disconnectDuration;
+      attempt.DisconnectDetectedAt = null;
+    }
+
+    // Check if budget exceeded
+    if (attempt.TotalDisconnectSeconds > Domain.Constants.ExamDefaults.MaxDisconnectSeconds)
+    {
+      attempt.Status = AttemptStatus.Expired;
+      attempt.ExpiryReason = ExpiryReason.DisconnectTimeout;
+
+      // Close proctor session
+      if (proctorSession != null)
+      {
+        proctorSession.Status = ProctorSessionStatus.Completed;
+        proctorSession.EndedAt = now;
+        proctorSession.UpdatedDate = now;
+        proctorSession.UpdatedBy = "system";
+      }
+
+      // Log event
+      _context.Set<AttemptEvent>().Add(new AttemptEvent
+      {
+        AttemptId = attempt.Id,
+        EventType = AttemptEventType.DisconnectExpired,
+        OccurredAt = now,
+        MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+        {
+          totalDisconnectSeconds = attempt.TotalDisconnectSeconds,
+          maxAllowed = Domain.Constants.ExamDefaults.MaxDisconnectSeconds
+        }),
+        CreatedDate = now,
+        CreatedBy = "system"
+      });
+
+      await _context.SaveChangesAsync();
+      return true;
+    }
+
+    return false;
+  }
 
   private DateTime CalculateExpiresAt(DateTime startedAt, int durationMinutes, DateTime? examEndAt)
   {

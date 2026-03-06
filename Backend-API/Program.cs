@@ -238,6 +238,8 @@ builder.Services.AddScoped<IExamOperationsService, ExamOperationsService>();
 builder.Services.AddScoped<ICandidateExamDetailsService, CandidateExamDetailsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
+builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
+builder.Services.AddScoped<INotificationService, Smart_Core.Infrastructure.Services.Notification.NotificationService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<DatabaseSeeder>();
@@ -246,6 +248,7 @@ builder.Services.AddScoped<DatabaseSeeder>();
 builder.Services.AddHostedService<LogCleanupService>();
 builder.Services.AddHostedService<VideoRetentionService>();
 builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Background.AttemptExpiryBackgroundService>();
+builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Notification.NotificationBackgroundService>();
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();

@@ -60,9 +60,27 @@ public class CandidateService : ICandidateService
         // Build query for published + active exams
         var query = _context.Exams
           .Include(e => e.Department)
+          .Include(e => e.AccessPolicy)
  .Include(e => e.Sections.Where(s => !s.IsDeleted))
         .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
-            .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted);
+            .Where(e => e.IsPublished && e.IsActive && !e.IsDeleted)
+            // Double safety: no AccessPolicy record = not visible to candidates
+            .Where(e => e.AccessPolicy != null);
+
+        // Access Policy enforcement:
+        // - If RestrictToAssignedCandidates = true, only show to candidates with ExamAssignment
+        if (isCandidate)
+        {
+            var assignedExamIds = await _context.Set<Domain.Entities.ExamAssignment.ExamAssignment>()
+                .Where(a => a.CandidateId == candidateId && a.IsActive && !a.IsDeleted)
+                .Select(a => a.ExamId)
+                .ToListAsync();
+
+            query = query.Where(e =>
+                e.AccessPolicy!.IsPublic ||
+                (!e.AccessPolicy.RestrictToAssignedCandidates) ||
+                assignedExamIds.Contains(e.Id));
+        }
 
         // Department filtering logic:
         // - If user is Candidate role AND has no department => list all exams (no filter)

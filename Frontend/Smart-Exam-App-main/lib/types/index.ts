@@ -428,6 +428,7 @@ export interface Exam {
   sectionsCount: number;
   questionsCount: number;
   totalPoints: number;
+  accessPolicyStatus?: string; // "Public" | "Assigned"
   sections: ExamSection[];
   instructions: ExamInstruction[];
   accessPolicy: ExamAccessPolicy | null;

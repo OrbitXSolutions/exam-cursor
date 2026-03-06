@@ -18,6 +18,7 @@ public class AssessmentService : IAssessmentService
   private readonly IDepartmentService _departmentService;
   private readonly ICurrentUserService _currentUserService;
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly INotificationService _notificationService;
   private const int MaxDurationMinutes = 600;
   private const int MinAccessCodeLength = 6;
 
@@ -25,12 +26,14 @@ public class AssessmentService : IAssessmentService
     ApplicationDbContext context,
    IDepartmentService departmentService,
       ICurrentUserService currentUserService,
-      UserManager<ApplicationUser> userManager)
+      UserManager<ApplicationUser> userManager,
+      INotificationService notificationService)
   {
     _context = context;
     _departmentService = departmentService;
     _currentUserService = currentUserService;
     _userManager = userManager;
+    _notificationService = notificationService;
   }
 
   #region Exams
@@ -39,6 +42,7 @@ public class AssessmentService : IAssessmentService
   {
     var query = _context.Exams
      .Include(x => x.Department)
+        .Include(x => x.AccessPolicy)
         .Include(x => x.Sections)
 .ThenInclude(s => s.Questions)
 .AsQueryable();
@@ -287,6 +291,19 @@ public class AssessmentService : IAssessmentService
     _context.Exams.Add(entity);
     await _context.SaveChangesAsync();
 
+    // Auto-create default AccessPolicy (Public by default)
+    var defaultAccessPolicy = new ExamAccessPolicy
+    {
+      ExamId = entity.Id,
+      IsPublic = true,
+      RestrictToAssignedCandidates = false,
+      AccessCode = null,
+      CreatedDate = DateTime.UtcNow,
+      CreatedBy = createdBy
+    };
+    _context.Set<ExamAccessPolicy>().Add(defaultAccessPolicy);
+    await _context.SaveChangesAsync();
+
     return await GetExamByIdAsync(entity.Id);
   }
 
@@ -433,7 +450,17 @@ public class AssessmentService : IAssessmentService
 
     await _context.SaveChangesAsync();
 
-    return ApiResponse<bool>.SuccessResponse(true, "Exam published successfully");
+    // Queue notifications for candidates (runs in background)
+    try
+    {
+      await _notificationService.QueueExamPublishedNotificationsAsync(id);
+    }
+    catch (Exception)
+    {
+      // Don't fail publish if notification queueing fails
+    }
+
+    return ApiResponse<bool>.SuccessResponse(true, "Exam published successfully. Notifications queued.");
   }
 
   public async Task<ApiResponse<bool>> UnpublishExamAsync(int id, string updatedBy)
@@ -1534,7 +1561,10 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       CreatedDate = exam.CreatedDate,
       SectionsCount = exam.Sections?.Count ?? 0,
       QuestionsCount = allQuestions.Count(),
-      TotalPoints = allQuestions.Sum(q => q.Points)
+      TotalPoints = allQuestions.Sum(q => q.Points),
+      AccessPolicyStatus = exam.AccessPolicy?.RestrictToAssignedCandidates == true
+          ? "Assigned"
+          : "Public"
     };
   }
 

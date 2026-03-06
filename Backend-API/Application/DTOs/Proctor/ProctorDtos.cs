@@ -207,6 +207,7 @@ public class HeartbeatResponseDto
     public int TotalViolations { get; set; }
     public bool HasWarning { get; set; }
     public string? WarningMessage { get; set; }
+    public bool IsExpired { get; set; }
 }
 
 #endregion

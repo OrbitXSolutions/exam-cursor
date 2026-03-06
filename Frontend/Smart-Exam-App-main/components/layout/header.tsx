@@ -97,9 +97,11 @@ export function Header() {
                   {t("nav.settings")}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <HelpCircle className="mr-2 h-4 w-4" />
-                {t("nav.helpSupport")}
+              <DropdownMenuItem asChild>
+                <Link href="/tutorials" className="cursor-pointer">
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  {t("nav.userGuide") || t("nav.helpSupport")}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">

@@ -43,6 +43,10 @@ public class Attempt : BaseEntity
     public string? IPAddress { get; set; }
     public string? DeviceInfo { get; set; }
 
+    // Disconnect tracking
+    public int TotalDisconnectSeconds { get; set; }
+    public DateTime? DisconnectDetectedAt { get; set; }
+
     // Navigation Properties
     public virtual Exam Exam { get; set; } = null!;
     public virtual ApplicationUser Candidate { get; set; } = null!;

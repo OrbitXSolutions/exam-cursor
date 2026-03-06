@@ -5,6 +5,8 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Proctor;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Proctor;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
@@ -376,6 +378,69 @@ public class ProctorService : IProctorService
         }
 
         var now = DateTime.UtcNow;
+
+        // --- Disconnect budget check ---
+        // If previous heartbeat was stale (gap > threshold), candidate was disconnected
+        if (session.LastHeartbeatAt.HasValue)
+        {
+            var gapSeconds = (int)(now - session.LastHeartbeatAt.Value).TotalSeconds;
+            if (gapSeconds > ExamDefaults.HeartbeatStaleThresholdSeconds)
+            {
+                // Candidate was disconnected — accumulate gap on attempt
+                var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                    .FirstOrDefaultAsync(a => a.Id == session.AttemptId);
+
+                if (attempt != null &&
+                    (attempt.Status == AttemptStatus.InProgress ||
+                     attempt.Status == AttemptStatus.Started ||
+                     attempt.Status == AttemptStatus.Resumed))
+                {
+                    attempt.TotalDisconnectSeconds += gapSeconds;
+                    attempt.DisconnectDetectedAt = null; // candidate is back now
+                    attempt.LastActivityAt = now;
+
+                    // Budget exceeded → expire
+                    if (attempt.TotalDisconnectSeconds > ExamDefaults.MaxDisconnectSeconds)
+                    {
+                        attempt.Status = AttemptStatus.Expired;
+                        attempt.ExpiryReason = ExpiryReason.DisconnectTimeout;
+
+                        session.Status = ProctorSessionStatus.Completed;
+                        session.EndedAt = now;
+                        session.UpdatedDate = now;
+                        session.UpdatedBy = "system";
+
+                        _context.Set<AttemptEvent>().Add(new AttemptEvent
+                        {
+                            AttemptId = attempt.Id,
+                            EventType = AttemptEventType.DisconnectExpired,
+                            OccurredAt = now,
+                            MetadataJson = JsonSerializer.Serialize(new
+                            {
+                                totalDisconnectSeconds = attempt.TotalDisconnectSeconds,
+                                lastGapSeconds = gapSeconds,
+                                maxAllowed = ExamDefaults.MaxDisconnectSeconds
+                            }),
+                            CreatedDate = now,
+                            CreatedBy = "system"
+                        });
+
+                        await _context.SaveChangesAsync();
+
+                        return ApiResponse<HeartbeatResponseDto>.SuccessResponse(new HeartbeatResponseDto
+                        {
+                            Success = true,
+                            ServerTime = now,
+                            CurrentRiskScore = session.RiskScore,
+                            TotalViolations = session.TotalViolations,
+                            HasWarning = true,
+                            WarningMessage = "Exam expired: disconnect time exceeded allowed limit.",
+                            IsExpired = true
+                        });
+                    }
+                }
+            }
+        }
 
         // Log heartbeat event
         var heartbeatEvent = new ProctorEvent
@@ -1548,39 +1613,57 @@ UploadEvidenceDto dto, string candidateId)
         {
             [-1] = new()
             {
-                Id = -1, AttemptId = -1, ExamId = -1,
+                Id = -1,
+                AttemptId = -1,
+                ExamId = -1,
                 ExamTitleEn = "Introduction to Computer Science \u2014 Final",
-                CandidateId = "sample-1", CandidateName = "Sarah Ahmed",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-1",
+                CandidateName = "Sarah Ahmed",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-22),
-                TotalEvents = 5, TotalViolations = 1,
-                RiskScore = 12, IsFlagged = false,
+                TotalEvents = 5,
+                TotalViolations = 1,
+                RiskScore = 12,
+                IsFlagged = false,
                 LastHeartbeatAt = now.AddSeconds(-10),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
             },
             [-2] = new()
             {
-                Id = -2, AttemptId = -2, ExamId = -1,
+                Id = -2,
+                AttemptId = -2,
+                ExamId = -1,
                 ExamTitleEn = "Introduction to Computer Science \u2014 Final",
-                CandidateId = "sample-2", CandidateName = "Omar Khalid",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-2",
+                CandidateName = "Omar Khalid",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-15),
-                TotalEvents = 18, TotalViolations = 8,
-                RiskScore = 68, IsFlagged = true,
+                TotalEvents = 18,
+                TotalViolations = 8,
+                RiskScore = 68,
+                IsFlagged = true,
                 LastHeartbeatAt = now.AddSeconds(-5),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()
             },
             [-3] = new()
             {
-                Id = -3, AttemptId = -3, ExamId = -1,
+                Id = -3,
+                AttemptId = -3,
+                ExamId = -1,
                 ExamTitleEn = "IT Exam App",
-                CandidateId = "sample-3", CandidateName = "Ali Mahmoud",
-                Mode = ProctorMode.Soft, Status = ProctorSessionStatus.Active,
+                CandidateId = "sample-3",
+                CandidateName = "Ali Mahmoud",
+                Mode = ProctorMode.Soft,
+                Status = ProctorSessionStatus.Active,
                 StartedAt = now.AddMinutes(-10),
-                TotalEvents = 10, TotalViolations = 3,
-                RiskScore = 42, IsFlagged = false,
+                TotalEvents = 10,
+                TotalViolations = 3,
+                RiskScore = 42,
+                IsFlagged = false,
                 LastHeartbeatAt = now.AddSeconds(-8),
                 HeartbeatMissedCount = 0,
                 RecentEvents = new List<ProctorEventDto>()

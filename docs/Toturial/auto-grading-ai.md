@@ -37,3 +37,35 @@ The confidence % reflects how sure the AI is. With a rubric it'll typically be 8
 Done. Your API key is now in appsettings.Development.json, which is already gitignored (line 18 of your .gitignore has appsettings.\*.json). It will never be pushed to GitHub.
 
 .NET automatically merges appsettings.Development.json over appsettings.json when running in Development mode, so the placeholder in appsettings.json gets overridden with your real key at runtime. No code changes needed.
+
+# For grading MCQ multi
+
+The MCQ Multi grading uses All-or-Nothing approach:
+
+Problem: This is HARSH
+All-or-Nothing means:
+
+Candidate knows 2 out of 3 correct answers → gets ZERO
+Candidate selects all correct + 1 extra wrong → gets ZERO
+
+if you want:
+Recommendation: Implement Partial Credit Scoring
+This is the industry standard for MCQ Multi. Here's the formula:
+
+Case 1 with Partial Credit (3 correct, 1 wrong, 2 points):
+Candidate selects Correct picked Wrong picked Calculation Score
+A, B (2 correct) 2/3 0/1 (0.667 - 0) × 2 1.33 pts
+A, B, C (3 correct) 3/3 0/1 (1.0 - 0) × 2 2.0 pts
+A only (1 correct) 1/3 0/1 (0.333 - 0) × 2 0.67 pts
+0 selected 0/3 0/1 (0 - 0) × 2 0 pts
+A, B, D (2 correct + 1 wrong) 2/3 1/1 (0.667 - 1.0) × 2 = negative 0 pts
+Case 2 with Partial Credit (2 correct, 2 wrong, 2 points):
+Candidate selects Correct picked Wrong picked Calculation Score
+A, B (2 correct) 2/2 0/2 (1.0 - 0) × 2 2.0 pts
+A, B, C (2 correct + 1 wrong) 2/2 1/2 (1.0 - 0.5) × 2 1.0 pts
+A only (1 correct) 1/2 0/2 (0.5 - 0) × 2 1.0 pts
+0 selected 0/2 0/2 0 0 pts
+Question for you:
+Keep All-or-Nothing (current) — strict but simple?
+Add Partial Credit — fairer, industry standard?
+Make it configurable per exam — admin chooses grading mode (All-or-Nothing vs Partial Credit)?

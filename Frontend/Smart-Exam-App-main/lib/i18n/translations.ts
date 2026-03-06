@@ -150,12 +150,18 @@ export const translations = {
       candidateExamDetails: "Candidate Exam Details",
       // Administration group
       administration: "Administration",
+      // Notifications group
+      notifications: "Notifications",
+      notificationSettings: "Notification Settings",
+      notificationTemplates: "Email Templates",
+      notificationLog: "Notification Log",
       // Roles
       roleAdmin: "Administrator",
       roleInstructor: "Instructor",
       roleCandidate: "Candidate",
       roleProctor: "Proctor",
       helpSupport: "Help & Support",
+      userGuide: "User Guide",
     },
 
     // Auth
@@ -1285,12 +1291,18 @@ export const translations = {
       candidateExamDetails: "تفاصيل اختبار المرشح",
       // Administration group
       administration: "الإدارة",
+      // Notifications group
+      notifications: "الإشعارات",
+      notificationSettings: "إعدادات الإشعارات",
+      notificationTemplates: "قوالب البريد",
+      notificationLog: "سجل الإشعارات",
       // Roles
       roleAdmin: "مدير النظام",
       roleInstructor: "مدرب",
       roleCandidate: "مرشح",
       roleProctor: "مراقب",
       helpSupport: "المساعدة والدعم",
+      userGuide: "دليل المستخدم",
     },
 
     // Auth

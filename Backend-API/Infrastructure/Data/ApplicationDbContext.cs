@@ -12,6 +12,7 @@ using Smart_Core.Domain.Entities.Lookups;
 using Smart_Core.Domain.Entities.QuestionBank;
 using Smart_Core.Domain.Entities.Batch;
 using Smart_Core.Domain.Entities.ExamAssignment;
+using Smart_Core.Domain.Entities.Notification;
 
 namespace Smart_Core.Infrastructure.Data;
 
@@ -99,6 +100,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
     // ExamAssignment
     public DbSet<ExamAssignment> ExamAssignments { get; set; } = null!;
+
+    // Notification
+    public DbSet<NotificationSettings> NotificationSettings { get; set; } = null!;
+    public DbSet<NotificationTemplate> NotificationTemplates { get; set; } = null!;
+    public DbSet<NotificationLog> NotificationLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

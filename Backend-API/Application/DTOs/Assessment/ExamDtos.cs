@@ -122,6 +122,11 @@ public class ExamListDto
     public int SectionsCount { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
+
+    /// <summary>
+    /// Access policy status: "Public" or "Assigned"
+    /// </summary>
+    public string AccessPolicyStatus { get; set; } = "Public";
 }
 
 /// <summary>

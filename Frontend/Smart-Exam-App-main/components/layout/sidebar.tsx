@@ -54,6 +54,10 @@ import {
   ShieldAlert,
   Copy,
   Sparkles,
+  HelpCircle,
+  Bell,
+  Send,
+  ScrollText,
 } from "lucide-react"
 
 interface NavItem {
@@ -177,6 +181,26 @@ const administrationNavGroup: NavGroup = {
   ],
 }
 
+// NEW: Notifications group
+const notificationsNavGroup: NavGroup = {
+  icon: Bell,
+  labelKey: "nav.notifications",
+  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  children: [
+    { icon: Settings, labelKey: "nav.notificationSettings", href: "/notifications/settings" },
+    { icon: FileText, labelKey: "nav.notificationTemplates", href: "/notifications/templates" },
+    { icon: ScrollText, labelKey: "nav.notificationLog", href: "/notifications/logs" },
+  ],
+}
+
+// User Guide / Tutorials - visible to all non-candidate roles
+const userGuideNavItem: NavItem = {
+  icon: HelpCircle,
+  labelKey: "nav.userGuide",
+  href: "/tutorials",
+  roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor, UserRole.Proctor, UserRole.ProctorReviewer, UserRole.Examiner, UserRole.Auditor],
+}
+
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
@@ -202,6 +226,7 @@ export function Sidebar() {
     proctor: proctorNavGroup,
     candidates: candidatesNavGroup,
     administration: administrationNavGroup,
+    notifications: notificationsNavGroup,
   }), [])
 
   // Compute which groups should be expanded based on current route
@@ -213,6 +238,7 @@ export function Sidebar() {
       proctor: false,
       candidates: false,
       administration: false,
+      notifications: false,
     }
     
     // Check if current route is inside any group
@@ -253,6 +279,9 @@ export function Sidebar() {
       return item.roles.some((role) => hasRole(role))
     })
   }
+
+  // Check if user guide should show (must be after filterByRole)
+  const showUserGuide = !hasRole(UserRole.Candidate) && filterByRole([userGuideNavItem]).length > 0
 
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = item.exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(`${item.href}/`))
@@ -513,6 +542,30 @@ export function Sidebar() {
                   </div>
                 )}
                 <NavGroupBlock group={administrationNavGroup} groupKey="administration" />
+              </>
+            )}
+
+            {/* Notifications (expandable) */}
+            {showGroup(notificationsNavGroup) && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "الإشعارات" : "Notifications"}
+                  </div>
+                )}
+                <NavGroupBlock group={notificationsNavGroup} groupKey="notifications" />
+              </>
+            )}
+
+            {/* User Guide */}
+            {showUserGuide && (
+              <>
+                {!isCollapsed && (
+                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {language === "ar" ? "المساعدة" : "Help"}
+                  </div>
+                )}
+                <NavLink item={userGuideNavItem} />
               </>
             )}
           </nav>

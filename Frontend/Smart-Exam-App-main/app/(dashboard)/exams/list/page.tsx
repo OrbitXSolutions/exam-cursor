@@ -49,6 +49,9 @@ import {
   Copy,
   AlertCircle,
   PartyPopper,
+  Globe,
+  Users,
+  Info,
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
@@ -244,6 +247,9 @@ export default function ExamsListPage() {
                     <TableHead>{t("exams.title") || "Title"}</TableHead>
                     <TableHead>{t("common.status") || "Status"}</TableHead>
                     <TableHead className="text-center">
+                      {language === "ar" ? "سياسة الوصول" : "Access"}
+                    </TableHead>
+                    <TableHead className="text-center">
                       {language === "ar" ? "الإعدادات" : "Configuration"}
                     </TableHead>
                     <TableHead className="text-center">
@@ -272,7 +278,22 @@ export default function ExamsListPage() {
                           <StatusBadge status={status} />
                         </TableCell>
 
-                        {/* Configuration Button */}
+                        {/* Access Policy */}
+                        <TableCell className="text-center">
+                          {exam.accessPolicyStatus === "Assigned" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                              <Users className="h-3 w-3" />
+                              {language === "ar" ? "مُعيّن" : "Assigned"}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                              <Globe className="h-3 w-3" />
+                              {language === "ar" ? "عام" : "Public"}
+                            </span>
+                          )}
+                        </TableCell>
+
+                        {/* Configuration Button */}}
                         <TableCell className="text-center">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={`/exams/${exam.id}/configuration`}>
@@ -470,11 +491,19 @@ export default function ExamsListPage() {
             <h2 className="text-xl font-bold mb-2">
               {language === "ar" ? "تم نشر الاختبار!" : "Exam Published!"}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-sm text-muted-foreground mb-4">
               {language === "ar"
                 ? "الاختبار متاح الآن للمرشحين لأدائه."
                 : "The exam is now available for candidates to take."}
             </p>
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-6">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                {language === "ar"
+                  ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
+                  : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy."}
+              </p>
+            </div>
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               onClick={() => setPublishDialogOpen(false)}

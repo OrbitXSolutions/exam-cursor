@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Smart_Core.Application.Interfaces;
+using Smart_Core.Infrastructure.Data;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -10,57 +12,99 @@ public class EmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmailService> _logger;
+    private readonly ApplicationDbContext _db;
+    private readonly IEncryptionService _encryption;
 
-    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+    public EmailService(
+        IConfiguration configuration,
+        ILogger<EmailService> logger,
+        ApplicationDbContext db,
+        IEncryptionService encryption)
     {
         _configuration = configuration;
         _logger = logger;
+        _db = db;
+        _encryption = encryption;
     }
 
- public async Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true)
+    private async Task<(string Host, int Port, string Username, string Password, string FromEmail, string FromName, bool EnableSsl)> GetSmtpConfigAsync()
+    {
+        // Try DB first
+        var dbSettings = await _db.NotificationSettings.FirstOrDefaultAsync();
+        if (dbSettings != null && !string.IsNullOrWhiteSpace(dbSettings.SmtpHost))
+        {
+            var password = string.IsNullOrWhiteSpace(dbSettings.SmtpPasswordEncrypted)
+                ? string.Empty
+                : _encryption.Decrypt(dbSettings.SmtpPasswordEncrypted);
+
+            return (
+                dbSettings.SmtpHost,
+                dbSettings.SmtpPort,
+                dbSettings.SmtpUsername,
+                password,
+                dbSettings.SmtpFromEmail,
+                dbSettings.SmtpFromName,
+                dbSettings.SmtpEnableSsl
+            );
+        }
+
+        // Fallback to appsettings
+        var smtpSettings = _configuration.GetSection("SmtpSettings");
+        return (
+            smtpSettings["Host"] ?? "smtp.gmail.com",
+            int.Parse(smtpSettings["Port"] ?? "587"),
+            smtpSettings["Username"] ?? "",
+            smtpSettings["Password"] ?? "",
+            smtpSettings["FromEmail"] ?? "noreply@smartcore.com",
+            smtpSettings["FromName"] ?? "Smart Core",
+            bool.Parse(smtpSettings["EnableSsl"] ?? "true")
+        );
+    }
+
+    public async Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true)
     {
         return await SendEmailAsync(new List<string> { to }, subject, body, isHtml);
     }
 
     public async Task<bool> SendEmailAsync(List<string> to, string subject, string body, bool isHtml = true)
     {
-  try
-     {
-  var smtpSettings = _configuration.GetSection("SmtpSettings");
-            
-     using var client = new SmtpClient(smtpSettings["Host"], int.Parse(smtpSettings["Port"] ?? "587"))
-     {
-  Credentials = new NetworkCredential(smtpSettings["Username"], smtpSettings["Password"]),
-      EnableSsl = bool.Parse(smtpSettings["EnableSsl"] ?? "true")
-  };
+        try
+        {
+            var config = await GetSmtpConfigAsync();
+
+            using var client = new SmtpClient(config.Host, config.Port)
+            {
+                Credentials = new NetworkCredential(config.Username, config.Password),
+                EnableSsl = config.EnableSsl
+            };
 
             using var message = new MailMessage
-        {
-  From = new MailAddress(smtpSettings["FromEmail"]!, smtpSettings["FromName"]),
-        Subject = subject,
-    Body = body,
-      IsBodyHtml = isHtml
-  };
-
-    foreach (var recipient in to)
             {
-message.To.Add(recipient);
-  }
+                From = new MailAddress(config.FromEmail, config.FromName),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = isHtml
+            };
 
- await client.SendMailAsync(message);
-       _logger.LogInformation("Email sent successfully to {Recipients}", string.Join(", ", to));
-  return true;
-     }
-catch (Exception ex)
-   {
-      _logger.LogError(ex, "Failed to send email to {Recipients}", string.Join(", ", to));
+            foreach (var recipient in to)
+            {
+                message.To.Add(recipient);
+            }
+
+            await client.SendMailAsync(message);
+            _logger.LogInformation("Email sent successfully to {Recipients}", string.Join(", ", to));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send email to {Recipients}", string.Join(", ", to));
             return false;
-      }
-}
+        }
+    }
 
     public async Task<bool> SendPasswordResetEmailAsync(string to, string resetLink)
- {
-   var subject = "Reset Your Password";
+    {
+        var subject = "Reset Your Password";
         var body = $@"
          <html>
             <body>
@@ -77,8 +121,8 @@ catch (Exception ex)
 
     public async Task<bool> SendEmailConfirmationAsync(string to, string confirmationLink)
     {
-  var subject = "Confirm Your Email";
- var body = $@"
+        var subject = "Confirm Your Email";
+        var body = $@"
       <html>
        <body>
        <h2>Email Confirmation</h2>
@@ -88,10 +132,10 @@ catch (Exception ex)
 </body>
             </html>";
 
-      return await SendEmailAsync(to, subject, body);
+        return await SendEmailAsync(to, subject, body);
     }
 
- public async Task<bool> SendWelcomeEmailAsync(string to, string displayName)
+    public async Task<bool> SendWelcomeEmailAsync(string to, string displayName)
     {
         var subject = "Welcome to Smart Core";
         var body = $@"
