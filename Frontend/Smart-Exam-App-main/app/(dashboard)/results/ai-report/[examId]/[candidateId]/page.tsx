@@ -5,6 +5,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { getAttemptIdForCandidate } from "@/lib/api/results"
 import { apiClient } from "@/lib/api-client"
+import { getAiProctorAnalysis, type AiProctorAnalysis } from "@/lib/api/proctoring"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,6 +26,10 @@ import {
   Monitor,
   Clock,
   Info,
+  Sparkles,
+  Loader2,
+  Video,
+  ExternalLink,
 } from "lucide-react"
 
 interface ProctorSession {
@@ -82,6 +88,9 @@ export default function AIReportPage() {
   const [evidence, setEvidence] = useState<ProctorEvidence[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [aiAnalysis2, setAiAnalysis2] = useState<AiProctorAnalysis | null>(null)
+  const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
+  const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null)
 
   const normalizeList = <T,>(res: unknown): T[] => {
     if (Array.isArray(res)) return res as T[]
@@ -336,6 +345,23 @@ export default function AIReportPage() {
     }
   }
 
+  const handleGenerateAiAnalysis = async () => {
+    if (!session?.id) return
+    try {
+      setAiAnalysisLoading(true)
+      setAiAnalysisError(null)
+      const result = await getAiProctorAnalysis(String(session.id))
+      setAiAnalysis2(result)
+      toast.success(language === "ar" ? "تم إنشاء تحليل الذكاء الاصطناعي" : "AI analysis generated successfully")
+    } catch (error: any) {
+      const msg = error?.message || (language === "ar" ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
+      setAiAnalysisError(msg)
+      toast.error(msg)
+    } finally {
+      setAiAnalysisLoading(false)
+    }
+  }
+
   const getRiskLevel = (score: number) => {
     if (score < 20) return { label: language === "ar" ? "منخفض" : "Low", color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/30" }
     if (score < 50) return { label: language === "ar" ? "متوسط" : "Medium", color: "text-yellow-600", bg: "bg-yellow-100 dark:bg-yellow-900/30" }
@@ -494,6 +520,136 @@ export default function AIReportPage() {
             </Card>
           </div>
 
+          {/* AI Proctor Analysis (GPT-4o) */}
+          <Card className="border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Brain className="h-5 w-5 text-purple-500" />
+                {language === "ar" ? "تقرير المراقبة بالذكاء الاصطناعي" : "AI Proctor Report"}
+                <Badge variant="outline" className="ms-auto bg-purple-500/10 border-purple-500/30 text-purple-600 text-[10px]">
+                  <Sparkles className="h-3 w-3 me-1" />
+                  GPT-4o
+                </Badge>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {language === "ar" ? "تحليل المخاطر بالذكاء الاصطناعي — استشاري فقط" : "AI-powered risk analysis — advisory only"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Generate Button */}
+              {!aiAnalysis2 && !aiAnalysisLoading && (
+                <div className="text-center py-4">
+                  <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500/30" />
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {language === "ar"
+                      ? "إنشاء تحليل بالذكاء الاصطناعي لأنماط المخاطر والسلوك في هذه الجلسة"
+                      : "Generate an AI-powered analysis of this session's risk and behavior patterns"}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateAiAnalysis}
+                    className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                    {language === "ar" ? "إنشاء تحليل الذكاء الاصطناعي" : "Generate AI Analysis"}
+                  </Button>
+                  {aiAnalysisError && (
+                    <p className="text-xs text-destructive mt-2">{aiAnalysisError}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Loading */}
+              {aiAnalysisLoading && (
+                <div className="text-center py-6">
+                  <Loader2 className="h-6 w-6 mx-auto mb-2 text-purple-500 animate-spin" />
+                  <p className="text-xs text-muted-foreground">
+                    {language === "ar" ? "جارٍ تحليل الجلسة بالذكاء الاصطناعي..." : "Analyzing session with AI..."}
+                  </p>
+                </div>
+              )}
+
+              {/* Analysis Results */}
+              {aiAnalysis2 && !aiAnalysisLoading && (
+                <div className="space-y-3">
+                  {/* Risk Level & Confidence */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{language === "ar" ? "مستوى الخطورة" : "Risk Level"}</span>
+                    <Badge variant="outline" className={
+                      aiAnalysis2.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                      aiAnalysis2.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
+                      aiAnalysis2.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
+                      "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+                    }>
+                      {aiAnalysis2.riskLevel}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{language === "ar" ? "الثقة" : "Confidence"}</span>
+                    <span className="text-sm font-medium">{aiAnalysis2.confidence}%</span>
+                  </div>
+
+                  {/* Risk Explanation */}
+                  <div className="pt-2 border-t">
+                    <p className="text-sm font-medium mb-1">{language === "ar" ? "شرح الخطورة" : "Risk Explanation"}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis2.riskExplanation}</p>
+                  </div>
+
+                  {/* Suspicious Behaviors */}
+                  {aiAnalysis2.suspiciousBehaviors?.length > 0 && (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1.5">{language === "ar" ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}</p>
+                      <ul className="space-y-1">
+                        {aiAnalysis2.suspiciousBehaviors.map((behavior, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                            <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
+                            <span>{behavior}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Recommendation */}
+                  <div className="pt-2 border-t">
+                    <p className="text-sm font-medium mb-1">{language === "ar" ? "التوصية" : "Recommendation"}</p>
+                    <div className="flex items-start gap-1.5 p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
+                      <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
+                      <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis2.recommendation}</p>
+                    </div>
+                  </div>
+
+                  {/* Detailed Analysis (collapsible) */}
+                  {aiAnalysis2.detailedAnalysis && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors">
+                        {language === "ar" ? "التحليل التفصيلي" : "Detailed Analysis"}
+                      </summary>
+                      <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis2.detailedAnalysis}</p>
+                    </details>
+                  )}
+
+                  {/* Regenerate */}
+                  <div className="pt-2 border-t flex items-center justify-between">
+                    <span className="text-[10px] text-muted-foreground">
+                      {aiAnalysis2.generatedAt ? new Date(aiAnalysis2.generatedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US") : ""}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleGenerateAiAnalysis}
+                      className="h-7 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-500/10"
+                    >
+                      <Sparkles className="h-3 w-3 me-1" />
+                      {language === "ar" ? "إعادة إنشاء" : "Regenerate"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Session Details */}
           <Card>
             <CardHeader>
@@ -576,6 +732,43 @@ export default function AIReportPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Video Recording */}
+          <Card className="border-blue-500/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Video className="h-5 w-5 text-blue-500" />
+                {language === "ar" ? "تسجيل فيديو المرشح" : "Candidate Video Recording"}
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {language === "ar"
+                  ? "مشاهدة تسجيل الفيديو الكامل لجلسة الاختبار"
+                  : "View the full video recording of the exam session"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10">
+                    <Video className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{session.candidateName}</p>
+                    <p className="text-xs text-muted-foreground">{session.examTitleEn}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
+                  onClick={() => window.open(`/proctor-center/recording/${session.attemptId}`, "_blank")}
+                >
+                  <ExternalLink className="h-3.5 w-3.5 me-1.5" />
+                  {language === "ar" ? "فتح التسجيل" : "Open Recording"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

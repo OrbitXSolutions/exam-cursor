@@ -135,7 +135,8 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
             IPAddress = attempt.IPAddress,
             DeviceInfo = attempt.DeviceInfo,
             TotalQuestions = questionCounts?.Total ?? 0,
-            AnsweredQuestions = questionCounts?.Answered ?? 0
+            AnsweredQuestions = questionCounts?.Answered ?? 0,
+            ExpiryReason = attempt.ExpiryReason
         };
 
         // ── Computed flags ──
@@ -196,6 +197,20 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
 
         if (proctorSession != null)
         {
+            // Compute accurate event/violation counts from actual event data
+            var eventCounts = await _db.ProctorEvents
+                .Where(pe => pe.ProctorSessionId == proctorSession.Id && !pe.IsDeleted)
+                .GroupBy(pe => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Violations = g.Count(pe => pe.IsViolation)
+                })
+                .FirstOrDefaultAsync();
+
+            var computedTotalEvents = eventCounts?.Total ?? proctorSession.TotalEvents;
+            var computedTotalViolations = eventCounts?.Violations ?? proctorSession.TotalViolations;
+
             // Fetch evidence separately (for video + screenshots)
             var evidence = await _db.ProctorEvidence
                 .Where(e => e.ProctorSessionId == proctorSession.Id
@@ -216,8 +231,8 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
                 SessionId = proctorSession.Id,
                 ModeName = proctorSession.Mode.ToString(),
                 StatusName = proctorSession.Status.ToString(),
-                TotalEvents = proctorSession.TotalEvents,
-                TotalViolations = proctorSession.TotalViolations,
+                TotalEvents = computedTotalEvents,
+                TotalViolations = computedTotalViolations,
                 RiskScore = proctorSession.RiskScore,
                 RiskLevel = GetRiskLevel(proctorSession.RiskScore),
                 LastHeartbeatAt = proctorSession.LastHeartbeatAt,
@@ -395,7 +410,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
 
     private static string GetRiskLevel(decimal? score) => score switch
     {
-        null => "Unknown",
+        null or 0 => "Low",
         <= 20 => "Low",
         <= 50 => "Medium",
         <= 75 => "High",
@@ -411,7 +426,10 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
         FileSize = e.FileSize,
         CapturedAt = e.StartAt ?? e.UploadedAt,
         DurationSeconds = e.DurationSeconds,
-        IsUploaded = e.IsUploaded
+        IsUploaded = e.IsUploaded,
+        PreviewUrl = !string.IsNullOrWhiteSpace(e.FilePath)
+            ? $"/media/{e.FilePath.TrimStart('/')}"
+            : null
     };
 
     private static int ExtractQuestionIdFromMetadata(string? metadataJson)

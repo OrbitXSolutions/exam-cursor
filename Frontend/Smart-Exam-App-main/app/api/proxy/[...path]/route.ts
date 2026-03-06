@@ -41,7 +41,9 @@ export async function GET(
     if (
       contentType.includes("application/vnd.openxmlformats") ||
       contentType.includes("application/octet-stream") ||
-      contentType.includes("application/zip")
+      contentType.includes("application/zip") ||
+      contentType.includes("image/") ||
+      contentType.includes("video/")
     ) {
       const buffer = await response.arrayBuffer();
       const disposition = response.headers.get("content-disposition") || "";

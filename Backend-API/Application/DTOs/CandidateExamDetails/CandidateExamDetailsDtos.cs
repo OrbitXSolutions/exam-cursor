@@ -105,6 +105,8 @@ public class ExamDetailsAttemptDto
     public string? DeviceInfo { get; set; }
     public int TotalQuestions { get; set; }
     public int AnsweredQuestions { get; set; }
+    public ExpiryReason ExpiryReason { get; set; }
+    public string ExpiryReasonName => ExpiryReason.ToString();
 }
 
 public class ExamDetailsAssignmentDto
@@ -147,6 +149,7 @@ public class ExamDetailsEvidenceItemDto
     public DateTime? CapturedAt { get; set; }
     public int? DurationSeconds { get; set; }
     public bool IsUploaded { get; set; }
+    public string? PreviewUrl { get; set; }
 }
 
 /// <summary>
