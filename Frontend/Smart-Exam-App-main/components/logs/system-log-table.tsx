@@ -119,7 +119,7 @@ export function SystemLogTable({
 
   const getStatusBadge = (code: number | null) => {
     if (!code) return null
-    if (code >= 500) return <Badge variant="destructive">{code}</Badge>
+    if (code >= 500 || code === 400) return <Badge variant="destructive">{code}</Badge>
     if (code >= 400) return <Badge variant="outline" className="border-amber-500 text-amber-600">{code}</Badge>
     return <Badge variant="secondary" className="text-green-600">{code}</Badge>
   }

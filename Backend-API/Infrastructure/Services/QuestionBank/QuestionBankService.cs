@@ -1,6 +1,7 @@
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
 using Smart_Core.Application.Interfaces;
@@ -494,7 +495,7 @@ public class QuestionBankService : IQuestionBankService
         return ApiResponse<bool>.SuccessResponse(true, $"Question {status} successfully");
     }
 
-    public async Task<ApiResponse<int>> GetQuestionsCountAsync(int? subjectId, int? topicId)
+    public async Task<ApiResponse<QuestionsCountResponse>> GetQuestionsCountAsync(int? subjectId, int? topicId)
     {
         var query = _context.Questions
             .Include(q => q.Subject)
@@ -521,7 +522,15 @@ public class QuestionBankService : IQuestionBankService
         }
 
         var count = await query.CountAsync();
-        return ApiResponse<int>.SuccessResponse(count);
+        var totalPoints = count > 0 ? await query.SumAsync(q => q.Points) : 0;
+
+        return ApiResponse<QuestionsCountResponse>.SuccessResponse(new QuestionsCountResponse
+        {
+            Count = count,
+            TotalPoints = totalPoints,
+            SubjectId = subjectId,
+            TopicId = topicId
+        });
     }
 
     #endregion

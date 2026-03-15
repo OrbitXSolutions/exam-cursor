@@ -12,6 +12,15 @@ import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
@@ -27,6 +36,7 @@ import {
   Users,
   Hash,
   PartyPopper,
+  AlertCircle,
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
@@ -49,6 +59,8 @@ export default function ExamOverviewPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     if (examId) {
@@ -75,8 +87,10 @@ export default function ExamOverviewPage() {
       await publishExam(exam.id)
       setPublishDialogOpen(true)
       fetchExam()
-    } catch (error) {
-      toast.error(t("exams.publishError") || "Failed to publish exam")
+    } catch (error: any) {
+      const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
+      setErrorMessage(msg)
+      setErrorDialogOpen(true)
     } finally {
       setActionLoading(false)
     }
@@ -220,7 +234,11 @@ export default function ExamOverviewPage() {
                 onClick={handlePublish}
                 disabled={actionLoading}
               >
-                <Send className="h-4 w-4 me-2" />
+                {actionLoading ? (
+                  <LoadingSpinner size="sm" className="me-2" />
+                ) : (
+                  <Send className="h-4 w-4 me-2" />
+                )}
                 {language === "ar" ? "نشر الاختبار" : "Publish Exam"}
               </Button>
             )}
@@ -263,6 +281,26 @@ export default function ExamOverviewPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Publish Error Dialog */}
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              {language === "ar" ? "فشل النشر" : "Failed to Publish"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base whitespace-pre-line">
+              {errorMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>
+              {t("common.ok") || "OK"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

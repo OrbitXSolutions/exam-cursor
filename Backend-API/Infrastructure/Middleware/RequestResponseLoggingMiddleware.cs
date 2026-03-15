@@ -159,7 +159,11 @@ public class RequestResponseLoggingMiddleware
                 var log = new SystemLog
                 {
                     Timestamp = DateTime.UtcNow,
-                    Level = isError ? (statusCode >= 500 ? SystemLogLevel.Error : SystemLogLevel.Warning) : SystemLogLevel.Info,
+                    Level = isError
+                        ? (statusCode >= 500 || statusCode == 400
+                            ? SystemLogLevel.Error
+                            : SystemLogLevel.Warning)
+                        : SystemLogLevel.Info,
                     Category = category,
                     UserId = userId,
                     UserDisplayName = email,

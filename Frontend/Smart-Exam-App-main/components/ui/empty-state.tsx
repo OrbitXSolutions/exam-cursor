@@ -1,5 +1,6 @@
 "use client"
 
+import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { LucideIcon } from "lucide-react"
@@ -11,7 +12,7 @@ interface EmptyStateProps {
   action?: {
     label: string
     onClick: () => void
-  }
+  } | ReactNode
   className?: string
 }
 
@@ -31,9 +32,15 @@ export function EmptyState({ icon: Icon, title, description, action, className }
       <h3 className="mb-2 text-lg font-semibold">{title}</h3>
       {description && <p className="mb-4 max-w-sm text-sm text-muted-foreground">{description}</p>}
       {action && (
-        <Button onClick={action.onClick} className="mt-2">
-          {action.label}
-        </Button>
+        <div className="mt-2">
+          {typeof action === "object" && action !== null && "label" in action ? (
+            <Button onClick={(action as { label: string; onClick: () => void }).onClick}>
+              {(action as { label: string; onClick: () => void }).label}
+            </Button>
+          ) : (
+            action
+          )}
+        </div>
       )}
     </div>
   )

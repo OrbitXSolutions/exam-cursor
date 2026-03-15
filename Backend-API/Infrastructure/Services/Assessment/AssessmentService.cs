@@ -232,18 +232,22 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<ExamDto>> CreateExamAsync(SaveExamDto dto, string createdBy)
   {
-    // Handle nullable DepartmentId - use user's department if not provided
+    // Security: Always resolve departmentId server-side for non-SuperDev users
     int departmentId;
-    if (dto.DepartmentId.HasValue && dto.DepartmentId.Value > 0)
+    var isSuperDev = await IsCurrentUserSuperDevAsync();
+
+    if (isSuperDev && dto.DepartmentId.HasValue && dto.DepartmentId.Value > 0)
     {
+      // Only SuperDev can explicitly specify a department
       departmentId = dto.DepartmentId.Value;
     }
     else
     {
+      // All other users: auto-fill from their assigned department (ignore any frontend value)
       var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
       if (!userDepartmentId.HasValue)
       {
-        return ApiResponse<ExamDto>.FailureResponse("Department ID is required. Please provide a department or ensure your user account is assigned to a department.");
+        return ApiResponse<ExamDto>.FailureResponse("Department ID is required. Please ensure your user account is assigned to a department.");
       }
       departmentId = userDepartmentId.Value;
     }
@@ -2730,6 +2734,13 @@ $"Questions not found: {string.Join(", ", missingIds)}");
     }
 
     _context.ExamSections.AddRange(newSections);
+
+    // Update pass score if provided
+    if (dto.PassScore.HasValue && dto.PassScore.Value >= 0)
+    {
+      exam.PassScore = dto.PassScore.Value;
+    }
+
     await _context.SaveChangesAsync();
     InvalidateExamCache();
 

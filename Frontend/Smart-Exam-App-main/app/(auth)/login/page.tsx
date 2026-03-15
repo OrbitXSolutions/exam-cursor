@@ -224,65 +224,85 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <div className="mt-4 rounded-lg bg-muted p-4 text-sm">
+                <div className="mt-4 rounded-lg bg-muted p-4 text-sm max-h-80 overflow-y-auto">
                   <p className="font-medium mb-3">Demo Credentials (click to fill):</p>
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("ahmed.it.admin@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Admin:</span>{" "}
-                      <span className="text-muted-foreground">ahmed.it.admin@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("sara.it.instructor@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Instructor:</span>{" "}
-                      <span className="text-muted-foreground">sara.it.instructor@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("omar.it.examiner@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Examiner:</span>{" "}
-                      <span className="text-muted-foreground">omar.it.examiner@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("layla.it.proctor@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Proctor:</span>{" "}
-                      <span className="text-muted-foreground">layla.it.proctor@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("ali.it.candidate@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Candidate 1:</span>{" "}
-                      <span className="text-muted-foreground">ali.it.candidate@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("nour.it.candidate@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Candidate 2:</span>{" "}
-                      <span className="text-muted-foreground">nour.it.candidate@examcore.com</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoCredentials("youssef.finance.candidate@examcore.com")}
-                      className="w-full text-left p-2 rounded hover:bg-background transition-colors"
-                    >
-                      <span className="font-medium text-primary">Candidate 3:</span>{" "}
-                      <span className="text-muted-foreground">youssef.finance.candidate@examcore.com</span>
-                    </button>
+                  <div className="space-y-3">
+                    {/* IT Department */}
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">IT Department</p>
+                      <div className="space-y-1">
+                        <button type="button" onClick={() => fillDemoCredentials("ahmed.it.admin@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Admin:</span>{" "}
+                          <span className="text-muted-foreground">ahmed.it.admin@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("sara.it.instructor@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Instructor:</span>{" "}
+                          <span className="text-muted-foreground">sara.it.instructor@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("omar.it.examiner@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Examiner:</span>{" "}
+                          <span className="text-muted-foreground">omar.it.examiner@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("layla.it.proctor@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Proctor:</span>{" "}
+                          <span className="text-muted-foreground">layla.it.proctor@examcore.com</span>
+                        </button>
+                      </div>
+                    </div>
+                    {/* HR Department */}
+                    <div className="border-t pt-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">HR Department</p>
+                      <div className="space-y-1">
+                        <button type="button" onClick={() => fillDemoCredentials("mona.hr.admin@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Admin:</span>{" "}
+                          <span className="text-muted-foreground">mona.hr.admin@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("huda.hr.instructor@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Instructor:</span>{" "}
+                          <span className="text-muted-foreground">huda.hr.instructor@examcore.com</span>
+                        </button>
+                      </div>
+                    </div>
+                    {/* Finance Department */}
+                    <div className="border-t pt-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Finance Department</p>
+                      <div className="space-y-1">
+                        <button type="button" onClick={() => fillDemoCredentials("tarek.finance.admin@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Admin:</span>{" "}
+                          <span className="text-muted-foreground">tarek.finance.admin@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("dina.finance.instructor@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Instructor:</span>{" "}
+                          <span className="text-muted-foreground">dina.finance.instructor@examcore.com</span>
+                        </button>
+                      </div>
+                    </div>
+                    {/* Candidates */}
+                    <div className="border-t pt-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Candidates</p>
+                      <div className="space-y-1">
+                        <button type="button" onClick={() => fillDemoCredentials("ali.it.candidate@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Ali Mahmoud:</span>{" "}
+                          <span className="text-muted-foreground">ali.it.candidate@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("nour.it.candidate@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Nour Ahmed:</span>{" "}
+                          <span className="text-muted-foreground">nour.it.candidate@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("youssef.finance.candidate@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Youssef Adel:</span>{" "}
+                          <span className="text-muted-foreground">youssef.finance.candidate@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("ahmed.hr.candidate@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Ahmed Nabil:</span>{" "}
+                          <span className="text-muted-foreground">ahmed.hr.candidate@examcore.com</span>
+                        </button>
+                        <button type="button" onClick={() => fillDemoCredentials("salma.hr.candidate@examcore.com")} className="w-full text-left p-2 rounded hover:bg-background transition-colors">
+                          <span className="font-medium text-primary">Salma Hussein:</span>{" "}
+                          <span className="text-muted-foreground">salma.hr.candidate@examcore.com</span>
+                        </button>
+                      </div>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
                       Password for all: <code className="bg-background px-1 py-0.5 rounded">Demo@123456</code>
                     </p>

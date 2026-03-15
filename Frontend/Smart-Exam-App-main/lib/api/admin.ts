@@ -149,6 +149,8 @@ export async function getAuditLogs(params?: {
   actorId?: string;
   action?: string;
   entityName?: string;
+  outcome?: number;
+  search?: string;
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -163,6 +165,8 @@ export async function getAuditLogs(params?: {
     if (params?.entityName && params.entityName !== "all")
       query.set("EntityName", params.entityName);
     if (params?.actorId) query.set("ActorId", params.actorId);
+    if (params?.outcome != null) query.set("Outcome", String(params.outcome));
+    if (params?.search) query.set("Search", params.search);
     if (params?.startDate) query.set("OccurredFrom", params.startDate);
     if (params?.endDate) query.set("OccurredTo", params.endDate);
     const raw = await apiClient.get<{
@@ -193,6 +197,34 @@ export async function getAuditLogs(params?: {
   } catch {
     return { items: [], totalCount: 0 };
   }
+}
+
+export async function getAuditLogDetail(
+  id: number,
+): Promise<import("@/lib/types").AuditLogDetail> {
+  const raw = await apiClient.get<any>(`/Audit/log/${id}`);
+  return {
+    id: raw.id,
+    actorId: raw.actorId ?? null,
+    actorDisplayName: raw.actorDisplayName ?? null,
+    actorType:
+      raw.actorTypeName ?? ACTOR_TYPE_MAP[raw.actorType ?? 1] ?? "User",
+    action: raw.action ?? "",
+    entityName: raw.entityName ?? "",
+    entityId: raw.entityId ?? "",
+    correlationId: raw.correlationId ?? null,
+    source: raw.sourceName ?? SOURCE_MAP[raw.source ?? 1] ?? null,
+    channel: raw.channelName ?? CHANNEL_MAP[raw.channel ?? 1] ?? null,
+    ipAddress: raw.ipAddress ?? null,
+    userAgent: raw.userAgent ?? null,
+    beforeJson: raw.beforeJson ?? null,
+    afterJson: raw.afterJson ?? null,
+    metadataJson: raw.metadataJson ?? null,
+    outcome: raw.outcomeName ?? "Success",
+    errorMessage: raw.errorMessage ?? null,
+    occurredAt: raw.occurredAt ?? "",
+    durationMs: raw.durationMs ?? null,
+  };
 }
 
 // System Settings (includes Brand Info for white-label exam system)

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
 using Smart_Core.Application.Interfaces;
@@ -107,7 +108,7 @@ public class QuestionBankController : ControllerBase
     /// Get count of available questions for a subject or topic
     /// </summary>
     [HttpGet("questions/count")]
-    [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<QuestionsCountResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetQuestionsCount([FromQuery] int? subjectId, [FromQuery] int? topicId)
     {
         var result = await _questionBankService.GetQuestionsCountAsync(subjectId, topicId);
