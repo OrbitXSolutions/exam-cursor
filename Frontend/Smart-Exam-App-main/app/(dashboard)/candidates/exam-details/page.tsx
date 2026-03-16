@@ -766,7 +766,7 @@ export default function CandidateExamDetailsPage() {
                   </Badge>
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {isRtl ? "تحليل المخاطر بالذكاء الاصطناعي — استشاري فقط" : "AI-powered risk analysis — advisory only"}
+                  {isRtl ? "تحليل شامل للمخاطر بالذكاء الاصطناعي — استشاري فقط" : "Comprehensive AI-powered forensic analysis — advisory only"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -776,8 +776,8 @@ export default function CandidateExamDetailsPage() {
                     <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500/30" />
                     <p className="text-xs text-muted-foreground mb-3">
                       {isRtl
-                        ? "إنشاء تحليل بالذكاء الاصطناعي لأنماط المخاطر والسلوك في هذه الجلسة"
-                        : "Generate an AI-powered analysis of this session's risk and behavior patterns"}
+                        ? "إنشاء تقرير تحليل شامل بالذكاء الاصطناعي لهذه الجلسة"
+                        : "Generate a comprehensive AI forensic analysis report for this session"}
                     </p>
                     <Button
                       variant="outline"
@@ -786,7 +786,7 @@ export default function CandidateExamDetailsPage() {
                       className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
                     >
                       <Sparkles className="h-3.5 w-3.5 me-1.5" />
-                      {isRtl ? "إنشاء تحليل الذكاء الاصطناعي" : "Generate AI Analysis"}
+                      {isRtl ? "إنشاء التقرير الشامل" : "Generate Full Report"}
                     </Button>
                     {aiAnalysisError && (
                       <p className="text-xs text-destructive mt-2">{aiAnalysisError}</p>
@@ -799,72 +799,348 @@ export default function CandidateExamDetailsPage() {
                   <div className="text-center py-6">
                     <Loader2 className="h-6 w-6 mx-auto mb-2 text-purple-500 animate-spin" />
                     <p className="text-xs text-muted-foreground">
-                      {isRtl ? "جارٍ تحليل الجلسة بالذكاء الاصطناعي..." : "Analyzing session with AI..."}
+                      {isRtl ? "جارٍ تحليل الجلسة بالذكاء الاصطناعي..." : "Generating comprehensive analysis report..."}
                     </p>
                   </div>
                 )}
 
-                {/* Analysis Results */}
+                {/* ═══ Analysis Results ═══ */}
                 {aiAnalysis && !aiAnalysisLoading && (
-                  <div className="space-y-3">
-                    {/* Risk Level & Confidence */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{isRtl ? "مستوى الخطورة" : "Risk Level"}</span>
-                      <Badge variant="outline" className={
-                        aiAnalysis.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
-                        aiAnalysis.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
-                        aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
-                        "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
-                      }>
-                        {aiAnalysis.riskLevel}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{isRtl ? "الثقة" : "Confidence"}</span>
-                      <span className="text-sm font-medium">{aiAnalysis.confidence}%</span>
+                  <div className="space-y-4">
+
+                    {/* ── Header: Risk Level, Score, Confidence ── */}
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium">{isRtl ? "مستوى الخطورة" : "Risk Level"}</span>
+                          <Badge variant="outline" className={`text-xs font-semibold ${
+                            aiAnalysis.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                            aiAnalysis.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
+                            aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
+                            "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+                          }`}>
+                            {aiAnalysis.riskLevel}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          {aiAnalysis.riskScore != null && (
+                            <span>{isRtl ? "نقاط الخطورة" : "Risk Score"}: <span className="font-medium text-foreground">{aiAnalysis.riskScore}/100</span></span>
+                          )}
+                          <span>{isRtl ? "الثقة" : "Confidence"}: <span className="font-medium text-foreground">{aiAnalysis.confidence}%</span></span>
+                        </div>
+                      </div>
+                      {/* Risk score visual bar */}
+                      {aiAnalysis.riskScore != null && (
+                        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              aiAnalysis.riskScore >= 75 ? "bg-destructive" :
+                              aiAnalysis.riskScore >= 50 ? "bg-orange-500" :
+                              aiAnalysis.riskScore >= 25 ? "bg-amber-500" :
+                              "bg-emerald-500"
+                            }`}
+                            style={{ width: `${Math.min(100, aiAnalysis.riskScore)}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    {/* Risk Explanation */}
-                    <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1">{isRtl ? "شرح الخطورة" : "Risk Explanation"}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis.riskExplanation}</p>
-                    </div>
+                    {/* ── Executive Summary ── */}
+                    {aiAnalysis.executiveSummary && (
+                      <div className="p-3 rounded-lg border border-purple-500/20 bg-purple-500/5">
+                        <p className="text-sm font-medium mb-1 text-purple-700 dark:text-purple-300">{isRtl ? "الملخص التنفيذي" : "Executive Summary"}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis.executiveSummary}</p>
+                      </div>
+                    )}
 
-                    {/* Suspicious Behaviors */}
+                    {/* ── Candidate Profile ── */}
+                    {aiAnalysis.candidateProfile && (
+                      <details className="border rounded-lg" open>
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <User className="h-4 w-4 text-blue-500" />
+                          {isRtl ? "ملف المرشح" : "Candidate Profile"}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-1.5">
+                          {aiAnalysis.candidateProfile.name && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "الاسم" : "Name"}</span><span>{aiAnalysis.candidateProfile.name}</span></div>
+                          )}
+                          {aiAnalysis.candidateProfile.email && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "البريد" : "Email"}</span><span>{aiAnalysis.candidateProfile.email}</span></div>
+                          )}
+                          {aiAnalysis.candidateProfile.rollNumber && aiAnalysis.candidateProfile.rollNumber !== "N/A" && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "الرقم" : "Roll No."}</span><span>{aiAnalysis.candidateProfile.rollNumber}</span></div>
+                          )}
+                          {aiAnalysis.candidateProfile.department && aiAnalysis.candidateProfile.department !== "N/A" && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "القسم" : "Department"}</span><span>{aiAnalysis.candidateProfile.department}</span></div>
+                          )}
+                          {aiAnalysis.candidateProfile.identityVerificationStatus && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "التحقق من الهوية" : "ID Verification"}</span><span>{aiAnalysis.candidateProfile.identityVerificationStatus}</span></div>
+                          )}
+                          {aiAnalysis.candidateProfile.deviceSummary && (
+                            <div className="pt-1.5 border-t"><p className="text-xs text-muted-foreground"><span className="font-medium">{isRtl ? "الجهاز" : "Device"}:</span> {aiAnalysis.candidateProfile.deviceSummary}</p></div>
+                          )}
+                          {aiAnalysis.candidateProfile.networkSummary && (
+                            <div><p className="text-xs text-muted-foreground"><span className="font-medium">{isRtl ? "الشبكة" : "Network"}:</span> {aiAnalysis.candidateProfile.networkSummary}</p></div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Session Overview ── */}
+                    {aiAnalysis.sessionOverview && (
+                      <details className="border rounded-lg" open>
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <Clock className="h-4 w-4 text-indigo-500" />
+                          {isRtl ? "نظرة عامة على الجلسة" : "Session Overview"}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-1.5">
+                          {aiAnalysis.sessionOverview.examTitle && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "الاختبار" : "Exam"}</span><span className="font-medium">{aiAnalysis.sessionOverview.examTitle}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.proctorMode && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "وضع المراقبة" : "Proctor Mode"}</span><span>{aiAnalysis.sessionOverview.proctorMode}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.sessionStatus && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "حالة الجلسة" : "Session Status"}</span><span>{aiAnalysis.sessionOverview.sessionStatus}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.attemptStatus && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "حالة المحاولة" : "Attempt Status"}</span><span>{aiAnalysis.sessionOverview.attemptStatus}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.duration && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "المدة" : "Duration"}</span><span>{aiAnalysis.sessionOverview.duration}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.timeUsage && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "استخدام الوقت" : "Time Usage"}</span><span>{aiAnalysis.sessionOverview.timeUsage}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.completionRate && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "نسبة الإكمال" : "Completion"}</span><span>{aiAnalysis.sessionOverview.completionRate}</span></div>
+                          )}
+                          {aiAnalysis.sessionOverview.terminationInfo && aiAnalysis.sessionOverview.terminationInfo !== "N/A" && (
+                            <div className="pt-1.5 border-t">
+                              <p className="text-xs text-destructive"><span className="font-medium">{isRtl ? "الإنهاء" : "Termination"}:</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Behavior Analysis ── */}
+                    {aiAnalysis.behaviorAnalysis && (
+                      <details className="border rounded-lg">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <Activity className="h-4 w-4 text-cyan-500" />
+                          {isRtl ? "تحليل السلوك" : "Behavior Analysis"}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-2.5">
+                          {aiAnalysis.behaviorAnalysis.answerPatternSummary && (
+                            <div><p className="text-xs font-medium mb-0.5">{isRtl ? "أنماط الإجابة" : "Answer Patterns"}</p><p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.behaviorAnalysis.answerPatternSummary}</p></div>
+                          )}
+                          {aiAnalysis.behaviorAnalysis.timingAnalysis && (
+                            <div><p className="text-xs font-medium mb-0.5">{isRtl ? "تحليل التوقيت" : "Timing Analysis"}</p><p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.behaviorAnalysis.timingAnalysis}</p></div>
+                          )}
+                          {aiAnalysis.behaviorAnalysis.navigationBehavior && (
+                            <div><p className="text-xs font-medium mb-0.5">{isRtl ? "سلوك التنقل" : "Navigation Behavior"}</p><p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.behaviorAnalysis.navigationBehavior}</p></div>
+                          )}
+                          {aiAnalysis.behaviorAnalysis.focusBehavior && (
+                            <div><p className="text-xs font-medium mb-0.5">{isRtl ? "سلوك التركيز" : "Focus Behavior"}</p><p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.behaviorAnalysis.focusBehavior}</p></div>
+                          )}
+                          {aiAnalysis.behaviorAnalysis.suspiciousPatterns && (
+                            <div className="p-2 rounded bg-amber-500/5 border border-amber-500/10">
+                              <p className="text-xs font-medium mb-0.5 text-amber-600">{isRtl ? "أنماط مشبوهة" : "Suspicious Patterns"}</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Violation Analysis ── */}
+                    {aiAnalysis.violationAnalysis && (
+                      <details className="border rounded-lg border-orange-500/20">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          {isRtl ? "تحليل المخالفات" : "Violation Analysis"}
+                          {aiAnalysis.violationAnalysis.totalViolations != null && (
+                            <Badge variant="outline" className="ms-auto text-[10px] bg-orange-500/10 border-orange-500/30 text-orange-600">{aiAnalysis.violationAnalysis.totalViolations} {isRtl ? "مخالفة" : "violations"}</Badge>
+                          )}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-2">
+                          {aiAnalysis.violationAnalysis.thresholdStatus && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "حالة الحد" : "Threshold"}</span><span className="text-xs">{aiAnalysis.violationAnalysis.thresholdStatus}</span></div>
+                          )}
+                          {aiAnalysis.violationAnalysis.violationTrend && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "اتجاه المخالفات" : "Trend"}</span><span className="text-xs">{aiAnalysis.violationAnalysis.violationTrend}</span></div>
+                          )}
+                          {aiAnalysis.violationAnalysis.violationBreakdown && aiAnalysis.violationAnalysis.violationBreakdown.length > 0 && (
+                            <div className="pt-1.5 border-t">
+                              <p className="text-xs font-medium mb-1.5">{isRtl ? "التفاصيل" : "Breakdown"}</p>
+                              <div className="space-y-1">
+                                {aiAnalysis.violationAnalysis.violationBreakdown.map((v, i) => (
+                                  <div key={i} className="flex items-center justify-between text-xs p-1.5 rounded bg-muted/50">
+                                    <span className="font-medium">{v.type}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-muted-foreground">x{v.count}</span>
+                                      <Badge variant="outline" className={`text-[9px] ${
+                                        v.severity === "Critical" ? "border-destructive/30 text-destructive" :
+                                        v.severity === "High" ? "border-orange-500/30 text-orange-600" :
+                                        v.severity === "Medium" ? "border-amber-500/30 text-amber-600" :
+                                        "border-muted-foreground/30"
+                                      }`}>{v.severity}</Badge>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Environment Assessment ── */}
+                    {aiAnalysis.environmentAssessment && (
+                      <details className="border rounded-lg">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <Shield className="h-4 w-4 text-teal-500" />
+                          {isRtl ? "تقييم البيئة" : "Environment Assessment"}
+                        </summary>
+                        <div className="px-3 pb-3 space-y-1.5">
+                          {aiAnalysis.environmentAssessment.browserCompliance && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "المتصفح" : "Browser"}</span><span className="text-xs max-w-[60%] text-end">{aiAnalysis.environmentAssessment.browserCompliance}</span></div>
+                          )}
+                          {aiAnalysis.environmentAssessment.networkStability && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "الشبكة" : "Network"}</span><span className="text-xs max-w-[60%] text-end">{aiAnalysis.environmentAssessment.networkStability}</span></div>
+                          )}
+                          {aiAnalysis.environmentAssessment.webcamStatus && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "الكاميرا" : "Webcam"}</span><span className="text-xs">{aiAnalysis.environmentAssessment.webcamStatus}</span></div>
+                          )}
+                          {aiAnalysis.environmentAssessment.fullscreenCompliance && (
+                            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{isRtl ? "ملء الشاشة" : "Fullscreen"}</span><span className="text-xs">{aiAnalysis.environmentAssessment.fullscreenCompliance}</span></div>
+                          )}
+                          {aiAnalysis.environmentAssessment.overallEnvironmentRisk && (
+                            <div className="pt-1.5 border-t flex justify-between text-sm"><span className="text-muted-foreground font-medium">{isRtl ? "خطر البيئة" : "Environment Risk"}</span><span className="font-medium text-xs">{aiAnalysis.environmentAssessment.overallEnvironmentRisk}</span></div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Suspicious Behaviors ── */}
                     {aiAnalysis.suspiciousBehaviors?.length > 0 && (
-                      <div className="pt-2 border-t">
-                        <p className="text-sm font-medium mb-1.5">{isRtl ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}</p>
+                      <details className="border rounded-lg border-amber-500/20">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          {isRtl ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}
+                          <Badge variant="outline" className="ms-auto text-[10px] bg-amber-500/10 border-amber-500/30 text-amber-600">{aiAnalysis.suspiciousBehaviors.length}</Badge>
+                        </summary>
+                        <div className="px-3 pb-3">
+                          <ul className="space-y-1">
+                            {aiAnalysis.suspiciousBehaviors.map((behavior, i) => (
+                              <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                                <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0 text-amber-500" />
+                                <span>{behavior}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Aggravating & Mitigating Factors ── */}
+                    {((aiAnalysis.aggravatingFactors && aiAnalysis.aggravatingFactors.length > 0) || (aiAnalysis.mitigatingFactors && aiAnalysis.mitigatingFactors.length > 0)) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {aiAnalysis.aggravatingFactors && aiAnalysis.aggravatingFactors.length > 0 && (
+                          <div className="p-2.5 rounded-lg border border-destructive/20 bg-destructive/5">
+                            <p className="text-xs font-medium mb-1.5 text-destructive">{isRtl ? "عوامل مشددة" : "Aggravating Factors"}</p>
+                            <ul className="space-y-1">
+                              {aiAnalysis.aggravatingFactors.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1 text-xs text-muted-foreground">
+                                  <XCircle className="h-3 w-3 mt-0.5 shrink-0 text-destructive/60" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {aiAnalysis.mitigatingFactors && aiAnalysis.mitigatingFactors.length > 0 && (
+                          <div className="p-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+                            <p className="text-xs font-medium mb-1.5 text-emerald-600">{isRtl ? "عوامل مخففة" : "Mitigating Factors"}</p>
+                            <ul className="space-y-1">
+                              {aiAnalysis.mitigatingFactors.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1 text-xs text-muted-foreground">
+                                  <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-emerald-500/60" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ── Risk Timeline ── */}
+                    {aiAnalysis.riskTimeline && aiAnalysis.riskTimeline.length > 0 && (
+                      <details className="border rounded-lg">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <Clock className="h-4 w-4 text-violet-500" />
+                          {isRtl ? "الجدول الزمني للمخاطر" : "Risk Timeline"}
+                        </summary>
+                        <div className="px-3 pb-3">
+                          <div className="relative border-s-2 border-muted ms-2 space-y-2">
+                            {aiAnalysis.riskTimeline.map((event, i) => (
+                              <div key={i} className="ms-4 relative">
+                                <div className="absolute -start-[1.3rem] top-1 h-2 w-2 rounded-full bg-violet-500" />
+                                <p className="text-xs text-muted-foreground">{event}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
+                    )}
+
+                    {/* ── Integrity Verdict ── */}
+                    {aiAnalysis.integrityVerdict && (
+                      <div className="p-3 rounded-lg border-2 border-purple-500/30 bg-purple-500/5">
+                        <p className="text-sm font-medium mb-1 text-purple-700 dark:text-purple-300">{isRtl ? "حكم النزاهة" : "Integrity Verdict"}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis.integrityVerdict}</p>
+                      </div>
+                    )}
+
+                    {/* ── Recommendations ── */}
+                    {aiAnalysis.recommendations && aiAnalysis.recommendations.length > 0 ? (
+                      <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10">
+                        <p className="text-sm font-medium mb-1.5 text-purple-700 dark:text-purple-300">{isRtl ? "التوصيات" : "Recommendations"}</p>
                         <ul className="space-y-1">
-                          {aiAnalysis.suspiciousBehaviors.map((behavior, i) => (
+                          {aiAnalysis.recommendations.map((rec, i) => (
                             <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
-                              <span>{behavior}</span>
+                              <Shield className="h-3.5 w-3.5 mt-0.5 shrink-0 text-purple-500" />
+                              <span>{rec}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
+                    ) : aiAnalysis.recommendation && (
+                      <div className="p-3 rounded-lg bg-purple-500/5 border border-purple-500/10">
+                        <p className="text-sm font-medium mb-1">{isRtl ? "التوصية" : "Recommendation"}</p>
+                        <div className="flex items-start gap-1.5">
+                          <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
+                          <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
+                        </div>
+                      </div>
                     )}
 
-                    {/* Recommendation */}
-                    <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1">{isRtl ? "التوصية" : "Recommendation"}</p>
-                      <div className="flex items-start gap-1.5 p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
-                        <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
-                        <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
-                      </div>
-                    </div>
-
-                    {/* Detailed Analysis (collapsible) */}
+                    {/* ── Detailed Analysis (collapsible) ── */}
                     {aiAnalysis.detailedAnalysis && (
-                      <details className="pt-2 border-t">
-                        <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors">
-                          {isRtl ? "التحليل التفصيلي" : "Detailed Analysis"}
+                      <details className="border rounded-lg">
+                        <summary className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 transition-colors text-sm font-medium">
+                          <FileText className="h-4 w-4 text-gray-500" />
+                          {isRtl ? "التحليل التفصيلي الكامل" : "Full Detailed Analysis"}
                         </summary>
-                        <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis.detailedAnalysis}</p>
+                        <div className="px-3 pb-3">
+                          <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">{aiAnalysis.detailedAnalysis}</p>
+                        </div>
                       </details>
                     )}
 
-                    {/* Regenerate */}
+                    {/* ── Footer: Regenerate & Timestamp ── */}
                     <div className="pt-2 border-t flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground">
                         {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleString(isRtl ? "ar-SA" : "en-US") : ""}

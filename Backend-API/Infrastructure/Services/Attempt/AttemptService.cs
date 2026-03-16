@@ -397,6 +397,22 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
     await _context.SaveChangesAsync();
 
+    // Notify proctor via SignalR (server-side, reliable)
+    _ = Task.Run(async () =>
+    {
+      try
+      {
+        var group = $"attempt_{attemptId}";
+        await _proctorHub.Clients.Group(group).SendAsync("ExamSubmitted", new
+        {
+          attemptId,
+          status = "Submitted",
+          message = "The candidate has submitted the exam."
+        });
+      }
+      catch { /* fire-and-forget */ }
+    });
+
     var totalQuestions = attempt.Questions.Count;
     var answeredQuestions = attempt.Questions.Count(q => q.Answers.Any());
 

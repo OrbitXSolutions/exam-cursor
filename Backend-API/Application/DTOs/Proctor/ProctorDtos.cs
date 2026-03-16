@@ -25,14 +25,26 @@ public class ProctorSessionDto
     public string? UserAgent { get; set; }
     public string? IpAddress { get; set; }
     public string? BrowserName { get; set; }
+    public string? BrowserVersion { get; set; }
     public string? OperatingSystem { get; set; }
+    public string? ScreenResolution { get; set; }
     public int TotalEvents { get; set; }
     public int TotalViolations { get; set; }
+    public int CountableViolationCount { get; set; }
+    public int MaxViolationWarnings { get; set; }
+    public bool IsTerminatedByProctor { get; set; }
+    public string? TerminationReason { get; set; }
     public decimal? RiskScore { get; set; }
     public string RiskLevel => GetRiskLevel(RiskScore);
     public DateTime? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
     public bool IsFlagged { get; set; }
+    // Attempt-level fields
+    public int? RemainingSeconds { get; set; }
+    public DateTime? ExpiresAt { get; set; }
+    public string? AttemptStatus { get; set; }
+    public string? AttemptIpAddress { get; set; }
+    public string? AttemptDeviceInfo { get; set; }
     public ProctorDecisionDto? Decision { get; set; }
     public List<ProctorEventDto> RecentEvents { get; set; } = new();
 

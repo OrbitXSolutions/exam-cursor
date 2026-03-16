@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Proctor;
@@ -12,6 +13,7 @@ using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Hubs;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -22,6 +24,7 @@ public class ProctorService : IProctorService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHubContext<ProctorHub> _proctorHub;
     private const int DefaultHeartbeatIntervalSeconds = 15;
     private const int HeartbeatMissedThresholdSeconds = 45;
 
@@ -30,13 +33,15 @@ public class ProctorService : IProctorService
         IMediaStorageService mediaStorage,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IHubContext<ProctorHub> proctorHub)
     {
         _context = context;
         _mediaStorage = mediaStorage;
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _proctorHub = proctorHub;
     }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
@@ -1426,7 +1431,8 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<bool>.FailureResponse("Session not found");
 
         if (session.Status != ProctorSessionStatus.Active)
-            return ApiResponse<bool>.FailureResponse("Session is not active");
+            return ApiResponse<bool>.FailureResponse(
+                $"Session is not active (current status: {session.Status}). The candidate may have already submitted or the exam has ended.");
 
         if (string.IsNullOrWhiteSpace(message))
             return ApiResponse<bool>.FailureResponse("Warning message is required");
@@ -1531,6 +1537,23 @@ UploadEvidenceDto dto, string candidateId)
 
         await _context.SaveChangesAsync();
 
+        // Notify candidate via SignalR (server-side, reliable)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var group = $"attempt_{session.AttemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("SessionTerminated", new
+                {
+                    attemptId = session.AttemptId,
+                    reason,
+                    status = "Terminated",
+                    message = "Your exam has been terminated by the proctor."
+                });
+            }
+            catch { /* fire-and-forget */ }
+        });
+
         return ApiResponse<bool>.SuccessResponse(true, "Session terminated and attempt force-ended");
     }
 
@@ -1600,11 +1623,12 @@ UploadEvidenceDto dto, string candidateId)
     private async Task<ProctorSession?> GetSessionWithIncludesAsync(int sessionId)
     {
         return await _context.Set<ProctorSession>()
-.Include(s => s.Exam)
-    .Include(s => s.Candidate)
-        .Include(s => s.Decision)
+            .Include(s => s.Exam)
+            .Include(s => s.Candidate)
+            .Include(s => s.Decision)
+            .Include(s => s.Attempt)
             .Include(s => s.Events.OrderByDescending(e => e.OccurredAt).Take(20))
-     .FirstOrDefaultAsync(s => s.Id == sessionId);
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
     }
 
     private IQueryable<ProctorSession> ApplySessionFilters(
@@ -1826,6 +1850,26 @@ UploadEvidenceDto dto, string candidateId)
 
     private ProctorSessionDto MapToSessionDto(ProctorSession session)
     {
+        // Calculate remaining seconds from the linked Attempt
+        int? remainingSeconds = null;
+        DateTime? expiresAt = null;
+        string? attemptStatus = null;
+        if (session.Attempt != null)
+        {
+            expiresAt = session.Attempt.ExpiresAt;
+            attemptStatus = session.Attempt.Status.ToString();
+            if (session.Attempt.ExpiresAt.HasValue && session.Attempt.Status == AttemptStatus.InProgress)
+            {
+                remainingSeconds = Math.Max(0, (int)(session.Attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds);
+            }
+            else if (session.Attempt.Status == AttemptStatus.Submitted ||
+                     session.Attempt.Status == AttemptStatus.Terminated ||
+                     session.Attempt.Status == AttemptStatus.Expired)
+            {
+                remainingSeconds = 0;
+            }
+        }
+
         return new ProctorSessionDto
         {
             Id = session.Id,
@@ -1842,13 +1886,24 @@ UploadEvidenceDto dto, string candidateId)
             UserAgent = session.UserAgent,
             IpAddress = session.IpAddress,
             BrowserName = session.BrowserName,
+            BrowserVersion = session.BrowserVersion,
             OperatingSystem = session.OperatingSystem,
+            ScreenResolution = session.ScreenResolution,
             TotalEvents = session.TotalEvents,
             TotalViolations = session.TotalViolations,
+            CountableViolationCount = session.CountableViolationCount,
+            MaxViolationWarnings = session.Exam?.MaxViolationWarnings ?? 0,
+            IsTerminatedByProctor = session.IsTerminatedByProctor,
+            TerminationReason = session.TerminationReason,
             RiskScore = session.RiskScore,
             LastHeartbeatAt = session.LastHeartbeatAt,
             HeartbeatMissedCount = session.HeartbeatMissedCount,
             IsFlagged = session.IsFlagged,
+            RemainingSeconds = remainingSeconds,
+            ExpiresAt = expiresAt,
+            AttemptStatus = attemptStatus,
+            AttemptIpAddress = session.Attempt?.IPAddress,
+            AttemptDeviceInfo = session.Attempt?.DeviceInfo,
             Decision = session.Decision != null ? MapToDecisionDto(session.Decision) : null,
             RecentEvents = session.Events.Select(MapToEventDto).ToList()
         };

@@ -154,7 +154,8 @@ public class AssessmentService : IAssessmentService
           IsActive = x.IsActive,
           CreatedDate = x.CreatedDate,
           SectionsCount = x.Sections.Count,
-          QuestionsCount = x.Sections.SelectMany(s => s.Questions).Count(),
+          QuestionsCount = x.Sections.Sum(s => s.Questions.Any() ? s.Questions.Count() : s.PickCount),
+          TopicsCount = x.Sections.SelectMany(s => s.Topics).Count(),
           TotalPoints = x.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
           AccessPolicyStatus = x.AccessPolicy != null && x.AccessPolicy.RestrictToAssignedCandidates
               ? "Assigned"

@@ -230,10 +230,29 @@ interface ProctorSessionDetailDto {
   statusName: string;
   startedAt: string;
   endedAt?: string;
+  totalEvents: number;
   totalViolations: number;
+  countableViolationCount: number;
+  maxViolationWarnings: number;
+  isTerminatedByProctor: boolean;
+  terminationReason?: string;
   riskScore?: number;
   lastHeartbeatAt?: string;
   isFlagged?: boolean;
+  // Device & Browser info
+  browserName?: string;
+  browserVersion?: string;
+  operatingSystem?: string;
+  screenResolution?: string;
+  ipAddress?: string;
+  deviceFingerprint?: string;
+  userAgent?: string;
+  // Attempt-level fields
+  remainingSeconds?: number;
+  expiresAt?: string;
+  attemptStatus?: string;
+  attemptIpAddress?: string;
+  attemptDeviceInfo?: string;
 }
 
 /**
@@ -264,11 +283,13 @@ export async function getSessionDetails(
   const session: LiveSession = {
     id: String(data.id),
     attemptId: data.attemptId,
+    examId: data.examId,
     candidateId: data.candidateId ?? "",
     candidateName: data.candidateName ?? "",
     examTitle: data.examTitleEn ?? "",
     startedAt: data.startedAt,
-    timeRemaining: 0,
+    timeRemaining:
+      data.remainingSeconds != null ? Math.ceil(data.remainingSeconds / 60) : 0,
     status:
       data.statusName === "Active"
         ? "Active"
@@ -278,6 +299,26 @@ export async function getSessionDetails(
     incidentCount: data.totalViolations ?? 0,
     flagged: data.isFlagged ?? false,
     lastActivity: data.lastHeartbeatAt ?? data.startedAt,
+    totalViolations: data.totalViolations,
+    countableViolationCount: data.countableViolationCount,
+    maxViolationWarnings: data.maxViolationWarnings,
+    isTerminatedByProctor: data.isTerminatedByProctor,
+    terminationReason: data.terminationReason,
+    riskScore: data.riskScore,
+    // Device & Browser info
+    browserName: data.browserName,
+    browserVersion: data.browserVersion,
+    operatingSystem: data.operatingSystem,
+    screenResolution: data.screenResolution,
+    ipAddress: data.ipAddress,
+    deviceFingerprint: data.deviceFingerprint,
+    userAgent: data.userAgent,
+    // Attempt-level fields
+    remainingSeconds: data.remainingSeconds,
+    expiresAt: data.expiresAt,
+    attemptStatus: data.attemptStatus,
+    attemptIpAddress: data.attemptIpAddress,
+    attemptDeviceInfo: data.attemptDeviceInfo,
   };
   let incidents: Incident[] = [];
   try {
@@ -336,11 +377,13 @@ export async function refreshSessionData(sessionId: string): Promise<{
   const session: LiveSession = {
     id: String(data.id),
     attemptId: data.attemptId,
+    examId: data.examId,
     candidateId: data.candidateId ?? "",
     candidateName: data.candidateName ?? "",
     examTitle: data.examTitleEn ?? "",
     startedAt: data.startedAt,
-    timeRemaining: 0,
+    timeRemaining:
+      data.remainingSeconds != null ? Math.ceil(data.remainingSeconds / 60) : 0,
     status:
       data.statusName === "Active"
         ? "Active"
@@ -350,6 +393,24 @@ export async function refreshSessionData(sessionId: string): Promise<{
     incidentCount: data.totalViolations ?? 0,
     flagged: data.isFlagged ?? false,
     lastActivity: data.lastHeartbeatAt ?? data.startedAt,
+    totalViolations: data.totalViolations,
+    countableViolationCount: data.countableViolationCount,
+    maxViolationWarnings: data.maxViolationWarnings,
+    isTerminatedByProctor: data.isTerminatedByProctor,
+    terminationReason: data.terminationReason,
+    riskScore: data.riskScore,
+    browserName: data.browserName,
+    browserVersion: data.browserVersion,
+    operatingSystem: data.operatingSystem,
+    screenResolution: data.screenResolution,
+    ipAddress: data.ipAddress,
+    deviceFingerprint: data.deviceFingerprint,
+    userAgent: data.userAgent,
+    remainingSeconds: data.remainingSeconds,
+    expiresAt: data.expiresAt,
+    attemptStatus: data.attemptStatus,
+    attemptIpAddress: data.attemptIpAddress,
+    attemptDeviceInfo: data.attemptDeviceInfo,
   };
   let screenshots: Array<{ id: string; timestamp: string; url: string }> = [];
   try {
@@ -410,6 +471,58 @@ export async function terminateSession(
 
 // ============ AI PROCTOR ANALYSIS ============
 
+export interface AiReportCandidateProfile {
+  name?: string;
+  email?: string;
+  rollNumber?: string;
+  department?: string;
+  identityVerificationStatus?: string;
+  deviceSummary?: string;
+  networkSummary?: string;
+}
+
+export interface AiReportSessionOverview {
+  examTitle?: string;
+  sessionStatus?: string;
+  attemptStatus?: string;
+  duration?: string;
+  timeUsage?: string;
+  completionRate?: string;
+  terminationInfo?: string;
+  proctorMode?: string;
+}
+
+export interface AiReportBehaviorAnalysis {
+  answerPatternSummary?: string;
+  navigationBehavior?: string;
+  focusBehavior?: string;
+  timingAnalysis?: string;
+  suspiciousPatterns?: string;
+}
+
+export interface AiReportViolationItem {
+  type?: string;
+  count?: number;
+  severity?: string;
+  impact?: string;
+}
+
+export interface AiReportViolationAnalysis {
+  totalViolations?: number;
+  countableViolations?: number;
+  thresholdStatus?: string;
+  violationBreakdown?: AiReportViolationItem[];
+  violationTrend?: string;
+}
+
+export interface AiReportEnvironmentAssessment {
+  browserCompliance?: string;
+  networkStability?: string;
+  webcamStatus?: string;
+  fullscreenCompliance?: string;
+  overallEnvironmentRisk?: string;
+}
+
 export interface AiProctorAnalysis {
   riskLevel: string;
   riskExplanation: string;
@@ -419,6 +532,19 @@ export interface AiProctorAnalysis {
   detailedAnalysis: string;
   model: string;
   generatedAt: string;
+  // Enhanced report sections
+  executiveSummary?: string;
+  candidateProfile?: AiReportCandidateProfile;
+  sessionOverview?: AiReportSessionOverview;
+  behaviorAnalysis?: AiReportBehaviorAnalysis;
+  violationAnalysis?: AiReportViolationAnalysis;
+  environmentAssessment?: AiReportEnvironmentAssessment;
+  integrityVerdict?: string;
+  riskScore?: number;
+  mitigatingFactors?: string[];
+  aggravatingFactors?: string[];
+  recommendations?: string[];
+  riskTimeline?: string[];
 }
 
 /**

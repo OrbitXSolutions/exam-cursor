@@ -6,6 +6,7 @@ import { Sheet, X, GripHorizontal, Maximize2, Minimize2 } from "lucide-react"
 import { createUniver, LocaleType } from "@univerjs/presets"
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core"
 import sheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US"
+// @ts-ignore - CSS module imported at runtime
 import "@univerjs/preset-sheets-core/lib/index.css"
 
 // ============================================

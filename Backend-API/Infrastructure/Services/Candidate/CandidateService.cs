@@ -14,6 +14,8 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Smart_Core.Infrastructure.Services.Candidate;
 
@@ -26,6 +28,7 @@ public class CandidateService : ICandidateService
     private readonly ILogger<CandidateService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ICacheService _cache;
+    private readonly IHubContext<ProctorHub> _proctorHub;
 
     public CandidateService(
         ApplicationDbContext context,
@@ -34,7 +37,8 @@ public class CandidateService : ICandidateService
         IExamResultService examResultService,
         ILogger<CandidateService> logger,
         IServiceScopeFactory serviceScopeFactory,
-        ICacheService cache)
+        ICacheService cache,
+        IHubContext<ProctorHub> proctorHub)
     {
         _context = context;
         _userManager = userManager;
@@ -43,6 +47,7 @@ public class CandidateService : ICandidateService
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
         _cache = cache;
+        _proctorHub = proctorHub;
     }
 
     private void InvalidateCandidateCache()
@@ -837,6 +842,22 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             await _context.SaveChangesAsync();
             InvalidateCandidateCache();
 
+            // Notify proctor via SignalR (server-side, reliable)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var group = $"attempt_{attemptId}";
+                    await _proctorHub.Clients.Group(group).SendAsync("ExamSubmitted", new
+                    {
+                        attemptId,
+                        status = "Submitted",
+                        message = "The candidate has submitted the exam (expired attempt)."
+                    });
+                }
+                catch { /* fire-and-forget */ }
+            });
+
             // Still trigger background grading for expired-then-submitted
             _ = TriggerBackgroundGradingAsync(attemptId, candidateId, attempt.Exam.ShowResults);
 
@@ -891,6 +912,22 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         _logger.LogInformation("Submit succeeded: Attempt {AttemptId} submitted | CandidateId={CandidateId} | ExamId={ExamId}",
             attemptId, candidateId, attempt.ExamId);
+
+        // Notify proctor via SignalR (server-side, reliable — never depends on candidate's connection)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var group = $"attempt_{attemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("ExamSubmitted", new
+                {
+                    attemptId,
+                    status = "Submitted",
+                    message = "The candidate has submitted the exam."
+                });
+            }
+            catch { /* fire-and-forget */ }
+        });
 
         // Step 2: Build response IMMEDIATELY (before grading)
         var summary = new CandidateResultSummaryDto

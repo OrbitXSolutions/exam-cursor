@@ -106,11 +106,11 @@ public class Exam : BaseEntity
 
     /// <summary>
     /// Maximum number of countable violations before the exam is auto-terminated.
-    /// 0 = disabled (no auto-termination). Default = 10.
+    /// 0 = disabled (no auto-termination). Default = 0.
     /// At (X-1) the candidate receives a "last warning" modal.
     /// At X the attempt is automatically terminated.
     /// </summary>
-    public int MaxViolationWarnings { get; set; } = 10;
+    public int MaxViolationWarnings { get; set; } = 0;
 
     #endregion
 

@@ -34,7 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera } from "lucide-react"
 
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
@@ -76,7 +76,7 @@ export default function ExamConfigurationPage() {
     requireWebcam: true,
     requireFullscreen: true,
     browserLockdown: true,
-    maxViolationWarnings: 10,
+    maxViolationWarnings: 0,
   })
   
   // Result Message State
@@ -112,14 +112,14 @@ export default function ExamConfigurationPage() {
           showResults: examData.showResults !== false,
           allowReview: examData.allowReview || false,
           showCorrectAnswers: examData.showCorrectAnswers || false,
-          requireProctoring: examData.requireProctoring || false,
+          requireProctoring: true,
           requireIdVerification: examData.requireIdVerification || false,
           preventCopyPaste: examData.preventCopyPaste || false,
           preventScreenCapture: examData.preventScreenCapture || false,
-          requireWebcam: examData.requireWebcam || false,
+          requireWebcam: true,
           requireFullscreen: examData.requireFullscreen || false,
           browserLockdown: examData.browserLockdown || false,
-          maxViolationWarnings: examData.maxViolationWarnings ?? 10,
+          maxViolationWarnings: examData.maxViolationWarnings ?? 0,
         })
       }
       
@@ -501,22 +501,18 @@ export default function ExamConfigurationPage() {
                     </div>
                     <Switch
                       checked={
-                        formData.requireProctoring &&
                         formData.requireIdVerification &&
                         formData.preventCopyPaste &&
                         formData.preventScreenCapture &&
-                        formData.requireWebcam &&
                         formData.requireFullscreen &&
                         formData.browserLockdown
                       }
                       onCheckedChange={(checked) => {
                         setFormData((prev) => ({
                           ...prev,
-                          requireProctoring: checked,
                           requireIdVerification: checked,
                           preventCopyPaste: checked,
                           preventScreenCapture: checked,
-                          requireWebcam: checked,
                           requireFullscreen: checked,
                           browserLockdown: checked,
                         }))
@@ -535,8 +531,22 @@ export default function ExamConfigurationPage() {
                       <p className="text-sm text-muted-foreground">{t("exams.requireProctoringDesc")}</p>
                     </div>
                     <Switch
-                      checked={formData.requireProctoring}
-                      onCheckedChange={(checked) => updateField("requireProctoring", checked)}
+                      checked={true}
+                      disabled={true}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Camera className="h-4 w-4 text-amber-600" />
+                        <Label className="text-base font-medium">{t("exams.requireWebcam")}</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{t("exams.requireWebcamDesc")}</p>
+                    </div>
+                    <Switch
+                      checked={true}
+                      disabled={true}
                     />
                   </div>
                   
@@ -573,17 +583,6 @@ export default function ExamConfigurationPage() {
                     <Switch
                       checked={formData.preventScreenCapture}
                       onCheckedChange={(checked) => updateField("preventScreenCapture", checked)}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="space-y-1">
-                      <Label className="text-base font-medium">{t("exams.requireWebcam")}</Label>
-                      <p className="text-sm text-muted-foreground">{t("exams.requireWebcamDesc")}</p>
-                    </div>
-                    <Switch
-                      checked={formData.requireWebcam}
-                      onCheckedChange={(checked) => updateField("requireWebcam", checked)}
                     />
                   </div>
                   

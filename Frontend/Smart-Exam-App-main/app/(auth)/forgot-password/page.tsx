@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Shield className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold">ExamPro</span>
+          <span className="text-xl font-bold">SmartExam</span>
         </div>
         <div className="flex items-center gap-2">
           <LanguageToggle />

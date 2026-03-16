@@ -1,6 +1,7 @@
 export interface LiveSession {
   id: string;
   attemptId?: number;
+  examId?: number;
   candidateId: string;
   candidateName: string;
   examTitle: string;
@@ -18,6 +19,22 @@ export interface LiveSession {
   totalViolations?: number;
   countableViolationCount?: number;
   maxViolationWarnings?: number;
+  isTerminatedByProctor?: boolean;
+  terminationReason?: string;
+  // Device & Browser info
+  browserName?: string;
+  browserVersion?: string;
+  operatingSystem?: string;
+  screenResolution?: string;
+  ipAddress?: string;
+  deviceFingerprint?: string;
+  userAgent?: string;
+  // Attempt-level fields
+  remainingSeconds?: number;
+  expiresAt?: string;
+  attemptStatus?: string;
+  attemptIpAddress?: string;
+  attemptDeviceInfo?: string;
 }
 
 export interface Incident {

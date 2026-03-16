@@ -15,6 +15,12 @@ export interface ProctorViewerCallbacks {
   onStatusChange?: (status: ViewerStatus) => void;
   onRemoteStream?: (stream: MediaStream) => void;
   onExamSubmitted?: (attemptId: number) => void;
+  onExamTerminated?: (event: {
+    attemptId: number;
+    reason: string;
+    countableViolationCount?: number;
+    maxViolationWarnings?: number;
+  }) => void;
   onAttemptExpired?: (event: {
     attemptId: number;
     eventType: string;
@@ -170,6 +176,16 @@ export class ProctorViewer {
             "color: #4caf50; font-weight: bold",
           );
           this.callbacks.onExamSubmitted?.(event.attemptId);
+        },
+        onTerminationReceived: (event) => {
+          console.log(
+            `%c[WebRTC Viewer] ExamTerminated for attempt ${event.attemptId}: "${event.reason}"`,
+            "color: #f44336; font-weight: bold",
+          );
+          this.callbacks.onExamTerminated?.({
+            attemptId: event.attemptId,
+            reason: event.reason,
+          });
         },
         onAttemptExpired: (event) => {
           console.log(

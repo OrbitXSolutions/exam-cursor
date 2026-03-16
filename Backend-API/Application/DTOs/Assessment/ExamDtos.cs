@@ -126,6 +126,7 @@ public class ExamListDto
     public DateTime CreatedDate { get; set; }
     public int SectionsCount { get; set; }
     public int QuestionsCount { get; set; }
+    public int TopicsCount { get; set; }
     public decimal TotalPoints { get; set; }
 
     /// <summary>
@@ -229,9 +230,9 @@ public class SaveExamDto
     public bool BrowserLockdown { get; set; }
 
     /// <summary>
-    /// Max countable violations before auto-termination (0 = disabled, default 10)
+    /// Max countable violations before auto-termination (0 = disabled, default 0)
     /// </summary>
-    public int MaxViolationWarnings { get; set; } = 10;
+    public int MaxViolationWarnings { get; set; } = 0;
 
     #endregion
 }
@@ -302,9 +303,9 @@ public class UpdateExamSettingsDto
     public bool BrowserLockdown { get; set; }
 
     /// <summary>
-    /// Max countable violations before auto-termination (0 = disabled, default 10)
+    /// Max countable violations before auto-termination (0 = disabled, default 0)
     /// </summary>
-    public int MaxViolationWarnings { get; set; } = 10;
+    public int MaxViolationWarnings { get; set; } = 0;
 
     #endregion
 }

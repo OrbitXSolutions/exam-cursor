@@ -1085,6 +1085,16 @@ export default function ExamPage() {
         chunkRecorderRef.current = null
       }
 
+      // Notify proctor via SignalR BEFORE stopping background activity (connection is still alive)
+      if (publisherRef.current?.signalingConnection) {
+        try {
+          await publisherRef.current.signalingConnection.notifyExamSubmitted()
+          console.log('[ExamPage] Proctor notified of exam submission via SignalR')
+        } catch (e) {
+          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
+        }
+      }
+
       // Stop all background calls BEFORE submit to prevent race conditions
       stopAllBackgroundActivity()
 
@@ -1110,16 +1120,6 @@ export default function ExamPage() {
           })
         } catch (e) {
           console.warn("[Proctor] Video finalize setup failed (non-fatal):", e)
-        }
-      }
-
-      // Notify proctor via SignalR that exam was submitted
-      if (publisherRef.current?.signalingConnection) {
-        try {
-          await publisherRef.current.signalingConnection.notifyExamSubmitted()
-          console.log('[ExamPage] Proctor notified of exam submission')
-        } catch (e) {
-          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
         }
       }
 

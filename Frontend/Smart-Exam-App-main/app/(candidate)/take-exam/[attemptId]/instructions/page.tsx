@@ -330,7 +330,7 @@ export default function ExamInstructionsPage() {
                 <Button
                   type="button"
                   variant={examLanguage === "en" ? "default" : "outline"}
-                  onClick={() => setExamLanguage("en")}
+                  onClick={() => { setExamLanguage("en"); setLanguage("en") }}
                   className="flex-1"
                 >
                   {t("instructions.english")}
@@ -338,7 +338,7 @@ export default function ExamInstructionsPage() {
                 <Button
                   type="button"
                   variant={examLanguage === "ar" ? "default" : "outline"}
-                  onClick={() => setExamLanguage("ar")}
+                  onClick={() => { setExamLanguage("ar"); setLanguage("ar") }}
                   className="flex-1"
                 >
                   {t("instructions.arabic")}
