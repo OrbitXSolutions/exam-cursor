@@ -1811,9 +1811,9 @@ export const gradingTutorial: TutorialModule = {
           titleEn: "Auto Grading (Instant)",
           titleAr: "التصحيح الآلي (فوري)",
           descriptionEn:
-            'Objective questions are graded **automatically** when the candidate submits. Supported types:\n- Multiple Choice (single & multi-answer)\n- True / False\n- Matching\n- Fill-in-the-blank (exact match)\nThe score appears **immediately** — no instructor action needed.',
+            "Objective questions are graded **automatically** when the candidate submits. Supported types:\n- Multiple Choice (single & multi-answer)\n- True / False\n- Matching\n- Fill-in-the-blank (exact match)\nThe score appears **immediately** — no instructor action needed.",
           descriptionAr:
-            'يتم تصحيح الأسئلة الموضوعية **تلقائياً** عند تسليم المرشح. الأنواع المدعومة:\n- اختيار من متعدد (إجابة واحدة ومتعددة)\n- صح / خطأ\n- مطابقة\n- ملء الفراغات (مطابقة حرفية)\nتظهر الدرجة **فوراً** — لا حاجة لتدخل المصحح.',
+            "يتم تصحيح الأسئلة الموضوعية **تلقائياً** عند تسليم المرشح. الأنواع المدعومة:\n- اختيار من متعدد (إجابة واحدة ومتعددة)\n- صح / خطأ\n- مطابقة\n- ملء الفراغات (مطابقة حرفية)\nتظهر الدرجة **فوراً** — لا حاجة لتدخل المصحح.",
           tipEn:
             "If an exam contains ONLY auto-graded questions, the result is available immediately after submission — no manual grading step is needed.",
           tipAr:
@@ -1882,9 +1882,9 @@ export const gradingTutorial: TutorialModule = {
           titleEn: "View Statistics",
           titleAr: "عرض الإحصائيات",
           descriptionEn:
-            'Three **summary cards** at the top:\n- **Total Sessions** — filtered count of all grading sessions\n- **Questions to Grade** — sum of all manual questions still pending\n- **Exams with Pending** — how many exams have ungraded submissions',
+            "Three **summary cards** at the top:\n- **Total Sessions** — filtered count of all grading sessions\n- **Questions to Grade** — sum of all manual questions still pending\n- **Exams with Pending** — how many exams have ungraded submissions",
           descriptionAr:
-            'ثلاث **بطاقات ملخصة** في الأعلى:\n- **إجمالي الجلسات** — العدد المصفّى لجميع جلسات التصحيح\n- **أسئلة للتصحيح** — مجموع الأسئلة اليدوية المعلقة\n- **اختبارات بها معلّقات** — عدد الاختبارات بها تسليمات غير مصححة',
+            "ثلاث **بطاقات ملخصة** في الأعلى:\n- **إجمالي الجلسات** — العدد المصفّى لجميع جلسات التصحيح\n- **أسئلة للتصحيح** — مجموع الأسئلة اليدوية المعلقة\n- **اختبارات بها معلّقات** — عدد الاختبارات بها تسليمات غير مصححة",
           imagePlaceholder: "/tutorials/grading-stats.png",
         },
         {
@@ -1967,9 +1967,9 @@ export const gradingTutorial: TutorialModule = {
             'انقر على زر **"اقتراح AI للدرجة"** (بنفسجي، مع أيقونة ✨). يعيد AI:\n1. **الدرجة المقترحة** — تملأ حقل النقاط مسبقاً\n2. **الملاحظات المقترحة** — تعليق تصحيح مفصّل\n3. **نسبة الثقة %** — مستوى ثقة مرمّز بالألوان\n\nالقيم **تملأ** حقول الدرجة والملاحظات مسبقاً. عدّلها بحرية قبل الحفظ.',
           imagePlaceholder: "/tutorials/grading-ai-suggest.png",
           noteEn:
-            'AI suggestion is advisory only. The instructor ALWAYS has final authority. The button is disabled if the candidate didn\'t answer the question.',
+            "AI suggestion is advisory only. The instructor ALWAYS has final authority. The button is disabled if the candidate didn't answer the question.",
           noteAr:
-            'اقتراح AI استشاري فقط. المصحح لديه دائماً القرار النهائي. الزر يكون معطلاً إذا لم يجب المرشح على السؤال.',
+            "اقتراح AI استشاري فقط. المصحح لديه دائماً القرار النهائي. الزر يكون معطلاً إذا لم يجب المرشح على السؤال.",
         },
         {
           id: "enter-score",
@@ -2042,18 +2042,18 @@ export const gradingTutorial: TutorialModule = {
           titleEn: "How Scores Are Calculated",
           titleAr: "كيف تُحسب الدرجات",
           descriptionEn:
-            '**Auto-graded questions:**\n- ✅ Correct → full points\n- ❌ Wrong → zero points\n- Partial credit for multi-select MCQ based on correct selections\n\n**Manually-graded questions:**\n- Score you assign (0 to max, supports 0.5 steps)\n\n**Final calculation:**\n- **Total Score** = sum of all question scores\n- **Percentage** = (Total Score / Max Possible Score) × 100',
+            "**Auto-graded questions:**\n- ✅ Correct → full points\n- ❌ Wrong → zero points\n- Partial credit for multi-select MCQ based on correct selections\n\n**Manually-graded questions:**\n- Score you assign (0 to max, supports 0.5 steps)\n\n**Final calculation:**\n- **Total Score** = sum of all question scores\n- **Percentage** = (Total Score / Max Possible Score) × 100",
           descriptionAr:
-            '**الأسئلة المصححة آلياً:**\n- ✅ صحيحة ← نقاط كاملة\n- ❌ خاطئة ← صفر نقاط\n- درجة جزئية لأسئلة الاختيار المتعدد بناءً على الاختيارات الصحيحة\n\n**الأسئلة المصححة يدوياً:**\n- الدرجة التي تحددها (0 إلى الحد الأقصى، يدعم خطوات 0.5)\n\n**الحساب النهائي:**\n- **الدرجة الإجمالية** = مجموع درجات جميع الأسئلة\n- **النسبة المئوية** = (الدرجة الإجمالية / الدرجة القصوى) × 100',
+            "**الأسئلة المصححة آلياً:**\n- ✅ صحيحة ← نقاط كاملة\n- ❌ خاطئة ← صفر نقاط\n- درجة جزئية لأسئلة الاختيار المتعدد بناءً على الاختيارات الصحيحة\n\n**الأسئلة المصححة يدوياً:**\n- الدرجة التي تحددها (0 إلى الحد الأقصى، يدعم خطوات 0.5)\n\n**الحساب النهائي:**\n- **الدرجة الإجمالية** = مجموع درجات جميع الأسئلة\n- **النسبة المئوية** = (الدرجة الإجمالية / الدرجة القصوى) × 100",
         },
         {
           id: "pass-fail",
           titleEn: "Pass / Fail Determination",
           titleAr: "تحديد النجاح / الرسوب",
           descriptionEn:
-            'The pass score is defined in the **exam configuration** (e.g., 60%).\n\nAfter grading, the system compares:\n- **Total Score ≥ Pass Score** → **Passed** (green badge)\n- **Total Score < Pass Score** → **Failed** (red badge)\n\nThis is computed **automatically** upon finalization.',
+            "The pass score is defined in the **exam configuration** (e.g., 60%).\n\nAfter grading, the system compares:\n- **Total Score ≥ Pass Score** → **Passed** (green badge)\n- **Total Score < Pass Score** → **Failed** (red badge)\n\nThis is computed **automatically** upon finalization.",
           descriptionAr:
-            'درجة النجاح محددة في **إعدادات الاختبار** (مثلاً 60%).\n\nبعد التصحيح، يقارن النظام:\n- **الدرجة الإجمالية ≥ درجة النجاح** ← **ناجح** (شارة خضراء)\n- **الدرجة الإجمالية < درجة النجاح** ← **راسب** (شارة حمراء)\n\nيُحسب **تلقائياً** عند الاعتماد.',
+            "درجة النجاح محددة في **إعدادات الاختبار** (مثلاً 60%).\n\nبعد التصحيح، يقارن النظام:\n- **الدرجة الإجمالية ≥ درجة النجاح** ← **ناجح** (شارة خضراء)\n- **الدرجة الإجمالية < درجة النجاح** ← **راسب** (شارة حمراء)\n\nيُحسب **تلقائياً** عند الاعتماد.",
         },
         {
           id: "mixed-exam",
@@ -2085,27 +2085,27 @@ export const gradingTutorial: TutorialModule = {
           titleEn: "Grading Audit Trail",
           titleAr: "سجل تدقيق التصحيح",
           descriptionEn:
-            'Every grading action is logged:\n- **Who** graded\n- **When** the grade was assigned\n- **What score** was given\n- Whether **AI suggestion** was used\n\nThe grader\'s identity is recorded with each grade for **full accountability and traceability**.',
+            "Every grading action is logged:\n- **Who** graded\n- **When** the grade was assigned\n- **What score** was given\n- Whether **AI suggestion** was used\n\nThe grader's identity is recorded with each grade for **full accountability and traceability**.",
           descriptionAr:
-            'كل إجراء تصحيح مسجّل:\n- **من** صحح\n- **متى** تم تعيين الدرجة\n- **ما الدرجة** المحددة\n- هل **استُخدم اقتراح AI**\n\nهوية المصحح مسجلة مع كل درجة لضمان **مساءلة وتتبع كاملين**.',
+            "كل إجراء تصحيح مسجّل:\n- **من** صحح\n- **متى** تم تعيين الدرجة\n- **ما الدرجة** المحددة\n- هل **استُخدم اقتراح AI**\n\nهوية المصحح مسجلة مع كل درجة لضمان **مساءلة وتتبع كاملين**.",
         },
         {
           id: "grading-permissions",
           titleEn: "Role-Based Access",
           titleAr: "صلاحيات حسب الدور",
           descriptionEn:
-            'Access roles:\n- **Admin** — full access to grading center\n- **Instructor** — can grade and finalize\n- **Examiner** — can grade assigned exams\n\n**Candidates** cannot see grading details — only their **published final result** and feedback.',
+            "Access roles:\n- **Admin** — full access to grading center\n- **Instructor** — can grade and finalize\n- **Examiner** — can grade assigned exams\n\n**Candidates** cannot see grading details — only their **published final result** and feedback.",
           descriptionAr:
-            'أدوار الوصول:\n- **مدير** — وصول كامل لمركز التصحيح\n- **مدرّس** — يمكنه التصحيح والاعتماد\n- **مصحح** — يمكنه تصحيح الاختبارات المعيّنة\n\n**المرشحون** لا يمكنهم رؤية تفاصيل التصحيح — فقط **نتيجتهم النهائية المنشورة** والملاحظات.',
+            "أدوار الوصول:\n- **مدير** — وصول كامل لمركز التصحيح\n- **مدرّس** — يمكنه التصحيح والاعتماد\n- **مصحح** — يمكنه تصحيح الاختبارات المعيّنة\n\n**المرشحون** لا يمكنهم رؤية تفاصيل التصحيح — فقط **نتيجتهم النهائية المنشورة** والملاحظات.",
         },
         {
           id: "media-storage-grading",
           titleEn: "Media & Attachment Storage",
           titleAr: "تخزين الوسائط والمرفقات",
           descriptionEn:
-            'Storage locations:\n- **Question attachments** (images, PDFs) → MediaStorage/ folder, served via /media URL\n- **Proctor snapshots** → MediaStorage/proctor-snapshots/\n- **Video recordings** → MediaStorage/video-recordings/\n- **Tutorial media** → wwwroot/tutorials/ (static)\n\nAll uploads are validated for **file type and size**.',
+            "Storage locations:\n- **Question attachments** (images, PDFs) → MediaStorage/ folder, served via /media URL\n- **Proctor snapshots** → MediaStorage/proctor-snapshots/\n- **Video recordings** → MediaStorage/video-recordings/\n- **Tutorial media** → wwwroot/tutorials/ (static)\n\nAll uploads are validated for **file type and size**.",
           descriptionAr:
-            'مواقع التخزين:\n- **مرفقات الأسئلة** (صور، PDF) → مجلد MediaStorage/، تُقدم عبر /media\n- **لقطات المراقبة** → MediaStorage/proctor-snapshots/\n- **تسجيلات الفيديو** → MediaStorage/video-recordings/\n- **وسائط الدروس** → wwwroot/tutorials/ (ثابتة)\n\nجميع التحميلات تُفحص من حيث **نوع الملف والحجم**.',
+            "مواقع التخزين:\n- **مرفقات الأسئلة** (صور، PDF) → مجلد MediaStorage/، تُقدم عبر /media\n- **لقطات المراقبة** → MediaStorage/proctor-snapshots/\n- **تسجيلات الفيديو** → MediaStorage/video-recordings/\n- **وسائط الدروس** → wwwroot/tutorials/ (ثابتة)\n\nجميع التحميلات تُفحص من حيث **نوع الملف والحجم**.",
         },
       ],
     },
@@ -2152,9 +2152,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Filter & Search Results",
           titleAr: "تصفية والبحث في النتائج",
           descriptionEn:
-            'Filter controls available:\n- **Exam** — filter by specific exam or view all\n- **Result Status** — All, Passed, Failed, Under Review, Not Published\n- **Search** — by candidate name or email\n- **Refresh** — reload the latest data\n\nThe summary card shows the **total count** of filtered candidates.',
+            "Filter controls available:\n- **Exam** — filter by specific exam or view all\n- **Result Status** — All, Passed, Failed, Under Review, Not Published\n- **Search** — by candidate name or email\n- **Refresh** — reload the latest data\n\nThe summary card shows the **total count** of filtered candidates.",
           descriptionAr:
-            'أدوات التصفية المتاحة:\n- **الاختبار** — تصفية حسب اختبار محدد أو عرض الكل\n- **حالة النتيجة** — الكل، ناجح، راسب، قيد المراجعة، غير منشور\n- **البحث** — باسم المرشح أو البريد\n- **تحديث** — إعادة تحميل أحدث البيانات\n\nتعرض بطاقة الملخص **العدد الإجمالي** للمرشحين المصفّين.',
+            "أدوات التصفية المتاحة:\n- **الاختبار** — تصفية حسب اختبار محدد أو عرض الكل\n- **حالة النتيجة** — الكل، ناجح، راسب، قيد المراجعة، غير منشور\n- **البحث** — باسم المرشح أو البريد\n- **تحديث** — إعادة تحميل أحدث البيانات\n\nتعرض بطاقة الملخص **العدد الإجمالي** للمرشحين المصفّين.",
           imagePlaceholder: "/tutorials/results-filters.png",
           tipEn:
             '"Under Review" shows results where grading is still pending or not yet finalized. "Not Published" shows finalized results not yet sent to candidates.',
@@ -2176,9 +2176,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Available Actions per Candidate",
           titleAr: "الإجراءات المتاحة لكل مرشح",
           descriptionEn:
-            'Click the **Actions dropdown** (⋮) on any row:\n- **View Details** — open exam review page\n- **Score Card** — detailed score breakdown\n- **Publish Result** — make result visible to candidate + send email\n- **View Grading** — open grading session\n- **AI Report** — AI proctor analysis\n- **Attempt Media** — view proctoring recordings',
+            "Click the **Actions dropdown** (⋮) on any row:\n- **View Details** — open exam review page\n- **Score Card** — detailed score breakdown\n- **Publish Result** — make result visible to candidate + send email\n- **View Grading** — open grading session\n- **AI Report** — AI proctor analysis\n- **Attempt Media** — view proctoring recordings",
           descriptionAr:
-            'انقر على **قائمة الإجراءات** (⋮) في أي صف:\n- **عرض التفاصيل** — فتح صفحة مراجعة الاختبار\n- **بطاقة الدرجات** — تفصيل الدرجات\n- **نشر النتيجة** — جعل النتيجة مرئية للمرشح + إرسال بريد\n- **عرض التصحيح** — فتح جلسة التصحيح\n- **تقرير AI** — تحليل المراقبة\n- **وسائط المحاولة** — عرض تسجيلات المراقبة',
+            "انقر على **قائمة الإجراءات** (⋮) في أي صف:\n- **عرض التفاصيل** — فتح صفحة مراجعة الاختبار\n- **بطاقة الدرجات** — تفصيل الدرجات\n- **نشر النتيجة** — جعل النتيجة مرئية للمرشح + إرسال بريد\n- **عرض التصحيح** — فتح جلسة التصحيح\n- **تقرير AI** — تحليل المراقبة\n- **وسائط المحاولة** — عرض تسجيلات المراقبة",
           imagePlaceholder: "/tutorials/results-actions.png",
         },
       ],
@@ -2288,9 +2288,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Termination Statistics",
           titleAr: "إحصائيات الإنهاء",
           descriptionEn:
-            'Four summary cards at the top:\n- **Terminated by Proctor** (red) — terminated due to violations\n- **Force Ended by Admin** (orange) — admin manually ended the attempt\n- **Expired** (rose) — timer ran out or exam window closed\n- **Total Terminated** (gray) — total count of all terminated attempts',
+            "Four summary cards at the top:\n- **Terminated by Proctor** (red) — terminated due to violations\n- **Force Ended by Admin** (orange) — admin manually ended the attempt\n- **Expired** (rose) — timer ran out or exam window closed\n- **Total Terminated** (gray) — total count of all terminated attempts",
           descriptionAr:
-            'أربع بطاقات ملخصة في الأعلى:\n- **أُنهي بواسطة المراقب** (أحمر) — أنهاه المراقب بسبب مخالفات\n- **أُنهي قسراً بواسطة المدير** (برتقالي) — المدير أنهى المحاولة يدوياً\n- **منتهي الصلاحية** (وردي) — انتهى الوقت أو أغلقت نافذة الاختبار\n- **الإجمالي المنتهي** (رمادي) — العدد الكلي لجميع المحاولات المنتهية',
+            "أربع بطاقات ملخصة في الأعلى:\n- **أُنهي بواسطة المراقب** (أحمر) — أنهاه المراقب بسبب مخالفات\n- **أُنهي قسراً بواسطة المدير** (برتقالي) — المدير أنهى المحاولة يدوياً\n- **منتهي الصلاحية** (وردي) — انتهى الوقت أو أغلقت نافذة الاختبار\n- **الإجمالي المنتهي** (رمادي) — العدد الكلي لجميع المحاولات المنتهية",
           imagePlaceholder: "/tutorials/results-terminated-stats.png",
         },
         {
@@ -2298,9 +2298,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Termination Status Types",
           titleAr: "أنواع حالات الإنهاء",
           descriptionEn:
-            'Three status types:\n- **Terminated** (red badge) — proctor ended the attempt due to policy violations, suspicious behavior, or exceeding max violations\n- **Expired** (rose badge) — timer expired while active, while disconnected, or exam window closed\n- **Force Ended** (orange badge) — admin force-submitted the attempt',
+            "Three status types:\n- **Terminated** (red badge) — proctor ended the attempt due to policy violations, suspicious behavior, or exceeding max violations\n- **Expired** (rose badge) — timer expired while active, while disconnected, or exam window closed\n- **Force Ended** (orange badge) — admin force-submitted the attempt",
           descriptionAr:
-            'ثلاثة أنواع حالات:\n- **أُنهي** (شارة حمراء) — المراقب أنهى المحاولة بسبب مخالفات أو سلوك مشبوه أو تجاوز الحد الأقصى للمخالفات\n- **منتهي** (شارة وردية) — انتهى الوقت أثناء النشاط أو أثناء الانقطاع أو إغلاق النافذة\n- **أُنهي قسراً** (شارة برتقالية) — المدير سلّم المحاولة قسراً',
+            "ثلاثة أنواع حالات:\n- **أُنهي** (شارة حمراء) — المراقب أنهى المحاولة بسبب مخالفات أو سلوك مشبوه أو تجاوز الحد الأقصى للمخالفات\n- **منتهي** (شارة وردية) — انتهى الوقت أثناء النشاط أو أثناء الانقطاع أو إغلاق النافذة\n- **أُنهي قسراً** (شارة برتقالية) — المدير سلّم المحاولة قسراً",
         },
         {
           id: "termination-reason",
@@ -2387,18 +2387,18 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Risk Rules Configuration",
           titleAr: "إعدادات قواعد المخاطر",
           descriptionEn:
-            'Each **Risk Rule** in the database defines:\n- **EventType** — which proctoring event to monitor (e.g., TabSwitched, FaceNotDetected, CameraBlocked)\n- **ThresholdCount** — how many events needed to trigger the rule (e.g., 3 tab switches)\n- **WindowSeconds** — time window in seconds (0 = count all events, 60 = last 60 seconds only)\n- **RiskPoints** — points added per trigger (0–100)\n- **MinSeverity** — minimum event severity to count (optional filter)\n- **MaxTriggers** — cap on total triggers per session (prevents runaway scores)\n- **Priority** — evaluation order\n\nRules are evaluated in **priority order** and the resulting points are **summed together**, capped at 100.',
+            "Each **Risk Rule** in the database defines:\n- **EventType** — which proctoring event to monitor (e.g., TabSwitched, FaceNotDetected, CameraBlocked)\n- **ThresholdCount** — how many events needed to trigger the rule (e.g., 3 tab switches)\n- **WindowSeconds** — time window in seconds (0 = count all events, 60 = last 60 seconds only)\n- **RiskPoints** — points added per trigger (0–100)\n- **MinSeverity** — minimum event severity to count (optional filter)\n- **MaxTriggers** — cap on total triggers per session (prevents runaway scores)\n- **Priority** — evaluation order\n\nRules are evaluated in **priority order** and the resulting points are **summed together**, capped at 100.",
           descriptionAr:
-            'كل **قاعدة مخاطر** في قاعدة البيانات تحدد:\n- **نوع الحدث** — أي حدث مراقبة يُراقب (مثلاً تبديل علامة، عدم كشف وجه، حجب الكاميرا)\n- **عدد الحد** — كم حدث مطلوب لتفعيل القاعدة (مثلاً 3 تبديلات علامة)\n- **نافذة الثواني** — نافذة زمنية بالثواني (0 = عدّ جميع الأحداث، 60 = آخر 60 ثانية فقط)\n- **نقاط المخاطر** — نقاط تُضاف لكل تفعيل (0–100)\n- **الحد الأدنى للخطورة** — أقل خطورة للحدث ليُعدّ (فلتر اختياري)\n- **أقصى تفعيلات** — سقف التفعيلات لكل جلسة (يمنع النقاط المفرطة)\n- **الأولوية** — ترتيب التقييم\n\nتُقيّم القواعد حسب **ترتيب الأولوية** والنقاط الناتجة **تُجمع معاً** بحد أقصى 100.',
+            "كل **قاعدة مخاطر** في قاعدة البيانات تحدد:\n- **نوع الحدث** — أي حدث مراقبة يُراقب (مثلاً تبديل علامة، عدم كشف وجه، حجب الكاميرا)\n- **عدد الحد** — كم حدث مطلوب لتفعيل القاعدة (مثلاً 3 تبديلات علامة)\n- **نافذة الثواني** — نافذة زمنية بالثواني (0 = عدّ جميع الأحداث، 60 = آخر 60 ثانية فقط)\n- **نقاط المخاطر** — نقاط تُضاف لكل تفعيل (0–100)\n- **الحد الأدنى للخطورة** — أقل خطورة للحدث ليُعدّ (فلتر اختياري)\n- **أقصى تفعيلات** — سقف التفعيلات لكل جلسة (يمنع النقاط المفرطة)\n- **الأولوية** — ترتيب التقييم\n\nتُقيّم القواعد حسب **ترتيب الأولوية** والنقاط الناتجة **تُجمع معاً** بحد أقصى 100.",
         },
         {
           id: "report-face-detection",
           titleEn: "Category 1: Face Detection Score",
           titleAr: "الفئة 1: نقاط كشف الوجه",
           descriptionEn:
-            'Starts at **100** and loses points per violation:\n- **Face Not Detected** — **-8 points** each time the face disappears from the camera\n- **Multiple Faces** — **-12 points** each time more than one person is detected in frame\n- **Camera Blocked** — **-10 points** each time the webcam is covered or obstructed\n- **Webcam Denied** — **-25 points** if the candidate denied webcam permission\n\n**Example:** A candidate whose face disappears 3 times and multiple faces detected once:\n100 - (3 × 8) - (1 × 12) = **64/100**',
+            "Starts at **100** and loses points per violation:\n- **Face Not Detected** — **-8 points** each time the face disappears from the camera\n- **Multiple Faces** — **-12 points** each time more than one person is detected in frame\n- **Camera Blocked** — **-10 points** each time the webcam is covered or obstructed\n- **Webcam Denied** — **-25 points** if the candidate denied webcam permission\n\n**Example:** A candidate whose face disappears 3 times and multiple faces detected once:\n100 - (3 × 8) - (1 × 12) = **64/100**",
           descriptionAr:
-            'يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **عدم كشف الوجه** — **-8 نقاط** كل مرة يختفي الوجه من الكاميرا\n- **وجوه متعددة** — **-12 نقطة** كل مرة يُكتشف أكثر من شخص في الإطار\n- **حجب الكاميرا** — **-10 نقاط** كل مرة تُغطى الكاميرا أو تُعاق\n- **رفض الكاميرا** — **-25 نقطة** إذا رفض المرشح إذن الكاميرا\n\n**مثال:** مرشح اختفى وجهه 3 مرات وكُشف وجوه متعددة مرة:\n100 - (3 × 8) - (1 × 12) = **64/100**',
+            "يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **عدم كشف الوجه** — **-8 نقاط** كل مرة يختفي الوجه من الكاميرا\n- **وجوه متعددة** — **-12 نقطة** كل مرة يُكتشف أكثر من شخص في الإطار\n- **حجب الكاميرا** — **-10 نقاط** كل مرة تُغطى الكاميرا أو تُعاق\n- **رفض الكاميرا** — **-25 نقطة** إذا رفض المرشح إذن الكاميرا\n\n**مثال:** مرشح اختفى وجهه 3 مرات وكُشف وجوه متعددة مرة:\n100 - (3 × 8) - (1 × 12) = **64/100**",
           imagePlaceholder: "/tutorials/results-face-detection-score.png",
         },
         {
@@ -2406,9 +2406,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Category 2: Eye Tracking Score",
           titleAr: "الفئة 2: نقاط تتبع العين",
           descriptionEn:
-            'Starts at **100** and loses points per violation:\n- **Head Turned** — **-7 points** each time the candidate looks away or turns head significantly\n- **Face Out of Frame** — **-6 points** each time the face goes partially or fully outside the camera frame\n\n**Example:** A candidate turns head 5 times and face goes out of frame 2 times:\n100 - (5 × 7) - (2 × 6) = **53/100**',
+            "Starts at **100** and loses points per violation:\n- **Head Turned** — **-7 points** each time the candidate looks away or turns head significantly\n- **Face Out of Frame** — **-6 points** each time the face goes partially or fully outside the camera frame\n\n**Example:** A candidate turns head 5 times and face goes out of frame 2 times:\n100 - (5 × 7) - (2 × 6) = **53/100**",
           descriptionAr:
-            'يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **التفات الرأس** — **-7 نقاط** كل مرة ينظر المرشح بعيداً أو يلتفت برأسه بشكل ملحوظ\n- **الوجه خارج الإطار** — **-6 نقاط** كل مرة يخرج الوجه جزئياً أو كلياً من إطار الكاميرا\n\n**مثال:** مرشح التفت 5 مرات وخرج وجهه من الإطار مرتين:\n100 - (5 × 7) - (2 × 6) = **53/100**',
+            "يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **التفات الرأس** — **-7 نقاط** كل مرة ينظر المرشح بعيداً أو يلتفت برأسه بشكل ملحوظ\n- **الوجه خارج الإطار** — **-6 نقاط** كل مرة يخرج الوجه جزئياً أو كلياً من إطار الكاميرا\n\n**مثال:** مرشح التفت 5 مرات وخرج وجهه من الإطار مرتين:\n100 - (5 × 7) - (2 × 6) = **53/100**",
           imagePlaceholder: "/tutorials/results-eye-tracking-score.png",
         },
         {
@@ -2416,9 +2416,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Category 3: Behavior Score",
           titleAr: "الفئة 3: نقاط السلوك",
           descriptionEn:
-            'Starts at **100** and loses points per violation:\n- **Tab Switched** — **-8 points** each tab switch or Alt+Tab\n- **Window Blur** — **-4 points** each time the exam window loses focus\n- **Copy Attempt** — **-10 points** each time copy (Ctrl+C) is attempted\n- **Paste Attempt** — **-10 points** each time paste (Ctrl+V) is attempted\n- **Right Click** — **-5 points** each right-click attempt\n\n**Example:** 2 tab switches + 1 copy attempt + 3 window blurs:\n100 - (2 × 8) - (1 × 10) - (3 × 4) = **66/100**',
+            "Starts at **100** and loses points per violation:\n- **Tab Switched** — **-8 points** each tab switch or Alt+Tab\n- **Window Blur** — **-4 points** each time the exam window loses focus\n- **Copy Attempt** — **-10 points** each time copy (Ctrl+C) is attempted\n- **Paste Attempt** — **-10 points** each time paste (Ctrl+V) is attempted\n- **Right Click** — **-5 points** each right-click attempt\n\n**Example:** 2 tab switches + 1 copy attempt + 3 window blurs:\n100 - (2 × 8) - (1 × 10) - (3 × 4) = **66/100**",
           descriptionAr:
-            'يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **تبديل علامة** — **-8 نقاط** كل تبديل تبويب أو Alt+Tab\n- **فقدان التركيز** — **-4 نقاط** كل مرة تفقد نافذة الاختبار التركيز\n- **محاولة نسخ** — **-10 نقاط** كل محاولة نسخ (Ctrl+C)\n- **محاولة لصق** — **-10 نقاط** كل محاولة لصق (Ctrl+V)\n- **نقر يمين** — **-5 نقاط** كل محاولة نقر يمين\n\n**مثال:** 2 تبديل علامة + 1 محاولة نسخ + 3 فقدان تركيز:\n100 - (2 × 8) - (1 × 10) - (3 × 4) = **66/100**',
+            "يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **تبديل علامة** — **-8 نقاط** كل تبديل تبويب أو Alt+Tab\n- **فقدان التركيز** — **-4 نقاط** كل مرة تفقد نافذة الاختبار التركيز\n- **محاولة نسخ** — **-10 نقاط** كل محاولة نسخ (Ctrl+C)\n- **محاولة لصق** — **-10 نقاط** كل محاولة لصق (Ctrl+V)\n- **نقر يمين** — **-5 نقاط** كل محاولة نقر يمين\n\n**مثال:** 2 تبديل علامة + 1 محاولة نسخ + 3 فقدان تركيز:\n100 - (2 × 8) - (1 × 10) - (3 × 4) = **66/100**",
           imagePlaceholder: "/tutorials/results-behavior-score.png",
         },
         {
@@ -2426,9 +2426,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Category 4: Environment Score",
           titleAr: "الفئة 4: نقاط البيئة",
           descriptionEn:
-            'Starts at **100** and loses points per violation:\n- **Fullscreen Exited** — **-10 points** each time the candidate exits fullscreen mode\n- **Camera Blocked** — **-12 points** each time the camera is blocked or obstructed\n- **Snapshot Failed** — **-8 points** each time a scheduled webcam snapshot fails to capture\n\n**Example:** 1 fullscreen exit + 2 snapshot failures:\n100 - (1 × 10) - (2 × 8) = **74/100**',
+            "Starts at **100** and loses points per violation:\n- **Fullscreen Exited** — **-10 points** each time the candidate exits fullscreen mode\n- **Camera Blocked** — **-12 points** each time the camera is blocked or obstructed\n- **Snapshot Failed** — **-8 points** each time a scheduled webcam snapshot fails to capture\n\n**Example:** 1 fullscreen exit + 2 snapshot failures:\n100 - (1 × 10) - (2 × 8) = **74/100**",
           descriptionAr:
-            'يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **خروج من الشاشة الكاملة** — **-10 نقاط** كل مرة يخرج المرشح من وضع الشاشة الكاملة\n- **حجب الكاميرا** — **-12 نقطة** كل مرة تُحجب الكاميرا أو تُعاق\n- **فشل اللقطة** — **-8 نقاط** كل مرة تفشل لقطة الكاميرا المجدولة\n\n**مثال:** 1 خروج من الشاشة الكاملة + 2 فشل لقطات:\n100 - (1 × 10) - (2 × 8) = **74/100**',
+            "يبدأ من **100** ويخسر نقاط لكل مخالفة:\n- **خروج من الشاشة الكاملة** — **-10 نقاط** كل مرة يخرج المرشح من وضع الشاشة الكاملة\n- **حجب الكاميرا** — **-12 نقطة** كل مرة تُحجب الكاميرا أو تُعاق\n- **فشل اللقطة** — **-8 نقاط** كل مرة تفشل لقطة الكاميرا المجدولة\n\n**مثال:** 1 خروج من الشاشة الكاملة + 2 فشل لقطات:\n100 - (1 × 10) - (2 × 8) = **74/100**",
           imagePlaceholder: "/tutorials/results-environment-score.png",
         },
         {
@@ -2459,9 +2459,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "What the AI Report Contains",
           titleAr: "ماذا يحتوي تقرير AI",
           descriptionEn:
-            'GPT-4o returns a structured JSON report with these sections:\n\n**Summary:**\n- **Risk Level** — Low, Medium, High, or Critical\n- **Risk Score** — 0 to 100\n- **Confidence** — AI confidence percentage (0–100%)\n- **Executive Summary** — 3–4 sentence overview\n- **Risk Explanation** — 2–3 sentence summary of findings\n- **Integrity Verdict** — professional verdict on exam integrity\n\n**Detailed Findings:**\n- **Suspicious Behaviors** — list of flagged behaviors\n- **Aggravating Factors** — factors that increase risk\n- **Mitigating Factors** — factors that lower risk\n- **Risk Timeline** — how risk developed over time\n\n**Behavior Analysis:**\n- **Answer Pattern Summary** — how the candidate answered questions\n- **Navigation Behavior** — question navigation patterns\n- **Focus Behavior** — attention and focus patterns\n- **Timing Analysis** — suspicious timing patterns\n- **Suspicious Patterns** — cross-correlated anomalies\n\n**Violation Analysis:**\n- **Total Violations** — overall count\n- **Violation Trend** — increasing, stable, or decreasing\n- **Violation Breakdown** — each violation type with count, severity, and impact\n\n**Recommendations:**\n- **Primary Recommendation** — main action to take\n- **Additional Recommendations** — list of suggested actions',
+            "GPT-4o returns a structured JSON report with these sections:\n\n**Summary:**\n- **Risk Level** — Low, Medium, High, or Critical\n- **Risk Score** — 0 to 100\n- **Confidence** — AI confidence percentage (0–100%)\n- **Executive Summary** — 3–4 sentence overview\n- **Risk Explanation** — 2–3 sentence summary of findings\n- **Integrity Verdict** — professional verdict on exam integrity\n\n**Detailed Findings:**\n- **Suspicious Behaviors** — list of flagged behaviors\n- **Aggravating Factors** — factors that increase risk\n- **Mitigating Factors** — factors that lower risk\n- **Risk Timeline** — how risk developed over time\n\n**Behavior Analysis:**\n- **Answer Pattern Summary** — how the candidate answered questions\n- **Navigation Behavior** — question navigation patterns\n- **Focus Behavior** — attention and focus patterns\n- **Timing Analysis** — suspicious timing patterns\n- **Suspicious Patterns** — cross-correlated anomalies\n\n**Violation Analysis:**\n- **Total Violations** — overall count\n- **Violation Trend** — increasing, stable, or decreasing\n- **Violation Breakdown** — each violation type with count, severity, and impact\n\n**Recommendations:**\n- **Primary Recommendation** — main action to take\n- **Additional Recommendations** — list of suggested actions",
           descriptionAr:
-            'يُرجع GPT-4o تقريراً بصيغة JSON مهيكلة بالأقسام التالية:\n\n**الملخص:**\n- **مستوى المخاطر** — منخفض، متوسط، مرتفع، أو حرج\n- **نقاط المخاطر** — 0 إلى 100\n- **الثقة** — نسبة ثقة AI (0–100%)\n- **الملخص التنفيذي** — نظرة عامة من 3–4 جمل\n- **شرح المخاطر** — ملخص النتائج من 2–3 جمل\n- **حكم النزاهة** — حكم مهني على نزاهة الاختبار\n\n**النتائج التفصيلية:**\n- **السلوكيات المشبوهة** — قائمة السلوكيات المُعلّمة\n- **العوامل المشددة** — العوامل التي تزيد المخاطر\n- **العوامل المخففة** — العوامل التي تقلل المخاطر\n- **الجدول الزمني للمخاطر** — كيف تطورت المخاطر عبر الوقت\n\n**تحليل السلوك:**\n- **ملخص نمط الإجابة** — كيف أجاب المرشح على الأسئلة\n- **سلوك التنقل** — أنماط التنقل بين الأسئلة\n- **سلوك التركيز** — أنماط الانتباه والتركيز\n- **تحليل التوقيت** — أنماط توقيت مشبوهة\n- **الأنماط المشبوهة** — شذوذات مترابطة\n\n**تحليل المخالفات:**\n- **إجمالي المخالفات** — العدد الكلي\n- **اتجاه المخالفات** — متزايد، مستقر، أو متناقص\n- **تفصيل المخالفات** — كل نوع مخالفة مع العدد والخطورة والتأثير\n\n**التوصيات:**\n- **التوصية الرئيسية** — الإجراء الأساسي المطلوب\n- **توصيات إضافية** — قائمة إجراءات مقترحة',
+            "يُرجع GPT-4o تقريراً بصيغة JSON مهيكلة بالأقسام التالية:\n\n**الملخص:**\n- **مستوى المخاطر** — منخفض، متوسط، مرتفع، أو حرج\n- **نقاط المخاطر** — 0 إلى 100\n- **الثقة** — نسبة ثقة AI (0–100%)\n- **الملخص التنفيذي** — نظرة عامة من 3–4 جمل\n- **شرح المخاطر** — ملخص النتائج من 2–3 جمل\n- **حكم النزاهة** — حكم مهني على نزاهة الاختبار\n\n**النتائج التفصيلية:**\n- **السلوكيات المشبوهة** — قائمة السلوكيات المُعلّمة\n- **العوامل المشددة** — العوامل التي تزيد المخاطر\n- **العوامل المخففة** — العوامل التي تقلل المخاطر\n- **الجدول الزمني للمخاطر** — كيف تطورت المخاطر عبر الوقت\n\n**تحليل السلوك:**\n- **ملخص نمط الإجابة** — كيف أجاب المرشح على الأسئلة\n- **سلوك التنقل** — أنماط التنقل بين الأسئلة\n- **سلوك التركيز** — أنماط الانتباه والتركيز\n- **تحليل التوقيت** — أنماط توقيت مشبوهة\n- **الأنماط المشبوهة** — شذوذات مترابطة\n\n**تحليل المخالفات:**\n- **إجمالي المخالفات** — العدد الكلي\n- **اتجاه المخالفات** — متزايد، مستقر، أو متناقص\n- **تفصيل المخالفات** — كل نوع مخالفة مع العدد والخطورة والتأثير\n\n**التوصيات:**\n- **التوصية الرئيسية** — الإجراء الأساسي المطلوب\n- **توصيات إضافية** — قائمة إجراءات مقترحة",
         },
         {
           id: "report-ai-example-low",
@@ -2486,9 +2486,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Evidence & Event Log",
           titleAr: "الأدلة وسجل الأحداث",
           descriptionEn:
-            'Below the AI analysis card, the report includes:\n\n**Session Details card:**\n- Session start/end times and **total duration**\n- Session **status** (Active, Completed, Terminated)\n- Total **violations** count and **termination info** (if applicable)\n\n**Device & Environment card:**\n- **IP address** — with IP mismatch detection if IP changed during session\n- **Browser** and **OS** — user agent details\n- **Screen resolution** — monitor dimensions\n- **Device fingerprint** — unique device identifier\n\n**Candidate Answer Behavior card:**\n- **Questions answered** out of total\n- **Answer changes** — how many times the candidate changed answers\n- **Timing analysis** — average, fastest, and slowest answer time\n- **Rapid answers** — count of answers submitted in less than 3 seconds\n\n**Evidence Gallery:**\n- **Webcam snapshots** — periodic captures from the camera\n- **Screen captures** — periodic screenshots of the candidate screen',
+            "Below the AI analysis card, the report includes:\n\n**Session Details card:**\n- Session start/end times and **total duration**\n- Session **status** (Active, Completed, Terminated)\n- Total **violations** count and **termination info** (if applicable)\n\n**Device & Environment card:**\n- **IP address** — with IP mismatch detection if IP changed during session\n- **Browser** and **OS** — user agent details\n- **Screen resolution** — monitor dimensions\n- **Device fingerprint** — unique device identifier\n\n**Candidate Answer Behavior card:**\n- **Questions answered** out of total\n- **Answer changes** — how many times the candidate changed answers\n- **Timing analysis** — average, fastest, and slowest answer time\n- **Rapid answers** — count of answers submitted in less than 3 seconds\n\n**Evidence Gallery:**\n- **Webcam snapshots** — periodic captures from the camera\n- **Screen captures** — periodic screenshots of the candidate screen",
           descriptionAr:
-            'أسفل بطاقة تحليل AI، يتضمن التقرير:\n\n**بطاقة تفاصيل الجلسة:**\n- أوقات بدء/انتهاء الجلسة و**المدة الإجمالية**\n- **حالة** الجلسة (نشطة، مكتملة، منتهية)\n- إجمالي عدد **المخالفات** و**معلومات الإنهاء** (إن وُجدت)\n\n**بطاقة الجهاز والبيئة:**\n- **عنوان IP** — مع كشف تغيير IP إذا تغيّر أثناء الجلسة\n- **المتصفح** و**نظام التشغيل** — تفاصيل وكيل المستخدم\n- **دقة الشاشة** — أبعاد الشاشة\n- **بصمة الجهاز** — معرّف فريد للجهاز\n\n**بطاقة سلوك إجابة المرشح:**\n- **الأسئلة المُجابة** من الإجمالي\n- **تغييرات الإجابة** — كم مرة غيّر المرشح إجاباته\n- **تحليل التوقيت** — متوسط وأسرع وأبطأ وقت إجابة\n- **إجابات سريعة** — عدد الإجابات المقدمة في أقل من 3 ثوان\n\n**معرض الأدلة:**\n- **لقطات الكاميرا** — تسجيلات دورية من الكاميرا\n- **لقطات الشاشة** — لقطات شاشة دورية لشاشة المرشح',
+            "أسفل بطاقة تحليل AI، يتضمن التقرير:\n\n**بطاقة تفاصيل الجلسة:**\n- أوقات بدء/انتهاء الجلسة و**المدة الإجمالية**\n- **حالة** الجلسة (نشطة، مكتملة، منتهية)\n- إجمالي عدد **المخالفات** و**معلومات الإنهاء** (إن وُجدت)\n\n**بطاقة الجهاز والبيئة:**\n- **عنوان IP** — مع كشف تغيير IP إذا تغيّر أثناء الجلسة\n- **المتصفح** و**نظام التشغيل** — تفاصيل وكيل المستخدم\n- **دقة الشاشة** — أبعاد الشاشة\n- **بصمة الجهاز** — معرّف فريد للجهاز\n\n**بطاقة سلوك إجابة المرشح:**\n- **الأسئلة المُجابة** من الإجمالي\n- **تغييرات الإجابة** — كم مرة غيّر المرشح إجاباته\n- **تحليل التوقيت** — متوسط وأسرع وأبطأ وقت إجابة\n- **إجابات سريعة** — عدد الإجابات المقدمة في أقل من 3 ثوان\n\n**معرض الأدلة:**\n- **لقطات الكاميرا** — تسجيلات دورية من الكاميرا\n- **لقطات الشاشة** — لقطات شاشة دورية لشاشة المرشح",
           imagePlaceholder: "/tutorials/results-event-log.png",
         },
         {
@@ -2496,9 +2496,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Attempt Event Log Timeline",
           titleAr: "سجل أحداث المحاولة الزمني",
           descriptionEn:
-            'The **Attempt Event Log** at the bottom shows every proctoring event in **chronological order**:\n\n- **Timestamp** — exact date and time of each event\n- **Event Type** — what happened (e.g., TabSwitched, FaceNotDetected, FullscreenExited)\n- **Severity** — color-coded badge (Critical, High, Medium, Low, Minor)\n- **Details** — additional context for each event\n\nThis timeline allows administrators to **reconstruct exactly** what happened during the exam — correlating events with answer behavior and score changes.',
+            "The **Attempt Event Log** at the bottom shows every proctoring event in **chronological order**:\n\n- **Timestamp** — exact date and time of each event\n- **Event Type** — what happened (e.g., TabSwitched, FaceNotDetected, FullscreenExited)\n- **Severity** — color-coded badge (Critical, High, Medium, Low, Minor)\n- **Details** — additional context for each event\n\nThis timeline allows administrators to **reconstruct exactly** what happened during the exam — correlating events with answer behavior and score changes.",
           descriptionAr:
-            'يعرض **سجل أحداث المحاولة** في الأسفل كل حدث مراقبة بـ**الترتيب الزمني**:\n\n- **الطابع الزمني** — التاريخ والوقت الدقيق لكل حدث\n- **نوع الحدث** — ما حدث (مثلاً تبديل علامة، عدم كشف الوجه، خروج من الشاشة الكاملة)\n- **الخطورة** — شارة ملونة (حرج، عالي، متوسط، منخفض، طفيف)\n- **التفاصيل** — سياق إضافي لكل حدث\n\nيتيح هذا الجدول الزمني للمسؤولين **إعادة بناء** ما حدث بالضبط أثناء الاختبار — ربط الأحداث بسلوك الإجابة وتغييرات الدرجة.',
+            "يعرض **سجل أحداث المحاولة** في الأسفل كل حدث مراقبة بـ**الترتيب الزمني**:\n\n- **الطابع الزمني** — التاريخ والوقت الدقيق لكل حدث\n- **نوع الحدث** — ما حدث (مثلاً تبديل علامة، عدم كشف الوجه، خروج من الشاشة الكاملة)\n- **الخطورة** — شارة ملونة (حرج، عالي، متوسط، منخفض، طفيف)\n- **التفاصيل** — سياق إضافي لكل حدث\n\nيتيح هذا الجدول الزمني للمسؤولين **إعادة بناء** ما حدث بالضبط أثناء الاختبار — ربط الأحداث بسلوك الإجابة وتغييرات الدرجة.",
           imagePlaceholder: "/tutorials/results-event-timeline.png",
         },
         {
@@ -2541,9 +2541,9 @@ export const resultsTutorial: TutorialModule = {
           titleEn: "Step-by-Step Workflow",
           titleAr: "خطوات سير العمل",
           descriptionEn:
-            'The complete flow:\n1. Candidate submits exam → **auto-grading** runs immediately\n2. If manual grading needed → appears in **Grading Center**\n3. Instructor grades all questions → clicks **Finalize**\n4. Admin/Instructor clicks **Publish Result**\n5. Candidate receives **email notification**\n6. Candidate views result in their **dashboard**\n7. If terminated → appears in **Terminated Attempts** for review\n8. **AI Proctor Report** available for any proctored attempt\n9. **Risk Score** tracked historically via snapshots',
+            "The complete flow:\n1. Candidate submits exam → **auto-grading** runs immediately\n2. If manual grading needed → appears in **Grading Center**\n3. Instructor grades all questions → clicks **Finalize**\n4. Admin/Instructor clicks **Publish Result**\n5. Candidate receives **email notification**\n6. Candidate views result in their **dashboard**\n7. If terminated → appears in **Terminated Attempts** for review\n8. **AI Proctor Report** available for any proctored attempt\n9. **Risk Score** tracked historically via snapshots",
           descriptionAr:
-            'السير الكامل:\n1. المرشح يسلّم الاختبار ← **التصحيح الآلي** يعمل فوراً\n2. إذا احتاج تصحيح يدوي ← يظهر في **مركز التصحيح**\n3. المصحح يصحح جميع الأسئلة ← ينقر **اعتماد**\n4. المدير/المدرّس ينقر **نشر النتيجة**\n5. المرشح يستلم **إشعار بريد**\n6. المرشح يعرض النتيجة في **لوحته**\n7. إذا أُنهي ← يظهر في **المحاولات المنتهية** للمراجعة\n8. **تقرير مراقب AI** متاح لأي محاولة مراقَبة\n9. **نقاط المخاطر** مُتتبعة تاريخياً عبر اللقطات',
+            "السير الكامل:\n1. المرشح يسلّم الاختبار ← **التصحيح الآلي** يعمل فوراً\n2. إذا احتاج تصحيح يدوي ← يظهر في **مركز التصحيح**\n3. المصحح يصحح جميع الأسئلة ← ينقر **اعتماد**\n4. المدير/المدرّس ينقر **نشر النتيجة**\n5. المرشح يستلم **إشعار بريد**\n6. المرشح يعرض النتيجة في **لوحته**\n7. إذا أُنهي ← يظهر في **المحاولات المنتهية** للمراجعة\n8. **تقرير مراقب AI** متاح لأي محاولة مراقَبة\n9. **نقاط المخاطر** مُتتبعة تاريخياً عبر اللقطات",
         },
       ],
       examples: [
