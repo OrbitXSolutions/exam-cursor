@@ -11,16 +11,68 @@ const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: {
-    default: "ExamPro - Enterprise Online Exam Platform",
-    template: "%s | ExamPro",
+    default: "SmartExam - Enterprise Online Examination Platform",
+    template: "%s | SmartExam",
   },
   description:
-    "Enterprise-grade bilingual online examination platform with advanced proctoring, grading, and analytics",
-  generator: "v0.app",
-  keywords: ["exam", "assessment", "proctoring", "education", "enterprise", "online exam"],
-  authors: [{ name: "ExamPro" }],
+    "Enterprise-grade bilingual online examination platform with AI-powered proctoring, automated grading, and real-time analytics. Secure, scalable assessments by Build4IT.",
+  generator: "Next.js",
+  applicationName: "SmartExam",
+  keywords: [
+    "online exam platform",
+    "smart exam",
+    "AI proctoring",
+    "online assessment",
+    "exam management",
+    "question bank",
+    "enterprise exam",
+    "secure online exam",
+    "exam analytics",
+    "automated grading",
+    "Build4IT",
+  ],
+  authors: [{ name: "Build4IT", url: "https://www.build4it.com" }],
+  creator: "Build4IT",
+  publisher: "Build4IT",
+  metadataBase: new URL("https://app.smartexam.io"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "SmartExam",
+    title: "SmartExam - Enterprise Online Examination Platform",
+    description:
+      "Enterprise-grade bilingual online examination platform with AI-powered proctoring, automated grading, and real-time analytics.",
+    images: [
+      {
+        url: "/hero-dashboard.jpg",
+        width: 1200,
+        height: 630,
+        alt: "SmartExam Dashboard - Enterprise Exam Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SmartExam - Enterprise Online Examination Platform",
+    description:
+      "Enterprise-grade online examination platform with AI-powered proctoring, automated grading, and real-time analytics.",
+    images: ["/hero-dashboard.jpg"],
+    creator: "@Build4IT",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       {
         url: "/icon-light-32x32.png",
         media: "(prefers-color-scheme: light)",

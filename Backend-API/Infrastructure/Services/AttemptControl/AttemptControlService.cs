@@ -211,6 +211,22 @@ public class AttemptControlService : IAttemptControlService
 
         await _db.SaveChangesAsync();
 
+        // Notify proctor/candidate via SignalR (server-side, reliable)
+        _ = Task.Run(async () =>
+        {
+          try
+          {
+            var group = $"attempt_{attempt.Id}";
+            await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
+            {
+              attemptId = attempt.Id,
+              reason = $"Force-ended by administrator: {dto.Reason}",
+              status = "ForceSubmitted"
+            });
+          }
+          catch { /* fire-and-forget */ }
+        });
+
         // Audit log (fire-and-forget)
         _ = Task.Run(async () =>
         {

@@ -1,3 +1,4 @@
+using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
 
@@ -17,7 +18,7 @@ public interface IQuestionBankService
   /// <summary>
   /// Get count of active questions for a subject or topic
   /// </summary>
-  Task<ApiResponse<int>> GetQuestionsCountAsync(int? subjectId, int? topicId);
+  Task<ApiResponse<QuestionsCountResponse>> GetQuestionsCountAsync(int? subjectId, int? topicId);
 
   #endregion
 

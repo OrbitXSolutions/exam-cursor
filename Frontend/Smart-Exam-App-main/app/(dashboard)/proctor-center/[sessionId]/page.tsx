@@ -49,6 +49,9 @@ import {
   Brain,
   Sparkles,
   Loader2,
+  Monitor,
+  Globe,
+  Zap,
 } from "lucide-react"
 
 export default function SessionDetailPage() {
@@ -129,6 +132,30 @@ export default function SessionDetailPage() {
             const data = await refreshSessionData(sessionId)
             setSession(data.session)
             setScreenshots(data.screenshots)
+            // Detect session ended from polling (server already closed the session)
+            if (data.session.status !== "Active" && !sessionEnded) {
+              const reason = data.session.status === "Completed" ? "Submitted"
+                : data.session.status === "Cancelled" ? "Terminated"
+                : "Expired"
+              setSessionEnded({ reason: reason as "Submitted" | "Expired" | "Terminated" })
+              setHasRemoteStream(false)
+              viewerRef.current?.disconnect()
+              const reportUrl = `/results/ai-report/${data.session.examId}/${data.session.candidateId}`
+              toast.info(
+                `Session ended: ${reason}`,
+                {
+                  description: "Redirecting to session report in 10 seconds…",
+                  duration: 10000,
+                  action: {
+                    label: "View Report Now",
+                    onClick: () => router.push(reportUrl),
+                  },
+                }
+              )
+              setTimeout(() => {
+                router.push(reportUrl)
+              }, 10000)
+            }
           } catch {
             // silent — don't redirect on poll failure
           }
@@ -184,14 +211,14 @@ export default function SessionDetailPage() {
             setScreenshots(data.screenshots)
           }).catch(() => {})
 
-          // Build the redirect URL — video page with all session evidence
-          const reportUrl = `/proctor-center/video/${session?.candidateId ?? "unknown"}?attemptId=${attemptId}`
+          // Build the redirect URL — recording page with all session evidence
+          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
 
           // Prominent toast with 15s duration + action button
           toast.success(
             `Candidate has submitted the exam (Attempt #${attemptId})`,
             {
-              description: "Redirecting to candidate report in 15 seconds…",
+              description: "Redirecting to session report in 15 seconds…",
               duration: 15000,
               icon: "✅",
               action: {
@@ -205,6 +232,36 @@ export default function SessionDetailPage() {
           setTimeout(() => {
             router.push(reportUrl)
           }, 15000)
+        },
+        onExamTerminated: (termEvent) => {
+          // Auto-termination (max violations) or proctor-initiated termination
+          setSessionEnded({ reason: "Terminated" })
+          setHasRemoteStream(false)
+          viewerRef.current?.disconnect()
+          // Refresh session data to reflect updated status
+          refreshSessionData(sessionId).then((data) => {
+            setSession(data.session)
+            setScreenshots(data.screenshots)
+          }).catch(() => {})
+
+          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
+
+          toast.error(
+            `Exam terminated: ${termEvent.reason}`,
+            {
+              description: "Redirecting to session report in 10 seconds…",
+              duration: 10000,
+              icon: "🚫",
+              action: {
+                label: "View Report Now",
+                onClick: () => router.push(reportUrl),
+              },
+            }
+          )
+
+          setTimeout(() => {
+            router.push(reportUrl)
+          }, 10000)
         },
         onSignalRStatusChange: (connected) => {
           console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)
@@ -230,10 +287,6 @@ export default function SessionDetailPage() {
           }
         },
         onAttemptExpired: (expEvent) => {
-          toast.warning(`Exam has expired (Attempt #${expEvent.attemptId})`, {
-            duration: 10000,
-            icon: "⏰",
-          })
           setSessionEnded({ reason: "Expired" })
           setHasRemoteStream(false)
           viewerRef.current?.disconnect()
@@ -241,6 +294,22 @@ export default function SessionDetailPage() {
             setSession(data.session)
             setScreenshots(data.screenshots)
           }).catch(() => {})
+
+          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
+
+          toast.warning(`Exam has expired (Attempt #${expEvent.attemptId})`, {
+            description: "Redirecting to session report in 10 seconds…",
+            duration: 10000,
+            icon: "⏰",
+            action: {
+              label: "View Report Now",
+              onClick: () => router.push(reportUrl),
+            },
+          })
+
+          setTimeout(() => {
+            router.push(reportUrl)
+          }, 10000)
         },
       })
 
@@ -283,6 +352,15 @@ export default function SessionDetailPage() {
       setSession(data.session)
       setIncidents(data.incidents)
       setScreenshots(data.screenshots)
+
+      // Detect if session is already ended (e.g. candidate submitted while proctor was away)
+      if (data.session?.status && data.session.status !== "Active" && !sessionEnded) {
+        const reason = data.session.status === "Completed" ? "Submitted"
+          : data.session.status === "Cancelled" ? "Terminated"
+          : "Expired"
+        setSessionEnded({ reason: reason as "Submitted" | "Expired" | "Terminated" })
+      }
+
       // Load attempt events for events log
       if (data.session?.attemptId) {
         const attemptEvents = await getAttemptEvents(data.session.attemptId)
@@ -335,7 +413,11 @@ export default function SessionDetailPage() {
       setWarningDialogOpen(false)
       setWarningMessage("")
     } catch (error) {
-      toast.error("Failed to send warning")
+      const errMsg = error instanceof Error ? error.message : "Failed to send warning"
+      toast.error(errMsg, {
+        description: "The session may no longer be active. Please refresh the page.",
+        duration: 8000,
+      })
     }
   }
 
@@ -350,9 +432,20 @@ export default function SessionDetailPage() {
         console.warn("[ProctorPage] SignalR termination notification failed (non-fatal):", e)
       }
       toast.success(t("proctor.sessionTerminated"))
-      router.push("/proctor-center")
+      setTerminateDialogOpen(false)
+      setTerminateReason("")
+      // Redirect to session report instead of the list
+      if (session.attemptId) {
+        router.push(`/results/ai-report/${session.examId}/${session.candidateId}`)
+      } else {
+        router.push("/proctor-center")
+      }
     } catch (error) {
-      toast.error("Failed to terminate session")
+      const errMsg = error instanceof Error ? error.message : "Failed to terminate session"
+      toast.error(errMsg, {
+        description: "The session may no longer be active.",
+        duration: 8000,
+      })
     }
   }
 
@@ -479,14 +572,18 @@ export default function SessionDetailPage() {
             <Flag className="h-4 w-4 me-2" />
             {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
           </Button>
-          <Button variant="outline" onClick={() => setWarningDialogOpen(true)}>
-            <MessageSquare className="h-4 w-4 me-2" />
-            {t("proctor.sendWarning")}
-          </Button>
-          <Button variant="destructive" onClick={() => setTerminateDialogOpen(true)}>
-            <XCircle className="h-4 w-4 me-2" />
-            {t("proctor.terminateSession")}
-          </Button>
+          {session.status === "Active" && (
+            <Button variant="outline" onClick={() => setWarningDialogOpen(true)}>
+              <MessageSquare className="h-4 w-4 me-2" />
+              {t("proctor.sendWarning")}
+            </Button>
+          )}
+          {session.status === "Active" && (
+            <Button variant="destructive" onClick={() => setTerminateDialogOpen(true)}>
+              <XCircle className="h-4 w-4 me-2" />
+              {t("proctor.terminateSession")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -526,9 +623,9 @@ export default function SessionDetailPage() {
                   )}
                   {session.attemptId && session.status !== "Active" && (
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                      <Link href={`/results/ai-report/${session.examId}/${session.candidateId}`}>
                         <Play className="h-3.5 w-3.5 me-1.5" />
-                        View Recording
+                        View AI Report
                       </Link>
                     </Button>
                   )}
@@ -581,9 +678,9 @@ export default function SessionDetailPage() {
                     <p className="text-sm text-white/70 mb-4">The live video stream has ended</p>
                     {session.attemptId && (
                       <Button variant="secondary" size="sm" asChild>
-                        <Link href={`/proctor-center/recording/${session.attemptId}`}>
+                        <Link href={`/results/ai-report/${session.examId}/${session.candidateId}`}>
                           <Play className="h-3.5 w-3.5 me-1.5" />
-                          View Recording
+                          View AI Report
                         </Link>
                       </Button>
                     )}
@@ -785,12 +882,31 @@ export default function SessionDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("proctor.timeRemaining")}</span>
-                <span className="font-medium">{session.timeRemaining} min</span>
+                <span className="font-medium">
+                  {session.status === "Active" && session.remainingSeconds != null && session.remainingSeconds > 0
+                    ? `${Math.ceil(session.remainingSeconds / 60)} min`
+                    : session.status !== "Active"
+                      ? "—"
+                      : "0 min"}
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("proctor.incidentCount")}</span>
-                <Badge variant={session.incidentCount > 0 ? "destructive" : "secondary"}>{session.incidentCount}</Badge>
-              </div>
+              {session.attemptStatus && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Attempt Status</span>
+                  <Badge variant={
+                    session.attemptStatus === "Terminated" ? "destructive" :
+                    session.attemptStatus === "Expired" ? "secondary" :
+                    session.attemptStatus === "Submitted" ? "default" :
+                    "outline"
+                  }>{session.attemptStatus}</Badge>
+                </div>
+              )}
+              {session.terminationReason && (
+                <div className="flex justify-between items-start">
+                  <span className="text-muted-foreground">Termination Reason</span>
+                  <span className="font-medium text-destructive text-xs text-end max-w-[60%]">{session.terminationReason}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">{t("proctor.lastActivity")}</span>
                 <div className="flex items-center gap-1 text-emerald-600">
@@ -798,66 +914,137 @@ export default function SessionDetailPage() {
                   <span className="text-xs">{formatDateTime(session.lastActivity)}</span>
                 </div>
               </div>
+
+              {/* Browser & Device Info */}
+              {(session.browserName || session.operatingSystem || session.ipAddress) && (
+                <div className="pt-3 border-t space-y-2">
+                  <p className="text-xs font-medium flex items-center gap-1.5">
+                    <Monitor className="h-3.5 w-3.5" />
+                    Device & Browser
+                  </p>
+                  {session.browserName && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Browser</span>
+                      <span className="text-xs font-medium">{session.browserName}{session.browserVersion ? ` ${session.browserVersion}` : ""}</span>
+                    </div>
+                  )}
+                  {session.operatingSystem && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">OS</span>
+                      <span className="text-xs font-medium">{session.operatingSystem}</span>
+                    </div>
+                  )}
+                  {session.screenResolution && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Screen</span>
+                      <span className="text-xs font-medium">{session.screenResolution}</span>
+                    </div>
+                  )}
+                  {(session.ipAddress || session.attemptIpAddress) && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs flex items-center gap-1"><Globe className="h-3 w-3" />IP</span>
+                      <span className="text-xs font-medium">{session.ipAddress || session.attemptIpAddress}</span>
+                    </div>
+                  )}
+                  {session.attemptDeviceInfo && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground text-xs">Device</span>
+                      <span className="text-xs font-medium text-end max-w-[60%]">{session.attemptDeviceInfo}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Incidents */}
-          <Card>
+          {/* Violations Summary */}
+          <Card className={session.countableViolationCount && session.countableViolationCount > 0 ? "border-destructive/30" : ""}>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                {t("proctor.incidents")} ({incidents.length})
+                <Zap className="h-4 w-4 text-destructive" />
+                Violations
+                {session.countableViolationCount != null && session.countableViolationCount > 0 && (
+                  <Badge variant="destructive" className="ms-auto">
+                    {session.countableViolationCount}{session.maxViolationWarnings ? `/${session.maxViolationWarnings}` : ""}
+                  </Badge>
+                )}
               </CardTitle>
+              <CardDescription className="text-xs">
+                {session.maxViolationWarnings
+                  ? `Auto-termination at ${session.maxViolationWarnings} countable violations`
+                  : "No auto-termination threshold set"}
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {incidents.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-sm">
-                  <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
-                  {t("proctor.noIncidents")}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {incidents.map((incident) => (
+            <CardContent className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Countable Violations</span>
+                <Badge variant={session.countableViolationCount && session.countableViolationCount > 0 ? "destructive" : "secondary"}>
+                  {session.countableViolationCount ?? 0}
+                </Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Violations</span>
+                <Badge variant="secondary">{session.totalViolations ?? 0}</Badge>
+              </div>
+              {session.maxViolationWarnings != null && session.maxViolationWarnings > 0 && (
+                <div className="pt-2">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Threshold Usage</span>
+                    <span className="font-medium">
+                      {Math.round(((session.countableViolationCount ?? 0) / session.maxViolationWarnings) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      key={incident.id}
-                      className={`p-3 rounded-lg border ${incident.reviewed ? "bg-muted/30" : "bg-background"}`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className={getSeverityColor(incident.severity)}>
-                              {incident.severity}
-                            </Badge>
-                            {incident.reviewed && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
-                          </div>
-                          <p className="font-medium text-sm mt-1">{incident.type}</p>
-                          <p className="text-xs text-muted-foreground">{incident.description}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{formatDateTime(incident.timestamp)}</p>
-                        </div>
-                        {!incident.reviewed && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedIncident(incident)
-                              setReviewDialogOpen(true)
-                            }}
-                          >
-                            {t("proctor.review")}
-                          </Button>
-                        )}
-                      </div>
-                      {incident.reviewed && incident.reviewNotes && (
-                        <div className="mt-2 pt-2 border-t text-xs">
-                          <p className="text-muted-foreground">
-                            <span className="font-medium">{incident.reviewedBy}:</span> {incident.reviewNotes}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                      className={`h-2 rounded-full transition-all ${
+                        (session.countableViolationCount ?? 0) >= session.maxViolationWarnings
+                          ? "bg-destructive"
+                          : (session.countableViolationCount ?? 0) >= session.maxViolationWarnings * 0.7
+                            ? "bg-orange-500"
+                            : "bg-amber-500"
+                      }`}
+                      style={{ width: `${Math.min(100, ((session.countableViolationCount ?? 0) / session.maxViolationWarnings) * 100)}%` }}
+                    />
+                  </div>
                 </div>
               )}
+
+              {/* Violation events breakdown */}
+              {(() => {
+                const violationEvents = events.filter(e => isViolationEvent(e.eventType))
+                if (violationEvents.length === 0) return (
+                  <div className="text-center py-3 text-muted-foreground text-xs">
+                    <Shield className="h-6 w-6 mx-auto mb-1 opacity-30" />
+                    No violations detected
+                  </div>
+                )
+                // Group by event type
+                const grouped = violationEvents.reduce<Record<string, { count: number; name: string; severity: string }>>((acc, e) => {
+                  const name = e.eventTypeName || getEventTypeName(e.eventType)
+                  if (!acc[name]) acc[name] = { count: 0, name, severity: getEventSeverity(e.eventType) }
+                  acc[name].count++
+                  return acc
+                }, {})
+                return (
+                  <div className="pt-2 border-t space-y-1.5">
+                    <p className="text-xs font-medium mb-1">Violation Breakdown</p>
+                    {Object.values(grouped).sort((a, b) => b.count - a.count).map((group) => (
+                      <div key={group.name} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <div className={`h-1.5 w-1.5 rounded-full ${
+                            group.severity === "Critical" ? "bg-destructive" :
+                            group.severity === "High" ? "bg-orange-500" :
+                            group.severity === "Medium" ? "bg-amber-500" :
+                            "bg-blue-500"
+                          }`} />
+                          <span className="text-muted-foreground">{group.name}</span>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] h-5">{group.count}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
             </CardContent>
           </Card>
 
@@ -975,6 +1162,67 @@ export default function SessionDetailPage() {
                       Regenerate
                     </Button>
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Incidents (manually created by proctor) */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                {t("proctor.incidents")} ({incidents.length})
+              </CardTitle>
+              <CardDescription className="text-xs">Manually created incident cases</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {incidents.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground text-sm">
+                  <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
+                  No incidents created
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {incidents.map((incident) => (
+                    <div
+                      key={incident.id}
+                      className={`p-3 rounded-lg border ${incident.reviewed ? "bg-muted/30" : "bg-background"}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={getSeverityColor(incident.severity)}>
+                              {incident.severity}
+                            </Badge>
+                            {incident.reviewed && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                          </div>
+                          <p className="font-medium text-sm mt-1">{incident.type}</p>
+                          <p className="text-xs text-muted-foreground">{incident.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{formatDateTime(incident.timestamp)}</p>
+                        </div>
+                        {!incident.reviewed && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedIncident(incident)
+                              setReviewDialogOpen(true)
+                            }}
+                          >
+                            {t("proctor.review")}
+                          </Button>
+                        )}
+                      </div>
+                      {incident.reviewed && incident.reviewNotes && (
+                        <div className="mt-2 pt-2 border-t text-xs">
+                          <p className="text-muted-foreground">
+                            <span className="font-medium">{incident.reviewedBy}:</span> {incident.reviewNotes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>

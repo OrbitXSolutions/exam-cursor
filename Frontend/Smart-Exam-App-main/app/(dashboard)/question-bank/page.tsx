@@ -262,11 +262,11 @@ export default function QuestionBankPage() {
         {showFilters && (
           <Card className="animate-in slide-in-from-top-2">
             <CardContent className="pt-6">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 w-full">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{language === "ar" ? "المادة" : "Subject"}</label>
                   <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع المواد" : "All Subjects"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,7 +282,7 @@ export default function QuestionBankPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{language === "ar" ? "الموضوع" : "Topic"}</label>
                   <Select value={selectedTopic} onValueChange={setSelectedTopic} disabled={selectedSubject === "all" || topics.length === 0}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع المواضيع" : "All Topics"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -298,7 +298,7 @@ export default function QuestionBankPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("questionBank.questionType")}</label>
                   <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -314,7 +314,7 @@ export default function QuestionBankPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("questionBank.difficulty")}</label>
                   <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="All Difficulties" />
                     </SelectTrigger>
                     <SelectContent>

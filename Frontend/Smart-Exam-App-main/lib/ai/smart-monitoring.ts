@@ -141,6 +141,17 @@ export class SmartMonitoring {
         "[SmartMonitoring] Loading MediaPipe FaceLandmarker model...",
       );
 
+      // Suppress TensorFlow Lite XNNPACK info messages logged via console.error by WASM
+      const origError = console.error;
+      console.error = (...args: any[]) => {
+        if (
+          typeof args[0] === "string" &&
+          args[0].includes("TensorFlow Lite XNNPACK")
+        )
+          return;
+        origError.apply(console, args);
+      };
+
       const vision = await FilesetResolver.forVisionTasks(
         // Serve WASM from CDN — avoids needing to copy files to public/
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm",
@@ -157,6 +168,9 @@ export class SmartMonitoring {
         outputFaceBlendshapes: false, // don't need blendshapes for Phase 1
         outputFacialTransformationMatrixes: true, // need this for head pose (yaw/pitch)
       });
+
+      // Restore original console.error after model initialization
+      console.error = origError;
 
       console.log("[SmartMonitoring] ✅ FaceLandmarker loaded successfully");
 

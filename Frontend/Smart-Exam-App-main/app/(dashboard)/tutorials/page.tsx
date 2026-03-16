@@ -88,13 +88,6 @@ export default function TutorialsPage() {
   const availableModules = allTutorialModules
   const comingSoonModules = [
     {
-      titleEn: "Grading & Results",
-      titleAr: "التصحيح والنتائج",
-      descriptionEn: "Manual grading, AI-assisted grading, candidate results, and analytics.",
-      descriptionAr: "التصحيح اليدوي، التصحيح بمساعدة AI، نتائج المرشحين، والتحليلات.",
-      iconName: "GraduationCap",
-    },
-    {
       titleEn: "Proctor Center",
       titleAr: "مركز المراقبة",
       descriptionEn: "Live monitoring, AI proctoring, identity verification, and incident management.",

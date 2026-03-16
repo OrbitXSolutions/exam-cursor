@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { ExamType } from "@/lib/types"
@@ -26,12 +26,12 @@ import {
   Timer,
   Copy,
   FileText,
-  Shield,
   Settings,
   Search,
   CheckCircle2,
   Layers,
   HelpCircle,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -46,6 +46,8 @@ export default function CreateFromTemplatePage() {
   const [allExams, setAllExams] = useState<Exam[]>([])
   const [examSearch, setExamSearch] = useState("")
   const [selectedExamId, setSelectedExamId] = useState<number | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Form data - user provides these
   const [formData, setFormData] = useState({
@@ -78,6 +80,17 @@ export default function CreateFromTemplatePage() {
     fetchExams()
   }, [])
 
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
   const selectedExam = allExams.find((e) => e.id === selectedExamId) || null
 
   // Filter exams by search text
@@ -99,6 +112,7 @@ export default function CreateFromTemplatePage() {
   function handleSelectExam(examId: number) {
     setSelectedExamId(examId)
     setExamSearch("")
+    setDropdownOpen(false)
     const exam = allExams.find((e) => e.id === examId)
     if (exam) {
       // Pre-fill duration from source exam
@@ -194,8 +208,8 @@ export default function CreateFromTemplatePage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Step 1: Select Template Exam */}
-        <Card className="overflow-hidden pt-0">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b py-4">
+        <Card className="overflow-visible pt-0">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b py-4 rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <Copy className="h-5 w-5 text-primary" />
               Select Template Exam
@@ -205,49 +219,65 @@ export default function CreateFromTemplatePage() {
               access policy will be copied.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 overflow-visible min-h-[80px]">
             {examsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <LoadingSpinner size="md" />
               </div>
             ) : (
               <>
-                {/* Search input */}
-                <div className="relative">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search exams by name..."
-                    value={examSearch}
-                    onChange={(e) => setExamSearch(e.target.value)}
-                    className="ps-9 h-11 border-2"
-                  />
-                </div>
+                {/* Dropdown selector */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 h-11 text-sm rounded-md border-2 bg-background hover:bg-accent/50 transition-colors"
+                  >
+                    <span className={selectedExam ? "text-foreground" : "text-muted-foreground"}>
+                      {selectedExam ? getExamTitle(selectedExam) : "Select an exam template..."}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
 
-                {/* Exam list */}
-                <div className="max-h-52 overflow-y-auto rounded-md border-2 divide-y">
-                  {filteredExams.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-muted-foreground">No exams found</div>
-                  ) : (
-                    filteredExams.map((exam) => (
-                      <button
-                        key={exam.id}
-                        type="button"
-                        onClick={() => {
-                          handleSelectExam(exam.id)
-                        }}
-                        className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
-                          selectedExamId === exam.id ? "bg-primary/10 text-primary font-medium" : ""
-                        }`}
-                      >
-                        {selectedExamId === exam.id && (
-                          <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                  {dropdownOpen && (
+                    <div className="absolute z-50 w-full mt-1 rounded-md border-2 bg-popover shadow-lg">
+                      {/* Search inside dropdown */}
+                      <div className="p-2 border-b">
+                        <div className="relative">
+                          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Search exams by name..."
+                            value={examSearch}
+                            onChange={(e) => setExamSearch(e.target.value)}
+                            className="ps-9 h-9 border"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      {/* Options list */}
+                      <div className="max-h-80 overflow-y-auto divide-y">
+                        {filteredExams.length === 0 ? (
+                          <div className="p-4 text-center text-sm text-muted-foreground">No exams found</div>
+                        ) : (
+                          filteredExams.map((exam) => (
+                            <button
+                              key={exam.id}
+                              type="button"
+                              onClick={() => handleSelectExam(exam.id)}
+                              className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                selectedExamId === exam.id ? "bg-primary/10 text-primary font-medium" : ""
+                              }`}
+                            >
+                              {selectedExamId === exam.id && (
+                                <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                              )}
+                              <span className="truncate">{getExamTitle(exam)}</span>
+                            </button>
+                          ))
                         )}
-                        <span className="truncate">{getExamTitle(exam)}</span>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap ms-auto">
-                          ({exam.questionsCount || 0} Q · {exam.durationMinutes}min)
-                        </span>
-                      </button>
-                    ))
+                      </div>
+                    </div>
                   )}
                 </div>
               </>
@@ -281,6 +311,13 @@ export default function CreateFromTemplatePage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <div className="text-muted-foreground">Pass Score</div>
+                        <div className="font-medium">{selectedExam.passScore ?? 0}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <div className="text-muted-foreground">Questions</div>
@@ -292,13 +329,6 @@ export default function CreateFromTemplatePage() {
                       <div>
                         <div className="text-muted-foreground">Duration</div>
                         <div className="font-medium">{selectedExam.durationMinutes} min</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <div className="text-muted-foreground">Proctoring</div>
-                        <div className="font-medium">{selectedExam.requireProctoring ? "Yes" : "No"}</div>
                       </div>
                     </div>
                   </div>

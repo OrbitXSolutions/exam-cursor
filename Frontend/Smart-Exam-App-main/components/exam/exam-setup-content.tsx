@@ -90,7 +90,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   const [topics, setTopics] = useState<Map<number, QuestionTopic[]>>(new Map())
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<number[]>([])
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([])
-  const [questionsCount, setQuestionsCount] = useState<Map<string, number>>(new Map())
+  const [questionsCount, setQuestionsCount] = useState<Map<string, { count: number; totalPoints: number }>>(new Map())
   const [builderSections, setBuilderSections] = useState<Array<{
     key: string // unique key for react
     questionSubjectId: number | null
@@ -106,6 +106,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     sourceType: SectionSourceType
     availableQuestionsCount: number
     estimatedTotalPoints: number
+    totalPoolPoints: number
   }>>([])
   const [loadedBuilderData, setLoadedBuilderData] = useState<ExamBuilderDto | null>(null)
   const [examTotalPoints, setExamTotalPoints] = useState<number>(0)
@@ -190,18 +191,19 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   }, [])
 
   // Fetch questions count for a subject/topic
-  const fetchQuestionsCount = useCallback(async (subjectId: number | null, topicId: number | null): Promise<number> => {
+  const fetchQuestionsCount = useCallback(async (subjectId: number | null, topicId: number | null): Promise<{ count: number; totalPoints: number }> => {
     const key = `${subjectId || 0}-${topicId || 0}`
     if (questionsCount.has(key)) {
-      return questionsCount.get(key) || 0
+      return questionsCount.get(key)!
     }
     try {
-      const count = await getQuestionsCount(subjectId, topicId)
-      setQuestionsCount(prev => new Map(prev).set(key, count))
-      return count
+      const result = await getQuestionsCount(subjectId, topicId)
+      const data = { count: result.count, totalPoints: result.totalPoints }
+      setQuestionsCount(prev => new Map(prev).set(key, data))
+      return data
     } catch (err) {
       console.error("Failed to fetch questions count:", err)
-      return 0
+      return { count: 0, totalPoints: 0 }
     }
   }, [questionsCount])
 
@@ -219,22 +221,28 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         setSourceType(data.sourceType)
         
         // Build sections from loaded data
-        const loadedSections = data.sections.map((s, index) => ({
-          key: `section-${s.id || index}-${Date.now()}`,
-          questionSubjectId: s.questionSubjectId,
-          questionTopicId: s.questionTopicId,
-          subjectNameEn: s.subjectNameEn || "",
-          subjectNameAr: s.subjectNameAr || "",
-          topicNameEn: s.topicNameEn,
-          topicNameAr: s.topicNameAr,
-          titleEn: s.titleEn,
-          titleAr: s.titleAr,
-          durationMinutes: s.durationMinutes,
-          pickCount: s.pickCount,
-          sourceType: s.sourceType,
-          availableQuestionsCount: s.availableQuestionsCount,
-          estimatedTotalPoints: s.estimatedTotalPoints ?? s.pickCount,
-        }))
+        const loadedSections = data.sections.map((s, index) => {
+          // Derive totalPoolPoints from backend's estimatedTotalPoints (pickCount × avgPoints)
+          const avgPoints = s.pickCount > 0 ? (s.estimatedTotalPoints ?? s.pickCount) / s.pickCount : 1
+          const totalPoolPoints = s.availableQuestionsCount * avgPoints
+          return {
+            key: `section-${s.id || index}-${Date.now()}`,
+            questionSubjectId: s.questionSubjectId,
+            questionTopicId: s.questionTopicId,
+            subjectNameEn: s.subjectNameEn || "",
+            subjectNameAr: s.subjectNameAr || "",
+            topicNameEn: s.topicNameEn,
+            topicNameAr: s.topicNameAr,
+            titleEn: s.titleEn,
+            titleAr: s.titleAr,
+            durationMinutes: s.durationMinutes,
+            pickCount: s.pickCount,
+            sourceType: s.sourceType,
+            availableQuestionsCount: s.availableQuestionsCount,
+            estimatedTotalPoints: s.estimatedTotalPoints ?? s.pickCount,
+            totalPoolPoints,
+          }
+        })
         
         setBuilderSections(loadedSections)
         
@@ -279,7 +287,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       
       if (sourceType === SectionSourceType.Subject) {
         // Add section for this subject
-        const count = await fetchQuestionsCount(subjectId, null)
+        const { count, totalPoints } = await fetchQuestionsCount(subjectId, null)
+        const pickCount = Math.min(10, count)
+        const avgPoints = count > 0 && totalPoints > 0 ? totalPoints / count : 1
         setBuilderSections(prev => [...prev, {
           key: `subject-${subjectId}-${Date.now()}`,
           questionSubjectId: subjectId,
@@ -291,10 +301,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           titleEn: subject.nameEn,
           titleAr: subject.nameAr,
           durationMinutes: null,
-          pickCount: Math.min(10, count),
+          pickCount,
           sourceType: SectionSourceType.Subject,
           availableQuestionsCount: count,
-          estimatedTotalPoints: Math.min(10, count), // default: 1 point per question until backend recalculates
+          estimatedTotalPoints: pickCount * avgPoints,
+          totalPoolPoints: totalPoints > 0 ? totalPoints : count,
         }])
       } else {
         // Load topics for this subject
@@ -322,7 +333,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setSelectedTopicIds(prev => [...prev, topic.id])
       
       // Add section for this topic
-      const count = await fetchQuestionsCount(topic.subjectId, topic.id)
+      const { count, totalPoints } = await fetchQuestionsCount(topic.subjectId, topic.id)
+      const pickCount = Math.min(10, count)
+      const avgPoints = count > 0 ? totalPoints / count : 1
       setBuilderSections(prev => [...prev, {
         key: `topic-${topic.id}-${Date.now()}`,
         questionSubjectId: topic.subjectId,
@@ -334,10 +347,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         titleEn: topic.nameEn,
         titleAr: topic.nameAr,
         durationMinutes: null,
-        pickCount: Math.min(10, count),
+        pickCount,
         sourceType: SectionSourceType.Topic,
         availableQuestionsCount: count,
-        estimatedTotalPoints: Math.min(10, count),
+        estimatedTotalPoints: pickCount * avgPoints,
+        totalPoolPoints: totalPoints,
       }])
     } else {
       setSelectedTopicIds(prev => prev.filter(id => id !== topic.id))
@@ -363,6 +377,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         // Validate pickCount doesn't exceed available
         if (field === "pickCount" && typeof value === "number") {
           updated.pickCount = Math.max(1, Math.min(value, s.availableQuestionsCount))
+          // Recalculate estimated total points based on avg points per question
+          const avgPoints = s.availableQuestionsCount > 0 && s.totalPoolPoints > 0 ? s.totalPoolPoints / s.availableQuestionsCount : 1
+          updated.estimatedTotalPoints = updated.pickCount * avgPoints
         }
         return updated
       }
@@ -416,17 +433,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           sourceType: s.sourceType,
           order: index + 1,
         })),
+        passScore: formData.passScore,
       }
 
       const result = await saveExamBuilder(examId, request)
       setLoadedBuilderData(result)
-
-      // Also save pass score to the exam
-      try {
-        await updateExam(examId, { passScore: formData.passScore })
-      } catch {
-        // Non-critical — pass score can be updated later
-      }
 
       toast.success("Builder configuration saved successfully")
       // Redirect to exam overview page
@@ -484,7 +495,6 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setLoading(true)
 
       const requestBody = {
-        departmentId: 1,
         examType: formData.examType,
         titleEn: formData.titleEn,
         titleAr: formData.titleAr || formData.titleEn,

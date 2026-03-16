@@ -370,6 +370,7 @@ export interface BuilderSectionDto {
 export interface SaveExamBuilderRequest {
   sourceType: SectionSourceType;
   sections: SaveBuilderSectionDto[];
+  passScore?: number;
 }
 
 export interface SaveBuilderSectionDto {
@@ -385,6 +386,7 @@ export interface SaveBuilderSectionDto {
 
 export interface QuestionsCountResponse {
   count: number;
+  totalPoints: number;
 }
 
 export interface Exam {
@@ -698,6 +700,28 @@ export interface AuditLog {
   userAgent: string | null;
   timestamp: string;
   details: string | null;
+}
+
+export interface AuditLogDetail {
+  id: number;
+  actorId: string | null;
+  actorDisplayName: string | null;
+  actorType: string;
+  action: string;
+  entityName: string;
+  entityId: string;
+  correlationId: string | null;
+  source: string | null;
+  channel: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  beforeJson: string | null;
+  afterJson: string | null;
+  metadataJson: string | null;
+  outcome: string;
+  errorMessage: string | null;
+  occurredAt: string;
+  durationMs: number | null;
 }
 
 // ============ IDENTITY VERIFICATION ============

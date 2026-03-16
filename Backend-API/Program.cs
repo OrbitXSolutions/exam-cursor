@@ -364,6 +364,20 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/candidateIDs"
 });
 
+// Serve tutorial videos from wwwroot/tutorials/
+var tutorialsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "tutorials");
+if (!Directory.Exists(tutorialsPath))
+{
+    Directory.CreateDirectory(tutorialsPath);
+    Log.Information("Created tutorials directory at {Path}", tutorialsPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(tutorialsPath),
+    RequestPath = "/tutorials"
+});
+
 // Rate Limiting
 app.UseRateLimiter();
 

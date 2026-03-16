@@ -94,15 +94,19 @@ class ApiClient {
 
         const errors = jsonResponse.errors;
         const errorsStr = Array.isArray(errors)
-          ? errors.join(", ")
+          ? errors.join("\n• ")
           : typeof errors === "string"
             ? errors
             : errors && typeof errors === "object"
-              ? Object.values(errors).flat().filter(Boolean).join(", ")
+              ? Object.values(errors).flat().filter(Boolean).join("\n• ")
               : "";
         const traceId = jsonResponse.traceId || "";
         const baseMessage =
-          jsonResponse.message || errorsStr || `HTTP Error: ${response.status}`;
+          jsonResponse.message && errorsStr
+            ? `${jsonResponse.message}\n\n• ${errorsStr}`
+            : jsonResponse.message ||
+              errorsStr ||
+              `HTTP Error: ${response.status}`;
         const errorMessage = traceId
           ? `${baseMessage} (Ref: ${traceId})`
           : baseMessage;

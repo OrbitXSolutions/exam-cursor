@@ -42,6 +42,14 @@ import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, Refr
 import { QuestionRenderer } from "./question-renderer"
 import { ImageZoomModal } from "./image-zoom-modal"
 import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
+import { SpreadsheetButton } from "@/components/exam/exam-spreadsheet"
+import dynamic from "next/dynamic"
+
+// Dynamically import spreadsheet to avoid SSR issues
+const ExamSpreadsheet = dynamic(
+  () => import("@/components/exam/exam-spreadsheet").then(mod => ({ default: mod.ExamSpreadsheet })),
+  { ssr: false, loading: () => null }
+)
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -91,6 +99,9 @@ export default function ExamPage() {
 
   // Calculator state
   const [showCalculator, setShowCalculator] = useState(false)
+
+  // Spreadsheet state
+  const [showSpreadsheet, setShowSpreadsheet] = useState(false)
 
   // Auto-save indicator state
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
@@ -152,10 +163,13 @@ export default function ExamPage() {
       ))
     : !!(currentFlatQuestion?.isCalculatorAllowed)
 
-  // Auto-hide calculator when navigating to context that doesn't allow it
+  // Auto-hide calculator & spreadsheet when navigating to context that doesn't allow it
   useEffect(() => {
     if (!isCalculatorAllowedInContext && showCalculator) {
       setShowCalculator(false)
+    }
+    if (!isCalculatorAllowedInContext && showSpreadsheet) {
+      setShowSpreadsheet(false)
     }
   }, [isCalculatorAllowedInContext, currentSectionId, currentQuestionIndex])
 
@@ -1071,6 +1085,16 @@ export default function ExamPage() {
         chunkRecorderRef.current = null
       }
 
+      // Notify proctor via SignalR BEFORE stopping background activity (connection is still alive)
+      if (publisherRef.current?.signalingConnection) {
+        try {
+          await publisherRef.current.signalingConnection.notifyExamSubmitted()
+          console.log('[ExamPage] Proctor notified of exam submission via SignalR')
+        } catch (e) {
+          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
+        }
+      }
+
       // Stop all background calls BEFORE submit to prevent race conditions
       stopAllBackgroundActivity()
 
@@ -1096,16 +1120,6 @@ export default function ExamPage() {
           })
         } catch (e) {
           console.warn("[Proctor] Video finalize setup failed (non-fatal):", e)
-        }
-      }
-
-      // Notify proctor via SignalR that exam was submitted
-      if (publisherRef.current?.signalingConnection) {
-        try {
-          await publisherRef.current.signalingConnection.notifyExamSubmitted()
-          console.log('[ExamPage] Proctor notified of exam submission')
-        } catch (e) {
-          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
         }
       }
 
@@ -1414,6 +1428,15 @@ export default function ExamPage() {
                 <Calculator className="h-4 w-4" />
                 <span className="hidden sm:inline">{language === "ar" ? "آلة حاسبة" : "Calculator"}</span>
               </Button>
+            )}
+
+            {/* Spreadsheet Toggle - shown only when calculator is allowed */}
+            {isCalculatorAllowedInContext && (
+              <SpreadsheetButton
+                isOpen={showSpreadsheet}
+                onClick={() => setShowSpreadsheet(!showSpreadsheet)}
+                label={language === "ar" ? "جدول بيانات" : "Spreadsheet"}
+              />
             )}
 
             {/* Summary Toggle */}
@@ -1802,6 +1825,11 @@ export default function ExamPage() {
       {/* Floating Calculator */}
       {showCalculator && (
         <ExamCalculator onClose={() => setShowCalculator(false)} />
+      )}
+
+      {/* Floating Spreadsheet */}
+      {showSpreadsheet && (
+        <ExamSpreadsheet onClose={() => setShowSpreadsheet(false)} />
       )}
 
       {/* Submit confirmation dialog */}

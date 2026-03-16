@@ -49,6 +49,7 @@ public class SaveExamBuilderRequest
 {
     public SectionSourceType SourceType { get; set; }
     public List<SaveBuilderSectionDto> Sections { get; set; } = new();
+    public decimal? PassScore { get; set; }
 }
 
 /// <summary>
@@ -72,6 +73,7 @@ public class SaveBuilderSectionDto
 public class QuestionsCountResponse
 {
     public int Count { get; set; }
+    public decimal TotalPoints { get; set; }
     public int? SubjectId { get; set; }
     public int? TopicId { get; set; }
 }

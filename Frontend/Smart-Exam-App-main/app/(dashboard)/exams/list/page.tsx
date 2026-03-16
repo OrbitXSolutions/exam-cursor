@@ -73,6 +73,7 @@ export default function ExamsListPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [examToDelete, setExamToDelete] = useState<Exam | null>(null)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
+  const [errorDialogTitle, setErrorDialogTitle] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
@@ -103,8 +104,11 @@ export default function ExamsListPage() {
       await publishExam(exam.id)
       setPublishDialogOpen(true)
       fetchExams()
-    } catch (error) {
-      toast.error(t("exams.publishError") || "Failed to publish exam")
+    } catch (error: any) {
+      const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
+      setErrorDialogTitle(language === "ar" ? "فشل النشر" : "Failed to Publish")
+      setErrorMessage(msg)
+      setErrorDialogOpen(true)
     } finally {
       setActionLoading(null)
     }
@@ -136,6 +140,7 @@ export default function ExamsListPage() {
       setDeleteDialogOpen(false)
       setExamToDelete(null)
       const msg = error?.response?.data?.message || error?.message || "Failed to delete exam"
+      setErrorDialogTitle(language === "ar" ? "لا يمكن الحذف" : "Cannot Delete")
       setErrorMessage(msg)
       setErrorDialogOpen(true)
     } finally {
@@ -315,6 +320,11 @@ export default function ExamsListPage() {
 
                         {/* Actions Menu */}
                         <TableCell>
+                          {actionLoading === exam.id ? (
+                            <div className="flex items-center justify-center h-8 w-8">
+                              <LoadingSpinner size="sm" />
+                            </div>
+                          ) : (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -377,6 +387,7 @@ export default function ExamsListPage() {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          )}
                         </TableCell>
                       </TableRow>
                     )
@@ -461,15 +472,15 @@ export default function ExamsListPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Error Dialog - shown when delete is blocked */}
+      {/* Error Dialog */}
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
-              {language === "ar" ? "لا يمكن الحذف" : "Cannot Delete"}
+              {errorDialogTitle}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base">
+            <AlertDialogDescription className="text-base whitespace-pre-line">
               {errorMessage}
             </AlertDialogDescription>
           </AlertDialogHeader>

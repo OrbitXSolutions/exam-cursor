@@ -988,7 +988,7 @@ export async function saveExamBuilder(
 export async function getQuestionsCount(
   subjectId?: number | null,
   topicId?: number | null,
-): Promise<number> {
+): Promise<QuestionsCountResponse> {
   const params = new URLSearchParams();
   if (subjectId) params.append("subjectId", subjectId.toString());
   if (topicId) params.append("topicId", topicId.toString());
@@ -1004,9 +1004,12 @@ export async function getQuestionsCount(
   );
   // Handle both response formats (wrapped and unwrapped)
   if (typeof response === "number") {
-    return response;
+    return { count: response, totalPoints: 0 };
   }
-  return (response as QuestionsCountResponse).count ?? response;
+  return {
+    count: (response as QuestionsCountResponse).count ?? 0,
+    totalPoints: (response as QuestionsCountResponse).totalPoints ?? 0,
+  };
 }
 
 // ============ CLONE EXAM (Create from Template) ============

@@ -535,6 +535,8 @@ export const translations = {
       securityDesc1:
         "This exam is proctored. Your webcam and screen may be monitored.",
       securityDesc2: "Any suspicious activity will be flagged for review.",
+      autoTerminationWarning:
+        "This exam has automatic termination enabled. After {count} countable violations (such as tab switching, camera blocked, etc.), your exam will be automatically terminated.",
       agreement:
         "I have read and understood all instructions and agree to follow the exam rules.",
       pleaseAgree: "Please agree to the terms before starting",

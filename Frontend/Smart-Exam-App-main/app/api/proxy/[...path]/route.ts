@@ -163,6 +163,50 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> },
+) {
+  const { path } = await params;
+  const searchParams = request.nextUrl.searchParams.toString();
+  const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
+
+  console.log(`[Proxy PATCH] ${url}`);
+
+  try {
+    const token = request.headers.get("authorization");
+    const body = await request.json().catch(() => ({}));
+
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: token }),
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    console.log(`[Proxy PATCH Response] ${url}`, {
+      status: response.status,
+      data,
+    });
+
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    console.error(`[Proxy PATCH Error] ${url}`, error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to connect to backend",
+        data: null,
+        errors: [],
+      },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
