@@ -39,6 +39,7 @@ import {
   Laptop,
   Globe,
   Fingerprint,
+  User,
 } from "lucide-react"
 
 interface ProctorSession {
@@ -144,27 +145,51 @@ export default function AIReportPage() {
     }
     const c = (t: number) => counts[t] || 0
 
+    // ── Proportional CameraBlocked penalty ──
+    // Each CameraBlocked event represents ~30s of blocked camera (cooldown period).
+    // Calculate what fraction of the session the camera was blocked to scale penalties.
+    // Without this, a 20s session with 1 event only gets a tiny flat penalty.
+    const sessionDurationSec = sess.endedAt
+      ? (new Date(sess.endedAt).getTime() - new Date(sess.startedAt).getTime()) / 1000
+      : 300 // default 5 min if session still active
+    const effectiveDuration = Math.max(10, sessionDurationSec)
+    const blockedSeconds = c(21) * 30 // each event ≈ 30s blocked (cooldown)
+    const blockedRatio = Math.min(1, blockedSeconds / effectiveDuration)
+
+    // CameraBlocked = most severe: face & eyes are invisible when camera is covered
+    const cameraBlockedFacePenalty = Math.round(blockedRatio * 85)
+    const cameraBlockedEyePenalty = Math.round(blockedRatio * 80)
+    const cameraBlockedEnvPenalty = Math.round(blockedRatio * 50)
+
+    // ── Proportional FaceNotDetected penalty ──
+    // Same logic: each FaceNotDetected event ≈ 30s without a visible face
+    const faceAbsentSeconds = c(18) * 30
+    const faceAbsentRatio = Math.min(1, faceAbsentSeconds / effectiveDuration)
+    const faceAbsentPenalty = Math.round(faceAbsentRatio * 70)
+
     // ── Face Detection Score (100 → 0) ──
-    // Penalties: FaceNotDetected(18)=8, MultipleFaces(19)=12, CameraBlocked(21)=10, WebcamDenied(16)=25
     const faceDetPenalty =
-      c(18) * 8 + c(19) * 12 + c(21) * 10 + c(16) * 25
+      faceAbsentPenalty + c(19) * 12 + cameraBlockedFacePenalty + c(16) * 25
     const faceDetectionScore = Math.max(0, Math.min(100, 100 - faceDetPenalty))
 
     // ── Eye Tracking Score (100 → 0) ──
-    // Penalties: HeadTurned(22)=7, FaceOutOfFrame(20)=6
-    const eyePenalty = c(22) * 7 + c(20) * 6
-    const eyeTrackingScore = Math.max(0, Math.min(100, 100 - eyePenalty))
+    // Eye tracking depends on face detection — can't track eyes if face isn't detected
+    const eyePenalty = c(22) * 7 + c(20) * 6 + cameraBlockedEyePenalty
+    const rawEyeTrackingScore = Math.max(0, Math.min(100, 100 - eyePenalty))
+    // Cap eye tracking score to never exceed face detection score
+    const eyeTrackingScore = Math.min(rawEyeTrackingScore, faceDetectionScore)
 
     // ── Behavior Score (100 → 0) ──
-    // Penalties: TabSwitched(4)=8, WindowBlur(8)=4, CopyAttempt(10)=10, PasteAttempt(11)=10, RightClick(12)=5
     const behaviorPenalty =
       c(4) * 8 + c(8) * 4 + c(10) * 10 + c(11) * 10 + c(12) * 5
     const behaviorScore = Math.max(0, Math.min(100, 100 - behaviorPenalty))
 
     // ── Environment Score (100 → 0) ──
-    // Penalties: FullscreenExited(5)=10, CameraBlocked(21)=12, SnapshotFailed(17)=8
-    const envPenalty = c(5) * 10 + c(21) * 12 + c(17) * 8
-    const environmentScore = Math.max(0, Math.min(100, 100 - envPenalty))
+    const envPenalty = c(5) * 10 + cameraBlockedEnvPenalty + c(17) * 8
+    // Penalize if device/environment info is missing (IP, browser, OS, screen)
+    const hasDeviceInfo = !!(sess.ipAddress || sess.browserName || sess.operatingSystem || sess.screenResolution)
+    const missingInfoPenalty = hasDeviceInfo ? 0 : 30
+    const environmentScore = Math.max(0, Math.min(100, 100 - envPenalty - missingInfoPenalty))
 
     // ── Overall Risk Score ──
     // Source of truth: Backend Rule Engine (ProctorSession.RiskScore)
@@ -175,12 +200,23 @@ export default function AIReportPage() {
       (100 - eyeTrackingScore) * 0.20 +
       (100 - environmentScore) * 0.15
     ))
-    const overallRiskScore = (sess.riskScore != null && sess.riskScore !== undefined)
+    // If session was auto-terminated, risk should be at least 75 (High)
+    const terminationFloor = sess.isTerminatedByProctor ? 75 : 0
+    const rawRiskScore = (sess.riskScore != null && sess.riskScore !== undefined)
       ? Number(sess.riskScore)
       : clientFallback
+    const overallRiskScore = Math.max(rawRiskScore, terminationFloor)
 
     // ── Suspicious Activities (built from real counts) ──
     const suspiciousActivities: string[] = []
+    if (c(21) > 0) {
+      const pct = Math.round(blockedRatio * 100)
+      suspiciousActivities.push(
+        language === "ar"
+          ? `الكاميرا محجوبة ${c(21)} مرة (~${pct}% من الجلسة)`
+          : `Camera blocked ${c(21)} time${c(21) > 1 ? "s" : ""} (~${pct}% of session)`
+      )
+    }
     if (c(18) > 0) suspiciousActivities.push(
       language === "ar"
         ? `لم يتم اكتشاف الوجه ${c(18)} مرة`
@@ -200,11 +236,6 @@ export default function AIReportPage() {
       language === "ar"
         ? `الوجه خارج الإطار ${c(20)} مرة`
         : `Face out of frame ${c(20)} time${c(20) > 1 ? "s" : ""}`
-    )
-    if (c(21) > 0) suspiciousActivities.push(
-      language === "ar"
-        ? `الكاميرا محجوبة ${c(21)} مرة`
-        : `Camera blocked ${c(21)} time${c(21) > 1 ? "s" : ""}`
     )
     if (c(4) > 0) suspiciousActivities.push(
       language === "ar"
@@ -234,6 +265,19 @@ export default function AIReportPage() {
 
     // ── Recommendations ──
     const recommendations: string[] = []
+    if (c(21) > 0 && blockedRatio >= 0.5) {
+      recommendations.push(
+        language === "ar"
+          ? "تم حظر الكاميرا لمعظم الجلسة — بيانات المراقبة غير موثوقة، يجب المراجعة اليدوية"
+          : "Camera was blocked for most of the session — proctoring data unreliable, manual review required"
+      )
+    } else if (c(21) > 0) {
+      recommendations.push(
+        language === "ar"
+          ? "تم حظر الكاميرا — تحقق من سلامة التسجيل"
+          : "Camera was blocked — verify recording integrity"
+      )
+    }
     if (overallRiskScore >= 50) {
       recommendations.push(
         language === "ar"
@@ -266,13 +310,6 @@ export default function AIReportPage() {
         language === "ar"
           ? `غياب الوجه المتكرر (${c(18)} مرات) — قد يشير إلى وجود شخص آخر`
           : `Frequent face absence (${c(18)} times) — may indicate another person present`
-      )
-    }
-    if (c(21) > 0) {
-      recommendations.push(
-        language === "ar"
-          ? "تم حظر الكاميرا — تحقق من سلامة التسجيل"
-          : "Camera was blocked — verify recording integrity"
       )
     }
     if (recommendations.length === 0) {
@@ -330,6 +367,17 @@ export default function AIReportPage() {
           // Compute AI analysis from real event data
           const realAnalysis = computeAnalysis(evts, selectedSession)
           setAnalysis(realAnalysis)
+
+          // Auto-generate GPT-4o analysis
+          try {
+            setAiAnalysisLoading(true)
+            const aiResult = await getAiProctorAnalysis(String(selectedSession.id))
+            setAiAnalysis2(aiResult)
+          } catch {
+            // Silent fail — user can click Regenerate
+          } finally {
+            setAiAnalysisLoading(false)
+          }
         } else {
           setError(language === "ar" ? "لا توجد بيانات مراقبة" : "No proctoring data found")
         }
@@ -597,7 +645,7 @@ export default function AIReportPage() {
               {/* Analysis Results */}
               {aiAnalysis2 && !aiAnalysisLoading && (
                 <div className="space-y-3">
-                  {/* Risk Level & Confidence */}
+                  {/* Risk Level, Score & Confidence */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{language === "ar" ? "مستوى الخطورة" : "Risk Level"}</span>
                     <Badge variant="outline" className={
@@ -609,10 +657,51 @@ export default function AIReportPage() {
                       {aiAnalysis2.riskLevel}
                     </Badge>
                   </div>
+                  {aiAnalysis2.riskScore != null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{language === "ar" ? "درجة المخاطر" : "Risk Score"}</span>
+                      <span className="text-sm font-bold">{aiAnalysis2.riskScore}/100</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{language === "ar" ? "الثقة" : "Confidence"}</span>
                     <span className="text-sm font-medium">{aiAnalysis2.confidence}%</span>
                   </div>
+
+                  {/* Executive Summary */}
+                  {aiAnalysis2.executiveSummary && (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">{language === "ar" ? "الملخص التنفيذي" : "Executive Summary"}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis2.executiveSummary}</p>
+                    </div>
+                  )}
+
+                  {/* Candidate Profile */}
+                  {aiAnalysis2.candidateProfile && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-500" />
+                        {language === "ar" ? "ملف المرشح" : "Candidate Profile"}
+                      </summary>
+                      <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                        {aiAnalysis2.candidateProfile.name && (
+                          <div><span className="font-medium text-foreground">{language === "ar" ? "الاسم:" : "Name:"}</span> {aiAnalysis2.candidateProfile.name}</div>
+                        )}
+                        {aiAnalysis2.candidateProfile.department && (
+                          <div><span className="font-medium text-foreground">{language === "ar" ? "القسم:" : "Dept:"}</span> {aiAnalysis2.candidateProfile.department}</div>
+                        )}
+                        {aiAnalysis2.candidateProfile.identityVerificationStatus && (
+                          <div><span className="font-medium text-foreground">{language === "ar" ? "التحقق:" : "ID Verification:"}</span> {aiAnalysis2.candidateProfile.identityVerificationStatus}</div>
+                        )}
+                        {aiAnalysis2.candidateProfile.deviceSummary && (
+                          <div className="col-span-2"><span className="font-medium text-foreground">{language === "ar" ? "الجهاز:" : "Device:"}</span> {aiAnalysis2.candidateProfile.deviceSummary}</div>
+                        )}
+                        {aiAnalysis2.candidateProfile.networkSummary && (
+                          <div className="col-span-2"><span className="font-medium text-foreground">{language === "ar" ? "الشبكة:" : "Network:"}</span> {aiAnalysis2.candidateProfile.networkSummary}</div>
+                        )}
+                      </div>
+                    </details>
+                  )}
 
                   {/* Risk Explanation */}
                   <div className="pt-2 border-t">
@@ -620,11 +709,37 @@ export default function AIReportPage() {
                     <p className="text-sm text-muted-foreground leading-relaxed">{aiAnalysis2.riskExplanation}</p>
                   </div>
 
+                  {/* Integrity Verdict */}
+                  {aiAnalysis2.integrityVerdict && (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">{language === "ar" ? "حكم النزاهة" : "Integrity Verdict"}</p>
+                      <div className={`flex items-start gap-1.5 p-2.5 rounded-md border ${
+                        aiAnalysis2.riskLevel === "Critical" || aiAnalysis2.riskLevel === "High"
+                          ? "bg-destructive/5 border-destructive/20"
+                          : aiAnalysis2.riskLevel === "Medium"
+                          ? "bg-amber-500/5 border-amber-500/20"
+                          : "bg-emerald-500/5 border-emerald-500/20"
+                      }`}>
+                        <Shield className={`h-4 w-4 mt-0.5 shrink-0 ${
+                          aiAnalysis2.riskLevel === "Critical" || aiAnalysis2.riskLevel === "High"
+                            ? "text-destructive" : aiAnalysis2.riskLevel === "Medium" ? "text-amber-500" : "text-emerald-500"
+                        }`} />
+                        <p className="text-sm leading-relaxed">{aiAnalysis2.integrityVerdict}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Suspicious Behaviors */}
                   {aiAnalysis2.suspiciousBehaviors?.length > 0 && (
-                    <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1.5">{language === "ar" ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}</p>
-                      <ul className="space-y-1">
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                        {language === "ar" ? "السلوكيات المشبوهة" : "Suspicious Behaviors"}
+                        <Badge variant="outline" className="ms-auto text-[10px] bg-amber-500/10 border-amber-500/20 text-amber-600">
+                          {aiAnalysis2.suspiciousBehaviors.length}
+                        </Badge>
+                      </summary>
+                      <ul className="space-y-1 mt-2">
                         {aiAnalysis2.suspiciousBehaviors.map((behavior, i) => (
                           <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
@@ -632,25 +747,253 @@ export default function AIReportPage() {
                           </li>
                         ))}
                       </ul>
+                    </details>
+                  )}
+
+                  {/* Violation Analysis */}
+                  {aiAnalysis2.violationAnalysis && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-red-500" />
+                        {language === "ar" ? "تحليل المخالفات" : "Violation Analysis"}
+                        {(aiAnalysis2.violationAnalysis.totalViolations ?? 0) > 0 && (
+                          <Badge variant="outline" className="ms-auto text-[10px] bg-red-500/10 border-red-500/20 text-red-600">
+                            {aiAnalysis2.violationAnalysis.totalViolations}
+                          </Badge>
+                        )}
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        {aiAnalysis2.violationAnalysis.thresholdStatus && (
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">{language === "ar" ? "حالة العتبة:" : "Threshold:"}</span> {aiAnalysis2.violationAnalysis.thresholdStatus}
+                          </p>
+                        )}
+                        {aiAnalysis2.violationAnalysis.violationTrend && (
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">{language === "ar" ? "الاتجاه:" : "Trend:"}</span> {aiAnalysis2.violationAnalysis.violationTrend}
+                          </p>
+                        )}
+                        {aiAnalysis2.violationAnalysis.violationBreakdown && aiAnalysis2.violationAnalysis.violationBreakdown.length > 0 && (
+                          <div className="space-y-1.5">
+                            {aiAnalysis2.violationAnalysis.violationBreakdown.map((v, i) => (
+                              <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className={`text-[10px] ${
+                                    v.severity === "Critical" || v.severity === "High" ? "bg-red-500/10 border-red-500/20 text-red-600" :
+                                    v.severity === "Medium" ? "bg-amber-500/10 border-amber-500/20 text-amber-600" :
+                                    "bg-blue-500/10 border-blue-500/20 text-blue-600"
+                                  }`}>{v.severity}</Badge>
+                                  <span className="font-medium">{v.type}</span>
+                                  <span className="text-muted-foreground">×{v.count}</span>
+                                </div>
+                                {v.impact && <span className="text-muted-foreground max-w-[50%] text-end">{v.impact}</span>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Behavior Analysis */}
+                  {aiAnalysis2.behaviorAnalysis && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-indigo-500" />
+                        {language === "ar" ? "تحليل السلوك" : "Behavior Analysis"}
+                      </summary>
+                      <div className="mt-2 space-y-2 text-sm text-muted-foreground">
+                        {aiAnalysis2.behaviorAnalysis.answerPatternSummary && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-0.5">{language === "ar" ? "أنماط الإجابة" : "Answer Patterns"}</p>
+                            <p className="text-xs leading-relaxed">{aiAnalysis2.behaviorAnalysis.answerPatternSummary}</p>
+                          </div>
+                        )}
+                        {aiAnalysis2.behaviorAnalysis.focusBehavior && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-0.5">{language === "ar" ? "سلوك التركيز" : "Focus Behavior"}</p>
+                            <p className="text-xs leading-relaxed">{aiAnalysis2.behaviorAnalysis.focusBehavior}</p>
+                          </div>
+                        )}
+                        {aiAnalysis2.behaviorAnalysis.timingAnalysis && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-0.5">{language === "ar" ? "تحليل التوقيت" : "Timing Analysis"}</p>
+                            <p className="text-xs leading-relaxed">{aiAnalysis2.behaviorAnalysis.timingAnalysis}</p>
+                          </div>
+                        )}
+                        {aiAnalysis2.behaviorAnalysis.suspiciousPatterns && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-0.5">{language === "ar" ? "أنماط مشبوهة" : "Suspicious Patterns"}</p>
+                            <p className="text-xs leading-relaxed">{aiAnalysis2.behaviorAnalysis.suspiciousPatterns}</p>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Session Overview */}
+                  {aiAnalysis2.sessionOverview && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-blue-500" />
+                        {language === "ar" ? "نظرة عامة على الجلسة" : "Session Overview"}
+                      </summary>
+                      <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                        {aiAnalysis2.sessionOverview.duration && (
+                          <div><span className="text-muted-foreground">{language === "ar" ? "المدة:" : "Duration:"}</span> <span className="font-medium">{aiAnalysis2.sessionOverview.duration}</span></div>
+                        )}
+                        {aiAnalysis2.sessionOverview.timeUsage && (
+                          <div><span className="text-muted-foreground">{language === "ar" ? "استخدام الوقت:" : "Time Usage:"}</span> <span className="font-medium">{aiAnalysis2.sessionOverview.timeUsage}</span></div>
+                        )}
+                        {aiAnalysis2.sessionOverview.completionRate && (
+                          <div><span className="text-muted-foreground">{language === "ar" ? "معدل الإنجاز:" : "Completion:"}</span> <span className="font-medium">{aiAnalysis2.sessionOverview.completionRate}</span></div>
+                        )}
+                        {aiAnalysis2.sessionOverview.proctorMode && (
+                          <div><span className="text-muted-foreground">{language === "ar" ? "وضع المراقبة:" : "Proctor Mode:"}</span> <span className="font-medium">{aiAnalysis2.sessionOverview.proctorMode}</span></div>
+                        )}
+                        {aiAnalysis2.sessionOverview.terminationInfo && aiAnalysis2.sessionOverview.terminationInfo !== "N/A" && (
+                          <div className="col-span-2 text-red-600"><span className="font-medium">{language === "ar" ? "الإنهاء:" : "Termination:"}</span> {aiAnalysis2.sessionOverview.terminationInfo}</div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Environment Assessment */}
+                  {aiAnalysis2.environmentAssessment && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <Monitor className="h-4 w-4 text-teal-500" />
+                        {language === "ar" ? "تقييم البيئة" : "Environment Assessment"}
+                        {aiAnalysis2.environmentAssessment.overallEnvironmentRisk && (
+                          <Badge variant="outline" className={`ms-auto text-[10px] ${
+                            aiAnalysis2.environmentAssessment.overallEnvironmentRisk === "High" ? "bg-red-500/10 border-red-500/20 text-red-600" :
+                            aiAnalysis2.environmentAssessment.overallEnvironmentRisk === "Medium" ? "bg-amber-500/10 border-amber-500/20 text-amber-600" :
+                            "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
+                          }`}>{aiAnalysis2.environmentAssessment.overallEnvironmentRisk}</Badge>
+                        )}
+                      </summary>
+                      <div className="mt-2 space-y-1.5 text-xs text-muted-foreground">
+                        {aiAnalysis2.environmentAssessment.webcamStatus && (
+                          <div className="flex items-center gap-2">
+                            <Camera className="h-3 w-3 shrink-0" />
+                            <span className="font-medium text-foreground">{language === "ar" ? "الكاميرا:" : "Webcam:"}</span>
+                            <span>{aiAnalysis2.environmentAssessment.webcamStatus}</span>
+                          </div>
+                        )}
+                        {aiAnalysis2.environmentAssessment.networkStability && (
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-3 w-3 shrink-0" />
+                            <span className="font-medium text-foreground">{language === "ar" ? "الشبكة:" : "Network:"}</span>
+                            <span>{aiAnalysis2.environmentAssessment.networkStability}</span>
+                          </div>
+                        )}
+                        {aiAnalysis2.environmentAssessment.browserCompliance && (
+                          <div className="flex items-center gap-2">
+                            <Laptop className="h-3 w-3 shrink-0" />
+                            <span className="font-medium text-foreground">{language === "ar" ? "المتصفح:" : "Browser:"}</span>
+                            <span>{aiAnalysis2.environmentAssessment.browserCompliance}</span>
+                          </div>
+                        )}
+                        {aiAnalysis2.environmentAssessment.fullscreenCompliance && (
+                          <div className="flex items-center gap-2">
+                            <Monitor className="h-3 w-3 shrink-0" />
+                            <span className="font-medium text-foreground">{language === "ar" ? "ملء الشاشة:" : "Fullscreen:"}</span>
+                            <span>{aiAnalysis2.environmentAssessment.fullscreenCompliance}</span>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Aggravating & Mitigating Factors */}
+                  {((aiAnalysis2.aggravatingFactors && aiAnalysis2.aggravatingFactors.length > 0) || (aiAnalysis2.mitigatingFactors && aiAnalysis2.mitigatingFactors.length > 0)) && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors">
+                        {language === "ar" ? "العوامل المشددة والمخففة" : "Aggravating & Mitigating Factors"}
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        {aiAnalysis2.aggravatingFactors && aiAnalysis2.aggravatingFactors.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-red-600 mb-1">{language === "ar" ? "عوامل مشددة" : "Aggravating Factors"}</p>
+                            <ul className="space-y-0.5">
+                              {aiAnalysis2.aggravatingFactors.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                                  <XCircle className="h-3 w-3 mt-0.5 shrink-0 text-red-400" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {aiAnalysis2.mitigatingFactors && aiAnalysis2.mitigatingFactors.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-emerald-600 mb-1">{language === "ar" ? "عوامل مخففة" : "Mitigating Factors"}</p>
+                            <ul className="space-y-0.5">
+                              {aiAnalysis2.mitigatingFactors.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                                  <CheckCircle2 className="h-3 w-3 mt-0.5 shrink-0 text-emerald-400" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Risk Timeline */}
+                  {aiAnalysis2.riskTimeline && aiAnalysis2.riskTimeline.length > 0 && (
+                    <details className="pt-2 border-t" open>
+                      <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors flex items-center gap-2">
+                        <Timer className="h-4 w-4 text-purple-500" />
+                        {language === "ar" ? "الجدول الزمني للمخاطر" : "Risk Timeline"}
+                        <Badge variant="outline" className="ms-auto text-[10px]">{aiAnalysis2.riskTimeline.length}</Badge>
+                      </summary>
+                      <div className="mt-2 relative">
+                        <div className="absolute start-[7px] top-2 bottom-2 w-0.5 bg-purple-500/20" />
+                        <ul className="space-y-2">
+                          {aiAnalysis2.riskTimeline.map((event, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground ps-0">
+                              <div className="h-3.5 w-3.5 rounded-full bg-purple-500/20 border-2 border-purple-500/40 shrink-0 mt-0.5 z-10" />
+                              <span>{event}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Recommendations */}
+                  {aiAnalysis2.recommendations && aiAnalysis2.recommendations.length > 0 ? (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1.5">{language === "ar" ? "التوصيات" : "Recommendations"}</p>
+                      <div className="space-y-1.5">
+                        {aiAnalysis2.recommendations.map((rec, i) => (
+                          <div key={i} className="flex items-start gap-1.5 p-2 rounded-md bg-purple-500/5 border border-purple-500/10">
+                            <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0 text-purple-500" />
+                            <p className="text-xs text-purple-700 dark:text-purple-300">{rec}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">{language === "ar" ? "التوصية" : "Recommendation"}</p>
+                      <div className="flex items-start gap-1.5 p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
+                        <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
+                        <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis2.recommendation}</p>
+                      </div>
                     </div>
                   )}
 
-                  {/* Recommendation */}
-                  <div className="pt-2 border-t">
-                    <p className="text-sm font-medium mb-1">{language === "ar" ? "التوصية" : "Recommendation"}</p>
-                    <div className="flex items-start gap-1.5 p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
-                      <Shield className="h-4 w-4 mt-0.5 shrink-0 text-purple-500" />
-                      <p className="text-sm text-purple-700 dark:text-purple-300">{aiAnalysis2.recommendation}</p>
-                    </div>
-                  </div>
-
                   {/* Detailed Analysis (collapsible) */}
                   {aiAnalysis2.detailedAnalysis && (
-                    <details className="pt-2 border-t">
+                    <details className="pt-2 border-t" open>
                       <summary className="text-sm font-medium cursor-pointer hover:text-purple-600 transition-colors">
-                        {language === "ar" ? "التحليل التفصيلي" : "Detailed Analysis"}
+                        {language === "ar" ? "التحليل التفصيلي الكامل" : "Full Detailed Analysis"}
                       </summary>
-                      <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis2.detailedAnalysis}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed mt-1.5 whitespace-pre-line">{aiAnalysis2.detailedAnalysis}</p>
                     </details>
                   )}
 
@@ -871,7 +1214,7 @@ export default function AIReportPage() {
             const questionMap = new Map<number, { count: number; times: string[]; text?: string }>()
             for (const evt of answerEvents) {
               try {
-                const meta = evt.metadataJson ? JSON.parse(evt.metadataJson) : {}
+                const meta = evt.metadataJson ? JSON.parse(evt.metadataJson as string) : {}
                 const qId = meta.questionId
                 if (!qId) continue
                 const existing = questionMap.get(qId)
@@ -895,7 +1238,7 @@ export default function AIReportPage() {
             const questionTimes: { qId: number; text?: string; seconds: number }[] = []
             for (let i = 0; i < sortedAnswers.length; i++) {
               try {
-                const meta = sortedAnswers[i].metadataJson ? JSON.parse(sortedAnswers[i].metadataJson) : {}
+                const meta = sortedAnswers[i].metadataJson ? JSON.parse(sortedAnswers[i].metadataJson as string) : {}
                 const qId = meta.questionId
                 if (!qId) continue
                 // Only count first answer per question for time analysis

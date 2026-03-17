@@ -234,9 +234,25 @@ export interface Question {
   isActive: boolean;
   isCalculatorAllowed: boolean;
   createdDate: string;
+  updatedDate?: string | null;
   isDeleted: boolean;
+  explanationEn?: string | null;
+  explanationAr?: string | null;
   options: QuestionOption[];
   attachments: QuestionAttachment[];
+  answerKey?: {
+    id: number;
+    questionId: number;
+    acceptedAnswersJsonEn?: string | null;
+    acceptedAnswersJsonAr?: string | null;
+    caseSensitive?: boolean;
+    trimSpaces?: boolean;
+    normalizeWhitespace?: boolean;
+    rubricTextEn?: string | null;
+    rubricTextAr?: string | null;
+    numericAnswer?: number | null;
+    tolerance?: number | null;
+  } | null;
   optionsCount?: number;
   attachmentsCount?: number;
 }

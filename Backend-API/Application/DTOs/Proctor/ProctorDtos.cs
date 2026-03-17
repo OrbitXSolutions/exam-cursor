@@ -48,6 +48,45 @@ public class ProctorSessionDto
     public ProctorDecisionDto? Decision { get; set; }
     public List<ProctorEventDto> RecentEvents { get; set; } = new();
 
+    // ── Enriched: Candidate Profile ──
+    public string? CandidateEmail { get; set; }
+    public string? CandidateNameAr { get; set; }
+    public string? CandidateRollNo { get; set; }
+    public string? CandidateDepartment { get; set; }
+    public string? CandidatePhone { get; set; }
+
+    // ── Enriched: Exam Details ──
+    public string? ExamTitleAr { get; set; }
+    public int ExamDurationMinutes { get; set; }
+    public decimal ExamPassScore { get; set; }
+    public int ExamMaxAttempts { get; set; }
+    public int ExamTotalQuestions { get; set; }
+    public bool ExamRequireWebcam { get; set; }
+    public bool ExamRequireIdVerification { get; set; }
+    public bool ExamRequireFullscreen { get; set; }
+    public bool ExamPreventCopyPaste { get; set; }
+    public bool ExamBrowserLockdown { get; set; }
+
+    // ── Enriched: Attempt Progress ──
+    public int AttemptNumber { get; set; }
+    public decimal? AttemptTotalScore { get; set; }
+    public bool? AttemptIsPassed { get; set; }
+    public DateTime? AttemptSubmittedAt { get; set; }
+    public DateTime? AttemptStartedAt { get; set; }
+    public int AttemptExtraTimeSeconds { get; set; }
+    public int AttemptTotalAnswered { get; set; }
+    public int AttemptTotalQuestions { get; set; }
+
+    // ── Enriched: Session Duration ──
+    public string? SessionDuration { get; set; }
+    public double SessionDurationMinutes { get; set; }
+
+    // ── Enriched: Identity Verification ──
+    public SessionIdentityVerificationDto? IdentityVerification { get; set; }
+
+    // ── Enriched: Violation Breakdown by Type ──
+    public List<ViolationBreakdownDto> ViolationBreakdown { get; set; } = new();
+
     private static string GetRiskLevel(decimal? score) => score switch
     {
         null => "Unknown",
@@ -56,6 +95,33 @@ public class ProctorSessionDto
         <= 75 => "High",
         _ => "Critical"
     };
+}
+
+/// <summary>
+/// Identity verification summary for session detail
+/// </summary>
+public class SessionIdentityVerificationDto
+{
+    public string Status { get; set; } = string.Empty;
+    public decimal? FaceMatchScore { get; set; }
+    public string? LivenessResult { get; set; }
+    public decimal? RiskScore { get; set; }
+    public DateTime SubmittedAt { get; set; }
+    public string? ReviewedBy { get; set; }
+    public DateTime? ReviewedAt { get; set; }
+    public string? ReviewNotes { get; set; }
+    public string? IdDocumentType { get; set; }
+    public bool IdDocumentUploaded { get; set; }
+}
+
+/// <summary>
+/// Violation count grouped by event type
+/// </summary>
+public class ViolationBreakdownDto
+{
+    public string EventType { get; set; } = string.Empty;
+    public int Count { get; set; }
+    public string Severity { get; set; } = string.Empty;
 }
 
 /// <summary>

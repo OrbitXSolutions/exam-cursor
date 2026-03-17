@@ -37,6 +37,7 @@ import {
   Hash,
   PartyPopper,
   AlertCircle,
+  Info,
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
@@ -267,11 +268,23 @@ export default function ExamOverviewPage() {
             <h2 className="text-xl font-bold mb-2">
               {language === "ar" ? "تم نشر الاختبار!" : "Exam Published!"}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-sm text-muted-foreground mb-4">
               {language === "ar"
                 ? "الاختبار متاح الآن للمرشحين لأدائه."
                 : "The exam is now available for candidates to take."}
             </p>
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-6 w-full">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                {exam?.accessPolicyStatus === "Assigned"
+                  ? (language === "ar"
+                    ? "سياسة الوصول: مُعيّن — يمكن فقط للمرشحين المعينين الوصول إلى هذا الاختبار."
+                    : "Access policy: Assigned — only assigned candidates can access this exam.")
+                  : (language === "ar"
+                    ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
+                    : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
+              </p>
+            </div>
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               onClick={() => setPublishDialogOpen(false)}

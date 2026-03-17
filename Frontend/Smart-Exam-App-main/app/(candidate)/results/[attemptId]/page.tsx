@@ -141,27 +141,6 @@ export default function ResultsPage() {
           </div>
           {showScores && (
             <div className="flex items-center gap-2">
-              {certificate && result?.isPassed && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch(`/api/proxy/Certificate/${certificate.id}/download`, {
-                        headers: { Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("auth_token") : ""}` },
-                      })
-                      const html = await res.text()
-                      const win = window.open("", "_blank")
-                      if (win) win.document.write(html)
-                    } catch {
-                      window.open(`/api/proxy/Certificate/${certificate.id}/download`, "_blank")
-                    }
-                  }}
-                >
-                  <Download className="h-4 w-4 me-2" />
-                  {t("results.downloadCertificate") || "Download Certificate"}
-                </Button>
-              )}
               <Button variant="outline" size="sm" className="bg-transparent">
                 <Share2 className="h-4 w-4 me-2" />
                 {t("results.share")}
@@ -171,7 +150,7 @@ export default function ResultsPage() {
         </div>
       </header>
 
-      <main className="container py-8 max-w-4xl">
+      <main className="container py-8 max-w-2xl mx-auto">
         {/* Just Submitted Banner */}
         {justSubmitted && (
           <Card className="mb-6 border-blue-500/50 bg-blue-500/5">
