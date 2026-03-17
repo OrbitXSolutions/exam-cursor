@@ -27,16 +27,26 @@ import type {
 } from "@/lib/tutorials/tutorial-data"
 
 // ─── Rich Text Parser ─────────────────────────
-// Supports: **bold**, "highlighted", numbered lines (1️⃣ or 1.), bullet lines (- or •), → arrows
+// Supports: **bold**, "highlighted", numbered lines (1️⃣ or 1.), bullet lines (- or •), ✓/✗/❌ markers, pipe tables, → arrows, flow diagrams
 function RichText({ text, className }: { text: string; className?: string }) {
   const lines = text.split("\n")
 
+  // Detect if content has pipe-delimited table
+  const hasTable = lines.filter((l) => l.trim().startsWith("|") && l.trim().endsWith("|")).length >= 2
+
   // Detect if content has list items
   const hasNumberedList = lines.some(
-    (l) => /^[1-9]️⃣/.test(l.trim()) || /^[1-9]\.\s/.test(l.trim()) || /^[1-9]\)\s/.test(l.trim())
+    (l) => /^[1-9]️⃣/.test(l.trim()) || /^[1-9][0-9]?\. /.test(l.trim()) || /^[1-9][0-9]?\)\s/.test(l.trim())
   )
   const hasBulletList = lines.some(
-    (l) => /^[-•●]\s/.test(l.trim()) || /^[✅✏️🟢🟡🔴✨→←▸▹▪▫☑☐]\s?/.test(l.trim())
+    (l) => /^[-•●]\s/.test(l.trim()) || /^[✅✏️🟢🟡🔴✨▸▹▪▫☑☐]\s?/.test(l.trim())
+  )
+  const hasCheckMarkers = lines.some(
+    (l) => /^[✓✗❌]\s/.test(l.trim())
+  )
+  // Detect flow arrows (→ or ←) — lines with 3+ arrows are flow diagrams
+  const hasFlowArrows = lines.some(
+    (l) => (l.match(/[→←]/g) || []).length >= 2
   )
 
   // Inline formatting: **bold** and "highlighted"
@@ -80,8 +90,101 @@ function RichText({ text, className }: { text: string; className?: string }) {
     return parts
   }
 
-  // If only plain text (no lists), render as paragraph
-  if (!hasNumberedList && !hasBulletList) {
+  // Render a flow line: split by → or ← and show as styled flow steps
+  function renderFlowLine(line: string, key: number): React.ReactNode {
+    // Determine arrow direction
+    const isRTLFlow = line.includes("←") && !line.includes("→")
+    const separator = isRTLFlow ? "←" : "→"
+    const segments = line.split(separator).map((s) => s.trim()).filter(Boolean)
+
+    if (segments.length < 2) {
+      return (
+        <p key={key} className="text-sm leading-relaxed">
+          {formatInline(line)}
+        </p>
+      )
+    }
+
+    return (
+      <div key={key} className="flex flex-wrap items-center gap-1.5 py-1">
+        {segments.map((seg, i) => (
+          <span key={i} className="contents">
+            <span className="inline-flex items-center px-2 py-1 rounded-md bg-white/80 dark:bg-white/5 border border-current/10 text-sm font-medium shadow-sm">
+              {formatInline(seg)}
+            </span>
+            {i < segments.length - 1 && (
+              <span className="text-primary/60 mx-0.5">
+                {isRTLFlow ? (
+                  <ArrowLeft className="h-3.5 w-3.5 inline" />
+                ) : (
+                  <ArrowRight className="h-3.5 w-3.5 inline" />
+                )}
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
+  // Render pipe-delimited table
+  if (hasTable) {
+    const tableLines = lines.filter((l) => l.trim().startsWith("|") && l.trim().endsWith("|"))
+    const dataLines = tableLines.filter((l) => !/^\|[\s-|]+\|$/.test(l.trim()))
+    if (dataLines.length >= 2) {
+      const parseRow = (row: string) =>
+        row.split("|").slice(1, -1).map((c) => c.trim())
+      const headers = parseRow(dataLines[0])
+      const rows = dataLines.slice(1).map(parseRow)
+      const nonTableLines = lines.filter(
+        (l) => !(l.trim().startsWith("|") && l.trim().endsWith("|"))
+      ).filter((l) => l.trim())
+      return (
+        <div className={cn("space-y-3", className)}>
+          <div className="rounded-xl border overflow-hidden shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50 border-b">
+                  {headers.map((h, i) => (
+                    <th key={i} className="text-start px-4 py-2.5 font-semibold text-xs uppercase tracking-wider">
+                      {formatInline(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, ri) => (
+                  <tr key={ri} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                    {row.map((cell, ci) => (
+                      <td key={ci} className="px-4 py-3 text-muted-foreground">
+                        {cell.startsWith("✓") ? (
+                          <span className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
+                            <CheckCircle2 className="h-3.5 w-3.5" />{formatInline(cell.replace(/^✓\s*/, ""))}
+                          </span>
+                        ) : cell.startsWith("✗") ? (
+                          <span className="inline-flex items-center gap-1.5 text-red-500 dark:text-red-400 font-medium">
+                            <Circle className="h-3.5 w-3.5" />{formatInline(cell.replace(/^✗\s*/, ""))}
+                          </span>
+                        ) : (
+                          <>{formatInline(cell)}</>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {nonTableLines.length > 0 && nonTableLines.map((l, i) => (
+            <p key={i} className="text-sm text-muted-foreground leading-relaxed">{formatInline(l)}</p>
+          ))}
+        </div>
+      )
+    }
+  }
+
+  // If only plain text (no lists, no flow arrows, no check markers), render as paragraph
+  if (!hasNumberedList && !hasBulletList && !hasFlowArrows && !hasCheckMarkers) {
     return (
       <div className={cn("text-sm text-muted-foreground leading-relaxed", className)}>
         {formatInline(text)}
@@ -143,13 +246,64 @@ function RichText({ text, className }: { text: string; className?: string }) {
     }
 
     // Bullet list: -, •, ●, ✅, ✏️, etc.
-    const bulletMatch = line.match(/^[-•●▪▫]\s+(.+)/) || line.match(/^[✅✏️🟢🟡🔴✨→←▸▹☑☐]\s*(.+)/)
+    const bulletMatch = line.match(/^[-•●▪▫]\s+(.+)/) || line.match(/^[✅✏️🟢🟡🔴✨▸▹☑☐]\s*(.+)/)
     if (bulletMatch) {
       if (!currentList || currentList.type !== "ul") {
         flushList()
         currentList = { type: "ul", items: [] }
       }
       currentList.items.push(<>{formatInline(bulletMatch[1])}</>)
+      return
+    }
+
+    // Check/cross markers: ✓, ✗, ❌
+    const checkMatch = line.match(/^✓\s*(.+)/)
+    const crossMatch = line.match(/^[✗❌]\s*(.+)/)
+    if (checkMatch || crossMatch) {
+      flushList()
+      const isCheck = !!checkMatch
+      const content = isCheck ? checkMatch![1] : crossMatch![1]
+      elements.push(
+        <div key={elKey++} className={cn(
+          "flex items-start gap-2.5 text-sm py-1.5 px-3 rounded-lg my-0.5",
+          isCheck
+            ? "text-green-700 dark:text-green-300 bg-green-50/60 dark:bg-green-950/20"
+            : "text-red-600 dark:text-red-400 bg-red-50/60 dark:bg-red-950/20"
+        )}>
+          {isCheck ? (
+            <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+          ) : (
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          )}
+          <span className="leading-relaxed font-medium">{formatInline(content)}</span>
+        </div>
+      )
+      return
+    }
+
+    // Option-style lines: A) B) C) etc.
+    const optionMatch = line.match(/^\s*[A-Zأ-ي]\)\s+(.+)/)
+    if (optionMatch) {
+      flushList()
+      const hasCorrect = line.includes("✓")
+      const hasWrong = line.includes("✗")
+      elements.push(
+        <div key={elKey++} className={cn(
+          "flex items-center gap-2 text-sm py-1 px-3 rounded-md my-0.5 font-mono",
+          hasCorrect ? "bg-green-50/80 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200/60 dark:border-green-800/40"
+            : hasWrong ? "bg-muted/30 text-muted-foreground"
+            : "text-muted-foreground"
+        )}>
+          <span className="leading-relaxed">{formatInline(line.trim())}</span>
+        </div>
+      )
+      return
+    }
+
+    // Flow arrow line: contains 2+ → or ← arrows (e.g., "Step A → Step B → Step C")
+    if (hasFlowArrows && ((line.match(/→/g) || []).length >= 2 || (line.match(/←/g) || []).length >= 2)) {
+      flushList()
+      elements.push(renderFlowLine(line, elKey++))
       return
     }
 
@@ -181,15 +335,15 @@ function StepCard({ step, stepIndex, language }: { step: TutorialStep; stepIndex
       <div className="flex items-start gap-4">
         {/* Step number */}
         <div className="flex flex-col items-center shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm font-bold shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground text-sm font-bold shadow-md ring-2 ring-primary/20">
             {stepIndex + 1}
           </div>
-          <div className="w-px h-full min-h-4 bg-gradient-to-b from-primary/30 to-border" />
+          <div className="w-0.5 h-full min-h-4 bg-gradient-to-b from-primary/40 via-primary/15 to-transparent rounded-full" />
         </div>
 
         {/* Step Content */}
         <div className="flex-1 pb-8 space-y-3">
-          <h4 className="text-base font-semibold leading-tight pt-1.5">{title}</h4>
+          <h4 className="text-base font-bold leading-tight pt-2 tracking-tight">{title}</h4>
 
           {/* Rich description */}
           <RichText text={description} />
@@ -274,13 +428,13 @@ function StepCard({ step, stepIndex, language }: { step: TutorialStep; stepIndex
 
           {/* Tip */}
           {tip && (
-            <div className="flex items-start gap-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-4 shadow-sm">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 shrink-0">
-                <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-3 rounded-xl bg-gradient-to-r from-blue-50 to-sky-50/60 dark:from-blue-950/40 dark:to-sky-950/20 border border-blue-200/80 dark:border-blue-800/60 p-4 shadow-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-sky-600 shrink-0 shadow-sm">
+                <Lightbulb className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
-                  {language === "ar" ? "نصيحة" : "Tip"}
+                <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1 uppercase tracking-wider">
+                  {language === "ar" ? "نصيحة" : "Pro Tip"}
                 </p>
                 <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">{tip}</p>
               </div>
@@ -289,12 +443,12 @@ function StepCard({ step, stepIndex, language }: { step: TutorialStep; stepIndex
 
           {/* Note / Warning */}
           {note && (
-            <div className="flex items-start gap-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 shadow-sm">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50 shrink-0">
-                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <div className="flex items-start gap-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50/60 dark:from-amber-950/40 dark:to-orange-950/20 border border-amber-200/80 dark:border-amber-800/60 p-4 shadow-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shrink-0 shadow-sm">
+                <AlertTriangle className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1">
+                <p className="text-xs font-bold text-amber-600 dark:text-amber-400 mb-1 uppercase tracking-wider">
                   {language === "ar" ? "ملاحظة مهمة" : "Important"}
                 </p>
                 <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">{note}</p>
@@ -313,17 +467,17 @@ function ExampleCard({ example, language }: { example: TutorialExample; language
   const content = language === "ar" ? example.contentAr : example.contentEn
 
   return (
-    <div className="rounded-xl border bg-gradient-to-br from-green-50/80 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/10 border-green-200 dark:border-green-800 p-5 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50">
-          <CheckCircle2 className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+    <div className="rounded-xl border-2 bg-gradient-to-br from-green-50/90 via-emerald-50/60 to-teal-50/40 dark:from-green-950/30 dark:via-emerald-950/15 dark:to-teal-950/10 border-green-200/80 dark:border-green-800/60 p-5 shadow-sm">
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-sm">
+          <CheckCircle2 className="h-4 w-4 text-white" />
         </div>
-        <h5 className="text-sm font-semibold text-green-700 dark:text-green-400">{title}</h5>
+        <h5 className="text-sm font-bold text-green-800 dark:text-green-300 tracking-tight">{title}</h5>
       </div>
-      <div className="rounded-lg bg-white/60 dark:bg-green-950/30 border border-green-100 dark:border-green-900 p-4">
+      <div className="rounded-lg bg-white/70 dark:bg-green-950/40 border border-green-100/80 dark:border-green-900/50 p-4 backdrop-blur-sm">
         <RichText
           text={content}
-          className="text-green-800 dark:text-green-300 [&_strong]:text-green-900 dark:[&_strong]:text-green-200"
+          className="text-green-800 dark:text-green-300 [&_strong]:text-green-900 dark:[&_strong]:text-green-200 [&_ol]:space-y-2.5 [&_ul]:space-y-2"
         />
       </div>
     </div>
@@ -331,16 +485,25 @@ function ExampleCard({ example, language }: { example: TutorialExample; language
 }
 
 // ─── Section Renderer ─────────────────────────
-export function TutorialSectionRenderer({ section, language }: { section: TutorialSection; language: string }) {
+export function TutorialSectionRenderer({ section, language, sectionIndex }: { section: TutorialSection; language: string; sectionIndex?: number }) {
   const title = language === "ar" ? section.titleAr : section.titleEn
   const description = language === "ar" ? section.descriptionAr : section.descriptionEn
 
   return (
     <div id={`section-${section.id}`} className="scroll-mt-24">
-      <Card className="mb-8 shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle className="text-xl">{title}</CardTitle>
-          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{description}</p>
+      <Card className="mb-8 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+        <CardHeader className="border-b bg-gradient-to-r from-muted/40 via-muted/20 to-transparent pb-5">
+          <div className="flex items-start gap-3">
+            {sectionIndex !== undefined && (
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-bold shadow-sm shrink-0 mt-0.5">
+                {sectionIndex + 1}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-xl tracking-tight">{title}</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{description}</p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-2 pt-6">
           {/* Steps */}
@@ -350,10 +513,12 @@ export function TutorialSectionRenderer({ section, language }: { section: Tutori
 
           {/* Examples */}
           {section.examples && section.examples.length > 0 && (
-            <div className="space-y-3 pt-4 border-t">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <FileText className="h-4 w-4 text-primary" />
-                {language === "ar" ? "أمثلة" : "Examples"}
+            <div className="space-y-3 pt-5 mt-2 border-t-2 border-dashed border-green-200/60 dark:border-green-800/40">
+              <h4 className="text-sm font-bold flex items-center gap-2.5 text-green-700 dark:text-green-400">
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-emerald-600 shadow-sm">
+                  <FileText className="h-3.5 w-3.5 text-white" />
+                </div>
+                {language === "ar" ? "أمثلة عملية" : "Practical Examples"}
               </h4>
               {section.examples.map((example, i) => (
                 <ExampleCard key={i} example={example} language={language} />
@@ -425,8 +590,8 @@ export function TutorialModulePage({ module: mod }: { module: TutorialModule }) 
   return (
     <>
       <TutorialModuleHeader module={mod} language={language} />
-      {mod.sections.map((section) => (
-        <TutorialSectionRenderer key={section.id} section={section} language={language} />
+      {mod.sections.map((section, i) => (
+        <TutorialSectionRenderer key={section.id} section={section} language={language} sectionIndex={i} />
       ))}
     </>
   )

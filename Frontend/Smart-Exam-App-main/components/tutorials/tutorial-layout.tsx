@@ -134,6 +134,18 @@ export function TutorialLayout({ children, currentModuleSlug }: TutorialLayoutPr
     <div className="flex h-[calc(100vh-4rem)]">
       {/* Sidebar TOC */}
       <aside className="hidden lg:flex w-72 flex-col border-e bg-muted/30">
+        {/* Back to User Guide */}
+        <div className="p-3 border-b">
+          <Link
+            href="/tutorials"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+          >
+            {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            <BookOpen className="h-4 w-4" />
+            {language === "ar" ? "دليل المستخدم" : "User Guide"}
+          </Link>
+        </div>
+
         {/* Search */}
         <div className="p-4 border-b">
           <div className="relative">
@@ -251,16 +263,6 @@ export function TutorialLayout({ children, currentModuleSlug }: TutorialLayoutPr
           )}
         </ScrollArea>
 
-        {/* Back to Hub */}
-        <div className="border-t p-3">
-          <Link
-            href="/tutorials"
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            {language === "ar" ? "العودة لدليل المستخدم" : "Back to User Guide"}
-          </Link>
-        </div>
       </aside>
 
       {/* Main Content */}
