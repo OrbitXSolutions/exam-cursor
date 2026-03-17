@@ -391,12 +391,14 @@ app.MapControllers();
 app.MapHub<ProctorHub>("/hubs/proctor");
 
 // Apply pending migrations and seed data in development
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await dbContext.Database.MigrateAsync();
-}
+// Note: Auto-migration disabled to prevent conflicts when DB already has tables.
+// Use 'dotnet ef database update' manually when you need to apply new migrations.
+// if (app.Environment.IsDevelopment())
+// {
+//     using var scope = app.Services.CreateScope();
+//     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     await dbContext.Database.MigrateAsync();
+// }
 
 try
 {

@@ -84,9 +84,10 @@ public class IdentityVerificationController : ControllerBase
     [HttpPost("submit")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Candidate}")]
     [RequestSizeLimit(20 * 1024 * 1024)] // 20MB
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> SubmitVerification(
-        [FromForm] IFormFile selfiePhoto,
-        [FromForm] IFormFile idPhoto,
+        IFormFile selfiePhoto,
+        IFormFile idPhoto,
         [FromForm] string? idDocumentType,
         [FromForm] string? idNumber)
     {

@@ -17,6 +17,7 @@ import {
   Monitor,
   BarChart3,
   Settings,
+  Users,
   X,
 } from "lucide-react"
 import Link from "next/link"
@@ -37,6 +38,7 @@ const iconMap: Record<string, React.ElementType> = {
   Monitor,
   BarChart3,
   Settings,
+  Users,
 }
 
 export default function TutorialsPage() {
@@ -86,21 +88,7 @@ export default function TutorialsPage() {
 
   // Group modules for display: available and coming soon
   const availableModules = allTutorialModules
-  const comingSoonModules = [
-    {
-      titleEn: "Proctor Center",
-      titleAr: "مركز المراقبة",
-      descriptionEn: "Live monitoring, AI proctoring, identity verification, and incident management.",
-      descriptionAr: "المراقبة الحية، المراقبة بالذكاء الاصطناعي، التحقق من الهوية، وإدارة الحوادث.",
-      iconName: "Monitor",
-    },
-    {
-      titleEn: "Settings & Administration",
-      titleAr: "الإعدادات والإدارة",
-      descriptionEn: "User management, roles, permissions, organization settings, and audit logs.",
-      descriptionAr: "إدارة المستخدمين، الأدوار، الصلاحيات، إعدادات المنظمة، وسجلات التدقيق.",
-      iconName: "Settings",
-    },
+  const comingSoonModules: { titleEn: string; titleAr: string; descriptionEn: string; descriptionAr: string; iconName: string }[] = [
   ]
 
   return (
