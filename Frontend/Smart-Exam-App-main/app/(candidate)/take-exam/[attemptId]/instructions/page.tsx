@@ -187,13 +187,13 @@ export default function ExamInstructionsPage() {
         else if (ua.includes("Linux")) os = "Linux"
         else if (ua.includes("Android")) os = "Android"
         else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
-        updateSessionDeviceInfo({
+        await updateSessionDeviceInfo({
           attemptId: session.attemptId,
           browserName: browserName.trim(),
           browserVersion: browserVersion.split(" ")[0],
           operatingSystem: os.trim(),
           screenResolution: `${screen.width}x${screen.height}`,
-        }).catch((e) => console.warn("[v0] Device info update failed:", e))
+        })
       } catch (e) { console.warn("[v0] Device info collection failed:", e) }
       
       // Request fullscreen before navigating to exam page

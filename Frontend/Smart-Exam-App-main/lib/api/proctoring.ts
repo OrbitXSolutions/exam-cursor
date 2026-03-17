@@ -253,6 +253,64 @@ interface ProctorSessionDetailDto {
   attemptStatus?: string;
   attemptIpAddress?: string;
   attemptDeviceInfo?: string;
+  // Enriched fields
+  candidateEmail?: string;
+  candidateNameAr?: string;
+  candidateRollNo?: string;
+  candidateDepartment?: string;
+  candidatePhone?: string;
+  examTitleAr?: string;
+  examDurationMinutes?: number;
+  examPassScore?: number;
+  examMaxAttempts?: number;
+  examTotalQuestions?: number;
+  examRequireWebcam?: boolean;
+  examRequireIdVerification?: boolean;
+  examRequireFullscreen?: boolean;
+  examPreventCopyPaste?: boolean;
+  examBrowserLockdown?: boolean;
+  attemptNumber?: number;
+  attemptTotalScore?: number;
+  attemptIsPassed?: boolean;
+  attemptSubmittedAt?: string;
+  attemptStartedAt?: string;
+  attemptExtraTimeSeconds?: number;
+  attemptTotalAnswered?: number;
+  attemptTotalQuestions?: number;
+  sessionDuration?: string;
+  sessionDurationMinutes?: number;
+  riskLevel?: string;
+  modeName?: string;
+  heartbeatMissedCount?: number;
+  endedAt?: string;
+  identityVerification?: {
+    status: string;
+    faceMatchScore?: number;
+    livenessResult?: string;
+    riskScore?: number;
+    submittedAt: string;
+    reviewedBy?: string;
+    reviewedAt?: string;
+    reviewNotes?: string;
+    idDocumentType?: string;
+    idDocumentUploaded: boolean;
+  };
+  violationBreakdown?: Array<{
+    eventType: string;
+    count: number;
+    severity: string;
+  }>;
+  decision?: {
+    id: number;
+    status: number;
+    statusName: string;
+    decisionReasonEn?: string;
+    decidedBy?: string;
+    deciderName?: string;
+    decidedAt?: string;
+    isFinalized: boolean;
+    wasOverridden: boolean;
+  };
 }
 
 /**
@@ -319,6 +377,54 @@ export async function getSessionDetails(
     attemptStatus: data.attemptStatus,
     attemptIpAddress: data.attemptIpAddress,
     attemptDeviceInfo: data.attemptDeviceInfo,
+    // Enriched: Candidate Profile
+    candidateEmail: data.candidateEmail,
+    candidateNameAr: data.candidateNameAr,
+    candidateRollNo: data.candidateRollNo,
+    candidateDepartment: data.candidateDepartment,
+    candidatePhone: data.candidatePhone,
+    // Enriched: Exam Details
+    examTitleAr: data.examTitleAr,
+    examDurationMinutes: data.examDurationMinutes,
+    examPassScore: data.examPassScore,
+    examMaxAttempts: data.examMaxAttempts,
+    examTotalQuestions: data.examTotalQuestions,
+    examRequireWebcam: data.examRequireWebcam,
+    examRequireIdVerification: data.examRequireIdVerification,
+    examRequireFullscreen: data.examRequireFullscreen,
+    examPreventCopyPaste: data.examPreventCopyPaste,
+    examBrowserLockdown: data.examBrowserLockdown,
+    // Enriched: Attempt Progress
+    attemptNumber: data.attemptNumber,
+    attemptTotalScore: data.attemptTotalScore,
+    attemptIsPassed: data.attemptIsPassed,
+    attemptSubmittedAt: data.attemptSubmittedAt,
+    attemptStartedAt: data.attemptStartedAt,
+    attemptExtraTimeSeconds: data.attemptExtraTimeSeconds,
+    attemptTotalAnswered: data.attemptTotalAnswered,
+    attemptTotalQuestions: data.attemptTotalQuestions,
+    // Enriched: Session Duration & Risk
+    sessionDuration: data.sessionDuration,
+    sessionDurationMinutes: data.sessionDurationMinutes,
+    riskLevel: data.riskLevel,
+    modeName: data.modeName,
+    heartbeatMissedCount: data.heartbeatMissedCount,
+    endedAt: data.endedAt,
+    // Enriched: Identity Verification
+    identityVerification: data.identityVerification,
+    // Enriched: Violation Breakdown
+    violationBreakdown: data.violationBreakdown,
+    // Enriched: Decision
+    decision: data.decision ? {
+      status: data.decision.statusName,
+      statusName: data.decision.statusName,
+      decisionReasonEn: data.decision.decisionReasonEn,
+      decidedBy: data.decision.decidedBy,
+      deciderName: data.decision.deciderName,
+      decidedAt: data.decision.decidedAt,
+      isFinalized: data.decision.isFinalized,
+      wasOverridden: data.decision.wasOverridden,
+    } : undefined,
   };
   let incidents: Incident[] = [];
   try {
@@ -411,6 +517,48 @@ export async function refreshSessionData(sessionId: string): Promise<{
     attemptStatus: data.attemptStatus,
     attemptIpAddress: data.attemptIpAddress,
     attemptDeviceInfo: data.attemptDeviceInfo,
+    // Enriched fields (also populated on refresh)
+    candidateEmail: data.candidateEmail,
+    candidateNameAr: data.candidateNameAr,
+    candidateRollNo: data.candidateRollNo,
+    candidateDepartment: data.candidateDepartment,
+    candidatePhone: data.candidatePhone,
+    examTitleAr: data.examTitleAr,
+    examDurationMinutes: data.examDurationMinutes,
+    examPassScore: data.examPassScore,
+    examMaxAttempts: data.examMaxAttempts,
+    examTotalQuestions: data.examTotalQuestions,
+    examRequireWebcam: data.examRequireWebcam,
+    examRequireIdVerification: data.examRequireIdVerification,
+    examRequireFullscreen: data.examRequireFullscreen,
+    examPreventCopyPaste: data.examPreventCopyPaste,
+    examBrowserLockdown: data.examBrowserLockdown,
+    attemptNumber: data.attemptNumber,
+    attemptTotalScore: data.attemptTotalScore,
+    attemptIsPassed: data.attemptIsPassed,
+    attemptSubmittedAt: data.attemptSubmittedAt,
+    attemptStartedAt: data.attemptStartedAt,
+    attemptExtraTimeSeconds: data.attemptExtraTimeSeconds,
+    attemptTotalAnswered: data.attemptTotalAnswered,
+    attemptTotalQuestions: data.attemptTotalQuestions,
+    sessionDuration: data.sessionDuration,
+    sessionDurationMinutes: data.sessionDurationMinutes,
+    riskLevel: data.riskLevel,
+    modeName: data.modeName,
+    heartbeatMissedCount: data.heartbeatMissedCount,
+    endedAt: data.endedAt,
+    identityVerification: data.identityVerification,
+    violationBreakdown: data.violationBreakdown,
+    decision: data.decision ? {
+      status: data.decision.statusName,
+      statusName: data.decision.statusName,
+      decisionReasonEn: data.decision.decisionReasonEn,
+      decidedBy: data.decision.decidedBy,
+      deciderName: data.decision.deciderName,
+      decidedAt: data.decision.decidedAt,
+      isFinalized: data.decision.isFinalized,
+      wasOverridden: data.decision.wasOverridden,
+    } : undefined,
   };
   let screenshots: Array<{ id: string; timestamp: string; url: string }> = [];
   try {

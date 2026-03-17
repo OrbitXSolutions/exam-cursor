@@ -197,7 +197,7 @@ export default function ExamBuilderPage() {
       setSectionDialogOpen(false)
       loadData()
     } catch (error) {
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
 
@@ -264,7 +264,7 @@ export default function ExamBuilderPage() {
       setTopicDialogOpen(false)
       loadData()
     } catch (error) {
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
 
@@ -276,7 +276,7 @@ export default function ExamBuilderPage() {
       setDeleteTopicDialog(null)
       loadData()
     } catch (error) {
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
 
@@ -322,7 +322,7 @@ export default function ExamBuilderPage() {
       setSelectedQuestions(new Set())
       await loadData()
     } catch (error) {
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     } finally {
       setIsAddingQuestions(false)
     }

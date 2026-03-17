@@ -975,6 +975,7 @@ export const MOCK_EXAM_PREVIEW: ExamPreview = {
     preventScreenCapture: false,
     requireFullscreen: true,
     browserLockdown: false,
+    maxViolationWarnings: 0,
   },
   eligibility: {
     canStartNow: true,

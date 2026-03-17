@@ -167,15 +167,18 @@ const CreateQuestionPage = () => {
   }, [])
 
   useEffect(() => {
-    const typeId = Number(formData.questionTypeId)
+    const currentType = types.find((t) => String(t.id) === formData.questionTypeId)
+    const typeName = currentType?.nameEn?.toLowerCase() || ""
+    const isTF = typeName === "true/false" || typeName === "true_false" || typeName === "truefalse"
+    const isMCQ = typeName.includes("mcq") || typeName.includes("multiple choice")
 
-    if (typeId === QUESTION_TYPE.TRUE_FALSE) {
+    if (isTF) {
       setOptions([
         { id: "true", textEn: "True", textAr: "صحيح", isCorrect: false, order: 0 },
         { id: "false", textEn: "False", textAr: "خطأ", isCorrect: false, order: 1 },
       ])
       setTrueFalseAnswer("")
-    } else if (typeId === QUESTION_TYPE.MCQ_SINGLE || typeId === QUESTION_TYPE.MCQ_MULTI) {
+    } else if (isMCQ) {
       if (options.length === 2 && options[0].id === "true") {
         setOptions([
           { id: "1", textEn: "", textAr: "", isCorrect: false, order: 0 },
@@ -183,7 +186,7 @@ const CreateQuestionPage = () => {
         ])
       }
     }
-  }, [formData.questionTypeId])
+  }, [formData.questionTypeId, types])
 
   useEffect(() => {
     if (formErrors.length > 0 && errorRef.current) {
@@ -229,7 +232,7 @@ const CreateQuestionPage = () => {
 
       // Default to MCQ Single if available
       if (typesData.length > 0) {
-        const mcqType = typesData.find((t) => t.id === QUESTION_TYPE.MCQ_SINGLE) || typesData[0]
+        const mcqType = typesData.find((t) => t.nameEn?.toLowerCase().includes("single") || t.nameEn?.toLowerCase() === "mcq single") || typesData[0]
         setFormData((prev) => ({ ...prev, questionTypeId: String(mcqType.id) }))
       }
 
@@ -266,14 +269,15 @@ const CreateQuestionPage = () => {
   }
 
   const updateOption = (id: string, updates: Partial<OptionInput>) => {
-    const typeId = Number(formData.questionTypeId)
+    const currentType = types.find((t) => String(t.id) === formData.questionTypeId)
+    const isSingle = currentType?.nameEn?.toLowerCase().includes("single") || currentType?.nameEn?.toLowerCase() === "mcq single" || currentType?.nameEn?.toLowerCase() === "mcq_single"
 
     setOptions(
       options.map((opt) => {
         if (opt.id === id) {
           return { ...opt, ...updates }
         }
-        if (updates.isCorrect && typeId === QUESTION_TYPE.MCQ_SINGLE) {
+        if (updates.isCorrect && isSingle) {
           return { ...opt, isCorrect: false }
         }
         return opt
@@ -290,10 +294,12 @@ const CreateQuestionPage = () => {
   }
 
   const selectedTypeId = Number(formData.questionTypeId)
-  const isMCQSingle = selectedTypeId === QUESTION_TYPE.MCQ_SINGLE
-  const isMCQMulti = selectedTypeId === QUESTION_TYPE.MCQ_MULTI
-  const isTrueFalse = selectedTypeId === QUESTION_TYPE.TRUE_FALSE
-  const isSubjective = selectedTypeId === QUESTION_TYPE.SUBJECTIVE
+  const selectedType = types.find((t) => String(t.id) === formData.questionTypeId)
+  const selectedTypeName = selectedType?.nameEn?.toLowerCase() || ""
+  const isMCQSingle = selectedTypeName === "mcq single" || selectedTypeName === "mcq_single" || selectedTypeName === "multiple choice (single)"
+  const isMCQMulti = selectedTypeName === "mcq multi" || selectedTypeName === "mcq_multi" || selectedTypeName === "multiple choice (multi)"
+  const isTrueFalse = selectedTypeName === "true/false" || selectedTypeName === "true_false" || selectedTypeName === "truefalse"
+  const isSubjective = selectedTypeName === "subjective" || selectedTypeName === "essay" || selectedTypeName === "short answer"
 
   const needsOptions = isMCQSingle || isMCQMulti || isTrueFalse
   const isTextBased = isSubjective

@@ -164,7 +164,7 @@ const candidatesNavGroup: NavGroup = {
     { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
     { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
     { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
-    { icon: Wrench, labelKey: "nav.examOperations", href: "/candidates/exam-operations" },
+    // { icon: Wrench, labelKey: "nav.examOperations", href: "/candidates/exam-operations" },
     { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
   ],
 }

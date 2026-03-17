@@ -76,13 +76,6 @@ public class IdentityVerificationService : IIdentityVerificationService
 
         var dtoItems = items.Select(MapToListDto).ToList();
 
-        // ── Sample fallback ──
-        if (totalCount == 0)
-        {
-            dtoItems = GenerateSampleVerifications();
-            totalCount = dtoItems.Count;
-        }
-
         return ApiResponse<PaginatedResponse<IdentityVerificationListDto>>.SuccessResponse(
             new PaginatedResponse<IdentityVerificationListDto>
             {
@@ -97,15 +90,6 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     public async Task<ApiResponse<IdentityVerificationDetailDto>> GetVerificationDetailAsync(int id)
     {
-        // Handle sample IDs
-        if (id < 0)
-        {
-            var sample = GenerateSampleDetail(id);
-            return sample != null
-                ? ApiResponse<IdentityVerificationDetailDto>.SuccessResponse(sample)
-                : ApiResponse<IdentityVerificationDetailDto>.FailureResponse("Not found");
-        }
-
         var entity = await _context.IdentityVerifications
             .Include(v => v.Candidate)
             .Include(v => v.ProctorSession)

@@ -133,7 +133,7 @@ export default function ExamConfigurationPage() {
       }
     } catch (error) {
       console.log("[v0] Configuration page - error:", error)
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     } finally {
       setLoading(false)
     }
@@ -217,8 +217,9 @@ export default function ExamConfigurationPage() {
       setExam(prev => prev ? { ...prev, ...formData } : null)
     } catch (error) {
       console.log("[v0] Save settings error:", error)
-      toast.error(t("common.error"))
-      showResult("error", t("common.error"))
+      const msg = error instanceof Error ? error.message : t("common.error")
+      toast.error(msg)
+      showResult("error", msg)
     } finally {
       setSaving(false)
     }
@@ -240,6 +241,10 @@ export default function ExamConfigurationPage() {
   async function handleSaveInstruction() {
     if (!instructionForm.contentEn.trim()) {
       toast.error(t("exams.instructionContentRequired"))
+      return
+    }
+    if (!instructionForm.contentAr.trim()) {
+      toast.error(language === "ar" ? "المحتوى العربي مطلوب" : "Arabic content is required")
       return
     }
     
@@ -268,8 +273,9 @@ export default function ExamConfigurationPage() {
       setInstructionDialogOpen(false)
     } catch (error) {
       console.log("[v0] Save instruction error:", error)
-      toast.error(t("common.error"))
-      showResult("error", t("common.error"))
+      const msg = error instanceof Error ? error.message : t("common.error")
+      toast.error(msg)
+      showResult("error", msg)
     } finally {
       setSavingInstruction(false)
     }
@@ -288,7 +294,7 @@ export default function ExamConfigurationPage() {
       setInstructions(updatedInstructions.sort((a, b) => a.order - b.order))
     } catch (error) {
       console.log("[v0] Delete instruction error:", error)
-      toast.error(t("common.error"))
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
 
@@ -306,8 +312,9 @@ export default function ExamConfigurationPage() {
       setAccessPolicy(updatedPolicy)
     } catch (error) {
       console.log("[v0] Save access policy error:", error)
-      toast.error(t("common.error"))
-      showResult("error", t("common.error"))
+      const msg = error instanceof Error ? error.message : t("common.error")
+      toast.error(msg)
+      showResult("error", msg)
     } finally {
       setSavingAccessPolicy(false)
     }
@@ -825,7 +832,7 @@ export default function ExamConfigurationPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contentAr">{t("exams.instructionsAr")}</Label>
+              <Label htmlFor="contentAr">{t("exams.instructionsAr")} <span className="text-destructive">*</span></Label>
               <Textarea
                 id="contentAr"
                 value={instructionForm.contentAr}

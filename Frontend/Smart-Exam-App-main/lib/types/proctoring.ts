@@ -35,6 +35,71 @@ export interface LiveSession {
   attemptStatus?: string;
   attemptIpAddress?: string;
   attemptDeviceInfo?: string;
+  // Enriched: Candidate Profile
+  candidateEmail?: string;
+  candidateNameAr?: string;
+  candidateRollNo?: string;
+  candidateDepartment?: string;
+  candidatePhone?: string;
+  // Enriched: Exam Details
+  examTitleAr?: string;
+  examDurationMinutes?: number;
+  examPassScore?: number;
+  examMaxAttempts?: number;
+  examTotalQuestions?: number;
+  examRequireWebcam?: boolean;
+  examRequireIdVerification?: boolean;
+  examRequireFullscreen?: boolean;
+  examPreventCopyPaste?: boolean;
+  examBrowserLockdown?: boolean;
+  // Enriched: Attempt Progress
+  attemptNumber?: number;
+  attemptTotalScore?: number;
+  attemptIsPassed?: boolean;
+  attemptSubmittedAt?: string;
+  attemptStartedAt?: string;
+  attemptExtraTimeSeconds?: number;
+  attemptTotalAnswered?: number;
+  attemptTotalQuestions?: number;
+  // Enriched: Session Duration
+  sessionDuration?: string;
+  sessionDurationMinutes?: number;
+  // Enriched: Identity Verification
+  identityVerification?: {
+    status: string;
+    faceMatchScore?: number;
+    livenessResult?: string;
+    riskScore?: number;
+    submittedAt: string;
+    reviewedBy?: string;
+    reviewedAt?: string;
+    reviewNotes?: string;
+    idDocumentType?: string;
+    idDocumentUploaded: boolean;
+  };
+  // Enriched: Violation Breakdown
+  violationBreakdown?: Array<{
+    eventType: string;
+    count: number;
+    severity: string;
+  }>;
+  // Enriched: Risk Level
+  riskLevel?: string;
+  // Enriched: Decision
+  decision?: {
+    status: string;
+    statusName: string;
+    decisionReasonEn?: string;
+    decidedBy?: string;
+    deciderName?: string;
+    decidedAt?: string;
+    isFinalized: boolean;
+    wasOverridden: boolean;
+  };
+  // Enriched: Mode
+  modeName?: string;
+  heartbeatMissedCount?: number;
+  endedAt?: string;
 }
 
 export interface Incident {
