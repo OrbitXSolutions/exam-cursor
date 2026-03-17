@@ -425,6 +425,7 @@ public class AssessmentService : IAssessmentService
     entity.PreventScreenCapture = dto.PreventScreenCapture;
     entity.RequireFullscreen = dto.RequireFullscreen;
     entity.BrowserLockdown = dto.BrowserLockdown;
+    entity.MaxViolationWarnings = dto.MaxViolationWarnings;
     entity.UpdatedDate = DateTime.UtcNow;
     entity.UpdatedBy = updatedBy;
 
@@ -1660,6 +1661,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       PreventScreenCapture = exam.PreventScreenCapture,
       RequireFullscreen = exam.RequireFullscreen,
       BrowserLockdown = exam.BrowserLockdown,
+      MaxViolationWarnings = exam.MaxViolationWarnings,
       CreatedDate = exam.CreatedDate,
       UpdatedDate = exam.UpdatedDate,
       SectionsCount = exam.Sections?.Count ?? 0,

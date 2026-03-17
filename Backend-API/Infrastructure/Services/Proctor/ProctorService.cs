@@ -176,7 +176,46 @@ public class ProctorService : IProctorService
             return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
         }
 
-        return ApiResponse<ProctorSessionDto>.SuccessResponse(MapToSessionDto(session));
+        var dto = MapToSessionDto(session);
+
+        // Enriched: load exam total questions count (separate query to avoid heavy include)
+        dto.ExamTotalQuestions = await _context.Set<Domain.Entities.Assessment.ExamQuestion>()
+            .CountAsync(q => q.ExamId == session.ExamId);
+
+        // Enriched: load attempt answered questions count
+        if (session.Attempt != null)
+        {
+            dto.AttemptTotalQuestions = await _context.Set<Domain.Entities.Attempt.AttemptQuestion>()
+                .CountAsync(q => q.AttemptId == session.AttemptId);
+            dto.AttemptTotalAnswered = await _context.Set<Domain.Entities.Attempt.AttemptQuestion>()
+                .CountAsync(q => q.AttemptId == session.AttemptId && q.Answers.Any());
+        }
+
+        // Enriched: load identity verification (if exists)
+        var idVerification = await _context.Set<IdentityVerification>()
+            .Where(v => v.ProctorSessionId == sessionId ||
+                       (v.AttemptId == session.AttemptId && v.CandidateId == session.CandidateId))
+            .OrderByDescending(v => v.SubmittedAt)
+            .FirstOrDefaultAsync();
+
+        if (idVerification != null)
+        {
+            dto.IdentityVerification = new SessionIdentityVerificationDto
+            {
+                Status = idVerification.Status.ToString(),
+                FaceMatchScore = idVerification.FaceMatchScore,
+                LivenessResult = idVerification.LivenessResult.ToString(),
+                RiskScore = idVerification.RiskScore,
+                SubmittedAt = idVerification.SubmittedAt,
+                ReviewedBy = idVerification.ReviewedBy,
+                ReviewedAt = idVerification.ReviewedAt,
+                ReviewNotes = idVerification.ReviewNotes,
+                IdDocumentType = idVerification.IdDocumentType,
+                IdDocumentUploaded = idVerification.IdDocumentUploaded,
+            };
+        }
+
+        return ApiResponse<ProctorSessionDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int attemptId, ProctorMode mode)
@@ -1624,7 +1663,7 @@ UploadEvidenceDto dto, string candidateId)
     {
         return await _context.Set<ProctorSession>()
             .Include(s => s.Exam)
-            .Include(s => s.Candidate)
+            .Include(s => s.Candidate).ThenInclude(c => c.Department)
             .Include(s => s.Decision)
             .Include(s => s.Attempt)
             .Include(s => s.Events.OrderByDescending(e => e.OccurredAt).Take(20))
@@ -1870,6 +1909,29 @@ UploadEvidenceDto dto, string candidateId)
             }
         }
 
+        // Calculate session duration
+        var duration = session.EndedAt.HasValue
+            ? session.EndedAt.Value - session.StartedAt
+            : DateTime.UtcNow - session.StartedAt;
+        var durationStr = duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}h {duration.Minutes}m {duration.Seconds}s"
+            : duration.TotalMinutes >= 1
+                ? $"{(int)duration.TotalMinutes}m {duration.Seconds}s"
+                : $"{(int)duration.TotalSeconds}s";
+
+        // Build violation breakdown from events
+        var violationBreakdown = session.Events
+            .Where(e => e.IsViolation && e.EventType != ProctorEventType.Heartbeat)
+            .GroupBy(e => e.EventType)
+            .Select(g => new ViolationBreakdownDto
+            {
+                EventType = g.Key.ToString(),
+                Count = g.Count(),
+                Severity = GetMaxSeverityLabel(g.Max(e => e.Severity))
+            })
+            .OrderByDescending(v => v.Count)
+            .ToList();
+
         return new ProctorSessionDto
         {
             Id = session.Id,
@@ -1905,9 +1967,51 @@ UploadEvidenceDto dto, string candidateId)
             AttemptIpAddress = session.Attempt?.IPAddress,
             AttemptDeviceInfo = session.Attempt?.DeviceInfo,
             Decision = session.Decision != null ? MapToDecisionDto(session.Decision) : null,
-            RecentEvents = session.Events.Select(MapToEventDto).ToList()
+            RecentEvents = session.Events.Select(MapToEventDto).ToList(),
+
+            // Enriched: Candidate Profile
+            CandidateEmail = session.Candidate?.Email,
+            CandidateNameAr = session.Candidate?.FullNameAr,
+            CandidateRollNo = session.Candidate?.RollNo,
+            CandidateDepartment = session.Candidate?.Department?.NameEn,
+            CandidatePhone = session.Candidate?.PhoneNumber,
+
+            // Enriched: Exam Details
+            ExamTitleAr = session.Exam?.TitleAr,
+            ExamDurationMinutes = session.Exam?.DurationMinutes ?? 0,
+            ExamPassScore = session.Exam?.PassScore ?? 0,
+            ExamMaxAttempts = session.Exam?.MaxAttempts ?? 1,
+            ExamTotalQuestions = session.Exam?.Questions?.Count ?? 0,
+            ExamRequireWebcam = session.Exam?.RequireWebcam ?? false,
+            ExamRequireIdVerification = session.Exam?.RequireIdVerification ?? false,
+            ExamRequireFullscreen = session.Exam?.RequireFullscreen ?? false,
+            ExamPreventCopyPaste = session.Exam?.PreventCopyPaste ?? false,
+            ExamBrowserLockdown = session.Exam?.BrowserLockdown ?? false,
+
+            // Enriched: Attempt Progress
+            AttemptNumber = session.Attempt?.AttemptNumber ?? 0,
+            AttemptTotalScore = session.Attempt?.TotalScore,
+            AttemptIsPassed = session.Attempt?.IsPassed,
+            AttemptSubmittedAt = session.Attempt?.SubmittedAt,
+            AttemptStartedAt = session.Attempt?.StartedAt,
+            AttemptExtraTimeSeconds = session.Attempt?.ExtraTimeSeconds ?? 0,
+
+            // Enriched: Session Duration
+            SessionDuration = durationStr,
+            SessionDurationMinutes = Math.Round(duration.TotalMinutes, 1),
+
+            // Enriched: Violation Breakdown
+            ViolationBreakdown = violationBreakdown,
         };
     }
+
+    private static string GetMaxSeverityLabel(byte severity) => severity switch
+    {
+        >= 4 => "Critical",
+        3 => "High",
+        2 => "Medium",
+        _ => "Low"
+    };
 
     private ProctorSessionListDto MapToSessionListDto(ProctorSession session)
     {

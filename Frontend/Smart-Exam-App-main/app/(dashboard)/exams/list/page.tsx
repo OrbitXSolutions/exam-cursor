@@ -77,6 +77,7 @@ export default function ExamsListPage() {
   const [errorMessage, setErrorMessage] = useState("")
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
+  const [publishedExam, setPublishedExam] = useState<Exam | null>(null)
 
   useEffect(() => {
     fetchExams()
@@ -102,6 +103,7 @@ export default function ExamsListPage() {
     try {
       setActionLoading(exam.id)
       await publishExam(exam.id)
+      setPublishedExam(exam)
       setPublishDialogOpen(true)
       fetchExams()
     } catch (error: any) {
@@ -510,9 +512,13 @@ export default function ExamsListPage() {
             <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-6">
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                {language === "ar"
-                  ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
-                  : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy."}
+                {publishedExam?.accessPolicyStatus === "Assigned"
+                  ? (language === "ar"
+                    ? "سياسة الوصول: مُعيّن — يمكن فقط للمرشحين المعينين الوصول إلى هذا الاختبار."
+                    : "Access policy: Assigned — only assigned candidates can access this exam.")
+                  : (language === "ar"
+                    ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
+                    : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
               </p>
             </div>
             <Button

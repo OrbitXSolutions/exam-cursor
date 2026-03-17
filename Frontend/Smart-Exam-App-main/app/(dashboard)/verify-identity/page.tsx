@@ -105,14 +105,20 @@ export default function VerifyIdentityPage() {
         video: { facingMode: "user", width: 640, height: 480 },
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
+      // Set cameraActive first so the video element renders,
+      // then assign srcObject in a useEffect below
       setCameraActive(true)
     } catch {
       setCameraError("Camera access denied. Please allow camera access and try again.")
     }
   }, [])
+
+  // Assign stream to video element after it renders
+  useEffect(() => {
+    if (cameraActive && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+    }
+  }, [cameraActive])
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {

@@ -880,14 +880,24 @@ export default function SessionDetailPage() {
                 <span className="text-muted-foreground">{t("proctor.startedAt")}</span>
                 <span className="font-medium">{formatDateTime(session.startedAt)}</span>
               </div>
+              {session.endedAt && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Ended At</span>
+                  <span className="font-medium">{formatDateTime(session.endedAt)}</span>
+                </div>
+              )}
+              {session.sessionDuration && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Duration</span>
+                  <span className="font-medium">{session.sessionDuration}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("proctor.timeRemaining")}</span>
                 <span className="font-medium">
-                  {session.status === "Active" && session.remainingSeconds != null && session.remainingSeconds > 0
+                  {session.remainingSeconds != null && session.remainingSeconds > 0
                     ? `${Math.ceil(session.remainingSeconds / 60)} min`
-                    : session.status !== "Active"
-                      ? "—"
-                      : "0 min"}
+                    : "—"}
                 </span>
               </div>
               {session.attemptStatus && (
@@ -899,6 +909,23 @@ export default function SessionDetailPage() {
                     session.attemptStatus === "Submitted" ? "default" :
                     "outline"
                   }>{session.attemptStatus}</Badge>
+                </div>
+              )}
+              {session.attemptNumber != null && session.attemptNumber > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Attempt #</span>
+                  <span className="font-medium">{session.attemptNumber}{session.examMaxAttempts ? ` / ${session.examMaxAttempts}` : ""}</span>
+                </div>
+              )}
+              {session.riskLevel && session.riskLevel !== "Unknown" && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Risk Level</span>
+                  <Badge variant="outline" className={
+                    session.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                    session.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
+                    session.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
+                    "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
+                  }>{session.riskLevel}{session.riskScore != null ? ` (${session.riskScore})` : ""}</Badge>
                 </div>
               )}
               {session.terminationReason && (
@@ -914,6 +941,51 @@ export default function SessionDetailPage() {
                   <span className="text-xs">{formatDateTime(session.lastActivity)}</span>
                 </div>
               </div>
+              {session.heartbeatMissedCount != null && session.heartbeatMissedCount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Missed Heartbeats</span>
+                  <Badge variant="outline" className="bg-amber-500/10 border-amber-500/30 text-amber-600 text-xs">
+                    {session.heartbeatMissedCount}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Decision Summary */}
+              {session.decision && (
+                <div className="pt-3 border-t space-y-2">
+                  <p className="text-xs font-medium flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5" />
+                    Proctor Decision
+                  </p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Status</span>
+                    <Badge variant={
+                      session.decision.statusName === "Approved" ? "default" :
+                      session.decision.statusName === "Invalidated" ? "destructive" :
+                      session.decision.statusName === "Flagged" ? "outline" :
+                      "secondary"
+                    } className="text-xs">{session.decision.statusName}</Badge>
+                  </div>
+                  {session.decision.deciderName && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Decided By</span>
+                      <span className="text-xs font-medium">{session.decision.deciderName}</span>
+                    </div>
+                  )}
+                  {session.decision.decidedAt && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Decided At</span>
+                      <span className="text-xs">{formatDateTime(session.decision.decidedAt)}</span>
+                    </div>
+                  )}
+                  {session.decision.decisionReasonEn && (
+                    <p className="text-xs text-muted-foreground bg-muted/50 rounded p-1.5">{session.decision.decisionReasonEn}</p>
+                  )}
+                  {session.decision.wasOverridden && (
+                    <Badge variant="outline" className="text-[10px] bg-amber-500/10 border-amber-500/30 text-amber-600">Overridden</Badge>
+                  )}
+                </div>
+              )}
 
               {/* Browser & Device Info */}
               {(session.browserName || session.operatingSystem || session.ipAddress) && (
@@ -1048,6 +1120,232 @@ export default function SessionDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Candidate Profile */}
+          {(session.candidateEmail || session.candidateRollNo || session.candidateDepartment) && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Candidate Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {session.candidateNameAr && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Name (AR)</span>
+                    <span className="text-xs font-medium" dir="rtl">{session.candidateNameAr}</span>
+                  </div>
+                )}
+                {session.candidateEmail && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Email</span>
+                    <span className="text-xs font-medium truncate max-w-[60%]">{session.candidateEmail}</span>
+                  </div>
+                )}
+                {session.candidateRollNo && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Roll No</span>
+                    <span className="text-xs font-medium">{session.candidateRollNo}</span>
+                  </div>
+                )}
+                {session.candidateDepartment && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Department</span>
+                    <span className="text-xs font-medium">{session.candidateDepartment}</span>
+                  </div>
+                )}
+                {session.candidatePhone && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Phone</span>
+                    <span className="text-xs font-medium">{session.candidatePhone}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Exam Details */}
+          {session.examDurationMinutes != null && session.examDurationMinutes > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Exam Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {session.examTitleAr && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Title (AR)</span>
+                    <span className="text-xs font-medium" dir="rtl">{session.examTitleAr}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Duration</span>
+                  <span className="text-xs font-medium">{session.examDurationMinutes} min</span>
+                </div>
+                {session.examTotalQuestions != null && session.examTotalQuestions > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Total Questions</span>
+                    <span className="text-xs font-medium">{session.examTotalQuestions}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Pass Score</span>
+                  <span className="text-xs font-medium">{session.examPassScore}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Max Attempts</span>
+                  <span className="text-xs font-medium">{session.examMaxAttempts}</span>
+                </div>
+                {/* Security Settings */}
+                <div className="pt-2 border-t space-y-1.5">
+                  <p className="text-xs font-medium mb-1">Security Settings</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {session.examRequireWebcam && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Webcam</Badge>
+                    )}
+                    {session.examRequireIdVerification && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">ID Verification</Badge>
+                    )}
+                    {session.examRequireFullscreen && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Fullscreen</Badge>
+                    )}
+                    {session.examPreventCopyPaste && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">No Copy/Paste</Badge>
+                    )}
+                    {session.examBrowserLockdown && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Browser Lock</Badge>
+                    )}
+                    {!session.examRequireWebcam && !session.examRequireIdVerification && !session.examRequireFullscreen && !session.examPreventCopyPaste && !session.examBrowserLockdown && (
+                      <span className="text-xs text-muted-foreground">No security requirements</span>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Attempt Progress */}
+          {session.attemptTotalQuestions != null && session.attemptTotalQuestions > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  Attempt Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Questions Answered</span>
+                  <span className="text-xs font-medium">
+                    {session.attemptTotalAnswered ?? 0} / {session.attemptTotalQuestions}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full bg-primary transition-all"
+                    style={{ width: `${Math.min(100, ((session.attemptTotalAnswered ?? 0) / session.attemptTotalQuestions) * 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <span>Completion</span>
+                  <span>{Math.round(((session.attemptTotalAnswered ?? 0) / session.attemptTotalQuestions) * 100)}%</span>
+                </div>
+                {session.attemptTotalScore != null && (
+                  <div className="flex justify-between pt-1 border-t">
+                    <span className="text-muted-foreground text-xs">Score</span>
+                    <span className={`text-xs font-bold ${session.attemptIsPassed ? "text-emerald-600" : session.attemptIsPassed === false ? "text-destructive" : ""}`}>
+                      {session.attemptTotalScore}
+                      {session.attemptIsPassed != null && (
+                        <span className="ms-1">{session.attemptIsPassed ? "✓ Passed" : "✗ Failed"}</span>
+                      )}
+                    </span>
+                  </div>
+                )}
+                {session.attemptExtraTimeSeconds != null && session.attemptExtraTimeSeconds > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Extra Time Added</span>
+                    <span className="text-xs font-medium text-amber-600">+{Math.ceil(session.attemptExtraTimeSeconds / 60)} min</span>
+                  </div>
+                )}
+                {session.attemptSubmittedAt && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Submitted At</span>
+                    <span className="text-xs">{formatDateTime(session.attemptSubmittedAt)}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Identity Verification */}
+          {session.identityVerification && (
+            <Card className={
+              session.identityVerification.status === "Rejected" ? "border-destructive/30" :
+              session.identityVerification.status === "Approved" ? "border-emerald-500/30" :
+              ""
+            }>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Identity Verification
+                  <Badge variant="outline" className={`ms-auto text-[10px] ${
+                    session.identityVerification.status === "Approved" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600" :
+                    session.identityVerification.status === "Rejected" ? "bg-destructive/10 border-destructive/30 text-destructive" :
+                    "bg-amber-500/10 border-amber-500/30 text-amber-600"
+                  }`}>{session.identityVerification.status}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {session.identityVerification.faceMatchScore != null && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Face Match Score</span>
+                    <span className={`text-xs font-bold ${
+                      session.identityVerification.faceMatchScore >= 80 ? "text-emerald-600" :
+                      session.identityVerification.faceMatchScore >= 50 ? "text-amber-600" :
+                      "text-destructive"
+                    }`}>{session.identityVerification.faceMatchScore}%</span>
+                  </div>
+                )}
+                {session.identityVerification.livenessResult && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Liveness</span>
+                    <Badge variant="outline" className="text-[10px] h-5">{session.identityVerification.livenessResult}</Badge>
+                  </div>
+                )}
+                {session.identityVerification.idDocumentType && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Document Type</span>
+                    <span className="text-xs font-medium">{session.identityVerification.idDocumentType}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Document Uploaded</span>
+                  <span className="text-xs">{session.identityVerification.idDocumentUploaded ? "✓ Yes" : "✗ No"}</span>
+                </div>
+                {session.identityVerification.riskScore != null && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-xs">Verification Risk</span>
+                    <Badge variant="outline" className={`text-[10px] h-5 ${
+                      session.identityVerification.riskScore <= 20 ? "text-emerald-600 border-emerald-500/30" :
+                      session.identityVerification.riskScore <= 50 ? "text-amber-600 border-amber-500/30" :
+                      "text-destructive border-destructive/30"
+                    }`}>{session.identityVerification.riskScore}</Badge>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground text-xs">Submitted</span>
+                  <span className="text-xs">{formatDateTime(session.identityVerification.submittedAt)}</span>
+                </div>
+                {session.identityVerification.reviewNotes && (
+                  <p className="text-xs text-muted-foreground bg-muted/50 rounded p-1.5 mt-1">{session.identityVerification.reviewNotes}</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* AI Proctor Analysis */}
           <Card className="border-purple-500/20">
             <CardHeader className="pb-3">
@@ -1090,7 +1388,14 @@ export default function SessionDetailPage() {
 
               {aiAnalysis && !aiAnalysisLoading && (
                 <div className="space-y-3">
-                  {/* Risk Level Badge */}
+                  {/* Executive Summary */}
+                  {aiAnalysis.executiveSummary && (
+                    <div className="p-2.5 rounded-md bg-purple-500/5 border border-purple-500/10">
+                      <p className="text-xs leading-relaxed text-purple-700 dark:text-purple-300">{aiAnalysis.executiveSummary}</p>
+                    </div>
+                  )}
+
+                  {/* Risk Level & Risk Score */}
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Risk Level</span>
                     <Badge variant="outline" className={
@@ -1103,10 +1408,18 @@ export default function SessionDetailPage() {
                     </Badge>
                   </div>
 
-                  {/* Confidence */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Confidence</span>
-                    <span className="text-xs font-medium">{aiAnalysis.confidence}%</span>
+                  {/* Risk Score + Confidence */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {aiAnalysis.riskScore != null && (
+                      <div className="p-2 rounded-md bg-muted/50 text-center">
+                        <p className="text-lg font-bold">{aiAnalysis.riskScore}<span className="text-xs font-normal text-muted-foreground">/100</span></p>
+                        <p className="text-[10px] text-muted-foreground">Risk Score</p>
+                      </div>
+                    )}
+                    <div className="p-2 rounded-md bg-muted/50 text-center">
+                      <p className="text-lg font-bold">{aiAnalysis.confidence}<span className="text-xs font-normal text-muted-foreground">%</span></p>
+                      <p className="text-[10px] text-muted-foreground">Confidence</p>
+                    </div>
                   </div>
 
                   {/* Risk Explanation */}
@@ -1115,8 +1428,105 @@ export default function SessionDetailPage() {
                     <p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.riskExplanation}</p>
                   </div>
 
+                  {/* Candidate Profile */}
+                  {aiAnalysis.candidateProfile && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Candidate Profile</summary>
+                      <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+                        {aiAnalysis.candidateProfile.name && <p><span className="font-medium text-foreground">Name:</span> {aiAnalysis.candidateProfile.name}</p>}
+                        {aiAnalysis.candidateProfile.department && <p><span className="font-medium text-foreground">Dept:</span> {aiAnalysis.candidateProfile.department}</p>}
+                        {aiAnalysis.candidateProfile.identityVerificationStatus && <p><span className="font-medium text-foreground">ID Status:</span> {aiAnalysis.candidateProfile.identityVerificationStatus}</p>}
+                        {aiAnalysis.candidateProfile.deviceSummary && <p><span className="font-medium text-foreground">Device:</span> {aiAnalysis.candidateProfile.deviceSummary}</p>}
+                        {aiAnalysis.candidateProfile.networkSummary && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.candidateProfile.networkSummary}</p>}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Session Overview */}
+                  {aiAnalysis.sessionOverview && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Session Overview</summary>
+                      <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+                        {aiAnalysis.sessionOverview.examTitle && <p><span className="font-medium text-foreground">Exam:</span> {aiAnalysis.sessionOverview.examTitle}</p>}
+                        {aiAnalysis.sessionOverview.duration && <p><span className="font-medium text-foreground">Duration:</span> {aiAnalysis.sessionOverview.duration}</p>}
+                        {aiAnalysis.sessionOverview.timeUsage && <p><span className="font-medium text-foreground">Time Usage:</span> {aiAnalysis.sessionOverview.timeUsage}</p>}
+                        {aiAnalysis.sessionOverview.completionRate && <p><span className="font-medium text-foreground">Completion:</span> {aiAnalysis.sessionOverview.completionRate}</p>}
+                        {aiAnalysis.sessionOverview.attemptStatus && <p><span className="font-medium text-foreground">Status:</span> {aiAnalysis.sessionOverview.attemptStatus}</p>}
+                        {aiAnalysis.sessionOverview.proctorMode && <p><span className="font-medium text-foreground">Proctor Mode:</span> {aiAnalysis.sessionOverview.proctorMode}</p>}
+                        {aiAnalysis.sessionOverview.terminationInfo && aiAnalysis.sessionOverview.terminationInfo !== "N/A" && (
+                          <p className="text-destructive"><span className="font-medium">Termination:</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Violation Analysis */}
+                  {aiAnalysis.violationAnalysis && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">
+                        Violation Analysis
+                        {aiAnalysis.violationAnalysis.totalViolations > 0 && (
+                          <Badge variant="outline" className="ms-2 text-[10px] h-4 bg-destructive/10 border-destructive/30 text-destructive">
+                            {aiAnalysis.violationAnalysis.totalViolations}
+                          </Badge>
+                        )}
+                      </summary>
+                      <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
+                        {aiAnalysis.violationAnalysis.thresholdStatus && (
+                          <p><span className="font-medium text-foreground">Threshold:</span> {aiAnalysis.violationAnalysis.thresholdStatus}</p>
+                        )}
+                        {aiAnalysis.violationAnalysis.violationTrend && (
+                          <p><span className="font-medium text-foreground">Trend:</span> {aiAnalysis.violationAnalysis.violationTrend}</p>
+                        )}
+                        {aiAnalysis.violationAnalysis.violationBreakdown && aiAnalysis.violationAnalysis.violationBreakdown.length > 0 && (
+                          <div className="space-y-1 mt-1">
+                            {aiAnalysis.violationAnalysis.violationBreakdown.map((v: any, i: number) => (
+                              <div key={i} className="flex items-center justify-between p-1.5 rounded bg-muted/50">
+                                <span className="text-[11px]">{v.type}</span>
+                                <div className="flex items-center gap-1.5">
+                                  <Badge variant="outline" className="text-[9px] h-4">{v.severity}</Badge>
+                                  <span className="text-[10px] font-medium">x{v.count}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Behavior Analysis */}
+                  {aiAnalysis.behaviorAnalysis && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Behavior Analysis</summary>
+                      <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
+                        {aiAnalysis.behaviorAnalysis.answerPatternSummary && <p><span className="font-medium text-foreground">Answers:</span> {aiAnalysis.behaviorAnalysis.answerPatternSummary}</p>}
+                        {aiAnalysis.behaviorAnalysis.timingAnalysis && <p><span className="font-medium text-foreground">Timing:</span> {aiAnalysis.behaviorAnalysis.timingAnalysis}</p>}
+                        {aiAnalysis.behaviorAnalysis.focusBehavior && <p><span className="font-medium text-foreground">Focus:</span> {aiAnalysis.behaviorAnalysis.focusBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.navigationBehavior && <p><span className="font-medium text-foreground">Navigation:</span> {aiAnalysis.behaviorAnalysis.navigationBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.suspiciousPatterns && <p className="text-amber-600"><span className="font-medium">Suspicious:</span> {aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>}
+                      </div>
+                    </details>
+                  )}
+
+                  {/* Environment Assessment */}
+                  {aiAnalysis.environmentAssessment && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Environment Assessment</summary>
+                      <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+                        {aiAnalysis.environmentAssessment.webcamStatus && <p><span className="font-medium text-foreground">Webcam:</span> {aiAnalysis.environmentAssessment.webcamStatus}</p>}
+                        {aiAnalysis.environmentAssessment.networkStability && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.environmentAssessment.networkStability}</p>}
+                        {aiAnalysis.environmentAssessment.fullscreenCompliance && <p><span className="font-medium text-foreground">Fullscreen:</span> {aiAnalysis.environmentAssessment.fullscreenCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.browserCompliance && <p><span className="font-medium text-foreground">Browser:</span> {aiAnalysis.environmentAssessment.browserCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.overallEnvironmentRisk && (
+                          <p><span className="font-medium text-foreground">Overall Risk:</span> {aiAnalysis.environmentAssessment.overallEnvironmentRisk}</p>
+                        )}
+                      </div>
+                    </details>
+                  )}
+
                   {/* Suspicious Behaviors */}
-                  {aiAnalysis.suspiciousBehaviors.length > 0 && (
+                  {aiAnalysis.suspiciousBehaviors && aiAnalysis.suspiciousBehaviors.length > 0 && (
                     <div className="pt-2 border-t">
                       <p className="text-xs font-medium mb-1.5">Suspicious Behaviors</p>
                       <ul className="space-y-1">
@@ -1130,6 +1540,36 @@ export default function SessionDetailPage() {
                     </div>
                   )}
 
+                  {/* Aggravating & Mitigating Factors */}
+                  {((aiAnalysis.aggravatingFactors && aiAnalysis.aggravatingFactors.length > 0) || (aiAnalysis.mitigatingFactors && aiAnalysis.mitigatingFactors.length > 0)) && (
+                    <div className="pt-2 border-t grid grid-cols-1 gap-2">
+                      {aiAnalysis.aggravatingFactors && aiAnalysis.aggravatingFactors.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium text-destructive mb-1">Aggravating Factors</p>
+                          <ul className="space-y-0.5">
+                            {aiAnalysis.aggravatingFactors.map((f, i) => (
+                              <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
+                                <span className="text-destructive mt-0.5">▲</span> {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {aiAnalysis.mitigatingFactors && aiAnalysis.mitigatingFactors.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-medium text-emerald-600 mb-1">Mitigating Factors</p>
+                          <ul className="space-y-0.5">
+                            {aiAnalysis.mitigatingFactors.map((f, i) => (
+                              <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
+                                <span className="text-emerald-500 mt-0.5">▼</span> {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Recommendation */}
                   <div className="pt-2 border-t">
                     <p className="text-xs font-medium mb-1">Recommendation</p>
@@ -1137,7 +1577,38 @@ export default function SessionDetailPage() {
                       <Shield className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-purple-500" />
                       <p className="text-xs text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
                     </div>
+                    {aiAnalysis.recommendations && aiAnalysis.recommendations.length > 1 && (
+                      <ul className="mt-1.5 space-y-0.5">
+                        {aiAnalysis.recommendations.slice(1).map((r, i) => (
+                          <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
+                            <span className="text-purple-500">•</span> {r}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
+
+                  {/* Integrity Verdict */}
+                  {aiAnalysis.integrityVerdict && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs font-medium mb-1">Integrity Verdict</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed italic">{aiAnalysis.integrityVerdict}</p>
+                    </div>
+                  )}
+
+                  {/* Risk Timeline */}
+                  {aiAnalysis.riskTimeline && aiAnalysis.riskTimeline.length > 0 && (
+                    <details className="pt-2 border-t">
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Risk Timeline</summary>
+                      <ul className="mt-1.5 space-y-0.5">
+                        {aiAnalysis.riskTimeline.map((evt, i) => (
+                          <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1.5">
+                            <span className="text-purple-400">→</span> {evt}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
 
                   {/* Detailed Analysis (collapsible) */}
                   <details className="pt-2 border-t">

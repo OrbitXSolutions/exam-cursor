@@ -222,6 +222,10 @@ public class AttemptService : IAttemptService
         .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Mode == ProctorMode.Soft);
     if (existingProctorSession == null)
     {
+      var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString() ?? "";
+      var (browserName, browserVersion) = ParseBrowser(userAgent);
+      var operatingSystem = ParseOS(userAgent);
+
       var proctorSession = new ProctorSession
       {
         AttemptId = attempt.Id,
@@ -231,7 +235,10 @@ public class AttemptService : IAttemptService
         StartedAt = now,
         Status = ProctorSessionStatus.Active,
         IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
-        UserAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString(),
+        UserAgent = userAgent,
+        BrowserName = browserName,
+        BrowserVersion = browserVersion,
+        OperatingSystem = operatingSystem,
         TotalEvents = 0,
         TotalViolations = 0,
         RiskScore = 0,
@@ -1640,6 +1647,65 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed
     };
+  }
+
+  #endregion
+
+  #region UserAgent Helpers
+
+  private static (string Name, string Version) ParseBrowser(string ua)
+  {
+    if (string.IsNullOrEmpty(ua)) return ("Unknown", "");
+
+    if (ua.Contains("Edg/"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Edg/([\d.]+)");
+      return ("Edge", m.Success ? m.Groups[1].Value : "");
+    }
+    if (ua.Contains("OPR/") || ua.Contains("Opera"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"OPR/([\d.]+)");
+      return ("Opera", m.Success ? m.Groups[1].Value : "");
+    }
+    if (ua.Contains("Chrome/"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Chrome/([\d.]+)");
+      return ("Chrome", m.Success ? m.Groups[1].Value : "");
+    }
+    if (ua.Contains("Firefox/"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Firefox/([\d.]+)");
+      return ("Firefox", m.Success ? m.Groups[1].Value : "");
+    }
+    if (ua.Contains("Safari/") && !ua.Contains("Chrome"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Version/([\d.]+)");
+      return ("Safari", m.Success ? m.Groups[1].Value : "");
+    }
+    return ("Unknown", "");
+  }
+
+  private static string ParseOS(string ua)
+  {
+    if (string.IsNullOrEmpty(ua)) return "Unknown";
+
+    if (ua.Contains("Windows NT 10")) return "Windows 10/11";
+    if (ua.Contains("Windows NT 6.3")) return "Windows 8.1";
+    if (ua.Contains("Windows NT 6.1")) return "Windows 7";
+    if (ua.Contains("Windows")) return "Windows";
+    if (ua.Contains("Mac OS X"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Mac OS X ([\d_]+)");
+      return m.Success ? "macOS " + m.Groups[1].Value.Replace('_', '.') : "macOS";
+    }
+    if (ua.Contains("Android"))
+    {
+      var m = System.Text.RegularExpressions.Regex.Match(ua, @"Android ([\d.]+)");
+      return m.Success ? "Android " + m.Groups[1].Value : "Android";
+    }
+    if (ua.Contains("iPhone") || ua.Contains("iPad")) return "iOS";
+    if (ua.Contains("Linux")) return "Linux";
+    return "Unknown";
   }
 
   #endregion

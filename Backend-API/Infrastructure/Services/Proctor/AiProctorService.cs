@@ -87,8 +87,10 @@ public class AiProctorService : IAiProctorService
             // 5. Build event summary for the AI prompt
             var eventSummary = BuildEventSummary(session, attemptEvents, attemptQuestions, idVerification);
 
-            // 6. If no events at all, return a quick response without calling AI
-            if (session.TotalEvents == 0)
+            // 6. Only skip AI if truly zero activity from ALL sources
+            var hasProctorEvents = session.TotalEvents > 0 || (session.Events != null && session.Events.Any());
+            var hasAttemptActivity = attemptEvents.Count > 0 || attemptQuestions.Any(q => q.Answers != null && q.Answers.Any());
+            if (!hasProctorEvents && !hasAttemptActivity)
             {
                 return ApiResponse<AiProctorAnalysisResponseDto>.SuccessResponse(new AiProctorAnalysisResponseDto
                 {
@@ -293,6 +295,32 @@ public class AiProctorService : IAiProctorService
             .Select(e => $"[{e.OccurredAt:HH:mm:ss}] {e.EventType} (Severity: {e.Severity}, Violation: {(e.IsViolation ? "Yes" : "No")})")
             .ToList();
 
+        // --- AttemptEvent Timeline (non-routine events) ---
+        var attemptEventTimeline = attemptEvents
+            .Where(e => e.EventType != AttemptEventType.AnswerSaved
+                     && e.EventType != AttemptEventType.Navigated
+                     && e.EventType != AttemptEventType.WindowFocus)
+            .OrderBy(e => e.OccurredAt)
+            .Take(30)
+            .Select(e =>
+            {
+                var meta = "";
+                if (!string.IsNullOrEmpty(e.MetadataJson))
+                {
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(e.MetadataJson);
+                        if (doc.RootElement.TryGetProperty("source", out var src)) meta += $" source={src}";
+                        if (doc.RootElement.TryGetProperty("avgBrightness", out var br)) meta += $" brightness={br}";
+                        if (doc.RootElement.TryGetProperty("variance", out var va)) meta += $" variance={va}";
+                        if (doc.RootElement.TryGetProperty("faceCount", out var fc)) meta += $" faceCount={fc}";
+                    }
+                    catch { /* ignore */ }
+                }
+                return $"[{e.OccurredAt:HH:mm:ss}] {e.EventType}{meta}";
+            })
+            .ToList();
+
         // --- Risk Snapshots (progression) ---
         var riskSnapshots = session.RiskSnapshots?
             .OrderBy(r => r.CalculatedAt)
@@ -382,6 +410,7 @@ public class AiProctorService : IAiProctorService
             ProctorMode = session.Mode.ToString(),
             // Timeline & progression
             EventTimeline = eventTimeline,
+            AttemptEventTimeline = attemptEventTimeline,
             RiskProgressionTimeline = riskSnapshots,
             SeverityDistribution = severityDistribution,
             // Session timing
@@ -628,6 +657,18 @@ public class AiProctorService : IAiProctorService
             sb.AppendLine();
         }
 
+        // ── 9b. AttemptEvent Timeline (AI detections, tab switches, etc.) ──
+        if (summary.AttemptEventTimeline.Count > 0)
+        {
+            sb.AppendLine("═══════════════════════════════════════");
+            sb.AppendLine("ATTEMPT EVENT TIMELINE (AI detections, security violations, session lifecycle):");
+            sb.AppendLine("═══════════════════════════════════════");
+            sb.AppendLine("These events include CRITICAL AI monitoring detections (CameraBlocked, FaceNotDetected, MultipleFacesDetected, HeadTurnDetected, FaceOutOfFrame) sent from the client-side smart monitoring system:");
+            foreach (var evt in summary.AttemptEventTimeline)
+                sb.AppendLine($"  {evt}");
+            sb.AppendLine();
+        }
+
         // ── 10. Risk Progression ──
         if (summary.RiskProgressionTimeline.Count > 0)
         {
@@ -660,6 +701,10 @@ public class AiProctorService : IAiProctorService
         sb.AppendLine("- If countable violations reached max threshold (auto-termination), the session integrity is severely compromised");
         sb.AppendLine("- Consider whether the exam security settings (fullscreen, lockdown) align with the violations seen");
         sb.AppendLine("- Assess if IP address mismatch between session & attempt could indicate proxy or VPN usage");
+        sb.AppendLine("- CAMERA BLOCKED is a CRITICAL violation: it means the entire webcam feed was dark/covered, face detection and eye tracking are IMPOSSIBLE — this severely compromises proctoring integrity");
+        sb.AppendLine("- FaceNotDetected during a webcam-required exam is a HIGH severity violation — the candidate may have left or someone else may be present");
+        sb.AppendLine("- When CameraBlocked or FaceNotDetected occur, face detection and eye tracking scores should be rated VERY LOW — these are direct integrity failures");
+        sb.AppendLine("- AttemptEvents with source='smart_monitoring' are AI-detected violations from the client-side face detection system — treat them as VERIFIED detections");
         sb.AppendLine("- The risk score (0-100) should reflect the OVERALL integrity risk of the entire session");
         sb.AppendLine("- Provide mitigating factors: things that REDUCE suspicion (e.g., consistent timing, no tab switches)");
         sb.AppendLine("- Provide aggravating factors: things that INCREASE suspicion (e.g., bursts, disconnects + rapid answers)");
@@ -907,6 +952,7 @@ public class AiProctorService : IAiProctorService
         public string ProctorMode { get; set; } = string.Empty;
         // Timeline & progression
         public List<string> EventTimeline { get; set; } = new();
+        public List<string> AttemptEventTimeline { get; set; } = new();
         public List<string> RiskProgressionTimeline { get; set; } = new();
         public Dictionary<int, int> SeverityDistribution { get; set; } = new();
         // Session timing

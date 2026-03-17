@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getQuestionById, deleteQuestion } from "@/lib/api/question-bank"
 import type { Question } from "@/lib/types"
-import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2, Calculator } from "lucide-react"
+import { ArrowLeft, Edit, Check, X, FileImage, Calendar, Clock, Trash2, Calculator, BookOpen, FileText } from "lucide-react"
 import { toast } from "sonner"
 
 // Dynamically import the create page component
@@ -357,6 +357,65 @@ export default function QuestionDetailPage() {
                         )}
                       </div>
                     ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Model Answer / Rubric (Subjective Questions) */}
+            {question.answerKey && (question.answerKey.rubricTextEn || question.answerKey.rubricTextAr) && (
+              <Card className="border-blue-500/30 bg-blue-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    {language === "ar" ? "الإجابة النموذجية / معيار التقييم" : "Model Answer / Rubric"}
+                  </CardTitle>
+                  <CardDescription>
+                    {language === "ar" ? "الإجابة المرجعية المستخدمة للتصحيح" : "Reference answer used for grading"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {question.answerKey.rubricTextEn && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">English</p>
+                      <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-background p-4 whitespace-pre-wrap">
+                        {question.answerKey.rubricTextEn}
+                      </div>
+                    </div>
+                  )}
+                  {question.answerKey.rubricTextAr && (
+                    <div dir="rtl">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">العربية</p>
+                      <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-background p-4 whitespace-pre-wrap">
+                        {question.answerKey.rubricTextAr}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Explanation */}
+            {(question.explanationEn || question.explanationAr) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    {language === "ar" ? "الشرح" : "Explanation"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {question.explanationEn && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">English</p>
+                      <p className="leading-relaxed whitespace-pre-wrap">{question.explanationEn}</p>
+                    </div>
+                  )}
+                  {question.explanationAr && (
+                    <div dir="rtl">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">العربية</p>
+                      <p className="leading-relaxed whitespace-pre-wrap">{question.explanationAr}</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
