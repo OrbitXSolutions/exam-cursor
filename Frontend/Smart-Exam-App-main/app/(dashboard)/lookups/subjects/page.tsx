@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, BookOpen, Loader2 } from "lucide-react"
 import {
@@ -152,7 +153,7 @@ function SubjectsContent() {
             </p>
           </div>
           <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {language === "ar" ? "إضافة مادة" : "Add Subject"}
           </Button>
         </div>
@@ -161,12 +162,12 @@ function SubjectsContent() {
           <CardContent className="p-6">
             <div className="mb-4 flex items-center gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className={cn("absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground", language === "ar" ? "right-3" : "left-3")} />
                 <Input
                   placeholder={language === "ar" ? "البحث عن مادة..." : "Search subjects..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className={language === "ar" ? "pr-10" : "pl-10"}
                 />
               </div>
             </div>
@@ -222,14 +223,14 @@ function SubjectsContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(subject)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteClick(subject)}
                               className="text-destructive focus:text-destructive"
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -288,7 +289,7 @@ function SubjectsContent() {
                 {language === "ar" ? "إلغاء" : "Cancel"}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {dialogMode === "create"
                   ? language === "ar"
                     ? "إنشاء"
@@ -319,7 +320,7 @@ function SubjectsContent() {
                 disabled={deleting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {deleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {language === "ar" ? "حذف" : "Delete"}
               </AlertDialogAction>
             </AlertDialogFooter>

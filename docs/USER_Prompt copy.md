@@ -23,12 +23,7 @@ Taks2:
 In Candidate Video or Screen Streaming or Proctor Report
 Dispaly the attempt/events and logs/alert and screenshots of candidate in this attempt.
 
-Rules:
-
-- You may ask questions at any time.
-- Do not change any style or color till confirm with me.
-- Working on the task only.
-- After finish the task give me summary Output
+ 
 - Use minimal request API as ()
 - Do not change view details / score card Pages.
 

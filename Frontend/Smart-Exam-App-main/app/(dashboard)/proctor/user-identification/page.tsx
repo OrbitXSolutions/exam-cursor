@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -171,7 +172,7 @@ export default function UserIdentificationPage() {
       setTotalCount(result.totalCount ?? 0)
       setTotalPages(result.totalPages ?? Math.ceil((result.totalCount ?? 0) / pageSize))
     } catch {
-      toast.error("Failed to load verifications")
+      toast.error(localizeText("Failed to load verifications", "فشل تحميل التحققات", language))
     } finally {
       setLoading(false)
     }
@@ -229,7 +230,7 @@ export default function UserIdentificationPage() {
       setActionDialogOpen(false)
       fetchData()
     } catch {
-      toast.error("Failed to apply action")
+      toast.error(localizeText("Failed to apply action", "فشل تطبيق الإجراء", language))
     } finally {
       setActionLoading(false)
     }
@@ -257,7 +258,7 @@ export default function UserIdentificationPage() {
       setSelectedIds(new Set())
       fetchData()
     } catch {
-      toast.error("Bulk action failed")
+      toast.error(localizeText("Bulk action failed", "فشل الإجراء الجماعي", language))
     } finally {
       setBulkLoading(false)
     }
@@ -279,7 +280,7 @@ export default function UserIdentificationPage() {
     setNotifyLoading(true)
     // Simulate sending notification (in production, this would call an API)
     await new Promise(res => setTimeout(res, 1000))
-    toast.success(`Notification sent to ${notifyTargetName} via ${notifyMethod === "email" ? "Email" : "SMS"}`)
+    toast.success(language === "ar" ? `تم إرسال الإشعار إلى ${notifyTargetName} عبر ${notifyMethod === "email" ? "البريد الإلكتروني" : "الرسائل القصيرة"}` : `Notification sent to ${notifyTargetName} via ${notifyMethod === "email" ? "Email" : "SMS"}`)
     setNotifyDialogOpen(false)
     setNotifyLoading(false)
   }
@@ -492,7 +493,7 @@ export default function UserIdentificationPage() {
                               )}
                               <DropdownMenuItem onClick={() => openNotify(item.candidateName)}>
                                 <FileText className="h-4 w-4 me-2 text-blue-500" />
-                                Send Notification
+                                {language === "ar" ? "إرسال إشعار" : "Send Notification"}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -574,7 +575,7 @@ export default function UserIdentificationPage() {
                   )}
                   {detail.idDocumentType && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Type: {detail.idDocumentType}
+                      {language === "ar" ? `النوع: ${detail.idDocumentType}` : `Type: ${detail.idDocumentType}`}
                     </p>
                   )}
                 </div>
@@ -819,7 +820,7 @@ export default function UserIdentificationPage() {
       <Dialog open={notifyDialogOpen} onOpenChange={setNotifyDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Send Notification</DialogTitle>
+            <DialogTitle>{language === "ar" ? "إرسال إشعار" : "Send Notification"}</DialogTitle>
             <DialogDescription>
               Send a notification to <strong>{notifyTargetName}</strong> regarding their identity verification.
             </DialogDescription>

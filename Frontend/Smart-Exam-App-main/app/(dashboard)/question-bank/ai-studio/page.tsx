@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -129,7 +130,7 @@ export default function AiStudioPage() {
       setSubjects(subjectsRes?.items || [])
     } catch (err) {
       console.error("Failed to load lookups:", err)
-      toast.error("Failed to load form data")
+      toast.error(localizeText("Failed to load form data", "فشل تحميل بيانات النموذج", language))
     } finally {
       setIsLoadingLookups(false)
     }
@@ -147,11 +148,11 @@ export default function AiStudioPage() {
   const handleGenerate = async () => {
     // Validate
     if (!formData.subjectId) {
-      toast.error("Please select a subject")
+      toast.error(localizeText("Please select a subject", "يرجى اختيار مادة", language))
       return
     }
     if (!formData.questionTypeId) {
-      toast.error("Please select a question type")
+      toast.error(localizeText("Please select a question type", "يرجى اختيار نوع السؤال", language))
       return
     }
 
@@ -174,10 +175,10 @@ export default function AiStudioPage() {
         questionTypeName: result.questionTypeName,
       })
       setCurrentStep("review")
-      toast.success(`Generated ${editableQuestions.length} questions successfully!`)
+      toast.success(localizeText(`Generated ${editableQuestions.length} questions successfully!`, `تم توليد ${editableQuestions.length} سؤال بنجاح!`, language))
     } catch (err: any) {
       console.error("Generation failed:", err)
-      toast.error(err?.message || "Failed to generate questions. Please try again.")
+      toast.error(err?.message || localizeText("Failed to generate questions. Please try again.", "فشل توليد الأسئلة. يرجى المحاولة مرة أخرى.", language))
     } finally {
       setIsGenerating(false)
     }
@@ -246,7 +247,7 @@ export default function AiStudioPage() {
   const saveSelectedQuestions = async () => {
     const selected = generatedQuestions.filter((q) => q._selected && !q._saved)
     if (selected.length === 0) {
-      toast.error("No questions selected to save")
+      toast.error(localizeText("No questions selected to save", "لم يتم تحديد أسئلة للحفظ", language))
       return
     }
 
@@ -295,7 +296,7 @@ export default function AiStudioPage() {
       } catch (err: any) {
         console.error(`Failed to save question: ${question._id}`, err)
         updateQuestion(question._id, { _saving: false })
-        toast.error(`Failed to save a question: ${err?.message || "Unknown error"}`)
+        toast.error(localizeText(`Failed to save a question: ${err?.message || "Unknown error"}`, `فشل حفظ سؤال: ${err?.message || "Unknown error"}`, language))
       }
     }
 
@@ -339,7 +340,7 @@ export default function AiStudioPage() {
         <div className="mx-auto max-w-4xl">
           <Button variant="ghost" asChild className="mb-6">
             <Link href="/question-bank">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="me-2 h-4 w-4" />
               {t("common.back")}
             </Link>
           </Button>
@@ -464,9 +465,9 @@ export default function AiStudioPage() {
                     ))}
                     {types.length === 0 && (
                       <>
-                        <SelectItem value="1">MCQ - Single Answer</SelectItem>
-                        <SelectItem value="2">MCQ - Multiple Answers</SelectItem>
-                        <SelectItem value="3">True / False</SelectItem>
+                        <SelectItem value="1">{language === "ar" ? "اختيار متعدد - إجابة واحدة" : "MCQ - Single Answer"}</SelectItem>
+                        <SelectItem value="2">{language === "ar" ? "اختيار متعدد - إجابات متعددة" : "MCQ - Multiple Answers"}</SelectItem>
+                        <SelectItem value="3">{language === "ar" ? "صح / خطأ" : "True / False"}</SelectItem>
                       </>
                     )}
                   </SelectContent>
@@ -557,8 +558,8 @@ export default function AiStudioPage() {
             <div className="flex items-center justify-between mt-8 pt-6 border-t">
               <Button variant="ghost" asChild>
                 <Link href="/question-bank">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  {language === "ar" ? "العودة" : "Back to Question Bank"}
+                  <ArrowLeft className="me-2 h-4 w-4" />
+                  {language === "ar" ? "العودة إلى بنك الأسئلة" : "Back to Question Bank"}
                 </Link>
               </Button>
               <Button
@@ -569,12 +570,12 @@ export default function AiStudioPage() {
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="me-2 h-5 w-5 animate-spin" />
                     {language === "ar" ? "جاري التوليد..." : "Generating..."}
                   </>
                 ) : (
                   <>
-                    <Sparkles className="mr-2 h-5 w-5" />
+                    <Sparkles className="me-2 h-5 w-5" />
                     {language === "ar" ? "توليد الأسئلة" : "Generate Questions"}
                   </>
                 )}
@@ -599,7 +600,7 @@ export default function AiStudioPage() {
                   ? `تم توليد ${generatedQuestions.length} أسئلة — ${generationInfo.questionTypeName} — ${generationInfo.subjectName}${generationInfo.topicName ? ` / ${generationInfo.topicName}` : ""}`
                   : `Generated ${generatedQuestions.length} ${generationInfo.questionTypeName} questions — ${generationInfo.subjectName}${generationInfo.topicName ? ` / ${generationInfo.topicName}` : ""}`
                 }
-                <span className="ml-2 text-xs opacity-60">({generationInfo.model})</span>
+                <span className="ms-2 text-xs opacity-60">({generationInfo.model})</span>
               </AlertDescription>
             </Alert>
           )}
@@ -609,8 +610,8 @@ export default function AiStudioPage() {
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" onClick={toggleSelectAll}>
                 {generatedQuestions.every((q) => q._selected)
-                  ? <><X className="mr-1.5 h-3.5 w-3.5" />{language === "ar" ? "إلغاء الكل" : "Deselect All"}</>
-                  : <><Check className="mr-1.5 h-3.5 w-3.5" />{language === "ar" ? "تحديد الكل" : "Select All"}</>
+                  ? <><X className="me-1.5 h-3.5 w-3.5" />{language === "ar" ? "إلغاء الكل" : "Deselect All"}</>
+                  : <><Check className="me-1.5 h-3.5 w-3.5" />{language === "ar" ? "تحديد الكل" : "Select All"}</>
                 }
               </Button>
               <span className="text-sm text-muted-foreground">
@@ -624,7 +625,7 @@ export default function AiStudioPage() {
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={handleRegenerate}>
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="me-2 h-4 w-4" />
                 {language === "ar" ? "إعادة التوليد" : "Re-generate"}
               </Button>
               <Button
@@ -634,12 +635,12 @@ export default function AiStudioPage() {
               >
                 {isSavingAll ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                     {language === "ar" ? "جاري الحفظ..." : "Saving..."}
                   </>
                 ) : (
                   <>
-                    <Save className="mr-2 h-4 w-4" />
+                    <Save className="me-2 h-4 w-4" />
                     {language === "ar" ? `حفظ ${selectedCount} سؤال` : `Save ${selectedCount} Question${selectedCount !== 1 ? "s" : ""}`}
                   </>
                 )}
@@ -700,12 +701,12 @@ export default function AiStudioPage() {
                 setGenerationInfo(null)
                 setSavedCount(0)
               }}>
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Sparkles className="me-2 h-4 w-4" />
                 {language === "ar" ? "توليد المزيد" : "Generate More"}
               </Button>
               <Button asChild>
                 <Link href="/question-bank">
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Eye className="me-2 h-4 w-4" />
                   {language === "ar" ? "عرض بنك الأسئلة" : "View Question Bank"}
                 </Link>
               </Button>
@@ -742,12 +743,12 @@ function QuestionCard({
   const isSaved = question._saved
   const isSaving = question._saving
 
-  const difficultyLabel = question.difficultyLevel === 1 ? "Easy" : question.difficultyLevel === 2 ? "Medium" : "Hard"
+  const difficultyLabel = question.difficultyLevel === 1 ? (language === "ar" ? "سهل" : "Easy") : question.difficultyLevel === 2 ? (language === "ar" ? "متوسط" : "Medium") : (language === "ar" ? "صعب" : "Hard")
   const difficultyColor = question.difficultyLevel === 1 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
     : question.difficultyLevel === 2 ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
     : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
 
-  const typeLabel = question.questionTypeId === 1 ? "MCQ Single" : question.questionTypeId === 2 ? "MCQ Multi" : "True/False"
+  const typeLabel = question.questionTypeId === 1 ? (language === "ar" ? "اختيار متعدد - إجابة واحدة" : "MCQ Single") : question.questionTypeId === 2 ? (language === "ar" ? "اختيار متعدد - إجابات متعددة" : "MCQ Multi") : (language === "ar" ? "صح / خطأ" : "True/False")
 
   return (
     <Card className={`transition-all ${isSaved ? "border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20" : question._selected ? "border-purple-200 dark:border-purple-800" : "opacity-60"}`}>
@@ -768,15 +769,15 @@ function QuestionCard({
                 </span>
                 <Badge variant="outline" className="text-xs">{typeLabel}</Badge>
                 <Badge variant="outline" className={`text-xs ${difficultyColor}`}>{difficultyLabel}</Badge>
-                <Badge variant="outline" className="text-xs">{question.points} pts</Badge>
+                <Badge variant="outline" className="text-xs">{question.points} {language === "ar" ? "نقاط" : "pts"}</Badge>
                 {isSaved && (
                   <Badge className="bg-green-600 text-white text-xs">
-                    <Check className="mr-1 h-3 w-3" /> {language === "ar" ? "تم الحفظ" : "Saved"}
+                    <Check className="me-1 h-3 w-3" /> {language === "ar" ? "تم الحفظ" : "Saved"}
                   </Badge>
                 )}
                 {isSaving && (
                   <Badge className="bg-blue-600 text-white text-xs">
-                    <Loader2 className="mr-1 h-3 w-3 animate-spin" /> {language === "ar" ? "جاري الحفظ" : "Saving"}
+                    <Loader2 className="me-1 h-3 w-3 animate-spin" /> {language === "ar" ? "جاري الحفظ" : "Saving"}
                   </Badge>
                 )}
               </div>
@@ -811,7 +812,7 @@ function QuestionCard({
         {question._editing ? (
           <div className="space-y-3 mb-4">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Question (English)</Label>
+              <Label className="text-xs text-muted-foreground">{language === "ar" ? "السؤال (بالإنجليزية)" : "Question (English)"}</Label>
               <Textarea
                 value={question.bodyEn}
                 onChange={(e) => onUpdate({ bodyEn: e.target.value })}
@@ -819,7 +820,7 @@ function QuestionCard({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Question (Arabic)</Label>
+              <Label className="text-xs text-muted-foreground">{language === "ar" ? "السؤال (بالعربية)" : "Question (Arabic)"}</Label>
               <Textarea
                 value={question.bodyAr}
                 onChange={(e) => onUpdate({ bodyAr: e.target.value })}

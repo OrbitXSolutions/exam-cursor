@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { translateServerMessage } from "@/lib/i18n/runtime"
 import {
   getExamPreview,
   startExam,
@@ -21,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { ArrowLeft, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
+import { ArrowLeft, ArrowRight, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
 
 // Helper function to get localized field
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -46,7 +47,7 @@ interface ReadyCheckStatus {
 export default function ExamInstructionsPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const examId = Number.parseInt(attemptId, 10)
-  const { t, language, setLanguage } = useI18n()
+  const { t, dir, language, setLanguage } = useI18n()
   const router = useRouter()
   const [examPreview, setExamPreview] = useState<ExamPreview | null>(null)
   const [loading, setLoading] = useState(true)
@@ -125,6 +126,9 @@ export default function ExamInstructionsPage() {
     }
   }, [examPreview])
 
+  const translateReason = (reason?: string | null) =>
+    reason ? translateServerMessage(reason, language) : t("common.errorOccurred")
+
   async function loadExamPreview() {
     try {
       if (Number.isNaN(examId)) {
@@ -151,7 +155,7 @@ export default function ExamInstructionsPage() {
     }
 
     if (!examPreview?.eligibility.canStartNow) {
-      toast.error(examPreview?.eligibility.reasons[0] || t("common.errorOccurred"))
+      toast.error(translateReason(examPreview?.eligibility.reasons[0]))
       return
     }
 
@@ -221,7 +225,10 @@ export default function ExamInstructionsPage() {
       router.push(`/take-exam/${session.attemptId}`)
     } catch (error: unknown) {
       console.error("[v0] Error starting exam:", error)
-      const errorMessage = error instanceof Error ? error.message : t("common.errorOccurred")
+      const errorMessage =
+        error instanceof Error
+          ? translateServerMessage(error.message, language)
+          : t("common.errorOccurred")
       // Set the error state for display
       setAccessCodeError(errorMessage)
       toast.error(errorMessage)
@@ -244,7 +251,7 @@ export default function ExamInstructionsPage() {
         <p className="text-lg">{t("exams.notFound")}</p>
         <Button variant="outline" asChild>
           <Link href="/my-exams">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
             {t("common.back")}
           </Link>
         </Button>
@@ -287,13 +294,13 @@ export default function ExamInstructionsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
+    <div className="min-h-screen bg-muted/30 flex flex-col" dir={dir}>
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container flex h-16 items-center px-6">
           <Button variant="ghost" size="icon" asChild className="me-4">
             <Link href="/my-exams">
-              <ArrowLeft className="h-4 w-4" />
+              {dir === "rtl" ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
             </Link>
           </Button>
           <div>
@@ -635,7 +642,7 @@ export default function ExamInstructionsPage() {
                     <p className="font-medium">{t("instructions.noAttemptsLeft")}</p>
                     <ul className="mt-2 space-y-1 text-sm">
                       {examPreview.eligibility.reasons.map((reason, idx) => (
-                        <li key={idx}>- {reason}</li>
+                        <li key={idx}>- {translateReason(reason)}</li>
                       ))}
                     </ul>
                   </div>

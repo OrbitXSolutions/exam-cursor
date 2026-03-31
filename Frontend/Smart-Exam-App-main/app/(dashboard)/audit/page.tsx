@@ -156,12 +156,12 @@ export default function AuditLogPage() {
           <div className="mb-4 flex flex-col gap-4">
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder={t("audit.searchLogs")}
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                  className="pl-9"
+                  className="ps-9"
                 />
               </div>
               <Select value={actionFilter} onValueChange={(v) => { setActionFilter(v); setPage(1) }}>
@@ -288,7 +288,7 @@ export default function AuditLogPage() {
                         <TableCell>
                           <span className="text-muted-foreground">
                             {log.entityName}
-                            <span className="text-xs ml-1">#{log.entityId}</span>
+                            <span className="text-xs ms-1">#{log.entityId}</span>
                           </span>
                         </TableCell>
                         <TableCell>

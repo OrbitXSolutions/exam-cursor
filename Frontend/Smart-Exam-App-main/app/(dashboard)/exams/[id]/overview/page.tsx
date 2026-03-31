@@ -41,7 +41,7 @@ import {
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
-  return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || "Untitled Exam"
+  return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || (language === "ar" ? "اختبار بدون عنوان" : "Untitled Exam")
 }
 
 function getExamStatus(exam: Exam): string {
@@ -180,7 +180,7 @@ export default function ExamOverviewPage() {
               <span className="text-xs text-muted-foreground">
                 {language === "ar" ? "المدة" : "Duration"}
               </span>
-              <span className="text-sm font-semibold">{exam.durationMinutes || 0} min</span>
+              <span className="text-sm font-semibold">{exam.durationMinutes || 0} {language === "ar" ? "دقيقة" : "min"}</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <Hash className="h-5 w-5 text-muted-foreground" />
@@ -201,7 +201,7 @@ export default function ExamOverviewPage() {
               <span className="text-xs text-muted-foreground">
                 {language === "ar" ? "درجة النجاح" : "Pass Score"}
               </span>
-              <span className="text-sm font-semibold">{exam.passScore || 0} pts</span>
+              <span className="text-sm font-semibold">{exam.passScore || 0} {language === "ar" ? "نقطة" : "pts"}</span>
             </div>
           </div>
         </CardContent>

@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { localizeText } from "@/lib/i18n/runtime"
 import {
   ArrowLeft,
   Save,
@@ -52,7 +53,7 @@ interface ExamSetupContentProps {
 }
 
 export function ExamSetupContent({ examId }: ExamSetupContentProps) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -406,14 +407,14 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     if (!examId) return
     
     if (builderSections.length === 0) {
-      setBuilderError("Please add at least one section")
+      setBuilderError(localizeText("Please add at least one section", "يرجى إضافة قسم واحد على الأقل", language))
       return
     }
 
     // Validate all sections have pickCount >= 1
     const invalidSection = builderSections.find(s => s.pickCount < 1)
     if (invalidSection) {
-      setBuilderError("Pick count must be at least 1 for all sections")
+      setBuilderError(localizeText("Pick count must be at least 1 for all sections", "عدد الأسئلة المختارة يجب أن يكون 1 على الأقل لكل قسم", language))
       return
     }
 
@@ -439,11 +440,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       const result = await saveExamBuilder(examId, request)
       setLoadedBuilderData(result)
 
-      toast.success("Builder configuration saved successfully")
+      toast.success(localizeText("Builder configuration saved successfully", "تم حفظ إعدادات البناء بنجاح", language))
       // Redirect to exam overview page
       router.push(`/exams/${examId}/overview`)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to save builder"
+      const errorMessage = err instanceof Error ? err.message : localizeText("Failed to save builder", "فشل حفظ البناء", language)
       setBuilderError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -519,7 +520,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         const response = await apiClient.post("/Assessment/exams", requestBody) as any
 
         if (response?.success === false) {
-          setError(response.message || "Failed to create exam")
+          setError(response.message || localizeText("Failed to create exam", "فشل إنشاء الاختبار", language))
           return
         }
 
@@ -533,7 +534,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         }
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to save exam"
+      const errorMessage = err instanceof Error ? err.message : localizeText("Failed to save exam", "فشل حفظ الاختبار", language)
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -560,11 +561,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isEditMode ? t("exams.editExam") || "Edit Exam" : t("exams.create")}
+            {isEditMode ? t("exams.editExam") || (language === "ar" ? "تعديل الاختبار" : "Edit Exam") : t("exams.create")}
           </h1>
           <p className="text-muted-foreground mt-1">
             {isEditMode
-              ? t("exams.editExamSubtitle") || "Update exam configuration and build content"
+              ? t("exams.editExamSubtitle") || (language === "ar" ? "تحديث إعدادات الاختبار وبناء المحتوى" : "Update exam configuration and build content")
               : t("exams.createSubtitle")}
           </p>
         </div>
@@ -592,7 +593,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           >
             <Blocks className="h-4 w-4" />
             {t("exams.builder") || "Builder"}
-            {!isEditMode && <Lock className="h-3 w-3 ml-1" />}
+            {!isEditMode && <Lock className="h-3 w-3 ms-1" />}
           </TabsTrigger>
         </TabsList>
 
@@ -870,7 +871,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                   ? t("common.loading") || "Loading..."
                   : isEditMode
                     ? t("common.save") || "Save"
-                    : "Save & Continue"}
+                    : (language === "ar" ? "حفظ ومتابعة" : "Save & Continue")}
               </Button>
             </div>
           </form>
@@ -916,10 +917,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-primary">
                     <Blocks className="h-5 w-5" />
-                    Build Mode
+                    {language === "ar" ? "وضع البناء" : "Build Mode"}
                   </CardTitle>
                   <CardDescription>
-                    Choose how to structure your exam sections
+                    {language === "ar" ? "اختر كيفية هيكلة أقسام الاختبار" : "Choose how to structure your exam sections"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -928,27 +929,27 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                     onValueChange={handleSourceTypeChange}
                     className="flex gap-6"
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <RadioGroupItem value={String(SectionSourceType.Subject)} id="bySubject" />
                       <Label htmlFor="bySubject" className="cursor-pointer">
                         <div className="flex items-center gap-2">
                           <BookOpen className="h-4 w-4" />
-                          By Subject
+                          {language === "ar" ? "حسب المادة" : "By Subject"}
                         </div>
                         <p className="text-xs text-muted-foreground font-normal">
-                          One section per subject
+                          {language === "ar" ? "قسم واحد لكل مادة" : "One section per subject"}
                         </p>
                       </Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <RadioGroupItem value={String(SectionSourceType.Topic)} id="byTopic" />
                       <Label htmlFor="byTopic" className="cursor-pointer">
                         <div className="flex items-center gap-2">
                           <FolderTree className="h-4 w-4" />
-                          By Topic
+                          {language === "ar" ? "حسب الموضوع" : "By Topic"}
                         </div>
                         <p className="text-xs text-muted-foreground font-normal">
-                          One section per topic
+                          {language === "ar" ? "قسم واحد لكل موضوع" : "One section per topic"}
                         </p>
                       </Label>
                     </div>
@@ -961,27 +962,27 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-primary">
                     <BookOpen className="h-5 w-5" />
-                    Select Subjects
+                    {language === "ar" ? "اختيار المواد" : "Select Subjects"}
                   </CardTitle>
                   <CardDescription>
                     {sourceType === SectionSourceType.Subject
-                      ? "Each selected subject will become a section in your exam"
-                      : "Select subjects to see their topics"}
+                      ? (language === "ar" ? "كل مادة يتم اختيارها ستصبح قسماً في اختبارك" : "Each selected subject will become a section in your exam")
+                      : (language === "ar" ? "اختر المواد لعرض مواضيعها" : "Select subjects to see their topics")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {subjects.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <BookOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>No subjects found in Question Bank</p>
-                      <p className="text-sm">Create subjects in the Question Bank first</p>
+                      <p>{language === "ar" ? "لم يتم العثور على مواد في بنك الأسئلة" : "No subjects found in Question Bank"}</p>
+                      <p className="text-sm">{language === "ar" ? "أنشئ المواد في بنك الأسئلة أولاً" : "Create subjects in the Question Bank first"}</p>
                     </div>
                   ) : sourceType === SectionSourceType.Subject ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {subjects.map(subject => (
                         <div
                           key={subject.id}
-                          className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
+                          className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
                             selectedSubjectIds.includes(subject.id)
                               ? "border-primary bg-primary/5"
                               : "border-border hover:border-muted-foreground/50"
@@ -993,10 +994,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                             onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
                           />
                           <Label htmlFor={`subject-${subject.id}`} className="flex-1 cursor-pointer">
-                            <span className="font-medium">{subject.nameEn}</span>
+                            <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
                             {subject.topicsCount !== undefined && (
                               <span className="text-xs text-muted-foreground ms-2">
-                                ({subject.topicsCount} topics)
+                                ({subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"})
                               </span>
                             )}
                           </Label>
@@ -1017,10 +1018,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                                   onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
                                   onClick={(e) => e.stopPropagation()}
                                 />
-                                <span className="font-medium">{subject.nameEn}</span>
+                                <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
                                 {subject.topicsCount !== undefined && (
                                   <Badge variant="outline" className="text-xs">
-                                    {subject.topicsCount} topics
+                                    {subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"}
                                   </Badge>
                                 )}
                               </div>
@@ -1033,7 +1034,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                                   topics.get(subject.id)!.map(topic => (
                                     <div
                                       key={topic.id}
-                                      className={`flex items-center space-x-3 p-2 rounded-md border transition-colors ${
+                                      className={`flex items-center gap-3 p-2 rounded-md border transition-colors ${
                                         selectedTopicIds.includes(topic.id)
                                           ? "border-primary bg-primary/5"
                                           : "border-transparent hover:bg-muted"
@@ -1045,19 +1046,19 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                                         onCheckedChange={(checked) => toggleTopic(topic, checked as boolean)}
                                       />
                                       <Label htmlFor={`topic-${topic.id}`} className="flex-1 cursor-pointer text-sm">
-                                        {topic.nameEn}
+                                        {language === "ar" ? (topic.nameAr || topic.nameEn) : topic.nameEn}
                                       </Label>
                                     </div>
                                   ))
                                 ) : (
                                   <p className="text-sm text-muted-foreground py-2">
-                                    Loading topics...
+                                    {language === "ar" ? "جاري تحميل المواضيع..." : "Loading topics..."}
                                   </p>
                                 )}
                               </div>
                             ) : (
                               <p className="ps-8 text-sm text-muted-foreground py-2">
-                                Select this subject to see its topics
+                                {language === "ar" ? "اختر هذه المادة لعرض مواضيعها" : "Select this subject to see its topics"}
                               </p>
                             )}
                           </AccordionContent>
@@ -1074,10 +1075,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
                       <Settings className="h-5 w-5" />
-                      Configure Sections
+                      {language === "ar" ? "إعداد الأقسام" : "Configure Sections"}
                     </CardTitle>
                     <CardDescription>
-                      Set duration and question count for each section
+                      {language === "ar" ? "تحديد المدة وعدد الأسئلة لكل قسم" : "Set duration and question count for each section"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -1093,18 +1094,18 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                             </div>
                             <div>
                               <h4 className="font-medium">
-                                {section.titleEn}
+                                {language === "ar" ? (section.titleAr || section.titleEn) : section.titleEn}
                               </h4>
                               {section.sourceType === SectionSourceType.Topic && section.subjectNameEn && (
                                 <p className="text-xs text-muted-foreground">
-                                  Subject: {section.subjectNameEn}
+                                  {language === "ar" ? (section.subjectNameAr || section.subjectNameEn) : section.subjectNameEn}
                                 </p>
                               )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="text-xs">
-                              {section.availableQuestionsCount} available
+                              {section.availableQuestionsCount} {language === "ar" ? "متاح" : "available"}
                             </Badge>
                             <Button
                               variant="ghost"
@@ -1119,19 +1120,19 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                         
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor={`title-${section.key}`}>Section Title</Label>
+                            <Label htmlFor={`title-${section.key}`}>{language === "ar" ? "عنوان القسم" : "Section Title"}</Label>
                             <Input
                               id={`title-${section.key}`}
                               value={section.titleEn}
                               onChange={(e) => updateSectionField(section.key, "titleEn", e.target.value)}
-                              placeholder="Section title"
+                              placeholder={language === "ar" ? "عنوان القسم" : "Section title"}
                             />
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor={`duration-${section.key}`}>
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                Duration (minutes)
+                                {language === "ar" ? "المدة (بالدقائق)" : "Duration (minutes)"}
                               </div>
                             </Label>
                             <Input
@@ -1140,14 +1141,14 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                               min="1"
                               value={section.durationMinutes ?? ""}
                               onChange={(e) => updateSectionField(section.key, "durationMinutes", e.target.value ? Number(e.target.value) : null)}
-                              placeholder="Optional"
+                              placeholder={language === "ar" ? "اختياري" : "Optional"}
                             />
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor={`pickCount-${section.key}`}>
                               <div className="flex items-center gap-1">
                                 <Hash className="h-3 w-3" />
-                                Questions to Pick
+                                {language === "ar" ? "عدد الأسئلة المطلوبة" : "Questions to Pick"}
                               </div>
                             </Label>
                             <Input
@@ -1159,7 +1160,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                               onChange={(e) => updateSectionField(section.key, "pickCount", Number(e.target.value) || 1)}
                             />
                             <p className="text-xs text-muted-foreground">
-                              Max: {section.availableQuestionsCount}
+                              {language === "ar" ? "الحد الأقصى" : "Max"}: {section.availableQuestionsCount}
                             </p>
                           </div>
                         </div>
@@ -1178,19 +1179,19 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       <div className="flex items-center gap-6 flex-wrap">
                         <div className="flex items-center gap-2">
                           <FolderTree className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-medium">Sections:</span>
+                          <span className="text-sm font-medium">{language === "ar" ? "الأقسام:" : "Sections:"}</span>
                           <Badge variant="secondary" className="text-sm">{builderSections.length}</Badge>
                         </div>
                         <Separator orientation="vertical" className="h-5" />
                         <div className="flex items-center gap-2">
                           <Hash className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-medium">Total Questions:</span>
+                          <span className="text-sm font-medium">{language === "ar" ? "إجمالي الأسئلة:" : "Total Questions:"}</span>
                           <Badge variant="secondary" className="text-sm">{getTotalQuestionsCount()}</Badge>
                         </div>
                         <Separator orientation="vertical" className="h-5" />
                         <div className="flex items-center gap-2">
                           <Target className="h-4 w-4 text-orange-500" />
-                          <span className="text-sm font-medium">Total Points:</span>
+                          <span className="text-sm font-medium">{language === "ar" ? "إجمالي النقاط:" : "Total Points:"}</span>
                           <Badge variant="outline" className="text-sm font-semibold">{getTotalPoints()}</Badge>
                         </div>
                         <Separator orientation="vertical" className="h-5" />
@@ -1212,11 +1213,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       </div>
                       {formData.passScore > getTotalPoints() && (
                         <p className="text-xs text-destructive">
-                          Must be less than or equal to the exam total points ({getTotalPoints()})
+                          {language === "ar" ? `يجب أن تكون أقل من أو تساوي إجمالي نقاط الاختبار (${getTotalPoints()})` : `Must be less than or equal to the exam total points (${getTotalPoints()})`}
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Must be ≤ total points ({getTotalPoints()})
+                        {language === "ar" ? `يجب أن تكون ≤ إجمالي النقاط (${getTotalPoints()})` : `Must be ≤ total points (${getTotalPoints()})`}
                       </p>
                       {/* Action Buttons */}
                       <div className="flex justify-end gap-3 pt-2 border-t">
@@ -1229,7 +1230,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                           ) : (
                             <CheckCircle2 className="h-4 w-4 me-2" />
                           )}
-                          {builderSaving ? "Saving..." : "Save Builder Configuration"}
+                          {builderSaving ? (language === "ar" ? "جاري الحفظ..." : "Saving...") : (language === "ar" ? "حفظ إعدادات البناء" : "Save Builder Configuration")}
                         </Button>
                       </div>
                     </div>
@@ -1243,12 +1244,12 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <Blocks className="h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
-                      No Sections Added
+                      {language === "ar" ? "لم تتم إضافة أقسام" : "No Sections Added"}
                     </h3>
                     <p className="text-muted-foreground text-center max-w-md">
                       {sourceType === SectionSourceType.Subject
-                        ? "Select subjects above to create exam sections"
-                        : "Select subjects and their topics above to create exam sections"}
+                        ? (language === "ar" ? "اختر المواد أعلاه لإنشاء أقسام الاختبار" : "Select subjects above to create exam sections")
+                        : (language === "ar" ? "اختر المواد ومواضيعها أعلاه لإنشاء أقسام الاختبار" : "Select subjects and their topics above to create exam sections")}
                     </p>
                   </CardContent>
                 </Card>

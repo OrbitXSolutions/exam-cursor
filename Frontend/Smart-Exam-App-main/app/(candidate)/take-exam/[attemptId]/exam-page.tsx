@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -44,6 +44,7 @@ import { ImageZoomModal } from "./image-zoom-modal"
 import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
 import { SpreadsheetButton } from "@/components/exam/exam-spreadsheet"
 import dynamic from "next/dynamic"
+import { localizeText, translateServerMessage } from "@/lib/i18n/runtime"
 
 // Dynamically import spreadsheet to avoid SSR issues
 const ExamSpreadsheet = dynamic(
@@ -66,10 +67,86 @@ function getLocalizedField(
 
 const EXAM_LANGUAGE_KEY = "examLanguage"
 
+function isLastWarningMessage(message?: string | null): boolean {
+  const value = message ?? ""
+  return /LAST WARNING/i.test(value) || value.includes("Ø§Ù„ØªØ­Ø°ÙŠØ± Ø§Ù„Ø£Ø®ÙŠØ±")
+}
+
+function getQuestionTypeDisplayName(questionTypeName: string, language: string): string {
+  const normalized = questionTypeName?.trim().toLowerCase()
+
+  if (
+    [
+      "mcq_single",
+      "mcq single choice",
+      "singlechoice",
+      "multiple choice",
+      "mcq single",
+    ].includes(normalized)
+  ) {
+    return localizeText("Multiple Choice", "اختيار من متعدد", language)
+  }
+
+  if (
+    [
+      "mcq_multi",
+      "mcq multiple choice",
+      "mcq_multiple",
+      "multiplechoice",
+      "multiple select",
+      "mcq multiple",
+    ].includes(normalized)
+  ) {
+    return localizeText("Multiple Select", "اختيار متعدد", language)
+  }
+
+  if (["truefalse", "true_false", "true/false"].includes(normalized)) {
+    return localizeText("True/False", "صح أو خطأ", language)
+  }
+
+  if (
+    [
+      "subjective",
+      "shortanswer",
+      "short_answer",
+      "short answer",
+      "essay",
+      "numeric",
+    ].includes(normalized)
+  ) {
+    return localizeText("Subjective", "إجابة كتابية", language)
+  }
+
+  return questionTypeName
+}
+
 export default function ExamPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const { t, dir, language, setLanguage } = useI18n()
   const router = useRouter()
+  const translateCandidateMessage = useCallback(
+    (message?: string | null) => {
+      return message ? translateServerMessage(message, language) : undefined
+    },
+    [language],
+  )
+  const showWarningMessage = useCallback(
+    (message: string, isLastWarningOverride?: boolean) => {
+      playWarningBeep()
+      const localizedMessage =
+        translateCandidateMessage(message) ?? t("exam.proctorWarningNote")
+
+      if (isLastWarningOverride ?? isLastWarningMessage(message)) {
+        setLastWarningMessage(localizedMessage)
+        setLastWarningOpen(true)
+        return
+      }
+
+      setProctorWarningMessage(localizedMessage)
+      setProctorWarningOpen(true)
+    },
+    [t, translateCandidateMessage],
+  )
 
   // Core state
   const [session, setSession] = useState<AttemptSession | null>(null)
@@ -120,7 +197,7 @@ export default function ExamPage() {
   const [lastWarningOpen, setLastWarningOpen] = useState(false)
   const [lastWarningMessage, setLastWarningMessage] = useState("")
 
-  // SignalR connection state — drives smart polling
+  // SignalR connection state â€” drives smart polling
   const [signalRConnected, setSignalRConnected] = useState(false)
 
   // Refs
@@ -434,10 +511,10 @@ export default function ExamPage() {
           setSnapshotFailStreak((prev) => {
             const next = prev + 1
             if (next === 1) {
-              toast.error("Snapshot upload failed — retrying next cycle")
+              toast.error(t("exam.snapshotUploadRetry"))
             }
             if (next >= 3) {
-              toast.error("Proctor snapshots are not uploading", {
+              toast.error(t("exam.snapshotUploadFailedPersistent"), {
                 duration: Infinity,
                 id: "snapshot-fail-persist",
               })
@@ -464,7 +541,7 @@ export default function ExamPage() {
         snapshotIntervalRef.current = setInterval(captureSnapshot, 60000)
 
         // Start WebRTC live video publisher (share existing stream)
-        // Guarded by feature flags — failures never block the exam
+        // Guarded by feature flags â€” failures never block the exam
         if (webcamStreamRef.current && session?.attemptId) {
           console.log(`%c[ExamPage] Fetching video config for attempt ${session.attemptId}...`, 'color: #2196f3; font-weight: bold')
           getVideoConfig().then((cfg) => {
@@ -476,22 +553,14 @@ export default function ExamPage() {
 
             // Live video publisher
             if (cfg.enableLiveVideo) {
-              console.log(`%c[ExamPage] ✅ enableLiveVideo=true, starting CandidatePublisher for attempt ${session.attemptId}`, 'color: #4caf50; font-weight: bold')
+              console.log(`%c[ExamPage] âœ… enableLiveVideo=true, starting CandidatePublisher for attempt ${session.attemptId}`, 'color: #4caf50; font-weight: bold')
               try {
                 const publisher = new CandidatePublisher(session.attemptId, {
                   onStatusChange: (status) => {
                     console.log("[Proctor] WebRTC publisher status:", status)
                   },
                   onWarningReceived: (message, isLastWarning) => {
-                    // Instant warning via SignalR — same UI as polled warnings
-                    playWarningBeep()
-                    if (isLastWarning) {
-                      setLastWarningMessage(message)
-                      setLastWarningOpen(true)
-                    } else {
-                      setProctorWarningMessage(message)
-                      setProctorWarningOpen(true)
-                    }
+                    showWarningMessage(message, isLastWarning)
                   },
                   onSignalRStatusChange: (connected) => {
                     console.log(`[SmartPoll] SignalR status changed: connected=${connected}`)
@@ -501,7 +570,7 @@ export default function ExamPage() {
                     console.log(`[SmartPoll] Termination received via SignalR: "${reason}"`)
                     stopAllBackgroundActivity()
                     toast.error(
-                      reason ?? t("exam.terminatedByProctor"),
+                      translateCandidateMessage(reason) ?? t("exam.terminatedByProctor"),
                       { duration: 10000 }
                     )
                     router.push("/my-exams")
@@ -525,16 +594,16 @@ export default function ExamPage() {
                     } catch {}
                     // Show notification toast
                     toast.success(
-                      `Your exam time has been extended by ${event.extraMinutes} minute(s)`,
-                      { duration: 8000, icon: "⏰" }
+                      t("exam.timeExtendedByMinutes", { minutes: event.extraMinutes }),
+                      { duration: 8000, icon: "â°" }
                     )
                   },
                   onAttemptExpired: (event) => {
                     console.log(`[SmartPoll] Attempt expired via SignalR: type=${event.eventType}, reason=${event.reason}`)
                     stopAllBackgroundActivity()
                     const message = event.eventType === "ExamWindowClosed"
-                      ? t("exam.examWindowClosed") || "The exam schedule window has closed. Your attempt has been ended."
-                      : t("exam.timeExpired") || "Your exam time has expired."
+                      ? t("exam.examWindowClosed")
+                      : t("exam.timeExpired")
                     toast.error(message, { duration: 10000 })
                     router.push("/my-exams")
                   },
@@ -574,9 +643,9 @@ export default function ExamPage() {
 
             // Smart Monitoring (AI face detection)
             if (cfg.enableSmartMonitoring && webcamVideoRef.current) {
-              console.log(`%c[ExamPage] ✅ enableSmartMonitoring=true, starting AI detection`, 'color: #9c27b0; font-weight: bold')
+              console.log(`%c[ExamPage] âœ… enableSmartMonitoring=true, starting AI detection`, 'color: #9c27b0; font-weight: bold')
               try {
-                // Map ViolationType → AttemptEventType
+                // Map ViolationType â†’ AttemptEventType
                 const violationToEventType: Record<ViolationType, AttemptEventType> = {
                   FaceNotDetected: AttemptEventType.FaceNotDetected,
                   MultipleFacesDetected: AttemptEventType.MultipleFacesDetected,
@@ -587,7 +656,7 @@ export default function ExamPage() {
 
                 const monitor = new SmartMonitoring({
                   onViolation: (event) => {
-                    console.log(`%c[SmartMonitoring] 🚨 Violation: ${event.type} — ${event.message}`, 'color: #f44336; font-weight: bold')
+                    console.log(`%c[SmartMonitoring] ðŸš¨ Violation: ${event.type} â€” ${event.message}`, 'color: #f44336; font-weight: bold')
 
                     // Play a single soft alert beep (not the aggressive 3-beep used for proctor warnings)
                     try {
@@ -606,10 +675,10 @@ export default function ExamPage() {
 
                     // Show styled non-blocking toast for AI-detected violations
                     // (the full "Warning from Proctor" popup is reserved for real proctor warnings)
-                    toast.warning(event.message, {
+                    toast.warning(translateCandidateMessage(event.message) ?? event.message, {
                       duration: 8000,
                       id: `smart-monitoring-${event.type}`,
-                      icon: "⚠️",
+                      icon: "âš ï¸",
                       style: {
                         fontSize: "15px",
                         fontWeight: 500,
@@ -618,9 +687,7 @@ export default function ExamPage() {
                         background: "#fffbeb",
                         color: "#92400e",
                       },
-                      description: language === "ar"
-                        ? "يرجى الالتزام بتعليمات الاختبار"
-                        : "Please follow the exam guidelines",
+                      description: t("exam.proctorWarningNote"),
                     })
 
                     // Log event to backend (auto-pushes to proctor via SignalR)
@@ -640,7 +707,7 @@ export default function ExamPage() {
 
                 monitor.start(webcamVideoRef.current).then((ok) => {
                   if (ok) {
-                    console.log(`%c[ExamPage] ✅ SmartMonitoring started successfully`, 'color: #4caf50; font-weight: bold')
+                    console.log(`%c[ExamPage] âœ… SmartMonitoring started successfully`, 'color: #4caf50; font-weight: bold')
                   } else {
                     console.warn('[ExamPage] SmartMonitoring failed to start (non-fatal)')
                   }
@@ -684,7 +751,7 @@ export default function ExamPage() {
     try {
       const attemptIdNum = Number.parseInt(attemptId, 10)
       if (Number.isNaN(attemptIdNum)) {
-        throw new Error("Invalid attempt ID")
+        throw new Error(localizeText("Invalid attempt ID", "معرف المحاولة غير صالح", language))
       }
 
       const sessionData = await getAttemptSession(attemptIdNum)
@@ -784,30 +851,23 @@ export default function ExamPage() {
         }
       }, 60000)
 
-      // Initial proctor status check (one-time HTTP snapshot — source of truth)
+      // Initial proctor status check (one-time HTTP snapshot â€” source of truth)
       try {
         const status = await getCandidateSessionStatus(sessionData.attemptId)
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason ?? t("exam.terminatedByProctor"),
+            translateCandidateMessage(status.terminationReason) ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
           return
         }
         if (status.hasWarning && status.warningMessage) {
-          playWarningBeep()
-          if (status.warningMessage.includes("LAST WARNING")) {
-            setLastWarningMessage(status.warningMessage)
-            setLastWarningOpen(true)
-          } else {
-            setProctorWarningMessage(status.warningMessage)
-            setProctorWarningOpen(true)
-          }
+          showWarningMessage(status.warningMessage)
         }
       } catch {
-        // Silent fail — don't disrupt exam start
+        // Silent fail â€” don't disrupt exam start
       }
       // Note: Continuous polling is managed by the smart-poll useEffect below,
       // which only polls when SignalR is disconnected (signalRConnected === false).
@@ -958,7 +1018,7 @@ export default function ExamPage() {
       // Cleanup
       setTimeout(() => ctx.close().catch(() => {}), 1500)
     } catch {
-      // Silent fail — audio not critical
+      // Silent fail â€” audio not critical
     }
   }
 
@@ -982,7 +1042,7 @@ export default function ExamPage() {
     }
   }
 
-  // ── Smart Polling: poll proctor status ONLY when SignalR is disconnected ──
+  // â”€â”€ Smart Polling: poll proctor status ONLY when SignalR is disconnected â”€â”€
   // When SignalR is connected, warnings + termination arrive instantly via push.
   // When SignalR disconnects, start 15s fallback polling.
   // On reconnect, do one sync fetch then stop polling again.
@@ -990,9 +1050,9 @@ export default function ExamPage() {
     if (!session) return
 
     if (signalRConnected) {
-      // SignalR is healthy — stop polling, do one sync fetch to catch anything missed
+      // SignalR is healthy â€” stop polling, do one sync fetch to catch anything missed
       if (proctorPollRef.current) {
-        console.log("[SmartPoll] SignalR connected — stopping fallback polling")
+        console.log("[SmartPoll] SignalR connected â€” stopping fallback polling")
         clearInterval(proctorPollRef.current)
         proctorPollRef.current = undefined
       }
@@ -1001,51 +1061,37 @@ export default function ExamPage() {
         if (status.isTerminated) {
           stopAllBackgroundActivity()
           toast.error(
-            status.terminationReason ?? t("exam.terminatedByProctor"),
+            translateCandidateMessage(status.terminationReason) ?? t("exam.terminatedByProctor"),
             { duration: 10000 }
           )
           router.push("/my-exams")
           return
         }
         if (status.hasWarning && status.warningMessage) {
-          playWarningBeep()
-          if (status.warningMessage.includes("LAST WARNING")) {
-            setLastWarningMessage(status.warningMessage)
-            setLastWarningOpen(true)
-          } else {
-            setProctorWarningMessage(status.warningMessage)
-            setProctorWarningOpen(true)
-          }
+          showWarningMessage(status.warningMessage)
         }
       }).catch(() => {})
     } else {
-      // SignalR is disconnected — start 15s fallback polling
+      // SignalR is disconnected â€” start 15s fallback polling
       if (!proctorPollRef.current) {
-        console.log("[SmartPoll] SignalR disconnected — starting 15s fallback polling")
+        console.log("[SmartPoll] SignalR disconnected â€” starting 15s fallback polling")
         proctorPollRef.current = setInterval(async () => {
           try {
             const status = await getCandidateSessionStatus(session.attemptId)
             if (status.isTerminated) {
               stopAllBackgroundActivity()
               toast.error(
-                status.terminationReason ?? t("exam.terminatedByProctor"),
+                translateCandidateMessage(status.terminationReason) ?? t("exam.terminatedByProctor"),
                 { duration: 10000 }
               )
               router.push("/my-exams")
               return
             }
             if (status.hasWarning && status.warningMessage) {
-              playWarningBeep()
-              if (status.warningMessage.includes("LAST WARNING")) {
-                setLastWarningMessage(status.warningMessage)
-                setLastWarningOpen(true)
-              } else {
-                setProctorWarningMessage(status.warningMessage)
-                setProctorWarningOpen(true)
-              }
-            }
+          showWarningMessage(status.warningMessage)
+        }
           } catch {
-            // Silent fail — don't disrupt exam
+            // Silent fail â€” don't disrupt exam
           }
         }, 15000)
       }
@@ -1102,7 +1148,7 @@ export default function ExamPage() {
         eventType: AttemptEventType.Submitted,
       }).catch(() => { })
 
-      // Finalize video recording in background (fire-and-forget — never delays submit)
+      // Finalize video recording in background (fire-and-forget â€” never delays submit)
       // Backend returns 202 Accepted and processes FFmpeg in background
       if (session.attemptId) {
         try {
@@ -1131,7 +1177,7 @@ export default function ExamPage() {
       if (result && result.resultId && result.resultId > 0) {
         router.push(`/results/${session.attemptId}?submitted=true`)
       } else {
-        // Grading is async / pending — go back to my-exams safely
+        // Grading is async / pending â€” go back to my-exams safely
         router.push("/my-exams")
       }
     } catch (error: unknown) {
@@ -1173,7 +1219,7 @@ export default function ExamPage() {
       webcamVideoRef.current = video
       setWebcamStatus("active")
       setWebcamError(null)
-      toast.success("Camera connected")
+      toast.success(t("exam.cameraConnected"))
 
       // Take immediate snapshot and restart interval
       if (snapshotIntervalRef.current) clearInterval(snapshotIntervalRef.current)
@@ -1201,7 +1247,7 @@ export default function ExamPage() {
       const msg = error?.message ?? String(error)
       setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
       setWebcamError(msg)
-      toast.error("Camera access failed")
+      toast.error(t("exam.cameraAccessFailed"))
     }
   }
 
@@ -1291,7 +1337,7 @@ export default function ExamPage() {
             <div className="flex flex-col gap-2 pt-4">
               <Button asChild>
                 <Link href="/my-exams">
-                  <ArrowLeft className="h-4 w-4 me-2" />
+                  {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
                   {t("exam.backToMyExams")}
                 </Link>
               </Button>
@@ -1314,26 +1360,26 @@ export default function ExamPage() {
   const sectionTimeRemaining = currentSection && sectionTimers[currentSection.sectionId]
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background" dir={dir}>
       {/* Webcam denial / snapshot persistent error banner */}
       {(webcamStatus === "denied" || webcamStatus === "error") && (
         <div className="flex items-center gap-3 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
           <CameraOff className="h-4 w-4 shrink-0" />
           <span className="flex-1">
             {webcamStatus === "denied"
-              ? "Camera permission is required for proctoring snapshots. Please allow camera access in your browser settings."
-              : `Camera error: ${webcamError ?? "Unknown"}`}
+              ? t("exam.cameraPermissionRequired")
+              : t("exam.cameraError", { error: webcamError ?? t("common.unknown") })}
           </span>
           <Button size="sm" variant="outline" className="shrink-0 h-7 text-xs" onClick={handleRetryWebcam}>
             <RefreshCw className="h-3 w-3 me-1" />
-            Retry Camera
+            {t("exam.retryCamera")}
           </Button>
         </div>
       )}
       {snapshotFailStreak >= 3 && webcamStatus === "active" && (
         <div className="flex items-center gap-3 border-b bg-red-50 px-4 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
           <CameraOff className="h-4 w-4 shrink-0" />
-          <span className="flex-1">Proctor snapshots are not uploading. Your exam will continue but proctoring evidence may be incomplete.</span>
+          <span className="flex-1">{t("exam.snapshotUploadIncompleteWarning")}</span>
         </div>
       )}
 
@@ -1343,7 +1389,7 @@ export default function ExamPage() {
           <div>
             <h1 className="text-xl font-bold">{examTitle}</h1>
             <p className="text-xs text-muted-foreground">
-              {t("exam.progress")}: {answeredCount}/{totalQuestions} — {Math.round(progress)}%
+              {t("exam.progress")}: {answeredCount}/{totalQuestions} - {Math.round(progress)}%
             </p>
           </div>
 
@@ -1352,7 +1398,7 @@ export default function ExamPage() {
             {sectionTimeRemaining !== undefined && sectionTimeRemaining !== null && (
               <div className="flex items-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 dark:border-orange-900 dark:bg-orange-950">
                 <p className="text-xs font-medium text-orange-600 dark:text-orange-400">
-                  {t("exam.sectionTime") === "exam.sectionTime" ? "Section time" : t("exam.sectionTime")}: {formatTime(sectionTimeRemaining)}
+                  {t("exam.sectionTime")}: {formatTime(sectionTimeRemaining)}
                 </p>
               </div>
             )}
@@ -1370,26 +1416,26 @@ export default function ExamPage() {
                   ? "text-red-600 dark:text-red-400"
                   : "text-blue-600 dark:text-blue-400"
               )}>
-                {t("exam.timeRemaining") === "exam.timeRemaining" ? "Time remaining" : t("exam.timeRemaining")}: {formatTime(examTimeRemaining)}
+                {t("exam.timeRemaining")}: {formatTime(examTimeRemaining)}
               </p>
             </div>
 
             {/* Auto-save indicator */}
             {saveStatus === "saving" && (
               <span className="text-xs text-muted-foreground animate-pulse">
-                {t("exam.saving") || "Saving..."}
+                {t("exam.saving")}
               </span>
             )}
             {saveStatus === "saved" && (
               <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                {t("exam.saved") || "Saved"}
+                {t("exam.saved")}
               </span>
             )}
             {saveStatus === "error" && (
               <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                {t("exam.saveFailed") || "Save failed"}
+                {t("exam.saveFailed")}
               </span>
             )}
 
@@ -1401,7 +1447,7 @@ export default function ExamPage() {
                   ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
                   : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
               )}
-              title={lastSnapshotTime ? `Last snapshot: ${lastSnapshotTime}` : "Waiting for first snapshot"}
+              title={lastSnapshotTime ? t("exam.lastSnapshotAt", { time: lastSnapshotTime }) : t("exam.waitingForFirstSnapshot")}
             >
               {webcamStatus === "active" ? (
                 <Camera className="h-3 w-3" />
@@ -1413,7 +1459,7 @@ export default function ExamPage() {
                   ? lastSnapshotTime
                     ? `${lastSnapshotTime}`
                     : "..."
-                  : "Off"}
+                  : t("common.off")}
               </span>
             </div>
 
@@ -1426,7 +1472,7 @@ export default function ExamPage() {
                 className={cn("gap-1.5", showCalculator && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
               >
                 <Calculator className="h-4 w-4" />
-                <span className="hidden sm:inline">{language === "ar" ? "آلة حاسبة" : "Calculator"}</span>
+                <span className="hidden sm:inline">{t("exam.calculator")}</span>
               </Button>
             )}
 
@@ -1435,7 +1481,7 @@ export default function ExamPage() {
               <SpreadsheetButton
                 isOpen={showSpreadsheet}
                 onClick={() => setShowSpreadsheet(!showSpreadsheet)}
-                label={language === "ar" ? "جدول بيانات" : "Spreadsheet"}
+                label={t("exam.spreadsheet")}
               />
             )}
 
@@ -1447,7 +1493,7 @@ export default function ExamPage() {
               className={cn("gap-1.5", showSummary && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
             >
               <ListChecks className="h-4 w-4" />
-              <span className="hidden sm:inline">{language === "ar" ? "ملخص" : "Summary"}</span>
+              <span className="hidden sm:inline">{t("exam.summary")}</span>
             </Button>
 
             {/* Submit Button */}
@@ -1585,7 +1631,7 @@ export default function ExamPage() {
                 </Button>
 
                 <div className="flex items-center gap-3">
-                  {/* Calculator button — only if current question allows it */}
+                  {/* Calculator button â€” only if current question allows it */}
                   {currentFlatQuestion?.isCalculatorAllowed && (
                     <CalculatorButton
                       isOpen={showCalculator}
@@ -1593,7 +1639,7 @@ export default function ExamPage() {
                     />
                   )}
                   <p className="text-sm font-medium">
-                    Question {currentQuestionIndex + 1} {t("exam.of")} {flatQuestions.length}
+                    {t("exam.question")} {currentQuestionIndex + 1} {t("exam.of")} {flatQuestions.length}
                   </p>
                 </div>
 
@@ -1625,11 +1671,11 @@ export default function ExamPage() {
 
         {/* Summary Panel */}
         {showSummary && (
-          <div className="w-72 border-l bg-muted/20 flex flex-col overflow-hidden shrink-0">
+          <div className={cn("w-72 bg-muted/20 flex flex-col overflow-hidden shrink-0", dir === "rtl" ? "border-r" : "border-l")}>
             <div className="border-b px-4 py-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold flex items-center gap-2">
                 <ListChecks className="h-4 w-4" />
-                {language === "ar" ? "ملخص الامتحان" : "Exam Summary"}
+                {t("exam.summaryTitle")}
               </h2>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowSummary(false)}>
                 <XCircle className="h-3.5 w-3.5" />
@@ -1640,27 +1686,27 @@ export default function ExamPage() {
                 {/* Overall Stats */}
                 <div className="rounded-lg border bg-card p-3 space-y-2">
                   <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
-                    {language === "ar" ? "الإجمالي" : "Overall"}
+                    {t("exam.summaryOverall")}
                   </h3>
                   <div className="space-y-1.5 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
                         <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                        {language === "ar" ? "تمت الإجابة" : "Answered"}
+                        {t("exam.answered")}
                       </span>
                       <span className="font-semibold">{answeredCount}/{totalQuestions}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
                         <span className="h-2.5 w-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-                        {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                        {t("exam.unanswered")}
                       </span>
                       <span className="font-semibold">{totalQuestions - answeredCount}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
                         <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
-                        {language === "ar" ? "مُعلَّم" : "Flagged"}
+                        {t("exam.flagged")}
                       </span>
                       <span className="font-semibold">{flagged.size}</span>
                     </div>
@@ -1669,7 +1715,7 @@ export default function ExamPage() {
                     <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                       <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${progress}%` }} />
                     </div>
-                    <p className="text-[10px] text-muted-foreground text-right mt-0.5">{Math.round(progress)}%</p>
+                    <p className="mt-0.5 text-[10px] text-end text-muted-foreground">{Math.round(progress)}%</p>
                   </div>
                 </div>
 
@@ -1698,7 +1744,7 @@ export default function ExamPage() {
                       onClick={() => {
                         if (isDisabled) {
                           toast.warning(isExpired
-                            ? (language === "ar" ? "انتهى وقت هذا القسم" : "This section's time has expired")
+                            ? t("exam.thisSectionExpired")
                             : t("exam.cannotGoBack"))
                           return
                         }
@@ -1718,14 +1764,14 @@ export default function ExamPage() {
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                            {language === "ar" ? "تمت الإجابة" : "Answered"}
+                            {t("exam.answered")}
                           </span>
                           <span className="font-medium">{sectionAnswered}/{sectionTotal}</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-gray-300 dark:bg-gray-600" />
-                            {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                            {t("exam.unanswered")}
                           </span>
                           <span className="font-medium">{sectionTotal - sectionAnswered}</span>
                         </div>
@@ -1733,7 +1779,7 @@ export default function ExamPage() {
                           <div className="flex items-center justify-between">
                             <span className="flex items-center gap-1.5">
                               <span className="h-2 w-2 rounded-full bg-orange-500" />
-                              {language === "ar" ? "مُعلَّم" : "Flagged"}
+                              {t("exam.flagged")}
                             </span>
                             <span className="font-medium">{sectionFlaggedCount}</span>
                           </div>
@@ -1758,7 +1804,11 @@ export default function ExamPage() {
                                 !isAnswered && isQFlagged && "bg-orange-100 text-orange-700 ring-2 ring-orange-400 dark:bg-orange-950 dark:text-orange-300",
                                 !isAnswered && !isQFlagged && "bg-muted text-muted-foreground"
                               )}
-                              title={`Q${i + 1}${isAnswered ? " ✓" : ""}${isQFlagged ? " 🚩" : ""}`}
+                              title={[
+                                `${t("exam.question")} ${i + 1}`,
+                                isAnswered ? t("exam.answered") : t("exam.unanswered"),
+                                isQFlagged ? t("exam.flagged") : null,
+                              ].filter(Boolean).join(" - ")}
                             >
                               {i + 1}
                             </div>
@@ -1773,7 +1823,7 @@ export default function ExamPage() {
                 {!hasSections && flatQuestions.length > 0 && (
                   <div className="rounded-lg border bg-card p-3 space-y-2">
                     <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
-                      {language === "ar" ? "الأسئلة" : "Questions"}
+                      {t("common.questions")}
                     </h3>
                     <div className="flex flex-wrap gap-1">
                       {flatQuestions.map((q, i) => {
@@ -1792,7 +1842,11 @@ export default function ExamPage() {
                               !isAnswered && !isQFlagged && "bg-muted text-muted-foreground",
                               isCurrent && "ring-2 ring-primary"
                             )}
-                            title={`Q${i + 1}${isAnswered ? " ✓" : ""}${isQFlagged ? " 🚩" : ""}`}
+                            title={[
+                              `${t("exam.question")} ${i + 1}`,
+                              isAnswered ? t("exam.answered") : t("exam.unanswered"),
+                              isQFlagged ? t("exam.flagged") : null,
+                            ].filter(Boolean).join(" - ")}
                           >
                             {i + 1}
                           </button>
@@ -1803,15 +1857,15 @@ export default function ExamPage() {
                     <div className="flex flex-wrap gap-x-3 gap-y-1 pt-2 text-[10px] text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <span className="h-2.5 w-2.5 rounded bg-emerald-500" />
-                        {language === "ar" ? "تمت الإجابة" : "Answered"}
+                        {t("exam.answered")}
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="h-2.5 w-2.5 rounded bg-muted border" />
-                        {language === "ar" ? "لم تتم الإجابة" : "Unanswered"}
+                        {t("exam.unanswered")}
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="h-2.5 w-2.5 rounded bg-orange-100 ring-1 ring-orange-400" />
-                        {language === "ar" ? "مُعلَّم" : "Flagged"}
+                        {t("exam.flagged")}
                       </span>
                     </div>
                   </div>
@@ -1972,13 +2026,13 @@ export default function ExamPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Last Warning Dialog — blocking modal before auto-termination */}
+      {/* Last Warning Dialog â€” blocking modal before auto-termination */}
       <AlertDialog open={lastWarningOpen}>
         <AlertDialogContent className="border-red-300 dark:border-red-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-red-600">
               <XCircle className="h-6 w-6" />
-              {t("exam.lastWarningTitle") || "⚠ FINAL WARNING"}
+              {t("exam.lastWarningTitle") || "âš  FINAL WARNING"}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
@@ -2033,7 +2087,7 @@ function SectionContent({
   onToggleFlag: (questionId: number) => void
   onNextSection: () => void
 }) {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
   const hasTopic = section.topics && section.topics.length > 0
 
   // Check if this is a Builder section
@@ -2077,7 +2131,7 @@ function SectionContent({
 
         {/* Builder Section Header - Subject Mode */}
         {isBuilderSection && isSubjectMode && subjectTitle && (
-          <Card className="border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20">
+          <Card className="border-s-4 border-s-purple-500 bg-purple-50/50 dark:bg-purple-950/20">
             <CardHeader className="py-2">
               <div className="flex items-center justify-center gap-2">
                 <Badge variant="outline" className="text-xs">
@@ -2093,7 +2147,7 @@ function SectionContent({
 
         {/* Builder Section Header - Topic Mode */}
         {isBuilderSection && isTopicMode && (
-          <Card className="border-l-4 border-l-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20">
+          <Card className="border-s-4 border-s-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20">
             <CardHeader className="py-2">
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {subjectTitle && (
@@ -2114,7 +2168,7 @@ function SectionContent({
 
         {/* Section description (for non-Builder sections) */}
         {!isBuilderSection && (section.descriptionEn || section.descriptionAr) && (
-          <Card className="border-l-4 border-l-primary">
+          <Card className="border-s-4 border-s-primary">
             <CardHeader className="py-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <BookOpen className="h-4 w-4" />
@@ -2134,7 +2188,7 @@ function SectionContent({
               return (
                 <div key={topic.topicId} className="space-y-4">
                   {/* Topic header */}
-                  <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/20">
+                  <Card className="border-s-4 border-s-blue-500 bg-blue-50/50 dark:bg-blue-950/20">
                     <CardHeader className="py-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base font-semibold">
@@ -2231,7 +2285,7 @@ function SectionContent({
             ) : (
               <>
                 {t("exam.nextSection") || "Next Section"}
-                <ArrowRight className="h-4 w-4" />
+                {dir === "rtl" ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
               </>
             )}
           </Button>
@@ -2277,13 +2331,15 @@ function QuestionCard({
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="secondary" className="text-xs">
-                Question {questionNumber} {language === "ar" ? "من" : "of"} {totalQuestions}
+                {t("exam.question")} {questionNumber} {t("exam.of")} {totalQuestions}
               </Badge>
-              <Badge variant="outline" className="text-xs">{question.questionTypeName}</Badge>
-              <Badge variant="secondary" className="text-xs">{question.points} Points</Badge>
+              <Badge variant="outline" className="text-xs">
+                {getQuestionTypeDisplayName(question.questionTypeName, language)}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">{question.points} {t("common.points")}</Badge>
               {isSaving && (
                 <Badge variant="outline" className="gap-1 text-xs">
-                  <LoadingSpinner size="sm" /> Saving...
+                  <LoadingSpinner size="sm" /> {t("exam.saving")}
                 </Badge>
               )}
             </div>
@@ -2299,12 +2355,12 @@ function QuestionCard({
           </Button>
         </div>
 
-        {/* Question Image — shown inside the question area, above options */}
+        {/* Question Image â€” shown inside the question area, above options */}
         {questionImage && (
           <div className="mt-3 flex justify-center overflow-hidden rounded-lg border bg-muted/30">
             <ImageZoomModal
               src={questionImage.filePath}
-              alt="Question image"
+              alt={t("exam.questionImageAlt")}
               thumbnailClassName="max-h-64 w-auto object-contain"
             />
           </div>
@@ -2322,3 +2378,6 @@ function QuestionCard({
     </Card>
   )
 }
+
+
+

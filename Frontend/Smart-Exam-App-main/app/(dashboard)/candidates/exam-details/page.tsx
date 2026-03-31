@@ -299,7 +299,7 @@ export default function CandidateExamDetailsPage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowSearch(!showSearch)}>
             {showSearch ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            <span className="ml-1">{isRtl ? "بحث" : "Search"}</span>
+            <span className="ms-1">{isRtl ? "بحث" : "Search"}</span>
           </Button>
           {data && (
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
@@ -332,19 +332,19 @@ export default function CandidateExamDetailsPage() {
                           {isRtl ? "اختر مرشح..." : "Select candidate..."}
                         </span>
                       )}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
                     <div className="flex items-center border-b px-3">
-                      <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      <Search className="me-2 h-4 w-4 shrink-0 opacity-50" />
                       <input
                         className="flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
                         placeholder={isRtl ? "ابحث بالاسم، البريد، الرقم..." : "Search name, email, roll no..."}
                         value={candidateSearch}
                         onChange={e => setCandidateSearch(e.target.value)}
                       />
-                      {isSearching && <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />}
+                      {isSearching && <Loader2 className="ms-2 h-4 w-4 animate-spin shrink-0 opacity-50" />}
                     </div>
                     <div className="max-h-60 overflow-y-auto">
                       {candidateList.length === 0 ? (
@@ -355,7 +355,7 @@ export default function CandidateExamDetailsPage() {
                         candidateList.map(c => (
                           <button
                             key={c.id}
-                            className={`w-full text-left px-3 py-2 text-sm transition-colors flex items-start gap-2 ${
+                            className={`w-full text-start px-3 py-2 text-sm transition-colors flex items-start gap-2 ${
                               selectedCandidateId === c.id
                                 ? "bg-primary/10"
                                 : "hover:bg-muted/50"
@@ -390,7 +390,7 @@ export default function CandidateExamDetailsPage() {
                     {candidateExams.map(e => (
                       <SelectItem key={e.examId} value={String(e.examId)}>
                         {isRtl ? (e.titleAr || e.titleEn) : e.titleEn}
-                        <span className="text-muted-foreground text-xs ml-2">
+                        <span className="text-muted-foreground text-xs ms-2">
                           ({e.totalAttempts} {isRtl ? "محاولة" : "attempts"})
                         </span>
                       </SelectItem>
@@ -533,7 +533,7 @@ export default function CandidateExamDetailsPage() {
                     </Badge>
                     {data.exam.requireProctoring && (
                       <Badge variant="outline">
-                        <Shield className="h-3 w-3 mr-1" />
+                        <Shield className="h-3 w-3 me-1" />
                         {isRtl ? "مراقب" : "Proctored"}
                       </Badge>
                     )}
@@ -549,7 +549,7 @@ export default function CandidateExamDetailsPage() {
                   <div className="flex items-center gap-2">
                     <Badge variant={statusBadgeVariant(data.attemptSummary.statusName)}>
                       {getStatusIcon(data.attemptSummary.statusName)}
-                      <span className="ml-1">{data.attemptSummary.statusName}</span>
+                      <span className="ms-1">{data.attemptSummary.statusName}</span>
                     </Badge>
                     <span className="text-sm text-muted-foreground">
                       #{data.attemptSummary.attemptNumber}
@@ -563,9 +563,9 @@ export default function CandidateExamDetailsPage() {
                         <a
                           href={`/results/review/${data.exam.examId}/${data.candidate.candidateId}`}
                         >
-                          <FileText className="h-3 w-3 mr-1" />
+                          <FileText className="h-3 w-3 me-1" />
                           {isRtl ? "النتيجة" : "Result"}
-                          <ExternalLink className="h-3 w-3 ml-1" />
+                          <ExternalLink className="h-3 w-3 ms-1" />
                         </a>
                       </Button>
                     )}
@@ -574,9 +574,9 @@ export default function CandidateExamDetailsPage() {
                         <a
                           href={`/grading/${data.resultInfo.gradingSessionId}`}
                         >
-                          <CheckCircle className="h-3 w-3 mr-1" />
+                          <CheckCircle className="h-3 w-3 me-1" />
                           {isRtl ? "التصحيح" : "Grade"}
-                          <ExternalLink className="h-3 w-3 ml-1" />
+                          <ExternalLink className="h-3 w-3 ms-1" />
                         </a>
                       </Button>
                     )}
@@ -1201,7 +1201,7 @@ export default function CandidateExamDetailsPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <ExternalLink className="h-3 w-3 mr-1" />
+                          <ExternalLink className="h-3 w-3 me-1" />
                           {isRtl ? "فتح" : "Open"}
                         </a>
                       </Button>
@@ -1317,12 +1317,12 @@ export default function CandidateExamDetailsPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left py-2 px-3 font-medium">#</th>
-                        <th className="text-left py-2 px-3 font-medium">{isRtl ? "الحالة" : "Status"}</th>
-                        <th className="text-left py-2 px-3 font-medium">{isRtl ? "بدأ" : "Started"}</th>
-                        <th className="text-left py-2 px-3 font-medium">{isRtl ? "سُلّم" : "Submitted"}</th>
-                        <th className="text-left py-2 px-3 font-medium">{isRtl ? "الدرجة" : "Score"}</th>
-                        <th className="text-left py-2 px-3 font-medium">{isRtl ? "النتيجة" : "Result"}</th>
+                        <th className="text-start py-2 px-3 font-medium">#</th>
+                        <th className="text-start py-2 px-3 font-medium">{isRtl ? "الحالة" : "Status"}</th>
+                        <th className="text-start py-2 px-3 font-medium">{isRtl ? "بدأ" : "Started"}</th>
+                        <th className="text-start py-2 px-3 font-medium">{isRtl ? "سُلّم" : "Submitted"}</th>
+                        <th className="text-start py-2 px-3 font-medium">{isRtl ? "الدرجة" : "Score"}</th>
+                        <th className="text-start py-2 px-3 font-medium">{isRtl ? "النتيجة" : "Result"}</th>
                         <th className="text-right py-2 px-3 font-medium"></th>
                       </tr>
                     </thead>
@@ -1338,7 +1338,7 @@ export default function CandidateExamDetailsPage() {
                           <td className="py-2 px-3">
                             <Badge variant={statusBadgeVariant(a.statusName)} className="text-xs">
                               {getStatusIcon(a.statusName)}
-                              <span className="ml-1">{a.statusName}</span>
+                              <span className="ms-1">{a.statusName}</span>
                             </Badge>
                           </td>
                           <td className="py-2 px-3">{formatDateTime(a.startedAt, language)}</td>

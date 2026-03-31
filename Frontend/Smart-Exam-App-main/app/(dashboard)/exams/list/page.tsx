@@ -55,7 +55,7 @@ import {
 } from "lucide-react"
 
 function getExamTitle(exam: Exam, language: string): string {
-  return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || "Untitled Exam"
+  return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || (language === "ar" ? "اختبار بدون عنوان" : "Untitled Exam")
 }
 
 function getExamStatus(exam: Exam): string {
@@ -141,7 +141,7 @@ export default function ExamsListPage() {
     } catch (error: any) {
       setDeleteDialogOpen(false)
       setExamToDelete(null)
-      const msg = error?.response?.data?.message || error?.message || "Failed to delete exam"
+      const msg = error?.response?.data?.message || error?.message || (language === "ar" ? "فشل في حذف الاختبار" : "Failed to delete exam")
       setErrorDialogTitle(language === "ar" ? "لا يمكن الحذف" : "Cannot Delete")
       setErrorMessage(msg)
       setErrorDialogOpen(true)
@@ -420,29 +420,29 @@ export default function ExamsListPage() {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">1</div>
                 <div>
-                  <h4 className="font-medium text-foreground text-sm">Configure Exam</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Set up title, timing, type, and security settings</p>
+                  <h4 className="font-medium text-foreground text-sm">{language === "ar" ? "إعداد الاختبار" : "Configure Exam"}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{language === "ar" ? "إعداد العنوان والتوقيت والنوع وإعدادات الأمان" : "Set up title, timing, type, and security settings"}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-6 h-6 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
                 <div>
-                  <h4 className="font-medium text-foreground text-sm">Build Structure</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Add sections, topics, and select questions from the bank</p>
+                  <h4 className="font-medium text-foreground text-sm">{language === "ar" ? "بناء الهيكل" : "Build Structure"}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{language === "ar" ? "إضافة أقسام ومواضيع واختيار أسئلة من البنك" : "Add sections, topics, and select questions from the bank"}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">3</div>
                 <div>
-                  <h4 className="font-medium text-foreground text-sm">Publish & Assign</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Review, publish, and assign candidates to the exam</p>
+                  <h4 className="font-medium text-foreground text-sm">{language === "ar" ? "النشر والتعيين" : "Publish & Assign"}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{language === "ar" ? "مراجعة ونشر وتعيين المرشحين للاختبار" : "Review, publish, and assign candidates to the exam"}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">4</div>
                 <div>
-                  <h4 className="font-medium text-foreground text-sm">Monitor & Grade</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Proctor live sessions, grade responses, and view results</p>
+                  <h4 className="font-medium text-foreground text-sm">{language === "ar" ? "المراقبة والتصحيح" : "Monitor & Grade"}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{language === "ar" ? "مراقبة الجلسات المباشرة وتصحيح الإجابات وعرض النتائج" : "Proctor live sessions, grade responses, and view results"}</p>
                 </div>
               </div>
             </div>

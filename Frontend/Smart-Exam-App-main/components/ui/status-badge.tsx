@@ -21,6 +21,16 @@ const statusVariantMap: Record<string, StatusVariant> = {
   approved: "success",
   rejected: "destructive",
 
+  // General (Arabic)
+  "نشط": "success",
+  "غيرنشط": "secondary",
+  "منشور": "success",
+  "غيرمنشور": "secondary",
+  "مسودة": "warning",
+  "قيدالانتظار": "warning",
+  "موافقعليه": "success",
+  "مرفوض": "destructive",
+
   // Attempt Status
   notstarted: "secondary",
   inprogress: "warning",
@@ -52,6 +62,8 @@ const statusVariantMap: Record<string, StatusVariant> = {
   // Pass/Fail
   passed: "success",
   failed: "destructive",
+  "ناجح": "success",
+  "راسب": "destructive",
 
   // Severity
   low: "secondary",
@@ -63,6 +75,9 @@ const statusVariantMap: Record<string, StatusVariant> = {
   // Difficulty
   easy: "success",
   hard: "destructive",
+  "سهل": "success",
+  "متوسط": "warning",
+  "صعب": "destructive",
 }
 
 export function StatusBadge({ status, variant, className, showDot = true }: StatusBadgeProps) {

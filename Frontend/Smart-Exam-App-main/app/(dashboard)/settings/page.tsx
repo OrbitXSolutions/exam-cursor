@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { getSystemSettings, updateSystemSettings, type SystemSettings } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,7 +30,7 @@ export default function SettingsPage() {
       const data = await getSystemSettings()
       setSettings(data)
     } catch {
-      toast.error("Failed to load settings")
+      toast.error(localizeText("Failed to load settings", "فشل تحميل الإعدادات", language))
     } finally {
       setLoading(false)
     }
@@ -40,9 +41,9 @@ export default function SettingsPage() {
     setSaving(true)
     try {
       await updateSystemSettings(settings)
-      toast.success(language === "ar" ? "تم حفظ الإعدادات" : "Settings saved")
+      toast.success(localizeText("Settings saved", "تم حفظ الإعدادات", language))
     } catch {
-      toast.error("Failed to save settings")
+      toast.error(localizeText("Failed to save settings", "فشل حفظ الإعدادات", language))
     } finally {
       setSaving(false)
     }
@@ -86,12 +87,12 @@ export default function SettingsPage() {
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="me-2 h-4 w-4 animate-spin" />
               {language === "ar" ? "جاري الحفظ..." : "Saving..."}
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="me-2 h-4 w-4" />
               {language === "ar" ? "حفظ التغييرات" : "Save Changes"}
             </>
           )}

@@ -321,13 +321,13 @@ export default function CandidateResultPage() {
             {language === "ar" ? "بحث" : "Search"}
           </Label>
           <div className="relative w-[240px]">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="search-candidates"
               placeholder={language === "ar" ? "الاسم أو البريد الإلكتروني..." : "Name or email..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
+              className="ps-8"
             />
           </div>
         </div>
@@ -343,7 +343,7 @@ export default function CandidateResultPage() {
             <p className="text-sm text-muted-foreground">
               {language === "ar" ? "إجمالي المرشحين" : "Total candidates"}
               {(searchQuery.trim() || resultStatus !== RESULT_STATUS_ALL) && (
-                <span className="text-xs ml-1">({language === "ar" ? "بعد الفلترة" : "filtered"})</span>
+                <span className="text-xs ms-1">({language === "ar" ? "بعد الفلترة" : "filtered"})</span>
               )}
             </p>
           </div>
@@ -453,27 +453,27 @@ export default function CandidateResultPage() {
                               {effectiveExamId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/results/review/${effectiveExamId}/${row.candidateId}`}>
-                                    <Eye className="h-4 w-4 mr-2" />{language === "ar" ? "عرض التفاصيل" : "View Details"}
+                                    <Eye className="h-4 w-4 me-2" />{language === "ar" ? "عرض التفاصيل" : "View Details"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
                               {effectiveExamId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/results/score-card/${effectiveExamId}/${row.candidateId}`}>
-                                    <FileText className="h-4 w-4 mr-2" />{language === "ar" ? "كشف الدرجات" : "Score Card"}
+                                    <FileText className="h-4 w-4 me-2" />{language === "ar" ? "كشف الدرجات" : "Score Card"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handlePublish(row)} disabled={!canPublish(row) || isPublishing} className={!canPublish(row) ? "opacity-50" : ""}>
-                                {isPublishing ? <LoadingSpinner size="sm" className="mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                                {isPublishing ? <LoadingSpinner size="sm" className="me-2" /> : <Send className="h-4 w-4 me-2" />}
                                 {language === "ar" ? "نشر النتيجة" : "Publish Result"}
                               </DropdownMenuItem>
                 
                               {row.attemptId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/grading/${row.attemptId}`}>
-                                    <ClipboardCheck className="h-4 w-4 mr-2" />{language === "ar" ? "عرض التصحيح" : "View Grading"}
+                                    <ClipboardCheck className="h-4 w-4 me-2" />{language === "ar" ? "عرض التصحيح" : "View Grading"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
@@ -481,13 +481,13 @@ export default function CandidateResultPage() {
                               {effectiveExamId && (
                                 <DropdownMenuItem asChild>
                                   <Link href={`/results/ai-report/${effectiveExamId}/${row.candidateId}${attemptQuery}`}>
-                                    <Bot className="h-4 w-4 mr-2" />{language === "ar" ? "تقرير الذكاء الاصطناعي" : "AI Report"}
+                                    <Bot className="h-4 w-4 me-2" />{language === "ar" ? "تقرير الذكاء الاصطناعي" : "AI Report"}
                                   </Link>
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem asChild>
                                 <Link href={`/proctor-center/video/${row.candidateId}${attemptQuery}`}>
-                                  <Video className="h-4 w-4 mr-2" />{language === "ar" ? "وسائط المحاولة" : "Attempt Media"}
+                                  <Video className="h-4 w-4 me-2" />{language === "ar" ? "وسائط المحاولة" : "Attempt Media"}
                                 </Link>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
