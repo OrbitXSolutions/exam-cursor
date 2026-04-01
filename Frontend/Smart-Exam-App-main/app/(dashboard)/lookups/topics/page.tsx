@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, Hash, Loader2, Filter } from "lucide-react"
 import {
@@ -188,7 +189,7 @@ function TopicsContent() {
             </p>
           </div>
           <Button onClick={handleCreate} disabled={subjects.length === 0}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {language === "ar" ? "إضافة موضوع" : "Add Topic"}
           </Button>
         </div>
@@ -197,18 +198,18 @@ function TopicsContent() {
           <CardContent className="p-6">
             <div className="mb-4 flex items-center gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className={cn("absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground", language === "ar" ? "right-3" : "left-3")} />
                 <Input
                   placeholder={language === "ar" ? "البحث عن موضوع..." : "Search topics..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className={language === "ar" ? "pr-10" : "pl-10"}
                 />
               </div>
               <div className="w-[200px]">
                 <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
                   <SelectTrigger>
-                    <Filter className="mr-2 h-4 w-4" />
+                    <Filter className="me-2 h-4 w-4" />
                     <SelectValue placeholder={language === "ar" ? "جميع المواد" : "All Subjects"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -284,14 +285,14 @@ function TopicsContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(topic)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteClick(topic)}
                               className="text-destructive focus:text-destructive"
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -368,7 +369,7 @@ function TopicsContent() {
                 {language === "ar" ? "إلغاء" : "Cancel"}
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {dialogMode === "create"
                   ? language === "ar"
                     ? "إنشاء"
@@ -399,7 +400,7 @@ function TopicsContent() {
                 disabled={deleting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {deleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {language === "ar" ? "حذف" : "Delete"}
               </AlertDialogAction>
             </AlertDialogFooter>

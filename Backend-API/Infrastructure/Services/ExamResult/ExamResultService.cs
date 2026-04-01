@@ -20,19 +20,22 @@ public class ExamResultService : IExamResultService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly INotificationService _notificationService;
 
     public ExamResultService(
         ApplicationDbContext context,
         ICertificateService certificateService,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        INotificationService notificationService)
     {
         _context = context;
         _certificateService = certificateService;
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _notificationService = notificationService;
     }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
@@ -279,6 +282,16 @@ public class ExamResultService : IExamResultService
 
         await _context.SaveChangesAsync();
 
+        // Queue result published notification
+        try
+        {
+            await _notificationService.QueueResultPublishedNotificationsAsync(result.ExamId);
+        }
+        catch (Exception)
+        {
+            // Don't fail publish if notification queueing fails
+        }
+
         return await GetResultByIdAsync(resultId);
     }
 
@@ -325,6 +338,17 @@ public class ExamResultService : IExamResultService
 
         await _context.SaveChangesAsync();
 
+        // Queue result published notifications for affected exams
+        try
+        {
+            var examIds = results.Select(r => r.ExamId).Distinct();
+            foreach (var examId in examIds)
+            {
+                await _notificationService.QueueResultPublishedNotificationsAsync(examId);
+            }
+        }
+        catch (Exception) { }
+
         return ApiResponse<int>.SuccessResponse(results.Count, $"{results.Count} results published successfully");
     }
 
@@ -351,6 +375,13 @@ public class ExamResultService : IExamResultService
         }
 
         await _context.SaveChangesAsync();
+
+        // Queue result published notifications
+        try
+        {
+            await _notificationService.QueueResultPublishedNotificationsAsync(dto.ExamId);
+        }
+        catch (Exception) { }
 
         return ApiResponse<int>.SuccessResponse(results.Count, $"{results.Count} results published successfully");
     }

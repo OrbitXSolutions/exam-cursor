@@ -300,6 +300,7 @@ export function Sidebar() {
 
   // Check if user guide should show (must be after filterByRole)
   const showUserGuide = !hasRole(UserRole.Candidate) && filterByRole([userGuideNavItem]).length > 0
+  const sectionHeadingClass = "mb-2 mt-4 px-3 text-start text-xs font-semibold uppercase tracking-wider text-muted-foreground"
 
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = item.exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(`${item.href}/`))
@@ -310,16 +311,16 @@ export function Sidebar() {
       <Link
         href={item.href}
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium transition-all",
           "hover:bg-accent hover:text-accent-foreground",
           isActive && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
           isCollapsed && "justify-center px-2",
         )}
       >
         <Icon className="h-5 w-5 shrink-0" />
-        {!isCollapsed && <span className="truncate">{label}</span>}
+        {!isCollapsed && <span className="min-w-0 flex-1 truncate text-start">{label}</span>}
         {!isCollapsed && item.badge && (
-          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
+          <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
             {item.badge}
           </span>
         )}
@@ -349,6 +350,7 @@ export function Sidebar() {
   const NavGroupBlock = ({ group, groupKey }: { group: NavGroup; groupKey: string }) => {
     const isOpen = openGroups[groupKey] ?? false
     const Icon = group.icon
+    const GroupChevron = isRTL ? ChevronLeft : ChevronRight
     const label = t(group.labelKey) || group.labelKey.split(".").pop()
     const children = filterByRole(group.children)
     if (children.length === 0) return null
@@ -368,15 +370,15 @@ export function Sidebar() {
         <button
           type="button"
           onClick={() => setOpenGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }))}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium text-foreground hover:bg-accent"
         >
           <Icon className="h-5 w-5 shrink-0" />
-          <span className="flex-1 truncate text-start">{label}</span>
-          <ChevronRight 
+          <span className="min-w-0 flex-1 truncate text-start">{label}</span>
+          <GroupChevron
             className={cn(
               "h-4 w-4 shrink-0 transition-transform duration-200",
-              isOpen && "rotate-90"
-            )} 
+              isOpen && (isRTL ? "-rotate-90" : "rotate-90")
+            )}
           />
         </button>
         {isOpen && (
@@ -393,15 +395,17 @@ export function Sidebar() {
   return (
     <TooltipProvider>
       <aside
+        dir={isRTL ? "rtl" : "ltr"}
         className={cn(
-          "flex h-screen flex-col border-r bg-sidebar transition-all duration-300",
+          "flex h-screen flex-col bg-sidebar transition-all duration-300",
+          isRTL ? "border-l" : "border-r",
           isCollapsed ? "w-16" : "w-64",
         )}
       >
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b px-4">
           {!isCollapsed && (
-            <Link href={isCandidate ? "/my-exams" : "/dashboard"} className="flex items-center gap-2">
+            <Link href={isCandidate ? "/my-exams" : "/dashboard"} className="flex min-w-0 items-center gap-2 text-start">
               {isCandidate && hasOrgBranding && logoSrc ? (
                 <img src={logoSrc} alt={orgName} className="h-8 w-8 rounded-lg object-contain" />
               ) : (
@@ -436,7 +440,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <ScrollArea className="flex-1 min-h-0 px-3 py-4">
-          <nav className="flex flex-col gap-1">
+          <nav dir={isRTL ? "rtl" : "ltr"} className="flex flex-col gap-1">
             {/* Main Nav */}
             {mainNavItems.map((item) => (
               <NavLink key={item.href} item={item} />
@@ -446,7 +450,7 @@ export function Sidebar() {
             {hasRole(UserRole.Candidate) && filterByRole(candidateNavItems).length > 0 && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "بوابة المرشح" : "Candidate Portal"}
                   </div>
                 )}
@@ -458,7 +462,7 @@ export function Sidebar() {
                   <Link
                     href="/verify-identity"
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium transition-all",
                       "hover:bg-accent hover:text-accent-foreground",
                       pathname === "/verify-identity" && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
                       isCollapsed && "justify-center px-2",
@@ -472,10 +476,10 @@ export function Sidebar() {
                       <ShieldCheck className="h-5 w-5 shrink-0 text-red-500" />
                     )}
                     {!isCollapsed && (
-                      <span className="flex items-center gap-2 truncate">
-                        {language === "ar" ? "التحقق من الهوية" : "Identity"}
+                      <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                        <span className="truncate text-start">{language === "ar" ? "التحقق من الهوية" : "Identity"}</span>
                         <span className={cn(
-                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                          "inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium",
                           verifiedStatus === "Approved" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                           verifiedStatus === "Pending" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
                           (verifiedStatus === "Rejected" || verifiedStatus === "Flagged") && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
@@ -495,7 +499,7 @@ export function Sidebar() {
             {showGroup(questionBankNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "بنك الأسئلة" : "Question Bank"}
                   </div>
                 )}
@@ -507,7 +511,7 @@ export function Sidebar() {
             {showGroup(examsNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "إدارة الاختبارات" : "Exam Management"}
                   </div>
                 )}
@@ -519,7 +523,7 @@ export function Sidebar() {
             {showGroup(resultNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "النتائج" : "Result"}
                   </div>
                 )}
@@ -531,7 +535,7 @@ export function Sidebar() {
             {showGroup(proctorNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "مركز المراقبة" : "Proctor Center"}
                   </div>
                 )}
@@ -543,7 +547,7 @@ export function Sidebar() {
             {showGroup(candidatesNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "المرشحون" : "Candidates"}
                   </div>
                 )}
@@ -555,7 +559,7 @@ export function Sidebar() {
             {showGroup(administrationNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "الإدارة" : "Administration"}
                   </div>
                 )}
@@ -567,7 +571,7 @@ export function Sidebar() {
             {showGroup(notificationsNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "الإشعارات" : "Notifications"}
                   </div>
                 )}
@@ -579,7 +583,7 @@ export function Sidebar() {
             {showGroup(logsNavGroup) && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "سجلات النظام" : "System Logs"}
                   </div>
                 )}
@@ -591,7 +595,7 @@ export function Sidebar() {
             {showUserGuide && (
               <>
                 {!isCollapsed && (
-                  <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className={sectionHeadingClass}>
                     {language === "ar" ? "المساعدة" : "Help"}
                   </div>
                 )}
@@ -605,13 +609,13 @@ export function Sidebar() {
         {isCandidate && hasOrgBranding && !isCollapsed && (branding.supportEmail || branding.mobileNumber) && (
           <div className="border-t px-3 py-2 space-y-1">
             {branding.supportEmail && (
-              <a href={`mailto:${branding.supportEmail}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground truncate">
+              <a href={`mailto:${branding.supportEmail}`} className="flex items-center gap-2 truncate text-start text-xs text-muted-foreground hover:text-foreground">
                 <span className="shrink-0">📧</span>
                 {branding.supportEmail}
               </a>
             )}
             {branding.mobileNumber && (
-              <a href={`tel:${branding.mobileNumber}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">
+              <a href={`tel:${branding.mobileNumber}`} className="flex items-center gap-2 text-start text-xs text-muted-foreground hover:text-foreground">
                 <span className="shrink-0">📱</span>
                 {branding.mobileNumber}
               </a>
@@ -627,7 +631,7 @@ export function Sidebar() {
                 {getLocalizedField(user, "fullName", language).charAt(0).toUpperCase()}
               </div>
               {!isCollapsed && (
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden text-start">
                   <p className="truncate text-sm font-medium">{getLocalizedField(user, "fullName", language)}</p>
                   <p className="truncate text-xs text-muted-foreground">{user.role}</p>
                 </div>

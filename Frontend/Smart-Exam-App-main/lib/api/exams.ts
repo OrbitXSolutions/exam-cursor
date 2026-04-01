@@ -318,6 +318,47 @@ export async function unpublishExam(id: string | number): Promise<boolean> {
   return response === true || (response && response.success);
 }
 
+// ============ SHARE LINKS ============
+
+export interface ExamShareLink {
+  id: number
+  examId: number
+  shareToken: string
+  shareUrl: string
+  expiresAt?: string
+  isActive: boolean
+  createdDate: string
+}
+
+export async function generateShareLink(
+  examId: string | number,
+  expiresAt?: string,
+): Promise<ExamShareLink> {
+  return apiClient.post<ExamShareLink>(
+    `/Assessment/exams/${examId}/share-link`,
+    expiresAt ? { expiresAt } : {},
+  );
+}
+
+export async function getShareLink(
+  examId: string | number,
+): Promise<ExamShareLink | null> {
+  try {
+    return await apiClient.get<ExamShareLink>(
+      `/Assessment/exams/${examId}/share-link`,
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function revokeShareLink(
+  examId: string | number,
+): Promise<boolean> {
+  await apiClient.delete<void>(`/Assessment/exams/${examId}/share-link`);
+  return true;
+}
+
 export async function validateExam(
   id: string | number,
 ): Promise<{ isValid: boolean; errors: string[]; warnings: string[] }> {

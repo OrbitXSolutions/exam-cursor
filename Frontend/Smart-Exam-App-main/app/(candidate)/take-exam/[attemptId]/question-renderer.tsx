@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import type { AttemptQuestionDto, SaveAnswerRequest } from "@/lib/api/candidate"
+import { localizeText } from "@/lib/i18n/runtime"
 import { cn } from "@/lib/utils"
 import { ImageZoomModal } from "./image-zoom-modal"
 
@@ -116,7 +117,12 @@ function renderAnswerComponent(
         />
       )
     default:
-      return <div>Unsupported question type: {question.questionTypeName}</div>
+      return (
+        <div>
+          {localizeText("Unsupported question type", "نوع سؤال غير مدعوم", language)}:{" "}
+          {question.questionTypeName}
+        </div>
+      )
   }
 }
 

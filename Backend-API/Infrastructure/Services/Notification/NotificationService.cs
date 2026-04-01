@@ -205,18 +205,36 @@ public class NotificationService : INotificationService
         return ApiResponse<bool>.SuccessResponse(true, "Notification queued for retry.");
     }
 
+    public async Task<ApiResponse<bool>> SendNowAsync(int logId)
+    {
+        var log = await _db.NotificationLogs.FindAsync(logId);
+        if (log == null)
+            return ApiResponse<bool>.FailureResponse("Notification log not found.");
+
+        if (log.Status == NotificationStatus.Sent)
+            return ApiResponse<bool>.FailureResponse("Notification was already sent.");
+
+        log.Status = NotificationStatus.Pending;
+        log.ErrorMessage = null;
+        log.RetryCount++;
+        log.UpdatedDate = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync();
+        return ApiResponse<bool>.SuccessResponse(true, "Notification queued for immediate sending.");
+    }
+
     // ── Test ────────────────────────────────────────────────────
 
     public async Task<ApiResponse<bool>> SendTestEmailAsync(TestEmailDto dto)
     {
-        var result = await _emailService.SendEmailAsync(
+        var (success, error) = await _emailService.SendEmailWithDetailAsync(
             dto.ToEmail,
             "Smart Exam - Test Email",
             "<h2>Test Email</h2><p>This is a test email from Smart Exam notification system. If you received this, your SMTP configuration is working correctly.</p>");
 
-        return result
+        return success
             ? ApiResponse<bool>.SuccessResponse(true, "Test email sent successfully.")
-            : ApiResponse<bool>.FailureResponse("Failed to send test email. Check your SMTP settings.");
+            : ApiResponse<bool>.FailureResponse($"Failed to send test email: {error}");
     }
 
     public async Task<ApiResponse<bool>> SendTestSmsAsync(TestSmsDto dto)
@@ -331,6 +349,69 @@ public class NotificationService : INotificationService
         }
     }
 
+    // ── Event: Result Published ─────────────────────────────────
+
+    public async Task QueueResultPublishedNotificationsAsync(int examId)
+    {
+        var settings = await _db.NotificationSettings.FirstOrDefaultAsync();
+        if (settings == null || !settings.EnableEmail)
+        {
+            _logger.LogInformation("Email notifications disabled. Skipping result published for exam {ExamId}.", examId);
+            return;
+        }
+
+        var exam = await _db.Exams.FirstOrDefaultAsync(e => e.Id == examId);
+        if (exam == null) return;
+
+        // Get all candidates who have published results for this exam
+        var publishedResults = await _db.Set<Domain.Entities.ExamResult.Result>()
+            .Include(r => r.Candidate)
+            .Where(r => r.ExamId == examId && r.IsPublishedToCandidate)
+            .ToListAsync();
+
+        if (publishedResults.Count == 0)
+        {
+            _logger.LogInformation("No published results to notify for exam {ExamId}.", examId);
+            return;
+        }
+
+        var logs = new List<NotificationLog>();
+
+        foreach (var result in publishedResults)
+        {
+            var candidate = result.Candidate;
+            if (candidate == null || string.IsNullOrWhiteSpace(candidate.Email)) continue;
+
+            // Avoid duplicate: don't queue if already sent for this candidate+exam+event
+            var alreadyQueued = await _db.NotificationLogs.AnyAsync(l =>
+                l.CandidateId == candidate.Id &&
+                l.ExamId == examId &&
+                l.EventType == NotificationEventType.ResultPublished &&
+                l.Channel == NotificationChannel.Email);
+
+            if (alreadyQueued) continue;
+
+            logs.Add(new NotificationLog
+            {
+                CandidateId = candidate.Id,
+                ExamId = examId,
+                EventType = NotificationEventType.ResultPublished,
+                Channel = NotificationChannel.Email,
+                Status = NotificationStatus.Pending,
+                RecipientEmail = candidate.Email,
+                RecipientPhone = candidate.PhoneNumber,
+                CreatedDate = DateTime.UtcNow
+            });
+        }
+
+        if (logs.Count > 0)
+        {
+            _db.NotificationLogs.AddRange(logs);
+            await _db.SaveChangesAsync();
+            _logger.LogInformation("Queued {Count} result published notifications for exam {ExamId}.", logs.Count, examId);
+        }
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
 
     private async Task<NotificationSettings> GetOrCreateSettingsAsync()
@@ -369,6 +450,8 @@ Password: {{Password}}
 
 Click here to login and start: {{LoginUrl}}
 
+Or Public Login in {{ExamURL}}
+
 If you did not expect this email, please contact support at {{SupportEmail}}.
 
 Good luck!",
@@ -386,6 +469,8 @@ Good luck!",
 كلمة المرور: {{Password}}
 
 انقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}
+
+أو الدخول العام في {{ExamURL}}
 
 إذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.
 

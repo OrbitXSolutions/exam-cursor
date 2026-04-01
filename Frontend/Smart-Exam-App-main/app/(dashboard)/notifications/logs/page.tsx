@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n/context"
 import {
   getNotificationLogs,
   retryNotification,
+  sendNowNotification,
   type NotificationLogDto,
   type NotificationLogFilter,
 } from "@/lib/api/notifications"
@@ -36,6 +37,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Send,
 } from "lucide-react"
 
 const STATUS_CONFIG: Record<number, { en: string; ar: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof CheckCircle2 }> = {
@@ -61,6 +63,7 @@ export default function NotificationLogsPage() {
   const [logs, setLogs] = useState<NotificationLogDto[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [retryingId, setRetryingId] = useState<number | null>(null)
+  const [sendingNowId, setSendingNowId] = useState<number | null>(null)
 
   // Filters
   const [filter, setFilter] = useState<NotificationLogFilter>({
@@ -104,6 +107,19 @@ export default function NotificationLogsPage() {
       toast.error(language === "ar" ? "فشلت إعادة المحاولة" : "Retry failed")
     } finally {
       setRetryingId(null)
+    }
+  }
+
+  async function handleSendNow(logId: number) {
+    setSendingNowId(logId)
+    try {
+      await sendNowNotification(logId)
+      toast.success(language === "ar" ? "تمت جدولة الإرسال الفوري" : "Queued for immediate sending")
+      loadLogs()
+    } catch {
+      toast.error(language === "ar" ? "فشل الإرسال" : "Send failed")
+    } finally {
+      setSendingNowId(null)
     }
   }
 
@@ -350,21 +366,40 @@ export default function NotificationLogsPage() {
                             : new Date(log.createdDate).toLocaleString(language === "ar" ? "ar" : "en")}
                         </TableCell>
                         <TableCell>
-                          {log.status === 3 && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleRetry(log.id)}
-                              disabled={retryingId === log.id}
-                              title={language === "ar" ? "إعادة المحاولة" : "Retry"}
-                            >
-                              {retryingId === log.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <RotateCcw className="h-4 w-4" />
-                              )}
-                            </Button>
-                          )}
+                          <div className="flex items-center gap-1">
+                            {/* Send Now - for Pending and Failed */}
+                            {(log.status === 1 || log.status === 3) && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleSendNow(log.id)}
+                                disabled={sendingNowId === log.id}
+                                title={language === "ar" ? "إرسال الآن" : "Send Now"}
+                              >
+                                {sendingNowId === log.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Send className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                            {/* Retry - only for Failed */}
+                            {log.status === 3 && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleRetry(log.id)}
+                                disabled={retryingId === log.id}
+                                title={language === "ar" ? "إعادة المحاولة" : "Retry"}
+                              >
+                                {retryingId === log.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <RotateCcw className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     )

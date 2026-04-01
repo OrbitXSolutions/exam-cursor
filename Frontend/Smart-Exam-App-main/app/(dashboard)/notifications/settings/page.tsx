@@ -67,12 +67,16 @@ export default function NotificationSettingsPage() {
       toast.error(language === "ar" ? "يرجى إدخال البريد الإلكتروني" : "Please enter an email address")
       return
     }
+    if (!settings) return
     setSendingTestEmail(true)
     try {
+      // Save current settings to DB first so the test uses latest values
+      await updateNotificationSettings(settings)
       await sendTestEmail(testEmail)
       toast.success(language === "ar" ? "تم إرسال البريد التجريبي بنجاح" : "Test email sent successfully")
-    } catch {
-      toast.error(language === "ar" ? "فشل إرسال البريد التجريبي" : "Failed to send test email")
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to send test email"
+      toast.error(msg)
     } finally {
       setSendingTestEmail(false)
     }

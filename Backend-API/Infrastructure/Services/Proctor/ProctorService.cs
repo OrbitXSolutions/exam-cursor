@@ -146,7 +146,7 @@ public class ProctorService : IProctorService
             .FirstOrDefaultAsync(s => s.AttemptId == dto.AttemptId && s.CandidateId == candidateId);
 
         if (session == null)
-            return ApiResponse<bool>.FailureResponse("Session not found");
+            return ApiResponse<bool>.SuccessResponse(true, "No proctor session — skipped device info update");
 
         if (!string.IsNullOrEmpty(dto.BrowserName)) session.BrowserName = dto.BrowserName;
         if (!string.IsNullOrEmpty(dto.BrowserVersion)) session.BrowserVersion = dto.BrowserVersion;

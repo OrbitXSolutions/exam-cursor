@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { useAuth } from "@/lib/auth/context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,7 +45,7 @@ export default function ProfilePage() {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     setIsUpdating(false)
-    toast.success("Profile updated successfully (mock)")
+    toast.success(localizeText("Profile updated successfully (mock)", "تم تحديث الملف الشخصي بنجاح (تجريبيًا)", language))
   }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -62,7 +63,7 @@ export default function ProfilePage() {
 
     setIsUpdating(false)
     setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
-    toast.success("Password changed successfully (mock)")
+    toast.success(localizeText("Password changed successfully (mock)", "تم تغيير كلمة المرور بنجاح (تجريبيًا)", language))
   }
 
   if (!user) return null
@@ -72,7 +73,9 @@ export default function ProfilePage() {
       <div className="flex-1 p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">{t("nav.profile")}</h1>
-          <p className="text-muted-foreground">Manage your account settings</p>
+          <p className="text-muted-foreground">
+            {localizeText("Manage your account settings", "إدارة إعدادات حسابك", language)}
+          </p>
         </div>
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
@@ -99,7 +102,9 @@ export default function ProfilePage() {
                       {user.role}
                     </Badge>
                     <Badge variant={user.isActive ? "default" : "destructive"}>
-                      {user.isActive ? "Active" : "Inactive"}
+                      {user.isActive
+                        ? localizeText("Active", "نشط", language)
+                        : localizeText("Inactive", "غير نشط", language)}
                     </Badge>
                   </div>
                 </div>
@@ -112,11 +117,11 @@ export default function ProfilePage() {
             <TabsList className="grid w-full grid-cols-2 max-w-md">
               <TabsTrigger value="profile" className="gap-2">
                 <User className="h-4 w-4" />
-                Profile
+                {localizeText("Profile", "الملف الشخصي", language)}
               </TabsTrigger>
               <TabsTrigger value="security" className="gap-2">
                 <Lock className="h-4 w-4" />
-                Security
+                {localizeText("Security", "الأمان", language)}
               </TabsTrigger>
             </TabsList>
 

@@ -48,7 +48,7 @@ export function Header() {
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1 top-1 flex h-2 w-2">
+          <span className="absolute end-1 top-1 flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
@@ -87,25 +87,25 @@ export function Header() {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
+                  <User className="h-4 w-4" />
                   {t("nav.profile")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/settings" className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
+                  <Settings className="h-4 w-4" />
                   {t("nav.settings")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/tutorials" className="cursor-pointer">
-                  <HelpCircle className="mr-2 h-4 w-4" />
+                  <HelpCircle className="h-4 w-4" />
                   {t("nav.userGuide") || t("nav.helpSupport")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="h-4 w-4" />
                 {t("nav.logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>

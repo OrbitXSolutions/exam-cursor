@@ -2,9 +2,11 @@ namespace Smart_Core.Application.Interfaces;
 
 public interface IEmailService
 {
-    Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true);
-    Task<bool> SendEmailAsync(List<string> to, string subject, string body, bool isHtml = true);
+  Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true);
+  Task<bool> SendEmailAsync(List<string> to, string subject, string body, bool isHtml = true);
+  /// <summary>Sends an email and returns (success, errorMessage). Used by test-email to surface SMTP errors.</summary>
+  Task<(bool Success, string? Error)> SendEmailWithDetailAsync(string to, string subject, string body, bool isHtml = true);
   Task<bool> SendPasswordResetEmailAsync(string to, string resetLink);
-    Task<bool> SendEmailConfirmationAsync(string to, string confirmationLink);
-    Task<bool> SendWelcomeEmailAsync(string to, string displayName);
+  Task<bool> SendEmailConfirmationAsync(string to, string confirmationLink);
+  Task<bool> SendWelcomeEmailAsync(string to, string displayName);
 }

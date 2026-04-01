@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { translations, type Language } from "./translations"
+import { DEFAULT_LANGUAGE } from "./runtime"
 
 interface I18nContextType {
   language: Language
@@ -15,12 +16,14 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en")
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE)
 
   useEffect(() => {
     const saved = localStorage.getItem("language") as Language
     if (saved && (saved === "en" || saved === "ar")) {
       setLanguageState(saved)
+    } else {
+      localStorage.setItem("language", DEFAULT_LANGUAGE)
     }
   }, [])
 

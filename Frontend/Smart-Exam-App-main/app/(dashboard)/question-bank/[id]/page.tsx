@@ -6,6 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -69,7 +70,7 @@ export default function QuestionDetailPage() {
       }
     } catch (error) {
       console.error("[v0] Failed to fetch question:", error)
-      toast.error("Failed to load question")
+      toast.error(localizeText("Failed to load question", "فشل تحميل السؤال", language))
     }
     setIsLoading(false)
   }
@@ -78,11 +79,11 @@ export default function QuestionDetailPage() {
     setIsDeleting(true)
     try {
       await deleteQuestion(numericId)
-      toast.success("Question deleted successfully")
+      toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       router.push("/question-bank")
     } catch (error) {
       console.error("[v0] Failed to delete question:", error)
-      toast.error("Failed to delete question")
+      toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
     }
     setIsDeleting(false)
   }
@@ -94,7 +95,7 @@ export default function QuestionDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <PageHeader title="Question Details" />
+        <PageHeader title={language === "ar" ? "تفاصيل السؤال" : "Question Details"} />
         <PageLoader />
       </div>
     )
@@ -103,13 +104,13 @@ export default function QuestionDetailPage() {
   if (!question) {
     return (
       <div className="flex flex-col">
-        <PageHeader title="Question Not Found" />
+        <PageHeader title={language === "ar" ? "السؤال غير موجود" : "Question Not Found"} />
         <div className="flex-1 p-6">
-          <p className="text-muted-foreground">The question you are looking for does not exist.</p>
+          <p className="text-muted-foreground">{language === "ar" ? "السؤال الذي تبحث عنه غير موجود." : "The question you are looking for does not exist."}</p>
           <Button variant="outline" className="mt-4 bg-transparent" asChild>
             <Link href="/question-bank">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Question Bank
+              <ArrowLeft className="me-2 h-4 w-4" />
+              {language === "ar" ? "العودة إلى بنك الأسئلة" : "Back to Question Bank"}
             </Link>
           </Button>
         </div>
@@ -119,14 +120,14 @@ export default function QuestionDetailPage() {
 
   return (
     <div className="flex flex-col">
-      <PageHeader title="Question Details" subtitle={`Question #${question.id}`} />
+      <PageHeader title={language === "ar" ? "تفاصيل السؤال" : "Question Details"} subtitle={language === "ar" ? `سؤال #${question.id}` : `Question #${question.id}`} />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-3xl">
           <div className="mb-6 flex items-center justify-between">
             <Button variant="ghost" asChild>
               <Link href="/question-bank">
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="me-2 h-4 w-4" />
                 {t("common.back")}
               </Link>
             </Button>
@@ -137,15 +138,15 @@ export default function QuestionDetailPage() {
                     variant="outline"
                     className="text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent"
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="me-2 h-4 w-4" />
                     {t("common.delete")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Question</AlertDialogTitle>
+                    <AlertDialogTitle>{language === "ar" ? "حذف السؤال" : "Delete Question"}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete this question? This action cannot be undone.
+                      {language === "ar" ? "هل أنت متأكد من حذف هذا السؤال؟ لا يمكن التراجع عن هذا الإجراء." : "Are you sure you want to delete this question? This action cannot be undone."}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -155,14 +156,14 @@ export default function QuestionDetailPage() {
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       disabled={isDeleting}
                     >
-                      {isDeleting ? "Deleting..." : t("common.delete")}
+                      {isDeleting ? (language === "ar" ? "جاري الحذف..." : "Deleting...") : t("common.delete")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
               <Button asChild>
                 <Link href={`/question-bank/${question.id}/edit`}>
-                  <Edit className="mr-2 h-4 w-4" />
+                  <Edit className="me-2 h-4 w-4" />
                   {t("common.edit")}
                 </Link>
               </Button>
@@ -175,7 +176,7 @@ export default function QuestionDetailPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
-                    <CardTitle>Question</CardTitle>
+                    <CardTitle>{language === "ar" ? "السؤال" : "Question"}</CardTitle>
                     <CardDescription>
                       {language === "ar"
                         ? (question.questionTypeNameAr || question.questionTypeNameEn || question.questionTypeName)
@@ -188,7 +189,7 @@ export default function QuestionDetailPage() {
                     {question.isCalculatorAllowed && (
                       <Badge variant="outline" className="gap-1 border-blue-300 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                         <Calculator className="h-3 w-3" />
-                        Calculator
+                        {language === "ar" ? "آلة حاسبة" : "Calculator"}
                       </Badge>
                     )}
                   </div>
@@ -198,8 +199,8 @@ export default function QuestionDetailPage() {
                 <div className="space-y-4">
                   {/* English Body */}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">English</p>
-                    <p className="text-lg leading-relaxed">{question.bodyEn || question.body || "No question text"}</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">{language === "ar" ? "الإنجليزية" : "English"}</p>
+                    <p className="text-lg leading-relaxed">{question.bodyEn || question.body || (language === "ar" ? "لا يوجد نص للسؤال" : "No question text")}</p>
                   </div>
                   {/* Arabic Body */}
                   {question.bodyAr && (
@@ -234,7 +235,7 @@ export default function QuestionDetailPage() {
             {/* Metadata */}
             <Card>
               <CardHeader>
-                <CardTitle>Details</CardTitle>
+                <CardTitle>{language === "ar" ? "التفاصيل" : "Details"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -244,7 +245,7 @@ export default function QuestionDetailPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">{t("common.points")}</p>
-                      <p className="font-medium">{question.points} points</p>
+                      <p className="font-medium">{question.points} {language === "ar" ? "نقاط" : "points"}</p>
                     </div>
                   </div>
 
@@ -283,7 +284,7 @@ export default function QuestionDetailPage() {
                       <Calendar className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Created</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "تاريخ الإنشاء" : "Created"}</p>
                       <p className="font-medium">
                         {new Date(question.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
                       </p>
@@ -296,7 +297,7 @@ export default function QuestionDetailPage() {
                         <Clock className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Last Updated</p>
+                        <p className="text-sm text-muted-foreground">{language === "ar" ? "آخر تحديث" : "Last Updated"}</p>
                         <p className="font-medium">
                           {new Date(question.updatedDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
                         </p>
@@ -312,7 +313,7 @@ export default function QuestionDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("questionBank.options")}</CardTitle>
-                  <CardDescription>Answer choices for this question</CardDescription>
+                  <CardDescription>{language === "ar" ? "خيارات الإجابة لهذا السؤال" : "Answer choices for this question"}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {question.options
@@ -376,7 +377,7 @@ export default function QuestionDetailPage() {
                 <CardContent className="space-y-4">
                   {question.answerKey.rubricTextEn && (
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">English</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">{language === "ar" ? "الإنجليزية" : "English"}</p>
                       <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-background p-4 whitespace-pre-wrap">
                         {question.answerKey.rubricTextEn}
                       </div>
@@ -406,7 +407,7 @@ export default function QuestionDetailPage() {
                 <CardContent className="space-y-4">
                   {question.explanationEn && (
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">English</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">{language === "ar" ? "الإنجليزية" : "English"}</p>
                       <p className="leading-relaxed whitespace-pre-wrap">{question.explanationEn}</p>
                     </div>
                   )}
@@ -449,7 +450,7 @@ export default function QuestionDetailPage() {
                             <div className="flex items-center gap-2">
                               <p className="text-xs text-muted-foreground">{(attachment.fileSize / 1024).toFixed(1)} KB</p>
                               {attachment.isPrimary && (
-                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Primary</Badge>
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{language === "ar" ? "أساسي" : "Primary"}</Badge>
                               )}
                             </div>
                           </div>

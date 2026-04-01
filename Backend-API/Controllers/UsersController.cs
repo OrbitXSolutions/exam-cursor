@@ -18,31 +18,43 @@ public class UsersController : ControllerBase
 
     public UsersController(IUserService userService, ICurrentUserService currentUserService)
     {
-    _userService = userService;
+        _userService = userService;
         _currentUserService = currentUserService;
     }
 
-/// <summary>
+    /// <summary>
+    /// Create a new user (admin)
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+    {
+        var result = await _userService.CreateUserAsync(dto, _currentUserService.UserId!);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
     /// Get all users with pagination and filtering
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResponse<UserDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filter)
     {
-   var result = await _userService.GetUsersAsync(filter);
+        var result = await _userService.GetUsersAsync(filter);
         return Ok(result);
-  }
+    }
 
     /// <summary>
     /// Get user by ID
     /// </summary>
-[HttpGet("{id}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById(string id)
     {
         var result = await _userService.GetUserByIdAsync(id);
-     return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -53,13 +65,13 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserByEmail(string email)
     {
-  var result = await _userService.GetUserByEmailAsync(email);
+        var result = await _userService.GetUserByEmailAsync(email);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
     /// Get users by role
-/// </summary>
+    /// </summary>
     [HttpGet("by-role/{roleName}")]
     [ProducesResponseType(typeof(ApiResponse<List<UserDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUsersByRole(string roleName)
@@ -72,23 +84,23 @@ public class UsersController : ControllerBase
     /// Update user
     /// </summary>
     [HttpPut("{id}")]
- [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<UserDetailDto>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto dto)
     {
-  var result = await _userService.UpdateUserAsync(id, dto, _currentUserService.UserId!);
+        var result = await _userService.UpdateUserAsync(id, dto, _currentUserService.UserId!);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Block user
     /// </summary>
- [HttpPost("{id}/block")]
+    [HttpPost("{id}/block")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
-  [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> BlockUser(string id)
     {
-    var result = await _userService.BlockUserAsync(id, _currentUserService.UserId!);
+        var result = await _userService.BlockUserAsync(id, _currentUserService.UserId!);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -100,8 +112,8 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnblockUser(string id)
     {
-    var result = await _userService.UnblockUserAsync(id, _currentUserService.UserId!);
-      return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _userService.UnblockUserAsync(id, _currentUserService.UserId!);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -124,12 +136,12 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeactivateUser(string id)
     {
-   var result = await _userService.DeactivateUserAsync(id, _currentUserService.UserId!);
+        var result = await _userService.DeactivateUserAsync(id, _currentUserService.UserId!);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
- /// Delete user (soft delete)
+    /// Delete user (soft delete)
     /// </summary>
     [HttpDelete("{id}")]
     [Authorize(Roles = AppRoles.SuperDev)]
@@ -137,7 +149,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteUser(string id)
     {
-   var result = await _userService.DeleteUserAsync(id, _currentUserService.UserId!);
+        var result = await _userService.DeleteUserAsync(id, _currentUserService.UserId!);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 }

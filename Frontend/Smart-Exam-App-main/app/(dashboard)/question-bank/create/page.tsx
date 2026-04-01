@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -116,13 +117,13 @@ const CreateQuestionPage = () => {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      toast.error(localizeText('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed', 'يُسمح فقط بملفات الصور (JPEG, PNG, GIF, WebP, SVG)', language))
       return
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be less than 10MB')
+      toast.error(localizeText('Image size must be less than 10MB', 'يجب أن يكون حجم الصورة أقل من 10 ميجابايت', language))
       return
     }
 
@@ -144,11 +145,11 @@ const CreateQuestionPage = () => {
     if (!file) return
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      toast.error(localizeText('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed', 'يُسمح فقط بملفات الصور (JPEG, PNG, GIF, WebP, SVG)', language))
       return
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be less than 10MB')
+      toast.error(localizeText('Image size must be less than 10MB', 'يجب أن يكون حجم الصورة أقل من 10 ميجابايت', language))
       return
     }
     const reader = new FileReader()
@@ -242,7 +243,7 @@ const CreateQuestionPage = () => {
       }
     } catch (error) {
       console.error("[v0] Failed to fetch lookups:", error)
-      toast.error("Failed to load question types and categories")
+      toast.error(localizeText("Failed to load question types and categories", "فشل تحميل أنواع وتصنيفات الأسئلة", language))
     }
     setIsLoading(false)
   }
@@ -262,7 +263,7 @@ const CreateQuestionPage = () => {
 
   const removeOption = (id: string) => {
     if (options.length <= 2) {
-      toast.error("At least 2 options are required")
+      toast.error(localizeText("At least 2 options are required", "مطلوب خياران على الأقل", language))
       return
     }
     setOptions(options.filter((opt) => opt.id !== id).map((opt, idx) => ({ ...opt, order: idx })))
@@ -308,25 +309,25 @@ const CreateQuestionPage = () => {
     const errors: string[] = []
 
     if (!formData.bodyEn.trim()) {
-      errors.push("Question body (English) is required")
+      errors.push(language === "ar" ? "نص السؤال (بالإنجليزية) مطلوب" : "Question body (English) is required")
     }
     if (!formData.questionTypeId) {
-      errors.push("Question type is required")
+      errors.push(language === "ar" ? "نوع السؤال مطلوب" : "Question type is required")
     }
     if (!formData.subjectId) {
-      errors.push("Subject is required")
+      errors.push(language === "ar" ? "المادة مطلوبة" : "Subject is required")
     }
 
     if (needsOptions) {
       const hasCorrectAnswer = options.some((opt) => opt.isCorrect)
       if (!hasCorrectAnswer) {
-        errors.push("At least one option must be marked as correct")
+        errors.push(language === "ar" ? "يجب تحديد خيار واحد على الأقل كإجابة صحيحة" : "At least one option must be marked as correct")
       }
 
       if (!isTrueFalse) {
         const hasEmptyOption = options.some((opt) => !opt.textEn.trim())
         if (hasEmptyOption) {
-          errors.push("All options must have text (English)")
+          errors.push(language === "ar" ? "جميع الخيارات يجب أن تحتوي على نص (بالإنجليزية)" : "All options must have text (English)")
         }
       }
     }
@@ -448,17 +449,17 @@ const CreateQuestionPage = () => {
           }
         } catch (imgErr) {
           console.warn('Image upload failed, question was created:', imgErr)
-          toast.warning('Question created but image upload failed. You can add the image later.')
+          toast.warning(localizeText('Question created but image upload failed. You can add the image later.', 'تم إنشاء السؤال لكن فشل رفع الصورة. يمكنك إضافتها لاحقاً.', language))
         }
       }
 
       if (createdQuestionId) {
         // Response is the Question directly
-        toast.success("Question created successfully")
+        toast.success(localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
         router.replace("/question-bank")
       } else if (responseAny.success === true) {
         // Response is wrapped { success, message, data }
-        toast.success(responseAny.message || "Question created successfully")
+        toast.success(responseAny.message || localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
         router.replace("/question-bank")
       } else if (responseAny.success === false) {
         // Response indicates failure
@@ -467,7 +468,7 @@ const CreateQuestionPage = () => {
         setFormErrors(apiErrors)
       } else {
         // Unknown response format, but we got a response so assume success
-        toast.success("Question created successfully")
+        toast.success(localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
         router.replace("/question-bank")
       }
     } catch (error) {
@@ -494,7 +495,7 @@ const CreateQuestionPage = () => {
     return (
       <Alert variant="destructive" ref={errorRef} tabIndex={-1} className="animate-in fade-in-0 slide-in-from-top-2">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Please fix the following errors</AlertTitle>
+        <AlertTitle>{language === "ar" ? "يرجى إصلاح الأخطاء التالية" : "Please fix the following errors"}</AlertTitle>
         <AlertDescription>
           <ul className="list-disc list-inside mt-2 space-y-1">
             {formErrors.map((error, index) => (
@@ -508,13 +509,13 @@ const CreateQuestionPage = () => {
 
   return (
     <div className="flex flex-col">
-      <PageHeader title={t("questionBank.createQuestion")} subtitle="Add a new question to your bank" className="text-center" />
+      <PageHeader title={t("questionBank.createQuestion")} subtitle={language === "ar" ? "إضافة سؤال جديد إلى بنك الأسئلة" : "Add a new question to your bank"} className="text-center" />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-4xl">
           <Button variant="ghost" asChild className="mb-6">
             <Link href="/question-bank">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="me-2 h-4 w-4" />
               {t("common.back")}
             </Link>
           </Button>
@@ -529,8 +530,8 @@ const CreateQuestionPage = () => {
                     <FileText className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Question Details</CardTitle>
-                    <CardDescription>Enter the question content and settings</CardDescription>
+                    <CardTitle className="text-lg">{language === "ar" ? "تفاصيل السؤال" : "Question Details"}</CardTitle>
+                    <CardDescription>{language === "ar" ? "أدخل محتوى السؤال والإعدادات" : "Enter the question content and settings"}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -593,7 +594,7 @@ const CreateQuestionPage = () => {
                           onClick={removeQuestionImage}
                           className="text-destructive hover:bg-destructive/10"
                         >
-                          <X className="h-4 w-4 mr-1" />
+                          <X className="h-4 w-4 me-1" />
                           {language === "ar" ? "إزالة" : "Remove"}
                         </Button>
                       </div>
@@ -746,7 +747,7 @@ const CreateQuestionPage = () => {
                     </div>
                     <div>
                       <p className="font-semibold">{t("common.active")}</p>
-                      <p className="text-sm text-muted-foreground">Question can be used in exams</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "يمكن استخدام السؤال في الاختبارات" : "Question can be used in exams"}</p>
                     </div>
                   </div>
                   <Switch
@@ -762,8 +763,8 @@ const CreateQuestionPage = () => {
                       <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="font-semibold">Allow Calculator</p>
-                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                      <p className="font-semibold">{language === "ar" ? "السماح بالآلة الحاسبة" : "Allow Calculator"}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "يمكن للمرشحين استخدام آلة حاسبة مدمجة لهذا السؤال" : "Candidates can use a built-in calculator for this question"}</p>
                     </div>
                   </div>
                   <Switch
@@ -784,12 +785,12 @@ const CreateQuestionPage = () => {
                       onValueChange={(value) => setFormData({ ...formData, questionTypeId: value })}
                     >
                       <SelectTrigger id="type" className="border-2 h-11 w-full">
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder={language === "ar" ? "اختر النوع" : "Select type"} />
                       </SelectTrigger>
                       <SelectContent>
                         {types.length === 0 ? (
                           <SelectItem value="none" disabled>
-                            No types available
+                            {language === "ar" ? "لا توجد أنواع متاحة" : "No types available"}
                           </SelectItem>
                         ) : (
                           types.map((type) => (
@@ -815,7 +816,7 @@ const CreateQuestionPage = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">{t("questionBank.options")}</CardTitle>
-                      <CardDescription>Add answer options and select the single correct answer</CardDescription>
+                      <CardDescription>{language === "ar" ? "أضف خيارات الإجابة واختر الإجابة الصحيحة الوحيدة" : "Add answer options and select the single correct answer"}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -885,7 +886,7 @@ const CreateQuestionPage = () => {
                           ) : (
                             <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
                               <ImageIcon className="h-3.5 w-3.5" />
-                              <span>Add Image</span>
+                              <span>{language === "ar" ? "إضافة صورة" : "Add Image"}</span>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -914,7 +915,7 @@ const CreateQuestionPage = () => {
                     onClick={addOption}
                     className="w-full h-12 border-2 border-dashed hover:border-primary hover:bg-primary/5 bg-transparent"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="me-2 h-4 w-4" />
                     {t("questionBank.addOption")}
                   </Button>
                 </CardContent>
@@ -931,7 +932,7 @@ const CreateQuestionPage = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">{t("questionBank.options")}</CardTitle>
-                      <CardDescription>Add answer options and check all correct answers</CardDescription>
+                      <CardDescription>{language === "ar" ? "أضف خيارات الإجابة وحدد جميع الإجابات الصحيحة" : "Add answer options and check all correct answers"}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -939,7 +940,7 @@ const CreateQuestionPage = () => {
                   <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/30">
                     <Info className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-700 dark:text-blue-300">
-                      Multiple answers can be correct. Check all that apply.
+                      {language === "ar" ? "يمكن أن تكون إجابات متعددة صحيحة. حدد كل ما ينطبق." : "Multiple answers can be correct. Check all that apply."}
                     </AlertDescription>
                   </Alert>
 
@@ -1007,7 +1008,7 @@ const CreateQuestionPage = () => {
                           ) : (
                             <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
                               <ImageIcon className="h-3.5 w-3.5" />
-                              <span>Add Image</span>
+                              <span>{language === "ar" ? "إضافة صورة" : "Add Image"}</span>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -1036,7 +1037,7 @@ const CreateQuestionPage = () => {
                     onClick={addOption}
                     className="w-full h-12 border-2 border-dashed hover:border-primary hover:bg-primary/5 bg-transparent"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="me-2 h-4 w-4" />
                     {t("questionBank.addOption")}
                   </Button>
                 </CardContent>
@@ -1052,8 +1053,8 @@ const CreateQuestionPage = () => {
                       <ListChecks className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">Correct Answer</CardTitle>
-                      <CardDescription>Select whether the statement is true or false</CardDescription>
+                      <CardTitle className="text-lg">{language === "ar" ? "الإجابة الصحيحة" : "Correct Answer"}</CardTitle>
+                      <CardDescription>{language === "ar" ? "حدد ما إذا كانت العبارة صحيحة أم خاطئة" : "Select whether the statement is true or false"}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -1065,8 +1066,8 @@ const CreateQuestionPage = () => {
                       className={`flex-1 h-14 text-lg border-2 ${trueFalseAnswer === "true" ? "bg-green-600 hover:bg-green-700" : ""}`}
                       onClick={() => handleTrueFalseChange("true")}
                     >
-                      <CheckCircle2 className="mr-2 h-5 w-5" />
-                      True
+                      <CheckCircle2 className="me-2 h-5 w-5" />
+                      {language === "ar" ? "صحيح" : "True"}
                     </Button>
                     <Button
                       type="button"
@@ -1074,8 +1075,8 @@ const CreateQuestionPage = () => {
                       className={`flex-1 h-14 text-lg border-2 ${trueFalseAnswer === "false" ? "bg-red-600 hover:bg-red-700" : ""}`}
                       onClick={() => handleTrueFalseChange("false")}
                     >
-                      <AlertCircle className="mr-2 h-5 w-5" />
-                      False
+                      <AlertCircle className="me-2 h-5 w-5" />
+                      {language === "ar" ? "خطأ" : "False"}
                     </Button>
                   </div>
                 </CardContent>
@@ -1152,13 +1153,13 @@ const CreateQuestionPage = () => {
               <Button type="submit" size="lg" disabled={isSaving} className="min-w-[140px]">
                 {isSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                    {language === "ar" ? "جاري الحفظ..." : "Saving..."}
                   </>
                 ) : (
                   <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Question
+                    <Plus className="me-2 h-4 w-4" />
+                    {language === "ar" ? "إنشاء سؤال" : "Create Question"}
                   </>
                 )}
               </Button>

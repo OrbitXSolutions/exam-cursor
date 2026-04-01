@@ -759,6 +759,59 @@ namespace Smart_Core.Migrations
                     b.ToTable("ExamSections", (string)null);
                 });
 
+            modelBuilder.Entity("Smart_Core.Domain.Entities.Assessment.ExamShareLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ShareToken")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExamId")
+                        .IsUnique()
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.HasIndex("ShareToken")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ExamShareLinks", (string)null);
+                });
+
             modelBuilder.Entity("Smart_Core.Domain.Entities.Assessment.ExamTopic", b =>
                 {
                     b.Property<int>("Id")
@@ -5073,6 +5126,17 @@ namespace Smart_Core.Migrations
                     b.Navigation("QuestionSubject");
 
                     b.Navigation("QuestionTopic");
+                });
+
+            modelBuilder.Entity("Smart_Core.Domain.Entities.Assessment.ExamShareLink", b =>
+                {
+                    b.HasOne("Smart_Core.Domain.Entities.Assessment.Exam", "Exam")
+                        .WithMany()
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Assessment.ExamTopic", b =>

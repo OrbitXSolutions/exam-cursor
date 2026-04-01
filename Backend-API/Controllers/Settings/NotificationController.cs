@@ -79,6 +79,13 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    [HttpPost("logs/{logId:int}/send-now")]
+    public async Task<IActionResult> SendNow(int logId)
+    {
+        var result = await _notificationService.SendNowAsync(logId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     // ── Test ────────────────────────────────────────────────────
 
     [HttpPost("test-email")]
@@ -93,5 +100,14 @@ public class NotificationController : ControllerBase
     {
         var result = await _notificationService.SendTestSmsAsync(dto);
         return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    // ── Manual triggers ─────────────────────────────────────────
+
+    [HttpPost("queue-exam-emails/{examId:int}")]
+    public async Task<IActionResult> QueueExamEmails(int examId)
+    {
+        await _notificationService.QueueExamPublishedNotificationsAsync(examId);
+        return Ok(new { success = true, message = "Notifications queued for exam." });
     }
 }

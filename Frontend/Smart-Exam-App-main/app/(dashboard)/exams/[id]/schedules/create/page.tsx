@@ -20,7 +20,7 @@ import { ArrowLeft, Save, Calendar, Users } from "lucide-react"
 
 export default function CreateSchedulePage() {
   const { id } = useParams<{ id: string }>()
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const router = useRouter()
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,7 +45,7 @@ export default function CreateSchedulePage() {
       const data = await getExam(id)
       setExam(data)
     } catch (error) {
-      toast.error("Failed to load exam")
+      toast.error(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
     } finally {
       setLoading(false)
     }
@@ -58,7 +58,7 @@ export default function CreateSchedulePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!formData.name.trim() || !formData.startTime || !formData.endTime) {
-      toast.error("Please fill in all required fields")
+      toast.error(language === "ar" ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill in all required fields")
       return
     }
 
@@ -69,10 +69,10 @@ export default function CreateSchedulePage() {
         startTime: new Date(formData.startTime).toISOString(),
         endTime: new Date(formData.endTime).toISOString(),
       })
-      toast.success("Schedule created successfully")
+      toast.success(language === "ar" ? "تم إنشاء الجدول بنجاح" : "Schedule created successfully")
       router.push(`/exams/${id}/overview`)
     } catch (error) {
-      toast.error("Failed to create schedule")
+      toast.error(language === "ar" ? "فشل في إنشاء الجدول" : "Failed to create schedule")
     } finally {
       setSaving(false)
     }

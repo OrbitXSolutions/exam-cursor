@@ -28,6 +28,55 @@ public class UserService : IUserService
     _cache.RemoveByPrefix(CacheKeys.RolesPrefix);
   }
 
+  public async Task<ApiResponse<UserDetailDto>> CreateUserAsync(CreateUserDto dto, string createdBy)
+  {
+    // Check if email already exists
+    var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+    if (existingUser != null)
+      return ApiResponse<UserDetailDto>.FailureResponse("A user with this email already exists.");
+
+    // Validate role
+    if (string.IsNullOrWhiteSpace(dto.Role) || !AppRoles.AllRoles.Contains(dto.Role))
+      return ApiResponse<UserDetailDto>.FailureResponse($"Invalid role. Allowed roles: {string.Join(", ", AppRoles.AllRoles)}");
+
+    var user = new ApplicationUser
+    {
+      UserName = dto.Email,
+      Email = dto.Email,
+      FullName = dto.FullName,
+      FullNameAr = dto.FullNameAr,
+      DisplayName = dto.FullName,
+      DepartmentId = dto.DepartmentId,
+      EmailConfirmed = true,
+      Status = UserStatus.Active,
+      CreatedDate = DateTime.UtcNow,
+      CreatedBy = createdBy
+    };
+
+    var result = await _userManager.CreateAsync(user, dto.Password);
+    if (!result.Succeeded)
+    {
+      return ApiResponse<UserDetailDto>.FailureResponse(
+        "Failed to create user.",
+        result.Errors.Select(e => e.Description).ToList());
+    }
+
+    await _userManager.AddToRoleAsync(user, dto.Role);
+
+    // Reload with department
+    var created = await _userManager.Users.Include(u => u.Department).FirstOrDefaultAsync(u => u.Id == user.Id);
+    var roles = await _userManager.GetRolesAsync(created!);
+    var userDto = created!.Adapt<UserDetailDto>();
+    userDto.Roles = roles.ToList();
+    userDto.Status = created.Status.ToString();
+    userDto.DepartmentId = created.DepartmentId;
+    userDto.DepartmentNameEn = created.Department?.NameEn;
+    userDto.DepartmentNameAr = created.Department?.NameAr;
+
+    InvalidateUserCache();
+    return ApiResponse<UserDetailDto>.SuccessResponse(userDto, "User created successfully.");
+  }
+
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter)
   {
     var query = _userManager.Users.Include(u => u.Department).AsQueryable();

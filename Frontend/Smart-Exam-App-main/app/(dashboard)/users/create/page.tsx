@@ -37,6 +37,11 @@ export default function CreateUserPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!formData.departmentId || formData.departmentId === "none") {
+      toast.error(language === "ar" ? "يرجى اختيار القسم" : "Please select a department")
+      return
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error(language === "ar" ? "كلمات المرور غير متطابقة" : "Passwords do not match")
       return
@@ -69,7 +74,7 @@ export default function CreateUserPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-[70%] space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -129,30 +134,25 @@ export default function CreateUserPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="role">{language === "ar" ? "الدور" : "Role"}</Label>
+                <Label htmlFor="role">{language === "ar" ? "الدور" : "Role"} <span className="text-destructive">*</span></Label>
                 <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={language === "ar" ? "اختر الدور" : "Select role"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Candidate">{language === "ar" ? "مرشح" : "Candidate"}</SelectItem>
-                    <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
+                    <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
                     <SelectItem value="Examiner">{language === "ar" ? "ممتحن" : "Examiner"}</SelectItem>
                     <SelectItem value="Proctor">{language === "ar" ? "مراقب" : "Proctor"}</SelectItem>
-                    <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
-                    <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
-                    <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="departmentId">{language === "ar" ? "القسم" : "Department"}</Label>
+                <Label htmlFor="departmentId">{language === "ar" ? "القسم" : "Department"} <span className="text-destructive">*</span></Label>
                 <Select value={formData.departmentId} onValueChange={(value) => setFormData({ ...formData, departmentId: value })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={language === "ar" ? "اختر القسم" : "Select department"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">{language === "ar" ? "بدون قسم" : "No Department"}</SelectItem>
                     {departments.map((dept) => (
                       <SelectItem key={dept.id} value={String(dept.id)}>
                         {language === "ar" ? dept.nameAr : dept.nameEn}
@@ -185,6 +185,11 @@ export default function CreateUserPage() {
                 />
               </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+              {language === "ar"
+                ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على: حرف كبير، حرف صغير، رقم، ورمز خاص."
+                : "Password must be at least 8 characters and contain: an uppercase letter, a lowercase letter, a number, and a special character."}
+            </p>
 
             <div className="flex justify-end gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => router.back()}>

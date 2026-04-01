@@ -196,7 +196,7 @@ export default function BatchPage() {
           </p>
         </div>
         <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {isAr ? "إنشاء دفعة" : "Create Batch"}
         </Button>
       </div>
@@ -206,12 +206,12 @@ export default function BatchPage() {
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={isAr ? "بحث بالاسم أو الوصف..." : "Search by name or description..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
             </div>
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }}>
@@ -288,25 +288,25 @@ export default function BatchPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => router.push(`/candidates/batch/${batch.id}`)}>
-                            <Eye className="h-4 w-4 mr-2" />
+                            <Eye className="h-4 w-4 me-2" />
                             {isAr ? "عرض التفاصيل" : "View Details"}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => openEdit(batch)}>
-                            <Pencil className="h-4 w-4 mr-2" />
+                            <Pencil className="h-4 w-4 me-2" />
                             {isAr ? "تعديل" : "Edit"}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleToggleStatus(batch)}>
                             {batch.isActive
-                              ? <><ToggleLeft className="h-4 w-4 mr-2" />{isAr ? "تعطيل" : "Deactivate"}</>
-                              : <><ToggleRight className="h-4 w-4 mr-2" />{isAr ? "تفعيل" : "Activate"}</>}
+                              ? <><ToggleLeft className="h-4 w-4 me-2" />{isAr ? "تعطيل" : "Deactivate"}</>
+                              : <><ToggleRight className="h-4 w-4 me-2" />{isAr ? "تفعيل" : "Activate"}</>}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleExport(batch.id)}
                             disabled={exportLoading === batch.id}
                           >
                             {exportLoading === batch.id
-                              ? <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              : <Download className="h-4 w-4 mr-2" />}
+                              ? <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                              : <Download className="h-4 w-4 me-2" />}
                             {isAr ? "تصدير الأعضاء" : "Export Members"}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -314,7 +314,7 @@ export default function BatchPage() {
                             className="text-destructive"
                             onClick={() => { setDeleteTarget(batch); setDeleteOpen(true) }}
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="h-4 w-4 me-2" />
                             {isAr ? "حذف" : "Delete"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -393,7 +393,7 @@ export default function BatchPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setFormOpen(false)}>{isAr ? "إلغاء" : "Cancel"}</Button>
             <Button onClick={handleSubmit} disabled={formLoading}>
-              {formLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {formLoading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {formMode === "create" ? (isAr ? "إنشاء" : "Create") : (isAr ? "تحديث" : "Update")}
             </Button>
           </DialogFooter>
@@ -414,7 +414,7 @@ export default function BatchPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>{isAr ? "إلغاء" : "Cancel"}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={deleteLoading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {deleteLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {deleteLoading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {isAr ? "حذف" : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

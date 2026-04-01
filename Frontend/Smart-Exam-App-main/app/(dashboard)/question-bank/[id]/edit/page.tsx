@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -157,7 +158,7 @@ export default function EditQuestionPage() {
       }
     } catch (error) {
       console.error("[v0] Failed to fetch data:", error)
-      toast.error("Failed to load question data")
+      toast.error(localizeText("Failed to load question data", "فشل تحميل بيانات السؤال", language))
     }
     setIsLoading(false)
   }
@@ -196,7 +197,7 @@ export default function EditQuestionPage() {
 
   const removeOption = (id: string) => {
     if (options.length <= 2) {
-      toast.error("At least 2 options are required")
+      toast.error(localizeText("At least 2 options are required", "مطلوب خياران على الأقل", language))
       return
     }
     setOptions(options.filter((opt) => opt.id !== id).map((opt, idx) => ({ ...opt, order: idx })))
@@ -216,11 +217,11 @@ export default function EditQuestionPage() {
     if (!file) return
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      toast.error(localizeText('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed', 'يُسمح فقط بملفات الصور (JPEG, PNG, GIF, WebP, SVG)', language))
       return
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be less than 10MB')
+      toast.error(localizeText('Image size must be less than 10MB', 'يجب أن يكون حجم الصورة أقل من 10 ميجابايت', language))
       return
     }
     setNewImage(file)
@@ -241,11 +242,11 @@ export default function EditQuestionPage() {
     if (!file) return
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed')
+      toast.error(localizeText('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed', 'يُسمح فقط بملفات الصور (JPEG, PNG, GIF, WebP, SVG)', language))
       return
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size must be less than 10MB')
+      toast.error(localizeText('Image size must be less than 10MB', 'يجب أن يكون حجم الصورة أقل من 10 ميجابايت', language))
       return
     }
     const reader = new FileReader()
@@ -263,9 +264,9 @@ export default function EditQuestionPage() {
     try {
       await deleteQuestionAttachment(attachment.id)
       setExistingAttachments(prev => prev.filter(a => a.id !== attachment.id))
-      toast.success('Attachment removed')
+      toast.success(localizeText('Attachment removed', 'تم إزالة المرفق', language))
     } catch {
-      toast.error('Failed to remove attachment')
+      toast.error(localizeText('Failed to remove attachment', 'فشل إزالة المرفق', language))
     }
   }
 
@@ -273,14 +274,14 @@ export default function EditQuestionPage() {
     e.preventDefault()
 
     if (!formData.bodyEn.trim()) {
-      toast.error("Question body (English) is required")
+      toast.error(localizeText("Question body (English) is required", "نص السؤال (بالإنجليزية) مطلوب", language))
       return
     }
 
     if (!isEssayType) {
       const hasCorrectAnswer = options.some((opt) => opt.isCorrect)
       if (!hasCorrectAnswer) {
-        toast.error("At least one option must be marked as correct")
+        toast.error(localizeText("At least one option must be marked as correct", "يجب تحديد خيار واحد كإجابة صحيحة على الأقل", language))
         return
       }
     }
@@ -340,7 +341,7 @@ export default function EditQuestionPage() {
           }
         } catch (imgErr) {
           console.warn('Image upload failed:', imgErr)
-          toast.warning('Question updated but image upload failed.')
+          toast.warning(localizeText('Question updated but image upload failed.', 'تم تحديث السؤال لكن فشل رفع الصورة.', language))
         } finally {
           setIsUploadingImage(false)
         }
@@ -405,14 +406,14 @@ export default function EditQuestionPage() {
       }
 
       if (isSuccess) {
-        toast.success("Question updated successfully")
+        toast.success(localizeText("Question updated successfully", "تم تحديث السؤال بنجاح", language))
         router.push(`/question-bank/${questionId}`)
       } else {
-        toast.error((response as any)?.message || "Failed to update question")
+        toast.error((response as any)?.message || localizeText("Failed to update question", "فشل تحديث السؤال", language))
       }
     } catch (error) {
       console.error("[v0] Update error:", error)
-      toast.error("Failed to update question")
+      toast.error(localizeText("Failed to update question", "فشل تحديث السؤال", language))
     }
 
     setIsSaving(false)
@@ -430,13 +431,13 @@ export default function EditQuestionPage() {
   if (!question) {
     return (
       <div className="flex flex-col">
-        <PageHeader title="Question Not Found" />
+        <PageHeader title={language === "ar" ? "السؤال غير موجود" : "Question Not Found"} />
         <div className="flex-1 p-6">
-          <p className="text-muted-foreground">The question you are looking for does not exist.</p>
+          <p className="text-muted-foreground">{language === "ar" ? "السؤال الذي تبحث عنه غير موجود." : "The question you are looking for does not exist."}</p>
           <Button variant="outline" asChild className="mt-4 bg-transparent">
             <Link href="/question-bank">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Question Bank
+              <ArrowLeft className="me-2 h-4 w-4" />
+              {language === "ar" ? "العودة إلى بنك الأسئلة" : "Back to Question Bank"}
             </Link>
           </Button>
         </div>
@@ -446,13 +447,13 @@ export default function EditQuestionPage() {
 
   return (
     <div className="flex flex-col">
-      <PageHeader title={t("questionBank.editQuestion")} subtitle={`Question #${question.id}`} />
+      <PageHeader title={t("questionBank.editQuestion")} subtitle={language === "ar" ? `سؤال #${question.id}` : `Question #${question.id}`} />
 
       <div className="flex-1 p-6">
         <div className="mx-auto max-w-3xl">
           <Button variant="ghost" asChild className="mb-6">
             <Link href={`/question-bank/${question.id}`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="me-2 h-4 w-4" />
               {t("common.back")}
             </Link>
           </Button>
@@ -461,8 +462,8 @@ export default function EditQuestionPage() {
             {/* Question Details */}
             <Card>
               <CardHeader>
-                <CardTitle>Question Details</CardTitle>
-                <CardDescription>Edit the question content and settings</CardDescription>
+                <CardTitle>{language === "ar" ? "تفاصيل السؤال" : "Question Details"}</CardTitle>
+                <CardDescription>{language === "ar" ? "تعديل محتوى السؤال والإعدادات" : "Edit the question content and settings"}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Question Body - Bilingual */}
@@ -531,7 +532,7 @@ export default function EditQuestionPage() {
                           onClick={() => handleDeleteAttachment(att)}
                           className="text-destructive hover:bg-destructive/10"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="h-4 w-4 me-1" />
                           {language === "ar" ? "إزالة" : "Remove"}
                         </Button>
                       </div>
@@ -560,7 +561,7 @@ export default function EditQuestionPage() {
                           onClick={removeNewImage}
                           className="text-destructive hover:bg-destructive/10"
                         >
-                          <X className="h-4 w-4 mr-1" />
+                          <X className="h-4 w-4 me-1" />
                           {language === "ar" ? "إلغاء" : "Cancel"}
                         </Button>
                       </div>
@@ -602,7 +603,7 @@ export default function EditQuestionPage() {
                       onValueChange={(value) => setFormData({ ...formData, questionTypeId: value })}
                     >
                       <SelectTrigger id="type" className="w-full">
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder={language === "ar" ? "اختر النوع" : "Select type"} />
                       </SelectTrigger>
                       <SelectContent>
                         {types.map((type) => (
@@ -695,7 +696,7 @@ export default function EditQuestionPage() {
                 <div className="flex items-center justify-between rounded-lg border p-4">
                   <div>
                     <p className="font-medium">{t("common.active")}</p>
-                    <p className="text-sm text-muted-foreground">Question can be used in exams</p>
+                    <p className="text-sm text-muted-foreground">{language === "ar" ? "يمكن استخدام السؤال في الاختبارات" : "Question can be used in exams"}</p>
                   </div>
                   <Switch
                     checked={formData.isActive}
@@ -708,8 +709,8 @@ export default function EditQuestionPage() {
                   <div className="flex items-center gap-3">
                     <Calculator className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     <div>
-                      <p className="font-medium">Allow Calculator</p>
-                      <p className="text-sm text-muted-foreground">Candidates can use a built-in calculator for this question</p>
+                      <p className="font-medium">{language === "ar" ? "السماح بالآلة الحاسبة" : "Allow Calculator"}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "يمكن للمرشحين استخدام آلة حاسبة مدمجة لهذا السؤال" : "Candidates can use a built-in calculator for this question"}</p>
                     </div>
                   </div>
                   <Switch
@@ -725,7 +726,7 @@ export default function EditQuestionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("questionBank.options")}</CardTitle>
-                  <CardDescription>Edit answer options and correct answers</CardDescription>
+                  <CardDescription>{language === "ar" ? "تعديل خيارات الإجابة والإجابات الصحيحة" : "Edit answer options and correct answers"}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {options.map((option, index) => (
@@ -789,7 +790,7 @@ export default function EditQuestionPage() {
                           ) : (
                             <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors border border-dashed rounded-md px-2 py-1.5">
                               <ImageIcon className="h-3.5 w-3.5" />
-                              <span>Add Image</span>
+                              <span>{language === "ar" ? "إضافة صورة" : "Add Image"}</span>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -813,7 +814,7 @@ export default function EditQuestionPage() {
                   ))}
 
                   <Button type="button" variant="outline" onClick={addOption} className="w-full bg-transparent">
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="me-2 h-4 w-4" />
                     {t("questionBank.addOption")}
                   </Button>
                 </CardContent>
@@ -871,8 +872,8 @@ export default function EditQuestionPage() {
                 <Link href={`/question-bank/${question.id}`}>{t("common.cancel")}</Link>
               </Button>
               <Button type="submit" disabled={isSaving}>
-                {isSaving && <LoadingSpinner size="sm" className="mr-2" />}
-                {t("common.save")}
+                {isSaving && <LoadingSpinner size="sm" className="me-2" />}
+                {isSaving ? (language === "ar" ? "جاري الحفظ..." : "Saving...") : (language === "ar" ? "حفظ التغييرات" : "Save Changes")}
               </Button>
             </div>
           </form>

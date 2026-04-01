@@ -1,3 +1,5 @@
+import { getResolvedLanguage, translateServerMessage } from "@/lib/i18n/runtime";
+
 const API_BASE_URL = "/api/proxy";
 
 interface ApiResponse<T> {
@@ -84,46 +86,60 @@ class ApiClient {
       });
 
       if (!response.ok) {
+        const language = getResolvedLanguage();
+
         if (response.status === 401) {
           this.clearToken();
           if (typeof window !== "undefined") {
             window.location.href = "/login";
           }
-          throw new Error("Session expired. Please login again.");
+          throw new Error(
+            translateServerMessage(
+              "Session expired. Please login again.",
+              language,
+            ),
+          );
         }
 
         const errors = jsonResponse.errors;
         const errorsStr = Array.isArray(errors)
-          ? errors.join("\n• ")
+          ? errors.join("\n- ")
           : typeof errors === "string"
             ? errors
             : errors && typeof errors === "object"
-              ? Object.values(errors).flat().filter(Boolean).join("\n• ")
+              ? Object.values(errors).flat().filter(Boolean).join("\n- ")
               : "";
+
         const traceId = jsonResponse.traceId || "";
         const baseMessage =
           jsonResponse.message && errorsStr
-            ? `${jsonResponse.message}\n\n• ${errorsStr}`
+            ? `${jsonResponse.message}\n\n- ${errorsStr}`
             : jsonResponse.message ||
               errorsStr ||
               `HTTP Error: ${response.status}`;
+
         const errorMessage = traceId
           ? `${baseMessage} (Ref: ${traceId})`
           : baseMessage;
-        throw new Error(errorMessage);
+
+        throw new Error(translateServerMessage(errorMessage, language));
       }
 
-      // Handle wrapped response { success, data, message }
       if (jsonResponse.success !== undefined) {
         if (!jsonResponse.success) {
-          throw new Error(jsonResponse.message || "Operation failed");
+          throw new Error(
+            translateServerMessage(
+              jsonResponse.message || "Operation failed",
+              getResolvedLanguage(),
+            ),
+          );
         }
+
         return jsonResponse.data !== undefined
           ? jsonResponse.data
           : jsonResponse;
       }
 
-      // Return raw response
       return jsonResponse.data !== undefined ? jsonResponse.data : jsonResponse;
     } catch (error) {
       console.error(`[API Error] ${options.method || "GET"} ${url}`, error);
@@ -217,7 +233,12 @@ class ApiClient {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error(`[API Upload Error] POST ${url}`, errorData);
-        throw new Error(errorData.message || "Upload failed");
+        throw new Error(
+          translateServerMessage(
+            errorData.message || "Upload failed",
+            getResolvedLanguage(),
+          ),
+        );
       }
 
       const jsonResponse = await response.json();
@@ -230,7 +251,6 @@ class ApiClient {
   }
 }
 
-// Media upload result type
 interface MediaUploadResult {
   id: string;
   originalFileName: string;

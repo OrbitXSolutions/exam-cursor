@@ -13,13 +13,16 @@ public class AssessmentController : ControllerBase
 {
     private readonly IAssessmentService _assessmentService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IExamShareService _examShareService;
 
     public AssessmentController(
         IAssessmentService assessmentService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IExamShareService examShareService)
     {
         _assessmentService = assessmentService;
         _currentUserService = currentUserService;
+        _examShareService = examShareService;
     }
 
     #region Exams
@@ -603,6 +606,44 @@ public class AssessmentController : ControllerBase
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.SaveExamBuilderAsync(examId, dto, userId);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    #endregion
+
+    #region Share Links
+
+    /// <summary>
+    /// Generate a share link for a published exam (URL + QR code)
+    /// </summary>
+    [HttpPost("exams/{examId}/share-link")]
+    public async Task<IActionResult> GenerateShareLink(int examId, [FromBody] GenerateShareLinkDto? dto)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var result = await _examShareService.GenerateShareLinkAsync(examId, dto, userId, baseUrl);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Get active share link for an exam
+    /// </summary>
+    [HttpGet("exams/{examId}/share-link")]
+    public async Task<IActionResult> GetShareLink(int examId)
+    {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var result = await _examShareService.GetShareLinkAsync(examId, baseUrl);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>
+    /// Revoke (deactivate) the share link for an exam
+    /// </summary>
+    [HttpDelete("exams/{examId}/share-link")]
+    public async Task<IActionResult> RevokeShareLink(int examId)
+    {
+        var userId = _currentUserService.UserId ?? "system";
+        var result = await _examShareService.RevokeShareLinkAsync(examId, userId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
