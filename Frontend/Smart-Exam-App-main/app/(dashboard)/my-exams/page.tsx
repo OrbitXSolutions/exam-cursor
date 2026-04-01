@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType, ExpiryReason } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -68,7 +69,7 @@ export default function MyExamsPage() {
       setExams(Array.isArray(examsResponse) ? examsResponse : [])
     } catch (error) {
       console.error("[my-exams] API error:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to load exams")
+      toast.error(error instanceof Error ? error.message : localizeText("Failed to load exams", "فشل تحميل الاختبارات", language))
       setExams([])
     } finally {
       setLoading(false)

@@ -296,6 +296,13 @@ export interface ExamSettings {
   shuffleOptions: boolean;
   lockPreviousSections: boolean;
   preventBackNavigation: boolean;
+  // Security settings for frontend enforcement
+  requireProctoring?: boolean;
+  requireWebcam?: boolean;
+  requireFullscreen?: boolean;
+  preventCopyPaste?: boolean;
+  preventScreenCapture?: boolean;
+  browserLockdown?: boolean;
 }
 
 // Section structure for tab-based exam layout

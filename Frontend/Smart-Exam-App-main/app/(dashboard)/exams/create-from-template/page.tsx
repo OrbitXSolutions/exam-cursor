@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { toast } from "sonner"
+import { localizeText } from "@/lib/i18n/runtime"
 import {
   ArrowLeft,
   Save,
@@ -72,7 +73,7 @@ export default function CreateFromTemplatePage() {
           setAllExams(response.items)
         }
       } catch {
-        toast.error("Failed to load exams")
+        toast.error(localizeText("Failed to load exams", "فشل في تحميل الاختبارات", language))
       } finally {
         setExamsLoading(false)
       }
@@ -130,19 +131,19 @@ export default function CreateFromTemplatePage() {
     setError(null)
 
     if (!selectedExamId) {
-      setError("Please select a template exam")
+      setError(localizeText("Please select a template exam", "يرجى اختيار اختبار كقالب", language))
       return
     }
     if (!formData.titleEn.trim()) {
-      setError("Title (English) is required")
+      setError(localizeText("Title (English) is required", "العنوان (الإنجليزي) مطلوب", language))
       return
     }
     if (formData.durationMinutes < 1 || formData.durationMinutes > 600) {
-      setError("Duration must be between 1 and 600 minutes")
+      setError(localizeText("Duration must be between 1 and 600 minutes", "المدة يجب أن تكون بين 1 و 600 دقيقة", language))
       return
     }
     if (formData.startAt && formData.endAt && new Date(formData.endAt) <= new Date(formData.startAt)) {
-      setError("End date must be after start date")
+      setError(localizeText("End date must be after start date", "تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء", language))
       return
     }
 
@@ -160,10 +161,10 @@ export default function CreateFromTemplatePage() {
         durationMinutes: formData.durationMinutes,
       })
 
-      toast.success("Exam created from template successfully!")
+      toast.success(localizeText("Exam created from template successfully!", "تم إنشاء الاختبار من القالب بنجاح!", language))
       router.push(`/exams/${result.id}/overview`)
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || "Failed to create exam from template"
+      const msg = err?.response?.data?.message || err?.message || localizeText("Failed to create exam from template", "فشل في إنشاء الاختبار من القالب", language)
       setError(msg)
       toast.error(msg)
     } finally {
@@ -172,7 +173,7 @@ export default function CreateFromTemplatePage() {
   }
 
   function getExamTitle(exam: Exam): string {
-    return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || "Untitled"
+    return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || (language === "ar" ? "بدون عنوان" : "Untitled")
   }
 
   function getExamStatus(exam: Exam): string {
@@ -192,9 +193,9 @@ export default function CreateFromTemplatePage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Create Exam from Template</h1>
+          <h1 className="text-2xl font-bold text-foreground">{language === "ar" ? "إنشاء اختبار من قالب" : "Create Exam from Template"}</h1>
           <p className="text-muted-foreground mt-1">
-            Use an existing exam as a template to create a new exam with the same configuration and questions
+            {language === "ar" ? "استخدم اختبار موجود كقالب لإنشاء اختبار جديد بنفس الإعداد والأسئلة" : "Use an existing exam as a template to create a new exam with the same configuration and questions"}
           </p>
         </div>
       </div>
@@ -212,11 +213,10 @@ export default function CreateFromTemplatePage() {
           <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b py-4 rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <Copy className="h-5 w-5 text-primary" />
-              Select Template Exam
+              {language === "ar" ? "اختيار اختبار كقالب" : "Select Template Exam"}
             </CardTitle>
             <CardDescription>
-              Choose an existing exam to use as a template. All configuration, sections, questions, instructions, and
-              access policy will be copied.
+              {language === "ar" ? "اختر اختبار موجود لاستخدامه كقالب. سيتم نسخ جميع الأقسام والأسئلة." : "Choose an existing exam to use as a template. All configuration, sections, questions, instructions, and access policy will be copied."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 overflow-visible min-h-[80px]">
@@ -234,7 +234,7 @@ export default function CreateFromTemplatePage() {
                     className="w-full flex items-center justify-between px-3 py-2.5 h-11 text-sm rounded-md border-2 bg-background hover:bg-accent/50 transition-colors"
                   >
                     <span className={selectedExam ? "text-foreground" : "text-muted-foreground"}>
-                      {selectedExam ? getExamTitle(selectedExam) : "Select an exam template..."}
+                      {selectedExam ? getExamTitle(selectedExam) : (language === "ar" ? "اختر قالب اختبار..." : "Select an exam template...")}
                     </span>
                     <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
                   </button>
@@ -246,7 +246,7 @@ export default function CreateFromTemplatePage() {
                         <div className="relative">
                           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
-                            placeholder="Search exams by name..."
+                            placeholder={language === "ar" ? "البحث عن اختبارات بالاسم..." : "Search exams by name..."}
                             value={examSearch}
                             onChange={(e) => setExamSearch(e.target.value)}
                             className="ps-9 h-9 border"
@@ -258,7 +258,7 @@ export default function CreateFromTemplatePage() {
                       {/* Options list */}
                       <div className="max-h-80 overflow-y-auto divide-y">
                         {filteredExams.length === 0 ? (
-                          <div className="p-4 text-center text-sm text-muted-foreground">No exams found</div>
+                          <div className="p-4 text-center text-sm text-muted-foreground">{language === "ar" ? "لم يتم العثور على اختبارات" : "No exams found"}</div>
                         ) : (
                           filteredExams.map((exam) => (
                             <button
@@ -306,38 +306,46 @@ export default function CreateFromTemplatePage() {
                     <div className="flex items-center gap-2">
                       <Layers className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <div className="text-muted-foreground">Sections</div>
+                        <div className="text-muted-foreground">{language === "ar" ? "الأقسام" : "Sections"}</div>
                         <div className="font-medium">{selectedExam.sectionsCount || 0}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <div className="text-muted-foreground">Pass Score</div>
+                        <div className="text-muted-foreground">{language === "ar" ? "درجة النجاح" : "Pass Score"}</div>
                         <div className="font-medium">{selectedExam.passScore ?? 0}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <div className="text-muted-foreground">Questions</div>
+                        <div className="text-muted-foreground">{language === "ar" ? "الأسئلة" : "Questions"}</div>
                         <div className="font-medium">{selectedExam.questionsCount || 0}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Timer className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <div className="text-muted-foreground">Duration</div>
-                        <div className="font-medium">{selectedExam.durationMinutes} min</div>
+                        <div className="text-muted-foreground">{language === "ar" ? "المدة" : "Duration"}</div>
+                        <div className="font-medium">{selectedExam.durationMinutes} {language === "ar" ? "دقيقة" : "min"}</div>
                       </div>
                     </div>
                   </div>
 
                   {/* What will be copied */}
                   <div className="mt-4 pt-3 border-t">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">Will be copied from this template:</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">{language === "ar" ? "سيتم نسخها من هذا القالب:" : "Will be copied from this template:"}</p>
                     <div className="flex flex-wrap gap-2">
-                      {[
+                      {(language === "ar" ? [
+                        "إعداد الاختبار",
+                        "إعدادات الأمان",
+                        "إعدادات المراقبة",
+                        "إعدادات النتائج والمراجعة",
+                        "جميع الأقسام والأسئلة",
+                        "التعليمات",
+                        "سياسة الوصول",
+                      ] : [
                         "Exam Configuration",
                         "Security Settings",
                         "Proctoring Settings",
@@ -345,7 +353,7 @@ export default function CreateFromTemplatePage() {
                         "All Sections & Questions",
                         "Instructions",
                         "Access Policy",
-                      ].map((item) => (
+                      ]).map((item) => (
                         <span
                           key={item}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs"
@@ -367,15 +375,15 @@ export default function CreateFromTemplatePage() {
           <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-b py-4">
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-blue-600" />
-              Exam Information
+              {language === "ar" ? "معلومات الاختبار" : "Exam Information"}
             </CardTitle>
-            <CardDescription>Provide a new name and description for the cloned exam</CardDescription>
+            <CardDescription>{language === "ar" ? "أدخل اسم ووصف جديد للاختبار المنسوخ" : "Provide a new name and description for the cloned exam"}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="titleEn">
-                  Title (English) <span className="text-destructive">*</span>
+                  {language === "ar" ? "العنوان (بالإنجليزية)" : "Title (English)"} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="titleEn"
@@ -385,7 +393,7 @@ export default function CreateFromTemplatePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="titleAr">Title (Arabic)</Label>
+                <Label htmlFor="titleAr">{language === "ar" ? "العنوان (بالعربية)" : "Title (Arabic)"}</Label>
                 <Input
                   id="titleAr"
                   value={formData.titleAr}
@@ -398,7 +406,7 @@ export default function CreateFromTemplatePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="descriptionEn">Description (English)</Label>
+                <Label htmlFor="descriptionEn">{language === "ar" ? "الوصف (بالإنجليزية)" : "Description (English)"}</Label>
                 <Textarea
                   id="descriptionEn"
                   value={formData.descriptionEn}
@@ -408,7 +416,7 @@ export default function CreateFromTemplatePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="descriptionAr">Description (Arabic)</Label>
+                <Label htmlFor="descriptionAr">{language === "ar" ? "الوصف (بالعربية)" : "Description (Arabic)"}</Label>
                 <Textarea
                   id="descriptionAr"
                   value={formData.descriptionAr}
@@ -427,14 +435,14 @@ export default function CreateFromTemplatePage() {
           <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/30 border-b py-4">
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-orange-600" />
-              Exam Timing
+              {language === "ar" ? "توقيت الاختبار" : "Exam Timing"}
             </CardTitle>
-            <CardDescription>Set the schedule and duration for the new exam</CardDescription>
+            <CardDescription>{language === "ar" ? "حدد الجدول والمدة للاختبار الجديد" : "Set the schedule and duration for the new exam"}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Exam Type */}
             <div className="space-y-3">
-              <Label>Exam Type</Label>
+              <Label>{language === "ar" ? "نوع الاختبار" : "Exam Type"}</Label>
               <RadioGroup
                 value={formData.examType.toString()}
                 onValueChange={(val) => updateField("examType", Number(val))}
@@ -450,9 +458,9 @@ export default function CreateFromTemplatePage() {
                 >
                   <RadioGroupItem value={ExamType.Flex.toString()} id="type-flex" className="mt-0.5" />
                   <div>
-                    <div className="font-medium">Flexible</div>
+                    <div className="font-medium">{language === "ar" ? "مرن" : "Flexible"}</div>
                     <div className="text-sm text-muted-foreground">
-                      Candidates can start anytime within the availability window
+                      {language === "ar" ? "يمكن للمرشحين البدء في أي وقت ضمن فترة التوفر" : "Candidates can start anytime within the availability window"}
                     </div>
                   </div>
                 </Label>
@@ -466,9 +474,9 @@ export default function CreateFromTemplatePage() {
                 >
                   <RadioGroupItem value={ExamType.Fixed.toString()} id="type-fixed" className="mt-0.5" />
                   <div>
-                    <div className="font-medium">Fixed</div>
+                    <div className="font-medium">{language === "ar" ? "ثابت" : "Fixed"}</div>
                     <div className="text-sm text-muted-foreground">
-                      All candidates start at the exact same time
+                      {language === "ar" ? "يبدأ جميع المرشحين في نفس الوقت بالضبط" : "All candidates start at the exact same time"}
                     </div>
                   </div>
                 </Label>
@@ -479,7 +487,7 @@ export default function CreateFromTemplatePage() {
               <div className="space-y-2">
                 <Label htmlFor="startAt" className="flex items-center gap-1.5">
                   <Calendar className="h-3.5 w-3.5" />
-                  Start Date & Time
+                  {language === "ar" ? "تاريخ ووقت البدء" : "Start Date & Time"}
                 </Label>
                 <Input
                   id="startAt"
@@ -491,7 +499,7 @@ export default function CreateFromTemplatePage() {
               <div className="space-y-2">
                 <Label htmlFor="endAt" className="flex items-center gap-1.5">
                   <Calendar className="h-3.5 w-3.5" />
-                  End Date & Time
+                  {language === "ar" ? "تاريخ ووقت الانتهاء" : "End Date & Time"}
                 </Label>
                 <Input
                   id="endAt"
@@ -503,7 +511,7 @@ export default function CreateFromTemplatePage() {
               <div className="space-y-2">
                 <Label htmlFor="duration" className="flex items-center gap-1.5">
                   <Timer className="h-3.5 w-3.5" />
-                  Duration (minutes) <span className="text-destructive">*</span>
+                  {language === "ar" ? "المدة (بالدقائق)" : "Duration (minutes)"} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="duration"
@@ -522,26 +530,25 @@ export default function CreateFromTemplatePage() {
         <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30">
           <Settings className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-800 dark:text-blue-200">
-            The new exam will be created as a <strong>Draft</strong>. All configuration settings, sections, questions,
-            instructions, and access policy from the template will be copied. You can edit any settings after creation.
+            {language === "ar" ? "سيتم إنشاء الاختبار الجديد كمسودة. يمكنك مراجعته وتعديله قبل النشر." : <>The new exam will be created as a <strong>Draft</strong>. All configuration settings, sections, questions, instructions, and access policy from the template will be copied. You can edit any settings after creation.</>}
           </AlertDescription>
         </Alert>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-3">
           <Button type="button" variant="outline" asChild>
-            <Link href="/exams/list">Cancel</Link>
+            <Link href="/exams/list">{language === "ar" ? "إلغاء" : "Cancel"}</Link>
           </Button>
           <Button type="submit" disabled={loading || !selectedExamId}>
             {loading ? (
               <>
                 <LoadingSpinner size="sm" className="me-2" />
-                Creating...
+                {language === "ar" ? "جارٍ الإنشاء..." : "Creating..."}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 me-2" />
-                Create from Template
+                {language === "ar" ? "إنشاء من قالب" : "Create from Template"}
               </>
             )}
           </Button>

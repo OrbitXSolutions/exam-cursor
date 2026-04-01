@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { getLiveSessions, flagSession, sendWarning, terminateSession, getTriageRecommendations } from "@/lib/api/proctoring"
 import type { LiveSession } from "@/lib/types/proctoring"
 import type { TriageRecommendation } from "@/lib/api/proctoring"
@@ -73,10 +74,10 @@ export default function ProctorCenterPage() {
   // Risk level helper — matches backend GetRiskLevel thresholds
   function getRiskBadge(score?: number) {
     if (score == null) return null
-    if (score <= 20) return { label: "Low", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }
-    if (score <= 50) return { label: "Medium", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30" }
-    if (score <= 75) return { label: "High", color: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30" }
-    return { label: "Critical", color: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30" }
+    if (score <= 20) return { label: localizeText("Low", "منخفض", locale), color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }
+    if (score <= 50) return { label: localizeText("Medium", "متوسط", locale), color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30" }
+    if (score <= 75) return { label: localizeText("High", "مرتفع", locale), color: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30" }
+    return { label: localizeText("Critical", "حرج", locale), color: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30" }
   }
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function ProctorCenterPage() {
       })
       setSessions(flagged)
     } catch (error) {
-      toast.error("Failed to load sessions")
+      toast.error(localizeText("Failed to load sessions", "فشل تحميل الجلسات", locale))
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -127,7 +128,7 @@ export default function ProctorCenterPage() {
       toast.success(session.flagged ? t("proctor.unflagged") : t("proctor.flagged"))
       loadSessions()
     } catch (error) {
-      toast.error("Failed to update flag")
+      toast.error(localizeText("Failed to update flag", "فشل تحديث العلامة", locale))
     }
   }
 
@@ -140,7 +141,7 @@ export default function ProctorCenterPage() {
       setWarningMessage("")
       setSelectedSession(null)
     } catch (error) {
-      toast.error("Failed to send warning")
+      toast.error(localizeText("Failed to send warning", "فشل إرسال التحذير", locale))
     }
   }
 
@@ -154,7 +155,7 @@ export default function ProctorCenterPage() {
       setSelectedSession(null)
       loadSessions()
     } catch (error) {
-      toast.error("Failed to terminate session")
+      toast.error(localizeText("Failed to terminate session", "فشل إنهاء الجلسة", locale))
     }
   }
 

@@ -66,17 +66,49 @@ public class EmailService : IEmailService
         return await SendEmailAsync(new List<string> { to }, subject, body, isHtml);
     }
 
+    public async Task<(bool Success, string? Error)> SendEmailWithDetailAsync(string to, string subject, string body, bool isHtml = true)
+    {
+        try
+        {
+            var config = await GetSmtpConfigAsync();
+
+            using var client = new SmtpClient(config.Host, config.Port);
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(config.Username, config.Password);
+            client.EnableSsl = config.EnableSsl;
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+            using var message = new MailMessage
+            {
+                From = new MailAddress(config.FromEmail, config.FromName),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = isHtml
+            };
+            message.To.Add(to);
+
+            await client.SendMailAsync(message);
+            _logger.LogInformation("Test email sent successfully to {Recipient}", to);
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send test email to {Recipient}", to);
+            return (false, ex.Message);
+        }
+    }
+
     public async Task<bool> SendEmailAsync(List<string> to, string subject, string body, bool isHtml = true)
     {
         try
         {
             var config = await GetSmtpConfigAsync();
 
-            using var client = new SmtpClient(config.Host, config.Port)
-            {
-                Credentials = new NetworkCredential(config.Username, config.Password),
-                EnableSsl = config.EnableSsl
-            };
+            using var client = new SmtpClient(config.Host, config.Port);
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(config.Username, config.Password);
+            client.EnableSsl = config.EnableSsl;
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
 
             using var message = new MailMessage
             {

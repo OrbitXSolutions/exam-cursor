@@ -27,6 +27,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { localizeText } from "@/lib/i18n/runtime"
 import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, ListTree, Loader2 } from "lucide-react"
 import {
@@ -66,7 +68,7 @@ function QuestionTypesContent() {
       const result = await getQuestionTypes({ pageSize: 100 })
       setTypes(result.items || [])
     } catch (error) {
-      toast.error("Failed to load question types")
+      toast.error(localizeText("Failed to load question types", "فشل تحميل أنواع الأسئلة", language))
     } finally {
       setLoading(false)
     }
@@ -88,7 +90,7 @@ function QuestionTypesContent() {
 
   const handleSave = async () => {
     if (!formData.nameEn.trim() || !formData.nameAr.trim()) {
-      toast.error("Both English and Arabic names are required")
+      toast.error(localizeText("Both English and Arabic names are required", "الاسمان بالإنجليزية والعربية مطلوبان", language))
       return
     }
 
@@ -113,7 +115,7 @@ function QuestionTypesContent() {
       }
       setDialogOpen(false)
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setSaving(false)
     }
@@ -134,7 +136,7 @@ function QuestionTypesContent() {
       setDeleteDialogOpen(false)
       setTypeToDelete(null)
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setDeleting(false)
     }
@@ -156,12 +158,12 @@ function QuestionTypesContent() {
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className={cn("absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground", language === "ar" ? "right-3" : "left-3")} />
             <Input
               placeholder={language === "ar" ? "بحث في الأنواع..." : "Search types..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className={language === "ar" ? "pr-10" : "pl-10"}
             />
           </div>
         </div>
@@ -174,8 +176,8 @@ function QuestionTypesContent() {
         ) : filteredTypes.length === 0 ? (
           <EmptyState
             icon={ListTree}
-            title={searchQuery ? "No types found" : "No question types yet"}
-            description={searchQuery ? "Try adjusting your search" : "Create your first question type"}
+            title={searchQuery ? (language === "ar" ? "لم يتم العثور على أنواع" : "No types found") : (language === "ar" ? "لا توجد أنواع أسئلة بعد" : "No question types yet")}
+            description={searchQuery ? (language === "ar" ? "حاول تعديل بحثك" : "Try adjusting your search") : (language === "ar" ? "أنشئ أول نوع سؤال" : "Create your first question type")}
             action={null}
           />
         ) : (
@@ -209,7 +211,7 @@ function QuestionTypesContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(type)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -219,7 +221,7 @@ function QuestionTypesContent() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -260,7 +262,7 @@ function QuestionTypesContent() {
                 id="nameEn"
                 value={formData.nameEn}
                 onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                placeholder="e.g. Multiple Choice"
+                placeholder={language === "ar" ? "مثال: اختيار من متعدد" : "e.g. Multiple Choice"}
               />
             </div>
             <div className="space-y-2">
@@ -279,7 +281,7 @@ function QuestionTypesContent() {
               {language === "ar" ? "إلغاء" : "Cancel"}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {dialogMode === "create" ? (language === "ar" ? "إنشاء" : "Create") : language === "ar" ? "حفظ" : "Save"}
             </Button>
           </DialogFooter>
@@ -304,7 +306,7 @@ function QuestionTypesContent() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {language === "ar" ? "حذف" : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

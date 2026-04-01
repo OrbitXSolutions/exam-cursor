@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LanguageToggle } from "@/components/layout/language-toggle"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Shield, Mail, ArrowLeft, CheckCircle } from "lucide-react"
+import { Shield, Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import { toast } from "sonner"
 
 export default function ForgotPasswordPage() {
@@ -31,7 +32,7 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(false)
     setIsSubmitted(true)
-    toast.success("Reset link sent to your email (mock)")
+    toast.success(localizeText("Reset link sent to your email (mock)", "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني (تجريبيًا)", isRTL ? "ar" : "en"))
   }
 
   return (
@@ -64,12 +65,14 @@ export default function ForgotPasswordPage() {
                   <CheckCircle className="h-8 w-8 text-primary" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Check your email</h3>
-                  <p className="text-sm text-muted-foreground">We sent a password reset link to {email}</p>
+                  <h3 className="text-lg font-medium">{localizeText("Check your email", "تحقق من بريدك الإلكتروني", isRTL ? "ar" : "en")}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {localizeText("We sent a password reset link to", "لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى", isRTL ? "ar" : "en")} {email}
+                  </p>
                 </div>
                 <Button asChild className="w-full">
                   <Link href="/login">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {isRTL ? <ArrowRight className="mr-2 h-4 w-4" /> : <ArrowLeft className="mr-2 h-4 w-4" />}
                     {t("auth.backToLogin")}
                   </Link>
                 </Button>
@@ -83,7 +86,7 @@ export default function ForgotPasswordPage() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="name@example.com"
+                      placeholder={localizeText("name@example.com", "name@example.com", isRTL ? "ar" : "en")}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
@@ -99,7 +102,7 @@ export default function ForgotPasswordPage() {
 
                 <Button variant="ghost" asChild className="w-full">
                   <Link href="/login">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {isRTL ? <ArrowRight className="mr-2 h-4 w-4" /> : <ArrowLeft className="mr-2 h-4 w-4" />}
                     {t("auth.backToLogin")}
                   </Link>
                 </Button>

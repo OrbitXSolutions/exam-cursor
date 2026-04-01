@@ -18,10 +18,14 @@ public interface INotificationService
     Task<ApiResponse<PaginatedResponse<NotificationLogDto>>> GetLogsAsync(NotificationLogFilterDto filter);
     Task<ApiResponse<bool>> RetryNotificationAsync(int logId);
 
+    // Send Now - force resend any notification regardless of status
+    Task<ApiResponse<bool>> SendNowAsync(int logId);
+
     // Test
     Task<ApiResponse<bool>> SendTestEmailAsync(TestEmailDto dto);
     Task<ApiResponse<bool>> SendTestSmsAsync(TestSmsDto dto);
 
     // Event triggers
     Task QueueExamPublishedNotificationsAsync(int examId);
+    Task QueueResultPublishedNotificationsAsync(int examId);
 }

@@ -147,6 +147,10 @@ export async function retryNotification(logId: number): Promise<void> {
   await apiClient.post(`/Notification/logs/${logId}/retry`);
 }
 
+export async function sendNowNotification(logId: number): Promise<void> {
+  await apiClient.post(`/Notification/logs/${logId}/send-now`);
+}
+
 // ── Test ──────────────────────────────────────────────────────
 
 export async function sendTestEmail(toEmail: string): Promise<void> {
@@ -155,4 +159,10 @@ export async function sendTestEmail(toEmail: string): Promise<void> {
 
 export async function sendTestSms(toPhone: string): Promise<void> {
   await apiClient.post("/Notification/test-sms", { toPhone });
+}
+
+// ── Manual triggers ───────────────────────────────────────────
+
+export async function queueExamEmails(examId: number): Promise<void> {
+  await apiClient.post(`/Notification/queue-exam-emails/${examId}`);
 }

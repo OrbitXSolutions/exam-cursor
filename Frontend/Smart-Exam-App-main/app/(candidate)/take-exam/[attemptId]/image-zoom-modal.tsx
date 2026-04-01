@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { ZoomIn, X } from "lucide-react"
+import { useI18n } from "@/lib/i18n/context"
 
 interface ImageZoomModalProps {
   src: string
@@ -12,6 +13,7 @@ interface ImageZoomModalProps {
 
 export function ImageZoomModal({ src, alt, className, thumbnailClassName }: ImageZoomModalProps) {
   const [open, setOpen] = useState(false)
+  const { dir } = useI18n()
 
   // Close on Escape key
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -56,13 +58,14 @@ export function ImageZoomModal({ src, alt, className, thumbnailClassName }: Imag
       {/* True fullscreen overlay — no Dialog constraints */}
       {open && (
         <div
+          dir={dir}
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4 sm:p-8"
           onClick={() => setOpen(false)}
         >
           {/* Close button */}
           <button
             onClick={() => setOpen(false)}
-            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25"
+            className="absolute end-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25"
           >
             <X className="h-6 w-6" />
           </button>

@@ -71,7 +71,7 @@ import {
 
 export default function ExamBuilderPage() {
   const { id } = useParams<{ id: string }>()
-  const { t, dir, locale } = useI18n()
+  const { t, dir, locale, language } = useI18n()
   const [exam, setExam] = useState<Exam | null>(null)
   const [sections, setSections] = useState<ExamSection[]>([])
   const [availableQuestions, setAvailableQuestions] = useState<Question[]>([])
@@ -130,7 +130,7 @@ export default function ExamBuilderPage() {
       // Expand all sections by default
       setExpandedSections(new Set(sectionsData.map((s) => s.id)))
     } catch (error) {
-      toast.error("Failed to load exam data")
+      toast.error(language === "ar" ? "فشل في تحميل بيانات الاختبار" : "Failed to load exam data")
     } finally {
       setLoading(false)
     }
@@ -206,11 +206,11 @@ export default function ExamBuilderPage() {
     try {
       // API takes sectionId directly, not examId + sectionId
       await deleteExamSection(deleteSectionDialog.id)
-      toast.success("Section deleted")
+      toast.success(language === "ar" ? "تم حذف القسم" : "Section deleted")
       setDeleteSectionDialog(null)
       loadData()
     } catch (error) {
-      toast.error("Failed to delete section")
+      toast.error(language === "ar" ? "فشل في حذف القسم" : "Failed to delete section")
     }
   }
 
@@ -332,10 +332,10 @@ export default function ExamBuilderPage() {
     try {
       // API takes examQuestionId directly
       await removeQuestionFromSection(id, sectionId, examQuestionId)
-      toast.success("Question removed")
+      toast.success(language === "ar" ? "تم إزالة السؤال" : "Question removed")
       loadData()
     } catch (error) {
-      toast.error("Failed to remove question")
+      toast.error(language === "ar" ? "فشل في إزالة السؤال" : "Failed to remove question")
     }
   }
 
@@ -395,7 +395,7 @@ export default function ExamBuilderPage() {
   if (!exam) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Exam not found</p>
+        <p className="text-muted-foreground">{language === "ar" ? "الاختبار غير موجود" : "Exam not found"}</p>
       </div>
     )
   }
@@ -621,7 +621,7 @@ export default function ExamBuilderPage() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm truncate">
                                 {locale === "ar" 
-                                  ? (eq.questionBodyAr || eq.questionBodyEn || eq.questionBody || "Question not found")
+                                  ? (eq.questionBodyAr || eq.questionBodyEn || eq.questionBody || "السؤال غير موجود")
                                   : (eq.questionBodyEn || eq.questionBody || "Question not found")}
                               </p>
                               <div className="flex items-center gap-2 mt-1">
@@ -632,7 +632,7 @@ export default function ExamBuilderPage() {
                                       : (eq.questionTypeNameEn || eq.questionTypeName)}
                                   </Badge>
                                 )}
-                                <span className="text-xs text-muted-foreground">{eq.points} pts</span>
+                                <span className="text-xs text-muted-foreground">{eq.points} {language === "ar" ? "نقاط" : "pts"}</span>
                               </div>
                             </div>
                             <Button
@@ -938,7 +938,7 @@ export default function ExamBuilderPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm line-clamp-2">
                               {locale === "ar" 
-                                ? (question.bodyAr || question.bodyEn || question.body || "No question text")
+                                ? (question.bodyAr || question.bodyEn || question.body || "لا يوجد نص سؤال")
                                 : (question.bodyEn || question.body || "No question text")}
                             </p>
                             <div className="flex items-center flex-wrap gap-2 mt-2">
@@ -956,7 +956,7 @@ export default function ExamBuilderPage() {
                                     : (question.questionCategoryNameEn || question.questionCategoryName)}
                                 </Badge>
                               )}
-                              <span className="text-xs text-muted-foreground">{question.points} pts</span>
+                              <span className="text-xs text-muted-foreground">{question.points} {language === "ar" ? "نقاط" : "pts"}</span>
                             </div>
                           </div>
                         </div>
@@ -1025,7 +1025,7 @@ export default function ExamBuilderPage() {
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm line-clamp-2">
                                   {locale === "ar" 
-                                    ? (question.bodyAr || question.bodyEn || question.body || "No question text")
+                                    ? (question.bodyAr || question.bodyEn || question.body || "لا يوجد نص سؤال")
                                     : (question.bodyEn || question.body || "No question text")}
                                 </p>
                                 <div className="flex items-center flex-wrap gap-2 mt-2">
@@ -1036,7 +1036,7 @@ export default function ExamBuilderPage() {
                                         : (question.questionCategoryNameEn || question.questionCategoryName)}
                                     </Badge>
                                   )}
-                                  <span className="text-xs text-muted-foreground">{question.points} pts</span>
+                                  <span className="text-xs text-muted-foreground">{question.points} {language === "ar" ? "نقاط" : "pts"}</span>
                                 </div>
                               </div>
                               <Button

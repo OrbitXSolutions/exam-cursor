@@ -27,6 +27,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { localizeText } from "@/lib/i18n/runtime"
 import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, FolderTree, Loader2 } from "lucide-react"
 import {
@@ -66,7 +68,7 @@ function QuestionCategoriesContent() {
       const result = await getQuestionCategories({ pageSize: 100 })
       setCategories(result.items || [])
     } catch (error) {
-      toast.error("Failed to load categories")
+      toast.error(localizeText("Failed to load categories", "فشل تحميل الفئات", language))
     } finally {
       setLoading(false)
     }
@@ -88,7 +90,7 @@ function QuestionCategoriesContent() {
 
   const handleSave = async () => {
     if (!formData.nameEn.trim() || !formData.nameAr.trim()) {
-      toast.error("Both English and Arabic names are required")
+      toast.error(localizeText("Both English and Arabic names are required", "الاسمان بالإنجليزية والعربية مطلوبان", language))
       return
     }
 
@@ -113,7 +115,7 @@ function QuestionCategoriesContent() {
       }
       setDialogOpen(false)
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setSaving(false)
     }
@@ -134,7 +136,7 @@ function QuestionCategoriesContent() {
       setDeleteDialogOpen(false)
       setCategoryToDelete(null)
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setDeleting(false)
     }
@@ -156,16 +158,16 @@ function QuestionCategoriesContent() {
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className={cn("absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground", language === "ar" ? "right-3" : "left-3")} />
             <Input
               placeholder={language === "ar" ? "بحث في الفئات..." : "Search categories..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className={language === "ar" ? "pr-10" : "pl-10"}
             />
           </div>
           <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {language === "ar" ? "إضافة فئة" : "Add Category"}
           </Button>
         </div>
@@ -178,12 +180,12 @@ function QuestionCategoriesContent() {
         ) : filteredCategories.length === 0 ? (
           <EmptyState
             icon={FolderTree}
-            title={searchQuery ? "No categories found" : "No categories yet"}
-            description={searchQuery ? "Try adjusting your search" : "Create your first question category"}
+            title={searchQuery ? (language === "ar" ? "لم يتم العثور على فئات" : "No categories found") : (language === "ar" ? "لا توجد فئات بعد" : "No categories yet")}
+            description={searchQuery ? (language === "ar" ? "حاول تعديل بحثك" : "Try adjusting your search") : (language === "ar" ? "أنشئ أول فئة أسئلة" : "Create your first question category")}
             action={
               !searchQuery && (
                 <Button onClick={handleCreate}>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 h-4 w-4" />
                   {language === "ar" ? "إضافة فئة" : "Add Category"}
                 </Button>
               )
@@ -220,7 +222,7 @@ function QuestionCategoriesContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(category)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -230,7 +232,7 @@ function QuestionCategoriesContent() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -271,7 +273,7 @@ function QuestionCategoriesContent() {
                 id="nameEn"
                 value={formData.nameEn}
                 onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                placeholder="e.g. Mathematics"
+                placeholder={language === "ar" ? "مثال: الرياضيات" : "e.g. Mathematics"}
               />
             </div>
             <div className="space-y-2">
@@ -290,7 +292,7 @@ function QuestionCategoriesContent() {
               {language === "ar" ? "إلغاء" : "Cancel"}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {dialogMode === "create" ? (language === "ar" ? "إنشاء" : "Create") : language === "ar" ? "حفظ" : "Save"}
             </Button>
           </DialogFooter>
@@ -315,7 +317,7 @@ function QuestionCategoriesContent() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {language === "ar" ? "حذف" : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

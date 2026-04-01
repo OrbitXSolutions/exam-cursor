@@ -133,9 +133,9 @@ export default function DashboardPage() {
   ]
 
   const completionData = [
-    { name: "Completed", value: 76, fill: "hsl(142, 60%, 45%)" },
-    { name: "In Progress", value: 15, fill: "hsl(45, 70%, 55%)" },
-    { name: "Not Started", value: 9, fill: "hsl(var(--muted-foreground))" },
+    { name: language === "ar" ? "مكتمل" : "Completed", value: 76, fill: "hsl(142, 60%, 45%)" },
+    { name: language === "ar" ? "قيد التنفيذ" : "In Progress", value: 15, fill: "hsl(45, 70%, 55%)" },
+    { name: language === "ar" ? "لم يبدأ" : "Not Started", value: 9, fill: "hsl(var(--muted-foreground))" },
   ]
 
   const topPerformers = [
@@ -172,25 +172,25 @@ export default function DashboardPage() {
             {/* Summary Stats Row */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <StatCard
-                title="Avg. Score"
+                title={language === "ar" ? "معدل الدرجات" : "Avg. Score"}
                 value="76%"
                 icon={Target}
                 trend={{ value: 4, isPositive: true }}
               />
               <StatCard
-                title="Active Candidates"
+                title={language === "ar" ? "المرشحون النشطون" : "Active Candidates"}
                 value="165"
                 icon={UserCheck}
                 trend={{ value: 12, isPositive: true }}
               />
               <StatCard
-                title="Exams This Month"
+                title={language === "ar" ? "اختبارات هذا الشهر" : "Exams This Month"}
                 value="14"
                 icon={BookOpen}
                 trend={{ value: 3, isPositive: true }}
               />
               <StatCard
-                title="Completion Rate"
+                title={language === "ar" ? "نسبة الإنجاز" : "Completion Rate"}
                 value="76%"
                 icon={Award}
                 trend={{ value: 5, isPositive: true }}
@@ -204,9 +204,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-primary" />
-                    Score Distribution
+                    {language === "ar" ? "توزيع الدرجات" : "Score Distribution"}
                   </CardTitle>
-                  <CardDescription>Distribution of candidate scores across all exams</CardDescription>
+                  <CardDescription>{language === "ar" ? "توزيع درجات المرشحين عبر جميع الاختبارات" : "Distribution of candidate scores across all exams"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[280px]">
@@ -239,9 +239,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Target className="h-5 w-5 text-primary" />
-                    Department Performance
+                    {language === "ar" ? "أداء الأقسام" : "Department Performance"}
                   </CardTitle>
-                  <CardDescription>Average scores by department</CardDescription>
+                  <CardDescription>{language === "ar" ? "متوسط الدرجات حسب القسم" : "Average scores by department"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[280px]">
@@ -281,9 +281,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="h-5 w-5 text-primary" />
-                    Monthly Trends
+                    {language === "ar" ? "الاتجاهات الشهرية" : "Monthly Trends"}
                   </CardTitle>
-                  <CardDescription>Exams, attempts, and pass rates over the last 6 months</CardDescription>
+                  <CardDescription>{language === "ar" ? "الاختبارات والمحاولات ومعدلات النجاح خلال الأشهر الستة الماضية" : "Exams, attempts, and pass rates over the last 6 months"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
@@ -300,9 +300,9 @@ export default function DashboardPage() {
                           }}
                         />
                         <Legend />
-                        <Line type="monotone" dataKey="attempts" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} name="Attempts" />
-                        <Line type="monotone" dataKey="passed" stroke="hsl(142, 60%, 45%)" strokeWidth={2} dot={{ r: 4 }} name="Passed" />
-                        <Line type="monotone" dataKey="exams" stroke="hsl(45, 70%, 55%)" strokeWidth={2} dot={{ r: 4 }} name="Exams Created" />
+                        <Line type="monotone" dataKey="attempts" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} name={language === "ar" ? "المحاولات" : "Attempts"} />
+                        <Line type="monotone" dataKey="passed" stroke="hsl(142, 60%, 45%)" strokeWidth={2} dot={{ r: 4 }} name={language === "ar" ? "الناجحون" : "Passed"} />
+                        <Line type="monotone" dataKey="exams" stroke="hsl(45, 70%, 55%)" strokeWidth={2} dot={{ r: 4 }} name={language === "ar" ? "الاختبارات المنشأة" : "Exams Created"} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -314,9 +314,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-primary" />
-                    Completion Rate
+                    {language === "ar" ? "نسبة الإنجاز" : "Completion Rate"}
                   </CardTitle>
-                  <CardDescription>Overall exam completion status</CardDescription>
+                  <CardDescription>{language === "ar" ? "حالة إنجاز الاختبارات الإجمالية" : "Overall exam completion status"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[220px]">
@@ -368,9 +368,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    Recent Submissions
+                    {language === "ar" ? "التسليمات الأخيرة" : "Recent Submissions"}
                   </CardTitle>
-                  <CardDescription>Latest exam submissions</CardDescription>
+                  <CardDescription>{language === "ar" ? "آخر تسليمات الاختبارات" : "Latest exam submissions"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -403,9 +403,9 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-primary" />
-                    Top Performers
+                    {language === "ar" ? "أفضل المتفوقين" : "Top Performers"}
                   </CardTitle>
-                  <CardDescription>Highest scoring candidates this month</CardDescription>
+                  <CardDescription>{language === "ar" ? "المرشحون الأعلى درجات هذا الشهر" : "Highest scoring candidates this month"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -416,7 +416,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{performer.name}</p>
-                          <p className="text-xs text-muted-foreground">{performer.department} &middot; {performer.exams} exams</p>
+                          <p className="text-xs text-muted-foreground">{language === "ar" ? `${performer.department} · ${performer.exams} اختبار` : `${performer.department} · ${performer.exams} exams`}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-primary">{performer.score}%</p>
@@ -466,36 +466,36 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks at your fingertips</CardDescription>
+              <CardTitle>{language === "ar" ? "إجراءات سريعة" : "Quick Actions"}</CardTitle>
+              <CardDescription>{language === "ar" ? "المهام الشائعة في متناول يديك" : "Common tasks at your fingertips"}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-2">
               {isAdmin ? (
                 <>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
                     <Link href="/question-bank/create">
-                      <FileQuestion className="mr-3 h-5 w-5 text-primary" />
-                      <div className="text-left">
+                      <FileQuestion className="me-3 h-5 w-5 text-primary" />
+                      <div className="text-start">
                         <p className="font-medium">{t("questionBank.createQuestion")}</p>
-                        <p className="text-xs text-muted-foreground">Add new question to bank</p>
+                        <p className="text-xs text-muted-foreground">{language === "ar" ? "إضافة سؤال جديد للبنك" : "Add new question to bank"}</p>
                       </div>
                     </Link>
                   </Button>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
                     <Link href="/exams/setup">
-                      <ClipboardList className="mr-3 h-5 w-5 text-primary" />
-                      <div className="text-left">
+                      <ClipboardList className="me-3 h-5 w-5 text-primary" />
+                      <div className="text-start">
                         <p className="font-medium">{t("exams.createExam")}</p>
-                        <p className="text-xs text-muted-foreground">Build a new examination</p>
+                        <p className="text-xs text-muted-foreground">{language === "ar" ? "إنشاء اختبار جديد" : "Build a new examination"}</p>
                       </div>
                     </Link>
                   </Button>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
                     <Link href="/grading">
-                      <GraduationCap className="mr-3 h-5 w-5 text-primary" />
-                      <div className="text-left">
+                      <GraduationCap className="me-3 h-5 w-5 text-primary" />
+                      <div className="text-start">
                         <p className="font-medium">{t("grading.gradingQueue")}</p>
-                        <p className="text-xs text-muted-foreground">{stats.pendingGrading} pending submissions</p>
+                        <p className="text-xs text-muted-foreground">{language === "ar" ? `${stats.pendingGrading} تسليم بانتظار التصحيح` : `${stats.pendingGrading} pending submissions`}</p>
                       </div>
                     </Link>
                   </Button>
@@ -504,8 +504,8 @@ export default function DashboardPage() {
                 <>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
                     <Link href="/my-exams">
-                      <ClipboardList className="mr-3 h-5 w-5 text-primary" />
-                      <div className="text-left">
+                      <ClipboardList className="me-3 h-5 w-5 text-primary" />
+                      <div className="text-start">
                         <p className="font-medium">{t("myExams.availableExams")}</p>
                         <p className="text-xs text-muted-foreground">{t("myExams.viewAndStart")}</p>
                       </div>
@@ -513,8 +513,8 @@ export default function DashboardPage() {
                   </Button>
                   <Button variant="outline" className="justify-start h-auto py-3 bg-transparent" asChild>
                     <Link href="/my-results">
-                      <CheckCircle className="mr-3 h-5 w-5 text-primary" />
-                      <div className="text-left">
+                      <CheckCircle className="me-3 h-5 w-5 text-primary" />
+                      <div className="text-start">
                         <p className="font-medium">{t("myExams.myResults")}</p>
                         <p className="text-xs text-muted-foreground">{t("myExams.viewScores")}</p>
                       </div>
@@ -530,12 +530,12 @@ export default function DashboardPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>{t("dashboard.upcomingExams")}</CardTitle>
-                <CardDescription>Scheduled examinations</CardDescription>
+                <CardDescription>{language === "ar" ? "الاختبارات المجدولة" : "Scheduled examinations"}</CardDescription>
               </div>
               <Button variant="ghost" size="sm" asChild>
                 <Link href={isAdmin ? "/exams/list" : "/my-exams"}>
-                  View all
-                  <ArrowRight className="ml-1 h-4 w-4" />
+                  {language === "ar" ? "عرض الكل" : "View all"}
+                  <ArrowRight className="ms-1 h-4 w-4" />
                 </Link>
               </Button>
             </CardHeader>
@@ -559,14 +559,14 @@ export default function DashboardPage() {
                           hour: "2-digit",
                           minute: "2-digit",
                         })
-                        : "Not scheduled"}
+                        : language === "ar" ? "غير مجدول" : "Not scheduled"}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">{exam.durationMinutes} min</div>
+                  <div className="text-xs text-muted-foreground">{language === "ar" ? `${exam.durationMinutes} دقيقة` : `${exam.durationMinutes} min`}</div>
                 </div>
               ))}
               {upcomingExams.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">No upcoming exams</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{language === "ar" ? "لا توجد اختبارات قادمة" : "No upcoming exams"}</p>
               )}
             </CardContent>
           </Card>
@@ -576,13 +576,13 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Open Incidents</CardTitle>
-                  <CardDescription>Cases requiring attention</CardDescription>
+                  <CardTitle>{language === "ar" ? "الحوادث المفتوحة" : "Open Incidents"}</CardTitle>
+                  <CardDescription>{language === "ar" ? "حالات تتطلب الاهتمام" : "Cases requiring attention"}</CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/incidents">
-                    View all
-                    <ArrowRight className="ml-1 h-4 w-4" />
+                    {language === "ar" ? "عرض الكل" : "View all"}
+                    <ArrowRight className="ms-1 h-4 w-4" />
                   </Link>
                 </Button>
               </CardHeader>
@@ -607,7 +607,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
                 {incidentCases.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">No open incidents</p>
+                  <p className="text-sm text-muted-foreground text-center py-4">{language === "ar" ? "لا توجد حوادث مفتوحة" : "No open incidents"}</p>
                 )}
               </CardContent>
             </Card>
@@ -615,10 +615,10 @@ export default function DashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>{t("dashboard.recentActivity")}</CardTitle>
-                <CardDescription>Your recent exam activity</CardDescription>
+                <CardDescription>{language === "ar" ? "نشاطك الأخير في الاختبارات" : "Your recent exam activity"}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{language === "ar" ? "لا يوجد نشاط حديث" : "No recent activity"}</p>
               </CardContent>
             </Card>
           )}
@@ -634,7 +634,7 @@ export default function DashboardPage() {
                   <TrendingUp className="h-5 w-5 text-primary" />
                   {t("dashboard.attemptsOverTime")}
                 </CardTitle>
-                <CardDescription>Exam attempts in the last 7 weeks</CardDescription>
+                <CardDescription>{language === "ar" ? "محاولات الاختبارات في آخر 7 أسابيع" : "Exam attempts in the last 7 weeks"}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -677,7 +677,7 @@ export default function DashboardPage() {
                     <AlertTriangle className="h-5 w-5 text-primary" />
                     {t("dashboard.riskDistribution")}
                   </CardTitle>
-                  <CardDescription>Proctor session risk levels</CardDescription>
+                  <CardDescription>{language === "ar" ? "مستويات المخاطر في جلسات المراقبة" : "Proctor session risk levels"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">

@@ -199,12 +199,12 @@ function DepartmentsContent() {
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={language === "ar" ? "بحث في الأقسام..." : "Search departments..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -215,7 +215,7 @@ function DepartmentsContent() {
               </Label>
             </div>
             <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               {language === "ar" ? "إضافة قسم" : "Add Department"}
             </Button>
           </div>
@@ -234,7 +234,7 @@ function DepartmentsContent() {
             action={
               !searchQuery && (
                 <Button onClick={handleCreate}>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 h-4 w-4" />
                   {language === "ar" ? "إضافة قسم" : "Add Department"}
                 </Button>
               )
@@ -284,18 +284,18 @@ function DepartmentsContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(department)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleToggleActive(department)}>
                               {department.isActive ? (
                                 <>
-                                  <PowerOff className="mr-2 h-4 w-4" />
+                                  <PowerOff className="me-2 h-4 w-4" />
                                   {language === "ar" ? "تعطيل" : "Deactivate"}
                                 </>
                               ) : (
                                 <>
-                                  <Power className="mr-2 h-4 w-4" />
+                                  <Power className="me-2 h-4 w-4" />
                                   {language === "ar" ? "تفعيل" : "Activate"}
                                 </>
                               )}
@@ -308,7 +308,7 @@ function DepartmentsContent() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -410,7 +410,7 @@ function DepartmentsContent() {
               {language === "ar" ? "إلغاء" : "Cancel"}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {dialogMode === "create"
                 ? (language === "ar" ? "إنشاء" : "Create")
                 : (language === "ar" ? "حفظ" : "Save")}
@@ -437,7 +437,7 @@ function DepartmentsContent() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {language === "ar" ? "حذف" : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

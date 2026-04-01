@@ -123,6 +123,18 @@ public class NotificationBackgroundService : BackgroundService
         var logoUrl = orgSettings?.LogoPath ?? systemSettings?.LogoUrl ?? "";
         var loginUrl = notifSettings?.LoginUrl ?? "https://smartexam-sable.vercel.app/login";
 
+        // Build ExamURL from share links (batch lookup for efficiency)
+        var examIds = logs.Where(l => l.ExamId.HasValue).Select(l => l.ExamId!.Value).Distinct().ToList();
+        var shareLinks = await db.ExamShareLinks
+            .Where(sl => examIds.Contains(sl.ExamId) && sl.IsActive)
+            .ToListAsync(stoppingToken);
+        var shareLinkMap = shareLinks.ToDictionary(sl => sl.ExamId, sl => sl.ShareToken);
+
+        // Base URL for public exam access (derive from loginUrl)
+        var baseUrl = loginUrl.Contains("/login")
+            ? loginUrl.Replace("/login", "")
+            : loginUrl.TrimEnd('/');
+
         foreach (var log in logs)
         {
             if (stoppingToken.IsCancellationRequested) break;
@@ -137,9 +149,20 @@ public class NotificationBackgroundService : BackgroundService
                     ? "N/A"
                     : encryption.Decrypt(candidate.EncryptedPassword);
 
+                // Build ExamURL for this log
+                var examUrl = "";
+                if (log.ExamId.HasValue && shareLinkMap.TryGetValue(log.ExamId.Value, out var shareToken))
+                {
+                    examUrl = $"{baseUrl}/exam/share/{shareToken}";
+                }
+                else if (log.ExamId.HasValue)
+                {
+                    examUrl = $"{baseUrl}/exam/{log.ExamId.Value}";
+                }
+
                 // Replace placeholders in template
-                var subject = ReplacePlaceholders(template.SubjectEn, candidate, exam, password, brandName, supportEmail, loginUrl);
-                var bodyText = ReplacePlaceholders(template.BodyEn, candidate, exam, password, brandName, supportEmail, loginUrl);
+                var subject = ReplacePlaceholders(template.SubjectEn, candidate, exam, password, brandName, supportEmail, loginUrl, examUrl);
+                var bodyText = ReplacePlaceholders(template.BodyEn, candidate, exam, password, brandName, supportEmail, loginUrl, examUrl);
 
                 // Wrap in HTML layout
                 var htmlBody = WrapInHtmlLayout(bodyText, brandName, primaryColor, logoUrl);
@@ -237,7 +260,8 @@ public class NotificationBackgroundService : BackgroundService
         string password,
         string brandName,
         string supportEmail,
-        string loginUrl)
+        string loginUrl,
+        string examUrl = "")
     {
         return template
             .Replace("{{CandidateName}}", candidate?.FullName ?? candidate?.DisplayName ?? "Candidate")
@@ -249,7 +273,8 @@ public class NotificationBackgroundService : BackgroundService
             .Replace("{{ExamDuration}}", exam?.DurationMinutes.ToString() ?? "N/A")
             .Replace("{{BrandName}}", brandName)
             .Replace("{{SupportEmail}}", supportEmail)
-            .Replace("{{LoginUrl}}", loginUrl);
+            .Replace("{{LoginUrl}}", loginUrl)
+            .Replace("{{ExamURL}}", examUrl);
     }
 
     private static string WrapInHtmlLayout(string bodyText, string brandName, string primaryColor, string logoUrl)

@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { PageHeader } from "@/components/layout/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -94,8 +96,8 @@ export default function QuestionBankPage() {
       setTypes(Array.isArray(typesData) ? typesData : [])
     } catch (err) {
       console.error("Error fetching data:", err)
-      setError("Failed to load data. Please try again.")
-      toast.error("Failed to load questions")
+      setError(localizeText("Failed to load data. Please try again.", "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.", language))
+      toast.error(localizeText("Failed to load questions", "فشل تحميل الأسئلة", language))
     } finally {
       setLoading(false)
     }
@@ -131,12 +133,12 @@ export default function QuestionBankPage() {
       const result = await deleteQuestion(questionToDelete.id)
       if (result) {
         setQuestions(questions.filter((q) => q.id !== questionToDelete.id))
-        toast.success("Question deleted successfully")
+        toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       } else {
-        toast.error("Failed to delete question")
+        toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
       }
     } catch (err) {
-      toast.error("Failed to delete question")
+      toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)
@@ -149,12 +151,16 @@ export default function QuestionBankPage() {
       const result = await toggleQuestionStatus(question.id)
       if (result) {
         setQuestions(questions.map((q) => (q.id === question.id ? { ...q, isActive: !q.isActive } : q)))
-        toast.success(`Question ${question.isActive ? "deactivated" : "activated"} successfully`)
+        toast.success(
+          question.isActive
+            ? localizeText("Question deactivated successfully", "تم تعطيل السؤال بنجاح", language)
+            : localizeText("Question activated successfully", "تم تفعيل السؤال بنجاح", language),
+        )
       } else {
-        toast.error("Failed to update question status")
+        toast.error(localizeText("Failed to update question status", "فشل تحديث حالة السؤال", language))
       }
     } catch (err) {
-      toast.error("Failed to update question status")
+      toast.error(localizeText("Failed to update question status", "فشل تحديث حالة السؤال", language))
     }
   }
 
@@ -200,8 +206,8 @@ export default function QuestionBankPage() {
           <div className="text-center space-y-4">
             <p className="text-destructive">{error}</p>
             <Button onClick={fetchData} variant="outline">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Retry
+              <RefreshCw className="me-2 h-4 w-4" />
+              {t("common.retry")}
             </Button>
           </div>
         </div>
@@ -218,12 +224,12 @@ export default function QuestionBankPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-2">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className={cn("absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground", language === "ar" ? "right-3" : "left-3")} />
               <Input
-                placeholder={`${t("common.search")} questions...`}
+                placeholder={`${t("common.search")} ${language === "ar" ? "الأسئلة..." : "questions..."}`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className={language === "ar" ? "pr-10" : "pl-10"}
               />
             </div>
             <Button
@@ -237,22 +243,22 @@ export default function QuestionBankPage() {
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
                 <X className="h-4 w-4" />
-                Clear
+                {language === "ar" ? "مسح" : "Clear"}
               </Button>
             )}
-            <Button variant="outline" size="icon" onClick={fetchData} title="Refresh">
+            <Button variant="outline" size="icon" onClick={fetchData} title={language === "ar" ? "تحديث" : "Refresh"}>
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
           <Button asChild variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950/30">
             <Link href="/question-bank/ai-studio">
-              <Sparkles className="mr-2 h-4 w-4" />
+              <Sparkles className="me-2 h-4 w-4" />
               {language === "ar" ? "استوديو الأسئلة الذكي" : "AI Question Studio"}
             </Link>
           </Button>
           <Button asChild>
             <Link href="/question-bank/create">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               {t("questionBank.createQuestion")}
             </Link>
           </Button>
@@ -299,10 +305,10 @@ export default function QuestionBankPage() {
                   <label className="text-sm font-medium">{t("questionBank.questionType")}</label>
                   <Select value={selectedType} onValueChange={setSelectedType}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Types" />
+                      <SelectValue placeholder={language === "ar" ? "جميع الأنواع" : "All Types"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="all">{language === "ar" ? "جميع الأنواع" : "All Types"}</SelectItem>
                       {types.map((type) => (
                         <SelectItem key={type.id} value={String(type.id)}>
                           {language === "ar" ? type.nameAr : type.nameEn}
@@ -315,10 +321,10 @@ export default function QuestionBankPage() {
                   <label className="text-sm font-medium">{t("questionBank.difficulty")}</label>
                   <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Difficulties" />
+                      <SelectValue placeholder={language === "ar" ? "جميع المستويات" : "All Difficulties"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Difficulties</SelectItem>
+                      <SelectItem value="all">{language === "ar" ? "جميع المستويات" : "All Difficulties"}</SelectItem>
                       <SelectItem value={String(DifficultyLevel.Easy)}>{t("questionBank.easy")}</SelectItem>
                       <SelectItem value={String(DifficultyLevel.Medium)}>{t("questionBank.medium")}</SelectItem>
                       <SelectItem value={String(DifficultyLevel.Hard)}>{t("questionBank.hard")}</SelectItem>
@@ -334,23 +340,25 @@ export default function QuestionBankPage() {
         {filteredQuestions.length === 0 ? (
           <EmptyState
             icon={FileQuestion}
-            title={hasActiveFilters ? "No questions match your filters" : "No questions yet"}
+            title={hasActiveFilters
+              ? (language === "ar" ? "لا توجد أسئلة تطابق الفلاتر" : "No questions match your filters")
+              : (language === "ar" ? "لا توجد أسئلة بعد" : "No questions yet")}
             description={
               hasActiveFilters
-                ? "Try adjusting your filters or search query"
-                : "Create your first question to get started with your question bank"
+                ? (language === "ar" ? "حاول تعديل الفلاتر أو مصطلح البحث" : "Try adjusting your filters or search query")
+                : (language === "ar" ? "أنشئ أول سؤال للبدء في بنك الأسئلة" : "Create your first question to get started with your question bank")
             }
             action={
               hasActiveFilters ? (
                 <Button variant="outline" onClick={clearFilters}>
-                  <X className="mr-2 h-4 w-4" />
-                  Clear Filters
+                  <X className="me-2 h-4 w-4" />
+                  {language === "ar" ? "مسح الفلاتر" : "Clear Filters"}
                 </Button>
               ) : (
                 <Button asChild>
                   <Link href="/question-bank/create">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Question
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("questionBank.createQuestion")}
                   </Link>
                 </Button>
               )
@@ -359,18 +367,20 @@ export default function QuestionBankPage() {
         ) : (
           <>
             <div className="text-sm text-muted-foreground">
-              Showing {filteredQuestions.length} of {questions.length} questions
+              {language === "ar"
+                ? `عرض ${filteredQuestions.length} من ${questions.length} سؤال`
+                : `Showing ${filteredQuestions.length} of ${questions.length} questions`}
             </div>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Question</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>{language === "ar" ? "السؤال" : "Question"}</TableHead>
+                    <TableHead>{language === "ar" ? "النوع" : "Type"}</TableHead>
                     <TableHead>{language === "ar" ? "المادة" : "Subject"}</TableHead>
-                    <TableHead>Difficulty</TableHead>
-                    <TableHead>Points</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{language === "ar" ? "الصعوبة" : "Difficulty"}</TableHead>
+                    <TableHead>{language === "ar" ? "النقاط" : "Points"}</TableHead>
+                    <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -381,7 +391,7 @@ export default function QuestionBankPage() {
                         <div className="max-w-md">
                           <p className="font-medium truncate">
                             {language === "ar" 
-                              ? (question.bodyAr || question.bodyEn || question.body || "No question text")
+                              ? (question.bodyAr || question.bodyEn || question.body || "لا يوجد نص للسؤال")
                               : (question.bodyEn || question.body || "No question text")}
                           </p>
                         </div>
@@ -409,13 +419,22 @@ export default function QuestionBankPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <StatusBadge status={question.difficultyLevelName || "Unknown"} />
+                        <StatusBadge status={
+                          language === "ar"
+                            ? (question.difficultyLevelName === "Easy" ? "سهل"
+                              : question.difficultyLevelName === "Medium" ? "متوسط"
+                              : question.difficultyLevelName === "Hard" ? "صعب"
+                              : question.difficultyLevelName || "غير معروف")
+                            : (question.difficultyLevelName || "Unknown")
+                        } />
                       </TableCell>
                       <TableCell>
                         <span className="font-medium">{question.points || 0}</span>
                       </TableCell>
                       <TableCell>
-                        <StatusBadge status={question.isActive ? "Active" : "Inactive"} />
+                        <StatusBadge status={question.isActive
+                          ? (language === "ar" ? "نشط" : "Active")
+                          : (language === "ar" ? "غير نشط" : "Inactive")} />
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -424,22 +443,24 @@ export default function QuestionBankPage() {
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align={language === "ar" ? "start" : "end"}>
                             <DropdownMenuItem asChild>
                               <Link href={`/question-bank/${question.id}`}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
+                                <Eye className="me-2 h-4 w-4" />
+                                {language === "ar" ? "عرض" : "View"}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                               <Link href={`/question-bank/${question.id}/edit`}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
+                                <Edit className="me-2 h-4 w-4" />
+                                {language === "ar" ? "تعديل" : "Edit"}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleToggleStatus(question)}>
-                              <ToggleLeft className="mr-2 h-4 w-4" />
-                              {question.isActive ? "Deactivate" : "Activate"}
+                              <ToggleLeft className="me-2 h-4 w-4" />
+                              {question.isActive
+                                ? (language === "ar" ? "تعطيل" : "Deactivate")
+                                : (language === "ar" ? "تفعيل" : "Activate")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -449,8 +470,8 @@ export default function QuestionBankPage() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              <Trash2 className="me-2 h-4 w-4" />
+                              {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -468,19 +489,23 @@ export default function QuestionBankPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Question?</AlertDialogTitle>
+            <AlertDialogTitle>{language === "ar" ? "حذف السؤال؟" : "Delete Question?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The question will be permanently deleted from your question bank.
+              {language === "ar"
+                ? "لا يمكن التراجع عن هذا الإجراء. سيتم حذف السؤال نهائياً من بنك الأسئلة."
+                : "This action cannot be undone. The question will be permanently deleted from your question bank."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{language === "ar" ? "إلغاء" : "Cancel"}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting
+                ? (language === "ar" ? "جاري الحذف..." : "Deleting...")
+                : (language === "ar" ? "حذف" : "Delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

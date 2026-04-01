@@ -1794,7 +1794,13 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 ShuffleQuestions = exam.ShuffleQuestions,
                 ShuffleOptions = exam.ShuffleOptions,
                 LockPreviousSections = true, // Default behavior
-                PreventBackNavigation = false // Default behavior
+                PreventBackNavigation = false, // Default behavior
+                RequireProctoring = exam.RequireProctoring,
+                RequireWebcam = exam.RequireWebcam,
+                RequireFullscreen = exam.RequireFullscreen,
+                PreventCopyPaste = exam.PreventCopyPaste,
+                PreventScreenCapture = exam.PreventScreenCapture,
+                BrowserLockdown = exam.BrowserLockdown,
             },
             Sections = sectionDtos,
             Questions = flatQuestions.OrderBy(q => q.Order).ToList(),

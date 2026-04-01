@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { apiClient } from "@/lib/api-client"
+import { useI18n } from "@/lib/i18n/context"
+import { translateServerMessage } from "@/lib/i18n/runtime"
 import type { User, UserRole } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -71,6 +73,7 @@ interface LoginApiResponse {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { language, t } = useI18n()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -124,17 +127,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("refreshToken", result.data.refreshToken)
 
         console.log("[Auth] Login successful, token stored")
-        toast.success("Login successful")
+        toast.success(t("auth.loginSuccess"))
         setIsLoading(false)
         return true
       }
 
       // API returned error
       const errorMsg = result.errors?.join(", ") || result.message || "Login failed"
-      throw new Error(errorMsg)
+      throw new Error(translateServerMessage(errorMsg, language))
     } catch (error) {
       console.error("[Auth] Login error:", error)
-      toast.error(error instanceof Error ? error.message : "Login failed")
+      toast.error(
+        error instanceof Error
+          ? translateServerMessage(error.message, language)
+          : t("auth.loginFailed"),
+      )
       setIsLoading(false)
       return false
     }
@@ -145,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("user")
     localStorage.removeItem("refreshToken")
     setUser(null)
-    toast.success("Logged out successfully")
+    toast.success(t("auth.logoutSuccess"))
   }
 
   const hasRole = (roles: UserRole | UserRole[]): boolean => {

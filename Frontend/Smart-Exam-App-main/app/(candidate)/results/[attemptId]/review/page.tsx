@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import { getMyResultReview, type CandidateResultReview, type ReviewQuestionDto } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -12,7 +13,7 @@ import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { 
-  ArrowLeft, CheckCircle2, XCircle, AlertCircle, FileText, 
+  ArrowLeft, ArrowRight, CheckCircle2, XCircle, AlertCircle, FileText, 
   ChevronLeft, ChevronRight, Trophy
 } from "lucide-react"
 
@@ -28,41 +29,47 @@ function getLocalizedField<T extends Record<string, unknown>>(
 }
 
 // Question type mapping for display names (supports various backend naming conventions)
-const QUESTION_TYPE_DISPLAY: Record<string, string> = {
+const QUESTION_TYPE_DISPLAY: Record<string, { en: string; ar: string }> = {
   // MCQ Single variants
-  "MCQ_Single": "Multiple Choice",
-  "MCQ Single Choice": "Multiple Choice",
-  "SingleChoice": "Multiple Choice",
-  "Multiple Choice": "Multiple Choice",
+  "MCQ_Single": { en: "Multiple Choice", ar: "اختيار من متعدد" },
+  "MCQ Single Choice": { en: "Multiple Choice", ar: "اختيار من متعدد" },
+  "SingleChoice": { en: "Multiple Choice", ar: "اختيار من متعدد" },
+  "Multiple Choice": { en: "Multiple Choice", ar: "اختيار من متعدد" },
   // MCQ Multi variants
-  "MCQ_Multi": "Multiple Select",
-  "MCQ_Multiple": "Multiple Select",
-  "MCQ Multiple Choice": "Multiple Select",
-  "MultipleChoice": "Multiple Select",
-  "Multiple Select": "Multiple Select",
+  "MCQ_Multi": { en: "Multiple Select", ar: "اختيار متعدد" },
+  "MCQ_Multiple": { en: "Multiple Select", ar: "اختيار متعدد" },
+  "MCQ Multiple Choice": { en: "Multiple Select", ar: "اختيار متعدد" },
+  "MultipleChoice": { en: "Multiple Select", ar: "اختيار متعدد" },
+  "Multiple Select": { en: "Multiple Select", ar: "اختيار متعدد" },
   // True/False variants
-  "TrueFalse": "True/False",
-  "True_False": "True/False",
-  "True/False": "True/False",
+  "TrueFalse": { en: "True/False", ar: "صح أو خطأ" },
+  "True_False": { en: "True/False", ar: "صح أو خطأ" },
+  "True/False": { en: "True/False", ar: "صح أو خطأ" },
   // Subjective (replaces ShortAnswer, Essay, Numeric)
-  "Subjective": "Subjective",
-  "ShortAnswer": "Subjective",
-  "Short_Answer": "Subjective",
-  "Short Answer": "Subjective",
-  "Essay": "Subjective",
-  "Numeric": "Subjective",
+  "Subjective": { en: "Subjective", ar: "إجابة كتابية" },
+  "ShortAnswer": { en: "Subjective", ar: "إجابة كتابية" },
+  "Short_Answer": { en: "Subjective", ar: "إجابة كتابية" },
+  "Short Answer": { en: "Subjective", ar: "إجابة كتابية" },
+  "Essay": { en: "Subjective", ar: "إجابة كتابية" },
+  "Numeric": { en: "Subjective", ar: "إجابة كتابية" },
 }
 
 // Helper function to get question type display name
-function getQuestionTypeDisplayName(questionTypeName: string): string {
+function getQuestionTypeDisplayName(questionTypeName: string, language: string): string {
   // Try exact match first
   if (QUESTION_TYPE_DISPLAY[questionTypeName]) {
-    return QUESTION_TYPE_DISPLAY[questionTypeName]
+    return localizeText(
+      QUESTION_TYPE_DISPLAY[questionTypeName].en,
+      QUESTION_TYPE_DISPLAY[questionTypeName].ar,
+      language,
+    )
   }
   // Try case-insensitive match
   const lowerName = questionTypeName?.toLowerCase()
   for (const [key, value] of Object.entries(QUESTION_TYPE_DISPLAY)) {
-    if (key.toLowerCase() === lowerName) return value
+    if (key.toLowerCase() === lowerName) {
+      return localizeText(value.en, value.ar, language)
+    }
   }
   return questionTypeName
 }
@@ -121,7 +128,7 @@ export default function ReviewPage() {
             </div>
             <Button asChild>
               <Link href={`/results/${attemptId}`}>
-                <ArrowLeft className="h-4 w-4 me-2" />
+                {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
                 {t("results.backToResults")}
               </Link>
             </Button>
@@ -241,7 +248,7 @@ export default function ReviewPage() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link href={`/results/${attemptId}`}>
-                <ArrowLeft className="h-4 w-4" />
+                {dir === "rtl" ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
               </Link>
             </Button>
             <div>
@@ -344,7 +351,7 @@ export default function ReviewPage() {
                         {currentQuestion.points} {t("common.points")}
                       </Badge>
                       <Badge variant="secondary">
-                        {getQuestionTypeDisplayName(currentQuestion.questionTypeName)}
+                        {getQuestionTypeDisplayName(currentQuestion.questionTypeName, language)}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
@@ -388,7 +395,7 @@ export default function ReviewPage() {
                 disabled={currentQuestionIndex === 0}
                 className="bg-transparent"
               >
-                <ChevronLeft className="h-4 w-4 me-1" />
+                {dir === "rtl" ? <ChevronRight className="h-4 w-4 me-1" /> : <ChevronLeft className="h-4 w-4 me-1" />}
                 {t("exam.previous")}
               </Button>
               <span className="text-sm text-muted-foreground">
@@ -401,7 +408,7 @@ export default function ReviewPage() {
                 className="bg-transparent"
               >
                 {t("exam.next")}
-                <ChevronRight className="h-4 w-4 ms-1" />
+                {dir === "rtl" ? <ChevronLeft className="h-4 w-4 ms-1" /> : <ChevronRight className="h-4 w-4 ms-1" />}
               </Button>
             </div>
           </div>
@@ -441,7 +448,7 @@ export default function ReviewPage() {
         <div className="flex justify-center mt-8">
           <Button variant="outline" asChild className="bg-transparent">
             <Link href={`/results/${attemptId}`}>
-              <ArrowLeft className="h-4 w-4 me-2" />
+              {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
               {t("results.backToResults")}
             </Link>
           </Button>

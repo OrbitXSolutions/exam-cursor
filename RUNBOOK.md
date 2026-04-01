@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - .NET 9 SDK
-- Node.js 18+ (npm or pnpm)
+- Node.js 18+ with `pnpm`
 - SQL Server (local or remote)
 
 ---
@@ -35,8 +35,8 @@ Or run seed via app startup if configured.
 
 ```powershell
 cd Frontend/Smart-Exam-App-main
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Frontend starts at **http://localhost:3000**
@@ -46,6 +46,9 @@ Create `.env.local` (already done if following setup):
 ```
 BACKEND_URL=http://localhost:5221/api
 ```
+
+Do not set `NODE_ENV=prod`.
+- Leave `NODE_ENV` unset for local `pnpm dev` / `pnpm build`, or use the standard value `production` when a hosting platform requires it.
 
 ---
 

@@ -76,12 +76,12 @@ export function DataTable<TData, TValue>({
       {showSearch && searchKey && (
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder || t("common.search")}
               value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
               onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
-              className="pl-9"
+              className="ps-9"
             />
           </div>
         </div>
@@ -91,9 +91,9 @@ export function DataTable<TData, TValue>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={isRTL ? "text-right" : "text-left"}>
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
       {showPagination && (
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Rows per page</span>
+            <span>{isRTL ? "عدد الصفوف في الصفحة" : "Rows per page"}</span>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -158,7 +158,9 @@ export function DataTable<TData, TValue>({
 
           <div className="flex items-center gap-2">
             <div className="text-sm text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              {isRTL
+                ? `الصفحة ${table.getState().pagination.pageIndex + 1} من ${table.getPageCount()}`
+                : `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -168,7 +170,7 @@ export function DataTable<TData, TValue>({
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronsLeft className="h-4 w-4" />
+                {isRTL ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
               </Button>
               <Button
                 variant="outline"
@@ -177,7 +179,7 @@ export function DataTable<TData, TValue>({
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronLeft className="h-4 w-4" />
+                {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </Button>
               <Button
                 variant="outline"
@@ -186,7 +188,7 @@ export function DataTable<TData, TValue>({
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronRight className="h-4 w-4" />
+                {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </Button>
               <Button
                 variant="outline"
@@ -195,7 +197,7 @@ export function DataTable<TData, TValue>({
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronsRight className="h-4 w-4" />
+                {isRTL ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
               </Button>
             </div>
           </div>

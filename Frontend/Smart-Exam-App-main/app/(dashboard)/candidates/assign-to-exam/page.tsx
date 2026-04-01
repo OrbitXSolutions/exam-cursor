@@ -292,12 +292,12 @@ export default function AssignToExamPage() {
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row gap-4 items-end">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder={isAr ? "بحث بالاسم أو البريد أو الرقم..." : "Search name, email, roll no..."}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10"
+                    className="ps-10"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }}>
@@ -322,21 +322,21 @@ export default function AssignToExamPage() {
                 <> &nbsp;|&nbsp; {isAr ? "محدد" : "Selected"}: <strong>{selected.size}</strong></>
               )}
             </span>
-            <div className="ml-auto flex gap-2">
+            <div className="ms-auto flex gap-2">
               {selected.size > 0 && (
                 <>
                   <Button size="sm" onClick={() => openConfirm("assign", "selected")}>
-                    <UserPlus className="h-4 w-4 mr-2" />
+                    <UserPlus className="h-4 w-4 me-2" />
                     {isAr ? `تعيين (${selected.size})` : `Assign (${selected.size})`}
                   </Button>
                   <Button size="sm" variant="destructive" onClick={() => openConfirm("unassign", "selected")}>
-                    <UserMinus className="h-4 w-4 mr-2" />
+                    <UserMinus className="h-4 w-4 me-2" />
                     {isAr ? `إلغاء (${selected.size})` : `Unassign (${selected.size})`}
                   </Button>
                 </>
               )}
               <Button size="sm" variant="outline" onClick={() => openConfirm("assign", "all")} disabled={totalCount === 0}>
-                <Users className="h-4 w-4 mr-2" />
+                <Users className="h-4 w-4 me-2" />
                 {isAr ? "تعيين الكل" : "Assign All Matching"}
               </Button>
             </div>
@@ -479,7 +479,7 @@ export default function AssignToExamPage() {
               disabled={actionLoading}
               className={confirmAction === "unassign" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
             >
-              {actionLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {actionLoading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               {confirmLabel} ({confirmMode === "all" ? totalCount : selected.size})
             </AlertDialogAction>
           </AlertDialogFooter>

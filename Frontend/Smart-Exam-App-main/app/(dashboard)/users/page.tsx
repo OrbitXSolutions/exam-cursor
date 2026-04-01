@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
+import { localizeText } from "@/lib/i18n/runtime"
 import type { User } from "@/lib/types"
 import { getUsers, getUserById, updateUser, deleteUser, getDepartmentsList } from "@/lib/api/admin"
 import type { DepartmentListItem } from "@/lib/api/admin"
@@ -81,7 +82,7 @@ export default function UsersPage() {
       setUsers(res.items)
     } catch (e) {
       console.error("Failed to load users", e)
-      toast.error("Failed to load users")
+      toast.error(localizeText("Failed to load users", "فشل تحميل المستخدمين", language))
       setUsers([])
     } finally {
       setLoading(false)
@@ -108,17 +109,23 @@ export default function UsersPage() {
     if (!userToDelete) return
     try {
       await deleteUser(userToDelete.id)
-      toast.success("User deleted successfully")
+      toast.success(localizeText("User deleted successfully", "تم حذف المستخدم بنجاح", language))
       setDeleteDialogOpen(false)
       setUserToDelete(null)
       loadUsers()
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to delete user")
+      toast.error(e instanceof Error ? e.message : localizeText("Failed to delete user", "فشل حذف المستخدم", language))
     }
   }
 
   function handleResetPassword(user: User) {
-    toast.success(`Password reset. Temporary password: TempPass123!`)
+    toast.success(
+      localizeText(
+        "Password reset. Temporary password: TempPass123!",
+        "تمت إعادة تعيين كلمة المرور. كلمة المرور المؤقتة: TempPass123!",
+        language,
+      ),
+    )
   }
 
   const getRoleBadgeVariant = (role: string) => {
@@ -165,7 +172,7 @@ export default function UsersPage() {
           </p>
         </div>
         <Button onClick={() => router.push("/users/create")}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="me-2 h-4 w-4" />
           {language === "ar" ? "إضافة مستخدم" : "Add User"}
         </Button>
       </div>
@@ -223,12 +230,12 @@ export default function UsersPage() {
         <CardContent>
           <div className="mb-4 flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder={language === "ar" ? "البحث بالاسم أو البريد..." : "Search by name or email..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="ps-9"
               />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -325,15 +332,15 @@ export default function UsersPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.push(`/users/${user.id}`)}>
-                              <Eye className="mr-2 h-4 w-4" />
+                              <Eye className="me-2 h-4 w-4" />
                               {language === "ar" ? "عرض" : "View"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.push(`/users/${user.id}/edit`)}>
-                              <Pencil className="mr-2 h-4 w-4" />
+                              <Pencil className="me-2 h-4 w-4" />
                               {language === "ar" ? "تعديل" : "Edit"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleResetPassword(user)}>
-                              <KeyRound className="mr-2 h-4 w-4" />
+                              <KeyRound className="me-2 h-4 w-4" />
                               {language === "ar" ? "إعادة تعيين كلمة المرور" : "Reset Password"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -344,7 +351,7 @@ export default function UsersPage() {
                                 setDeleteDialogOpen(true)
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="me-2 h-4 w-4" />
                               {language === "ar" ? "حذف" : "Delete"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>

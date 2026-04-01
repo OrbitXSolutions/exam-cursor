@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { CheckCircle2, XCircle, Trophy, Clock, Target, FileText, ArrowLeft, Download, Share2, AlertCircle } from "lucide-react"
+import { CheckCircle2, XCircle, Trophy, Clock, Target, FileText, ArrowLeft, ArrowRight, Download, Share2, AlertCircle } from "lucide-react"
 
 // Helper function to get localized field
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -29,7 +29,7 @@ export default function ResultsPage() {
   const attemptId = Number.parseInt(attemptIdParam, 10)
   const searchParams = useSearchParams()
   const justSubmitted = searchParams.get("submitted") === "true"
-  const { t, language } = useI18n()
+  const { t, language, dir } = useI18n()
   const [result, setResult] = useState<CandidateResult | null>(null)
   const [certificate, setCertificate] = useState<{ id: number; downloadUrl: string } | null>(null)
   const [loading, setLoading] = useState(true)
@@ -108,7 +108,7 @@ export default function ResultsPage() {
             </div>
             <Button asChild>
               <Link href="/my-exams">
-                <ArrowLeft className="h-4 w-4 me-2" />
+                {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
                 {t("results.backToExams")}
               </Link>
             </Button>
@@ -122,14 +122,14 @@ export default function ResultsPage() {
   const showScores = result.totalScore !== null
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30" dir={dir}>
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
               <Link href="/my-exams">
-                <ArrowLeft className="h-4 w-4" />
+                {dir === "rtl" ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
               </Link>
             </Button>
             <div>
@@ -340,7 +340,7 @@ export default function ResultsPage() {
         <div className="flex justify-center gap-4">
           <Button variant="outline" asChild className="bg-transparent">
             <Link href="/my-exams">
-              <ArrowLeft className="h-4 w-4 me-2" />
+              {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
               {t("results.backToExams")}
             </Link>
           </Button>

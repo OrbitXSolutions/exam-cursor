@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { translateServerMessage } from "@/lib/i18n/runtime"
 import {
   getExamPreview,
   startExam,
@@ -21,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { ArrowLeft, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
+import { ArrowLeft, ArrowRight, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
 
 // Helper function to get localized field
 function getLocalizedField<T extends Record<string, unknown>>(
@@ -46,7 +47,7 @@ interface ReadyCheckStatus {
 export default function ExamInstructionsPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const examId = Number.parseInt(attemptId, 10)
-  const { t, language, setLanguage } = useI18n()
+  const { t, dir, language, setLanguage } = useI18n()
   const router = useRouter()
   const [examPreview, setExamPreview] = useState<ExamPreview | null>(null)
   const [loading, setLoading] = useState(true)
@@ -91,12 +92,16 @@ export default function ExamInstructionsPage() {
   const runReadyChecks = async () => {
     setReadyCheck(prev => ({ ...prev, checking: true }))
     
-    // Check fullscreen support
-    const fullscreenSupported = checkFullscreenSupport()
-    setReadyCheck(prev => ({ ...prev, fullscreenSupported }))
+    // Check fullscreen support only if required
+    if (examPreview?.accessPolicy.requireFullscreen) {
+      const fullscreenSupported = checkFullscreenSupport()
+      setReadyCheck(prev => ({ ...prev, fullscreenSupported }))
+    } else {
+      setReadyCheck(prev => ({ ...prev, fullscreenSupported: true }))
+    }
     
-    // Check webcam if proctoring is enabled
-    if (examPreview?.accessPolicy.requireProctoring) {
+    // Check webcam only if webcam is required
+    if (examPreview?.accessPolicy.requireWebcam) {
       const webcamPermission = await checkWebcamPermission()
       setReadyCheck(prev => ({ ...prev, webcamPermission }))
     } else {
@@ -125,6 +130,9 @@ export default function ExamInstructionsPage() {
     }
   }, [examPreview])
 
+  const translateReason = (reason?: string | null) =>
+    reason ? translateServerMessage(reason, language) : t("common.errorOccurred")
+
   async function loadExamPreview() {
     try {
       if (Number.isNaN(examId)) {
@@ -151,7 +159,7 @@ export default function ExamInstructionsPage() {
     }
 
     if (!examPreview?.eligibility.canStartNow) {
-      toast.error(examPreview?.eligibility.reasons[0] || t("common.errorOccurred"))
+      toast.error(translateReason(examPreview?.eligibility.reasons[0]))
       return
     }
 
@@ -196,32 +204,37 @@ export default function ExamInstructionsPage() {
         })
       } catch (e) { console.warn("[v0] Device info collection failed:", e) }
       
-      // Request fullscreen before navigating to exam page
-      try {
-        const docEl = document.documentElement as HTMLElement & {
-          webkitRequestFullscreen?: () => Promise<void>;
-          mozRequestFullScreen?: () => Promise<void>;
-          msRequestFullscreen?: () => Promise<void>;
+      // Request fullscreen before navigating to exam page (only if required)
+      if (examPreview?.accessPolicy.requireFullscreen) {
+        try {
+          const docEl = document.documentElement as HTMLElement & {
+            webkitRequestFullscreen?: () => Promise<void>;
+            mozRequestFullScreen?: () => Promise<void>;
+            msRequestFullscreen?: () => Promise<void>;
+          }
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen()
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen()
+          } else if (docEl.mozRequestFullScreen) {
+            await docEl.mozRequestFullScreen()
+          } else if (docEl.msRequestFullscreen) {
+            await docEl.msRequestFullscreen()
+          }
+        } catch (fsError) {
+          console.log("[v0] Fullscreen request failed:", fsError)
+          // Continue even if fullscreen fails - exam page will try again
         }
-        if (docEl.requestFullscreen) {
-          await docEl.requestFullscreen()
-        } else if (docEl.webkitRequestFullscreen) {
-          await docEl.webkitRequestFullscreen()
-        } else if (docEl.mozRequestFullScreen) {
-          await docEl.mozRequestFullScreen()
-        } else if (docEl.msRequestFullscreen) {
-          await docEl.msRequestFullscreen()
-        }
-      } catch (fsError) {
-        console.log("[v0] Fullscreen request failed:", fsError)
-        // Continue even if fullscreen fails - exam page will try again
       }
       
       // Redirect to exam taking page with attemptId
       router.push(`/take-exam/${session.attemptId}`)
     } catch (error: unknown) {
       console.error("[v0] Error starting exam:", error)
-      const errorMessage = error instanceof Error ? error.message : t("common.errorOccurred")
+      const errorMessage =
+        error instanceof Error
+          ? translateServerMessage(error.message, language)
+          : t("common.errorOccurred")
       // Set the error state for display
       setAccessCodeError(errorMessage)
       toast.error(errorMessage)
@@ -244,7 +257,7 @@ export default function ExamInstructionsPage() {
         <p className="text-lg">{t("exams.notFound")}</p>
         <Button variant="outline" asChild>
           <Link href="/my-exams">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            {dir === "rtl" ? <ArrowRight className="h-4 w-4 me-2" /> : <ArrowLeft className="h-4 w-4 me-2" />}
             {t("common.back")}
           </Link>
         </Button>
@@ -262,11 +275,11 @@ export default function ExamInstructionsPage() {
       title: t("instructions.timeLimit"),
       description: t("instructions.timeLimitDesc", { minutes: String(examPreview.durationMinutes) }),
     },
-    {
+    ...(examPreview.accessPolicy.requireFullscreen ? [{
       icon: Monitor,
       title: t("instructions.fullscreen"),
       description: t("instructions.fullscreenDesc"),
-    },
+    }] : []),
     {
       icon: Wifi,
       title: t("instructions.connection"),
@@ -287,13 +300,13 @@ export default function ExamInstructionsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
+    <div className="min-h-screen bg-muted/30 flex flex-col" dir={dir}>
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container flex h-16 items-center px-6">
           <Button variant="ghost" size="icon" asChild className="me-4">
             <Link href="/my-exams">
-              <ArrowLeft className="h-4 w-4" />
+              {dir === "rtl" ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
             </Link>
           </Button>
           <div>
@@ -363,7 +376,8 @@ export default function ExamInstructionsPage() {
               <CardDescription>{t("instructions.readyCheckDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Fullscreen Support Check */}
+              {/* Fullscreen Support Check (only if required) */}
+              {examPreview.accessPolicy.requireFullscreen && (
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   <Monitor className="h-5 w-5 text-muted-foreground" />
@@ -388,9 +402,10 @@ export default function ExamInstructionsPage() {
                   )}
                 </div>
               </div>
+              )}
 
-              {/* Webcam Permission Check (if proctoring required) */}
-              {examPreview.accessPolicy.requireProctoring && (
+              {/* Webcam Permission Check (if webcam required) */}
+              {examPreview.accessPolicy.requireWebcam && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <Camera className="h-5 w-5 text-muted-foreground" />
@@ -635,7 +650,7 @@ export default function ExamInstructionsPage() {
                     <p className="font-medium">{t("instructions.noAttemptsLeft")}</p>
                     <ul className="mt-2 space-y-1 text-sm">
                       {examPreview.eligibility.reasons.map((reason, idx) => (
-                        <li key={idx}>- {reason}</li>
+                        <li key={idx}>- {translateReason(reason)}</li>
                       ))}
                     </ul>
                   </div>

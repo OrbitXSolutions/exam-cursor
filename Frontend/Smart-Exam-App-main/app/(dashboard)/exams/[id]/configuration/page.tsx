@@ -112,11 +112,11 @@ export default function ExamConfigurationPage() {
           showResults: examData.showResults !== false,
           allowReview: examData.allowReview || false,
           showCorrectAnswers: examData.showCorrectAnswers || false,
-          requireProctoring: true,
+          requireProctoring: examData.requireProctoring || false,
           requireIdVerification: examData.requireIdVerification || false,
           preventCopyPaste: examData.preventCopyPaste || false,
           preventScreenCapture: examData.preventScreenCapture || false,
-          requireWebcam: true,
+          requireWebcam: examData.requireWebcam || false,
           requireFullscreen: examData.requireFullscreen || false,
           browserLockdown: examData.browserLockdown || false,
           maxViolationWarnings: examData.maxViolationWarnings ?? 0,
@@ -508,6 +508,8 @@ export default function ExamConfigurationPage() {
                     </div>
                     <Switch
                       checked={
+                        formData.requireProctoring &&
+                        formData.requireWebcam &&
                         formData.requireIdVerification &&
                         formData.preventCopyPaste &&
                         formData.preventScreenCapture &&
@@ -517,6 +519,8 @@ export default function ExamConfigurationPage() {
                       onCheckedChange={(checked) => {
                         setFormData((prev) => ({
                           ...prev,
+                          requireProctoring: checked,
+                          requireWebcam: checked,
                           requireIdVerification: checked,
                           preventCopyPaste: checked,
                           preventScreenCapture: checked,
@@ -529,31 +533,31 @@ export default function ExamConfigurationPage() {
 
                   <div className="border-b" />
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-amber-600" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                         <Label className="text-base font-medium">{t("exams.requireProctoring")}</Label>
                       </div>
                       <p className="text-sm text-muted-foreground">{t("exams.requireProctoringDesc")}</p>
                     </div>
                     <Switch
-                      checked={true}
-                      disabled={true}
+                      checked={formData.requireProctoring}
+                      onCheckedChange={(checked) => updateField("requireProctoring", checked)}
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-amber-600" />
+                        <Camera className="h-4 w-4 text-muted-foreground" />
                         <Label className="text-base font-medium">{t("exams.requireWebcam")}</Label>
                       </div>
                       <p className="text-sm text-muted-foreground">{t("exams.requireWebcamDesc")}</p>
                     </div>
                     <Switch
-                      checked={true}
-                      disabled={true}
+                      checked={formData.requireWebcam}
+                      onCheckedChange={(checked) => updateField("requireWebcam", checked)}
                     />
                   </div>
                   

@@ -71,6 +71,8 @@ export const translations = {
       ready: "Ready",
       unsupported: "Not Supported",
       denied: "Denied",
+      off: "Off",
+      unknown: "Unknown",
       ok: "OK",
     },
 
@@ -188,6 +190,9 @@ export const translations = {
       resetSubtitle: "Create a new password for your account",
       sendResetLink: "Send Reset Link",
       backToLogin: "Back to Login",
+      loginSuccess: "Login successful",
+      loginFailed: "Login failed",
+      logoutSuccess: "Logged out successfully",
     },
 
     // Question Bank
@@ -608,6 +613,27 @@ export const translations = {
       saving: "Saving...",
       saved: "Saved",
       saveFailed: "Save failed",
+      summary: "Summary",
+      calculator: "Calculator",
+      spreadsheet: "Spreadsheet",
+      questionImageAlt: "Question image",
+      cameraConnected: "Camera connected",
+      cameraAccessFailed: "Camera access failed",
+      retryCamera: "Retry Camera",
+      cameraPermissionRequired: "Camera permission is required to continue this exam.",
+      cameraError: "Camera error: {error}",
+      snapshotUploadRetry: "Snapshot upload failed. Retrying on the next cycle.",
+      snapshotUploadFailedPersistent:
+        "Proctor snapshots are not uploading. Please check your camera connection and keep the exam page open.",
+      snapshotUploadIncompleteWarning:
+        "Proctor snapshots are currently failing to upload. Please keep your camera enabled and your connection stable.",
+      lastSnapshotAt: "Last snapshot: {time}",
+      waitingForFirstSnapshot: "Waiting for the first snapshot...",
+      timeExtendedByMinutes: "Exam time extended by {minutes} minutes",
+      examWindowClosed: "The exam schedule window has closed and your attempt has ended.",
+      summaryTitle: "Exam Summary",
+      summaryOverall: "Overall",
+      thisSectionExpired: "This section's time has expired.",
       // Summary labels
       unanswered: "Unanswered",
       flagged: "Flagged",
@@ -1163,6 +1189,8 @@ export const translations = {
   ar: {
     // Common
     common: {
+      off: "إيقاف",
+      unknown: "غير معروف",
       loading: "جاري التحميل...",
       saving: "جاري الحفظ...",
       saved: "تم الحفظ بنجاح",
@@ -1332,6 +1360,9 @@ export const translations = {
 
     // Auth
     auth: {
+      loginSuccess: "تم تسجيل الدخول بنجاح",
+      loginFailed: "فشل تسجيل الدخول",
+      logoutSuccess: "تم تسجيل الخروج بنجاح",
       login: "تسجيل الدخول",
       logout: "تسجيل الخروج",
       forgotPassword: "نسيت كلمة المرور",
@@ -1869,6 +1900,27 @@ export const translations = {
 
     // Exam Taking
     exam: {
+      summary: "الملخص",
+      calculator: "الآلة الحاسبة",
+      spreadsheet: "جدول حسابي",
+      questionImageAlt: "صورة السؤال",
+      cameraConnected: "تم تشغيل الكاميرا بنجاح",
+      cameraAccessFailed: "تعذر الوصول إلى الكاميرا",
+      retryCamera: "إعادة تشغيل الكاميرا",
+      cameraPermissionRequired: "يجب السماح بالكاميرا لمتابعة الاختبار.",
+      cameraError: "خطأ في الكاميرا: {error}",
+      snapshotUploadRetry: "فشل رفع لقطة المراقبة. ستتم إعادة المحاولة في الدورة التالية.",
+      snapshotUploadFailedPersistent:
+        "لا يتم رفع لقطات المراقبة حاليا. يرجى التحقق من اتصال الكاميرا وإبقاء صفحة الاختبار مفتوحة.",
+      snapshotUploadIncompleteWarning:
+        "تفشل لقطات المراقبة في الرفع حاليا. يرجى إبقاء الكاميرا مفعلة والاتصال مستقرا.",
+      lastSnapshotAt: "آخر لقطة: {time}",
+      waitingForFirstSnapshot: "جار انتظار أول لقطة...",
+      timeExtendedByMinutes: "تم تمديد وقت الاختبار بمقدار {minutes} دقائق",
+      examWindowClosed: "تم إغلاق نافذة موعد الاختبار وانتهت محاولتك.",
+      summaryTitle: "ملخص الاختبار",
+      summaryOverall: "الإجمالي",
+      thisSectionExpired: "انتهى وقت هذا القسم.",
       navigation: "التنقل",
       questionNavigation: "التنقل بين الأسئلة",
       question: "سؤال",

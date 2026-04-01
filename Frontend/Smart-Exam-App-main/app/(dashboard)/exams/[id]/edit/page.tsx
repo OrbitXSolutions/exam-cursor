@@ -20,7 +20,7 @@ import { ArrowLeft, Save, Zap, AlertCircle, Calendar, Clock, Timer, Target, Refr
 import Link from "next/link"
 
 export default function EditExamPage() {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
@@ -73,8 +73,8 @@ export default function EditExamPage() {
         isActive: examData.isActive ?? true,
       })
     } catch (err) {
-      setError("Failed to load exam")
-      toast.error("Failed to load exam")
+      setError(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
+      toast.error(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
     } finally {
       setLoading(false)
     }
@@ -147,7 +147,7 @@ export default function EditExamPage() {
       toast.success(t("common.saved"))
       router.push(`/exams/${id}/overview`)
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update exam"
+      const errorMessage = err instanceof Error ? err.message : (language === "ar" ? "فشل في تحديث الاختبار" : "Failed to update exam")
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
