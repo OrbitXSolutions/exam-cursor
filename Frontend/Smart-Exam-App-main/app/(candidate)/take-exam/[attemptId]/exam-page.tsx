@@ -267,15 +267,19 @@ export default function ExamPage() {
     return true
   }, [session])
 
-  // Apply exam language from instructions and force full screen as soon as page loads
+  // Apply exam language from instructions
   useEffect(() => {
     if (typeof window === "undefined") return
     const saved = window.localStorage.getItem(EXAM_LANGUAGE_KEY) as "en" | "ar" | null
     if (saved && (saved === "en" || saved === "ar")) {
       setLanguage(saved)
     }
+  }, [setLanguage])
+
+  // Request fullscreen only when session is loaded AND requireFullscreen is enabled
+  useEffect(() => {
+    if (!session?.examSettings?.requireFullscreen) return
     
-    // Request fullscreen with cross-browser support
     const requestFullScreen = async () => {
       try {
         const docEl = document.documentElement as HTMLElement & {
@@ -299,12 +303,11 @@ export default function ExamPage() {
       }
     }
     
-    // Request fullscreen immediately and also after a short delay (for browser focus issues)
     requestFullScreen()
     const retryTimeout = setTimeout(requestFullScreen, 500)
     
     return () => clearTimeout(retryTimeout)
-  }, [setLanguage])
+  }, [session?.examSettings?.requireFullscreen])
 
   useEffect(() => {
     initializeExam()
@@ -342,30 +345,34 @@ export default function ExamPage() {
 
     // Security features
     const setupSecurityFeatures = async () => {
-      // Request fullscreen mode with cross-browser support
-      try {
-        const docEl = document.documentElement as HTMLElement & {
-          webkitRequestFullscreen?: () => Promise<void>;
-          mozRequestFullScreen?: () => Promise<void>;
-          msRequestFullscreen?: () => Promise<void>;
-        }
-        if (!document.fullscreenElement) {
-          if (docEl.requestFullscreen) {
-            await docEl.requestFullscreen()
-          } else if (docEl.webkitRequestFullscreen) {
-            await docEl.webkitRequestFullscreen()
-          } else if (docEl.mozRequestFullScreen) {
-            await docEl.mozRequestFullScreen()
-          } else if (docEl.msRequestFullscreen) {
-            await docEl.msRequestFullscreen()
+      const settings = session.examSettings
+
+      // Request fullscreen mode only if required
+      if (settings?.requireFullscreen) {
+        try {
+          const docEl = document.documentElement as HTMLElement & {
+            webkitRequestFullscreen?: () => Promise<void>;
+            mozRequestFullScreen?: () => Promise<void>;
+            msRequestFullscreen?: () => Promise<void>;
           }
+          if (!document.fullscreenElement) {
+            if (docEl.requestFullscreen) {
+              await docEl.requestFullscreen()
+            } else if (docEl.webkitRequestFullscreen) {
+              await docEl.webkitRequestFullscreen()
+            } else if (docEl.mozRequestFullScreen) {
+              await docEl.mozRequestFullScreen()
+            } else if (docEl.msRequestFullscreen) {
+              await docEl.msRequestFullscreen()
+            }
+          }
+        } catch (error) {
+          console.log("[v0] Fullscreen request failed:", error)
         }
-      } catch (error) {
-        console.log("[v0] Fullscreen request failed:", error)
       }
 
-      // Monitor fullscreen changes
-      const handleFullscreenChange = () => {
+      // Monitor fullscreen changes only if fullscreen is required
+      const handleFullscreenChange = settings?.requireFullscreen ? () => {
         if (!document.fullscreenElement) {
           logAttemptEvent(session.attemptId, {
             eventType: AttemptEventType.FullscreenExited,
@@ -374,10 +381,10 @@ export default function ExamPage() {
           playWarningBeep()
           toast.warning(t("exam.tabSwitchWarning"))
         }
-      }
+      } : null
 
-      // Tab visibility detection
-      const handleVisibilityChange = () => {
+      // Tab visibility detection only if fullscreen is required
+      const handleVisibilityChange = settings?.requireFullscreen ? () => {
         if (document.hidden) {
           logAttemptEvent(session.attemptId, {
             eventType: AttemptEventType.TabSwitched,
@@ -386,10 +393,10 @@ export default function ExamPage() {
           playWarningBeep()
           toast.warning(t("exam.tabSwitchWarning"))
         }
-      }
+      } : null
 
-      // Copy/paste prevention
-      const handleCopy = (e: ClipboardEvent) => {
+      // Copy/paste prevention only if required
+      const handleCopy = settings?.preventCopyPaste ? (e: ClipboardEvent) => {
         e.preventDefault()
         logAttemptEvent(session.attemptId, {
           eventType: AttemptEventType.CopyAttempt,
@@ -397,9 +404,9 @@ export default function ExamPage() {
         }).catch(() => { })
         playWarningBeep()
         toast.warning(t("exam.copyPasteBlocked"))
-      }
+      } : null
 
-      const handlePaste = (e: ClipboardEvent) => {
+      const handlePaste = settings?.preventCopyPaste ? (e: ClipboardEvent) => {
         e.preventDefault()
         logAttemptEvent(session.attemptId, {
           eventType: AttemptEventType.PasteAttempt,
@@ -407,20 +414,20 @@ export default function ExamPage() {
         }).catch(() => { })
         playWarningBeep()
         toast.warning(t("exam.copyPasteBlocked"))
-      }
+      } : null
 
-      document.addEventListener("fullscreenchange", handleFullscreenChange)
-      document.addEventListener("visibilitychange", handleVisibilityChange)
-      document.addEventListener("copy", handleCopy)
-      document.addEventListener("paste", handlePaste)
+      if (handleFullscreenChange) document.addEventListener("fullscreenchange", handleFullscreenChange)
+      if (handleVisibilityChange) document.addEventListener("visibilitychange", handleVisibilityChange)
+      if (handleCopy) document.addEventListener("copy", handleCopy)
+      if (handlePaste) document.addEventListener("paste", handlePaste)
 
       return () => {
-        document.removeEventListener("fullscreenchange", handleFullscreenChange)
-        document.removeEventListener("visibilitychange", handleVisibilityChange)
-        document.removeEventListener("copy", handleCopy)
-        document.removeEventListener("paste", handlePaste)
+        if (handleFullscreenChange) document.removeEventListener("fullscreenchange", handleFullscreenChange)
+        if (handleVisibilityChange) document.removeEventListener("visibilitychange", handleVisibilityChange)
+        if (handleCopy) document.removeEventListener("copy", handleCopy)
+        if (handlePaste) document.removeEventListener("paste", handlePaste)
 
-        if (document.fullscreenElement) {
+        if (settings?.requireFullscreen && document.fullscreenElement) {
           document.exitFullscreen().catch(() => { })
         }
       }
@@ -432,9 +439,14 @@ export default function ExamPage() {
     }
   }, [session, t])
 
-  // Proctoring: Keep webcam stream alive and take periodic snapshots
+  // Proctoring: Keep webcam stream alive and take periodic snapshots (only if webcam is required)
   useEffect(() => {
     if (!session?.attemptId) return
+    // Skip webcam initialization entirely if webcam is not required
+    if (!session.examSettings?.requireWebcam) {
+      setWebcamStatus("active") // Mark as OK so UI doesn't show errors
+      return
+    }
 
     let isActive = true
 
@@ -1361,8 +1373,8 @@ export default function ExamPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background" dir={dir}>
-      {/* Webcam denial / snapshot persistent error banner */}
-      {(webcamStatus === "denied" || webcamStatus === "error") && (
+      {/* Webcam denial / snapshot persistent error banner (only if webcam required) */}
+      {session?.examSettings?.requireWebcam && (webcamStatus === "denied" || webcamStatus === "error") && (
         <div className="flex items-center gap-3 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
           <CameraOff className="h-4 w-4 shrink-0" />
           <span className="flex-1">
@@ -1376,7 +1388,7 @@ export default function ExamPage() {
           </Button>
         </div>
       )}
-      {snapshotFailStreak >= 3 && webcamStatus === "active" && (
+      {session?.examSettings?.requireWebcam && snapshotFailStreak >= 3 && webcamStatus === "active" && (
         <div className="flex items-center gap-3 border-b bg-red-50 px-4 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
           <CameraOff className="h-4 w-4 shrink-0" />
           <span className="flex-1">{t("exam.snapshotUploadIncompleteWarning")}</span>
@@ -1439,7 +1451,8 @@ export default function ExamPage() {
               </span>
             )}
 
-            {/* Proctoring indicator */}
+            {/* Proctoring indicator (only if webcam required) */}
+            {session?.examSettings?.requireWebcam && (
             <div
               className={cn(
                 "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs",
@@ -1462,6 +1475,7 @@ export default function ExamPage() {
                   : t("common.off")}
               </span>
             </div>
+            )}
 
             {/* Calculator Toggle - shown only when current section/question allows it */}
             {isCalculatorAllowedInContext && (
@@ -2317,6 +2331,7 @@ function QuestionCard({
   onAnswerChange: (questionId: number, answer: SaveAnswerRequest) => void
   onToggleFlag: (questionId: number) => void
 }) {
+  const { t } = useI18n()
   const questionBody = getLocalizedField(question, "body", language)
 
   // Find primary image attachment for the question

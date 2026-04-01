@@ -178,6 +178,14 @@ public class CandidateExamSettingsDto
     /// If true, candidate cannot navigate back to previous questions
     /// </summary>
     public bool PreventBackNavigation { get; set; }
+
+    // Security settings for frontend enforcement
+    public bool RequireProctoring { get; set; }
+    public bool RequireWebcam { get; set; }
+    public bool RequireFullscreen { get; set; }
+    public bool PreventCopyPaste { get; set; }
+    public bool PreventScreenCapture { get; set; }
+    public bool BrowserLockdown { get; set; }
 }
 
 /// <summary>

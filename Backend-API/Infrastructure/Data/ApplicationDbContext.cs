@@ -47,6 +47,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<ExamQuestion> ExamQuestions { get; set; } = null!;
     public DbSet<ExamAccessPolicy> ExamAccessPolicies { get; set; } = null!;
     public DbSet<ExamInstruction> ExamInstructions { get; set; } = null!;
+    public DbSet<ExamShareLink> ExamShareLinks { get; set; } = null!;
 
     // Attempt
     public DbSet<Domain.Entities.Attempt.Attempt> Attempts { get; set; } = null!;

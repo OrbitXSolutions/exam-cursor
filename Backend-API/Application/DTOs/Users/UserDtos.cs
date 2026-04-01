@@ -27,6 +27,16 @@ public class UserDetailDto : UserDto
     public string? UpdatedBy { get; set; }
 }
 
+public class CreateUserDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string? FullName { get; set; }
+    public string? FullNameAr { get; set; }
+    public string Role { get; set; } = string.Empty;
+    public int? DepartmentId { get; set; }
+}
+
 public class UpdateUserDto
 {
     public string? DisplayName { get; set; }

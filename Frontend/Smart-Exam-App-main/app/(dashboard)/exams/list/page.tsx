@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import type { Exam } from "@/lib/types"
 import { getExams, deleteExam, publishExam, unpublishExam } from "@/lib/api/exams"
+import { queueExamEmails } from "@/lib/api/notifications"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -52,7 +53,11 @@ import {
   Globe,
   Users,
   Info,
+  Mail,
+  Loader2,
+  Share2,
 } from "lucide-react"
+import { ExamShareDialog } from "@/components/exam/exam-share-dialog"
 
 function getExamTitle(exam: Exam, language: string): string {
   return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || (language === "ar" ? "اختبار بدون عنوان" : "Untitled Exam")
@@ -78,6 +83,12 @@ export default function ExamsListPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [publishedExam, setPublishedExam] = useState<Exam | null>(null)
+  const [assignFirstDialogOpen, setAssignFirstDialogOpen] = useState(false)
+  const [assignFirstExam, setAssignFirstExam] = useState<Exam | null>(null)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [shareExam, setShareExam] = useState<Exam | null>(null)
 
   useEffect(() => {
     fetchExams()
@@ -103,16 +114,38 @@ export default function ExamsListPage() {
     try {
       setActionLoading(exam.id)
       await publishExam(exam.id)
+      // Exam published. Now the backend already queued notifications.
+      // Show the celebration dialog with Send Email NOW button
       setPublishedExam(exam)
+      setEmailSent(false)
       setPublishDialogOpen(true)
       fetchExams()
     } catch (error: any) {
       const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
-      setErrorDialogTitle(language === "ar" ? "فشل النشر" : "Failed to Publish")
-      setErrorMessage(msg)
-      setErrorDialogOpen(true)
+      // Check if the error is about no candidates assigned
+      if (exam.accessPolicyStatus === "Assigned") {
+        setAssignFirstExam(exam)
+        setAssignFirstDialogOpen(true)
+      } else {
+        setErrorDialogTitle(language === "ar" ? "فشل النشر" : "Failed to Publish")
+        setErrorMessage(msg)
+        setErrorDialogOpen(true)
+      }
     } finally {
       setActionLoading(null)
+    }
+  }
+
+  async function handleSendEmailNow(examId: number) {
+    setSendingEmail(true)
+    try {
+      await queueExamEmails(examId)
+      setEmailSent(true)
+      toast.success(language === "ar" ? "تم جدولة إرسال البريد الإلكتروني" : "Email notifications queued successfully")
+    } catch {
+      toast.error(language === "ar" ? "فشل إرسال البريد الإلكتروني" : "Failed to queue email notifications")
+    } finally {
+      setSendingEmail(false)
     }
   }
 
@@ -374,6 +407,19 @@ export default function ExamsListPage() {
                                 </DropdownMenuItem>
                               )}
 
+                              {/* Share (only if Published) */}
+                              {status === "Published" && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setShareExam(exam)
+                                    setShareDialogOpen(true)
+                                  }}
+                                >
+                                  <Share2 className="h-4 w-4 me-2" />
+                                  {language === "ar" ? "مشاركة" : "Share"}
+                                </DropdownMenuItem>
+                              )}
+
                               <DropdownMenuSeparator />
 
                               {/* Delete */}
@@ -509,7 +555,7 @@ export default function ExamsListPage() {
                 ? "الاختبار متاح الآن للمرشحين لأدائه."
                 : "The exam is now available for candidates to take."}
             </p>
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-6">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-4">
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 {publishedExam?.accessPolicyStatus === "Assigned"
@@ -521,8 +567,51 @@ export default function ExamsListPage() {
                     : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
               </p>
             </div>
+
+            {/* Send Email NOW button */}
+            {publishedExam && !emailSent && (
+              <Button
+                className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => handleSendEmailNow(publishedExam.id)}
+                disabled={sendingEmail}
+              >
+                {sendingEmail ? (
+                  <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                ) : (
+                  <Mail className="h-4 w-4 me-2" />
+                )}
+                {language === "ar" ? "إرسال البريد الإلكتروني الآن" : "Send Email NOW"}
+              </Button>
+            )}
+
+            {emailSent && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-start mb-2 w-full">
+                <Mail className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  {language === "ar"
+                    ? "تمت جدولة إرسال البريد الإلكتروني بنجاح! ستتم معالجة الرسائل في الخلفية."
+                    : "Email notifications queued successfully! Messages will be processed in background."}
+                </p>
+              </div>
+            )}
+
+            {/* Assign candidates button if Assigned policy */}
+            {publishedExam?.accessPolicyStatus === "Assigned" && (
+              <Button
+                variant="outline"
+                className="w-full mb-2"
+                asChild
+              >
+                <Link href={`/exams/${publishedExam.id}/configuration?tab=assignment`}>
+                  <Users className="h-4 w-4 me-2" />
+                  {language === "ar" ? "تعيين المرشحين" : "Assign Candidates"}
+                </Link>
+              </Button>
+            )}
+
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              variant="outline"
+              className="w-full"
               onClick={() => setPublishDialogOpen(false)}
             >
               {language === "ar" ? "إغلاق" : "Close"}
@@ -530,6 +619,42 @@ export default function ExamsListPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Assign First Dialog - shown when Assigned policy has no candidates */}
+      <AlertDialog open={assignFirstDialogOpen} onOpenChange={setAssignFirstDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+              <Users className="h-5 w-5" />
+              {language === "ar" ? "يرجى تعيين المرشحين أولاً" : "Please Assign Candidates First"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              {language === "ar"
+                ? "هذا الاختبار يستخدم سياسة الوصول المُعيّن. يرجى تعيين المرشحين للاختبار أولاً قبل إرسال البريد الإلكتروني."
+                : "This exam uses Assigned access policy. Please assign candidates to the exam first before sending email notifications."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{language === "ar" ? "إلغاء" : "Cancel"}</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Link href={assignFirstExam ? `/exams/${assignFirstExam.id}/configuration?tab=assignment` : "#"}>
+                <Users className="h-4 w-4 me-2" />
+                {language === "ar" ? "تعيين الآن" : "Assign Now"}
+              </Link>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Share Exam Dialog */}
+      {shareExam && (
+        <ExamShareDialog
+          examId={shareExam.id}
+          examTitle={getExamTitle(shareExam, language)}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
+      )}
     </div>
   )
 }

@@ -75,10 +75,15 @@ export async function createUser(data: {
   password: string;
   departmentId?: number | null;
 }): Promise<User> {
-  // If backend adds POST /Users, use it. For now throw so UI shows error.
-  throw new Error(
-    "Create user is not available. Use backend seed or admin panel.",
-  );
+  const raw = await apiClient.post<UserDto>(`/Users`, {
+    email: data.email,
+    fullName: data.fullNameEn,
+    fullNameAr: data.fullNameAr,
+    role: data.role,
+    password: data.password,
+    departmentId: data.departmentId ?? null,
+  });
+  return mapUserDtoToUser(raw);
 }
 
 export async function updateUser(

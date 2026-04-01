@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import type { Exam } from "@/lib/types"
 import { getExam, publishExam, unpublishExam } from "@/lib/api/exams"
+import { queueExamEmails } from "@/lib/api/notifications"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -38,7 +39,11 @@ import {
   PartyPopper,
   AlertCircle,
   Info,
+  Share2,
+  Mail,
+  Loader2,
 } from "lucide-react"
+import { ExamShareDialog } from "@/components/exam/exam-share-dialog"
 
 function getExamTitle(exam: Exam, language: string): string {
   return (language === "ar" ? exam.titleAr : exam.titleEn) || exam.titleEn || (language === "ar" ? "اختبار بدون عنوان" : "Untitled Exam")
@@ -62,6 +67,9 @@ export default function ExamOverviewPage() {
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
   useEffect(() => {
     if (examId) {
@@ -86,6 +94,7 @@ export default function ExamOverviewPage() {
     try {
       setActionLoading(true)
       await publishExam(exam.id)
+      setEmailSent(false)
       setPublishDialogOpen(true)
       fetchExam()
     } catch (error: any) {
@@ -94,6 +103,20 @@ export default function ExamOverviewPage() {
       setErrorDialogOpen(true)
     } finally {
       setActionLoading(false)
+    }
+  }
+
+  async function handleSendEmailNow() {
+    if (!exam) return
+    setSendingEmail(true)
+    try {
+      await queueExamEmails(exam.id)
+      setEmailSent(true)
+      toast.success(language === "ar" ? "تم جدولة إرسال البريد الإلكتروني" : "Email notifications queued successfully")
+    } catch {
+      toast.error(language === "ar" ? "فشل إرسال البريد الإلكتروني" : "Failed to queue email notifications")
+    } finally {
+      setSendingEmail(false)
     }
   }
 
@@ -245,6 +268,16 @@ export default function ExamOverviewPage() {
             )}
 
             {isPublished && (
+              <Button
+                variant="outline"
+                onClick={() => setShareDialogOpen(true)}
+              >
+                <Share2 className="h-4 w-4 me-2" />
+                {language === "ar" ? "مشاركة" : "Share"}
+              </Button>
+            )}
+
+            {isPublished && (
               <Button 
                 variant="outline"
                 onClick={handleArchive}
@@ -285,12 +318,54 @@ export default function ExamOverviewPage() {
                     : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
               </p>
             </div>
-            <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => setPublishDialogOpen(false)}
-            >
-              {language === "ar" ? "إغلاق" : "Close"}
-            </Button>
+
+            {/* Send Email NOW button */}
+            {exam && !emailSent && (
+              <Button
+                className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleSendEmailNow}
+                disabled={sendingEmail}
+              >
+                {sendingEmail ? (
+                  <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                ) : (
+                  <Mail className="h-4 w-4 me-2" />
+                )}
+                {language === "ar" ? "إرسال البريد الإلكتروني الآن" : "Send Email NOW"}
+              </Button>
+            )}
+
+            {emailSent && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-start mb-2 w-full">
+                <Mail className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  {language === "ar"
+                    ? "تمت جدولة إرسال البريد الإلكتروني بنجاح! ستتم معالجة الرسائل في الخلفية."
+                    : "Email notifications queued successfully! Messages will be processed in background."}
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-2 w-full">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => {
+                  setPublishDialogOpen(false)
+                  setShareDialogOpen(true)
+                }}
+              >
+                <Share2 className="h-4 w-4 me-2" />
+                {language === "ar" ? "مشاركة عبر رابط / QR" : "Share via URL / QR"}
+              </Button>
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => setPublishDialogOpen(false)}
+              >
+                {language === "ar" ? "إغلاق" : "Close"}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -314,6 +389,16 @@ export default function ExamOverviewPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share Dialog */}
+      {exam && (
+        <ExamShareDialog
+          examId={exam.id}
+          examTitle={getExamTitle(exam, language)}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
+      )}
     </div>
   )
 }

@@ -92,12 +92,16 @@ export default function ExamInstructionsPage() {
   const runReadyChecks = async () => {
     setReadyCheck(prev => ({ ...prev, checking: true }))
     
-    // Check fullscreen support
-    const fullscreenSupported = checkFullscreenSupport()
-    setReadyCheck(prev => ({ ...prev, fullscreenSupported }))
+    // Check fullscreen support only if required
+    if (examPreview?.accessPolicy.requireFullscreen) {
+      const fullscreenSupported = checkFullscreenSupport()
+      setReadyCheck(prev => ({ ...prev, fullscreenSupported }))
+    } else {
+      setReadyCheck(prev => ({ ...prev, fullscreenSupported: true }))
+    }
     
-    // Check webcam if proctoring is enabled
-    if (examPreview?.accessPolicy.requireProctoring) {
+    // Check webcam only if webcam is required
+    if (examPreview?.accessPolicy.requireWebcam) {
       const webcamPermission = await checkWebcamPermission()
       setReadyCheck(prev => ({ ...prev, webcamPermission }))
     } else {
@@ -200,25 +204,27 @@ export default function ExamInstructionsPage() {
         })
       } catch (e) { console.warn("[v0] Device info collection failed:", e) }
       
-      // Request fullscreen before navigating to exam page
-      try {
-        const docEl = document.documentElement as HTMLElement & {
-          webkitRequestFullscreen?: () => Promise<void>;
-          mozRequestFullScreen?: () => Promise<void>;
-          msRequestFullscreen?: () => Promise<void>;
+      // Request fullscreen before navigating to exam page (only if required)
+      if (examPreview?.accessPolicy.requireFullscreen) {
+        try {
+          const docEl = document.documentElement as HTMLElement & {
+            webkitRequestFullscreen?: () => Promise<void>;
+            mozRequestFullScreen?: () => Promise<void>;
+            msRequestFullscreen?: () => Promise<void>;
+          }
+          if (docEl.requestFullscreen) {
+            await docEl.requestFullscreen()
+          } else if (docEl.webkitRequestFullscreen) {
+            await docEl.webkitRequestFullscreen()
+          } else if (docEl.mozRequestFullScreen) {
+            await docEl.mozRequestFullScreen()
+          } else if (docEl.msRequestFullscreen) {
+            await docEl.msRequestFullscreen()
+          }
+        } catch (fsError) {
+          console.log("[v0] Fullscreen request failed:", fsError)
+          // Continue even if fullscreen fails - exam page will try again
         }
-        if (docEl.requestFullscreen) {
-          await docEl.requestFullscreen()
-        } else if (docEl.webkitRequestFullscreen) {
-          await docEl.webkitRequestFullscreen()
-        } else if (docEl.mozRequestFullScreen) {
-          await docEl.mozRequestFullScreen()
-        } else if (docEl.msRequestFullscreen) {
-          await docEl.msRequestFullscreen()
-        }
-      } catch (fsError) {
-        console.log("[v0] Fullscreen request failed:", fsError)
-        // Continue even if fullscreen fails - exam page will try again
       }
       
       // Redirect to exam taking page with attemptId
@@ -269,11 +275,11 @@ export default function ExamInstructionsPage() {
       title: t("instructions.timeLimit"),
       description: t("instructions.timeLimitDesc", { minutes: String(examPreview.durationMinutes) }),
     },
-    {
+    ...(examPreview.accessPolicy.requireFullscreen ? [{
       icon: Monitor,
       title: t("instructions.fullscreen"),
       description: t("instructions.fullscreenDesc"),
-    },
+    }] : []),
     {
       icon: Wifi,
       title: t("instructions.connection"),
@@ -370,7 +376,8 @@ export default function ExamInstructionsPage() {
               <CardDescription>{t("instructions.readyCheckDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Fullscreen Support Check */}
+              {/* Fullscreen Support Check (only if required) */}
+              {examPreview.accessPolicy.requireFullscreen && (
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   <Monitor className="h-5 w-5 text-muted-foreground" />
@@ -395,9 +402,10 @@ export default function ExamInstructionsPage() {
                   )}
                 </div>
               </div>
+              )}
 
-              {/* Webcam Permission Check (if proctoring required) */}
-              {examPreview.accessPolicy.requireProctoring && (
+              {/* Webcam Permission Check (if webcam required) */}
+              {examPreview.accessPolicy.requireWebcam && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <Camera className="h-5 w-5 text-muted-foreground" />
