@@ -602,7 +602,7 @@ export default function ExamsListPage() {
                 className="w-full mb-2"
                 asChild
               >
-                <Link href={`/exams/${publishedExam.id}/configuration?tab=assignment`}>
+                <Link href={`/candidates/assign-to-exam?examId=${publishedExam.id}`}>
                   <Users className="h-4 w-4 me-2" />
                   {language === "ar" ? "تعيين المرشحين" : "Assign Candidates"}
                 </Link>
@@ -637,7 +637,7 @@ export default function ExamsListPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>{language === "ar" ? "إلغاء" : "Cancel"}</AlertDialogCancel>
             <AlertDialogAction asChild>
-              <Link href={assignFirstExam ? `/exams/${assignFirstExam.id}/configuration?tab=assignment` : "#"}>
+              <Link href={assignFirstExam ? `/candidates/assign-to-exam?examId=${assignFirstExam.id}` : "#"}>
                 <Users className="h-4 w-4 me-2" />
                 {language === "ar" ? "تعيين الآن" : "Assign Now"}
               </Link>

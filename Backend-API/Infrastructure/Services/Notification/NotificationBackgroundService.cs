@@ -57,7 +57,7 @@ public class NotificationBackgroundService : BackgroundService
         var smsBatchSize = settings?.SmsBatchSize ?? 50;
         var batchDelayMs = settings?.BatchDelayMs ?? 1000;
 
-        // Process email notifications
+        // Process email notifications — group by EventType to load correct template per batch
         var pendingEmails = await db.NotificationLogs
             .Include(l => l.Candidate)
             .Include(l => l.Exam)
@@ -68,8 +68,13 @@ public class NotificationBackgroundService : BackgroundService
 
         if (pendingEmails.Count > 0)
         {
-            _logger.LogInformation("Processing {Count} pending email notifications.", pendingEmails.Count);
-            await ProcessEmailBatchAsync(db, emailService, encryption, pendingEmails, stoppingToken);
+            // Group by EventType so each batch uses the correct template
+            var emailGroups = pendingEmails.GroupBy(l => l.EventType);
+            foreach (var group in emailGroups)
+            {
+                _logger.LogInformation("Processing {Count} pending email notifications for event {EventType}.", group.Count(), group.Key);
+                await ProcessEmailBatchAsync(db, emailService, encryption, group.ToList(), stoppingToken);
+            }
             await Task.Delay(batchDelayMs, stoppingToken);
         }
 
