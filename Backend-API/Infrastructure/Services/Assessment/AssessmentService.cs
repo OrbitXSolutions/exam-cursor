@@ -1,6 +1,7 @@
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces;
@@ -20,6 +21,7 @@ public class AssessmentService : IAssessmentService
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly INotificationService _notificationService;
   private readonly ICacheService _cache;
+  private readonly ILogger<AssessmentService> _logger;
   private const int MaxDurationMinutes = 600;
   private const int MinAccessCodeLength = 6;
 
@@ -29,7 +31,8 @@ public class AssessmentService : IAssessmentService
       ICurrentUserService currentUserService,
       UserManager<ApplicationUser> userManager,
       INotificationService notificationService,
-      ICacheService cache)
+      ICacheService cache,
+      ILogger<AssessmentService> logger)
   {
     _context = context;
     _departmentService = departmentService;
@@ -37,6 +40,7 @@ public class AssessmentService : IAssessmentService
     _userManager = userManager;
     _notificationService = notificationService;
     _cache = cache;
+    _logger = logger;
   }
 
   private void InvalidateExamCache()
@@ -493,9 +497,10 @@ public class AssessmentService : IAssessmentService
     {
       await _notificationService.QueueExamPublishedNotificationsAsync(id);
     }
-    catch (Exception)
+    catch (Exception ex)
     {
-      // Don't fail publish if notification queueing fails
+      // Don't fail publish, but log the error for debugging
+      _logger.LogError(ex, "Failed to queue notifications for exam {ExamId}. Email notifications were NOT sent.", id);
     }
 
     return ApiResponse<bool>.SuccessResponse(true, "Exam published successfully. Notifications queued.");

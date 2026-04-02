@@ -72,6 +72,8 @@ public class EmailService : IEmailService
         {
             var config = await GetSmtpConfigAsync();
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
             using var client = new SmtpClient(config.Host, config.Port);
             client.UseDefaultCredentials = false;
             client.Credentials = new NetworkCredential(config.Username, config.Password);
@@ -103,6 +105,8 @@ public class EmailService : IEmailService
         try
         {
             var config = await GetSmtpConfigAsync();
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
             using var client = new SmtpClient(config.Host, config.Port);
             client.UseDefaultCredentials = false;

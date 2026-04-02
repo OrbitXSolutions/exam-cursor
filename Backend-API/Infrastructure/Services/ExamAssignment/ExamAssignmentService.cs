@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.ExamAssignment;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.ExamAssignment;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
@@ -14,11 +16,19 @@ public class ExamAssignmentService : IExamAssignmentService
 {
     private readonly ApplicationDbContext _db;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly INotificationService _notificationService;
+    private readonly ILogger<ExamAssignmentService> _logger;
 
-    public ExamAssignmentService(ApplicationDbContext db, RoleManager<ApplicationRole> roleManager)
+    public ExamAssignmentService(
+        ApplicationDbContext db,
+        RoleManager<ApplicationRole> roleManager,
+        INotificationService notificationService,
+        ILogger<ExamAssignmentService> logger)
     {
         _db = db;
         _roleManager = roleManager;
+        _notificationService = notificationService;
+        _logger = logger;
     }
 
     // ── Candidate list with computed flags ─────────────────────
@@ -165,6 +175,7 @@ public class ExamAssignmentService : IExamAssignmentService
             .ToDictionaryAsync(u => u.Id);
 
         var result = new AssignmentResultDto { TotalTargeted = targetIds.Count };
+        var newlyAssignedIds = new List<string>();
 
         foreach (var candidateId in targetIds)
         {
@@ -215,9 +226,24 @@ public class ExamAssignmentService : IExamAssignmentService
                 CreatedDate = DateTime.UtcNow
             });
             result.SuccessCount++;
+            newlyAssignedIds.Add(candidateId);
         }
 
         await _db.SaveChangesAsync();
+
+        // Queue email notifications for newly assigned candidates
+        if (newlyAssignedIds.Count > 0)
+        {
+            try
+            {
+                await _notificationService.QueueExamPublishedForCandidatesAsync(dto.ExamId, newlyAssignedIds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to queue notifications for {Count} assigned candidates on exam {ExamId}.",
+                    newlyAssignedIds.Count, dto.ExamId);
+            }
+        }
 
         return ApiResponse<AssignmentResultDto>.SuccessResponse(result,
             $"{result.SuccessCount} candidate(s) assigned successfully.");

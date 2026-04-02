@@ -349,6 +349,89 @@ public class NotificationService : INotificationService
         }
     }
 
+    // ── Event: Exam Published for specific candidates (Assignment) ──
+
+    public async Task QueueExamPublishedForCandidatesAsync(int examId, List<string> candidateIds)
+    {
+        if (candidateIds == null || candidateIds.Count == 0) return;
+
+        var settings = await _db.NotificationSettings.FirstOrDefaultAsync();
+        if (settings == null || (!settings.EnableEmail && !settings.EnableSms))
+        {
+            _logger.LogInformation("Notifications disabled. Skipping assignment notification for exam {ExamId}.", examId);
+            return;
+        }
+
+        var exam = await _db.Exams.FirstOrDefaultAsync(e => e.Id == examId);
+        if (exam == null || !exam.IsPublished) return;
+
+        // Get candidates, skip those who already have a pending/sent notification for this exam
+        var alreadyNotifiedIds = await _db.NotificationLogs
+            .Where(l => l.ExamId == examId
+                && l.EventType == NotificationEventType.ExamPublished
+                && l.Channel == NotificationChannel.Email
+                && candidateIds.Contains(l.CandidateId))
+            .Select(l => l.CandidateId)
+            .Distinct()
+            .ToListAsync();
+
+        var newCandidateIds = candidateIds.Except(alreadyNotifiedIds).ToList();
+        if (newCandidateIds.Count == 0)
+        {
+            _logger.LogInformation("All candidates already notified for exam {ExamId}. Skipping.", examId);
+            return;
+        }
+
+        var candidates = await _db.Users
+            .Where(u => newCandidateIds.Contains(u.Id) && !u.IsDeleted && !u.IsBlocked)
+            .ToListAsync();
+
+        if (candidates.Count == 0) return;
+
+        var logs = new List<NotificationLog>();
+
+        foreach (var candidate in candidates)
+        {
+            if (settings.EnableEmail && !string.IsNullOrWhiteSpace(candidate.Email))
+            {
+                logs.Add(new NotificationLog
+                {
+                    CandidateId = candidate.Id,
+                    ExamId = examId,
+                    EventType = NotificationEventType.ExamPublished,
+                    Channel = NotificationChannel.Email,
+                    Status = NotificationStatus.Pending,
+                    RecipientEmail = candidate.Email,
+                    RecipientPhone = candidate.PhoneNumber,
+                    CreatedDate = DateTime.UtcNow
+                });
+            }
+
+            if (settings.EnableSms && !string.IsNullOrWhiteSpace(candidate.PhoneNumber))
+            {
+                logs.Add(new NotificationLog
+                {
+                    CandidateId = candidate.Id,
+                    ExamId = examId,
+                    EventType = NotificationEventType.ExamPublished,
+                    Channel = NotificationChannel.Sms,
+                    Status = NotificationStatus.Pending,
+                    RecipientEmail = candidate.Email ?? string.Empty,
+                    RecipientPhone = candidate.PhoneNumber,
+                    CreatedDate = DateTime.UtcNow
+                });
+            }
+        }
+
+        if (logs.Count > 0)
+        {
+            _db.NotificationLogs.AddRange(logs);
+            await _db.SaveChangesAsync();
+            _logger.LogInformation("Queued {Count} assignment notifications for {CandidateCount} candidates on exam {ExamId}.",
+                logs.Count, candidates.Count, examId);
+        }
+    }
+
     // ── Event: Result Published ─────────────────────────────────
 
     public async Task QueueResultPublishedNotificationsAsync(int examId)

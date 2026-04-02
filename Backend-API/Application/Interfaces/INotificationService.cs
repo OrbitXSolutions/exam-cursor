@@ -27,5 +27,6 @@ public interface INotificationService
 
     // Event triggers
     Task QueueExamPublishedNotificationsAsync(int examId);
+    Task QueueExamPublishedForCandidatesAsync(int examId, List<string> candidateIds);
     Task QueueResultPublishedNotificationsAsync(int examId);
 }
