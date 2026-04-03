@@ -14,6 +14,7 @@
 The Smart Exam System is a web-based platform for creating, delivering, and grading online exams. It supports multiple question types (MCQ, Essay, True/False, Numeric), exam sections, proctoring features, and certificate issuance for passed candidates.
 
 **Key capabilities:**
+
 - Create and manage question bank with categories and types
 - Build exams with sections and topics
 - Publish exams for candidates within a department
@@ -27,13 +28,13 @@ The Smart Exam System is a web-based platform for creating, delivering, and grad
 
 ## 2. Roles & Permissions Overview
 
-| Role | Access |
-|------|--------|
-| **Admin** | Full access: exams, question bank, lookups (categories, types), users, grading, reports, proctor center, audit, settings |
-| **Instructor** | Exams, question bank, grading, reports, proctor center (within department) |
-| **Candidate (Student)** | My Exams, take exams, view results, download certificate (if passed) |
-| **ProctorReviewer** | Proctor center (monitoring sessions) |
-| **SuperAdmin / Auditor** | Users, audit logs, settings (Admin-level) |
+| Role                     | Access                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Admin**                | Full access: exams, question bank, lookups (categories, types), users, grading, reports, proctor center, audit, settings |
+| **Instructor**           | Exams, question bank, grading, reports, proctor center (within department)                                               |
+| **Candidate (Student)**  | My Exams, take exams, view results, download certificate (if passed)                                                     |
+| **ProctorReviewer**      | Proctor center (monitoring sessions)                                                                                     |
+| **SuperAdmin / Auditor** | Users, audit logs, settings (Admin-level)                                                                                |
 
 **Department-based access:** Admins and Instructors see only exams and data within their assigned department.
 
@@ -103,6 +104,36 @@ Question types define how questions are displayed and graded (e.g. Multiple Choi
    - For True/False: add True/False options
 4. Click **Save**.
 
+#### Partial Scoring for MCQ Multi (Multiple Choice — Multi)
+
+When creating or editing an **MCQ Multi** question, you can assign **individual points to each option** for partial scoring:
+
+1. After adding options, a **Points** input field appears next to each option.
+2. Enter the points each correct option is worth (e.g., Option A = 2, Option B = 1.5, Option C = 1.5).
+3. A **real-time summary indicator** shows:
+   - **Option Points Sum** — total of all option points entered.
+   - **Question Total** — the question's total points.
+   - A green checkmark (✓) when the sum matches the question total, or a red alert (✗) when they don't match.
+4. The sum of all option points **must equal** the question's total points. The system will not save the question if they don't match.
+5. Each option's points must be **0 or greater** (no negative scoring).
+
+**How grading works with partial scoring:**
+
+- The candidate earns points for each **correctly selected** option.
+- Selecting a **wrong option** does not deduct points (wrong = 0).
+- The final score is the sum of points for all correctly selected options, capped at the question's maximum points.
+
+**Example:** A question worth 5 points with 3 correct options (A=2, B=1.5, C=1.5):
+| Candidate Selects | Score |
+|---|---|
+| A + B + C (all correct) | 5.0 |
+| A + B only | 3.5 |
+| A only | 2.0 |
+| A + B + wrong option D | 3.5 (wrong = 0) |
+| None | 0 |
+
+**Backward compatibility:** If no option points are set, the system uses **equal distribution** — each correct option earns `total points / number of correct options`.
+
 [Screenshot: Create Question form]
 
 ---
@@ -150,7 +181,7 @@ Exams are available to candidates based on:
 1. **Department** — Candidates must be in the same department as the exam.
 2. **Access Policy** — Configure under **Configuration** (or `/exams/{id}/configuration`):
    - **Access Code** — Optional; candidates must enter it to start.
-   - **Restrict to assigned candidates** — If enabled, only explicitly assigned users can access (assignment UI: *Not fully implemented in current version*).
+   - **Restrict to assigned candidates** — If enabled, only explicitly assigned users can access (assignment UI: _Not fully implemented in current version_).
    - **Is Public** — If true, any eligible candidate in the department can see the exam.
 
 3. **Publish status** — Exam must be **Published** for candidates to see it.
@@ -184,11 +215,13 @@ Exams are available to candidates based on:
 3. Click a session to open details (or `/proctor-center/{sessionId}`).
 
 **Available in current version:**
+
 - **Screenshots timeline** — Webcam snapshots captured during the exam (if proctoring is enabled).
 - **Incidents / Violations timeline** — Events such as tab switch, fullscreen exit, copy/paste attempts (when logged by the exam page).
 - **Session info** — Candidate name, exam, start time, remaining time.
 
 **Not fully implemented in current version:**
+
 - **Live video recording** — The session detail page shows a placeholder for live video. Live streaming is not implemented.
 - **Real-time connection** — Proctor Center may use mock or partial data; backend stores events and snapshots.
 
@@ -223,10 +256,11 @@ Certificates are **automatically created** when a result is published and the ca
 - **Candidate:** On the result page (`/results/{attemptId}`), if they passed, a **Download Certificate** button appears. They can download an HTML/printable certificate.
 - **Verification:** Anyone can verify a certificate at `/verify-certificate` by entering the certificate code (e.g. `CERT-20260131-XXXX`).
 
-**Admin certificate actions (API only):**  
-- Create certificate for a passed result: `POST /api/Certificate/create/{resultId}`  
-- Revoke: `POST /api/Certificate/{id}/revoke`  
-- Regenerate code: `POST /api/Certificate/{id}/regenerate`  
+**Admin certificate actions (API only):**
+
+- Create certificate for a passed result: `POST /api/Certificate/create/{resultId}`
+- Revoke: `POST /api/Certificate/{id}/revoke`
+- Regenerate code: `POST /api/Certificate/{id}/regenerate`
 
 **Not implemented in current version:**  
 A dedicated admin UI to manage certificates (list, revoke, regenerate) is not available. Use the API or database if needed.
@@ -346,15 +380,15 @@ If you switch tabs or exit fullscreen, you may see a warning. These events are r
 
 ### 5.1 Common Issues & Fixes
 
-| Issue | Solution |
-|-------|----------|
-| **Camera permission denied** | In browser settings, allow camera for this site. Refresh and try again. |
-| **Fullscreen blocked** | Allow fullscreen when the browser prompts. Do not use browser extensions that block fullscreen. |
+| Issue                              | Solution                                                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Camera permission denied**       | In browser settings, allow camera for this site. Refresh and try again.                            |
+| **Fullscreen blocked**             | Allow fullscreen when the browser prompts. Do not use browser extensions that block fullscreen.    |
 | **Microphone/camera not detected** | Ensure the device is connected, not in use by another app, and allowed in OS and browser settings. |
-| **Session expired** | Log in again. If the exam timer expired, the attempt may have been auto-submitted. |
-| **401 Unauthorized** | Log in again. Clear cache/cookies if the problem persists. |
-| **Answers not saving** | Check internet connection. Avoid closing the tab. Refresh only if necessary. |
-| **Result not visible** | Results may be hidden until published by the instructor. Contact your instructor. |
+| **Session expired**                | Log in again. If the exam timer expired, the attempt may have been auto-submitted.                 |
+| **401 Unauthorized**               | Log in again. Clear cache/cookies if the problem persists.                                         |
+| **Answers not saving**             | Check internet connection. Avoid closing the tab. Refresh only if necessary.                       |
+| **Result not visible**             | Results may be hidden until published by the instructor. Contact your instructor.                  |
 
 ### 5.2 FAQ
 
@@ -375,6 +409,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ## 6. Security Notes
 
 **Do NOT:**
+
 - Share your login credentials.
 - Switch tabs or windows during a proctored exam.
 - Use screen capture or recording tools during the exam.
@@ -383,6 +418,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 - Disable or block camera/fullscreen when the exam requires it.
 
 **Do:**
+
 - Use a private, quiet space.
 - Ensure your device is secure and malware-free.
 - Close other applications that might trigger proctoring events.
@@ -392,15 +428,15 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ## 7. Glossary
 
-| Term | Definition |
-|------|------------|
-| **Exam** | A configured assessment with questions, duration, and settings. |
-| **Attempt** | A single instance of a candidate taking an exam. A candidate may have multiple attempts per exam (up to max attempts). |
-| **Proctoring** | Monitoring during the exam (e.g. webcam snapshots, tab-switch and fullscreen events). |
-| **Violation** | A logged event such as tab switch, fullscreen exit, or copy/paste attempt during a proctored exam. |
-| **Reviewer** | Admin or Instructor who grades manual questions (e.g. essays) and finalizes results. |
-| **Result** | The final score and pass/fail status for an attempt, created after grading is complete. |
-| **Certificate** | A document issued to candidates who pass an exam, with a unique verification code. |
+| Term            | Definition                                                                                                             |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Exam**        | A configured assessment with questions, duration, and settings.                                                        |
+| **Attempt**     | A single instance of a candidate taking an exam. A candidate may have multiple attempts per exam (up to max attempts). |
+| **Proctoring**  | Monitoring during the exam (e.g. webcam snapshots, tab-switch and fullscreen events).                                  |
+| **Violation**   | A logged event such as tab switch, fullscreen exit, or copy/paste attempt during a proctored exam.                     |
+| **Reviewer**    | Admin or Instructor who grades manual questions (e.g. essays) and finalizes results.                                   |
+| **Result**      | The final score and pass/fail status for an attempt, created after grading is complete.                                |
+| **Certificate** | A document issued to candidates who pass an exam, with a unique verification code.                                     |
 
 ---
 
@@ -414,6 +450,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 - **Permissions:** Allow camera, microphone (if required), and fullscreen for the exam site
 
 **Chrome camera permissions:**
+
 1. Click the lock/info icon in the address bar.
 2. Find **Camera** → set to **Allow**.
 3. Refresh the page if needed.
@@ -431,6 +468,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 نظام الاختبارات الذكية منصة ويب لإنشاء وإجراء وتصحيح الاختبارات الإلكترونية. يدعم أنواعاً متعددة من الأسئلة (اختيار من متعدد، مقال، صح/خطأ، رقمية)، وأقسام الاختبار، ومراقبة الاختبار، وإصدار الشهادات للمرشحين الناجحين.
 
 **القدرات الرئيسية:**
+
 - إنشاء وإدارة بنك الأسئلة مع الفئات والأنواع
 - بناء اختبارات بأقسام ومواضيع
 - نشر الاختبارات للمرشحين ضمن القسم
@@ -444,13 +482,13 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ## ٢. نظرة عامة على الأدوار والصلاحيات
 
-| الدور | الوصول |
-|-------|--------|
-| **المسؤول** | وصول كامل: الاختبارات، بنك الأسئلة، القوائم (الفئات، الأنواع)، المستخدمون، التصحيح، التقارير، مركز المراقبة، التدقيق، الإعدادات |
-| **المدرّب** | الاختبارات، بنك الأسئلة، التصحيح، التقارير، مركز المراقبة (ضمن القسم) |
-| **المرشح (الطالب)** | اختباراتي، إجراء الاختبارات، عرض النتائج، تنزيل الشهادة (إذا نجح) |
-| **مراجع المراقبة** | مركز المراقبة (مراقبة الجلسات) |
-| **المسؤول الأعلى / المدقق** | المستخدمون، سجلات التدقيق، الإعدادات |
+| الدور                       | الوصول                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **المسؤول**                 | وصول كامل: الاختبارات، بنك الأسئلة، القوائم (الفئات، الأنواع)، المستخدمون، التصحيح، التقارير، مركز المراقبة، التدقيق، الإعدادات |
+| **المدرّب**                 | الاختبارات، بنك الأسئلة، التصحيح، التقارير، مركز المراقبة (ضمن القسم)                                                           |
+| **المرشح (الطالب)**         | اختباراتي، إجراء الاختبارات، عرض النتائج، تنزيل الشهادة (إذا نجح)                                                               |
+| **مراجع المراقبة**          | مركز المراقبة (مراقبة الجلسات)                                                                                                  |
+| **المسؤول الأعلى / المدقق** | المستخدمون، سجلات التدقيق، الإعدادات                                                                                            |
 
 **الوصول حسب القسم:** المسؤولون والمدرّبون يرون الاختبارات والبيانات ضمن قسمهم فقط.
 
@@ -512,13 +550,14 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ١. اذهب إلى **بنك الأسئلة** (أو `/question-bank`).  
 ٢. اضغط **إنشاء سؤال**.  
 ٣. املأ:
-   - **الفئة** و**النوع**
-   - **نص السؤال** (عربي وإنجليزي)
-   - **النقاط**
-   - للمتعدد: أضف الخيارات وحدّد الصحيح(ة)
-   - للمقال: لا حاجة لخيارات
-   - لصح/خطأ: أضف خيارات صح/خطأ  
-٤. اضغط **حفظ**.
+
+- **الفئة** و**النوع**
+- **نص السؤال** (عربي وإنجليزي)
+- **النقاط**
+- للمتعدد: أضف الخيارات وحدّد الصحيح(ة)
+- للمقال: لا حاجة لخيارات
+- لصح/خطأ: أضف خيارات صح/خطأ  
+  ٤. اضغط **حفظ**.
 
 [لقطة شاشة: نموذج إنشاء سؤال]
 
@@ -529,18 +568,20 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ١. اذهب إلى **الاختبارات** (أو `/exams`).  
 ٢. اضغط **إنشاء اختبار**.  
 ٣. في صفحة الإنشاء أدخل:
-   - **العنوان** (عربي وإنجليزي)
-   - **الوصف**
-   - **القسم**
-   - **نوع الاختبار**: ثابت (تاريخ/وقت محدد) أو مرن (البدء خلال نافذة)
-   - **المدة**، **تاريخ البداية/النهاية** (للثابت)
-   - **الحد الأقصى للمحاولات**، **درجة النجاح**  
-٤. اضغط **إنشاء**.
+
+- **العنوان** (عربي وإنجليزي)
+- **الوصف**
+- **القسم**
+- **نوع الاختبار**: ثابت (تاريخ/وقت محدد) أو مرن (البدء خلال نافذة)
+- **المدة**، **تاريخ البداية/النهاية** (للثابت)
+- **الحد الأقصى للمحاولات**، **درجة النجاح**  
+  ٤. اضغط **إنشاء**.
 
 ٥. **إضافة الأقسام والأسئلة:**
-   - افتح الاختبار واذهب إلى **المنشئ** (أو `/exams/{id}/builder`).
-   - أضف أقساماً (تبويبات).
-   - أضف أسئلة من بنك الأسئلة لكل قسم.
+
+- افتح الاختبار واذهب إلى **المنشئ** (أو `/exams/{id}/builder`).
+- أضف أقساماً (تبويبات).
+- أضف أسئلة من بنك الأسئلة لكل قسم.
 
 [لقطة شاشة: منشئ الاختبار]
 
@@ -566,9 +607,10 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ١. **القسم** — يجب أن يكون المرشح في نفس قسم الاختبار.  
 ٢. **سياسة الوصول** — من **الإعدادات** (أو `/exams/{id}/configuration`):
-   - **رمز الوصول** — اختياري؛ يجب على المرشح إدخاله للبدء.
-   - **تقييد على المرشحين المعينين** — إن وُجد؛ واجهة التعيين غير مكتملة في النسخة الحالية.
-   - **عام** — إن كان نعم، أي مرشح مخوّل في القسم يمكنه رؤية الاختبار.
+
+- **رمز الوصول** — اختياري؛ يجب على المرشح إدخاله للبدء.
+- **تقييد على المرشحين المعينين** — إن وُجد؛ واجهة التعيين غير مكتملة في النسخة الحالية.
+- **عام** — إن كان نعم، أي مرشح مخوّل في القسم يمكنه رؤية الاختبار.
 
 ٣. **حالة النشر** — يجب أن يكون الاختبار **منشوراً** ليراه المرشحون.  
 ٤. **الجدولة** — للاختبارات الثابتة، نافذة البداية/النهاية تحدد متى يمكن البدء.
@@ -583,10 +625,11 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ١. اذهب إلى **التصحيح** (أو `/grading`) لعرض التسليمات التي تحتاج تصحيحاً يدوياً.  
 ٢. اذهب إلى **التقارير** (أو `/reports`) لعرض جميع المحاولات والنتائج لاختبار:
-   - اختر الاختبار من القائمة المنسدلة.
-   - اعرض الإحصائيات: إجمالي المرشحين، متوسط الدرجة، نسبة النجاح، أعلى درجة.
-   - اعرض جدول النتائج بالدرجات والحالة.
-   - استخدم **تصدير** لتنزيل ملف CSV.
+
+- اختر الاختبار من القائمة المنسدلة.
+- اعرض الإحصائيات: إجمالي المرشحين، متوسط الدرجة، نسبة النجاح، أعلى درجة.
+- اعرض جدول النتائج بالدرجات والحالة.
+- استخدم **تصدير** لتنزيل ملف CSV.
 
 [لقطة شاشة: صفحة التقارير مع اختبار محدد]
 
@@ -601,10 +644,12 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ٣. اضغط على جلسة لفتح التفاصيل (أو `/proctor-center/{sessionId}`).
 
 **متوفر في النسخة الحالية:**
+
 - **جدول اللقطات** — لقطات الكاميرا أثناء الاختبار (إذا كانت المراقبة مفعّلة).
 - **جدول الحوادث/المخالفات** — أحداث مثل تغيير التبويب، الخروج من ملء الشاشة، محاولة النسخ واللصق (عند تسجيلها).
 
 **غير مكتمل في النسخة الحالية:**
+
 - **تسجيل الفيديو المباشر** — صفحة تفاصيل الجلسة تعرض عنصراً بديلاً للفيديو المباشر. البث المباشر غير مُنفّذ.
 - **الاتصال الفوري** — مركز المراقبة قد يستخدم بيانات وهمية أو جزئية؛ الخلفية تخزن الأحداث واللقطات.
 
@@ -618,11 +663,12 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ٢. اعرض قائمة التسليمات التي تحتاج تصحيحاً يدوياً (مثل المقالات).  
 ٣. اضغط **تصحيح** على تسليم (يفتح `/grading/{attemptId}`).  
 ٤. لكل سؤال يدوي:
-   - اقرأ إجابة المرشح.
-   - أدخل **النقاط** و**ملاحظات** اختيارية.
-   - اضغط **حفظ**.  
-٥. عند انتهاء تصحيح جميع الأسئلة اليدوية، اضغط **إنهاء**.  
-٦. يُنشئ النظام النتيجة. يمكن للمرشح رؤيتها **بعد** نشرها (انظر أدناه).
+
+- اقرأ إجابة المرشح.
+- أدخل **النقاط** و**ملاحظات** اختيارية.
+- اضغط **حفظ**.  
+  ٥. عند انتهاء تصحيح جميع الأسئلة اليدوية، اضغط **إنهاء**.  
+  ٦. يُنشئ النظام النتيجة. يمكن للمرشح رؤيتها **بعد** نشرها (انظر أدناه).
 
 **نشر النتائج:** تُنشأ النتائج لكنها قد لا تكون مرئية للمرشح حتى النشر. النشر يتم عبر API. زر «نشر النتيجة» مخصص في واجهة التصحيح قد لا يكون متوفراً في النسخة الحالية.
 
@@ -638,6 +684,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 - **التحقق:** أي شخص يمكنه التحقق من الشهادة في `/verify-certificate` بإدخال رمز الشهادة (مثل `CERT-20260131-XXXX`).
 
 **إجراءات المسؤول للشهادات (API فقط):**
+
 - إنشاء شهادة لنتيجة ناجحة
 - إلغاء الشهادة
 - إعادة توليد الرمز
@@ -738,8 +785,9 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ### ٤.٨ ماذا يحدث بعد التسليم
 
 ١. **صفحة النتيجة** (`/results/{attemptId}`):
-   - للاختبارات **المصححة تلقائياً بالكامل**، قد ترى درجتك فوراً (إن سمح الاختبار بعرض النتائج).
-   - للـ **تصحيح اليدوي** (مثل المقالات)، تظهر رسالة بأن النتائج ستتوفر بعد التصحيح.
+
+- للاختبارات **المصححة تلقائياً بالكامل**، قد ترى درجتك فوراً (إن سمح الاختبار بعرض النتائج).
+- للـ **تصحيح اليدوي** (مثل المقالات)، تظهر رسالة بأن النتائج ستتوفر بعد التصحيح.
 
 ٢. **نتائجي** (`/my-results`): اعرض جميع نتائجك السابقة ودرجاتك (بعد النشر).
 
@@ -755,15 +803,15 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ### ٥.١ المشكلات والحلول الشائعة
 
-| المشكلة | الحل |
-|---------|------|
-| **رفض إذن الكاميرا** | في إعدادات المتصفح، اسمح بالكاميرا لهذا الموقع. حدّث الصفحة وحاول مرة أخرى. |
-| **حظر ملء الشاشة** | اسمح بملء الشاشة عند طلب المتصفح. تجنب الإضافات التي تمنع ملء الشاشة. |
+| المشكلة                            | الحل                                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| **رفض إذن الكاميرا**               | في إعدادات المتصفح، اسمح بالكاميرا لهذا الموقع. حدّث الصفحة وحاول مرة أخرى.       |
+| **حظر ملء الشاشة**                 | اسمح بملء الشاشة عند طلب المتصفح. تجنب الإضافات التي تمنع ملء الشاشة.             |
 | **عدم اكتشاف الميكروفون/الكاميرا** | تأكد من توصيل الجهاز وعدم استخدامه من تطبيق آخر وتمكينه في نظام التشغيل والمتصفح. |
-| **انتهاء الجلسة** | سجّل الدخول مرة أخرى. إن انتهى وقت الاختبار، ربما أُرسلت المحاولة تلقائياً. |
-| **401 غير مصرح** | سجّل الدخول مرة أخرى. امسح الكاش/الكوكيز إن استمرت المشكلة. |
-| **عدم حفظ الإجابات** | تحقق من الاتصال. تجنب إغلاق التبويب. حدّث الصفحة عند الضرورة فقط. |
-| **عدم ظهور النتيجة** | قد تكون النتائج مخفية حتى نشرها المدرّب. تواصل مع مدرّبك. |
+| **انتهاء الجلسة**                  | سجّل الدخول مرة أخرى. إن انتهى وقت الاختبار، ربما أُرسلت المحاولة تلقائياً.       |
+| **401 غير مصرح**                   | سجّل الدخول مرة أخرى. امسح الكاش/الكوكيز إن استمرت المشكلة.                       |
+| **عدم حفظ الإجابات**               | تحقق من الاتصال. تجنب إغلاق التبويب. حدّث الصفحة عند الضرورة فقط.                 |
+| **عدم ظهور النتيجة**               | قد تكون النتائج مخفية حتى نشرها المدرّب. تواصل مع مدرّبك.                         |
 
 ### ٥.٢ أسئلة شائعة
 
@@ -784,6 +832,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 ## ٦. ملاحظات أمنية
 
 **لا تفعل:**
+
 - مشاركة بيانات تسجيل الدخول.
 - تغيير التبويبات أو النوافذ أثناء اختبار مراقب.
 - استخدام أدوات التقاط الشاشة أو التسجيل أثناء الاختبار.
@@ -792,6 +841,7 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 - تعطيل الكاميرا أو ملء الشاشة عند طلب الاختبار.
 
 **افعل:**
+
 - استخدم مكاناً هادئاً وخاصاً.
 - تأكد من أمان جهازك وخلوه من البرمجيات الخبيثة.
 - أغلق التطبيقات الأخرى التي قد تُطلق أحداث مراقبة.
@@ -801,15 +851,15 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ## ٧. مسرد المصطلحات
 
-| المصطلح | التعريف |
-|---------|---------|
-| **اختبار** | تقييم مُكوّن من أسئلة ومدة وإعدادات. |
-| **محاولة** | تنفيذ واحد لمرشح لأداء الاختبار. قد يكون للمرشح عدة محاولات لكل اختبار. |
-| **مراقبة الاختبار** | المراقبة أثناء الاختبار (لقطات كاميرا، أحداث تغيير التبويب وملء الشاشة). |
-| **مخالفة** | حدث مُسجّل مثل تغيير التبويب أو الخروج من ملء الشاشة أو محاولة النسخ واللصق. |
-| **مصحّح** | مسؤول أو مدرّب يصحح الأسئلة اليدوية وينهي النتائج. |
-| **نتيجة** | الدرجة النهائية وحالة النجاح/الرسوب للمحاولة، بعد انتهاء التصحيح. |
-| **شهادة** | وثيقة تُصدر للمرشحين الناجحين، برمز تحقق فريد. |
+| المصطلح             | التعريف                                                                      |
+| ------------------- | ---------------------------------------------------------------------------- |
+| **اختبار**          | تقييم مُكوّن من أسئلة ومدة وإعدادات.                                         |
+| **محاولة**          | تنفيذ واحد لمرشح لأداء الاختبار. قد يكون للمرشح عدة محاولات لكل اختبار.      |
+| **مراقبة الاختبار** | المراقبة أثناء الاختبار (لقطات كاميرا، أحداث تغيير التبويب وملء الشاشة).     |
+| **مخالفة**          | حدث مُسجّل مثل تغيير التبويب أو الخروج من ملء الشاشة أو محاولة النسخ واللصق. |
+| **مصحّح**           | مسؤول أو مدرّب يصحح الأسئلة اليدوية وينهي النتائج.                           |
+| **نتيجة**           | الدرجة النهائية وحالة النجاح/الرسوب للمحاولة، بعد انتهاء التصحيح.            |
+| **شهادة**           | وثيقة تُصدر للمرشحين الناجحين، برمز تحقق فريد.                               |
 
 ---
 
@@ -829,4 +879,4 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ---
 
-*End of User Manual*
+_End of User Manual_

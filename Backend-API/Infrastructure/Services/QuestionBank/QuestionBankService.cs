@@ -227,6 +227,7 @@ public class QuestionBankService : IQuestionBankService
                 TextEn = o.TextEn,
                 TextAr = o.TextAr,
                 IsCorrect = o.IsCorrect,
+                Points = o.Points,
                 Order = o.Order,
                 AttachmentPath = o.AttachmentPath,
                 CreatedDate = o.CreatedDate
@@ -315,6 +316,7 @@ public class QuestionBankService : IQuestionBankService
                     TextEn = optionDto.TextEn,
                     TextAr = optionDto.TextAr,
                     IsCorrect = optionDto.IsCorrect,
+                    Points = optionDto.Points,
                     Order = optionDto.Order,
                     AttachmentPath = optionDto.AttachmentPath,
                     CreatedDate = DateTime.UtcNow,
@@ -557,6 +559,7 @@ public class QuestionBankService : IQuestionBankService
             TextEn = o.TextEn,
             TextAr = o.TextAr,
             IsCorrect = o.IsCorrect,
+            Points = o.Points,
             Order = o.Order,
             AttachmentPath = o.AttachmentPath,
             CreatedDate = o.CreatedDate
@@ -579,6 +582,7 @@ public class QuestionBankService : IQuestionBankService
             TextEn = dto.TextEn,
             TextAr = dto.TextAr,
             IsCorrect = dto.IsCorrect,
+            Points = dto.Points,
             Order = dto.Order,
             AttachmentPath = dto.AttachmentPath,
             CreatedDate = DateTime.UtcNow,
@@ -596,6 +600,7 @@ public class QuestionBankService : IQuestionBankService
             TextEn = entity.TextEn,
             TextAr = entity.TextAr,
             IsCorrect = entity.IsCorrect,
+            Points = entity.Points,
             Order = entity.Order,
             AttachmentPath = entity.AttachmentPath,
             CreatedDate = entity.CreatedDate
@@ -616,6 +621,7 @@ public class QuestionBankService : IQuestionBankService
         entity.TextEn = dto.TextEn;
         entity.TextAr = dto.TextAr;
         entity.IsCorrect = dto.IsCorrect;
+        entity.Points = dto.Points;
         entity.Order = dto.Order;
         entity.AttachmentPath = dto.AttachmentPath;
         entity.UpdatedDate = DateTime.UtcNow;
@@ -631,6 +637,7 @@ public class QuestionBankService : IQuestionBankService
             TextEn = entity.TextEn,
             TextAr = entity.TextAr,
             IsCorrect = entity.IsCorrect,
+            Points = entity.Points,
             Order = entity.Order,
             AttachmentPath = entity.AttachmentPath,
             CreatedDate = entity.CreatedDate
@@ -680,6 +687,7 @@ public class QuestionBankService : IQuestionBankService
                 existingOption.TextEn = optionDto.TextEn;
                 existingOption.TextAr = optionDto.TextAr;
                 existingOption.IsCorrect = optionDto.IsCorrect;
+                existingOption.Points = optionDto.Points;
                 existingOption.Order = optionDto.Order;
                 existingOption.AttachmentPath = optionDto.AttachmentPath;
                 existingOption.UpdatedDate = DateTime.UtcNow;
@@ -694,6 +702,7 @@ public class QuestionBankService : IQuestionBankService
                     TextEn = optionDto.TextEn,
                     TextAr = optionDto.TextAr,
                     IsCorrect = optionDto.IsCorrect,
+                    Points = optionDto.Points,
                     Order = optionDto.Order,
                     AttachmentPath = optionDto.AttachmentPath,
                     CreatedDate = DateTime.UtcNow,

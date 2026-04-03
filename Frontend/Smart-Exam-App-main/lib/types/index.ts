@@ -199,6 +199,7 @@ export interface QuestionOption {
   textAr: string;
   text?: string; // Legacy field for backward compatibility
   isCorrect: boolean;
+  points?: number | null;
   order: number;
   attachmentPath: string | null;
   createdDate: string;

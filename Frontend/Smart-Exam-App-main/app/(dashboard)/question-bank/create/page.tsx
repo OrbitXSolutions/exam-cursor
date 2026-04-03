@@ -60,6 +60,7 @@ interface OptionInput {
   textEn: string
   textAr: string
   isCorrect: boolean
+  points?: number | null
   order: number
   imageFile?: File | null
   imagePreview?: string | null
@@ -330,6 +331,21 @@ const CreateQuestionPage = () => {
           errors.push(language === "ar" ? "جميع الخيارات يجب أن تحتوي على نص (بالإنجليزية)" : "All options must have text (English)")
         }
       }
+
+      // Partial scoring validation for MCQ_Multi
+      if (isMCQMulti) {
+        const hasAnyPoints = options.some((opt) => opt.points != null && opt.points !== undefined)
+        if (hasAnyPoints) {
+          const sum = options.reduce((acc, opt) => acc + (opt.points || 0), 0)
+          if (Math.abs(sum - formData.points) > 0.01) {
+            errors.push(language === "ar" ? `مجموع نقاط الخيارات (${sum}) يجب أن يساوي إجمالي نقاط السؤال (${formData.points})` : `Sum of option points (${sum}) must equal question total points (${formData.points})`)
+          }
+          const hasNegative = options.some((opt) => (opt.points ?? 0) < 0)
+          if (hasNegative) {
+            errors.push(language === "ar" ? "نقاط الخيار يجب أن تكون 0 أو أكثر" : "Option points must be 0 or greater")
+          }
+        }
+      }
     }
 
 
@@ -349,7 +365,7 @@ const CreateQuestionPage = () => {
     setFormErrors([])
     setIsSaving(true)
 
-    let finalOptions: { textEn: string; textAr: string; isCorrect: boolean; order: number; attachmentPath: string | null }[] = []
+    let finalOptions: { textEn: string; textAr: string; isCorrect: boolean; points?: number | null; order: number; attachmentPath: string | null }[] = []
 
     if (needsOptions) {
       // Upload option images first
@@ -384,6 +400,7 @@ const CreateQuestionPage = () => {
         textEn: opt.textEn,
         textAr: opt.textAr || opt.textEn,
         isCorrect: opt.isCorrect,
+        points: isMCQMulti && opt.points != null ? opt.points : null,
         order: opt.order,
         attachmentPath: opt.attachmentPath || null,
       }))
@@ -944,6 +961,21 @@ const CreateQuestionPage = () => {
                     </AlertDescription>
                   </Alert>
 
+                  {/* Partial Scoring Summary */}
+                  {(() => {
+                    const hasAnyPoints = options.some((opt) => opt.points != null && opt.points !== undefined)
+                    if (!hasAnyPoints) return null
+                    const sum = options.reduce((acc, opt) => acc + (opt.points || 0), 0)
+                    const isValid = Math.abs(sum - formData.points) < 0.01
+                    return (
+                      <div className={`flex items-center justify-between rounded-lg border-2 px-4 py-2 text-sm font-medium ${isValid ? "border-green-300 bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-300 dark:border-green-700" : "border-destructive bg-destructive/10 text-destructive"}`}>
+                        <span>{language === "ar" ? "مجموع نقاط الخيارات" : "Option Points Sum"}: {sum}</span>
+                        <span>{language === "ar" ? "إجمالي نقاط السؤال" : "Question Total"}: {formData.points}</span>
+                        {isValid ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                      </div>
+                    )
+                  })()}
+
                   {options.map((option, index) => (
                     <div
                       key={option.id}
@@ -992,6 +1024,22 @@ const CreateQuestionPage = () => {
                             {t("questionBank.correctAnswer")}
                           </p>
                         )}
+                        {/* Per-option points for partial scoring */}
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor={`option-points-${option.id}`} className="text-xs text-muted-foreground whitespace-nowrap">
+                            {language === "ar" ? "النقاط" : "Points"}
+                          </Label>
+                          <Input
+                            id={`option-points-${option.id}`}
+                            type="number"
+                            min={0}
+                            step={0.5}
+                            placeholder="0"
+                            value={option.points ?? ""}
+                            onChange={(e) => updateOption(option.id, { points: e.target.value === "" ? null : Number(e.target.value) })}
+                            className="border-2 h-8 w-24 text-sm"
+                          />
+                        </div>
                         {/* Option Image */}
                         <div className="flex items-center gap-2">
                           {option.imagePreview ? (
