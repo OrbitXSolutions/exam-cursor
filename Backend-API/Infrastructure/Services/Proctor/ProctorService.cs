@@ -1983,6 +1983,7 @@ UploadEvidenceDto dto, string candidateId)
             ExamMaxAttempts = session.Exam?.MaxAttempts ?? 1,
             ExamTotalQuestions = session.Exam?.Questions?.Count ?? 0,
             ExamRequireWebcam = session.Exam?.RequireWebcam ?? false,
+            ExamEnableScreenMonitoring = session.Exam?.EnableScreenMonitoring ?? false,
             ExamRequireIdVerification = session.Exam?.RequireIdVerification ?? false,
             ExamRequireFullscreen = session.Exam?.RequireFullscreen ?? false,
             ExamPreventCopyPaste = session.Exam?.PreventCopyPaste ?? false,

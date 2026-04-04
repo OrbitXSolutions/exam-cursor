@@ -436,11 +436,15 @@ export interface Exam {
   requireProctoring: boolean;
   requireIdVerification: boolean;
   requireWebcam: boolean;
+  enableScreenMonitoring: boolean;
+  screenMonitoringMode: number; // 0=Disabled, 1=Optional, 2=Required, 3=Strict
+  screenShareGracePeriod: number; // seconds (default 20)
   // Security Settings
   preventCopyPaste: boolean;
   preventScreenCapture: boolean;
   requireFullscreen: boolean;
   browserLockdown: boolean;
+  maxViolationWarnings: number;
   // Meta
   createdDate: string;
   updatedDate: string | null;

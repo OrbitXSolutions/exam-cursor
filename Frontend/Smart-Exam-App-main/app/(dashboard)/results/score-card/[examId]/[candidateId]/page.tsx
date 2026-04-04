@@ -123,7 +123,7 @@ export default function ScoreCardPage() {
         <Badge variant={session.isPassed ? "default" : "destructive"} className="text-base px-4 py-1">
           {session.isPassed
             ? (language === "ar" ? "ناجح" : "PASSED")
-            : (language === "ar" ? "راسب" : "FAILED")}
+            : (language === "ar" ? "غير ناجح" : "FAILED")}
         </Badge>
       </div>
 

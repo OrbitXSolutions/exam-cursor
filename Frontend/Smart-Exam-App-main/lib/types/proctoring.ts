@@ -48,6 +48,7 @@ export interface LiveSession {
   examMaxAttempts?: number;
   examTotalQuestions?: number;
   examRequireWebcam?: boolean;
+  examEnableScreenMonitoring?: boolean;
   examRequireIdVerification?: boolean;
   examRequireFullscreen?: boolean;
   examPreventCopyPaste?: boolean;

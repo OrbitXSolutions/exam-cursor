@@ -290,8 +290,22 @@ public class CandidateService : ICandidateService
             {
                 // Builder section - use PickCount as question count
                 totalQuestions += section.PickCount;
-                // Estimate points: use 1 point per question (actual points determined at attempt time)
-                totalPoints += section.PickCount;
+                // Calculate estimated points from the question pool
+                var poolQuery = _context.Questions
+                    .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == section.QuestionSubjectId);
+                if (section.QuestionTopicId.HasValue)
+                    poolQuery = poolQuery.Where(q => q.TopicId == section.QuestionTopicId);
+                var availableCount = await poolQuery.CountAsync();
+                if (availableCount > 0)
+                {
+                    var pointsSum = await poolQuery.SumAsync(q => q.Points);
+                    var avgPoints = pointsSum / availableCount;
+                    totalPoints += section.PickCount * avgPoints;
+                }
+                else
+                {
+                    totalPoints += section.PickCount; // fallback: 1 point per question
+                }
             }
             else
             {
@@ -322,6 +336,7 @@ public class CandidateService : ICandidateService
             PreventScreenCapture = exam.PreventScreenCapture,
             RequireFullscreen = exam.RequireFullscreen,
             BrowserLockdown = exam.BrowserLockdown,
+            EnableScreenMonitoring = exam.EnableScreenMonitoring,
             MaxViolationWarnings = exam.MaxViolationWarnings
         };
 
@@ -1801,6 +1816,9 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 PreventCopyPaste = exam.PreventCopyPaste,
                 PreventScreenCapture = exam.PreventScreenCapture,
                 BrowserLockdown = exam.BrowserLockdown,
+                EnableScreenMonitoring = exam.EnableScreenMonitoring,
+                ScreenMonitoringMode = exam.ScreenMonitoringMode,
+                ScreenShareGracePeriod = exam.ScreenShareGracePeriod,
             },
             Sections = sectionDtos,
             Questions = flatQuestions.OrderBy(q => q.Order).ToList(),

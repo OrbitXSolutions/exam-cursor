@@ -63,7 +63,7 @@ const statusVariantMap: Record<string, StatusVariant> = {
   passed: "success",
   failed: "destructive",
   "ناجح": "success",
-  "راسب": "destructive",
+  "غير ناجح": "destructive",
 
   // Severity
   low: "secondary",

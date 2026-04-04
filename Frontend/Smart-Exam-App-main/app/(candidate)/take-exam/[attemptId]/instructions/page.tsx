@@ -41,6 +41,7 @@ const EXAM_LANGUAGE_KEY = "examLanguage"
 interface ReadyCheckStatus {
   fullscreenSupported: boolean | null;
   webcamPermission: boolean | null;
+  screenSharePermission: boolean | null;
   checking: boolean;
 }
 
@@ -61,6 +62,7 @@ export default function ExamInstructionsPage() {
   const [readyCheck, setReadyCheck] = useState<ReadyCheckStatus>({
     fullscreenSupported: null,
     webcamPermission: null,
+    screenSharePermission: null,
     checking: false,
   })
   const [readyCheckComplete, setReadyCheckComplete] = useState(false)
@@ -88,6 +90,20 @@ export default function ExamInstructionsPage() {
     }
   }
 
+  // Check screen share permission
+  const checkScreenSharePermission = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { displaySurface: "monitor" } as MediaTrackConstraints,
+      })
+      // Stop all tracks after verifying it works
+      stream.getTracks().forEach(track => track.stop())
+      return true
+    } catch {
+      return false
+    }
+  }
+
   // Run ready checks
   const runReadyChecks = async () => {
     setReadyCheck(prev => ({ ...prev, checking: true }))
@@ -107,6 +123,11 @@ export default function ExamInstructionsPage() {
     } else {
       setReadyCheck(prev => ({ ...prev, webcamPermission: true }))
     }
+
+    // Screen share: do NOT auto-prompt — candidate clicks "Test" button
+    if (!examPreview?.accessPolicy.enableScreenMonitoring) {
+      setReadyCheck(prev => ({ ...prev, screenSharePermission: true }))
+    }
     
     setReadyCheck(prev => ({ ...prev, checking: false }))
     setReadyCheckComplete(true)
@@ -117,6 +138,13 @@ export default function ExamInstructionsPage() {
     setReadyCheck(prev => ({ ...prev, webcamPermission: null, checking: true }))
     const webcamPermission = await checkWebcamPermission()
     setReadyCheck(prev => ({ ...prev, webcamPermission, checking: false }))
+  }
+
+  // Test screen share (candidate-initiated)
+  const testScreenShare = async () => {
+    setReadyCheck(prev => ({ ...prev, screenSharePermission: null, checking: true }))
+    const screenSharePermission = await checkScreenSharePermission()
+    setReadyCheck(prev => ({ ...prev, screenSharePermission, checking: false }))
   }
 
   useEffect(() => {
@@ -443,14 +471,65 @@ export default function ExamInstructionsPage() {
                 </div>
               )}
 
+              {/* Screen Sharing Check (if screen monitoring enabled) */}
+              {examPreview.accessPolicy.enableScreenMonitoring && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <Monitor className="h-5 w-5 text-purple-500" />
+                    <div>
+                      <p className="font-medium">{t("instructions.screenSharing")}</p>
+                      <p className="text-xs text-muted-foreground">{t("instructions.screenSharingDesc")}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {readyCheck.screenSharePermission === null ? (
+                      readyCheck.checking ? (
+                        <LoadingSpinner size="sm" />
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={testScreenShare}
+                          className="border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950"
+                        >
+                          <Monitor className="h-3 w-3 me-1" />
+                          {t("instructions.testScreenShare") || "Test"}
+                        </Button>
+                      )
+                    ) : readyCheck.screenSharePermission ? (
+                      <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                        <CheckCircle2 className="h-3 w-3 me-1" />
+                        {t("common.ready")}
+                      </Badge>
+                    ) : (
+                      <>
+                        <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                          <XCircle className="h-3 w-3 me-1" />
+                          {t("common.denied")}
+                        </Badge>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={testScreenShare}
+                          disabled={readyCheck.checking}
+                        >
+                          <RefreshCw className={`h-3 w-3 me-1 ${readyCheck.checking ? 'animate-spin' : ''}`} />
+                          {t("common.retry")}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Summary */}
               {readyCheckComplete && (
                 <div className={`p-3 rounded-lg ${
-                  readyCheck.fullscreenSupported && readyCheck.webcamPermission
+                  readyCheck.fullscreenSupported && readyCheck.webcamPermission && readyCheck.screenSharePermission
                     ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
                 }`}>
-                  {readyCheck.fullscreenSupported && readyCheck.webcamPermission ? (
+                  {readyCheck.fullscreenSupported && readyCheck.webcamPermission && readyCheck.screenSharePermission ? (
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5" />
                       <span className="font-medium">{t("instructions.allChecksPassed")}</span>
@@ -620,6 +699,9 @@ export default function ExamInstructionsPage() {
                   {examPreview.accessPolicy.preventCopyPaste && (
                     <Badge variant="outline">{t("exams.preventCopyPaste")}</Badge>
                   )}
+                  {examPreview.accessPolicy.enableScreenMonitoring && (
+                    <Badge variant="outline"><Monitor className="h-3 w-3 me-1" />{t("instructions.screenMonitoring")}</Badge>
+                  )}
                 </div>
                 <p>{t("instructions.securityDesc1")}</p>
                 <p>{t("instructions.securityDesc2")}</p>
@@ -715,7 +797,8 @@ export default function ExamInstructionsPage() {
                   (examPreview.accessPolicy.requiresAccessCode && !accessCode.trim()) ||
                   !readyCheckComplete ||
                   !readyCheck.fullscreenSupported ||
-                  !readyCheck.webcamPermission
+                  !readyCheck.webcamPermission ||
+                  !readyCheck.screenSharePermission
                 }
                 className="w-full h-12 text-base font-semibold"
                 size="lg"

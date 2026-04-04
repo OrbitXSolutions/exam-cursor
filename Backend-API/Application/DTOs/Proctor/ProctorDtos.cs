@@ -62,6 +62,7 @@ public class ProctorSessionDto
     public int ExamMaxAttempts { get; set; }
     public int ExamTotalQuestions { get; set; }
     public bool ExamRequireWebcam { get; set; }
+    public bool ExamEnableScreenMonitoring { get; set; }
     public bool ExamRequireIdVerification { get; set; }
     public bool ExamRequireFullscreen { get; set; }
     public bool ExamPreventCopyPaste { get; set; }

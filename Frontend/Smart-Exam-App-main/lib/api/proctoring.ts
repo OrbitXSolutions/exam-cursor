@@ -265,6 +265,7 @@ interface ProctorSessionDetailDto {
   examMaxAttempts?: number;
   examTotalQuestions?: number;
   examRequireWebcam?: boolean;
+  examEnableScreenMonitoring?: boolean;
   examRequireIdVerification?: boolean;
   examRequireFullscreen?: boolean;
   examPreventCopyPaste?: boolean;
@@ -390,6 +391,7 @@ export async function getSessionDetails(
     examMaxAttempts: data.examMaxAttempts,
     examTotalQuestions: data.examTotalQuestions,
     examRequireWebcam: data.examRequireWebcam,
+    examEnableScreenMonitoring: data.examEnableScreenMonitoring,
     examRequireIdVerification: data.examRequireIdVerification,
     examRequireFullscreen: data.examRequireFullscreen,
     examPreventCopyPaste: data.examPreventCopyPaste,
@@ -415,16 +417,18 @@ export async function getSessionDetails(
     // Enriched: Violation Breakdown
     violationBreakdown: data.violationBreakdown,
     // Enriched: Decision
-    decision: data.decision ? {
-      status: data.decision.statusName,
-      statusName: data.decision.statusName,
-      decisionReasonEn: data.decision.decisionReasonEn,
-      decidedBy: data.decision.decidedBy,
-      deciderName: data.decision.deciderName,
-      decidedAt: data.decision.decidedAt,
-      isFinalized: data.decision.isFinalized,
-      wasOverridden: data.decision.wasOverridden,
-    } : undefined,
+    decision: data.decision
+      ? {
+          status: data.decision.statusName,
+          statusName: data.decision.statusName,
+          decisionReasonEn: data.decision.decisionReasonEn,
+          decidedBy: data.decision.decidedBy,
+          deciderName: data.decision.deciderName,
+          decidedAt: data.decision.decidedAt,
+          isFinalized: data.decision.isFinalized,
+          wasOverridden: data.decision.wasOverridden,
+        }
+      : undefined,
   };
   let incidents: Incident[] = [];
   try {
@@ -529,6 +533,7 @@ export async function refreshSessionData(sessionId: string): Promise<{
     examMaxAttempts: data.examMaxAttempts,
     examTotalQuestions: data.examTotalQuestions,
     examRequireWebcam: data.examRequireWebcam,
+    examEnableScreenMonitoring: data.examEnableScreenMonitoring,
     examRequireIdVerification: data.examRequireIdVerification,
     examRequireFullscreen: data.examRequireFullscreen,
     examPreventCopyPaste: data.examPreventCopyPaste,
@@ -549,16 +554,18 @@ export async function refreshSessionData(sessionId: string): Promise<{
     endedAt: data.endedAt,
     identityVerification: data.identityVerification,
     violationBreakdown: data.violationBreakdown,
-    decision: data.decision ? {
-      status: data.decision.statusName,
-      statusName: data.decision.statusName,
-      decisionReasonEn: data.decision.decisionReasonEn,
-      decidedBy: data.decision.decidedBy,
-      deciderName: data.decision.deciderName,
-      decidedAt: data.decision.decidedAt,
-      isFinalized: data.decision.isFinalized,
-      wasOverridden: data.decision.wasOverridden,
-    } : undefined,
+    decision: data.decision
+      ? {
+          status: data.decision.statusName,
+          statusName: data.decision.statusName,
+          decisionReasonEn: data.decision.decisionReasonEn,
+          decidedBy: data.decision.decidedBy,
+          deciderName: data.decision.deciderName,
+          decidedAt: data.decision.decidedAt,
+          isFinalized: data.decision.isFinalized,
+          wasOverridden: data.decision.wasOverridden,
+        }
+      : undefined,
   };
   let screenshots: Array<{ id: string; timestamp: string; url: string }> = [];
   try {

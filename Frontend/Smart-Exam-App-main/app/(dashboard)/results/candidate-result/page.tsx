@@ -309,7 +309,7 @@ export default function CandidateResultPage() {
             <SelectContent position="popper" sideOffset={4}>
               <SelectItem value={RESULT_STATUS_ALL}>{language === "ar" ? "الكل" : "All"}</SelectItem>
               <SelectItem value={RESULT_STATUS_PASSED}>{language === "ar" ? "ناجح" : "Passed"}</SelectItem>
-              <SelectItem value={RESULT_STATUS_FAILED}>{language === "ar" ? "راسب" : "Failed"}</SelectItem>
+              <SelectItem value={RESULT_STATUS_FAILED}>{language === "ar" ? "غير ناجح" : "Failed"}</SelectItem>
               <SelectItem value={RESULT_STATUS_UNDER_REVIEW}>{language === "ar" ? "قيد المراجعة" : "Under Review"}</SelectItem>
               <SelectItem value={RESULT_STATUS_NOT_PUBLISHED}>{language === "ar" ? "غير منشور" : "Not Published"}</SelectItem>
             </SelectContent>
@@ -430,7 +430,7 @@ export default function CandidateResultPage() {
                           ) : row.isPassed ? (
                             <Badge className="bg-green-600 hover:bg-green-700">{language === "ar" ? "ناجح" : "Pass"}</Badge>
                           ) : (
-                            <Badge variant="destructive">{language === "ar" ? "راسب" : "Fail"}</Badge>
+                            <Badge variant="destructive">{language === "ar" ? "غير ناجح" : "Fail"}</Badge>
                           )}
                         </TableCell>
                         <TableCell>{getGradingStatusBadge(row.gradingStatus)}</TableCell>

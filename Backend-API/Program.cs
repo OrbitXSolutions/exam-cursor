@@ -53,7 +53,9 @@ using Smart_Core.Infrastructure.Services.ExamOperations;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Infrastructure.Storage;
 using Smart_Core.Application.Interfaces.Logs;
+using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Infrastructure.Services.Logs;
+using Smart_Core.Infrastructure.Services.License;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -221,6 +223,10 @@ builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<DatabaseSeeder>();
 
+// License Validation
+builder.Services.AddSingleton<LicenseValidationService>();
+builder.Services.AddSingleton<ILicenseValidationService>(sp => sp.GetRequiredService<LicenseValidationService>());
+
 // System Logs (Channel + Background persistence)
 builder.Services.AddSingleton<SystemLogChannel>();
 builder.Services.AddScoped<ISystemLogService, SystemLogService>();
@@ -231,6 +237,7 @@ builder.Services.AddHostedService<VideoRetentionService>();
 builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Background.AttemptExpiryBackgroundService>();
 builder.Services.AddHostedService<Smart_Core.Infrastructure.Services.Notification.NotificationBackgroundService>();
 builder.Services.AddHostedService<LogPersistenceService>();
+builder.Services.AddHostedService<LicenseCheckBackgroundService>();
 
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
@@ -389,6 +396,9 @@ app.UseRateLimiter();
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// License enforcement — after auth, before controllers
+app.UseLicenseEnforcement();
 
 app.MapControllers();
 

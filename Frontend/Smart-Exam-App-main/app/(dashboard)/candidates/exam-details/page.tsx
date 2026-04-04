@@ -645,7 +645,7 @@ export default function CandidateExamDetailsPage() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{isRtl ? "النتيجة" : "Result"}</span>
                     <Badge variant={data.attemptSummary.isPassed ? "default" : "destructive"} className="text-xs">
-                      {data.attemptSummary.isPassed ? (isRtl ? "ناجح" : "Passed") : (isRtl ? "راسب" : "Failed")}
+                      {data.attemptSummary.isPassed ? (isRtl ? "ناجح" : "Passed") : (isRtl ? "غير ناجح" : "Failed")}
                     </Badge>
                   </div>
                 )}
@@ -1347,7 +1347,7 @@ export default function CandidateExamDetailsPage() {
                           <td className="py-2 px-3">
                             {a.isPassed !== null && a.isPassed !== undefined ? (
                               <Badge variant={a.isPassed ? "default" : "destructive"} className="text-xs">
-                                {a.isPassed ? (isRtl ? "ناجح" : "Pass") : (isRtl ? "راسب" : "Fail")}
+                                {a.isPassed ? (isRtl ? "ناجح" : "Pass") : (isRtl ? "غير ناجح" : "Fail")}
                               </Badge>
                             ) : "—"}
                           </td>

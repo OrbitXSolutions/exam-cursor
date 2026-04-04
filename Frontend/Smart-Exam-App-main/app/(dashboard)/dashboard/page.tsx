@@ -49,6 +49,8 @@ import {
 } from "recharts"
 import { UserRole } from "@/lib/types"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { getLicenseStatus, type LicenseStatusResult } from "@/lib/api/license"
+import { AlertTriangle as AlertTriangleIcon, ShieldAlert, Info } from "lucide-react"
 
 export default function DashboardPage() {
   const { t, language } = useI18n()
@@ -66,20 +68,23 @@ export default function DashboardPage() {
   const [upcomingExams, setUpcomingExams] = useState<Exam[]>([])
   const [incidentCases, setIncidentCases] = useState<{ id: number; titleEn?: string; titleAr?: string; candidateName?: string; severityName?: string }[]>([])
   const [loading, setLoading] = useState(true)
+  const [licenseStatus, setLicenseStatus] = useState<LicenseStatusResult | null>(null)
   const isAdmin = hasRole([UserRole.Admin, UserRole.Instructor])
 
   useEffect(() => {
     async function load() {
       setLoading(true)
       try {
-        const [statsRes, examsRes, incidentsRes] = await Promise.all([
+        const [statsRes, examsRes, incidentsRes, licenseRes] = await Promise.all([
           getDashboardStats(),
           getUpcomingExams(5),
           isAdmin ? getDashboardIncidents(5) : Promise.resolve([]),
+          getLicenseStatus().catch(() => null),
         ])
         setStats(statsRes)
         setUpcomingExams(examsRes)
         setIncidentCases(incidentsRes)
+        setLicenseStatus(licenseRes)
       } catch {
         // keep defaults
       } finally {
@@ -162,9 +167,71 @@ export default function DashboardPage() {
     )
   }
 
+  const licenseWarningBanner = () => {
+    if (!licenseStatus || licenseStatus.state === "Active") return null
+
+    let bgClass = ""
+    let borderClass = ""
+    let textClass = ""
+    let icon = <Info className="h-5 w-5" />
+    let message = ""
+
+    switch (licenseStatus.state) {
+      case "Warning":
+        bgClass = "bg-yellow-50 dark:bg-yellow-950/30"
+        borderClass = "border-yellow-300 dark:border-yellow-700"
+        textClass = "text-yellow-800 dark:text-yellow-200"
+        icon = <AlertTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+        message = language === "ar"
+          ? `تنتهي صلاحية الرخصة خلال ${licenseStatus.daysRemaining} يوم`
+          : `License expires in ${licenseStatus.daysRemaining} days`
+        break
+      case "GracePeriod":
+        bgClass = "bg-orange-50 dark:bg-orange-950/30"
+        borderClass = "border-orange-300 dark:border-orange-700"
+        textClass = "text-orange-800 dark:text-orange-200"
+        icon = <ShieldAlert className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+        message = language === "ar"
+          ? `انتهت صلاحية الرخصة. فترة السماح: ${licenseStatus.graceDaysRemaining} يوم متبقي`
+          : `License expired. Grace period: ${licenseStatus.graceDaysRemaining} days remaining`
+        break
+      case "Expired":
+        bgClass = "bg-red-50 dark:bg-red-950/30"
+        borderClass = "border-red-300 dark:border-red-700"
+        textClass = "text-red-800 dark:text-red-200"
+        icon = <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400" />
+        message = language === "ar"
+          ? "انتهت صلاحية الرخصة. النظام في وضع القراءة فقط"
+          : "License expired. System is in read-only mode"
+        break
+      case "Invalid":
+      case "Missing":
+        bgClass = "bg-yellow-50 dark:bg-yellow-950/30"
+        borderClass = "border-yellow-300 dark:border-yellow-700"
+        textClass = "text-yellow-800 dark:text-yellow-200"
+        icon = <AlertTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+        message = language === "ar"
+          ? "لم يتم العثور على رخصة صالحة. يرجى التواصل مع المسؤول"
+          : "No valid license found. Please contact your administrator"
+        break
+      default:
+        return null
+    }
+
+    return (
+      <div className={`flex items-center gap-3 rounded-lg border p-4 ${bgClass} ${borderClass} ${textClass}`}>
+        {icon}
+        <span className="text-sm font-medium">{message}</span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-6 p-6">
+
+        {/* License Warning Banner */}
+        {licenseWarningBanner()}
 
         {/* Enhanced Sections - Admin Only (TOP) */}
         {isAdmin && (

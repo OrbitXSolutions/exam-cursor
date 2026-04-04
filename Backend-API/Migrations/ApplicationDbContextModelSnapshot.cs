@@ -352,6 +352,9 @@ namespace Smart_Core.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
+                    b.Property<bool>("EnableScreenMonitoring")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("EndAt")
                         .HasColumnType("datetime2");
 
@@ -414,6 +417,12 @@ namespace Smart_Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<byte>("ScreenMonitoringMode")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("ScreenShareGracePeriod")
+                        .HasColumnType("int");
 
                     b.Property<bool>("ShowCorrectAnswers")
                         .ValueGeneratedOnAdd()
