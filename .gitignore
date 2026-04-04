@@ -23,3 +23,12 @@ Thumbs.db
 
 # ===== Media Storage =====
 Backend-API/MediaStorage/
+
+# ===== License =====
+# Private key — NEVER commit
+**/private.pem
+# License files — client-specific, not in repo
+Backend-API/License/license.json
+LicenseSigner/license*.json
+LicenseSigner/private.pem
+LicenseSigner/public.pem

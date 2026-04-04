@@ -86,11 +86,15 @@ public class VideoRecordingController : ControllerBase
             enableSmartMonitoring = _configuration.GetValue("Proctoring:EnableSmartMonitoring", true);
         }
 
+        // Screen monitoring: always enabled at system level (per-exam settings control actual behavior)
+        bool enableScreenMonitoring = true;
+
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             enableLiveVideo,
             enableVideoRecording,
             enableSmartMonitoring,
+            enableScreenMonitoring,
             stunServers
         }));
     }

@@ -4,10 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
+import { translateServerMessage } from "@/lib/i18n/runtime"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
+import { ScreenShareViewer, type ScreenViewerStatus } from "@/lib/webrtc/screen-share-viewer"
 import { getVideoConfig } from "@/lib/webrtc/video-config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -95,6 +97,13 @@ export default function SessionDetailPage() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [sessionEnded, setSessionEnded] = useState<{ reason: "Submitted" | "Expired" | "Terminated" } | null>(null)
 
+  // Screen share viewer state
+  const screenVideoRef = useRef<HTMLVideoElement>(null)
+  const screenViewerRef = useRef<ScreenShareViewer | null>(null)
+  const screenStreamRef = useRef<MediaStream | null>(null)
+  const [screenViewerStatus, setScreenViewerStatus] = useState<ScreenViewerStatus>("offline")
+  const [hasScreenStream, setHasScreenStream] = useState(false)
+
   // AI Proctor Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AiProctorAnalysis | null>(null)
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
@@ -142,12 +151,12 @@ export default function SessionDetailPage() {
               viewerRef.current?.disconnect()
               const reportUrl = `/results/ai-report/${data.session.examId}/${data.session.candidateId}`
               toast.info(
-                `Session ended: ${reason}`,
+                `${t("proctor.sessionTerminatedTitle")}: ${reason}`,
                 {
-                  description: "Redirecting to session report in 10 seconds…",
+                  description: t("proctor.redirectingToReport", { seconds: "10" }),
                   duration: 10000,
                   action: {
-                    label: "View Report Now",
+                    label: t("proctor.viewReportNow"),
                     onClick: () => router.push(reportUrl),
                   },
                 }
@@ -216,13 +225,13 @@ export default function SessionDetailPage() {
 
           // Prominent toast with 15s duration + action button
           toast.success(
-            `Candidate has submitted the exam (Attempt #${attemptId})`,
+            t("proctor.candidateSubmittedExam", { id: String(attemptId) }),
             {
-              description: "Redirecting to session report in 15 seconds…",
+              description: t("proctor.redirectingToReport", { seconds: "15" }),
               duration: 15000,
               icon: "✅",
               action: {
-                label: "View Report Now",
+                label: t("proctor.viewReportNow"),
                 onClick: () => router.push(reportUrl),
               },
             }
@@ -247,13 +256,13 @@ export default function SessionDetailPage() {
           const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
 
           toast.error(
-            `Exam terminated: ${termEvent.reason}`,
+            t("proctor.examTerminatedReason", { reason: termEvent.reason }),
             {
-              description: "Redirecting to session report in 10 seconds…",
+              description: t("proctor.redirectingToReport", { seconds: "10" }),
               duration: 10000,
               icon: "🚫",
               action: {
-                label: "View Report Now",
+                label: t("proctor.viewReportNow"),
                 onClick: () => router.push(reportUrl),
               },
             }
@@ -280,8 +289,8 @@ export default function SessionDetailPage() {
           setEvents((prev) => [newEvent, ...prev])
           // Show toast for critical events
           if (event.severity === "Critical" || event.severity === "High") {
-            toast.warning(`Violation: ${event.eventType}`, {
-              description: `Severity: ${event.severity}`,
+            toast.warning(t("proctor.violationLabel", { type: event.eventType }), {
+              description: t("proctor.severityLabel", { severity: event.severity }),
               duration: 5000,
             })
           }
@@ -297,12 +306,12 @@ export default function SessionDetailPage() {
 
           const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
 
-          toast.warning(`Exam has expired (Attempt #${expEvent.attemptId})`, {
-            description: "Redirecting to session report in 10 seconds…",
+          toast.warning(t("proctor.examExpiredAttempt", { id: String(expEvent.attemptId) }), {
+            description: t("proctor.redirectingToReport", { seconds: "10" }),
             duration: 10000,
             icon: "⏰",
             action: {
-              label: "View Report Now",
+              label: t("proctor.viewReportNow"),
               onClick: () => router.push(reportUrl),
             },
           })
@@ -315,6 +324,34 @@ export default function SessionDetailPage() {
 
       viewerRef.current = viewer
       viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal):", e))
+
+      // Screen share viewer (only if exam has screen monitoring enabled)
+      if (cfg.enableScreenMonitoring) {
+        console.log(`%c[ProctorPage] Creating ScreenShareViewer for attempt ${session.attemptId}`, 'color: #9c27b0; font-weight: bold')
+        const screenViewer = new ScreenShareViewer(session.attemptId!, {
+          onStatusChange: (status) => {
+            console.log(`%c[ProctorPage] Screen viewer status: ${status}`, status === 'live' ? 'color: #4caf50; font-weight: bold' : 'color: #ff9800')
+            setScreenViewerStatus(status)
+          },
+          onRemoteStream: (stream) => {
+            console.log(`%c[ProctorPage] ✅ Screen stream received! tracks=${stream.getTracks().length}`, 'color: #9c27b0; font-weight: bold')
+            screenStreamRef.current = stream
+            setHasScreenStream(true)
+            if (screenVideoRef.current) {
+              screenVideoRef.current.srcObject = stream
+              screenVideoRef.current.play().catch(() => {})
+            }
+          },
+          onScreenShareStatusChanged: (status) => {
+            console.log(`[ProctorPage] Screen share status changed: ${status}`)
+            if (status === "stopped" || status === "lost") {
+              setHasScreenStream(false)
+            }
+          },
+        })
+        screenViewerRef.current = screenViewer
+        screenViewer.connect().catch((e) => console.error("[ProctorPage] Screen viewer connect failed (non-fatal):", e))
+      }
     }).catch((e) => {
       console.warn("[ProctorPage] Video config fetch failed (non-fatal):", e)
     })
@@ -323,10 +360,25 @@ export default function SessionDetailPage() {
       cancelled = true
       viewerRef.current?.disconnect()
       viewerRef.current = null
+      screenViewerRef.current?.disconnect()
+      screenViewerRef.current = null
+      screenStreamRef.current = null
       setHasRemoteStream(false)
+      setHasScreenStream(false)
       setViewerStatus("offline")
+      setScreenViewerStatus("offline")
     }
   }, [session?.attemptId, session?.status])
+
+  // Ensure screen stream is assigned to video element after React makes it visible
+  useEffect(() => {
+    if (hasScreenStream && screenVideoRef.current && screenStreamRef.current) {
+      if (screenVideoRef.current.srcObject !== screenStreamRef.current) {
+        screenVideoRef.current.srcObject = screenStreamRef.current
+      }
+      screenVideoRef.current.play().catch(() => {})
+    }
+  }, [hasScreenStream])
 
   // Fullscreen change listener
   useEffect(() => {
@@ -367,7 +419,7 @@ export default function SessionDetailPage() {
         setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
       }
     } catch (error) {
-      toast.error("Failed to load session")
+      toast.error(t("proctor.failedToLoadSession"))
       router.push("/proctor-center")
     } finally {
       setLoading(false)
@@ -384,7 +436,7 @@ export default function SessionDetailPage() {
       setReviewNotes("")
       loadSession()
     } catch (error) {
-      toast.error("Failed to review incident")
+      toast.error(t("proctor.failedToReviewIncident"))
     }
   }
 
@@ -395,7 +447,7 @@ export default function SessionDetailPage() {
       toast.success(session.flagged ? t("proctor.unflagged") : t("proctor.flagged"))
       loadSession()
     } catch (error) {
-      toast.error("Failed to update flag")
+      toast.error(t("proctor.failedToUpdateFlag"))
     }
   }
 
@@ -415,7 +467,7 @@ export default function SessionDetailPage() {
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : "Failed to send warning"
       toast.error(errMsg, {
-        description: "The session may no longer be active. Please refresh the page.",
+        description: t("proctor.sessionMayNotBeActive"),
         duration: 8000,
       })
     }
@@ -441,9 +493,9 @@ export default function SessionDetailPage() {
         router.push("/proctor-center")
       }
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : "Failed to terminate session"
+      const errMsg = error instanceof Error ? error.message : t("proctor.failedToCreateIncident")
       toast.error(errMsg, {
-        description: "The session may no longer be active.",
+        description: t("proctor.sessionMayNotBeActive"),
         duration: 8000,
       })
     }
@@ -458,14 +510,14 @@ export default function SessionDetailPage() {
         extraMinutes: addTimeMinutes,
         reason: addTimeReason || undefined,
       })
-      toast.success(`${addTimeMinutes} minutes added successfully`)
+      toast.success(t("proctor.minutesAddedSuccess", { count: String(addTimeMinutes) }))
       setAddTimeDialogOpen(false)
       setAddTimeMinutes(10)
       setAddTimeReason("")
       // Refresh session data to show updated time
       loadSession()
     } catch (error) {
-      toast.error("Failed to add time")
+      toast.error(t("proctor.failedToAddTime"))
     } finally {
       setAddTimeLoading(false)
     }
@@ -475,10 +527,10 @@ export default function SessionDetailPage() {
     if (!session) return
     try {
       const result = await createIncidentFromProctor(parseInt(session.id))
-      toast.success(`Incident ${result.caseNumber} created`)
+      toast.success(t("proctor.incidentCreatedNum", { num: result.caseNumber }))
       router.push(`/proctor-center/incidents/${result.id}`)
     } catch (error: any) {
-      toast.error(error?.message || "Failed to create incident")
+      toast.error(error?.message || t("proctor.failedToCreateIncident"))
     }
   }
 
@@ -489,9 +541,9 @@ export default function SessionDetailPage() {
       setAiAnalysisError(null)
       const analysis = await getAiProctorAnalysis(session.id)
       setAiAnalysis(analysis)
-      toast.success("AI analysis generated successfully")
+      toast.success(t("proctor.aiAnalysisGenerated"))
     } catch (error: any) {
-      const msg = error?.message || "Failed to generate AI analysis"
+      const msg = error?.message || t("proctor.failedToGenerateAi")
       setAiAnalysisError(msg)
       toast.error(msg)
     } finally {
@@ -501,6 +553,7 @@ export default function SessionDetailPage() {
 
   function formatDateTime(dateString: string) {
     return new Date(dateString).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       dateStyle: "medium",
       timeStyle: "medium",
     })
@@ -546,12 +599,7 @@ export default function SessionDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">{session.candidateName}</h1>
-              {session.flagged && (
-                <Badge variant="outline" className="bg-amber-500/20 border-amber-500/50 text-amber-600">
-                  <Flag className="h-3 w-3 me-1" />
-                  {t("proctor.flagged")}
-                </Badge>
-              )}
+
               <Badge variant={session.status === "Active" ? "default" : "secondary"}>{session.status}</Badge>
             </div>
             <p className="text-muted-foreground mt-1">{session.examTitle}</p>
@@ -561,17 +609,14 @@ export default function SessionDetailPage() {
           {session.status === "Active" && (
             <Button variant="outline" onClick={() => setAddTimeDialogOpen(true)}>
               <Clock className="h-4 w-4 me-2" />
-              Add Time
+              {t("proctor.addTime")}
             </Button>
           )}
           <Button variant="outline" onClick={handleCreateIncident}>
             <AlertTriangle className="h-4 w-4 me-2" />
-            Create Incident
+            {t("proctor.createIncident")}
           </Button>
-          <Button variant="outline" onClick={handleToggleFlag}>
-            <Flag className="h-4 w-4 me-2" />
-            {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
-          </Button>
+
           {session.status === "Active" && (
             <Button variant="outline" onClick={() => setWarningDialogOpen(true)}>
               <MessageSquare className="h-4 w-4 me-2" />
@@ -615,17 +660,35 @@ export default function SessionDetailPage() {
                         viewerStatus === "connecting" || viewerStatus === "reconnecting" ? "bg-amber-500 animate-pulse" :
                         "bg-muted-foreground"
                       }`} />
-                      {viewerStatus === "live" ? "LIVE" :
-                       viewerStatus === "connecting" ? "Connecting…" :
-                       viewerStatus === "reconnecting" ? "Reconnecting…" :
-                       "Offline"}
+                      {viewerStatus === "live" ? t("proctor.webcamLabel") + " " + "LIVE" :
+                       viewerStatus === "connecting" ? t("proctor.connecting") :
+                       viewerStatus === "reconnecting" ? t("proctor.reconnecting") :
+                       t("proctor.offline")}
+                    </Badge>
+                  )}
+                  {session.examEnableScreenMonitoring && session.status === "Active" && (
+                    <Badge
+                      variant="outline"
+                      className={
+                        screenViewerStatus === "live"
+                          ? "bg-purple-500/20 border-purple-500/50 text-purple-600"
+                          : screenViewerStatus === "connecting" || screenViewerStatus === "reconnecting"
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-600"
+                            : "bg-muted text-muted-foreground"
+                      }
+                    >
+                      <Monitor className="h-3 w-3 me-1" />
+                      {screenViewerStatus === "live" ? t("proctor.screenLive") :
+                       screenViewerStatus === "connecting" ? t("proctor.screenConnecting") :
+                       screenViewerStatus === "reconnecting" ? t("proctor.screenReconnecting") :
+                       t("proctor.screenOff")}
                     </Badge>
                   )}
                   {session.attemptId && session.status !== "Active" && (
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/results/ai-report/${session.examId}/${session.candidateId}`}>
                         <Play className="h-3.5 w-3.5 me-1.5" />
-                        View AI Report
+                        {t("proctor.viewAiReport")}
                       </Link>
                     </Button>
                   )}
@@ -633,91 +696,144 @@ export default function SessionDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div ref={videoContainerRef} className={`aspect-video bg-muted rounded-lg overflow-hidden relative ${isFullscreen ? "rounded-none" : ""}`}>
-                {/* Live WebRTC video (shown when stream is active) */}
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={`w-full h-full object-cover ${hasRemoteStream && !sessionEnded ? "" : "hidden"}`}
-                />
-                {/* Snapshot fallback (shown when no live stream and session not ended) */}
-                {!hasRemoteStream && !sessionEnded && (
-                  <>
-                    {screenshots.length > 0 ? (
-                      <img
-                        src={screenshots[0].url}
-                        alt="Latest snapshot"
-                        className="w-full h-full object-cover cursor-pointer"
-                        onClick={() => setPreviewImage(screenshots[0])}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                      />
-                    ) : (
+              <div ref={videoContainerRef} className={`${session.examEnableScreenMonitoring ? "grid grid-cols-2 gap-2" : ""} ${isFullscreen ? "" : ""}`}>
+                {/* Webcam feed */}
+                <div className={`aspect-video bg-muted rounded-lg overflow-hidden relative ${isFullscreen ? "rounded-none" : ""}`}>
+                  {/* Live WebRTC video (shown when stream is active) */}
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className={`w-full h-full object-cover ${hasRemoteStream && !sessionEnded ? "" : "hidden"}`}
+                  />
+                  {/* Snapshot fallback (shown when no live stream and session not ended) */}
+                  {!hasRemoteStream && !sessionEnded && (
+                    <>
+                      {screenshots.length > 0 ? (
+                        <img
+                          src={screenshots[0].url}
+                          alt="Latest snapshot"
+                          className="w-full h-full object-cover cursor-pointer"
+                          onClick={() => setPreviewImage(screenshots[0])}
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                          <Camera className="h-12 w-12 mb-2 opacity-30" />
+                          <p className="text-sm">
+                            {session.status === "Active" ? t("proctor.waitingForVideo") : t("proctor.noSnapshotsCapt")}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Session-Ended Overlay */}
+                  {sessionEnded && (
+                    <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-300">
+                      {sessionEnded.reason === "Submitted" && <CheckCircle2Icon className="h-14 w-14 mb-3 text-emerald-400" />}
+                      {sessionEnded.reason === "Expired" && <Clock className="h-14 w-14 mb-3 text-amber-400" />}
+                      {sessionEnded.reason === "Terminated" && <XCircle className="h-14 w-14 mb-3 text-red-400" />}
+                      <h3 className="text-xl font-semibold mb-1">
+                        {sessionEnded.reason === "Submitted" ? t("proctor.examSubmitted") :
+                         sessionEnded.reason === "Expired" ? t("proctor.examExpired") :
+                         t("proctor.sessionTerminatedTitle")}
+                      </h3>
+                      <p className="text-sm text-white/70 mb-4">{t("proctor.liveStreamEnded")}</p>
+                      {session.attemptId && (
+                        <Button variant="secondary" size="sm" asChild>
+                          <Link href={`/results/ai-report/${session.examId}/${session.candidateId}`}>
+                            <Play className="h-3.5 w-3.5 me-1.5" />
+                            {t("proctor.viewAiReport")}
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Overlay badges */}
+                  <div className="absolute bottom-4 end-4 flex items-center gap-2 z-20">
+                    {screenshots.length > 0 && !sessionEnded && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
+                        <Camera className="h-4 w-4" />
+                        {screenshots.length} {t("proctor.snapshotsLabel")}
+                      </div>
+                    )}
+                    {hasRemoteStream && !sessionEnded && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/90 text-white text-sm">
+                        <Video className="h-4 w-4" />
+                        LIVE
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Label for webcam when in split view */}
+                  {session.examEnableScreenMonitoring && (
+                    <div className="absolute top-3 start-3 px-2 py-1 rounded bg-black/60 text-white text-xs z-20 flex items-center gap-1">
+                      <Camera className="h-3 w-3" /> {t("proctor.webcamLabel")}
+                    </div>
+                  )}
+
+                  {/* Fullscreen toggle */}
+                  <button
+                    onClick={async () => {
+                      if (!videoContainerRef.current) return
+                      if (document.fullscreenElement) {
+                        await document.exitFullscreen()
+                      } else {
+                        await videoContainerRef.current.requestFullscreen()
+                      }
+                    }}
+                    className="absolute top-3 end-3 p-1.5 rounded bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
+                    title={t("proctor.toggleFullscreen")}
+                  >
+                    {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
+                </div>
+
+                {/* Screen share feed (only when screen monitoring enabled) */}
+                {session.examEnableScreenMonitoring && (
+                  <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
+                    <video
+                      ref={(el) => {
+                        screenVideoRef.current = el
+                        if (el && screenStreamRef.current && el.srcObject !== screenStreamRef.current) {
+                          el.srcObject = screenStreamRef.current
+                          el.play().catch(() => {})
+                        }
+                      }}
+                      autoPlay
+                      playsInline
+                      muted
+                      className={`w-full h-full object-contain ${hasScreenStream && !sessionEnded ? "" : "hidden"}`}
+                    />
+                    {!hasScreenStream && !sessionEnded && (
                       <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
-                        <Camera className="h-12 w-12 mb-2 opacity-30" />
+                        <Monitor className="h-12 w-12 mb-2 opacity-30" />
                         <p className="text-sm">
-                          {session.status === "Active" ? "Waiting for candidate video…" : "No snapshots captured"}
+                          {session.status === "Active" ? t("proctor.waitingForScreen") : t("proctor.noScreenShare")}
                         </p>
                       </div>
                     )}
-                  </>
-                )}
-
-                {/* Session-Ended Overlay */}
-                {sessionEnded && (
-                  <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-300">
-                    {sessionEnded.reason === "Submitted" && <CheckCircle2Icon className="h-14 w-14 mb-3 text-emerald-400" />}
-                    {sessionEnded.reason === "Expired" && <Clock className="h-14 w-14 mb-3 text-amber-400" />}
-                    {sessionEnded.reason === "Terminated" && <XCircle className="h-14 w-14 mb-3 text-red-400" />}
-                    <h3 className="text-xl font-semibold mb-1">
-                      {sessionEnded.reason === "Submitted" ? "Exam Submitted" :
-                       sessionEnded.reason === "Expired" ? "Exam Expired" :
-                       "Session Terminated"}
-                    </h3>
-                    <p className="text-sm text-white/70 mb-4">The live video stream has ended</p>
-                    {session.attemptId && (
-                      <Button variant="secondary" size="sm" asChild>
-                        <Link href={`/results/ai-report/${session.examId}/${session.candidateId}`}>
-                          <Play className="h-3.5 w-3.5 me-1.5" />
-                          View AI Report
-                        </Link>
-                      </Button>
+                    {sessionEnded && (
+                      <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-10">
+                        <Monitor className="h-10 w-10 mb-2 opacity-50" />
+                        <p className="text-sm text-white/70">{t("proctor.streamEnded")}</p>
+                      </div>
+                    )}
+                    {/* Label */}
+                    <div className="absolute top-3 start-3 px-2 py-1 rounded bg-black/60 text-white text-xs z-20 flex items-center gap-1">
+                      <Monitor className="h-3 w-3" /> {t("proctor.screenLabel")}
+                    </div>
+                    {hasScreenStream && !sessionEnded && (
+                      <div className="absolute bottom-4 end-4 flex items-center gap-2 px-3 py-1.5 rounded bg-purple-600/90 text-white text-sm z-20">
+                        <Monitor className="h-4 w-4" />
+                        LIVE
+                      </div>
                     )}
                   </div>
                 )}
-
-                {/* Overlay badges */}
-                <div className="absolute bottom-4 end-4 flex items-center gap-2 z-20">
-                  {screenshots.length > 0 && !sessionEnded && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-sm">
-                      <Camera className="h-4 w-4" />
-                      {screenshots.length} snapshots
-                    </div>
-                  )}
-                  {hasRemoteStream && !sessionEnded && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/90 text-white text-sm">
-                      <Video className="h-4 w-4" />
-                      LIVE
-                    </div>
-                  )}
-                </div>
-
-                {/* Fullscreen toggle */}
-                <button
-                  onClick={async () => {
-                    if (!videoContainerRef.current) return
-                    if (document.fullscreenElement) {
-                      await document.exitFullscreen()
-                    } else {
-                      await videoContainerRef.current.requestFullscreen()
-                    }
-                  }}
-                  className="absolute top-3 end-3 p-1.5 rounded bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
-                  title="Toggle fullscreen"
-                >
-                  {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </button>
               </div>
             </CardContent>
           </Card>
@@ -736,7 +852,7 @@ export default function SessionDetailPage() {
               {screenshots.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground text-sm">
                   <Camera className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  No screenshots available yet
+                  {t("proctor.noSnapshotsCapt")}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -777,7 +893,7 @@ export default function SessionDetailPage() {
                   Events Log
                   {events.filter(e => isViolationEvent(e.eventType)).length > 0 && (
                     <Badge variant="destructive" className="ms-1">
-                      {events.filter(e => isViolationEvent(e.eventType)).length} violations
+                      {events.filter(e => isViolationEvent(e.eventType)).length} {t("proctor.violationsOnly").toLowerCase()}
                     </Badge>
                   )}
                 </CardTitle>
@@ -786,12 +902,12 @@ export default function SessionDetailPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="violations">Violations Only</SelectItem>
-                    <SelectItem value="all">All Events</SelectItem>
+                    <SelectItem value="violations">{t("proctor.violationsOnly")}</SelectItem>
+                    <SelectItem value="all">{t("proctor.allEvents")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <CardDescription>Real-time activity from candidate's exam session</CardDescription>
+              <CardDescription>{t("proctor.realTimeActivity")}</CardDescription>
             </CardHeader>
             <CardContent>
               {(() => {
@@ -802,41 +918,42 @@ export default function SessionDetailPage() {
                   return (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       <Shield className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                      {eventsFilter === "violations" ? "No violations detected" : "No events recorded yet"}
+                      {eventsFilter === "violations" ? t("proctor.noViolationsDetected") : t("proctor.noEventsRecorded")}
                     </div>
                   )
                 }
                 return (
                   <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
                     {filteredEvents.map((event) => {
-                      const severity = getEventSeverity(event.eventType)
+                      const severity = getEventSeverity(event.eventType, locale)
+                      const severityKey = getEventSeverity(event.eventType)
                       const isViolation = isViolationEvent(event.eventType)
                       return (
                         <div
                           key={event.id}
                           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm border ${
-                            severity === "Critical" ? "bg-destructive/5 border-destructive/20" :
-                            severity === "High" ? "bg-orange-500/5 border-orange-500/20" :
-                            severity === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
+                            severityKey === "Critical" ? "bg-destructive/5 border-destructive/20" :
+                            severityKey === "High" ? "bg-orange-500/5 border-orange-500/20" :
+                            severityKey === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
                             isViolation ? "bg-blue-500/5 border-blue-500/20" :
                             "bg-muted/30 border-transparent"
                           }`}
                         >
                           <div className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                            severity === "Critical" ? "bg-destructive" :
-                            severity === "High" ? "bg-orange-500" :
-                            severity === "Medium" ? "bg-amber-500" :
+                            severityKey === "Critical" ? "bg-destructive" :
+                            severityKey === "High" ? "bg-orange-500" :
+                            severityKey === "Medium" ? "bg-amber-500" :
                             isViolation ? "bg-blue-500" :
                             "bg-muted-foreground"
                           }`} />
                           <div className="flex-1 min-w-0">
-                            <span className="font-medium">{event.eventTypeName || getEventTypeName(event.eventType)}</span>
+                            <span className="font-medium">{getEventTypeName(event.eventType, locale)}</span>
                             {(() => {
                               if (!event.metadataJson) return null
                               try {
                                 const meta = JSON.parse(event.metadataJson)
                                 if (meta.source === "smart_monitoring" && meta.detail) {
-                                  return <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{meta.detail}</p>
+                                  return <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{translateServerMessage(meta.detail, locale)}</p>
                                 }
                               } catch {}
                               return null
@@ -844,16 +961,16 @@ export default function SessionDetailPage() {
                           </div>
                           {isViolation && (
                             <Badge variant="outline" className={`text-xs flex-shrink-0 ${
-                              severity === "Critical" ? "border-destructive/50 text-destructive" :
-                              severity === "High" ? "border-orange-500/50 text-orange-600" :
-                              severity === "Medium" ? "border-amber-500/50 text-amber-600" :
+                              severityKey === "Critical" ? "border-destructive/50 text-destructive" :
+                              severityKey === "High" ? "border-orange-500/50 text-orange-600" :
+                              severityKey === "Medium" ? "border-amber-500/50 text-amber-600" :
                               "border-blue-500/50 text-blue-600"
                             }`}>
                               {severity}
                             </Badge>
                           )}
                           <span className="text-xs text-muted-foreground flex-shrink-0 tabular-nums">
-                            {new Date(event.occurredAt).toLocaleTimeString()}
+                            {new Date(event.occurredAt).toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" })}
                           </span>
                         </div>
                       )
@@ -882,13 +999,13 @@ export default function SessionDetailPage() {
               </div>
               {session.endedAt && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ended At</span>
+                  <span className="text-muted-foreground">{t("proctor.endedAt")}</span>
                   <span className="font-medium">{formatDateTime(session.endedAt)}</span>
                 </div>
               )}
               {session.sessionDuration && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Duration</span>
+                  <span className="text-muted-foreground">{t("proctor.durationLabel")}</span>
                   <span className="font-medium">{session.sessionDuration}</span>
                 </div>
               )}
@@ -902,7 +1019,7 @@ export default function SessionDetailPage() {
               </div>
               {session.attemptStatus && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Attempt Status</span>
+                  <span className="text-muted-foreground">{t("proctor.attemptStatus")}</span>
                   <Badge variant={
                     session.attemptStatus === "Terminated" ? "destructive" :
                     session.attemptStatus === "Expired" ? "secondary" :
@@ -913,13 +1030,13 @@ export default function SessionDetailPage() {
               )}
               {session.attemptNumber != null && session.attemptNumber > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Attempt #</span>
+                  <span className="text-muted-foreground">{t("proctor.attemptNum")}</span>
                   <span className="font-medium">{session.attemptNumber}{session.examMaxAttempts ? ` / ${session.examMaxAttempts}` : ""}</span>
                 </div>
               )}
               {session.riskLevel && session.riskLevel !== "Unknown" && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Risk Level</span>
+                  <span className="text-muted-foreground">{t("proctor.riskLevel")}</span>
                   <Badge variant="outline" className={
                     session.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
                     session.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
@@ -930,7 +1047,7 @@ export default function SessionDetailPage() {
               )}
               {session.terminationReason && (
                 <div className="flex justify-between items-start">
-                  <span className="text-muted-foreground">Termination Reason</span>
+                  <span className="text-muted-foreground">{t("proctor.terminationReason")}</span>
                   <span className="font-medium text-destructive text-xs text-end max-w-[60%]">{session.terminationReason}</span>
                 </div>
               )}
@@ -943,7 +1060,7 @@ export default function SessionDetailPage() {
               </div>
               {session.heartbeatMissedCount != null && session.heartbeatMissedCount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Missed Heartbeats</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.missedHeartbeats")}</span>
                   <Badge variant="outline" className="bg-amber-500/10 border-amber-500/30 text-amber-600 text-xs">
                     {session.heartbeatMissedCount}
                   </Badge>
@@ -955,10 +1072,10 @@ export default function SessionDetailPage() {
                 <div className="pt-3 border-t space-y-2">
                   <p className="text-xs font-medium flex items-center gap-1.5">
                     <Shield className="h-3.5 w-3.5" />
-                    Proctor Decision
+                    {t("proctor.proctorDecision")}
                   </p>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Status</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.statusLabel")}</span>
                     <Badge variant={
                       session.decision.statusName === "Approved" ? "default" :
                       session.decision.statusName === "Invalidated" ? "destructive" :
@@ -968,13 +1085,13 @@ export default function SessionDetailPage() {
                   </div>
                   {session.decision.deciderName && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Decided By</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.decidedBy")}</span>
                       <span className="text-xs font-medium">{session.decision.deciderName}</span>
                     </div>
                   )}
                   {session.decision.decidedAt && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Decided At</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.decidedAt")}</span>
                       <span className="text-xs">{formatDateTime(session.decision.decidedAt)}</span>
                     </div>
                   )}
@@ -982,7 +1099,7 @@ export default function SessionDetailPage() {
                     <p className="text-xs text-muted-foreground bg-muted/50 rounded p-1.5">{session.decision.decisionReasonEn}</p>
                   )}
                   {session.decision.wasOverridden && (
-                    <Badge variant="outline" className="text-[10px] bg-amber-500/10 border-amber-500/30 text-amber-600">Overridden</Badge>
+                    <Badge variant="outline" className="text-[10px] bg-amber-500/10 border-amber-500/30 text-amber-600">{t("proctor.overridden")}</Badge>
                   )}
                 </div>
               )}
@@ -992,35 +1109,35 @@ export default function SessionDetailPage() {
                 <div className="pt-3 border-t space-y-2">
                   <p className="text-xs font-medium flex items-center gap-1.5">
                     <Monitor className="h-3.5 w-3.5" />
-                    Device & Browser
+                    {t("proctor.deviceBrowser")}
                   </p>
                   {session.browserName && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Browser</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.browser")}</span>
                       <span className="text-xs font-medium">{session.browserName}{session.browserVersion ? ` ${session.browserVersion}` : ""}</span>
                     </div>
                   )}
                   {session.operatingSystem && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">OS</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.os")}</span>
                       <span className="text-xs font-medium">{session.operatingSystem}</span>
                     </div>
                   )}
                   {session.screenResolution && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Screen</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.screenRes")}</span>
                       <span className="text-xs font-medium">{session.screenResolution}</span>
                     </div>
                   )}
                   {(session.ipAddress || session.attemptIpAddress) && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs flex items-center gap-1"><Globe className="h-3 w-3" />IP</span>
+                      <span className="text-muted-foreground text-xs flex items-center gap-1"><Globe className="h-3 w-3" />{t("proctor.ip")}</span>
                       <span className="text-xs font-medium">{session.ipAddress || session.attemptIpAddress}</span>
                     </div>
                   )}
                   {session.attemptDeviceInfo && (
                     <div className="flex justify-between items-start">
-                      <span className="text-muted-foreground text-xs">Device</span>
+                      <span className="text-muted-foreground text-xs">{t("proctor.device")}</span>
                       <span className="text-xs font-medium text-end max-w-[60%]">{session.attemptDeviceInfo}</span>
                     </div>
                   )}
@@ -1034,7 +1151,7 @@ export default function SessionDetailPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Zap className="h-4 w-4 text-destructive" />
-                Violations
+                {t("proctor.violationsOnly")}
                 {session.countableViolationCount != null && session.countableViolationCount > 0 && (
                   <Badge variant="destructive" className="ms-auto">
                     {session.countableViolationCount}{session.maxViolationWarnings ? `/${session.maxViolationWarnings}` : ""}
@@ -1043,25 +1160,25 @@ export default function SessionDetailPage() {
               </CardTitle>
               <CardDescription className="text-xs">
                 {session.maxViolationWarnings
-                  ? `Auto-termination at ${session.maxViolationWarnings} countable violations`
-                  : "No auto-termination threshold set"}
+                  ? t("proctor.autoTerminationAt", { count: String(session.maxViolationWarnings) })
+                  : t("proctor.noAutoTermination")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Countable Violations</span>
+                <span className="text-muted-foreground">{t("proctor.countableViolations")}</span>
                 <Badge variant={session.countableViolationCount && session.countableViolationCount > 0 ? "destructive" : "secondary"}>
                   {session.countableViolationCount ?? 0}
                 </Badge>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Violations</span>
+                <span className="text-muted-foreground">{t("proctor.totalViolations")}</span>
                 <Badge variant="secondary">{session.totalViolations ?? 0}</Badge>
               </div>
               {session.maxViolationWarnings != null && session.maxViolationWarnings > 0 && (
                 <div className="pt-2">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Threshold Usage</span>
+                    <span className="text-muted-foreground">{t("proctor.thresholdUsage")}</span>
                     <span className="font-medium">
                       {Math.round(((session.countableViolationCount ?? 0) / session.maxViolationWarnings) * 100)}%
                     </span>
@@ -1087,7 +1204,7 @@ export default function SessionDetailPage() {
                 if (violationEvents.length === 0) return (
                   <div className="text-center py-3 text-muted-foreground text-xs">
                     <Shield className="h-6 w-6 mx-auto mb-1 opacity-30" />
-                    No violations detected
+                    {t("proctor.noViolationsDetected")}
                   </div>
                 )
                 // Group by event type
@@ -1099,7 +1216,7 @@ export default function SessionDetailPage() {
                 }, {})
                 return (
                   <div className="pt-2 border-t space-y-1.5">
-                    <p className="text-xs font-medium mb-1">Violation Breakdown</p>
+                    <p className="text-xs font-medium mb-1">{t("proctor.violationBreakdown")}</p>
                     {Object.values(grouped).sort((a, b) => b.count - a.count).map((group) => (
                       <div key={group.name} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5">
@@ -1126,37 +1243,37 @@ export default function SessionDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  Candidate Profile
+                  {t("proctor.candidateProfile")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 {session.candidateNameAr && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Name (AR)</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.nameAr")}</span>
                     <span className="text-xs font-medium" dir="rtl">{session.candidateNameAr}</span>
                   </div>
                 )}
                 {session.candidateEmail && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Email</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.email")}</span>
                     <span className="text-xs font-medium truncate max-w-[60%]">{session.candidateEmail}</span>
                   </div>
                 )}
                 {session.candidateRollNo && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Roll No</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.rollNo")}</span>
                     <span className="text-xs font-medium">{session.candidateRollNo}</span>
                   </div>
                 )}
                 {session.candidateDepartment && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Department</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.department")}</span>
                     <span className="text-xs font-medium">{session.candidateDepartment}</span>
                   </div>
                 )}
                 {session.candidatePhone && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Phone</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.phone")}</span>
                     <span className="text-xs font-medium">{session.candidatePhone}</span>
                   </div>
                 )}
@@ -1170,55 +1287,58 @@ export default function SessionDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  Exam Details
+                  {t("proctor.examDetails")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 {session.examTitleAr && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Title (AR)</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.titleAr")}</span>
                     <span className="text-xs font-medium" dir="rtl">{session.examTitleAr}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Duration</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.durationLabel")}</span>
                   <span className="text-xs font-medium">{session.examDurationMinutes} min</span>
                 </div>
                 {session.examTotalQuestions != null && session.examTotalQuestions > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Total Questions</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.totalQuestions")}</span>
                     <span className="text-xs font-medium">{session.examTotalQuestions}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Pass Score</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.passScore")}</span>
                   <span className="text-xs font-medium">{session.examPassScore}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Max Attempts</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.maxAttempts")}</span>
                   <span className="text-xs font-medium">{session.examMaxAttempts}</span>
                 </div>
                 {/* Security Settings */}
                 <div className="pt-2 border-t space-y-1.5">
-                  <p className="text-xs font-medium mb-1">Security Settings</p>
+                  <p className="text-xs font-medium mb-1">{t("proctor.securitySettings")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {session.examRequireWebcam && (
-                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Webcam</Badge>
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">{t("proctor.webcam")}</Badge>
                     )}
                     {session.examRequireIdVerification && (
-                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">ID Verification</Badge>
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">{t("proctor.idVerification")}</Badge>
                     )}
                     {session.examRequireFullscreen && (
-                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Fullscreen</Badge>
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">{t("proctor.fullscreen")}</Badge>
                     )}
                     {session.examPreventCopyPaste && (
-                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">No Copy/Paste</Badge>
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">{t("proctor.noCopyPaste")}</Badge>
                     )}
                     {session.examBrowserLockdown && (
-                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">Browser Lock</Badge>
+                      <Badge variant="outline" className="text-[10px] h-5 bg-blue-500/5 border-blue-500/20 text-blue-600">{t("proctor.browserLock")}</Badge>
                     )}
-                    {!session.examRequireWebcam && !session.examRequireIdVerification && !session.examRequireFullscreen && !session.examPreventCopyPaste && !session.examBrowserLockdown && (
-                      <span className="text-xs text-muted-foreground">No security requirements</span>
+                    {session.examEnableScreenMonitoring && (
+                      <Badge variant="outline" className="text-[10px] h-5 bg-purple-500/5 border-purple-500/20 text-purple-600">{t("proctor.screenMonitor")}</Badge>
+                    )}
+                    {!session.examRequireWebcam && !session.examRequireIdVerification && !session.examRequireFullscreen && !session.examPreventCopyPaste && !session.examBrowserLockdown && !session.examEnableScreenMonitoring && (
+                      <span className="text-xs text-muted-foreground">{t("proctor.noSecurityReq")}</span>
                     )}
                   </div>
                 </div>
@@ -1232,12 +1352,12 @@ export default function SessionDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Activity className="h-4 w-4" />
-                  Attempt Progress
+                  {t("proctor.attemptProgress")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Questions Answered</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.questionsAnswered")}</span>
                   <span className="text-xs font-medium">
                     {session.attemptTotalAnswered ?? 0} / {session.attemptTotalQuestions}
                   </span>
@@ -1250,29 +1370,29 @@ export default function SessionDetailPage() {
                   />
                 </div>
                 <div className="flex justify-between text-[10px] text-muted-foreground">
-                  <span>Completion</span>
+                  <span>{t("proctor.completion")}</span>
                   <span>{Math.round(((session.attemptTotalAnswered ?? 0) / session.attemptTotalQuestions) * 100)}%</span>
                 </div>
                 {session.attemptTotalScore != null && (
                   <div className="flex justify-between pt-1 border-t">
-                    <span className="text-muted-foreground text-xs">Score</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.scoreLabel")}</span>
                     <span className={`text-xs font-bold ${session.attemptIsPassed ? "text-emerald-600" : session.attemptIsPassed === false ? "text-destructive" : ""}`}>
                       {session.attemptTotalScore}
                       {session.attemptIsPassed != null && (
-                        <span className="ms-1">{session.attemptIsPassed ? "✓ Passed" : "✗ Failed"}</span>
+                        <span className="ms-1">{session.attemptIsPassed ? t("proctor.passed") : t("proctor.failed")}</span>
                       )}
                     </span>
                   </div>
                 )}
                 {session.attemptExtraTimeSeconds != null && session.attemptExtraTimeSeconds > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Extra Time Added</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.extraTimeAdded")}</span>
                     <span className="text-xs font-medium text-amber-600">+{Math.ceil(session.attemptExtraTimeSeconds / 60)} min</span>
                   </div>
                 )}
                 {session.attemptSubmittedAt && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Submitted At</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.submittedAt")}</span>
                     <span className="text-xs">{formatDateTime(session.attemptSubmittedAt)}</span>
                   </div>
                 )}
@@ -1290,7 +1410,7 @@ export default function SessionDetailPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  Identity Verification
+                  {t("proctor.identityVerificationTitle")}
                   <Badge variant="outline" className={`ms-auto text-[10px] ${
                     session.identityVerification.status === "Approved" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600" :
                     session.identityVerification.status === "Rejected" ? "bg-destructive/10 border-destructive/30 text-destructive" :
@@ -1301,7 +1421,7 @@ export default function SessionDetailPage() {
               <CardContent className="space-y-2 text-sm">
                 {session.identityVerification.faceMatchScore != null && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Face Match Score</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.faceMatchScore")}</span>
                     <span className={`text-xs font-bold ${
                       session.identityVerification.faceMatchScore >= 80 ? "text-emerald-600" :
                       session.identityVerification.faceMatchScore >= 50 ? "text-amber-600" :
@@ -1311,23 +1431,23 @@ export default function SessionDetailPage() {
                 )}
                 {session.identityVerification.livenessResult && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Liveness</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.liveness")}</span>
                     <Badge variant="outline" className="text-[10px] h-5">{session.identityVerification.livenessResult}</Badge>
                   </div>
                 )}
                 {session.identityVerification.idDocumentType && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Document Type</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.documentType")}</span>
                     <span className="text-xs font-medium">{session.identityVerification.idDocumentType}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Document Uploaded</span>
-                  <span className="text-xs">{session.identityVerification.idDocumentUploaded ? "✓ Yes" : "✗ No"}</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.documentUploaded")}</span>
+                  <span className="text-xs">{session.identityVerification.idDocumentUploaded ? t("proctor.yesLabel") : t("proctor.noLabel")}</span>
                 </div>
                 {session.identityVerification.riskScore != null && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground text-xs">Verification Risk</span>
+                    <span className="text-muted-foreground text-xs">{t("proctor.verificationRisk")}</span>
                     <Badge variant="outline" className={`text-[10px] h-5 ${
                       session.identityVerification.riskScore <= 20 ? "text-emerald-600 border-emerald-500/30" :
                       session.identityVerification.riskScore <= 50 ? "text-amber-600 border-amber-500/30" :
@@ -1336,7 +1456,7 @@ export default function SessionDetailPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground text-xs">Submitted</span>
+                  <span className="text-muted-foreground text-xs">{t("proctor.submitted")}</span>
                   <span className="text-xs">{formatDateTime(session.identityVerification.submittedAt)}</span>
                 </div>
                 {session.identityVerification.reviewNotes && (
@@ -1351,19 +1471,19 @@ export default function SessionDetailPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Brain className="h-4 w-4 text-purple-500" />
-                AI Proctor Report
+                {t("proctor.aiProctorReport")}
                 <Badge variant="outline" className="ms-auto bg-purple-500/10 border-purple-500/30 text-purple-600 text-[10px]">
                   <Sparkles className="h-3 w-3 me-1" />
                   GPT-4o
                 </Badge>
               </CardTitle>
-              <CardDescription className="text-xs">AI-powered risk analysis — advisory only</CardDescription>
+              <CardDescription className="text-xs">{t("proctor.aiPoweredAdvisory")}</CardDescription>
             </CardHeader>
             <CardContent>
               {!aiAnalysis && !aiAnalysisLoading && (
                 <div className="text-center py-4">
                   <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500/30" />
-                  <p className="text-xs text-muted-foreground mb-3">Generate an AI-powered analysis of this session's risk and behavior patterns</p>
+                  <p className="text-xs text-muted-foreground mb-3">{t("proctor.generateAiDesc")}</p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -1371,7 +1491,7 @@ export default function SessionDetailPage() {
                     className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
                   >
                     <Sparkles className="h-3.5 w-3.5 me-1.5" />
-                    Generate AI Analysis
+                    {t("proctor.generateAiAnalysis")}
                   </Button>
                   {aiAnalysisError && (
                     <p className="text-xs text-destructive mt-2">{aiAnalysisError}</p>
@@ -1382,7 +1502,7 @@ export default function SessionDetailPage() {
               {aiAnalysisLoading && (
                 <div className="text-center py-6">
                   <Loader2 className="h-6 w-6 mx-auto mb-2 text-purple-500 animate-spin" />
-                  <p className="text-xs text-muted-foreground">Analyzing session with AI...</p>
+                  <p className="text-xs text-muted-foreground">{t("proctor.analyzingSession")}</p>
                 </div>
               )}
 
@@ -1397,14 +1517,14 @@ export default function SessionDetailPage() {
 
                   {/* Risk Level & Risk Score */}
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Risk Level</span>
+                    <span className="text-xs text-muted-foreground">{t("proctor.riskLevel")}</span>
                     <Badge variant="outline" className={
                       aiAnalysis.riskLevel === "Critical" ? "bg-destructive/10 border-destructive/30 text-destructive" :
                       aiAnalysis.riskLevel === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-600" :
                       aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
                       "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
                     }>
-                      {aiAnalysis.riskLevel}
+                      {translateSeverity(aiAnalysis.riskLevel, locale)}
                     </Badge>
                   </div>
 
@@ -1413,31 +1533,31 @@ export default function SessionDetailPage() {
                     {aiAnalysis.riskScore != null && (
                       <div className="p-2 rounded-md bg-muted/50 text-center">
                         <p className="text-lg font-bold">{aiAnalysis.riskScore}<span className="text-xs font-normal text-muted-foreground">/100</span></p>
-                        <p className="text-[10px] text-muted-foreground">Risk Score</p>
+                        <p className="text-[10px] text-muted-foreground">{locale === "ar" ? "درجة المخاطرة" : "Risk Score"}</p>
                       </div>
                     )}
                     <div className="p-2 rounded-md bg-muted/50 text-center">
                       <p className="text-lg font-bold">{aiAnalysis.confidence}<span className="text-xs font-normal text-muted-foreground">%</span></p>
-                      <p className="text-[10px] text-muted-foreground">Confidence</p>
+                      <p className="text-[10px] text-muted-foreground">{locale === "ar" ? "الثقة" : "Confidence"}</p>
                     </div>
                   </div>
 
                   {/* Risk Explanation */}
                   <div className="pt-2 border-t">
-                    <p className="text-xs font-medium mb-1">Risk Explanation</p>
+                    <p className="text-xs font-medium mb-1">{t("proctor.riskExplanation")}</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">{aiAnalysis.riskExplanation}</p>
                   </div>
 
                   {/* Candidate Profile */}
                   {aiAnalysis.candidateProfile && (
                     <details className="pt-2 border-t">
-                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Candidate Profile</summary>
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.candidateProfile")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.candidateProfile.name && <p><span className="font-medium text-foreground">Name:</span> {aiAnalysis.candidateProfile.name}</p>}
-                        {aiAnalysis.candidateProfile.department && <p><span className="font-medium text-foreground">Dept:</span> {aiAnalysis.candidateProfile.department}</p>}
-                        {aiAnalysis.candidateProfile.identityVerificationStatus && <p><span className="font-medium text-foreground">ID Status:</span> {aiAnalysis.candidateProfile.identityVerificationStatus}</p>}
-                        {aiAnalysis.candidateProfile.deviceSummary && <p><span className="font-medium text-foreground">Device:</span> {aiAnalysis.candidateProfile.deviceSummary}</p>}
-                        {aiAnalysis.candidateProfile.networkSummary && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.candidateProfile.networkSummary}</p>}
+                        {aiAnalysis.candidateProfile.name && <p><span className="font-medium text-foreground">{locale === "ar" ? "الاسم:" : "Name:"}</span> {aiAnalysis.candidateProfile.name}</p>}
+                        {aiAnalysis.candidateProfile.department && <p><span className="font-medium text-foreground">{locale === "ar" ? "القسم:" : "Dept:"}</span> {aiAnalysis.candidateProfile.department}</p>}
+                        {aiAnalysis.candidateProfile.identityVerificationStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "حالة التحقق:" : "ID Status:"}</span> {aiAnalysis.candidateProfile.identityVerificationStatus}</p>}
+                        {aiAnalysis.candidateProfile.deviceSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "الجهاز:" : "Device:"}</span> {aiAnalysis.candidateProfile.deviceSummary}</p>}
+                        {aiAnalysis.candidateProfile.networkSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "الشبكة:" : "Network:"}</span> {aiAnalysis.candidateProfile.networkSummary}</p>}
                       </div>
                     </details>
                   )}
@@ -1445,16 +1565,16 @@ export default function SessionDetailPage() {
                   {/* Session Overview */}
                   {aiAnalysis.sessionOverview && (
                     <details className="pt-2 border-t">
-                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Session Overview</summary>
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.sessionOverview")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.sessionOverview.examTitle && <p><span className="font-medium text-foreground">Exam:</span> {aiAnalysis.sessionOverview.examTitle}</p>}
-                        {aiAnalysis.sessionOverview.duration && <p><span className="font-medium text-foreground">Duration:</span> {aiAnalysis.sessionOverview.duration}</p>}
-                        {aiAnalysis.sessionOverview.timeUsage && <p><span className="font-medium text-foreground">Time Usage:</span> {aiAnalysis.sessionOverview.timeUsage}</p>}
-                        {aiAnalysis.sessionOverview.completionRate && <p><span className="font-medium text-foreground">Completion:</span> {aiAnalysis.sessionOverview.completionRate}</p>}
-                        {aiAnalysis.sessionOverview.attemptStatus && <p><span className="font-medium text-foreground">Status:</span> {aiAnalysis.sessionOverview.attemptStatus}</p>}
-                        {aiAnalysis.sessionOverview.proctorMode && <p><span className="font-medium text-foreground">Proctor Mode:</span> {aiAnalysis.sessionOverview.proctorMode}</p>}
+                        {aiAnalysis.sessionOverview.examTitle && <p><span className="font-medium text-foreground">{locale === "ar" ? "الاختبار:" : "Exam:"}</span> {aiAnalysis.sessionOverview.examTitle}</p>}
+                        {aiAnalysis.sessionOverview.duration && <p><span className="font-medium text-foreground">{locale === "ar" ? "المدة:" : "Duration:"}</span> {aiAnalysis.sessionOverview.duration}</p>}
+                        {aiAnalysis.sessionOverview.timeUsage && <p><span className="font-medium text-foreground">{locale === "ar" ? "استخدام الوقت:" : "Time Usage:"}</span> {aiAnalysis.sessionOverview.timeUsage}</p>}
+                        {aiAnalysis.sessionOverview.completionRate && <p><span className="font-medium text-foreground">{locale === "ar" ? "معدل الإنجاز:" : "Completion:"}</span> {aiAnalysis.sessionOverview.completionRate}</p>}
+                        {aiAnalysis.sessionOverview.attemptStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "الحالة:" : "Status:"}</span> {aiAnalysis.sessionOverview.attemptStatus}</p>}
+                        {aiAnalysis.sessionOverview.proctorMode && <p><span className="font-medium text-foreground">{locale === "ar" ? "وضع المراقبة:" : "Proctor Mode:"}</span> {aiAnalysis.sessionOverview.proctorMode}</p>}
                         {aiAnalysis.sessionOverview.terminationInfo && aiAnalysis.sessionOverview.terminationInfo !== "N/A" && (
-                          <p className="text-destructive"><span className="font-medium">Termination:</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
+                          <p className="text-destructive"><span className="font-medium">{locale === "ar" ? "الإنهاء:" : "Termination:"}</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
                         )}
                       </div>
                     </details>
@@ -1464,7 +1584,7 @@ export default function SessionDetailPage() {
                   {aiAnalysis.violationAnalysis && (
                     <details className="pt-2 border-t">
                       <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">
-                        Violation Analysis
+                        {t("proctor.violationAnalysis")}
                         {aiAnalysis.violationAnalysis.totalViolations > 0 && (
                           <Badge variant="outline" className="ms-2 text-[10px] h-4 bg-destructive/10 border-destructive/30 text-destructive">
                             {aiAnalysis.violationAnalysis.totalViolations}
@@ -1473,18 +1593,18 @@ export default function SessionDetailPage() {
                       </summary>
                       <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
                         {aiAnalysis.violationAnalysis.thresholdStatus && (
-                          <p><span className="font-medium text-foreground">Threshold:</span> {aiAnalysis.violationAnalysis.thresholdStatus}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "حالة العتبة:" : "Threshold:"}</span> {aiAnalysis.violationAnalysis.thresholdStatus}</p>
                         )}
                         {aiAnalysis.violationAnalysis.violationTrend && (
-                          <p><span className="font-medium text-foreground">Trend:</span> {aiAnalysis.violationAnalysis.violationTrend}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "الاتجاه:" : "Trend:"}</span> {aiAnalysis.violationAnalysis.violationTrend}</p>
                         )}
                         {aiAnalysis.violationAnalysis.violationBreakdown && aiAnalysis.violationAnalysis.violationBreakdown.length > 0 && (
                           <div className="space-y-1 mt-1">
                             {aiAnalysis.violationAnalysis.violationBreakdown.map((v: any, i: number) => (
                               <div key={i} className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                                <span className="text-[11px]">{v.type}</span>
+                                <span className="text-[11px]">{translateViolationType(v.type, locale)}</span>
                                 <div className="flex items-center gap-1.5">
-                                  <Badge variant="outline" className="text-[9px] h-4">{v.severity}</Badge>
+                                  <Badge variant="outline" className="text-[9px] h-4">{translateSeverity(v.severity, locale)}</Badge>
                                   <span className="text-[10px] font-medium">x{v.count}</span>
                                 </div>
                               </div>
@@ -1498,13 +1618,13 @@ export default function SessionDetailPage() {
                   {/* Behavior Analysis */}
                   {aiAnalysis.behaviorAnalysis && (
                     <details className="pt-2 border-t">
-                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Behavior Analysis</summary>
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.behaviorAnalysis")}</summary>
                       <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
-                        {aiAnalysis.behaviorAnalysis.answerPatternSummary && <p><span className="font-medium text-foreground">Answers:</span> {aiAnalysis.behaviorAnalysis.answerPatternSummary}</p>}
-                        {aiAnalysis.behaviorAnalysis.timingAnalysis && <p><span className="font-medium text-foreground">Timing:</span> {aiAnalysis.behaviorAnalysis.timingAnalysis}</p>}
-                        {aiAnalysis.behaviorAnalysis.focusBehavior && <p><span className="font-medium text-foreground">Focus:</span> {aiAnalysis.behaviorAnalysis.focusBehavior}</p>}
-                        {aiAnalysis.behaviorAnalysis.navigationBehavior && <p><span className="font-medium text-foreground">Navigation:</span> {aiAnalysis.behaviorAnalysis.navigationBehavior}</p>}
-                        {aiAnalysis.behaviorAnalysis.suspiciousPatterns && <p className="text-amber-600"><span className="font-medium">Suspicious:</span> {aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>}
+                        {aiAnalysis.behaviorAnalysis.answerPatternSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "أنماط الإجابة:" : "Answers:"}</span> {aiAnalysis.behaviorAnalysis.answerPatternSummary}</p>}
+                        {aiAnalysis.behaviorAnalysis.timingAnalysis && <p><span className="font-medium text-foreground">{locale === "ar" ? "تحليل التوقيت:" : "Timing:"}</span> {aiAnalysis.behaviorAnalysis.timingAnalysis}</p>}
+                        {aiAnalysis.behaviorAnalysis.focusBehavior && <p><span className="font-medium text-foreground">{locale === "ar" ? "سلوك التركيز:" : "Focus:"}</span> {aiAnalysis.behaviorAnalysis.focusBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.navigationBehavior && <p><span className="font-medium text-foreground">{locale === "ar" ? "سلوك التنقل:" : "Navigation:"}</span> {aiAnalysis.behaviorAnalysis.navigationBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.suspiciousPatterns && <p className="text-amber-600"><span className="font-medium">{locale === "ar" ? "أنماط مشبوهة:" : "Suspicious:"}</span> {aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>}
                       </div>
                     </details>
                   )}
@@ -1512,14 +1632,14 @@ export default function SessionDetailPage() {
                   {/* Environment Assessment */}
                   {aiAnalysis.environmentAssessment && (
                     <details className="pt-2 border-t">
-                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Environment Assessment</summary>
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.environmentAssessment")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.environmentAssessment.webcamStatus && <p><span className="font-medium text-foreground">Webcam:</span> {aiAnalysis.environmentAssessment.webcamStatus}</p>}
-                        {aiAnalysis.environmentAssessment.networkStability && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.environmentAssessment.networkStability}</p>}
-                        {aiAnalysis.environmentAssessment.fullscreenCompliance && <p><span className="font-medium text-foreground">Fullscreen:</span> {aiAnalysis.environmentAssessment.fullscreenCompliance}</p>}
-                        {aiAnalysis.environmentAssessment.browserCompliance && <p><span className="font-medium text-foreground">Browser:</span> {aiAnalysis.environmentAssessment.browserCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.webcamStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "الكاميرا:" : "Webcam:"}</span> {aiAnalysis.environmentAssessment.webcamStatus}</p>}
+                        {aiAnalysis.environmentAssessment.networkStability && <p><span className="font-medium text-foreground">{locale === "ar" ? "الشبكة:" : "Network:"}</span> {aiAnalysis.environmentAssessment.networkStability}</p>}
+                        {aiAnalysis.environmentAssessment.fullscreenCompliance && <p><span className="font-medium text-foreground">{locale === "ar" ? "ملء الشاشة:" : "Fullscreen:"}</span> {aiAnalysis.environmentAssessment.fullscreenCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.browserCompliance && <p><span className="font-medium text-foreground">{locale === "ar" ? "المتصفح:" : "Browser:"}</span> {aiAnalysis.environmentAssessment.browserCompliance}</p>}
                         {aiAnalysis.environmentAssessment.overallEnvironmentRisk && (
-                          <p><span className="font-medium text-foreground">Overall Risk:</span> {aiAnalysis.environmentAssessment.overallEnvironmentRisk}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "المخاطر العامة:" : "Overall Risk:"}</span> {aiAnalysis.environmentAssessment.overallEnvironmentRisk}</p>
                         )}
                       </div>
                     </details>
@@ -1528,7 +1648,7 @@ export default function SessionDetailPage() {
                   {/* Suspicious Behaviors */}
                   {aiAnalysis.suspiciousBehaviors && aiAnalysis.suspiciousBehaviors.length > 0 && (
                     <div className="pt-2 border-t">
-                      <p className="text-xs font-medium mb-1.5">Suspicious Behaviors</p>
+                      <p className="text-xs font-medium mb-1.5">{t("proctor.suspiciousBehaviors")}</p>
                       <ul className="space-y-1">
                         {aiAnalysis.suspiciousBehaviors.map((behavior, i) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -1545,7 +1665,7 @@ export default function SessionDetailPage() {
                     <div className="pt-2 border-t grid grid-cols-1 gap-2">
                       {aiAnalysis.aggravatingFactors && aiAnalysis.aggravatingFactors.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-medium text-destructive mb-1">Aggravating Factors</p>
+                          <p className="text-[10px] font-medium text-destructive mb-1">{t("proctor.aggravatingFactors")}</p>
                           <ul className="space-y-0.5">
                             {aiAnalysis.aggravatingFactors.map((f, i) => (
                               <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -1557,7 +1677,7 @@ export default function SessionDetailPage() {
                       )}
                       {aiAnalysis.mitigatingFactors && aiAnalysis.mitigatingFactors.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-medium text-emerald-600 mb-1">Mitigating Factors</p>
+                          <p className="text-[10px] font-medium text-emerald-600 mb-1">{t("proctor.mitigatingFactors")}</p>
                           <ul className="space-y-0.5">
                             {aiAnalysis.mitigatingFactors.map((f, i) => (
                               <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -1572,7 +1692,7 @@ export default function SessionDetailPage() {
 
                   {/* Recommendation */}
                   <div className="pt-2 border-t">
-                    <p className="text-xs font-medium mb-1">Recommendation</p>
+                    <p className="text-xs font-medium mb-1">{t("proctor.recommendation")}</p>
                     <div className="flex items-start gap-1.5 p-2 rounded-md bg-purple-500/5 border border-purple-500/10">
                       <Shield className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-purple-500" />
                       <p className="text-xs text-purple-700 dark:text-purple-300">{aiAnalysis.recommendation}</p>
@@ -1591,7 +1711,7 @@ export default function SessionDetailPage() {
                   {/* Integrity Verdict */}
                   {aiAnalysis.integrityVerdict && (
                     <div className="pt-2 border-t">
-                      <p className="text-xs font-medium mb-1">Integrity Verdict</p>
+                      <p className="text-xs font-medium mb-1">{t("proctor.integrityVerdict")}</p>
                       <p className="text-xs text-muted-foreground leading-relaxed italic">{aiAnalysis.integrityVerdict}</p>
                     </div>
                   )}
@@ -1599,7 +1719,7 @@ export default function SessionDetailPage() {
                   {/* Risk Timeline */}
                   {aiAnalysis.riskTimeline && aiAnalysis.riskTimeline.length > 0 && (
                     <details className="pt-2 border-t">
-                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">Risk Timeline</summary>
+                      <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.riskTimeline")}</summary>
                       <ul className="mt-1.5 space-y-0.5">
                         {aiAnalysis.riskTimeline.map((evt, i) => (
                           <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1.5">
@@ -1613,7 +1733,7 @@ export default function SessionDetailPage() {
                   {/* Detailed Analysis (collapsible) */}
                   <details className="pt-2 border-t">
                     <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">
-                      Detailed Analysis
+                      {t("proctor.detailedAnalysis")}
                     </summary>
                     <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">{aiAnalysis.detailedAnalysis}</p>
                   </details>
@@ -1621,7 +1741,7 @@ export default function SessionDetailPage() {
                   {/* Regenerate button */}
                   <div className="pt-2 border-t flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">
-                      {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleTimeString() : ""}
+                      {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }) : ""}
                     </span>
                     <Button
                       variant="ghost"
@@ -1630,7 +1750,7 @@ export default function SessionDetailPage() {
                       className="h-7 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-500/10"
                     >
                       <Sparkles className="h-3 w-3 me-1" />
-                      Regenerate
+                      {t("proctor.regenerate")}
                     </Button>
                   </div>
                 </div>
@@ -1645,13 +1765,13 @@ export default function SessionDetailPage() {
                 <AlertTriangle className="h-4 w-4" />
                 {t("proctor.incidents")} ({incidents.length})
               </CardTitle>
-              <CardDescription className="text-xs">Manually created incident cases</CardDescription>
+              <CardDescription className="text-xs">{t("proctor.manuallyCreatedIncidents")}</CardDescription>
             </CardHeader>
             <CardContent>
               {incidents.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground text-sm">
                   <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
-                  No incidents created
+                  {t("proctor.noIncidentsCreated")}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1815,15 +1935,15 @@ export default function SessionDetailPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Add Time to Exam
+              {t("proctor.addTimeTitle")}
             </DialogTitle>
             <DialogDescription>
-              Extend exam time for {session.candidateName}. The candidate will be notified instantly.
+              {t("proctor.addTimeDesc", { name: session.candidateName })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Minutes to Add</Label>
+              <Label>{t("proctor.minutesToAdd")}</Label>
               <div className="flex gap-2">
                 {[5, 10, 15, 30].map((mins) => (
                   <Button
@@ -1846,22 +1966,22 @@ export default function SessionDetailPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Reason (optional)</Label>
+              <Label>{t("proctor.reasonOptional")}</Label>
               <Textarea
                 value={addTimeReason}
                 onChange={(e) => setAddTimeReason(e.target.value)}
-                placeholder="e.g. Technical issue, accommodation request..."
+                placeholder={t("proctor.reasonPlaceholder")}
                 rows={2}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddTimeDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button onClick={handleAddTime} disabled={addTimeLoading || addTimeMinutes <= 0}>
               <Plus className="h-4 w-4 me-2" />
-              {addTimeLoading ? "Adding..." : `Add ${addTimeMinutes} Minutes`}
+              {addTimeLoading ? t("proctor.adding") : t("proctor.addMinutes", { count: String(addTimeMinutes) })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1873,7 +1993,7 @@ export default function SessionDetailPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Camera className="h-5 w-5" />
-              Screenshot Preview
+              {t("proctor.screenshotPreview")}
             </DialogTitle>
             {previewImage?.timestamp && (
               <DialogDescription>{formatDateTime(previewImage.timestamp)}</DialogDescription>

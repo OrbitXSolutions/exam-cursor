@@ -55,6 +55,7 @@ function formatDateTime(dateStr: string | undefined | null, lang: string): strin
   try {
     const d = new Date(dateStr)
     return d.toLocaleDateString(lang === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric",
       month: "short",
       day: "numeric",

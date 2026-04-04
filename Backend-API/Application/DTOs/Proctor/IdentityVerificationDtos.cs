@@ -57,6 +57,7 @@ public class IdentityVerificationDetailDto
     public IdentityVerificationStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public string? ReviewedBy { get; set; }
+    public string? ReviewedByName { get; set; }
     public DateTime? ReviewedAt { get; set; }
     public string? ReviewNotes { get; set; }
 

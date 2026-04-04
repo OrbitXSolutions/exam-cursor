@@ -394,6 +394,7 @@ export default function CandidatesDataPage() {
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {new Date(c.createdDate).toLocaleDateString(isAr ? "ar-SA" : "en-US", {
+                            timeZone: "Asia/Dubai",
                             year: "numeric", month: "short", day: "numeric",
                           })}
                         </TableCell>

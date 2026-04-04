@@ -69,6 +69,11 @@ interface ProctorSession {
   deviceFingerprint?: string
   attemptIpAddress?: string
   attemptDeviceInfo?: string
+  // Sub-scores from backend risk calculation (null until first risk recalculation)
+  faceScore?: number
+  eyeScore?: number
+  behaviorScore?: number
+  environmentScore?: number
 }
 
 interface AIAnalysis {
@@ -138,6 +143,14 @@ export default function AIReportPage() {
     events: AttemptEvent[],
     sess: ProctorSession,
   ): AIAnalysis {
+    // If backend has already computed and persisted sub-scores, use them directly.
+    // This avoids recalculation and ensures consistency with the risk engine.
+    const backendSubScoresAvailable =
+      sess.faceScore != null &&
+      sess.eyeScore != null &&
+      sess.behaviorScore != null &&
+      sess.environmentScore != null
+
     // Count events per type (eventType is numeric)
     const counts: Record<number, number> = {}
     for (const e of events) {
@@ -146,50 +159,43 @@ export default function AIReportPage() {
     const c = (t: number) => counts[t] || 0
 
     // ── Proportional CameraBlocked penalty ──
-    // Each CameraBlocked event represents ~30s of blocked camera (cooldown period).
-    // Calculate what fraction of the session the camera was blocked to scale penalties.
-    // Without this, a 20s session with 1 event only gets a tiny flat penalty.
     const sessionDurationSec = sess.endedAt
       ? (new Date(sess.endedAt).getTime() - new Date(sess.startedAt).getTime()) / 1000
-      : 300 // default 5 min if session still active
+      : 300
     const effectiveDuration = Math.max(10, sessionDurationSec)
-    const blockedSeconds = c(21) * 30 // each event ≈ 30s blocked (cooldown)
+    const blockedSeconds = c(21) * 30
     const blockedRatio = Math.min(1, blockedSeconds / effectiveDuration)
 
-    // CameraBlocked = most severe: face & eyes are invisible when camera is covered
     const cameraBlockedFacePenalty = Math.round(blockedRatio * 85)
     const cameraBlockedEyePenalty = Math.round(blockedRatio * 80)
     const cameraBlockedEnvPenalty = Math.round(blockedRatio * 50)
 
     // ── Proportional FaceNotDetected penalty ──
-    // Same logic: each FaceNotDetected event ≈ 30s without a visible face
     const faceAbsentSeconds = c(18) * 30
     const faceAbsentRatio = Math.min(1, faceAbsentSeconds / effectiveDuration)
     const faceAbsentPenalty = Math.round(faceAbsentRatio * 70)
 
-    // ── Face Detection Score (100 → 0) ──
-    const faceDetPenalty =
+    // ── Fallback sub-scores (used only when backend hasn't calculated yet) ──
+    const fallbackFaceDetPenalty =
       faceAbsentPenalty + c(19) * 12 + cameraBlockedFacePenalty + c(16) * 25
-    const faceDetectionScore = Math.max(0, Math.min(100, 100 - faceDetPenalty))
+    const fallbackFaceDetectionScore = Math.max(0, Math.min(100, 100 - fallbackFaceDetPenalty))
 
-    // ── Eye Tracking Score (100 → 0) ──
-    // Eye tracking depends on face detection — can't track eyes if face isn't detected
-    const eyePenalty = c(22) * 7 + c(20) * 6 + cameraBlockedEyePenalty
-    const rawEyeTrackingScore = Math.max(0, Math.min(100, 100 - eyePenalty))
-    // Cap eye tracking score to never exceed face detection score
-    const eyeTrackingScore = Math.min(rawEyeTrackingScore, faceDetectionScore)
+    const fallbackEyePenalty = c(22) * 7 + c(20) * 6 + cameraBlockedEyePenalty
+    const fallbackRawEye = Math.max(0, Math.min(100, 100 - fallbackEyePenalty))
+    const fallbackEyeScore = Math.min(fallbackRawEye, fallbackFaceDetectionScore)
 
-    // ── Behavior Score (100 → 0) ──
-    const behaviorPenalty =
-      c(4) * 8 + c(8) * 4 + c(10) * 10 + c(11) * 10 + c(12) * 5
-    const behaviorScore = Math.max(0, Math.min(100, 100 - behaviorPenalty))
+    const fallbackBehaviorPenalty = c(4) * 8 + c(8) * 4 + c(10) * 10 + c(11) * 10 + c(12) * 5
+    const fallbackBehaviorScore = Math.max(0, Math.min(100, 100 - fallbackBehaviorPenalty))
 
-    // ── Environment Score (100 → 0) ──
-    const envPenalty = c(5) * 10 + cameraBlockedEnvPenalty + c(17) * 8
-    // Penalize if device/environment info is missing (IP, browser, OS, screen)
-    const hasDeviceInfo = !!(sess.ipAddress || sess.browserName || sess.operatingSystem || sess.screenResolution)
-    const missingInfoPenalty = hasDeviceInfo ? 0 : 30
-    const environmentScore = Math.max(0, Math.min(100, 100 - envPenalty - missingInfoPenalty))
+    // IMP 1: Remove missingInfoPenalty — device info is now captured reliably at session start
+    const fallbackEnvPenalty = c(5) * 10 + cameraBlockedEnvPenalty + c(17) * 8
+    const fallbackEnvironmentScore = Math.max(0, Math.min(100, 100 - fallbackEnvPenalty))
+
+    // ── Use backend sub-scores when available, otherwise use local fallback ──
+    const faceDetectionScore = backendSubScoresAvailable ? sess.faceScore! : fallbackFaceDetectionScore
+    const eyeTrackingScore   = backendSubScoresAvailable ? sess.eyeScore!  : fallbackEyeScore
+    const behaviorScore      = backendSubScoresAvailable ? sess.behaviorScore! : fallbackBehaviorScore
+    const environmentScore   = backendSubScoresAvailable ? sess.environmentScore! : fallbackEnvironmentScore
 
     // ── Overall Risk Score ──
     // Source of truth: Backend Rule Engine (ProctorSession.RiskScore)
@@ -371,7 +377,7 @@ export default function AIReportPage() {
           // Auto-generate GPT-4o analysis
           try {
             setAiAnalysisLoading(true)
-            const aiResult = await getAiProctorAnalysis(String(selectedSession.id))
+            const aiResult = await getAiProctorAnalysis(String(selectedSession.id), language)
             setAiAnalysis2(aiResult)
           } catch {
             // Silent fail — user can click Regenerate
@@ -422,7 +428,7 @@ export default function AIReportPage() {
     try {
       setAiAnalysisLoading(true)
       setAiAnalysisError(null)
-      const result = await getAiProctorAnalysis(String(session.id))
+      const result = await getAiProctorAnalysis(String(session.id), language)
       setAiAnalysis2(result)
       toast.success(language === "ar" ? "تم إنشاء تحليل الذكاء الاصطناعي" : "AI analysis generated successfully")
     } catch (error: any) {
@@ -1000,7 +1006,7 @@ export default function AIReportPage() {
                   {/* Regenerate */}
                   <div className="pt-2 border-t flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">
-                      {aiAnalysis2.generatedAt ? new Date(aiAnalysis2.generatedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US") : ""}
+                      {aiAnalysis2.generatedAt ? new Date(aiAnalysis2.generatedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" }) : ""}
                     </span>
                     <Button
                       variant="ghost"
@@ -1027,7 +1033,7 @@ export default function AIReportPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">{language === "ar" ? "البداية" : "Started"}</p>
                   <p className="font-medium">
-                    {new Date(session.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                    {new Date(session.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                   </p>
                 </div>
                 <div>
@@ -1037,7 +1043,7 @@ export default function AIReportPage() {
                       const endDate = session.endedAt
                         || attemptEvents.find(e => e.eventType === 6 || e.eventType === 7 || e.eventType === 13)?.occurredAt
                       return endDate
-                        ? new Date(endDate).toLocaleString(language === "ar" ? "ar-SA" : "en-US")
+                        ? new Date(endDate).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })
                         : "—"
                     })()}
                   </p>
@@ -1520,7 +1526,7 @@ export default function AIReportPage() {
                   variant="outline"
                   size="sm"
                   className="border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
-                  onClick={() => window.open(`/proctor-center/recording/${session.attemptId}`, "_blank")}
+                  onClick={() => window.open(`/proctor-center/video/${candidateId}?attemptId=${session.attemptId}`, "_blank")}
                 >
                   <ExternalLink className="h-3.5 w-3.5 me-1.5" />
                   {language === "ar" ? "فتح التسجيل" : "Open Recording"}

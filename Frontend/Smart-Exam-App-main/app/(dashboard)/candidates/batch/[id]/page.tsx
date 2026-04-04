@@ -275,7 +275,7 @@ export default function BatchDetailPage() {
               <Calendar className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">{isAr ? "تاريخ الإنشاء" : "Created"}</p>
-                <p className="font-medium">{new Date(batch.createdDate).toLocaleDateString()}</p>
+                <p className="font-medium">{new Date(batch.createdDate).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" })}</p>
               </div>
             </div>
           </CardContent>
@@ -363,7 +363,7 @@ export default function BatchDetailPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(c.addedAt).toLocaleDateString()}
+                      {new Date(c.addedAt).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" })}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button

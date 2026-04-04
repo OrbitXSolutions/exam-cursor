@@ -190,7 +190,6 @@ function QuestionTypesContent() {
                     <TableHead>{language === "ar" ? "الاسم (إنجليزي)" : "Name (English)"}</TableHead>
                     <TableHead>{language === "ar" ? "الاسم (عربي)" : "Name (Arabic)"}</TableHead>
                     <TableHead>{language === "ar" ? "تاريخ الإنشاء" : "Created Date"}</TableHead>
-                    <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -200,32 +199,7 @@ function QuestionTypesContent() {
                       <TableCell className="font-medium">{type.nameEn}</TableCell>
                       <TableCell dir="rtl">{type.nameAr}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {type.createdDate ? new Date(type.createdDate).toLocaleDateString() : "-"}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(type)}>
-                              <Edit className="me-2 h-4 w-4" />
-                              {language === "ar" ? "تعديل" : "Edit"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => {
-                                setTypeToDelete(type)
-                                setDeleteDialogOpen(true)
-                              }}
-                            >
-                              <Trash2 className="me-2 h-4 w-4" />
-                              {language === "ar" ? "حذف" : "Delete"}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {type.createdDate ? new Date(type.createdDate).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" }) : "-"}
                       </TableCell>
                     </TableRow>
                   ))}

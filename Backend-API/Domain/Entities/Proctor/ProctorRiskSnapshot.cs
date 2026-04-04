@@ -10,26 +10,32 @@ public class ProctorRiskSnapshot : BaseEntity
 {
   public int Id { get; set; }
 
-public int ProctorSessionId { get; set; }
+  public int ProctorSessionId { get; set; }
 
-// Snapshot of computed score
-    public decimal RiskScore { get; set; }
+  // Snapshot of computed score
+  public decimal RiskScore { get; set; }
 
-    // Summary counts at time of snapshot
-    public int TotalEvents { get; set; }
-    public int TotalViolations { get; set; }
+  // Sub-scores at time of calculation
+  public decimal? FaceScore { get; set; }
+  public decimal? EyeScore { get; set; }
+  public decimal? BehaviorScore { get; set; }
+  public decimal? EnvironmentScore { get; set; }
 
-    // Breakdown by event type (JSON)
-    // e.g., { "TabSwitched": 3, "FullscreenExited": 1 }
-    public string? EventBreakdownJson { get; set; }
+  // Summary counts at time of snapshot
+  public int TotalEvents { get; set; }
+  public int TotalViolations { get; set; }
 
-    // Rules that triggered (JSON)
+  // Breakdown by event type (JSON)
+  // e.g., { "TabSwitched": 3, "FullscreenExited": 1 }
+  public string? EventBreakdownJson { get; set; }
+
+  // Rules that triggered (JSON)
   // e.g., [{ "ruleId": 1, "points": 10 }, { "ruleId": 3, "points": 30 }]
-    public string? TriggeredRulesJson { get; set; }
+  public string? TriggeredRulesJson { get; set; }
 
-    public DateTime CalculatedAt { get; set; }
-    public string CalculatedBy { get; set; } = null!;
+  public DateTime CalculatedAt { get; set; }
+  public string CalculatedBy { get; set; } = null!;
 
-    // Navigation Properties
-    public virtual ProctorSession ProctorSession { get; set; } = null!;
+  // Navigation Properties
+  public virtual ProctorSession ProctorSession { get; set; } = null!;
 }

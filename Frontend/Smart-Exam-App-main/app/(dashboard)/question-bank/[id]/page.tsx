@@ -286,7 +286,7 @@ export default function QuestionDetailPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">{language === "ar" ? "تاريخ الإنشاء" : "Created"}</p>
                       <p className="font-medium">
-                        {new Date(question.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
+                        {new Date(question.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                       </p>
                     </div>
                   </div>
@@ -299,7 +299,7 @@ export default function QuestionDetailPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">{language === "ar" ? "آخر تحديث" : "Last Updated"}</p>
                         <p className="font-medium">
-                          {new Date(question.updatedDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
+                          {new Date(question.updatedDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                         </p>
                       </div>
                     </div>

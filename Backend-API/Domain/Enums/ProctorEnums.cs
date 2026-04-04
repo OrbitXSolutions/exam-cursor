@@ -168,7 +168,64 @@ public enum ProctorEventType : byte
    /// <summary>
    /// Session terminated by proctor
    /// </summary>
-   ProctorTerminated = 62
+   ProctorTerminated = 62,
+
+   // Screen monitoring signals (70-79)
+   /// <summary>
+   /// Screen share permission requested from candidate
+   /// </summary>
+   ScreenShareRequested = 70,
+
+   /// <summary>
+   /// Candidate denied screen share permission
+   /// </summary>
+   ScreenShareDenied = 71,
+
+   /// <summary>
+   /// Screen share stream lost unexpectedly
+   /// </summary>
+   ScreenShareLost = 72,
+
+   /// <summary>
+   /// Screen share resumed after loss
+   /// </summary>
+   ScreenShareResumed = 73,
+
+   /// <summary>
+   /// Candidate revoked screen share permission
+   /// </summary>
+   ScreenSharePermissionRevoked = 74,
+
+   /// <summary>
+   /// Screen share track ended (browser stop sharing)
+   /// </summary>
+   ScreenShareTrackEnded = 75
+}
+
+/// <summary>
+/// Screen monitoring enforcement mode per exam
+/// </summary>
+public enum ScreenMonitoringMode : byte
+{
+   /// <summary>
+   /// Screen monitoring is disabled
+   /// </summary>
+   Disabled = 0,
+
+   /// <summary>
+   /// Candidate may continue without sharing (log event)
+   /// </summary>
+   Optional = 1,
+
+   /// <summary>
+   /// Must share screen before starting exam
+   /// </summary>
+   Required = 2,
+
+   /// <summary>
+   /// If sharing stops: warning + grace period + action
+   /// </summary>
+   Strict = 3
 }
 
 /// <summary>

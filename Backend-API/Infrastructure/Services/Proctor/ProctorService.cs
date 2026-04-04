@@ -615,11 +615,11 @@ public class ProctorService : IProctorService
     }
 
     private async Task<ApiResponse<RiskCalculationResultDto>> CalculateRiskScoreInternalAsync(
-  int sessionId, string calculatedBy)
+        int sessionId, string calculatedBy)
     {
         var session = await _context.Set<ProctorSession>()
-           .Include(s => s.Events)
-         .FirstOrDefaultAsync(s => s.Id == sessionId);
+            .Include(s => s.Events)
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
 
         if (session == null)
         {
@@ -632,6 +632,9 @@ public class ProctorService : IProctorService
             .ToListAsync();
 
         var now = DateTime.UtcNow;
+        // BUG FIX: anchor to session end time so time-window rules stay correct on recalculation
+        var anchor = session.EndedAt ?? session.UpdatedDate ?? now;
+
         decimal totalRiskPoints = 0;
         var triggeredRules = new List<TriggeredRuleDto>();
         var eventBreakdown = new Dictionary<string, int>();
@@ -642,21 +645,30 @@ public class ProctorService : IProctorService
             eventBreakdown[eventGroup.Key.ToString()] = eventGroup.Count();
         }
 
+        // IMP 4: Recency weighting — events in the last 20% of the session carry 1.5× weight
+        var sessionDuration = (session.EndedAt ?? now) - session.CreatedDate;
+        var latePhaseCutoff = session.CreatedDate + TimeSpan.FromTicks((long)(sessionDuration.Ticks * 0.80));
+
         // Evaluate each rule
         foreach (var rule in rules)
         {
             var relevantEvents = session.Events
-                   .Where(e => e.EventType == rule.EventType)
-                    .Where(e => !rule.MinSeverity.HasValue || e.Severity >= rule.MinSeverity.Value);
+                .Where(e => e.EventType == rule.EventType)
+                .Where(e => !rule.MinSeverity.HasValue || e.Severity >= rule.MinSeverity.Value);
 
             if (rule.WindowSeconds > 0)
             {
-                var windowStart = now.AddSeconds(-rule.WindowSeconds);
+                // BUG FIX: use anchor (session end time) not DateTime.UtcNow
+                var windowStart = anchor.AddSeconds(-rule.WindowSeconds);
                 relevantEvents = relevantEvents.Where(e => e.OccurredAt >= windowStart);
             }
 
-            var eventCount = relevantEvents.Count();
-            var triggerCount = eventCount / rule.ThresholdCount;
+            // IMP 4: apply 1.5× multiplier for late-phase events
+            var earlyCount = relevantEvents.Count(e => e.OccurredAt < latePhaseCutoff);
+            var lateCount = relevantEvents.Count(e => e.OccurredAt >= latePhaseCutoff);
+            var weightedCount = (int)Math.Ceiling(earlyCount + lateCount * 1.5m);
+
+            var triggerCount = weightedCount / rule.ThresholdCount;
 
             if (rule.MaxTriggers.HasValue)
             {
@@ -678,11 +690,55 @@ public class ProctorService : IProctorService
             }
         }
 
+        // IMP 5: Disconnect → Reconnect → Answer Spike correlation
+        // Load attempt events once, used for both this check and sub-score computation
+        var attemptEvents = await _context.Set<AttemptEvent>()
+            .Where(e => e.AttemptId == session.AttemptId)
+            .OrderBy(e => e.OccurredAt)
+            .ToListAsync();
+
+        var reconnectEvents = session.Events
+            .Where(e => e.EventType == ProctorEventType.NetworkReconnected)
+            .OrderBy(e => e.OccurredAt)
+            .ToList();
+
+        int suspiciousReconnects = 0;
+        foreach (var reconnect in reconnectEvents)
+        {
+            var answerBurst = attemptEvents.Count(e =>
+                e.EventType == AttemptEventType.AnswerSaved &&
+                e.OccurredAt > reconnect.OccurredAt &&
+                e.OccurredAt <= reconnect.OccurredAt.AddSeconds(90));
+
+            if (answerBurst >= 4)
+                suspiciousReconnects++;
+        }
+
+        if (suspiciousReconnects > 0)
+        {
+            var correlationPoints = Math.Min(suspiciousReconnects * 25m, 40m);
+            totalRiskPoints += correlationPoints;
+            triggeredRules.Add(new TriggeredRuleDto
+            {
+                RuleId = 0,
+                RuleName = "Disconnect-Reconnect Answer Spike",
+                RiskPoints = correlationPoints,
+                TriggerCount = suspiciousReconnects
+            });
+        }
+
         // Cap at 100
         var riskScore = Math.Min(totalRiskPoints, 100);
 
+        // IMP 2: Compute sub-scores from AttemptEvents (same formula as frontend, computed once and persisted)
+        var subScores = ComputeSubScores(attemptEvents, session, now);
+
         // Update session
         session.RiskScore = riskScore;
+        session.FaceScore = subScores.FaceScore;
+        session.EyeScore = subScores.EyeScore;
+        session.BehaviorScore = subScores.BehaviorScore;
+        session.EnvironmentScore = subScores.EnvironmentScore;
         session.UpdatedDate = now;
 
         // Create snapshot
@@ -690,6 +746,10 @@ public class ProctorService : IProctorService
         {
             ProctorSessionId = sessionId,
             RiskScore = riskScore,
+            FaceScore = subScores.FaceScore,
+            EyeScore = subScores.EyeScore,
+            BehaviorScore = subScores.BehaviorScore,
+            EnvironmentScore = subScores.EnvironmentScore,
             TotalEvents = session.TotalEvents,
             TotalViolations = session.TotalViolations,
             EventBreakdownJson = JsonSerializer.Serialize(eventBreakdown),
@@ -708,12 +768,64 @@ public class ProctorService : IProctorService
             ProctorSessionId = sessionId,
             RiskScore = riskScore,
             RiskLevel = GetRiskLevel(riskScore),
+            FaceScore = subScores.FaceScore,
+            EyeScore = subScores.EyeScore,
+            BehaviorScore = subScores.BehaviorScore,
+            EnvironmentScore = subScores.EnvironmentScore,
+            SuspiciousReconnects = suspiciousReconnects,
             TotalEvents = session.TotalEvents,
             TotalViolations = session.TotalViolations,
             TriggeredRules = triggeredRules,
             EventBreakdown = eventBreakdown,
             CalculatedAt = now
         });
+    }
+
+    /// <summary>
+    /// Computes the 4 display sub-scores from AttemptEvents using the same formula as the frontend.
+    /// Persisting these eliminates recalculation on every report page load and ensures consistency.
+    /// </summary>
+    private static (decimal FaceScore, decimal EyeScore, decimal BehaviorScore, decimal EnvironmentScore)
+        ComputeSubScores(List<AttemptEvent> events, ProctorSession session, DateTime now)
+    {
+        int c(AttemptEventType t) => events.Count(e => e.EventType == t);
+
+        var sessionDurationSec = Math.Max(10,
+            ((session.EndedAt ?? now) - session.StartedAt).TotalSeconds);
+
+        // Proportional penalties
+        var blockedRatio = Math.Min(1.0, c(AttemptEventType.CameraBlocked) * 30.0 / sessionDurationSec);
+        var faceAbsentRatio = Math.Min(1.0, c(AttemptEventType.FaceNotDetected) * 30.0 / sessionDurationSec);
+
+        // Face Detection Score
+        var facePenalty = faceAbsentRatio * 70
+            + c(AttemptEventType.MultipleFacesDetected) * 12
+            + blockedRatio * 85
+            + c(AttemptEventType.WebcamDenied) * 25;
+        var faceScore = (decimal)Math.Max(0, Math.Min(100, 100 - facePenalty));
+
+        // Eye Tracking Score (capped at face score)
+        var eyePenalty = c(AttemptEventType.HeadTurnDetected) * 7
+            + c(AttemptEventType.FaceOutOfFrame) * 6
+            + blockedRatio * 80;
+        var rawEyeScore = (decimal)Math.Max(0, Math.Min(100, 100 - eyePenalty));
+        var eyeScore = Math.Min(rawEyeScore, faceScore);
+
+        // Behavior Score
+        var behaviorPenalty = c(AttemptEventType.TabSwitched) * 8
+            + c(AttemptEventType.WindowBlur) * 4
+            + c(AttemptEventType.CopyAttempt) * 10
+            + c(AttemptEventType.PasteAttempt) * 10
+            + c(AttemptEventType.RightClickAttempt) * 5;
+        var behaviorScore = (decimal)Math.Max(0, Math.Min(100, 100 - behaviorPenalty));
+
+        // Environment Score (no missingInfoPenalty — device info is now captured reliably)
+        var envPenalty = c(AttemptEventType.FullscreenExited) * 10
+            + blockedRatio * 50
+            + c(AttemptEventType.SnapshotFailed) * 8;
+        var environmentScore = (decimal)Math.Max(0, Math.Min(100, 100 - envPenalty));
+
+        return (faceScore, eyeScore, behaviorScore, environmentScore);
     }
 
     public async Task<ApiResponse<List<ProctorRiskRuleDto>>> GetRiskRulesAsync(bool activeOnly = true)
@@ -835,7 +947,7 @@ public class ProctorService : IProctorService
 
     #region Evidence
 
-    public async Task<ApiResponse<ProctorEvidenceDto>> UploadSnapshotAsync(int attemptId, IFormFile file, string candidateId)
+    public async Task<ApiResponse<ProctorEvidenceDto>> UploadSnapshotAsync(int attemptId, IFormFile file, string candidateId, string? ipAddress = null, string? userAgent = null)
     {
         var attempt = await _context.Attempts
             .Include(a => a.Exam)
@@ -868,6 +980,8 @@ public class ProctorService : IProctorService
                 Mode = ProctorMode.Soft,
                 StartedAt = DateTime.UtcNow,
                 Status = ProctorSessionStatus.Active,
+                IpAddress = ipAddress,
+                UserAgent = userAgent,
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = candidateId
             };
@@ -1958,6 +2072,10 @@ UploadEvidenceDto dto, string candidateId)
             IsTerminatedByProctor = session.IsTerminatedByProctor,
             TerminationReason = session.TerminationReason,
             RiskScore = session.RiskScore,
+            FaceScore = session.FaceScore,
+            EyeScore = session.EyeScore,
+            BehaviorScore = session.BehaviorScore,
+            EnvironmentScore = session.EnvironmentScore,
             LastHeartbeatAt = session.LastHeartbeatAt,
             HeartbeatMissedCount = session.HeartbeatMissedCount,
             IsFlagged = session.IsFlagged,
@@ -1983,6 +2101,7 @@ UploadEvidenceDto dto, string candidateId)
             ExamMaxAttempts = session.Exam?.MaxAttempts ?? 1,
             ExamTotalQuestions = session.Exam?.Questions?.Count ?? 0,
             ExamRequireWebcam = session.Exam?.RequireWebcam ?? false,
+            ExamEnableScreenMonitoring = session.Exam?.EnableScreenMonitoring ?? false,
             ExamRequireIdVerification = session.Exam?.RequireIdVerification ?? false,
             ExamRequireFullscreen = session.Exam?.RequireFullscreen ?? false,
             ExamPreventCopyPaste = session.Exam?.PreventCopyPaste ?? false,
@@ -2058,7 +2177,11 @@ UploadEvidenceDto dto, string candidateId)
             ScreenResolution = session.ScreenResolution,
             DeviceFingerprint = session.DeviceFingerprint,
             AttemptIpAddress = session.Attempt?.IPAddress,
-            AttemptDeviceInfo = session.Attempt?.DeviceInfo
+            AttemptDeviceInfo = session.Attempt?.DeviceInfo,
+            FaceScore = session.FaceScore,
+            EyeScore = session.EyeScore,
+            BehaviorScore = session.BehaviorScore,
+            EnvironmentScore = session.EnvironmentScore
         };
     }
 

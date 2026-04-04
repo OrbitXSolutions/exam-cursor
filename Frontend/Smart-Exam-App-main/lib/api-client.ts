@@ -1,4 +1,7 @@
-import { getResolvedLanguage, translateServerMessage } from "@/lib/i18n/runtime";
+import {
+  getResolvedLanguage,
+  translateServerMessage,
+} from "@/lib/i18n/runtime";
 
 const API_BASE_URL = "/api/proxy";
 
@@ -99,6 +102,18 @@ class ApiClient {
               language,
             ),
           );
+        }
+
+        // Handle license enforcement 403
+        if (response.status === 403) {
+          const licenseState = response.headers.get("X-License-State");
+          if (licenseState === "Expired") {
+            throw new Error(
+              language === "ar"
+                ? "انتهت صلاحية الرخصة. النظام في وضع القراءة فقط. يرجى التواصل مع المسؤول لتجديد الرخصة."
+                : "License expired. System is in read-only mode. Please contact your administrator to renew the license.",
+            );
+          }
         }
 
         const errors = jsonResponse.errors;

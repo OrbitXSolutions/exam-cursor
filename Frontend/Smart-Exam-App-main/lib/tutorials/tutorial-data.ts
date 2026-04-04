@@ -465,18 +465,18 @@ export const questionBankTutorial: TutorialModule = {
           titleEn: "MCQ — Multiple Answers",
           titleAr: "اختيار من متعدد — إجابات متعددة",
           descriptionEn:
-            "Multiple Choice where more than one option can be correct. Mark all correct answers. Grading: All-or-Nothing approach — the candidate must select ALL correct answers and NO wrong answers to get full points. Any mistake = zero points. Auto-graded.",
+            "Multiple Choice where more than one option can be correct. Mark all correct answers. Grading: Partial Scoring — each correct option has its own points. The candidate earns points for each correctly selected option. Wrong selections score zero (no penalty). Auto-graded.",
           descriptionAr:
-            "اختيار من متعدد حيث يمكن أن تكون أكثر من إجابة صحيحة. حدد جميع الإجابات الصحيحة. التصحيح: نهج الكل أو لا شيء — يجب على المرشح اختيار جميع الإجابات الصحيحة وعدم اختيار أي إجابة خاطئة للحصول على النقاط الكاملة. أي خطأ = صفر نقاط. تصحيح تلقائي.",
+            "اختيار من متعدد حيث يمكن أن تكون أكثر من إجابة صحيحة. حدد جميع الإجابات الصحيحة. التصحيح: درجات جزئية — كل خيار صحيح له نقاطه الخاصة. يحصل المرشح على نقاط لكل خيار صحيح يتم اختياره. الاختيارات الخاطئة تحصل على صفر (بدون خصم). تصحيح تلقائي.",
           imagePlaceholder: "/tutorials/type-mcq-multi.png",
           tipEn:
-            "All-or-Nothing: If a question has 3 correct answers, the candidate must select exactly those 3. Selecting only 2 correct = ZERO. Selecting all 3 correct + 1 wrong = ZERO.",
+            "Partial Scoring: Each option has its own points value. Assign points per option when creating the question — the sum must equal the question total. Candidates earn points for each correct option they select. Wrong selections = 0 (no deduction).",
           tipAr:
-            "الكل أو لا شيء: إذا كان للسؤال 3 إجابات صحيحة، يجب على المرشح اختيار تلك الـ 3 بالضبط. اختيار 2 صحيحة فقط = صفر. اختيار 3 صحيحة + 1 خاطئة = صفر.",
+            "درجات جزئية: كل خيار له قيمة نقاط خاصة به. حدد النقاط لكل خيار عند إنشاء السؤال — المجموع يجب أن يساوي إجمالي نقاط السؤال. يحصل المرشحون على نقاط لكل خيار صحيح يختارونه. الاختيارات الخاطئة = 0 (بدون خصم).",
           noteEn:
-            "Example: Question worth 6 points with 3 correct answers (A, B, D). Candidate selects A, B → gets 0. Candidate selects A, B, D → gets 6. Candidate selects A, B, C, D → gets 0.",
+            "Example: Question worth 6 points with 3 correct options (A=2, B=2.5, D=1.5). Candidate selects A, B → gets 4.5. Candidate selects A, B, D → gets 6. Candidate selects A + wrong C → gets 2. If no option points are set, points are distributed equally among correct options.",
           noteAr:
-            "مثال: سؤال بقيمة 6 نقاط مع 3 إجابات صحيحة (A, B, D). المرشح يختار A, B ← يحصل على 0. المرشح يختار A, B, D ← يحصل على 6. المرشح يختار A, B, C, D ← يحصل على 0.",
+            "مثال: سؤال بقيمة 6 نقاط مع 3 خيارات صحيحة (A=2, B=2.5, D=1.5). المرشح يختار A, B ← يحصل على 4.5. المرشح يختار A, B, D ← يحصل على 6. المرشح يختار A + الخاطئ C ← يحصل على 2. إذا لم يتم تحديد نقاط الخيارات، يتم توزيع النقاط بالتساوي على الخيارات الصحيحة.",
         },
         {
           id: "type-true-false",
@@ -512,9 +512,9 @@ export const questionBankTutorial: TutorialModule = {
           titleEn: "Grading Comparison Table",
           titleAr: "جدول مقارنة التصحيح",
           contentEn:
-            "| Type | Auto-Graded | Grading Method | Manual Review |\n|------|-------------|---------------|---------------|\n| MCQ Single | ✓ Yes | Full or Zero | Not needed |\n| MCQ Multi | ✓ Yes | All-or-Nothing | Not needed |\n| True/False | ✓ Yes | Full or Zero | Not needed |\n| Subjective | ✗ No | Partial (manual) | Required |",
+            "| Type | Auto-Graded | Grading Method | Manual Review |\n|------|-------------|---------------|---------------|\n| MCQ Single | ✓ Yes | Full or Zero | Not needed |\n| MCQ Multi | ✓ Yes | Partial Scoring (per option) | Not needed |\n| True/False | ✓ Yes | Full or Zero | Not needed |\n| Subjective | ✗ No | Partial (manual) | Required |",
           contentAr:
-            "| النوع | تصحيح تلقائي | طريقة التصحيح | مراجعة يدوية |\n|------|-------------|---------------|---------------|\n| اختيار فردي | ✓ نعم | كامل أو صفر | غير مطلوبة |\n| اختيار متعدد | ✓ نعم | الكل أو لا شيء | غير مطلوبة |\n| صح/خطأ | ✓ نعم | كامل أو صفر | غير مطلوبة |\n| مقالي | ✗ لا | جزئي (يدوي) | مطلوبة |",
+            "| النوع | تصحيح تلقائي | طريقة التصحيح | مراجعة يدوية |\n|------|-------------|---------------|---------------|\n| اختيار فردي | ✓ نعم | كامل أو صفر | غير مطلوبة |\n| اختيار متعدد | ✓ نعم | درجات جزئية (لكل خيار) | غير مطلوبة |\n| صح/خطأ | ✓ نعم | كامل أو صفر | غير مطلوبة |\n| مقالي | ✗ لا | جزئي (يدوي) | مطلوبة |",
         },
       ],
     },
@@ -1191,37 +1191,43 @@ export const examManagementTutorial: TutorialModule = {
           titleEn: "Tab 4: Access Policy",
           titleAr: "تبويب 4: سياسة الوصول",
           descriptionEn:
-            "Control who can access and take the exam.\n\n**Default:** The exam is set to **\"Public\"** — meaning all candidates in the system can see and start the exam without any restrictions.\n\nIf you change the policy to **\"Restrict to Assigned\"**, only candidates you explicitly assign will be able to take the exam. You must then go to **Candidates → Assign to Exam** to assign candidates before they can access it.",
+            'Control who can access and take the exam.\n\n**Default:** The exam is set to **"Public"** — meaning all candidates in the system can see and start the exam without any restrictions.\n\nIf you change the policy to **"Restrict to Assigned"**, only candidates you explicitly assign will be able to take the exam. You must then go to **Candidates → Assign to Exam** to assign candidates before they can access it.',
           descriptionAr:
-            "تحكم في من يمكنه الوصول للاختبار وتقديمه.\n\n**الافتراضي:** الاختبار مُعيّن على **\"عام\"** — يعني أن جميع المرشحين في النظام يمكنهم رؤية الاختبار والبدء فيه بدون أي قيود.\n\nإذا غيّرت السياسة إلى **\"تقييد للمعينين\"**، فقط المرشحون الذين تعيّنهم صراحة سيتمكنون من تقديم الاختبار. يجب عليك الذهاب إلى **المرشحون ← تعيين للاختبار** لتعيين المرشحين قبل أن يتمكنوا من الوصول إليه.",
+            'تحكم في من يمكنه الوصول للاختبار وتقديمه.\n\n**الافتراضي:** الاختبار مُعيّن على **"عام"** — يعني أن جميع المرشحين في النظام يمكنهم رؤية الاختبار والبدء فيه بدون أي قيود.\n\nإذا غيّرت السياسة إلى **"تقييد للمعينين"**، فقط المرشحون الذين تعيّنهم صراحة سيتمكنون من تقديم الاختبار. يجب عليك الذهاب إلى **المرشحون ← تعيين للاختبار** لتعيين المرشحين قبل أن يتمكنوا من الوصول إليه.',
           imagePlaceholder: "/tutorials/config-access.png",
           fields: [
             {
               nameEn: "Is Public (Default: ON)",
               nameAr: "عام (الافتراضي: مُفعّل)",
               required: false,
-              descriptionEn: "Default setting — anyone can access the exam with no restrictions. All candidates see it in their dashboard.",
-              descriptionAr: "الإعداد الافتراضي — يمكن لأي شخص الوصول للاختبار بدون قيود. جميع المرشحين يرونه في لوحتهم.",
+              descriptionEn:
+                "Default setting — anyone can access the exam with no restrictions. All candidates see it in their dashboard.",
+              descriptionAr:
+                "الإعداد الافتراضي — يمكن لأي شخص الوصول للاختبار بدون قيود. جميع المرشحين يرونه في لوحتهم.",
             },
             {
               nameEn: "Access Code",
               nameAr: "رمز الوصول",
               required: false,
-              descriptionEn: "Optional code that candidates must enter before starting the exam",
-              descriptionAr: "رمز اختياري يجب على المرشحين إدخاله قبل بدء الاختبار",
+              descriptionEn:
+                "Optional code that candidates must enter before starting the exam",
+              descriptionAr:
+                "رمز اختياري يجب على المرشحين إدخاله قبل بدء الاختبار",
             },
             {
               nameEn: "Restrict to Assigned",
               nameAr: "تقييد للمعينين",
               required: false,
-              descriptionEn: "Only assigned candidates can take the exam. You must assign candidates via Candidates → Assign to Exam.",
-              descriptionAr: "فقط المرشحون المعينون يمكنهم تقديم الاختبار. يجب تعيين المرشحين عبر المرشحون ← تعيين للاختبار.",
+              descriptionEn:
+                "Only assigned candidates can take the exam. You must assign candidates via Candidates → Assign to Exam.",
+              descriptionAr:
+                "فقط المرشحون المعينون يمكنهم تقديم الاختبار. يجب تعيين المرشحين عبر المرشحون ← تعيين للاختبار.",
             },
           ],
           tipEn:
-            "If you set \"Restrict to Assigned\" but forget to assign candidates, no one will be able to access the exam — even after publishing.",
+            'If you set "Restrict to Assigned" but forget to assign candidates, no one will be able to access the exam — even after publishing.',
           tipAr:
-            "إذا اخترت \"تقييد للمعينين\" ولكن نسيت تعيين المرشحين، لن يتمكن أحد من الوصول للاختبار — حتى بعد النشر.",
+            'إذا اخترت "تقييد للمعينين" ولكن نسيت تعيين المرشحين، لن يتمكن أحد من الوصول للاختبار — حتى بعد النشر.',
         },
       ],
     },
@@ -1306,18 +1312,18 @@ export const examManagementTutorial: TutorialModule = {
       titleEn: "5. Assign Candidates to Exam",
       titleAr: "5. تعيين المرشحين للاختبار",
       descriptionEn:
-        "When an exam's Access Policy is set to \"Restrict to Assigned\", you must explicitly assign candidates before they can access the exam. Assigned candidates receive an email notification with exam details.",
+        'When an exam\'s Access Policy is set to "Restrict to Assigned", you must explicitly assign candidates before they can access the exam. Assigned candidates receive an email notification with exam details.',
       descriptionAr:
-        "عندما تكون سياسة وصول الاختبار مُعيّنة على \"تقييد للمعينين\"، يجب عليك تعيين المرشحين صراحة قبل أن يتمكنوا من الوصول للاختبار. يتلقى المرشحون المعيّنون إشعاراً بالبريد الإلكتروني بتفاصيل الاختبار.",
+        'عندما تكون سياسة وصول الاختبار مُعيّنة على "تقييد للمعينين"، يجب عليك تعيين المرشحين صراحة قبل أن يتمكنوا من الوصول للاختبار. يتلقى المرشحون المعيّنون إشعاراً بالبريد الإلكتروني بتفاصيل الاختبار.',
       steps: [
         {
           id: "assign-navigate",
           titleEn: "Navigate to Assign Page",
           titleAr: "الانتقال إلى صفحة التعيين",
           descriptionEn:
-            'From the sidebar: **Candidates → Assign to Exam**. This page lets you assign or unassign candidates for any published exam.',
+            "From the sidebar: **Candidates → Assign to Exam**. This page lets you assign or unassign candidates for any published exam.",
           descriptionAr:
-            'من القائمة الجانبية: **المرشحون ← تعيين للاختبار**. تتيح لك هذه الصفحة تعيين أو إلغاء تعيين المرشحين لأي اختبار منشور.',
+            "من القائمة الجانبية: **المرشحون ← تعيين للاختبار**. تتيح لك هذه الصفحة تعيين أو إلغاء تعيين المرشحين لأي اختبار منشور.",
           imagePlaceholder: "/tutorials/assign-navigate.png",
         },
         {
@@ -1334,15 +1340,19 @@ export const examManagementTutorial: TutorialModule = {
               nameEn: "Exam",
               nameAr: "الاختبار",
               required: true,
-              descriptionEn: "Select the published exam you want to assign candidates to",
-              descriptionAr: "اختر الاختبار المنشور الذي تريد تعيين المرشحين له",
+              descriptionEn:
+                "Select the published exam you want to assign candidates to",
+              descriptionAr:
+                "اختر الاختبار المنشور الذي تريد تعيين المرشحين له",
             },
             {
               nameEn: "Batch",
               nameAr: "الدفعة",
               required: false,
-              descriptionEn: "Filter candidates by batch (optional — select \"All\" to see all candidates)",
-              descriptionAr: "تصفية المرشحين حسب الدفعة (اختياري — اختر \"الكل\" لعرض جميع المرشحين)",
+              descriptionEn:
+                'Filter candidates by batch (optional — select "All" to see all candidates)',
+              descriptionAr:
+                'تصفية المرشحين حسب الدفعة (اختياري — اختر "الكل" لعرض جميع المرشحين)',
             },
             {
               nameEn: "Schedule From",
@@ -1365,9 +1375,9 @@ export const examManagementTutorial: TutorialModule = {
           titleEn: "Select & Assign Candidates",
           titleAr: "اختيار وتعيين المرشحين",
           descriptionEn:
-            "After selecting the exam, a table of candidates appears. You can:\n- **Search** by name or email\n- **Filter** by assignment status (All, Assigned, Unassigned)\n- **Select** individual candidates using checkboxes or use **Select All**\n- Click **\"Assign\"** to assign selected candidates to the exam\n\nAssigned candidates will immediately receive an **email notification** with the exam details, schedule, and a login link.",
+            'After selecting the exam, a table of candidates appears. You can:\n- **Search** by name or email\n- **Filter** by assignment status (All, Assigned, Unassigned)\n- **Select** individual candidates using checkboxes or use **Select All**\n- Click **"Assign"** to assign selected candidates to the exam\n\nAssigned candidates will immediately receive an **email notification** with the exam details, schedule, and a login link.',
           descriptionAr:
-            "بعد اختيار الاختبار، يظهر جدول بالمرشحين. يمكنك:\n- **البحث** بالاسم أو البريد الإلكتروني\n- **التصفية** حسب حالة التعيين (الكل، معيّن، غير معيّن)\n- **تحديد** المرشحين فردياً باستخدام مربعات الاختيار أو استخدام **تحديد الكل**\n- انقر **\"تعيين\"** لتعيين المرشحين المحددين للاختبار\n\nيتلقى المرشحون المعيّنون فوراً **إشعار بريد إلكتروني** بتفاصيل الاختبار والجدول ورابط تسجيل الدخول.",
+            'بعد اختيار الاختبار، يظهر جدول بالمرشحين. يمكنك:\n- **البحث** بالاسم أو البريد الإلكتروني\n- **التصفية** حسب حالة التعيين (الكل، معيّن، غير معيّن)\n- **تحديد** المرشحين فردياً باستخدام مربعات الاختيار أو استخدام **تحديد الكل**\n- انقر **"تعيين"** لتعيين المرشحين المحددين للاختبار\n\nيتلقى المرشحون المعيّنون فوراً **إشعار بريد إلكتروني** بتفاصيل الاختبار والجدول ورابط تسجيل الدخول.',
           imagePlaceholder: "/tutorials/assign-candidates.png",
           tipEn:
             "You can filter by Batch to quickly assign all candidates in a specific batch to the exam at once.",
@@ -1379,9 +1389,9 @@ export const examManagementTutorial: TutorialModule = {
           titleEn: "Unassign Candidates",
           titleAr: "إلغاء تعيين المرشحين",
           descriptionEn:
-            "To remove a candidate's access to an exam:\n1. Filter the table to show **\"Assigned\"** candidates\n2. Select the candidates you want to unassign\n3. Click **\"Unassign\"**\n4. Confirm the action\n\nUnassigned candidates will no longer see the exam in their dashboard.",
+            'To remove a candidate\'s access to an exam:\n1. Filter the table to show **"Assigned"** candidates\n2. Select the candidates you want to unassign\n3. Click **"Unassign"**\n4. Confirm the action\n\nUnassigned candidates will no longer see the exam in their dashboard.',
           descriptionAr:
-            "لإزالة وصول مرشح للاختبار:\n1. صفّي الجدول لعرض المرشحين **\"المعيّنين\"**\n2. حدد المرشحين الذين تريد إلغاء تعيينهم\n3. انقر **\"إلغاء التعيين\"**\n4. أكّد الإجراء\n\nلن يتمكن المرشحون المُلغى تعيينهم من رؤية الاختبار في لوحتهم.",
+            'لإزالة وصول مرشح للاختبار:\n1. صفّي الجدول لعرض المرشحين **"المعيّنين"**\n2. حدد المرشحين الذين تريد إلغاء تعيينهم\n3. انقر **"إلغاء التعيين"**\n4. أكّد الإجراء\n\nلن يتمكن المرشحون المُلغى تعيينهم من رؤية الاختبار في لوحتهم.',
           imagePlaceholder: "/tutorials/assign-unassign.png",
         },
       ],
@@ -1390,9 +1400,9 @@ export const examManagementTutorial: TutorialModule = {
           titleEn: "Typical Assignment Workflow",
           titleAr: "سير عمل التعيين النموذجي",
           contentEn:
-            "1. Create exam → set Access Policy to **\"Restrict to Assigned\"**\n2. Build exam sections and add questions\n3. Publish the exam\n4. Go to **Candidates → Assign to Exam**\n5. Select the exam → set schedule dates\n6. Filter by batch (e.g., \"Spring 2026\") → Select All → Assign\n7. Candidates receive email: \"You have been assigned to [Exam Title]\"\n8. Candidates log in → see the exam in their dashboard → take the exam",
+            '1. Create exam → set Access Policy to **"Restrict to Assigned"**\n2. Build exam sections and add questions\n3. Publish the exam\n4. Go to **Candidates → Assign to Exam**\n5. Select the exam → set schedule dates\n6. Filter by batch (e.g., "Spring 2026") → Select All → Assign\n7. Candidates receive email: "You have been assigned to [Exam Title]"\n8. Candidates log in → see the exam in their dashboard → take the exam',
           contentAr:
-            "1. إنشاء الاختبار ← تعيين سياسة الوصول على **\"تقييد للمعينين\"**\n2. بناء أقسام الاختبار وإضافة الأسئلة\n3. نشر الاختبار\n4. الذهاب إلى **المرشحون ← تعيين للاختبار**\n5. اختيار الاختبار ← تحديد تواريخ الجدول\n6. التصفية حسب الدفعة (مثال: \"ربيع 2026\") ← تحديد الكل ← تعيين\n7. المرشحون يتلقون بريداً: \"تم تعيينك في [عنوان الاختبار]\"\n8. المرشحون يسجلون الدخول ← يرون الاختبار في لوحتهم ← يقدمون الاختبار",
+            '1. إنشاء الاختبار ← تعيين سياسة الوصول على **"تقييد للمعينين"**\n2. بناء أقسام الاختبار وإضافة الأسئلة\n3. نشر الاختبار\n4. الذهاب إلى **المرشحون ← تعيين للاختبار**\n5. اختيار الاختبار ← تحديد تواريخ الجدول\n6. التصفية حسب الدفعة (مثال: "ربيع 2026") ← تحديد الكل ← تعيين\n7. المرشحون يتلقون بريداً: "تم تعيينك في [عنوان الاختبار]"\n8. المرشحون يسجلون الدخول ← يرون الاختبار في لوحتهم ← يقدمون الاختبار',
         },
       ],
     },
@@ -2268,7 +2278,7 @@ export const gradingTutorial: TutorialModule = {
           descriptionEn:
             "The pass score is defined in the **exam configuration** (e.g., 60%).\n\nAfter grading, the system compares:\n- **Total Score ≥ Pass Score** → **Passed** (green badge)\n- **Total Score < Pass Score** → **Failed** (red badge)\n\nThis is computed **automatically** upon finalization.",
           descriptionAr:
-            "درجة النجاح محددة في **إعدادات الاختبار** (مثلاً 60%).\n\nبعد التصحيح، يقارن النظام:\n- **الدرجة الإجمالية ≥ درجة النجاح** ← **ناجح** (شارة خضراء)\n- **الدرجة الإجمالية < درجة النجاح** ← **راسب** (شارة حمراء)\n\nيُحسب **تلقائياً** عند الاعتماد.",
+            "درجة النجاح محددة في **إعدادات الاختبار** (مثلاً 60%).\n\nبعد التصحيح، يقارن النظام:\n- **الدرجة الإجمالية ≥ درجة النجاح** ← **ناجح** (شارة خضراء)\n- **الدرجة الإجمالية < درجة النجاح** ← **غير ناجح** (شارة حمراء)\n\nيُحسب **تلقائياً** عند الاعتماد.",
         },
         {
           id: "mixed-exam",
@@ -2369,7 +2379,7 @@ export const resultsTutorial: TutorialModule = {
           descriptionEn:
             "Filter controls available:\n- **Exam** — filter by specific exam or view all\n- **Result Status** — All, Passed, Failed, Under Review, Not Published\n- **Search** — by candidate name or email\n- **Refresh** — reload the latest data\n\nThe summary card shows the **total count** of filtered candidates.",
           descriptionAr:
-            "أدوات التصفية المتاحة:\n- **الاختبار** — تصفية حسب اختبار محدد أو عرض الكل\n- **حالة النتيجة** — الكل، ناجح، راسب، قيد المراجعة، غير منشور\n- **البحث** — باسم المرشح أو البريد\n- **تحديث** — إعادة تحميل أحدث البيانات\n\nتعرض بطاقة الملخص **العدد الإجمالي** للمرشحين المصفّين.",
+            "أدوات التصفية المتاحة:\n- **الاختبار** — تصفية حسب اختبار محدد أو عرض الكل\n- **حالة النتيجة** — الكل، ناجح، غير ناجح، قيد المراجعة، غير منشور\n- **البحث** — باسم المرشح أو البريد\n- **تحديث** — إعادة تحميل أحدث البيانات\n\nتعرض بطاقة الملخص **العدد الإجمالي** للمرشحين المصفّين.",
           imagePlaceholder: "/tutorials/results-filters.png",
           tipEn:
             '"Under Review" shows results where grading is still pending or not yet finalized. "Not Published" shows finalized results not yet sent to candidates.',
@@ -2383,7 +2393,7 @@ export const resultsTutorial: TutorialModule = {
           descriptionEn:
             'Table columns:\n- **Sr. No.** — row number\n- **Exam Name** — bilingual exam title\n- **Candidate** — name + attempt number\n- **Score** — e.g., "75.5/100"\n- **Percentage** — e.g., "75.50%"\n- **Attempt Status** — Submitted, Expired, Force Ended, Terminated (color-coded badges)\n- **Pass/Fail** — green "Pass" or red "Fail" badge\n- **Grading Status** — Auto Graded, Manual Graded, In Review, Pending (color-coded)\n- **Published** — Yes / No\n- **Actions** — dropdown menu with all available operations',
           descriptionAr:
-            'أعمدة الجدول:\n- **الرقم** — رقم الصف\n- **اسم الاختبار** — عنوان الاختبار ثنائي اللغة\n- **المرشح** — الاسم + رقم المحاولة\n- **الدرجة** — مثلاً "75.5/100"\n- **النسبة** — مثلاً "75.50%"\n- **حالة المحاولة** — مسلّم، منتهي، أُنهي قسراً، أُنهي (شارات ملونة)\n- **ناجح/راسب** — شارة خضراء "ناجح" أو حمراء "راسب"\n- **حالة التصحيح** — آلي، يدوي، قيد المراجعة، معلّق (ملونة)\n- **منشور** — نعم / لا\n- **الإجراءات** — قائمة بجميع العمليات المتاحة',
+            'أعمدة الجدول:\n- **الرقم** — رقم الصف\n- **اسم الاختبار** — عنوان الاختبار ثنائي اللغة\n- **المرشح** — الاسم + رقم المحاولة\n- **الدرجة** — مثلاً "75.5/100"\n- **النسبة** — مثلاً "75.50%"\n- **حالة المحاولة** — مسلّم، منتهي، أُنهي قسراً، أُنهي (شارات ملونة)\n- **ناجح/غير ناجح** — شارة خضراء "ناجح" أو حمراء "غير ناجح"\n- **حالة التصحيح** — آلي، يدوي، قيد المراجعة، معلّق (ملونة)\n- **منشور** — نعم / لا\n- **الإجراءات** — قائمة بجميع العمليات المتاحة',
           imagePlaceholder: "/tutorials/results-table.png",
         },
         {
@@ -3407,9 +3417,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Typical Candidate Workflow",
           titleAr: "سير عمل المرشح النموذجي",
           contentEn:
-            "Register Candidate → Add to Batch (optional) → Assign to Exam → Candidate Takes Exam → Review in Exam Details\n\n**Cross-Department Example:**\n1. Admin in **HR Department** registers \"Ahmed\" with email ahmed@company.com\n2. Instructor in **IT Department** assigns Ahmed to \"Network Security Exam\"\n3. Instructor in **Finance Department** assigns Ahmed to \"Accounting Basics Exam\"\n4. Ahmed uses the **same login** to access both exams\n5. All results are tracked under **one unified profile**",
+            'Register Candidate → Add to Batch (optional) → Assign to Exam → Candidate Takes Exam → Review in Exam Details\n\n**Cross-Department Example:**\n1. Admin in **HR Department** registers "Ahmed" with email ahmed@company.com\n2. Instructor in **IT Department** assigns Ahmed to "Network Security Exam"\n3. Instructor in **Finance Department** assigns Ahmed to "Accounting Basics Exam"\n4. Ahmed uses the **same login** to access both exams\n5. All results are tracked under **one unified profile**',
           contentAr:
-            "تسجيل المرشح ← إضافة إلى دفعة (اختياري) ← تعيين اختبار ← المرشح يؤدي الاختبار ← مراجعة في تفاصيل الاختبار\n\n**مثال عبر الأقسام:**\n1. المدير في **قسم الموارد البشرية** يسجل \"أحمد\" بالبريد ahmed@company.com\n2. المدرّس في **قسم تقنية المعلومات** يعين أحمد لـ\"اختبار أمن الشبكات\"\n3. المدرّس في **قسم المالية** يعين أحمد لـ\"اختبار أساسيات المحاسبة\"\n4. أحمد يستخدم **نفس بيانات الدخول** للوصول لكلا الاختبارين\n5. جميع النتائج تُتبع تحت **ملف شخصي موحد**",
+            'تسجيل المرشح ← إضافة إلى دفعة (اختياري) ← تعيين اختبار ← المرشح يؤدي الاختبار ← مراجعة في تفاصيل الاختبار\n\n**مثال عبر الأقسام:**\n1. المدير في **قسم الموارد البشرية** يسجل "أحمد" بالبريد ahmed@company.com\n2. المدرّس في **قسم تقنية المعلومات** يعين أحمد لـ"اختبار أمن الشبكات"\n3. المدرّس في **قسم المالية** يعين أحمد لـ"اختبار أساسيات المحاسبة"\n4. أحمد يستخدم **نفس بيانات الدخول** للوصول لكلا الاختبارين\n5. جميع النتائج تُتبع تحت **ملف شخصي موحد**',
         },
       ],
     },
@@ -3457,22 +3467,27 @@ export const candidateTutorial: TutorialModule = {
               nameEn: "Name",
               nameAr: "الاسم",
               required: true,
-              descriptionEn: "A descriptive name for the batch (e.g., \"IT Department - Q1 2026\", \"New Hires March\")",
-              descriptionAr: "اسم وصفي للدفعة (مثل: \"قسم تقنية المعلومات - الربع الأول 2026\"، \"موظفون جدد مارس\")",
+              descriptionEn:
+                'A descriptive name for the batch (e.g., "IT Department - Q1 2026", "New Hires March")',
+              descriptionAr:
+                'اسم وصفي للدفعة (مثل: "قسم تقنية المعلومات - الربع الأول 2026"، "موظفون جدد مارس")',
             },
             {
               nameEn: "Description",
               nameAr: "الوصف",
               required: false,
-              descriptionEn: "Optional description explaining the purpose of this batch",
+              descriptionEn:
+                "Optional description explaining the purpose of this batch",
               descriptionAr: "وصف اختياري يوضح الغرض من هذه الدفعة",
             },
             {
               nameEn: "Is Active",
               nameAr: "نشط",
               required: false,
-              descriptionEn: "Toggle to set the batch as active or inactive (default: **Active**)",
-              descriptionAr: "مفتاح لتعيين الدفعة كنشطة أو غير نشطة (الافتراضي: **نشط**)",
+              descriptionEn:
+                "Toggle to set the batch as active or inactive (default: **Active**)",
+              descriptionAr:
+                "مفتاح لتعيين الدفعة كنشطة أو غير نشطة (الافتراضي: **نشط**)",
             },
           ],
           tipEn:
@@ -3509,9 +3524,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Add Candidates to a Batch",
           titleAr: "إضافة مرشحين إلى دفعة",
           descriptionEn:
-            "On the batch detail page, click **+ Add Candidates** to open the add dialog:\n\n1. A modal appears with a **searchable candidate list**\n2. Only candidates **not already in this batch** are shown\n3. Use the **search box** to find candidates by name, email, or roll number\n4. **Check the boxes** next to the candidates you want to add\n5. A counter shows \"**X selected**\" at the bottom\n6. Click **Add** to add the selected candidates to the batch",
+            'On the batch detail page, click **+ Add Candidates** to open the add dialog:\n\n1. A modal appears with a **searchable candidate list**\n2. Only candidates **not already in this batch** are shown\n3. Use the **search box** to find candidates by name, email, or roll number\n4. **Check the boxes** next to the candidates you want to add\n5. A counter shows "**X selected**" at the bottom\n6. Click **Add** to add the selected candidates to the batch',
           descriptionAr:
-            "في صفحة تفاصيل الدفعة، انقر **+ إضافة مرشحين** لفتح نافذة الإضافة:\n\n1. تظهر نافذة بـ**قائمة مرشحين قابلة للبحث**\n2. تُعرض فقط المرشحين **غير الموجودين بالفعل في هذه الدفعة**\n3. استخدم **مربع البحث** للعثور على مرشحين بالاسم أو البريد أو الرقم\n4. **حدد المربعات** بجانب المرشحين الذين تريد إضافتهم\n5. يظهر عداد \"**X محدد**\" في الأسفل\n6. انقر **إضافة** لإضافة المرشحين المحددين إلى الدفعة",
+            'في صفحة تفاصيل الدفعة، انقر **+ إضافة مرشحين** لفتح نافذة الإضافة:\n\n1. تظهر نافذة بـ**قائمة مرشحين قابلة للبحث**\n2. تُعرض فقط المرشحين **غير الموجودين بالفعل في هذه الدفعة**\n3. استخدم **مربع البحث** للعثور على مرشحين بالاسم أو البريد أو الرقم\n4. **حدد المربعات** بجانب المرشحين الذين تريد إضافتهم\n5. يظهر عداد "**X محدد**" في الأسفل\n6. انقر **إضافة** لإضافة المرشحين المحددين إلى الدفعة',
           imagePlaceholder: "/tutorials/candidates-batch-add.png",
         },
         {
@@ -3544,9 +3559,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Batch Organization Tips",
           titleAr: "نصائح تنظيم الدفعات",
           contentEn:
-            "**Common batch naming strategies:**\n- By department: \"IT Department\", \"Finance Team\", \"HR Recruits\"\n- By intake date: \"March 2026 Intake\", \"Q1 New Hires\"\n- By certification: \"AWS Certified Track\", \"PMP Candidates\"\n- By exam: \"Network Security Exam - Group A\"\n\n**Best Practice:** Create batches before importing candidates, then assign candidates to batches during import or manually afterward.",
+            '**Common batch naming strategies:**\n- By department: "IT Department", "Finance Team", "HR Recruits"\n- By intake date: "March 2026 Intake", "Q1 New Hires"\n- By certification: "AWS Certified Track", "PMP Candidates"\n- By exam: "Network Security Exam - Group A"\n\n**Best Practice:** Create batches before importing candidates, then assign candidates to batches during import or manually afterward.',
           contentAr:
-            "**استراتيجيات شائعة لتسمية الدفعات:**\n- حسب القسم: \"قسم تقنية المعلومات\"، \"فريق المالية\"، \"مرشحو الموارد البشرية\"\n- حسب تاريخ الدفعة: \"دفعة مارس 2026\"، \"موظفون جدد الربع الأول\"\n- حسب الشهادة: \"مسار شهادة AWS\"، \"مرشحو PMP\"\n- حسب الاختبار: \"اختبار أمن الشبكات - المجموعة أ\"\n\n**أفضل ممارسة:** أنشئ الدفعات قبل استيراد المرشحين، ثم عيّن المرشحين للدفعات أثناء الاستيراد أو يدوياً بعد ذلك.",
+            '**استراتيجيات شائعة لتسمية الدفعات:**\n- حسب القسم: "قسم تقنية المعلومات"، "فريق المالية"، "مرشحو الموارد البشرية"\n- حسب تاريخ الدفعة: "دفعة مارس 2026"، "موظفون جدد الربع الأول"\n- حسب الشهادة: "مسار شهادة AWS"، "مرشحو PMP"\n- حسب الاختبار: "اختبار أمن الشبكات - المجموعة أ"\n\n**أفضل ممارسة:** أنشئ الدفعات قبل استيراد المرشحين، ثم عيّن المرشحين للدفعات أثناء الاستيراد أو يدوياً بعد ذلك.',
         },
       ],
     },
@@ -3602,22 +3617,28 @@ export const candidateTutorial: TutorialModule = {
               nameEn: "Email",
               nameAr: "البريد الإلكتروني",
               required: true,
-              descriptionEn: "Unique email address — used as the candidate's **login credential**. Must be valid email format.",
-              descriptionAr: "عنوان بريد إلكتروني فريد — يُستخدم كـ**بيانات دخول المرشح**. يجب أن يكون بصيغة بريد صالحة.",
+              descriptionEn:
+                "Unique email address — used as the candidate's **login credential**. Must be valid email format.",
+              descriptionAr:
+                "عنوان بريد إلكتروني فريد — يُستخدم كـ**بيانات دخول المرشح**. يجب أن يكون بصيغة بريد صالحة.",
             },
             {
               nameEn: "Password",
               nameAr: "كلمة المرور",
               required: true,
-              descriptionEn: "Initial password for the candidate account (minimum **6 characters**). Required when creating; optional when editing.",
-              descriptionAr: "كلمة المرور الأولية لحساب المرشح (الحد الأدنى **6 أحرف**). مطلوبة عند الإنشاء؛ اختيارية عند التعديل.",
+              descriptionEn:
+                "Initial password for the candidate account (minimum **6 characters**). Required when creating; optional when editing.",
+              descriptionAr:
+                "كلمة المرور الأولية لحساب المرشح (الحد الأدنى **6 أحرف**). مطلوبة عند الإنشاء؛ اختيارية عند التعديل.",
             },
             {
               nameEn: "Roll No",
               nameAr: "الرقم التسلسلي",
               required: true,
-              descriptionEn: "Unique identifier for the candidate (e.g., employee ID, student number)",
-              descriptionAr: "معرّف فريد للمرشح (مثل: رقم الموظف أو رقم الطالب)",
+              descriptionEn:
+                "Unique identifier for the candidate (e.g., employee ID, student number)",
+              descriptionAr:
+                "معرّف فريد للمرشح (مثل: رقم الموظف أو رقم الطالب)",
             },
             {
               nameEn: "Mobile",
@@ -3643,9 +3664,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Block / Unblock a Candidate",
           titleAr: "حظر / إلغاء حظر مرشح",
           descriptionEn:
-            "From the **Actions** dropdown on any candidate row:\n\n**Block:**\n- Click **Block** to disable the candidate's access\n- Blocked candidates **cannot log in** or take any exams\n- A confirmation dialog shows the candidate's name before blocking\n- Status changes to a **red \"Blocked\" badge**\n\n**Unblock:**\n- Click **Unblock** on a blocked candidate to restore access\n- The candidate can immediately log in and take assigned exams\n- Status changes back to a **green \"Active\" badge**",
+            'From the **Actions** dropdown on any candidate row:\n\n**Block:**\n- Click **Block** to disable the candidate\'s access\n- Blocked candidates **cannot log in** or take any exams\n- A confirmation dialog shows the candidate\'s name before blocking\n- Status changes to a **red "Blocked" badge**\n\n**Unblock:**\n- Click **Unblock** on a blocked candidate to restore access\n- The candidate can immediately log in and take assigned exams\n- Status changes back to a **green "Active" badge**',
           descriptionAr:
-            "من القائمة المنسدلة **الإجراءات** لأي صف مرشح:\n\n**حظر:**\n- انقر **حظر** لتعطيل وصول المرشح\n- المرشحون المحظورون **لا يمكنهم تسجيل الدخول** أو أداء أي اختبارات\n- تظهر نافذة تأكيد باسم المرشح قبل الحظر\n- تتغير الحالة إلى **شارة \"محظور\" حمراء**\n\n**إلغاء الحظر:**\n- انقر **إلغاء الحظر** على مرشح محظور لاستعادة الوصول\n- يمكن للمرشح تسجيل الدخول فوراً وأداء الاختبارات المعيّنة\n- تعود الحالة إلى **شارة \"نشط\" خضراء**",
+            'من القائمة المنسدلة **الإجراءات** لأي صف مرشح:\n\n**حظر:**\n- انقر **حظر** لتعطيل وصول المرشح\n- المرشحون المحظورون **لا يمكنهم تسجيل الدخول** أو أداء أي اختبارات\n- تظهر نافذة تأكيد باسم المرشح قبل الحظر\n- تتغير الحالة إلى **شارة "محظور" حمراء**\n\n**إلغاء الحظر:**\n- انقر **إلغاء الحظر** على مرشح محظور لاستعادة الوصول\n- يمكن للمرشح تسجيل الدخول فوراً وأداء الاختبارات المعيّنة\n- تعود الحالة إلى **شارة "نشط" خضراء**',
           imagePlaceholder: "/tutorials/candidates-block.png",
           tipEn:
             "Blocking a candidate takes effect immediately. If the candidate is currently taking an exam, they will not be disconnected — but they cannot start any new exams until unblocked.",
@@ -3696,9 +3717,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Import Template Format",
           titleAr: "تنسيق قالب الاستيراد",
           contentEn:
-            "**Expected columns in the import template:**\n- Full Name (English) — required\n- Full Name (Arabic) — optional\n- Email — required, must be unique\n- Roll No — required\n- Mobile — optional\n\n**Example row:**\n- Full Name: \"Ahmed Ali\"\n- Email: \"ahmed.ali@company.com\"\n- Roll No: \"EMP-001\"\n- Mobile: \"+966555000111\"",
+            '**Expected columns in the import template:**\n- Full Name (English) — required\n- Full Name (Arabic) — optional\n- Email — required, must be unique\n- Roll No — required\n- Mobile — optional\n\n**Example row:**\n- Full Name: "Ahmed Ali"\n- Email: "ahmed.ali@company.com"\n- Roll No: "EMP-001"\n- Mobile: "+966555000111"',
           contentAr:
-            "**الأعمدة المتوقعة في قالب الاستيراد:**\n- الاسم الكامل (إنجليزي) — مطلوب\n- الاسم الكامل (عربي) — اختياري\n- البريد — مطلوب، يجب أن يكون فريداً\n- الرقم — مطلوب\n- الجوال — اختياري\n\n**مثال صف:**\n- الاسم: \"أحمد علي\"\n- البريد: \"ahmed.ali@company.com\"\n- الرقم: \"EMP-001\"\n- الجوال: \"+966555000111\"",
+            '**الأعمدة المتوقعة في قالب الاستيراد:**\n- الاسم الكامل (إنجليزي) — مطلوب\n- الاسم الكامل (عربي) — اختياري\n- البريد — مطلوب، يجب أن يكون فريداً\n- الرقم — مطلوب\n- الجوال — اختياري\n\n**مثال صف:**\n- الاسم: "أحمد علي"\n- البريد: "ahmed.ali@company.com"\n- الرقم: "EMP-001"\n- الجوال: "+966555000111"',
         },
       ],
     },
@@ -3728,52 +3749,59 @@ export const candidateTutorial: TutorialModule = {
           titleAr: "الخطوة 1 — تحديد الاختبار والجدول",
           descriptionEn:
             "Configure the assignment settings before selecting candidates:",
-          descriptionAr:
-            "اضبط إعدادات التعيين قبل اختيار المرشحين:",
+          descriptionAr: "اضبط إعدادات التعيين قبل اختيار المرشحين:",
           imagePlaceholder: "/tutorials/candidates-assign-step1.png",
           fields: [
             {
               nameEn: "Exam",
               nameAr: "الاختبار",
               required: true,
-              descriptionEn: "Select from the dropdown of **published exams** only. Draft or unpublished exams will not appear here.",
-              descriptionAr: "اختر من القائمة المنسدلة لـ**الاختبارات المنشورة** فقط. لن تظهر الاختبارات المسودة أو غير المنشورة.",
+              descriptionEn:
+                "Select from the dropdown of **published exams** only. Draft or unpublished exams will not appear here.",
+              descriptionAr:
+                "اختر من القائمة المنسدلة لـ**الاختبارات المنشورة** فقط. لن تظهر الاختبارات المسودة أو غير المنشورة.",
             },
             {
               nameEn: "Schedule From",
               nameAr: "الجدول من",
               required: true,
-              descriptionEn: "The **start date/time** of the assignment window — candidates can begin the exam from this time.",
-              descriptionAr: "**تاريخ/وقت البدء** لنافذة التعيين — يمكن للمرشحين بدء الاختبار من هذا الوقت.",
+              descriptionEn:
+                "The **start date/time** of the assignment window — candidates can begin the exam from this time.",
+              descriptionAr:
+                "**تاريخ/وقت البدء** لنافذة التعيين — يمكن للمرشحين بدء الاختبار من هذا الوقت.",
             },
             {
               nameEn: "Schedule To",
               nameAr: "الجدول إلى",
               required: true,
-              descriptionEn: "The **end date/time** of the assignment window — candidates must **start** the exam before this time. Must be after \"Schedule From\".",
-              descriptionAr: "**تاريخ/وقت النهاية** لنافذة التعيين — يجب أن **يبدأ** المرشحون الاختبار قبل هذا الوقت. يجب أن يكون بعد \"الجدول من\".",
+              descriptionEn:
+                'The **end date/time** of the assignment window — candidates must **start** the exam before this time. Must be after "Schedule From".',
+              descriptionAr:
+                '**تاريخ/وقت النهاية** لنافذة التعيين — يجب أن **يبدأ** المرشحون الاختبار قبل هذا الوقت. يجب أن يكون بعد "الجدول من".',
             },
             {
               nameEn: "Batch Filter",
               nameAr: "فلتر الدفعة",
               required: false,
-              descriptionEn: "Optional — filter the candidate list to show only members of a **specific batch**, or select \"All Candidates\" to see everyone.",
-              descriptionAr: "اختياري — تصفية قائمة المرشحين لعرض أعضاء **دفعة محددة** فقط، أو اختر \"جميع المرشحين\" لعرض الجميع.",
+              descriptionEn:
+                'Optional — filter the candidate list to show only members of a **specific batch**, or select "All Candidates" to see everyone.',
+              descriptionAr:
+                'اختياري — تصفية قائمة المرشحين لعرض أعضاء **دفعة محددة** فقط، أو اختر "جميع المرشحين" لعرض الجميع.',
             },
           ],
           tipEn:
-            "The \"Schedule To\" date defines when candidates can **start** the exam — not when they must finish. If a candidate starts at 11:59 PM before the deadline, they get the full exam duration to complete it.",
+            'The "Schedule To" date defines when candidates can **start** the exam — not when they must finish. If a candidate starts at 11:59 PM before the deadline, they get the full exam duration to complete it.',
           tipAr:
-            "تاريخ \"الجدول إلى\" يحدد متى يمكن للمرشحين **بدء** الاختبار — وليس متى يجب أن ينتهوا. إذا بدأ مرشح في 11:59 مساءً قبل الموعد النهائي، يحصل على كامل مدة الاختبار لإكماله.",
+            'تاريخ "الجدول إلى" يحدد متى يمكن للمرشحين **بدء** الاختبار — وليس متى يجب أن ينتهوا. إذا بدأ مرشح في 11:59 مساءً قبل الموعد النهائي، يحصل على كامل مدة الاختبار لإكماله.',
         },
         {
           id: "assign-step2-select",
           titleEn: "Step 2 — Select & Assign Candidates",
           titleAr: "الخطوة 2 — اختيار وتعيين المرشحين",
           descriptionEn:
-            "After completing Step 1, the candidate list appears with the following controls:\n\n**Search & Filter:**\n- **Search box** — find by name, email, or roll number\n- **Status filter** — All, Active, or Blocked\n- Results are **paginated** (20 per page)\n\n**Candidate Table Columns:**\n- **Checkbox** — select for bulk operations (row-level and header for page)\n- **#** — index number\n- **Roll No** — candidate identifier\n- **Name** — candidate name\n- **Email** — email address\n- **Mobile** — phone number\n- **Assigned?** — \"Yes\" (green) or \"No\" badge indicating current assignment status\n- **Started?** — \"Yes\" or \"No\" badge indicating if the candidate has started the exam\n- **Status** — Active or Blocked badge",
+            'After completing Step 1, the candidate list appears with the following controls:\n\n**Search & Filter:**\n- **Search box** — find by name, email, or roll number\n- **Status filter** — All, Active, or Blocked\n- Results are **paginated** (20 per page)\n\n**Candidate Table Columns:**\n- **Checkbox** — select for bulk operations (row-level and header for page)\n- **#** — index number\n- **Roll No** — candidate identifier\n- **Name** — candidate name\n- **Email** — email address\n- **Mobile** — phone number\n- **Assigned?** — "Yes" (green) or "No" badge indicating current assignment status\n- **Started?** — "Yes" or "No" badge indicating if the candidate has started the exam\n- **Status** — Active or Blocked badge',
           descriptionAr:
-            "بعد إكمال الخطوة 1، تظهر قائمة المرشحين بالأدوات التالية:\n\n**البحث والتصفية:**\n- **مربع البحث** — العثور بالاسم أو البريد أو الرقم\n- **فلتر الحالة** — الكل أو نشط أو محظور\n- النتائج **مُقسّمة** (20 لكل صفحة)\n\n**أعمدة جدول المرشحين:**\n- **مربع اختيار** — للاختيار للعمليات الجماعية (على مستوى الصف والعنوان للصفحة)\n- **#** — رقم الفهرس\n- **الرقم** — معرّف المرشح\n- **الاسم** — اسم المرشح\n- **البريد** — عنوان البريد\n- **الجوال** — رقم الهاتف\n- **معيّن؟** — \"نعم\" (أخضر) أو شارة \"لا\" تشير لحالة التعيين الحالية\n- **بدأ؟** — شارة \"نعم\" أو \"لا\" تشير إذا بدأ المرشح الاختبار\n- **الحالة** — شارة نشط أو محظور",
+            'بعد إكمال الخطوة 1، تظهر قائمة المرشحين بالأدوات التالية:\n\n**البحث والتصفية:**\n- **مربع البحث** — العثور بالاسم أو البريد أو الرقم\n- **فلتر الحالة** — الكل أو نشط أو محظور\n- النتائج **مُقسّمة** (20 لكل صفحة)\n\n**أعمدة جدول المرشحين:**\n- **مربع اختيار** — للاختيار للعمليات الجماعية (على مستوى الصف والعنوان للصفحة)\n- **#** — رقم الفهرس\n- **الرقم** — معرّف المرشح\n- **الاسم** — اسم المرشح\n- **البريد** — عنوان البريد\n- **الجوال** — رقم الهاتف\n- **معيّن؟** — "نعم" (أخضر) أو شارة "لا" تشير لحالة التعيين الحالية\n- **بدأ؟** — شارة "نعم" أو "لا" تشير إذا بدأ المرشح الاختبار\n- **الحالة** — شارة نشط أو محظور',
           imagePlaceholder: "/tutorials/candidates-assign-step2.png",
         },
         {
@@ -3781,9 +3809,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Assignment Actions",
           titleAr: "إجراءات التعيين",
           descriptionEn:
-            "After selecting candidates with checkboxes, the following action buttons become available:\n\n- **Assign (X)** — assign the selected X candidates to the exam with the configured schedule\n- **Unassign (X)** — remove the assignment for the selected X candidates\n- **Assign All Matching** — assign **all candidates** matching the current search/filter criteria (not just the visible page)\n\n**After clicking an action:**\n1. A **confirmation dialog** shows the count being assigned/unassigned\n2. Notes about skipping blocked or already-assigned candidates\n3. Unassign uses a **destructive** (red) button styling for clarity\n\n**Result Summary:**\nAfter the operation completes, a **result dialog** shows:\n- **Total Targeted** — how many were targeted\n- **Success** — how many were successfully assigned/unassigned\n- **Skipped** — how many were skipped, with **individual reasons** (e.g., \"already assigned\", \"candidate is blocked\")",
+            'After selecting candidates with checkboxes, the following action buttons become available:\n\n- **Assign (X)** — assign the selected X candidates to the exam with the configured schedule\n- **Unassign (X)** — remove the assignment for the selected X candidates\n- **Assign All Matching** — assign **all candidates** matching the current search/filter criteria (not just the visible page)\n\n**After clicking an action:**\n1. A **confirmation dialog** shows the count being assigned/unassigned\n2. Notes about skipping blocked or already-assigned candidates\n3. Unassign uses a **destructive** (red) button styling for clarity\n\n**Result Summary:**\nAfter the operation completes, a **result dialog** shows:\n- **Total Targeted** — how many were targeted\n- **Success** — how many were successfully assigned/unassigned\n- **Skipped** — how many were skipped, with **individual reasons** (e.g., "already assigned", "candidate is blocked")',
           descriptionAr:
-            "بعد اختيار المرشحين بمربعات الاختيار، تصبح أزرار الإجراءات التالية متاحة:\n\n- **تعيين (X)** — تعيين X مرشحين محددين للاختبار مع الجدول المُعَد\n- **إلغاء التعيين (X)** — إزالة التعيين لـ X مرشحين محددين\n- **تعيين الكل المطابق** — تعيين **جميع المرشحين** المطابقين لمعايير البحث/التصفية الحالية (ليس فقط الصفحة المرئية)\n\n**بعد النقر على إجراء:**\n1. تظهر **نافذة تأكيد** تعرض العدد الذي سيتم تعيينه/إلغاء تعيينه\n2. ملاحظات حول تخطي المحظورين أو المعيّنين بالفعل\n3. إلغاء التعيين يستخدم تنسيق زر **تدميري** (أحمر) للوضوح\n\n**ملخص النتيجة:**\nبعد اكتمال العملية، تظهر **نافذة نتيجة** تعرض:\n- **إجمالي المستهدفين** — كم تم استهدافهم\n- **النجاح** — كم تم تعيينهم/إلغاء تعيينهم بنجاح\n- **المُتخطّون** — كم تم تخطيهم، مع **أسباب فردية** (مثل: \"معيّن بالفعل\"، \"المرشح محظور\")",
+            'بعد اختيار المرشحين بمربعات الاختيار، تصبح أزرار الإجراءات التالية متاحة:\n\n- **تعيين (X)** — تعيين X مرشحين محددين للاختبار مع الجدول المُعَد\n- **إلغاء التعيين (X)** — إزالة التعيين لـ X مرشحين محددين\n- **تعيين الكل المطابق** — تعيين **جميع المرشحين** المطابقين لمعايير البحث/التصفية الحالية (ليس فقط الصفحة المرئية)\n\n**بعد النقر على إجراء:**\n1. تظهر **نافذة تأكيد** تعرض العدد الذي سيتم تعيينه/إلغاء تعيينه\n2. ملاحظات حول تخطي المحظورين أو المعيّنين بالفعل\n3. إلغاء التعيين يستخدم تنسيق زر **تدميري** (أحمر) للوضوح\n\n**ملخص النتيجة:**\nبعد اكتمال العملية، تظهر **نافذة نتيجة** تعرض:\n- **إجمالي المستهدفين** — كم تم استهدافهم\n- **النجاح** — كم تم تعيينهم/إلغاء تعيينهم بنجاح\n- **المُتخطّون** — كم تم تخطيهم، مع **أسباب فردية** (مثل: "معيّن بالفعل"، "المرشح محظور")',
           imagePlaceholder: "/tutorials/candidates-assign-actions.png",
           noteEn:
             "When a candidate is **assigned to an exam**, they receive an **email notification** informing them of the exam assignment and the schedule window. The same applies when they are **unassigned** — they are notified by email.",
@@ -3796,9 +3824,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Assignment Workflow Example",
           titleAr: "مثال على سير عمل التعيين",
           contentEn:
-            "**Scenario:** Assign the \"IT Department\" batch to the \"Network Security Exam\" with a 1-week window.\n\n1. Select exam: **Network Security Exam**\n2. Set schedule: **From** March 17, 2026 08:00 → **To** March 24, 2026 23:59\n3. Filter by batch: **IT Department**\n4. Click **Assign All Matching** to assign all IT batch members\n5. Review result: 45 targeted → 42 success → 3 skipped (already assigned)\n6. Candidates receive **email notifications** with exam details and schedule",
+            '**Scenario:** Assign the "IT Department" batch to the "Network Security Exam" with a 1-week window.\n\n1. Select exam: **Network Security Exam**\n2. Set schedule: **From** March 17, 2026 08:00 → **To** March 24, 2026 23:59\n3. Filter by batch: **IT Department**\n4. Click **Assign All Matching** to assign all IT batch members\n5. Review result: 45 targeted → 42 success → 3 skipped (already assigned)\n6. Candidates receive **email notifications** with exam details and schedule',
           contentAr:
-            "**السيناريو:** تعيين دفعة \"قسم تقنية المعلومات\" لـ\"اختبار أمن الشبكات\" مع نافذة أسبوع واحد.\n\n1. اختر الاختبار: **اختبار أمن الشبكات**\n2. حدد الجدول: **من** 17 مارس 2026 08:00 ← **إلى** 24 مارس 2026 23:59\n3. فلتر حسب الدفعة: **قسم تقنية المعلومات**\n4. انقر **تعيين الكل المطابق** لتعيين جميع أعضاء دفعة IT\n5. مراجعة النتيجة: 45 مستهدف → 42 نجاح → 3 متخطّى (معيّنون بالفعل)\n6. يتلقى المرشحون **إشعارات بريد إلكتروني** بتفاصيل الاختبار والجدول",
+            '**السيناريو:** تعيين دفعة "قسم تقنية المعلومات" لـ"اختبار أمن الشبكات" مع نافذة أسبوع واحد.\n\n1. اختر الاختبار: **اختبار أمن الشبكات**\n2. حدد الجدول: **من** 17 مارس 2026 08:00 ← **إلى** 24 مارس 2026 23:59\n3. فلتر حسب الدفعة: **قسم تقنية المعلومات**\n4. انقر **تعيين الكل المطابق** لتعيين جميع أعضاء دفعة IT\n5. مراجعة النتيجة: 45 مستهدف → 42 نجاح → 3 متخطّى (معيّنون بالفعل)\n6. يتلقى المرشحون **إشعارات بريد إلكتروني** بتفاصيل الاختبار والجدول',
         },
       ],
     },
@@ -3901,9 +3929,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Search for a Candidate's Exam",
           titleAr: "البحث عن اختبار مرشح",
           descriptionEn:
-            "Navigate to **Candidates** → **Candidate Exam Details** from the sidebar.\n\nThe page starts with a **collapsible search section** with three progressive fields:\n\n1. **Select Candidate** — searchable dropdown (type to search by name, email, or roll number)\n2. **Select Exam** — appears after selecting a candidate; shows all exams this candidate has taken with attempt count\n3. **Select Attempt** — optional; defaults to \"**Latest**\" attempt. You can switch to any historical attempt (#1, #2, etc.) with its status name",
+            'Navigate to **Candidates** → **Candidate Exam Details** from the sidebar.\n\nThe page starts with a **collapsible search section** with three progressive fields:\n\n1. **Select Candidate** — searchable dropdown (type to search by name, email, or roll number)\n2. **Select Exam** — appears after selecting a candidate; shows all exams this candidate has taken with attempt count\n3. **Select Attempt** — optional; defaults to "**Latest**" attempt. You can switch to any historical attempt (#1, #2, etc.) with its status name',
           descriptionAr:
-            "انتقل إلى **المرشحون** ← **تفاصيل اختبار المرشح** من القائمة الجانبية.\n\nتبدأ الصفحة بـ**قسم بحث قابل للطي** بثلاثة حقول متدرجة:\n\n1. **اختر المرشح** — قائمة منسدلة قابلة للبحث (اكتب للبحث بالاسم أو البريد أو الرقم)\n2. **اختر الاختبار** — يظهر بعد اختيار المرشح؛ يعرض جميع الاختبارات التي أداها هذا المرشح مع عدد المحاولات\n3. **اختر المحاولة** — اختياري؛ يتم تعيينه افتراضياً إلى \"**الأحدث**\". يمكنك التبديل لأي محاولة سابقة (#1، #2، إلخ) مع اسم حالتها",
+            'انتقل إلى **المرشحون** ← **تفاصيل اختبار المرشح** من القائمة الجانبية.\n\nتبدأ الصفحة بـ**قسم بحث قابل للطي** بثلاثة حقول متدرجة:\n\n1. **اختر المرشح** — قائمة منسدلة قابلة للبحث (اكتب للبحث بالاسم أو البريد أو الرقم)\n2. **اختر الاختبار** — يظهر بعد اختيار المرشح؛ يعرض جميع الاختبارات التي أداها هذا المرشح مع عدد المحاولات\n3. **اختر المحاولة** — اختياري؛ يتم تعيينه افتراضياً إلى "**الأحدث**". يمكنك التبديل لأي محاولة سابقة (#1، #2، إلخ) مع اسم حالتها',
           imagePlaceholder: "/tutorials/candidates-examdetails-search.png",
           tipEn:
             "You can switch between attempts without leaving the page — all data updates in-place. Use this to compare a candidate's performance across multiple attempts.",
@@ -3915,9 +3943,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Header Card — Candidate & Exam Overview",
           titleAr: "بطاقة الرأس — نظرة عامة على المرشح والاختبار",
           descriptionEn:
-            "The top section shows a comprehensive **header card** with three data groups:\n\n**Candidate Info:**\n- Full name (bilingual)\n- Email address\n- Roll No (if present)\n- Mobile (if present)\n- Status badge (Active/Blocked)\n\n**Exam Info:**\n- Title (bilingual)\n- Duration in minutes\n- Pass score percentage\n- Max attempts allowed\n- Published/Draft status\n- Proctored badge (if the exam requires proctoring)\n\n**Current Attempt:**\n- Status badge with icon (color-coded)\n- Attempt number (e.g., \"Attempt #2 of 3\")\n- Quick links: **View Result** and **View Grading** (if available)",
+            'The top section shows a comprehensive **header card** with three data groups:\n\n**Candidate Info:**\n- Full name (bilingual)\n- Email address\n- Roll No (if present)\n- Mobile (if present)\n- Status badge (Active/Blocked)\n\n**Exam Info:**\n- Title (bilingual)\n- Duration in minutes\n- Pass score percentage\n- Max attempts allowed\n- Published/Draft status\n- Proctored badge (if the exam requires proctoring)\n\n**Current Attempt:**\n- Status badge with icon (color-coded)\n- Attempt number (e.g., "Attempt #2 of 3")\n- Quick links: **View Result** and **View Grading** (if available)',
           descriptionAr:
-            "القسم العلوي يعرض **بطاقة رأس** شاملة بثلاث مجموعات بيانات:\n\n**معلومات المرشح:**\n- الاسم الكامل (ثنائي اللغة)\n- عنوان البريد\n- الرقم (إن وُجد)\n- الجوال (إن وُجد)\n- شارة الحالة (نشط/محظور)\n\n**معلومات الاختبار:**\n- العنوان (ثنائي اللغة)\n- المدة بالدقائق\n- نسبة درجة النجاح\n- أقصى محاولات مسموحة\n- حالة النشر/المسودة\n- شارة المراقبة (إذا كان الاختبار يتطلب مراقبة)\n\n**المحاولة الحالية:**\n- شارة الحالة مع أيقونة (ملونة)\n- رقم المحاولة (مثل: \"المحاولة #2 من 3\")\n- روابط سريعة: **عرض النتيجة** و**عرض التقييم** (إن توفرت)",
+            'القسم العلوي يعرض **بطاقة رأس** شاملة بثلاث مجموعات بيانات:\n\n**معلومات المرشح:**\n- الاسم الكامل (ثنائي اللغة)\n- عنوان البريد\n- الرقم (إن وُجد)\n- الجوال (إن وُجد)\n- شارة الحالة (نشط/محظور)\n\n**معلومات الاختبار:**\n- العنوان (ثنائي اللغة)\n- المدة بالدقائق\n- نسبة درجة النجاح\n- أقصى محاولات مسموحة\n- حالة النشر/المسودة\n- شارة المراقبة (إذا كان الاختبار يتطلب مراقبة)\n\n**المحاولة الحالية:**\n- شارة الحالة مع أيقونة (ملونة)\n- رقم المحاولة (مثل: "المحاولة #2 من 3")\n- روابط سريعة: **عرض النتيجة** و**عرض التقييم** (إن توفرت)',
           imagePlaceholder: "/tutorials/candidates-examdetails-header.png",
         },
         {
@@ -3925,9 +3953,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Metrics Cards",
           titleAr: "بطاقات المقاييس",
           descriptionEn:
-            "Below the header, three **metric cards** display detailed attempt data:\n\n**Timing Card:**\n- **Started at** — exact date/time the candidate started\n- **Submitted at** — when the exam was submitted (or blank if still active)\n- **Expires at** — the calculated expiry time\n- **Total Duration** — time spent in HH:MM:SS format\n- **Remaining** — time left if still active\n\n**Performance Card:**\n- **Total Questions** — number of questions in the exam\n- **Answered** — how many the candidate answered\n- **Score** — achieved score / maximum score\n- **Pass Status** — \"Passed\" (green) or \"Failed\" (red) badge\n- **Resume Count** — how many times the candidate resumed the exam\n\n**Activity Card:**\n- **Last Activity** — timestamp of the last recorded action\n- **IP Address** — the candidate's IP (if captured)\n- **Device Info** — browser/OS details (if captured)\n- **Force Submitted By** — admin who forced submission (if applicable) with timestamp",
+            'Below the header, three **metric cards** display detailed attempt data:\n\n**Timing Card:**\n- **Started at** — exact date/time the candidate started\n- **Submitted at** — when the exam was submitted (or blank if still active)\n- **Expires at** — the calculated expiry time\n- **Total Duration** — time spent in HH:MM:SS format\n- **Remaining** — time left if still active\n\n**Performance Card:**\n- **Total Questions** — number of questions in the exam\n- **Answered** — how many the candidate answered\n- **Score** — achieved score / maximum score\n- **Pass Status** — "Passed" (green) or "Failed" (red) badge\n- **Resume Count** — how many times the candidate resumed the exam\n\n**Activity Card:**\n- **Last Activity** — timestamp of the last recorded action\n- **IP Address** — the candidate\'s IP (if captured)\n- **Device Info** — browser/OS details (if captured)\n- **Force Submitted By** — admin who forced submission (if applicable) with timestamp',
           descriptionAr:
-            "أسفل الرأس، ثلاث **بطاقات مقاييس** تعرض بيانات المحاولة التفصيلية:\n\n**بطاقة التوقيت:**\n- **بدأ في** — التاريخ/الوقت الدقيق لبدء المرشح\n- **قُدّم في** — متى تم تقديم الاختبار (أو فارغ إذا لا يزال نشطاً)\n- **ينتهي في** — وقت الانتهاء المحسوب\n- **المدة الإجمالية** — الوقت المستغرق بتنسيق HH:MM:SS\n- **المتبقي** — الوقت المتبقي إذا لا يزال نشطاً\n\n**بطاقة الأداء:**\n- **إجمالي الأسئلة** — عدد الأسئلة في الاختبار\n- **المُجاب** — كم أجاب المرشح\n- **الدرجة** — الدرجة المحققة / الدرجة القصوى\n- **حالة النجاح** — شارة \"ناجح\" (أخضر) أو \"راسب\" (أحمر)\n- **عدد الاستئنافات** — كم مرة استأنف المرشح الاختبار\n\n**بطاقة النشاط:**\n- **آخر نشاط** — طابع زمني لآخر إجراء مسجل\n- **عنوان IP** — عنوان IP للمرشح (إذا تم التقاطه)\n- **معلومات الجهاز** — تفاصيل المتصفح/نظام التشغيل (إذا تم التقاطها)\n- **قدّم إجبارياً بواسطة** — المدير الذي فرض التقديم (إن وُجد) مع الطابع الزمني",
+            'أسفل الرأس، ثلاث **بطاقات مقاييس** تعرض بيانات المحاولة التفصيلية:\n\n**بطاقة التوقيت:**\n- **بدأ في** — التاريخ/الوقت الدقيق لبدء المرشح\n- **قُدّم في** — متى تم تقديم الاختبار (أو فارغ إذا لا يزال نشطاً)\n- **ينتهي في** — وقت الانتهاء المحسوب\n- **المدة الإجمالية** — الوقت المستغرق بتنسيق HH:MM:SS\n- **المتبقي** — الوقت المتبقي إذا لا يزال نشطاً\n\n**بطاقة الأداء:**\n- **إجمالي الأسئلة** — عدد الأسئلة في الاختبار\n- **المُجاب** — كم أجاب المرشح\n- **الدرجة** — الدرجة المحققة / الدرجة القصوى\n- **حالة النجاح** — شارة "ناجح" (أخضر) أو "غير ناجح" (أحمر)\n- **عدد الاستئنافات** — كم مرة استأنف المرشح الاختبار\n\n**بطاقة النشاط:**\n- **آخر نشاط** — طابع زمني لآخر إجراء مسجل\n- **عنوان IP** — عنوان IP للمرشح (إذا تم التقاطه)\n- **معلومات الجهاز** — تفاصيل المتصفح/نظام التشغيل (إذا تم التقاطها)\n- **قدّم إجبارياً بواسطة** — المدير الذي فرض التقديم (إن وُجد) مع الطابع الزمني',
           imagePlaceholder: "/tutorials/candidates-examdetails-metrics.png",
         },
         {
@@ -3945,9 +3973,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Proctor Session & Evidence",
           titleAr: "جلسة المراقبة والأدلة",
           descriptionEn:
-            "If the exam has **proctoring enabled**, this section shows comprehensive proctor data:\n\n**Proctor Summary:**\n- **Session ID** — unique identifier for the proctor session\n- **Mode** — e.g., \"AI Proctoring\", \"Live\"\n- **Status** — Active or Completed\n- **Total Events** — number of events recorded\n- **Total Violations** — detected violations count\n- **Risk Score & Level** — numerical risk score with color-coded badge (Low/Medium/High/Critical)\n\n**Video Evidence:**\n- Video file name, size (formatted: B/KB/MB/GB), upload status\n- Preview link to watch the recording\n- Duration in seconds\n\n**Screenshot Evidence:**\n- Multiple captured screenshots shown in a grid/carousel\n- Each screenshot shows: filename, capture date/time, file size, upload status\n- Preview/zoom option for each screenshot",
+            'If the exam has **proctoring enabled**, this section shows comprehensive proctor data:\n\n**Proctor Summary:**\n- **Session ID** — unique identifier for the proctor session\n- **Mode** — e.g., "AI Proctoring", "Live"\n- **Status** — Active or Completed\n- **Total Events** — number of events recorded\n- **Total Violations** — detected violations count\n- **Risk Score & Level** — numerical risk score with color-coded badge (Low/Medium/High/Critical)\n\n**Video Evidence:**\n- Video file name, size (formatted: B/KB/MB/GB), upload status\n- Preview link to watch the recording\n- Duration in seconds\n\n**Screenshot Evidence:**\n- Multiple captured screenshots shown in a grid/carousel\n- Each screenshot shows: filename, capture date/time, file size, upload status\n- Preview/zoom option for each screenshot',
           descriptionAr:
-            "إذا كان الاختبار بـ**تمكين المراقبة**، يعرض هذا القسم بيانات مراقبة شاملة:\n\n**ملخص المراقبة:**\n- **رقم الجلسة** — معرّف فريد لجلسة المراقبة\n- **الوضع** — مثل \"مراقبة AI\"، \"مباشر\"\n- **الحالة** — نشط أو مكتمل\n- **إجمالي الأحداث** — عدد الأحداث المسجلة\n- **إجمالي المخالفات** — عدد المخالفات المكتشفة\n- **نقاط ومستوى المخاطر** — درجة مخاطر رقمية مع شارة ملونة (منخفض/متوسط/عالي/حرج)\n\n**أدلة الفيديو:**\n- اسم ملف الفيديو، الحجم (بالتنسيق: B/KB/MB/GB)، حالة الرفع\n- رابط معاينة لمشاهدة التسجيل\n- المدة بالثواني\n\n**أدلة لقطات الشاشة:**\n- عدة لقطات شاشة ملتقطة معروضة في شبكة/عرض دائري\n- كل لقطة تعرض: اسم الملف، تاريخ/وقت الالتقاط، حجم الملف، حالة الرفع\n- خيار معاينة/تكبير لكل لقطة",
+            'إذا كان الاختبار بـ**تمكين المراقبة**، يعرض هذا القسم بيانات مراقبة شاملة:\n\n**ملخص المراقبة:**\n- **رقم الجلسة** — معرّف فريد لجلسة المراقبة\n- **الوضع** — مثل "مراقبة AI"، "مباشر"\n- **الحالة** — نشط أو مكتمل\n- **إجمالي الأحداث** — عدد الأحداث المسجلة\n- **إجمالي المخالفات** — عدد المخالفات المكتشفة\n- **نقاط ومستوى المخاطر** — درجة مخاطر رقمية مع شارة ملونة (منخفض/متوسط/عالي/حرج)\n\n**أدلة الفيديو:**\n- اسم ملف الفيديو، الحجم (بالتنسيق: B/KB/MB/GB)، حالة الرفع\n- رابط معاينة لمشاهدة التسجيل\n- المدة بالثواني\n\n**أدلة لقطات الشاشة:**\n- عدة لقطات شاشة ملتقطة معروضة في شبكة/عرض دائري\n- كل لقطة تعرض: اسم الملف، تاريخ/وقت الالتقاط، حجم الملف، حالة الرفع\n- خيار معاينة/تكبير لكل لقطة',
           imagePlaceholder: "/tutorials/candidates-examdetails-proctor.png",
         },
         {
@@ -3965,9 +3993,9 @@ export const candidateTutorial: TutorialModule = {
           titleEn: "Event Timeline",
           titleAr: "الجدول الزمني للأحداث",
           descriptionEn:
-            "The **Event Timeline** provides a chronological log of every action during the exam attempt:\n\n- **Event Date/Time** — when the event occurred\n- **Event Type** — categorized event name (e.g., \"Question Answered\", \"Tab Switch\", \"Face Not Detected\")\n- **Question Context** — which question was active (if applicable)\n- **Answer Summary** — what was answered (if applicable)\n- **Metadata** — additional contextual data\n\nThe timeline is **sortable** and **filterable**, allowing you to review the entire exam session chronologically or focus on specific event types.",
+            'The **Event Timeline** provides a chronological log of every action during the exam attempt:\n\n- **Event Date/Time** — when the event occurred\n- **Event Type** — categorized event name (e.g., "Question Answered", "Tab Switch", "Face Not Detected")\n- **Question Context** — which question was active (if applicable)\n- **Answer Summary** — what was answered (if applicable)\n- **Metadata** — additional contextual data\n\nThe timeline is **sortable** and **filterable**, allowing you to review the entire exam session chronologically or focus on specific event types.',
           descriptionAr:
-            "يوفر **الجدول الزمني للأحداث** سجلاً زمنياً لكل إجراء أثناء محاولة الاختبار:\n\n- **تاريخ/وقت الحدث** — متى وقع الحدث\n- **نوع الحدث** — اسم الحدث المصنّف (مثل: \"إجابة سؤال\"، \"تبديل تبويب\"، \"وجه غير مكتشف\")\n- **سياق السؤال** — أي سؤال كان نشطاً (إن وُجد)\n- **ملخص الإجابة** — ماذا تمت الإجابة (إن وُجد)\n- **البيانات الوصفية** — بيانات سياقية إضافية\n\nالجدول الزمني **قابل للترتيب** و**قابل للتصفية**، مما يتيح لك مراجعة جلسة الاختبار بالكامل زمنياً أو التركيز على أنواع أحداث محددة.",
+            'يوفر **الجدول الزمني للأحداث** سجلاً زمنياً لكل إجراء أثناء محاولة الاختبار:\n\n- **تاريخ/وقت الحدث** — متى وقع الحدث\n- **نوع الحدث** — اسم الحدث المصنّف (مثل: "إجابة سؤال"، "تبديل تبويب"، "وجه غير مكتشف")\n- **سياق السؤال** — أي سؤال كان نشطاً (إن وُجد)\n- **ملخص الإجابة** — ماذا تمت الإجابة (إن وُجد)\n- **البيانات الوصفية** — بيانات سياقية إضافية\n\nالجدول الزمني **قابل للترتيب** و**قابل للتصفية**، مما يتيح لك مراجعة جلسة الاختبار بالكامل زمنياً أو التركيز على أنواع أحداث محددة.',
           imagePlaceholder: "/tutorials/candidates-examdetails-timeline.png",
           tipEn:
             "The event timeline is the most valuable tool for investigating suspected cheating. Look for patterns like: frequent tab switches, face not detected events, or rapid answer changes.",
@@ -4059,9 +4087,9 @@ export const administrationTutorial: TutorialModule = {
           titleEn: "Department Isolation Example",
           titleAr: "مثال على عزل الأقسام",
           contentEn:
-            "**Scenario:** A company with 3 departments — IT, HR, and Finance.\n\n**Staff Isolation:**\n- IT Instructor creates \"Network Security Exam\" → visible only to IT staff\n- HR Admin creates \"Compliance Quiz\" → visible only to HR staff\n- Finance Instructor creates \"Accounting Test\" → visible only to Finance staff\n\n**Shared Candidates:**\n- Employee \"Ahmed\" is registered ONCE in the system\n- IT assigns Ahmed to \"Network Security Exam\"\n- HR assigns Ahmed to \"Compliance Quiz\"\n- Finance assigns Ahmed to \"Accounting Test\"\n- Ahmed sees ALL 3 exams in his dashboard with ONE login\n- All results appear under Ahmed's unified profile",
+            '**Scenario:** A company with 3 departments — IT, HR, and Finance.\n\n**Staff Isolation:**\n- IT Instructor creates "Network Security Exam" → visible only to IT staff\n- HR Admin creates "Compliance Quiz" → visible only to HR staff\n- Finance Instructor creates "Accounting Test" → visible only to Finance staff\n\n**Shared Candidates:**\n- Employee "Ahmed" is registered ONCE in the system\n- IT assigns Ahmed to "Network Security Exam"\n- HR assigns Ahmed to "Compliance Quiz"\n- Finance assigns Ahmed to "Accounting Test"\n- Ahmed sees ALL 3 exams in his dashboard with ONE login\n- All results appear under Ahmed\'s unified profile',
           contentAr:
-            "**السيناريو:** شركة بها 3 أقسام — تقنية المعلومات والموارد البشرية والمالية.\n\n**عزل الموظفين:**\n- مدرّس IT ينشئ \"اختبار أمن الشبكات\" → مرئي فقط لموظفي IT\n- مدير HR ينشئ \"اختبار الامتثال\" → مرئي فقط لموظفي HR\n- مدرّس المالية ينشئ \"اختبار المحاسبة\" → مرئي فقط لموظفي المالية\n\n**المرشحون المشتركون:**\n- الموظف \"أحمد\" مسجل مرة واحدة في النظام\n- IT يعيّن أحمد لـ\"اختبار أمن الشبكات\"\n- HR يعيّن أحمد لـ\"اختبار الامتثال\"\n- المالية تعيّن أحمد لـ\"اختبار المحاسبة\"\n- أحمد يرى جميع الاختبارات الـ3 في لوحته بتسجيل دخول واحد\n- جميع النتائج تظهر تحت ملف أحمد الموحد",
+            '**السيناريو:** شركة بها 3 أقسام — تقنية المعلومات والموارد البشرية والمالية.\n\n**عزل الموظفين:**\n- مدرّس IT ينشئ "اختبار أمن الشبكات" → مرئي فقط لموظفي IT\n- مدير HR ينشئ "اختبار الامتثال" → مرئي فقط لموظفي HR\n- مدرّس المالية ينشئ "اختبار المحاسبة" → مرئي فقط لموظفي المالية\n\n**المرشحون المشتركون:**\n- الموظف "أحمد" مسجل مرة واحدة في النظام\n- IT يعيّن أحمد لـ"اختبار أمن الشبكات"\n- HR يعيّن أحمد لـ"اختبار الامتثال"\n- المالية تعيّن أحمد لـ"اختبار المحاسبة"\n- أحمد يرى جميع الاختبارات الـ3 في لوحته بتسجيل دخول واحد\n- جميع النتائج تظهر تحت ملف أحمد الموحد',
         },
       ],
     },
@@ -4117,29 +4145,37 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Email",
               nameAr: "البريد الإلكتروني",
               required: true,
-              descriptionEn: "Unique email address — used as the user's **login credential**",
-              descriptionAr: "عنوان بريد إلكتروني فريد — يُستخدم كـ**بيانات دخول المستخدم**",
+              descriptionEn:
+                "Unique email address — used as the user's **login credential**",
+              descriptionAr:
+                "عنوان بريد إلكتروني فريد — يُستخدم كـ**بيانات دخول المستخدم**",
             },
             {
               nameEn: "Role",
               nameAr: "الدور",
               required: true,
-              descriptionEn: "Select a role: **Admin**, **Instructor**, **Examiner**, **Proctor**, **ProctorReviewer**, **Auditor**, or **SuperAdmin**",
-              descriptionAr: "اختر دوراً: **مدير**، **مدرّس**، **ممتحن**، **مراقب**، **مراجع المراقبة**، **مدقق**، أو **مسؤول أعلى**",
+              descriptionEn:
+                "Select a role: **Admin**, **Instructor**, **Examiner**, **Proctor**, **ProctorReviewer**, **Auditor**, or **SuperAdmin**",
+              descriptionAr:
+                "اختر دوراً: **مدير**، **مدرّس**، **ممتحن**، **مراقب**، **مراجع المراقبة**، **مدقق**، أو **مسؤول أعلى**",
             },
             {
               nameEn: "Department",
               nameAr: "القسم",
               required: false,
-              descriptionEn: "Optionally assign the user to a department. This controls their data scope and visibility.",
-              descriptionAr: "اختيارياً عيّن المستخدم لقسم. هذا يتحكم في نطاق بياناتهم وإمكانية رؤيتها.",
+              descriptionEn:
+                "Optionally assign the user to a department. This controls their data scope and visibility.",
+              descriptionAr:
+                "اختيارياً عيّن المستخدم لقسم. هذا يتحكم في نطاق بياناتهم وإمكانية رؤيتها.",
             },
             {
               nameEn: "Password",
               nameAr: "كلمة المرور",
               required: true,
-              descriptionEn: "Initial password (minimum **8 characters**). Must match the confirm password field.",
-              descriptionAr: "كلمة المرور الأولية (الحد الأدنى **8 أحرف**). يجب أن تطابق حقل تأكيد كلمة المرور.",
+              descriptionEn:
+                "Initial password (minimum **8 characters**). Must match the confirm password field.",
+              descriptionAr:
+                "كلمة المرور الأولية (الحد الأدنى **8 أحرف**). يجب أن تطابق حقل تأكيد كلمة المرور.",
             },
             {
               nameEn: "Confirm Password",
@@ -4221,9 +4257,9 @@ export const administrationTutorial: TutorialModule = {
           titleEn: "Assign or Change Department",
           titleAr: "تعيين أو تغيير القسم",
           descriptionEn:
-            "To assign or change a user's department:\n\n1. Find the user in the table\n2. Click the **Department dropdown** in their row\n3. Select a department or choose \"**No Department**\" to remove the assignment\n4. Click **Save** to apply\n\nDepartment assignment controls:\n- Which **exams and questions** the user can see\n- Which **data scope** applies to their work\n- Which **reports and logs** they can access",
+            'To assign or change a user\'s department:\n\n1. Find the user in the table\n2. Click the **Department dropdown** in their row\n3. Select a department or choose "**No Department**" to remove the assignment\n4. Click **Save** to apply\n\nDepartment assignment controls:\n- Which **exams and questions** the user can see\n- Which **data scope** applies to their work\n- Which **reports and logs** they can access',
           descriptionAr:
-            "لتعيين أو تغيير قسم المستخدم:\n\n1. ابحث عن المستخدم في الجدول\n2. انقر على **قائمة القسم** المنسدلة في صفه\n3. اختر قسماً أو اختر \"**بدون قسم**\" لإزالة التعيين\n4. انقر **حفظ** للتطبيق\n\nتعيين القسم يتحكم في:\n- أي **اختبارات وأسئلة** يمكن للمستخدم رؤيتها\n- أي **نطاق بيانات** ينطبق على عمله\n- أي **تقارير وسجلات** يمكنه الوصول إليها",
+            'لتعيين أو تغيير قسم المستخدم:\n\n1. ابحث عن المستخدم في الجدول\n2. انقر على **قائمة القسم** المنسدلة في صفه\n3. اختر قسماً أو اختر "**بدون قسم**" لإزالة التعيين\n4. انقر **حفظ** للتطبيق\n\nتعيين القسم يتحكم في:\n- أي **اختبارات وأسئلة** يمكن للمستخدم رؤيتها\n- أي **نطاق بيانات** ينطبق على عمله\n- أي **تقارير وسجلات** يمكنه الوصول إليها',
           imagePlaceholder: "/tutorials/admin-permissions-dept.png",
           tipEn:
             "Changes are saved **per user** — you can edit multiple users and save them individually. A badge at the top shows the count of **pending changes** not yet saved.",
@@ -4276,22 +4312,26 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Name (English)",
               nameAr: "الاسم (إنجليزي)",
               required: true,
-              descriptionEn: "Department name in English (e.g., \"Information Technology\")",
-              descriptionAr: "اسم القسم بالإنجليزية (مثل: \"Information Technology\")",
+              descriptionEn:
+                'Department name in English (e.g., "Information Technology")',
+              descriptionAr:
+                'اسم القسم بالإنجليزية (مثل: "Information Technology")',
             },
             {
               nameEn: "Name (Arabic)",
               nameAr: "الاسم (عربي)",
               required: true,
-              descriptionEn: "Department name in Arabic (e.g., \"تقنية المعلومات\")",
-              descriptionAr: "اسم القسم بالعربية (مثل: \"تقنية المعلومات\")",
+              descriptionEn:
+                'Department name in Arabic (e.g., "تقنية المعلومات")',
+              descriptionAr: 'اسم القسم بالعربية (مثل: "تقنية المعلومات")',
             },
             {
               nameEn: "Code",
               nameAr: "الرمز",
               required: false,
-              descriptionEn: "Optional short identifier (e.g., \"IT\", \"HR\", \"FIN\")",
-              descriptionAr: "معرّف قصير اختياري (مثل: \"IT\"، \"HR\"، \"FIN\")",
+              descriptionEn:
+                'Optional short identifier (e.g., "IT", "HR", "FIN")',
+              descriptionAr: 'معرّف قصير اختياري (مثل: "IT"، "HR"، "FIN")',
             },
             {
               nameEn: "Description (English)",
@@ -4311,8 +4351,10 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Is Active",
               nameAr: "نشط",
               required: false,
-              descriptionEn: "Toggle to set the department as active or inactive (default: **Active**)",
-              descriptionAr: "مفتاح لتعيين القسم نشطاً أو غير نشط (الافتراضي: **نشط**)",
+              descriptionEn:
+                "Toggle to set the department as active or inactive (default: **Active**)",
+              descriptionAr:
+                "مفتاح لتعيين القسم نشطاً أو غير نشط (الافتراضي: **نشط**)",
             },
           ],
         },
@@ -4356,22 +4398,28 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Organization Name",
               nameAr: "اسم المنظمة",
               required: false,
-              descriptionEn: "Your organization's display name (appears in notifications and branding)",
-              descriptionAr: "اسم العرض لمنظمتك (يظهر في الإشعارات والعلامة التجارية)",
+              descriptionEn:
+                "Your organization's display name (appears in notifications and branding)",
+              descriptionAr:
+                "اسم العرض لمنظمتك (يظهر في الإشعارات والعلامة التجارية)",
             },
             {
               nameEn: "Primary Color",
               nameAr: "اللون الأساسي",
               required: false,
-              descriptionEn: "Brand color used throughout the platform (color picker, default: **#0d9488** — teal)",
-              descriptionAr: "لون العلامة التجارية المستخدم عبر المنصة (منتقي ألوان، الافتراضي: **#0d9488** — أزرق مخضر)",
+              descriptionEn:
+                "Brand color used throughout the platform (color picker, default: **#0d9488** — teal)",
+              descriptionAr:
+                "لون العلامة التجارية المستخدم عبر المنصة (منتقي ألوان، الافتراضي: **#0d9488** — أزرق مخضر)",
             },
             {
               nameEn: "Support Email",
               nameAr: "بريد الدعم",
               required: false,
-              descriptionEn: "Contact email for support — included in notification templates via {{SupportEmail}}",
-              descriptionAr: "بريد الاتصال للدعم — مضمّن في قوالب الإشعارات عبر {{SupportEmail}}",
+              descriptionEn:
+                "Contact email for support — included in notification templates via {{SupportEmail}}",
+              descriptionAr:
+                "بريد الاتصال للدعم — مضمّن في قوالب الإشعارات عبر {{SupportEmail}}",
             },
             {
               nameEn: "Mobile Number",
@@ -4398,14 +4446,16 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Footer Text",
               nameAr: "نص التذييل",
               required: false,
-              descriptionEn: "Text shown in the platform footer and email templates",
+              descriptionEn:
+                "Text shown in the platform footer and email templates",
               descriptionAr: "النص المعروض في تذييل المنصة وقوالب البريد",
             },
             {
               nameEn: "Is Active",
               nameAr: "نشط",
               required: false,
-              descriptionEn: "Toggle to activate/deactivate organization settings",
+              descriptionEn:
+                "Toggle to activate/deactivate organization settings",
               descriptionAr: "مفتاح لتفعيل/إلغاء تفعيل إعدادات المنظمة",
             },
           ],
@@ -4440,8 +4490,10 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Maintenance Mode",
               nameAr: "وضع الصيانة",
               required: false,
-              descriptionEn: "Toggle to put the system in maintenance mode. When enabled, only SuperAdmin users can access the platform.",
-              descriptionAr: "مفتاح لوضع النظام في وضع الصيانة. عند التفعيل، فقط مستخدمو المسؤول الأعلى يمكنهم الوصول للمنصة.",
+              descriptionEn:
+                "Toggle to put the system in maintenance mode. When enabled, only SuperAdmin users can access the platform.",
+              descriptionAr:
+                "مفتاح لوضع النظام في وضع الصيانة. عند التفعيل، فقط مستخدمو المسؤول الأعلى يمكنهم الوصول للمنصة.",
             },
             {
               nameEn: "Allow Registration",
@@ -4454,15 +4506,18 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Max File Upload (MB)",
               nameAr: "أقصى حجم رفع (ميجابايت)",
               required: false,
-              descriptionEn: "Maximum file size allowed for uploads in megabytes",
+              descriptionEn:
+                "Maximum file size allowed for uploads in megabytes",
               descriptionAr: "أقصى حجم ملف مسموح للرفع بالميجابايت",
             },
             {
               nameEn: "Session Timeout (minutes)",
               nameAr: "مهلة الجلسة (دقائق)",
               required: false,
-              descriptionEn: "How long an inactive session stays alive before automatic logout",
-              descriptionAr: "كم تبقى الجلسة غير النشطة حية قبل تسجيل الخروج التلقائي",
+              descriptionEn:
+                "How long an inactive session stays alive before automatic logout",
+              descriptionAr:
+                "كم تبقى الجلسة غير النشطة حية قبل تسجيل الخروج التلقائي",
             },
           ],
         },
@@ -4480,7 +4535,8 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Minimum Length",
               nameAr: "الحد الأدنى للطول",
               required: false,
-              descriptionEn: "Minimum number of characters required for passwords",
+              descriptionEn:
+                "Minimum number of characters required for passwords",
               descriptionAr: "الحد الأدنى لعدد الأحرف المطلوبة لكلمات المرور",
             },
             {
@@ -4501,7 +4557,8 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Require Special Characters",
               nameAr: "تتطلب أحرف خاصة",
               required: false,
-              descriptionEn: "Toggle to require at least one special character (e.g., @, #, $)",
+              descriptionEn:
+                "Toggle to require at least one special character (e.g., @, #, $)",
               descriptionAr: "مفتاح لطلب حرف خاص واحد على الأقل (مثل: @، #، $)",
             },
           ],
@@ -4524,29 +4581,37 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Enable Live Video",
               nameAr: "تفعيل الفيديو المباشر",
               required: false,
-              descriptionEn: "Toggle to enable WebRTC live video streaming from candidate webcams during proctored exams",
-              descriptionAr: "مفتاح لتفعيل بث الفيديو المباشر WebRTC من كاميرات المرشحين أثناء الاختبارات المراقبة",
+              descriptionEn:
+                "Toggle to enable WebRTC live video streaming from candidate webcams during proctored exams",
+              descriptionAr:
+                "مفتاح لتفعيل بث الفيديو المباشر WebRTC من كاميرات المرشحين أثناء الاختبارات المراقبة",
             },
             {
               nameEn: "Enable Video Recording",
               nameAr: "تفعيل تسجيل الفيديو",
               required: false,
-              descriptionEn: "Toggle to record exam sessions for post-exam review and evidence",
-              descriptionAr: "مفتاح لتسجيل جلسات الاختبار للمراجعة بعد الاختبار والأدلة",
+              descriptionEn:
+                "Toggle to record exam sessions for post-exam review and evidence",
+              descriptionAr:
+                "مفتاح لتسجيل جلسات الاختبار للمراجعة بعد الاختبار والأدلة",
             },
             {
               nameEn: "Enable Smart Monitoring",
               nameAr: "تفعيل المراقبة الذكية",
               required: false,
-              descriptionEn: "Toggle to enable AI-powered behavioral analysis during proctored exams",
-              descriptionAr: "مفتاح لتفعيل التحليل السلوكي المدعوم بالذكاء الاصطناعي أثناء الاختبارات المراقبة",
+              descriptionEn:
+                "Toggle to enable AI-powered behavioral analysis during proctored exams",
+              descriptionAr:
+                "مفتاح لتفعيل التحليل السلوكي المدعوم بالذكاء الاصطناعي أثناء الاختبارات المراقبة",
             },
             {
               nameEn: "Default Proctor Mode",
               nameAr: "وضع المراقبة الافتراضي",
               required: false,
-              descriptionEn: "Select the default proctoring mode for new exams (e.g., AI Proctoring, Live, or Hybrid)",
-              descriptionAr: "اختر وضع المراقبة الافتراضي للاختبارات الجديدة (مثل: مراقبة AI، مباشر، أو هجين)",
+              descriptionEn:
+                "Select the default proctoring mode for new exams (e.g., AI Proctoring, Live, or Hybrid)",
+              descriptionAr:
+                "اختر وضع المراقبة الافتراضي للاختبارات الجديدة (مثل: مراقبة AI، مباشر، أو هجين)",
             },
           ],
         },
@@ -4564,8 +4629,10 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Brand Name",
               nameAr: "اسم العلامة التجارية",
               required: false,
-              descriptionEn: "Your brand name — used in emails via {{BrandName}} placeholder",
-              descriptionAr: "اسم علامتك التجارية — يُستخدم في الرسائل عبر عنصر {{BrandName}}",
+              descriptionEn:
+                "Your brand name — used in emails via {{BrandName}} placeholder",
+              descriptionAr:
+                "اسم علامتك التجارية — يُستخدم في الرسائل عبر عنصر {{BrandName}}",
             },
             {
               nameEn: "Logo URL",
@@ -4585,7 +4652,8 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Support Email / URL",
               nameAr: "بريد / رابط الدعم",
               required: false,
-              descriptionEn: "Support contact details for notifications and templates",
+              descriptionEn:
+                "Support contact details for notifications and templates",
               descriptionAr: "تفاصيل اتصال الدعم للإشعارات والقوالب",
             },
             {
@@ -4593,7 +4661,8 @@ export const administrationTutorial: TutorialModule = {
               nameAr: "اللون الأساسي",
               required: false,
               descriptionEn: "Brand color in hex format (e.g., **#0d9488**)",
-              descriptionAr: "لون العلامة التجارية بتنسيق hex (مثل: **#0d9488**)",
+              descriptionAr:
+                "لون العلامة التجارية بتنسيق hex (مثل: **#0d9488**)",
             },
           ],
           noteEn:
@@ -4627,43 +4696,51 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "SMTP Host",
               nameAr: "مضيف SMTP",
               required: false,
-              descriptionEn: "Mail server hostname (e.g., **smtp.gmail.com**, **smtp.office365.com**)",
-              descriptionAr: "اسم مضيف خادم البريد (مثل: **smtp.gmail.com**، **smtp.office365.com**)",
+              descriptionEn:
+                "Mail server hostname (e.g., **smtp.gmail.com**, **smtp.office365.com**)",
+              descriptionAr:
+                "اسم مضيف خادم البريد (مثل: **smtp.gmail.com**، **smtp.office365.com**)",
             },
             {
               nameEn: "SMTP Port",
               nameAr: "منفذ SMTP",
               required: false,
-              descriptionEn: "Mail server port (common: **587** for TLS, **465** for SSL, **25** for unencrypted)",
-              descriptionAr: "منفذ خادم البريد (شائع: **587** لـ TLS، **465** لـ SSL، **25** بدون تشفير)",
+              descriptionEn:
+                "Mail server port (common: **587** for TLS, **465** for SSL, **25** for unencrypted)",
+              descriptionAr:
+                "منفذ خادم البريد (شائع: **587** لـ TLS، **465** لـ SSL، **25** بدون تشفير)",
             },
             {
               nameEn: "Username",
               nameAr: "اسم المستخدم",
               required: false,
-              descriptionEn: "SMTP authentication username (usually the email address)",
+              descriptionEn:
+                "SMTP authentication username (usually the email address)",
               descriptionAr: "اسم مستخدم مصادقة SMTP (عادة عنوان البريد)",
             },
             {
               nameEn: "Password",
               nameAr: "كلمة المرور",
               required: false,
-              descriptionEn: "SMTP authentication password (masked input with show/hide toggle)",
-              descriptionAr: "كلمة مرور مصادقة SMTP (إدخال مخفي مع مفتاح إظهار/إخفاء)",
+              descriptionEn:
+                "SMTP authentication password (masked input with show/hide toggle)",
+              descriptionAr:
+                "كلمة مرور مصادقة SMTP (إدخال مخفي مع مفتاح إظهار/إخفاء)",
             },
             {
               nameEn: "From Email",
               nameAr: "البريد المرسل",
               required: false,
-              descriptionEn: "The \"From\" email address shown to recipients",
-              descriptionAr: "عنوان البريد \"المرسل\" المعروض للمستلمين",
+              descriptionEn: 'The "From" email address shown to recipients',
+              descriptionAr: 'عنوان البريد "المرسل" المعروض للمستلمين',
             },
             {
               nameEn: "From Name",
               nameAr: "اسم المرسل",
               required: false,
-              descriptionEn: "Display name for the sender (e.g., \"SmartExam System\")",
-              descriptionAr: "اسم العرض للمرسل (مثل: \"نظام SmartExam\")",
+              descriptionEn:
+                'Display name for the sender (e.g., "SmartExam System")',
+              descriptionAr: 'اسم العرض للمرسل (مثل: "نظام SmartExam")',
             },
             {
               nameEn: "Enable SSL",
@@ -4676,14 +4753,16 @@ export const administrationTutorial: TutorialModule = {
               nameEn: "Enable Email",
               nameAr: "تفعيل البريد",
               required: false,
-              descriptionEn: "Master toggle to **enable/disable all email notifications** system-wide",
-              descriptionAr: "مفتاح رئيسي لـ**تفعيل/تعطيل جميع إشعارات البريد** على مستوى النظام",
+              descriptionEn:
+                "Master toggle to **enable/disable all email notifications** system-wide",
+              descriptionAr:
+                "مفتاح رئيسي لـ**تفعيل/تعطيل جميع إشعارات البريد** على مستوى النظام",
             },
           ],
           tipEn:
-            "For Gmail, use **smtp.gmail.com** on port **587** with SSL enabled. You may need to create an \"App Password\" in your Google account security settings.",
+            'For Gmail, use **smtp.gmail.com** on port **587** with SSL enabled. You may need to create an "App Password" in your Google account security settings.',
           tipAr:
-            "لـ Gmail، استخدم **smtp.gmail.com** على المنفذ **587** مع تفعيل SSL. قد تحتاج لإنشاء \"كلمة مرور تطبيق\" في إعدادات أمان حسابك في Google.",
+            'لـ Gmail، استخدم **smtp.gmail.com** على المنفذ **587** مع تفعيل SSL. قد تحتاج لإنشاء "كلمة مرور تطبيق" في إعدادات أمان حسابك في Google.',
         },
         {
           id: "notification-settings-sms",
@@ -4701,37 +4780,44 @@ export const administrationTutorial: TutorialModule = {
           titleAr: "الإعدادات العامة والدفعات",
           descriptionEn:
             "Switch to the **General** tab for batch notification settings:",
-          descriptionAr:
-            "انتقل لتبويب **العام** لإعدادات إشعارات الدفعات:",
+          descriptionAr: "انتقل لتبويب **العام** لإعدادات إشعارات الدفعات:",
           imagePlaceholder: "/tutorials/admin-notifications-general.png",
           fields: [
             {
               nameEn: "Login URL",
               nameAr: "رابط الدخول",
               required: false,
-              descriptionEn: "The login page URL included in notification emails via {{LoginUrl}} placeholder",
-              descriptionAr: "رابط صفحة الدخول المضمّن في رسائل الإشعارات عبر عنصر {{LoginUrl}}",
+              descriptionEn:
+                "The login page URL included in notification emails via {{LoginUrl}} placeholder",
+              descriptionAr:
+                "رابط صفحة الدخول المضمّن في رسائل الإشعارات عبر عنصر {{LoginUrl}}",
             },
             {
               nameEn: "Email Batch Size",
               nameAr: "حجم دفعة البريد",
               required: false,
-              descriptionEn: "Number of emails sent per batch (default: **50**). Controls throttling for mass notifications.",
-              descriptionAr: "عدد الرسائل المُرسلة لكل دفعة (الافتراضي: **50**). يتحكم في تقييد الإشعارات الجماعية.",
+              descriptionEn:
+                "Number of emails sent per batch (default: **50**). Controls throttling for mass notifications.",
+              descriptionAr:
+                "عدد الرسائل المُرسلة لكل دفعة (الافتراضي: **50**). يتحكم في تقييد الإشعارات الجماعية.",
             },
             {
               nameEn: "SMS Batch Size",
               nameAr: "حجم دفعة الرسائل",
               required: false,
-              descriptionEn: "Number of SMS messages sent per batch (default: **50**)",
-              descriptionAr: "عدد الرسائل القصيرة المُرسلة لكل دفعة (الافتراضي: **50**)",
+              descriptionEn:
+                "Number of SMS messages sent per batch (default: **50**)",
+              descriptionAr:
+                "عدد الرسائل القصيرة المُرسلة لكل دفعة (الافتراضي: **50**)",
             },
             {
               nameEn: "Batch Delay (ms)",
               nameAr: "تأخير الدفعة (مللي ثانية)",
               required: false,
-              descriptionEn: "Delay between batches in milliseconds (default: **1000ms**). Prevents overwhelming the SMTP/SMS provider.",
-              descriptionAr: "التأخير بين الدفعات بالمللي ثانية (الافتراضي: **1000 مللي ثانية**). يمنع إرهاق مزود SMTP/SMS.",
+              descriptionEn:
+                "Delay between batches in milliseconds (default: **1000ms**). Prevents overwhelming the SMTP/SMS provider.",
+              descriptionAr:
+                "التأخير بين الدفعات بالمللي ثانية (الافتراضي: **1000 مللي ثانية**). يمنع إرهاق مزود SMTP/SMS.",
             },
           ],
         },
@@ -4863,9 +4949,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Portal Layout & Sidebar",
           titleAr: "تخطيط البوابة والشريط الجانبي",
           descriptionEn:
-            "When a candidate logs in, they see a dedicated **Candidate Portal** with a simplified sidebar:\n\n**Sidebar Menu Items:**\n1. **Dashboard** — landing page with welcome message and current date\n2. **My Exams** — all assigned exams with status filters and actions\n3. **Identity** — identity verification status and submission form\n\n**Header Bar (Top Right):**\n- 🔔 **Notifications bell** — alerts for exam assignments, results, and system messages\n- ☀️ **Theme toggle** — switch between Light and Dark mode\n- 🌐 **Language toggle** — switch between English and Arabic (full RTL support)\n- 👤 **User avatar & name** — shows candidate name with profile menu\n\n**Identity Status Badge:**\nThe sidebar shows the current verification status next to \"Identity\":\n- \"None\" (gray) — not yet submitted\n- \"Pending\" (yellow) — submitted, awaiting review\n- \"Verified\" (green) — approved\n- \"Rejected\" (red) — rejected, can resubmit",
+            'When a candidate logs in, they see a dedicated **Candidate Portal** with a simplified sidebar:\n\n**Sidebar Menu Items:**\n1. **Dashboard** — landing page with welcome message and current date\n2. **My Exams** — all assigned exams with status filters and actions\n3. **Identity** — identity verification status and submission form\n\n**Header Bar (Top Right):**\n- 🔔 **Notifications bell** — alerts for exam assignments, results, and system messages\n- ☀️ **Theme toggle** — switch between Light and Dark mode\n- 🌐 **Language toggle** — switch between English and Arabic (full RTL support)\n- 👤 **User avatar & name** — shows candidate name with profile menu\n\n**Identity Status Badge:**\nThe sidebar shows the current verification status next to "Identity":\n- "None" (gray) — not yet submitted\n- "Pending" (yellow) — submitted, awaiting review\n- "Verified" (green) — approved\n- "Rejected" (red) — rejected, can resubmit',
           descriptionAr:
-            "عندما يسجل المرشح الدخول، يرى **بوابة مرشح** مخصصة بشريط جانبي مبسط:\n\n**عناصر قائمة الشريط الجانبي:**\n1. **لوحة التحكم** — صفحة الهبوط مع رسالة ترحيب والتاريخ الحالي\n2. **اختباراتي** — جميع الاختبارات المعينة مع فلاتر الحالة والإجراءات\n3. **الهوية** — حالة التحقق من الهوية ونموذج التقديم\n\n**شريط الرأس (أعلى اليمين):**\n- 🔔 **جرس الإشعارات** — تنبيهات لتعيينات الاختبارات والنتائج ورسائل النظام\n- ☀️ **تبديل السمة** — التبديل بين الوضع الفاتح والداكن\n- 🌐 **تبديل اللغة** — التبديل بين الإنجليزية والعربية (دعم كامل لـ RTL)\n- 👤 **صورة وأسم المستخدم** — يعرض اسم المرشح مع قائمة الملف الشخصي\n\n**شارة حالة الهوية:**\nيعرض الشريط الجانبي حالة التحقق الحالية بجانب \"الهوية\":\n- \"بدون\" (رمادي) — لم يتم التقديم بعد\n- \"قيد المراجعة\" (أصفر) — تم التقديم، في انتظار المراجعة\n- \"موثق\" (أخضر) — تمت الموافقة\n- \"مرفوض\" (أحمر) — مرفوض، يمكن إعادة التقديم",
+            'عندما يسجل المرشح الدخول، يرى **بوابة مرشح** مخصصة بشريط جانبي مبسط:\n\n**عناصر قائمة الشريط الجانبي:**\n1. **لوحة التحكم** — صفحة الهبوط مع رسالة ترحيب والتاريخ الحالي\n2. **اختباراتي** — جميع الاختبارات المعينة مع فلاتر الحالة والإجراءات\n3. **الهوية** — حالة التحقق من الهوية ونموذج التقديم\n\n**شريط الرأس (أعلى اليمين):**\n- 🔔 **جرس الإشعارات** — تنبيهات لتعيينات الاختبارات والنتائج ورسائل النظام\n- ☀️ **تبديل السمة** — التبديل بين الوضع الفاتح والداكن\n- 🌐 **تبديل اللغة** — التبديل بين الإنجليزية والعربية (دعم كامل لـ RTL)\n- 👤 **صورة وأسم المستخدم** — يعرض اسم المرشح مع قائمة الملف الشخصي\n\n**شارة حالة الهوية:**\nيعرض الشريط الجانبي حالة التحقق الحالية بجانب "الهوية":\n- "بدون" (رمادي) — لم يتم التقديم بعد\n- "قيد المراجعة" (أصفر) — تم التقديم، في انتظار المراجعة\n- "موثق" (أخضر) — تمت الموافقة\n- "مرفوض" (أحمر) — مرفوض، يمكن إعادة التقديم',
           tipEn:
             "If the candidate's identity is **not verified**, they are directed to the Identity Verification page first before they can access exams.",
           tipAr:
@@ -4877,9 +4963,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Candidate Journey Flow",
           titleAr: "مسار رحلة المرشح",
           descriptionEn:
-            "The candidate follows a specific flow from login to exam completion:\n\n**Complete Candidate Journey:**\n1. **Login** → Candidate logs in with credentials\n2. **Identity Verification** → If not verified, must complete verification first\n3. **My Exams** → Browse all assigned exams with status filters\n4. **Start Exam** → Click \"Start Exam\" on an available exam card\n5. **Instructions Page** → Review exam rules, system checks, and agree to terms\n6. **Exam Taking** → Answer questions within sections with timers running\n7. **Submit Exam** → Confirm submission when ready or auto-submit on time expiry\n8. **Results** → View score, pass/fail status, and download certificate if passed\n\n**Key Rules:**\n- ✓ Candidates can only see exams **assigned to them** via the admin panel\n- ✓ A candidate profile is **shared across all departments** — one candidate can take exams from any department\n- ✓ Each exam has a **maximum number of attempts** — once exhausted, the candidate cannot retake\n- ✗ Candidates **cannot** access admin features, question banks, or grading modules\n- ✗ Candidates **cannot** go back to submit their own grades or modify answers after submission",
+            'The candidate follows a specific flow from login to exam completion:\n\n**Complete Candidate Journey:**\n1. **Login** → Candidate logs in with credentials\n2. **Identity Verification** → If not verified, must complete verification first\n3. **My Exams** → Browse all assigned exams with status filters\n4. **Start Exam** → Click "Start Exam" on an available exam card\n5. **Instructions Page** → Review exam rules, system checks, and agree to terms\n6. **Exam Taking** → Answer questions within sections with timers running\n7. **Submit Exam** → Confirm submission when ready or auto-submit on time expiry\n8. **Results** → View score, pass/fail status, and download certificate if passed\n\n**Key Rules:**\n- ✓ Candidates can only see exams **assigned to them** via the admin panel\n- ✓ A candidate profile is **shared across all departments** — one candidate can take exams from any department\n- ✓ Each exam has a **maximum number of attempts** — once exhausted, the candidate cannot retake\n- ✗ Candidates **cannot** access admin features, question banks, or grading modules\n- ✗ Candidates **cannot** go back to submit their own grades or modify answers after submission',
           descriptionAr:
-            "يتبع المرشح مسارًا محددًا من تسجيل الدخول إلى إكمال الاختبار:\n\n**رحلة المرشح الكاملة:**\n1. **تسجيل الدخول** → يسجل المرشح الدخول ببيانات الاعتماد\n2. **التحقق من الهوية** → إذا لم يكن موثقًا، يجب إكمال التحقق أولاً\n3. **اختباراتي** → تصفح جميع الاختبارات المعينة مع فلاتر الحالة\n4. **بدء الاختبار** → النقر على \"بدء الاختبار\" في بطاقة اختبار متاح\n5. **صفحة التعليمات** → مراجعة قواعد الاختبار، فحوصات النظام، والموافقة على الشروط\n6. **أداء الاختبار** → الإجابة على الأسئلة ضمن الأقسام مع تشغيل المؤقتات\n7. **تقديم الاختبار** → تأكيد التقديم عند الجاهزية أو التقديم التلقائي عند انتهاء الوقت\n8. **النتائج** → عرض الدرجة، حالة النجاح/الرسوب، وتنزيل الشهادة إذا نجح\n\n**القواعد الرئيسية:**\n- ✓ يمكن للمرشحين رؤية الاختبارات **المعينة لهم فقط** عبر لوحة الإدارة\n- ✓ ملف المرشح **مشترك بين جميع الأقسام** — مرشح واحد يمكنه أداء اختبار من أي قسم\n- ✓ كل اختبار له **عدد أقصى من المحاولات** — بمجرد استنفادها، لا يمكن للمرشح إعادة الاختبار\n- ✗ المرشحون **لا يمكنهم** الوصول إلى ميزات المسؤول أو بنوك الأسئلة أو وحدات التقييم\n- ✗ المرشحون **لا يمكنهم** العودة لتقديم درجاتهم أو تعديل الإجابات بعد التقديم",
+            'يتبع المرشح مسارًا محددًا من تسجيل الدخول إلى إكمال الاختبار:\n\n**رحلة المرشح الكاملة:**\n1. **تسجيل الدخول** → يسجل المرشح الدخول ببيانات الاعتماد\n2. **التحقق من الهوية** → إذا لم يكن موثقًا، يجب إكمال التحقق أولاً\n3. **اختباراتي** → تصفح جميع الاختبارات المعينة مع فلاتر الحالة\n4. **بدء الاختبار** → النقر على "بدء الاختبار" في بطاقة اختبار متاح\n5. **صفحة التعليمات** → مراجعة قواعد الاختبار، فحوصات النظام، والموافقة على الشروط\n6. **أداء الاختبار** → الإجابة على الأسئلة ضمن الأقسام مع تشغيل المؤقتات\n7. **تقديم الاختبار** → تأكيد التقديم عند الجاهزية أو التقديم التلقائي عند انتهاء الوقت\n8. **النتائج** → عرض الدرجة، حالة النجاح/الرسوب، وتنزيل الشهادة إذا نجح\n\n**القواعد الرئيسية:**\n- ✓ يمكن للمرشحين رؤية الاختبارات **المعينة لهم فقط** عبر لوحة الإدارة\n- ✓ ملف المرشح **مشترك بين جميع الأقسام** — مرشح واحد يمكنه أداء اختبار من أي قسم\n- ✓ كل اختبار له **عدد أقصى من المحاولات** — بمجرد استنفادها، لا يمكن للمرشح إعادة الاختبار\n- ✗ المرشحون **لا يمكنهم** الوصول إلى ميزات المسؤول أو بنوك الأسئلة أو وحدات التقييم\n- ✗ المرشحون **لا يمكنهم** العودة لتقديم درجاتهم أو تعديل الإجابات بعد التقديم',
           imagePlaceholder: "/tutorials/candidate-portal-flow.png",
         },
       ],
@@ -4900,19 +4986,20 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Verification Status States",
           titleAr: "حالات التحقق من الهوية",
           descriptionEn:
-            "The Identity page shows the current verification status at the top. Each status determines what the candidate sees:\n\n**Status States:**\n- ✓ **None** (gray shield icon) — Initial state. The candidate has not submitted any verification yet. The full capture form is displayed.\n- ✓ **Pending** (yellow clock icon) — Verification submitted and awaiting admin review. A status card shows \"Your verification is under review\" with submission timestamp.\n- ✓ **Approved / Verified** (green checkmark icon) — Identity verified successfully. Shows success card with \"Your identity has been verified\" and a \"Go to My Exams\" button.\n- ✗ **Rejected** (red X icon) — Verification rejected by admin. Shows rejection reason (review notes) and a \"Re-submit\" button to start over.\n- ✗ **Flagged** (orange warning icon) — Marked as suspicious. Shows flag reason and allows resubmission.\n\nThe page has a **3-step progress indicator** at the top:\n1. Selfie → 2. Emirates ID → 3. ID Info\n\nAll three steps are displayed on one page (not separate wizard pages).",
+            'The Identity page shows the current verification status at the top. Each status determines what the candidate sees:\n\n**Status States:**\n- ✓ **None** (gray shield icon) — Initial state. The candidate has not submitted any verification yet. The full capture form is displayed.\n- ✓ **Pending** (yellow clock icon) — Verification submitted and awaiting admin review. A status card shows "Your verification is under review" with submission timestamp.\n- ✓ **Approved / Verified** (green checkmark icon) — Identity verified successfully. Shows success card with "Your identity has been verified" and a "Go to My Exams" button.\n- ✗ **Rejected** (red X icon) — Verification rejected by admin. Shows rejection reason (review notes) and a "Re-submit" button to start over.\n- ✗ **Flagged** (orange warning icon) — Marked as suspicious. Shows flag reason and allows resubmission.\n\nThe page has a **3-step progress indicator** at the top:\n1. Selfie → 2. Emirates ID → 3. ID Info\n\nAll three steps are displayed on one page (not separate wizard pages).',
           descriptionAr:
-            "تعرض صفحة الهوية حالة التحقق الحالية في الأعلى. كل حالة تحدد ما يراه المرشح:\n\n**حالات التوثيق:**\n- ✓ **بدون** (أيقونة درع رمادية) — الحالة الأولية. لم يقدم المرشح أي تحقق بعد. يتم عرض نموذج الالتقاط الكامل.\n- ✓ **قيد المراجعة** (أيقونة ساعة صفراء) — تم تقديم التحقق في انتظار مراجعة المسؤول. تعرض بطاقة الحالة \"التحقق قيد المراجعة\" مع طابع وقت التقديم.\n- ✓ **معتمد / موثق** (أيقونة علامة صح خضراء) — تم التحقق من الهوية بنجاح. يعرض بطاقة نجاح مع \"تم التحقق من هويتك\" وزر \"الذهاب إلى اختباراتي\".\n- ✗ **مرفوض** (أيقونة X حمراء) — تم رفض التحقق من قبل المسؤول. يعرض سبب الرفض (ملاحظات المراجعة) وزر \"إعادة التقديم\" للبدء من جديد.\n- ✗ **مُبلّغ عنه** (أيقونة تحذير برتقالية) — تم وضع علامة مشبوهة. يعرض سبب الإبلاغ ويسمح بإعادة التقديم.\n\nتحتوي الصفحة على **مؤشر تقدم من 3 خطوات** في الأعلى:\n1. سيلفي → 2. بطاقة الهوية الإماراتية → 3. معلومات الهوية\n\nتُعرض جميع الخطوات الثلاث في صفحة واحدة (وليس صفحات معالج منفصلة).",
-          imagePlaceholder: "/tutorials/candidate-portal-verification-status.png",
+            'تعرض صفحة الهوية حالة التحقق الحالية في الأعلى. كل حالة تحدد ما يراه المرشح:\n\n**حالات التوثيق:**\n- ✓ **بدون** (أيقونة درع رمادية) — الحالة الأولية. لم يقدم المرشح أي تحقق بعد. يتم عرض نموذج الالتقاط الكامل.\n- ✓ **قيد المراجعة** (أيقونة ساعة صفراء) — تم تقديم التحقق في انتظار مراجعة المسؤول. تعرض بطاقة الحالة "التحقق قيد المراجعة" مع طابع وقت التقديم.\n- ✓ **معتمد / موثق** (أيقونة علامة صح خضراء) — تم التحقق من الهوية بنجاح. يعرض بطاقة نجاح مع "تم التحقق من هويتك" وزر "الذهاب إلى اختباراتي".\n- ✗ **مرفوض** (أيقونة X حمراء) — تم رفض التحقق من قبل المسؤول. يعرض سبب الرفض (ملاحظات المراجعة) وزر "إعادة التقديم" للبدء من جديد.\n- ✗ **مُبلّغ عنه** (أيقونة تحذير برتقالية) — تم وضع علامة مشبوهة. يعرض سبب الإبلاغ ويسمح بإعادة التقديم.\n\nتحتوي الصفحة على **مؤشر تقدم من 3 خطوات** في الأعلى:\n1. سيلفي → 2. بطاقة الهوية الإماراتية → 3. معلومات الهوية\n\nتُعرض جميع الخطوات الثلاث في صفحة واحدة (وليس صفحات معالج منفصلة).',
+          imagePlaceholder:
+            "/tutorials/candidate-portal-verification-status.png",
         },
         {
           id: "step1-selfie",
           titleEn: "Step 1: Take a Selfie",
           titleAr: "الخطوة 1: التقاط صورة سيلفي",
           descriptionEn:
-            "The first card is **Take a Selfie**. The candidate must capture a live photo using their device camera.\n\n**How It Works:**\n1. Click the **\"Open Camera\"** button — this requests webcam permission from the browser\n2. A **live video preview** appears showing the camera feed (640×480 resolution)\n3. Position your face clearly in the camera frame\n4. Click **\"Capture Photo\"** — a snapshot is taken from the video feed\n5. The captured photo shows as a preview with a green **\"Captured\"** badge\n6. If unhappy with the photo, click **\"Retake\"** to capture again\n\n**Technical Details:**\n- Uses the browser's **getUserMedia** API to access the webcam\n- Converts the live video frame to a **JPEG image** (quality 0.9)\n- The camera stream is properly cleaned up when done\n\n**Common Issues:**\n- ✗ **Camera permission denied** — the browser blocked camera access. Check browser settings and allow camera permission\n- ✗ **No camera found** — the device does not have a webcam. Use a device with a camera\n- ✓ **Camera working** — green \"Ready\" indicator shows the camera is accessible",
+            'The first card is **Take a Selfie**. The candidate must capture a live photo using their device camera.\n\n**How It Works:**\n1. Click the **"Open Camera"** button — this requests webcam permission from the browser\n2. A **live video preview** appears showing the camera feed (640×480 resolution)\n3. Position your face clearly in the camera frame\n4. Click **"Capture Photo"** — a snapshot is taken from the video feed\n5. The captured photo shows as a preview with a green **"Captured"** badge\n6. If unhappy with the photo, click **"Retake"** to capture again\n\n**Technical Details:**\n- Uses the browser\'s **getUserMedia** API to access the webcam\n- Converts the live video frame to a **JPEG image** (quality 0.9)\n- The camera stream is properly cleaned up when done\n\n**Common Issues:**\n- ✗ **Camera permission denied** — the browser blocked camera access. Check browser settings and allow camera permission\n- ✗ **No camera found** — the device does not have a webcam. Use a device with a camera\n- ✓ **Camera working** — green "Ready" indicator shows the camera is accessible',
           descriptionAr:
-            "البطاقة الأولى هي **التقاط صورة سيلفي**. يجب على المرشح التقاط صورة حية باستخدام كاميرا جهازه.\n\n**كيف يعمل:**\n1. انقر على زر **\"فتح الكاميرا\"** — يطلب إذن الكاميرا من المتصفح\n2. تظهر **معاينة فيديو حية** تعرض تغذية الكاميرا (دقة 640×480)\n3. ضع وجهك بوضوح في إطار الكاميرا\n4. انقر على **\"التقاط صورة\"** — يتم أخذ لقطة من تغذية الفيديو\n5. تُعرض الصورة الملتقطة كمعاينة مع شارة خضراء **\"تم الالتقاط\"**\n6. إذا لم تكن راضيًا عن الصورة، انقر على **\"إعادة الالتقاط\"** للالتقاط مرة أخرى\n\n**التفاصيل التقنية:**\n- يستخدم واجهة **getUserMedia** للمتصفح للوصول إلى الكاميرا\n- يحول إطار الفيديو الحي إلى **صورة JPEG** (جودة 0.9)\n- يتم تنظيف تدفق الكاميرا بشكل صحيح عند الانتهاء\n\n**مشاكل شائعة:**\n- ✗ **تم رفض إذن الكاميرا** — حظر المتصفح الوصول إلى الكاميرا. تحقق من إعدادات المتصفح واسمح بإذن الكاميرا\n- ✗ **لم يتم العثور على كاميرا** — الجهاز لا يحتوي على كاميرا ويب. استخدم جهازًا بكاميرا\n- ✓ **الكاميرا تعمل** — مؤشر أخضر \"جاهز\" يظهر أن الكاميرا متاحة",
+            'البطاقة الأولى هي **التقاط صورة سيلفي**. يجب على المرشح التقاط صورة حية باستخدام كاميرا جهازه.\n\n**كيف يعمل:**\n1. انقر على زر **"فتح الكاميرا"** — يطلب إذن الكاميرا من المتصفح\n2. تظهر **معاينة فيديو حية** تعرض تغذية الكاميرا (دقة 640×480)\n3. ضع وجهك بوضوح في إطار الكاميرا\n4. انقر على **"التقاط صورة"** — يتم أخذ لقطة من تغذية الفيديو\n5. تُعرض الصورة الملتقطة كمعاينة مع شارة خضراء **"تم الالتقاط"**\n6. إذا لم تكن راضيًا عن الصورة، انقر على **"إعادة الالتقاط"** للالتقاط مرة أخرى\n\n**التفاصيل التقنية:**\n- يستخدم واجهة **getUserMedia** للمتصفح للوصول إلى الكاميرا\n- يحول إطار الفيديو الحي إلى **صورة JPEG** (جودة 0.9)\n- يتم تنظيف تدفق الكاميرا بشكل صحيح عند الانتهاء\n\n**مشاكل شائعة:**\n- ✗ **تم رفض إذن الكاميرا** — حظر المتصفح الوصول إلى الكاميرا. تحقق من إعدادات المتصفح واسمح بإذن الكاميرا\n- ✗ **لم يتم العثور على كاميرا** — الجهاز لا يحتوي على كاميرا ويب. استخدم جهازًا بكاميرا\n- ✓ **الكاميرا تعمل** — مؤشر أخضر "جاهز" يظهر أن الكاميرا متاحة',
           imagePlaceholder: "/tutorials/candidate-portal-selfie.png",
         },
         {
@@ -4920,9 +5007,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Step 2: Upload Emirates ID Photo",
           titleAr: "الخطوة 2: تحميل صورة بطاقة الهوية الإماراتية",
           descriptionEn:
-            "The second card is **Emirates ID Photo**. The candidate uploads a clear photo of the front side of their Emirates ID.\n\n**How It Works:**\n1. Click the **\"Upload ID Photo\"** button\n2. A file picker opens — select a photo of your ID\n3. The uploaded photo shows as a preview with a green **\"Uploaded\"** badge\n4. To change the photo, click the **\"Change\"** button\n\n**File Requirements:**\n- **Accepted formats:** JPEG, PNG, or WebP\n- **Maximum file size:** 10MB\n- If the file type is wrong or too large, a **toast notification** shows the error\n\n**Preview:**\nThe uploaded image displays in a 16:10 aspect ratio preview card for the candidate to verify before submitting.",
+            'The second card is **Emirates ID Photo**. The candidate uploads a clear photo of the front side of their Emirates ID.\n\n**How It Works:**\n1. Click the **"Upload ID Photo"** button\n2. A file picker opens — select a photo of your ID\n3. The uploaded photo shows as a preview with a green **"Uploaded"** badge\n4. To change the photo, click the **"Change"** button\n\n**File Requirements:**\n- **Accepted formats:** JPEG, PNG, or WebP\n- **Maximum file size:** 10MB\n- If the file type is wrong or too large, a **toast notification** shows the error\n\n**Preview:**\nThe uploaded image displays in a 16:10 aspect ratio preview card for the candidate to verify before submitting.',
           descriptionAr:
-            "البطاقة الثانية هي **صورة بطاقة الهوية الإماراتية**. يقوم المرشح بتحميل صورة واضحة للجانب الأمامي من بطاقة الهوية الإماراتية.\n\n**كيف يعمل:**\n1. انقر على زر **\"تحميل صورة الهوية\"**\n2. يفتح منتقي الملفات — اختر صورة لبطاقة هويتك\n3. تُعرض الصورة المحملة كمعاينة مع شارة خضراء **\"تم التحميل\"**\n4. لتغيير الصورة، انقر على زر **\"تغيير\"**\n\n**متطلبات الملف:**\n- **الصيغ المقبولة:** JPEG أو PNG أو WebP\n- **الحجم الأقصى:** 10 ميجابايت\n- إذا كان نوع الملف خاطئًا أو كبيرًا جدًا، يظهر **إشعار منبثق** بالخطأ\n\n**المعاينة:**\nتُعرض الصورة المحملة في بطاقة معاينة بنسبة عرض إلى ارتفاع 16:10 ليتحقق المرشح منها قبل التقديم.",
+            'البطاقة الثانية هي **صورة بطاقة الهوية الإماراتية**. يقوم المرشح بتحميل صورة واضحة للجانب الأمامي من بطاقة الهوية الإماراتية.\n\n**كيف يعمل:**\n1. انقر على زر **"تحميل صورة الهوية"**\n2. يفتح منتقي الملفات — اختر صورة لبطاقة هويتك\n3. تُعرض الصورة المحملة كمعاينة مع شارة خضراء **"تم التحميل"**\n4. لتغيير الصورة، انقر على زر **"تغيير"**\n\n**متطلبات الملف:**\n- **الصيغ المقبولة:** JPEG أو PNG أو WebP\n- **الحجم الأقصى:** 10 ميجابايت\n- إذا كان نوع الملف خاطئًا أو كبيرًا جدًا، يظهر **إشعار منبثق** بالخطأ\n\n**المعاينة:**\nتُعرض الصورة المحملة في بطاقة معاينة بنسبة عرض إلى ارتفاع 16:10 ليتحقق المرشح منها قبل التقديم.',
           imagePlaceholder: "/tutorials/candidate-portal-emirates-id.png",
         },
         {
@@ -4960,10 +5047,11 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Submit & After Submission",
           titleAr: "التقديم وما بعده",
           descriptionEn:
-            "Once all three steps are completed (selfie captured, ID photo uploaded, ID information filled), click the **\"Submit Verification\"** button.\n\n**Submission Requirements:**\n- ✓ Selfie photo must be captured (not skipped)\n- ✓ ID photo must be uploaded (valid format and under 10MB)\n- ✓ Document type must be selected\n- ✓ ID number must be entered (not empty)\n\n**After Submitting:**\nThe page transitions to a **status view** showing:\n- **Pending status card** with a clock icon and yellow styling\n- Message: \"Your verification is under review\"\n- Submission timestamp\n- The candidate must wait for an admin to **Approve** or **Reject**\n\n**If Rejected:**\nA red status card appears showing:\n- Rejection reason (admin's review notes)\n- A **\"Re-submit\"** button that resets the form for a new attempt\n- All three steps must be completed again\n\n**If Approved:**\nA green status card appears showing:\n- ✓ \"Your identity has been verified\" message\n- **\"Go to My Exams\"** button to navigate to exam list\n- The sidebar Identity badge changes to green \"Verified\"",
+            'Once all three steps are completed (selfie captured, ID photo uploaded, ID information filled), click the **"Submit Verification"** button.\n\n**Submission Requirements:**\n- ✓ Selfie photo must be captured (not skipped)\n- ✓ ID photo must be uploaded (valid format and under 10MB)\n- ✓ Document type must be selected\n- ✓ ID number must be entered (not empty)\n\n**After Submitting:**\nThe page transitions to a **status view** showing:\n- **Pending status card** with a clock icon and yellow styling\n- Message: "Your verification is under review"\n- Submission timestamp\n- The candidate must wait for an admin to **Approve** or **Reject**\n\n**If Rejected:**\nA red status card appears showing:\n- Rejection reason (admin\'s review notes)\n- A **"Re-submit"** button that resets the form for a new attempt\n- All three steps must be completed again\n\n**If Approved:**\nA green status card appears showing:\n- ✓ "Your identity has been verified" message\n- **"Go to My Exams"** button to navigate to exam list\n- The sidebar Identity badge changes to green "Verified"',
           descriptionAr:
-            "بمجرد إكمال جميع الخطوات الثلاث (التقاط السيلفي، تحميل صورة الهوية، ملء معلومات الهوية)، انقر على زر **\"تقديم التحقق\"**.\n\n**متطلبات التقديم:**\n- ✓ يجب التقاط صورة السيلفي (لا يمكن تخطيها)\n- ✓ يجب تحميل صورة الهوية (صيغة صالحة وأقل من 10 ميجابايت)\n- ✓ يجب اختيار نوع الوثيقة\n- ✓ يجب إدخال رقم الهوية (غير فارغ)\n\n**بعد التقديم:**\nتنتقل الصفحة إلى **عرض الحالة** يظهر:\n- **بطاقة حالة قيد المراجعة** بأيقونة ساعة وتنسيق أصفر\n- رسالة: \"التحقق الخاص بك قيد المراجعة\"\n- طابع وقت التقديم\n- يجب على المرشح انتظار المسؤول لـ **الموافقة** أو **الرفض**\n\n**في حالة الرفض:**\nتظهر بطاقة حالة حمراء تعرض:\n- سبب الرفض (ملاحظات مراجعة المسؤول)\n- زر **\"إعادة التقديم\"** الذي يعيد تعيين النموذج لمحاولة جديدة\n- يجب إكمال جميع الخطوات الثلاث مرة أخرى\n\n**في حالة الموافقة:**\nتظهر بطاقة حالة خضراء تعرض:\n- ✓ رسالة \"تم التحقق من هويتك\"\n- زر **\"الذهاب إلى اختباراتي\"** للانتقال إلى قائمة الاختبارات\n- تتغير شارة الهوية في الشريط الجانبي إلى \"موثق\" باللون الأخضر",
-          imagePlaceholder: "/tutorials/candidate-portal-verification-submit.png",
+            'بمجرد إكمال جميع الخطوات الثلاث (التقاط السيلفي، تحميل صورة الهوية، ملء معلومات الهوية)، انقر على زر **"تقديم التحقق"**.\n\n**متطلبات التقديم:**\n- ✓ يجب التقاط صورة السيلفي (لا يمكن تخطيها)\n- ✓ يجب تحميل صورة الهوية (صيغة صالحة وأقل من 10 ميجابايت)\n- ✓ يجب اختيار نوع الوثيقة\n- ✓ يجب إدخال رقم الهوية (غير فارغ)\n\n**بعد التقديم:**\nتنتقل الصفحة إلى **عرض الحالة** يظهر:\n- **بطاقة حالة قيد المراجعة** بأيقونة ساعة وتنسيق أصفر\n- رسالة: "التحقق الخاص بك قيد المراجعة"\n- طابع وقت التقديم\n- يجب على المرشح انتظار المسؤول لـ **الموافقة** أو **الرفض**\n\n**في حالة الرفض:**\nتظهر بطاقة حالة حمراء تعرض:\n- سبب الرفض (ملاحظات مراجعة المسؤول)\n- زر **"إعادة التقديم"** الذي يعيد تعيين النموذج لمحاولة جديدة\n- يجب إكمال جميع الخطوات الثلاث مرة أخرى\n\n**في حالة الموافقة:**\nتظهر بطاقة حالة خضراء تعرض:\n- ✓ رسالة "تم التحقق من هويتك"\n- زر **"الذهاب إلى اختباراتي"** للانتقال إلى قائمة الاختبارات\n- تتغير شارة الهوية في الشريط الجانبي إلى "موثق" باللون الأخضر',
+          imagePlaceholder:
+            "/tutorials/candidate-portal-verification-submit.png",
         },
       ],
       examples: [
@@ -4993,9 +5081,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Status Filter Tabs",
           titleAr: "علامات تبويب فلتر الحالة",
           descriptionEn:
-            "At the top of the page, **filter tabs** show exam counts by status. Click any tab to filter the exam list:\n\n| Tab | Description | Badge Color |\n| All | Shows total count of all exams | Default |\n| Available | Exams the candidate can start now (within schedule, attempts remaining) | Emerald green |\n| In Progress | An active attempt is currently running | Sky blue |\n| Resume | Exams with admin override allowing the candidate to resume a terminated/expired attempt | Blue |\n| Submitted | Attempt submitted but grading/results not yet published | Amber |\n| Completed | Grading and results have been published | Emerald green |\n| Expired | The exam end date has passed | Rose red |\n| Terminated | The attempt was manually terminated by a proctor or auto-terminated due to violations | Gray |\n\nEach tab shows a **count badge** with the number of exams in that status. The \"All\" tab is selected by default.\n\nA **search bar** on the right lets you search exams by title or description (both English and Arabic).",
+            'At the top of the page, **filter tabs** show exam counts by status. Click any tab to filter the exam list:\n\n| Tab | Description | Badge Color |\n| All | Shows total count of all exams | Default |\n| Available | Exams the candidate can start now (within schedule, attempts remaining) | Emerald green |\n| In Progress | An active attempt is currently running | Sky blue |\n| Resume | Exams with admin override allowing the candidate to resume a terminated/expired attempt | Blue |\n| Submitted | Attempt submitted but grading/results not yet published | Amber |\n| Completed | Grading and results have been published | Emerald green |\n| Expired | The exam end date has passed | Rose red |\n| Terminated | The attempt was manually terminated by a proctor or auto-terminated due to violations | Gray |\n\nEach tab shows a **count badge** with the number of exams in that status. The "All" tab is selected by default.\n\nA **search bar** on the right lets you search exams by title or description (both English and Arabic).',
           descriptionAr:
-            "في أعلى الصفحة، تعرض **علامات تبويب الفلتر** أعداد الاختبارات حسب الحالة. انقر على أي علامة تبويب لتصفية قائمة الاختبارات:\n\n| التبويب | الوصف | لون الشارة |\n| الكل | يعرض العدد الإجمالي لجميع الاختبارات | افتراضي |\n| متاح | اختبارات يمكن للمرشح بدؤها الآن (ضمن الجدول، محاولات متبقية) | أخضر زمردي |\n| قيد التقدم | محاولة نشطة قيد التشغيل حاليًا | أزرق سماوي |\n| استئناف | اختبارات بتجاوز إداري يسمح للمرشح باستئناف محاولة منتهية/منتهية الصلاحية | أزرق |\n| مُقدم | تم تقديم المحاولة لكن التقييم/النتائج لم تُنشر بعد | عنبري |\n| مكتمل | تم نشر التقييم والنتائج | أخضر زمردي |\n| منتهي الصلاحية | تجاوز تاريخ انتهاء الاختبار | وردي أحمر |\n| موقوف | تم إيقاف المحاولة يدويًا بواسطة مراقب أو تلقائيًا بسبب المخالفات | رمادي |\n\nكل علامة تبويب تعرض **شارة عدد** بعدد الاختبارات في تلك الحالة. يتم تحديد علامة تبويب \"الكل\" بشكل افتراضي.\n\nيتيح **شريط البحث** على اليمين البحث عن الاختبارات بالعنوان أو الوصف (بالإنجليزية والعربية).",
+            'في أعلى الصفحة، تعرض **علامات تبويب الفلتر** أعداد الاختبارات حسب الحالة. انقر على أي علامة تبويب لتصفية قائمة الاختبارات:\n\n| التبويب | الوصف | لون الشارة |\n| الكل | يعرض العدد الإجمالي لجميع الاختبارات | افتراضي |\n| متاح | اختبارات يمكن للمرشح بدؤها الآن (ضمن الجدول، محاولات متبقية) | أخضر زمردي |\n| قيد التقدم | محاولة نشطة قيد التشغيل حاليًا | أزرق سماوي |\n| استئناف | اختبارات بتجاوز إداري يسمح للمرشح باستئناف محاولة منتهية/منتهية الصلاحية | أزرق |\n| مُقدم | تم تقديم المحاولة لكن التقييم/النتائج لم تُنشر بعد | عنبري |\n| مكتمل | تم نشر التقييم والنتائج | أخضر زمردي |\n| منتهي الصلاحية | تجاوز تاريخ انتهاء الاختبار | وردي أحمر |\n| موقوف | تم إيقاف المحاولة يدويًا بواسطة مراقب أو تلقائيًا بسبب المخالفات | رمادي |\n\nكل علامة تبويب تعرض **شارة عدد** بعدد الاختبارات في تلك الحالة. يتم تحديد علامة تبويب "الكل" بشكل افتراضي.\n\nيتيح **شريط البحث** على اليمين البحث عن الاختبارات بالعنوان أو الوصف (بالإنجليزية والعربية).',
           imagePlaceholder: "/tutorials/candidate-portal-exam-tabs.png",
         },
         {
@@ -5003,9 +5091,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Exam Card Information",
           titleAr: "معلومات بطاقة الاختبار",
           descriptionEn:
-            "Each exam appears as a **card** with detailed information:\n\n**Card Header:**\n- **Exam Title** — localized name (English or Arabic based on language setting)\n- **Description** — truncated to 2 lines with \"...\" for longer text\n- **Status Badge** — color-coded label (Available, Completed, Expired, etc.)\n\n**Stats Grid (2×2 layout with colored icons):**\n- 📄 **Questions** (blue icon) — total number of questions in the exam\n- 🏆 **Points** (amber icon) — total points available\n- 🎯 **Pass Score** (emerald icon) — minimum score to pass\n- ⏱️ **Duration** (purple icon) — exam time limit in minutes\n\n**Attempts Section:**\n- Shows **Used / Maximum** attempts (e.g., \"0 / 1\", \"1 / 1\")\n- **Progress bar** visualization:\n  - Green — attempts remaining\n  - Amber — only 1 attempt left\n  - Red — no attempts left (\"No attempts left\" text)\n- Text shows remaining attempts count (e.g., \"1 attempts remaining\")\n\n**Schedule Section:**\n- **Start** date and time\n- **Expired** / End date and time\n- If the exam is **Flexible** (no schedule), a \"Flex Exam\" badge appears instead\n\n**Result Strip (for completed exams):**\n- ✓ **Passed** — green strip at the bottom\n- ✗ **Failed** — red strip at the bottom with **\"Failed\"** text",
+            'Each exam appears as a **card** with detailed information:\n\n**Card Header:**\n- **Exam Title** — localized name (English or Arabic based on language setting)\n- **Description** — truncated to 2 lines with "..." for longer text\n- **Status Badge** — color-coded label (Available, Completed, Expired, etc.)\n\n**Stats Grid (2×2 layout with colored icons):**\n- 📄 **Questions** (blue icon) — total number of questions in the exam\n- 🏆 **Points** (amber icon) — total points available\n- 🎯 **Pass Score** (emerald icon) — minimum score to pass\n- ⏱️ **Duration** (purple icon) — exam time limit in minutes\n\n**Attempts Section:**\n- Shows **Used / Maximum** attempts (e.g., "0 / 1", "1 / 1")\n- **Progress bar** visualization:\n  - Green — attempts remaining\n  - Amber — only 1 attempt left\n  - Red — no attempts left ("No attempts left" text)\n- Text shows remaining attempts count (e.g., "1 attempts remaining")\n\n**Schedule Section:**\n- **Start** date and time\n- **Expired** / End date and time\n- If the exam is **Flexible** (no schedule), a "Flex Exam" badge appears instead\n\n**Result Strip (for completed exams):**\n- ✓ **Passed** — green strip at the bottom\n- ✗ **Failed** — red strip at the bottom with **"Failed"** text',
           descriptionAr:
-            "يظهر كل اختبار كـ **بطاقة** بمعلومات تفصيلية:\n\n**رأس البطاقة:**\n- **عنوان الاختبار** — الاسم المترجم (إنجليزي أو عربي حسب إعداد اللغة)\n- **الوصف** — مختصر إلى سطرين مع \"...\" للنص الأطول\n- **شارة الحالة** — تسمية ملونة (متاح، مكتمل، منتهي الصلاحية، إلخ)\n\n**شبكة الإحصائيات (تخطيط 2×2 بأيقونات ملونة):**\n- 📄 **الأسئلة** (أيقونة زرقاء) — العدد الإجمالي للأسئلة في الاختبار\n- 🏆 **النقاط** (أيقونة عنبرية) — إجمالي النقاط المتاحة\n- 🎯 **درجة النجاح** (أيقونة زمردية) — الحد الأدنى للدرجة للنجاح\n- ⏱️ **المدة** (أيقونة بنفسجية) — الحد الزمني للاختبار بالدقائق\n\n**قسم المحاولات:**\n- يعرض المحاولات **المستخدمة / الحد الأقصى** (مثلاً \"0 / 1\"، \"1 / 1\")\n- **شريط تقدم** مرئي:\n  - أخضر — محاولات متبقية\n  - عنبري — محاولة واحدة فقط متبقية\n  - أحمر — لا محاولات متبقية (نص \"لا محاولات متبقية\")\n- النص يعرض عدد المحاولات المتبقية (مثلاً \"1 محاولة متبقية\")\n\n**قسم الجدول الزمني:**\n- تاريخ ووقت **البدء**\n- تاريخ ووقت **الانتهاء** / انتهاء الصلاحية\n- إذا كان الاختبار **مرنًا** (بدون جدول)، تظهر شارة \"اختبار مرن\" بدلاً من ذلك\n\n**شريط النتيجة (للاختبارات المكتملة):**\n- ✓ **ناجح** — شريط أخضر في الأسفل\n- ✗ **راسب** — شريط أحمر في الأسفل مع نص **\"راسب\"**",
+            'يظهر كل اختبار كـ **بطاقة** بمعلومات تفصيلية:\n\n**رأس البطاقة:**\n- **عنوان الاختبار** — الاسم المترجم (إنجليزي أو عربي حسب إعداد اللغة)\n- **الوصف** — مختصر إلى سطرين مع "..." للنص الأطول\n- **شارة الحالة** — تسمية ملونة (متاح، مكتمل، منتهي الصلاحية، إلخ)\n\n**شبكة الإحصائيات (تخطيط 2×2 بأيقونات ملونة):**\n- 📄 **الأسئلة** (أيقونة زرقاء) — العدد الإجمالي للأسئلة في الاختبار\n- 🏆 **النقاط** (أيقونة عنبرية) — إجمالي النقاط المتاحة\n- 🎯 **درجة النجاح** (أيقونة زمردية) — الحد الأدنى للدرجة للنجاح\n- ⏱️ **المدة** (أيقونة بنفسجية) — الحد الزمني للاختبار بالدقائق\n\n**قسم المحاولات:**\n- يعرض المحاولات **المستخدمة / الحد الأقصى** (مثلاً "0 / 1"، "1 / 1")\n- **شريط تقدم** مرئي:\n  - أخضر — محاولات متبقية\n  - عنبري — محاولة واحدة فقط متبقية\n  - أحمر — لا محاولات متبقية (نص "لا محاولات متبقية")\n- النص يعرض عدد المحاولات المتبقية (مثلاً "1 محاولة متبقية")\n\n**قسم الجدول الزمني:**\n- تاريخ ووقت **البدء**\n- تاريخ ووقت **الانتهاء** / انتهاء الصلاحية\n- إذا كان الاختبار **مرنًا** (بدون جدول)، تظهر شارة "اختبار مرن" بدلاً من ذلك\n\n**شريط النتيجة (للاختبارات المكتملة):**\n- ✓ **ناجح** — شريط أخضر في الأسفل\n- ✗ **غير ناجح** — شريط أحمر في الأسفل مع نص **"غير ناجح"**',
           imagePlaceholder: "/tutorials/candidate-portal-exam-card.png",
         },
         {
@@ -5013,9 +5101,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Exam Card Actions",
           titleAr: "إجراءات بطاقة الاختبار",
           descriptionEn:
-            "The **action button** at the bottom of each card changes based on exam status:\n\n**Available Exam:**\n- ▶️ **\"Start Exam\"** (blue button) — navigates to the Instructions page. Enabled only when the exam is within its schedule window AND attempts are remaining.\n- ⏳ **\"Not Yet Available\"** (disabled) — the exam start date is in the future\n- 🚫 **\"No Attempts Left\"** (disabled) — all allowed attempts have been used\n\n**In Progress:**\n- ▶️ **\"Continue\"** (blue button) — resumes the active attempt directly (goes to the exam-taking page, not instructions)\n\n**Submitted (Grading in Progress):**\n- ⏳ **\"Under Review\"** (disabled button) — grading is not yet complete\n\n**Completed:**\n- 👁️ **\"View Results\"** (primary button) — navigates to the results page showing score and certificate\n- 🔄 **\"Retake\"** (secondary button) — appears if attempts remain, exam is in window, and candidate has not passed. Navigates to Instructions page.\n\n**Expired / Terminated:**\n- 🔄 **\"Retake\"** (if admin has granted an override with additional attempts)\n- 🚫 **\"Expired\"** or **\"Terminated\"** (disabled) — no further action possible\n\n**Admin Override Badge:**\nIf an admin has granted a special override (extra attempts, resume permission), a special badge appears on the card indicating the override.",
+            'The **action button** at the bottom of each card changes based on exam status:\n\n**Available Exam:**\n- ▶️ **"Start Exam"** (blue button) — navigates to the Instructions page. Enabled only when the exam is within its schedule window AND attempts are remaining.\n- ⏳ **"Not Yet Available"** (disabled) — the exam start date is in the future\n- 🚫 **"No Attempts Left"** (disabled) — all allowed attempts have been used\n\n**In Progress:**\n- ▶️ **"Continue"** (blue button) — resumes the active attempt directly (goes to the exam-taking page, not instructions)\n\n**Submitted (Grading in Progress):**\n- ⏳ **"Under Review"** (disabled button) — grading is not yet complete\n\n**Completed:**\n- 👁️ **"View Results"** (primary button) — navigates to the results page showing score and certificate\n- 🔄 **"Retake"** (secondary button) — appears if attempts remain, exam is in window, and candidate has not passed. Navigates to Instructions page.\n\n**Expired / Terminated:**\n- 🔄 **"Retake"** (if admin has granted an override with additional attempts)\n- 🚫 **"Expired"** or **"Terminated"** (disabled) — no further action possible\n\n**Admin Override Badge:**\nIf an admin has granted a special override (extra attempts, resume permission), a special badge appears on the card indicating the override.',
           descriptionAr:
-            "يتغير **زر الإجراء** في أسفل كل بطاقة بناءً على حالة الاختبار:\n\n**اختبار متاح:**\n- ▶️ **\"بدء الاختبار\"** (زر أزرق) — ينتقل إلى صفحة التعليمات. يكون مفعلاً فقط عندما يكون الاختبار ضمن نافذة الجدول الزمني وتبقى محاولات.\n- ⏳ **\"غير متاح بعد\"** (معطل) — تاريخ بدء الاختبار في المستقبل\n- 🚫 **\"لا محاولات متبقية\"** (معطل) — تم استخدام جميع المحاولات المسموح بها\n\n**قيد التقدم:**\n- ▶️ **\"متابعة\"** (زر أزرق) — يستأنف المحاولة النشطة مباشرة (ينتقل إلى صفحة أداء الاختبار، وليس التعليمات)\n\n**مُقدم (التقييم قيد التقدم):**\n- ⏳ **\"قيد المراجعة\"** (زر معطل) — لم يكتمل التقييم بعد\n\n**مكتمل:**\n- 👁️ **\"عرض النتائج\"** (زر رئيسي) — ينتقل إلى صفحة النتائج التي تعرض الدرجة والشهادة\n- 🔄 **\"إعادة الاختبار\"** (زر ثانوي) — يظهر إذا بقيت محاولات، والاختبار في النافذة الزمنية، ولم ينجح المرشح. ينتقل إلى صفحة التعليمات.\n\n**منتهي الصلاحية / موقوف:**\n- 🔄 **\"إعادة الاختبار\"** (إذا منح المسؤول تجاوزًا بمحاولات إضافية)\n- 🚫 **\"منتهي الصلاحية\"** أو **\"موقوف\"** (معطل) — لا إجراء إضافي ممكن\n\n**شارة التجاوز الإداري:**\nإذا منح المسؤول تجاوزًا خاصًا (محاولات إضافية، إذن استئناف)، تظهر شارة خاصة على البطاقة تشير إلى التجاوز.",
+            'يتغير **زر الإجراء** في أسفل كل بطاقة بناءً على حالة الاختبار:\n\n**اختبار متاح:**\n- ▶️ **"بدء الاختبار"** (زر أزرق) — ينتقل إلى صفحة التعليمات. يكون مفعلاً فقط عندما يكون الاختبار ضمن نافذة الجدول الزمني وتبقى محاولات.\n- ⏳ **"غير متاح بعد"** (معطل) — تاريخ بدء الاختبار في المستقبل\n- 🚫 **"لا محاولات متبقية"** (معطل) — تم استخدام جميع المحاولات المسموح بها\n\n**قيد التقدم:**\n- ▶️ **"متابعة"** (زر أزرق) — يستأنف المحاولة النشطة مباشرة (ينتقل إلى صفحة أداء الاختبار، وليس التعليمات)\n\n**مُقدم (التقييم قيد التقدم):**\n- ⏳ **"قيد المراجعة"** (زر معطل) — لم يكتمل التقييم بعد\n\n**مكتمل:**\n- 👁️ **"عرض النتائج"** (زر رئيسي) — ينتقل إلى صفحة النتائج التي تعرض الدرجة والشهادة\n- 🔄 **"إعادة الاختبار"** (زر ثانوي) — يظهر إذا بقيت محاولات، والاختبار في النافذة الزمنية، ولم ينجح المرشح. ينتقل إلى صفحة التعليمات.\n\n**منتهي الصلاحية / موقوف:**\n- 🔄 **"إعادة الاختبار"** (إذا منح المسؤول تجاوزًا بمحاولات إضافية)\n- 🚫 **"منتهي الصلاحية"** أو **"موقوف"** (معطل) — لا إجراء إضافي ممكن\n\n**شارة التجاوز الإداري:**\nإذا منح المسؤول تجاوزًا خاصًا (محاولات إضافية، إذن استئناف)، تظهر شارة خاصة على البطاقة تشير إلى التجاوز.',
           imagePlaceholder: "/tutorials/candidate-portal-exam-actions.png",
         },
         {
@@ -5023,9 +5111,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Fixed vs. Flexible Exams",
           titleAr: "اختبارات ثابتة مقابل مرنة",
           descriptionEn:
-            "Exams come in two scheduling types:\n\n**Fixed Exams (Scheduled):**\n- Have a specific **Start** and **End** date/time\n- The candidate can only start the exam within this window\n- A **10-minute grace period** is allowed after the start time for fixed exams\n- After the end date, the exam status changes to **Expired**\n- The schedule section on the card shows exact dates\n\n**Flexible Exams (No Schedule):**\n- No start or end date constraints\n- The candidate can start the exam at any time\n- A **\"Flex Exam\"** badge appears on the card instead of schedule dates\n- Only limited by attempt count\n\n**Important Rules:**\n- ✓ The exam window is checked in real-time when the candidate clicks \"Start Exam\"\n- ✓ If the window has passed, the button becomes disabled\n- ✗ Starting an exam 1 second before expiry still gives the full exam duration — the timer runs independently of the schedule window",
+            'Exams come in two scheduling types:\n\n**Fixed Exams (Scheduled):**\n- Have a specific **Start** and **End** date/time\n- The candidate can only start the exam within this window\n- A **10-minute grace period** is allowed after the start time for fixed exams\n- After the end date, the exam status changes to **Expired**\n- The schedule section on the card shows exact dates\n\n**Flexible Exams (No Schedule):**\n- No start or end date constraints\n- The candidate can start the exam at any time\n- A **"Flex Exam"** badge appears on the card instead of schedule dates\n- Only limited by attempt count\n\n**Important Rules:**\n- ✓ The exam window is checked in real-time when the candidate clicks "Start Exam"\n- ✓ If the window has passed, the button becomes disabled\n- ✗ Starting an exam 1 second before expiry still gives the full exam duration — the timer runs independently of the schedule window',
           descriptionAr:
-            "تأتي الاختبارات في نوعين من الجدولة:\n\n**اختبارات ثابتة (مجدولة):**\n- لها تاريخ/وقت **بدء** و**انتهاء** محدد\n- يمكن للمرشح بدء الاختبار فقط ضمن هذه النافذة\n- يُسمح بـ **فترة سماح 10 دقائق** بعد وقت البدء للاختبارات الثابتة\n- بعد تاريخ الانتهاء، تتغير حالة الاختبار إلى **منتهي الصلاحية**\n- يعرض قسم الجدول في البطاقة التواريخ الدقيقة\n\n**اختبارات مرنة (بدون جدول):**\n- لا قيود على تاريخ البدء أو الانتهاء\n- يمكن للمرشح بدء الاختبار في أي وقت\n- تظهر شارة **\"اختبار مرن\"** على البطاقة بدلاً من تواريخ الجدول\n- محدودة فقط بعدد المحاولات\n\n**قواعد مهمة:**\n- ✓ يتم التحقق من نافذة الاختبار في الوقت الفعلي عند نقر المرشح على \"بدء الاختبار\"\n- ✓ إذا انتهت النافذة، يصبح الزر معطلاً\n- ✗ بدء اختبار قبل ثانية من انتهاء الصلاحية لا يزال يمنح مدة الاختبار الكاملة — المؤقت يعمل بشكل مستقل عن نافذة الجدول",
+            'تأتي الاختبارات في نوعين من الجدولة:\n\n**اختبارات ثابتة (مجدولة):**\n- لها تاريخ/وقت **بدء** و**انتهاء** محدد\n- يمكن للمرشح بدء الاختبار فقط ضمن هذه النافذة\n- يُسمح بـ **فترة سماح 10 دقائق** بعد وقت البدء للاختبارات الثابتة\n- بعد تاريخ الانتهاء، تتغير حالة الاختبار إلى **منتهي الصلاحية**\n- يعرض قسم الجدول في البطاقة التواريخ الدقيقة\n\n**اختبارات مرنة (بدون جدول):**\n- لا قيود على تاريخ البدء أو الانتهاء\n- يمكن للمرشح بدء الاختبار في أي وقت\n- تظهر شارة **"اختبار مرن"** على البطاقة بدلاً من تواريخ الجدول\n- محدودة فقط بعدد المحاولات\n\n**قواعد مهمة:**\n- ✓ يتم التحقق من نافذة الاختبار في الوقت الفعلي عند نقر المرشح على "بدء الاختبار"\n- ✓ إذا انتهت النافذة، يصبح الزر معطلاً\n- ✗ بدء اختبار قبل ثانية من انتهاء الصلاحية لا يزال يمنح مدة الاختبار الكاملة — المؤقت يعمل بشكل مستقل عن نافذة الجدول',
           tipEn:
             "For fixed exams, make sure candidates know the exact start time. There is only a 10-minute grace period — after that, the exam cannot be started even if attempts remain.",
           tipAr:
@@ -5052,16 +5140,17 @@ export const candidatePortalTutorial: TutorialModule = {
             "The instructions page opens in a **fullscreen-friendly layout** showing:\n\n**Exam Header:**\n- **Exam title** in large text (centered)\n- **Exam description** below in muted text\n- Horizontal separator line\n\n**Exam Language Selection:**\nA card with two buttons to choose the exam language:\n- **English** — displays all questions and options in English\n- **Arabic** — displays all questions and options in Arabic\n- The selected language is highlighted in blue\n- Language preference is saved to **localStorage** and applied throughout the exam\n- This setting only affects question/option text — the interface direction follows the global language setting",
           descriptionAr:
             "تفتح صفحة التعليمات في **تخطيط ملائم لملء الشاشة** يعرض:\n\n**رأس الاختبار:**\n- **عنوان الاختبار** بنص كبير (مركز)\n- **وصف الاختبار** أسفله بنص باهت\n- خط فاصل أفقي\n\n**اختيار لغة الاختبار:**\nبطاقة بزرين لاختيار لغة الاختبار:\n- **الإنجليزية** — تعرض جميع الأسئلة والخيارات بالإنجليزية\n- **العربية** — تعرض جميع الأسئلة والخيارات بالعربية\n- اللغة المختارة مميزة باللون الأزرق\n- يتم حفظ تفضيل اللغة في **localStorage** وتطبيقه في جميع أنحاء الاختبار\n- هذا الإعداد يؤثر فقط على نص الأسئلة/الخيارات — اتجاه الواجهة يتبع إعداد اللغة العام",
-          imagePlaceholder: "/tutorials/candidate-portal-instructions-header.png",
+          imagePlaceholder:
+            "/tutorials/candidate-portal-instructions-header.png",
         },
         {
           id: "instructions-system-check",
           titleEn: "System Ready Check",
           titleAr: "فحص جاهزية النظام",
           descriptionEn:
-            "A **System Ready Check** card verifies the candidate's browser supports required features:\n\n**Fullscreen Support:**\n- Automatically checks if the browser supports fullscreen mode\n- Status: ✓ **\"Ready\"** (green badge) or ✗ **\"Unsupported\"** (red badge)\n- This is a browser capability check — cannot be retried\n- Required for exam security to prevent tab switching\n\n**Webcam Permission (if proctoring is enabled):**\n- Requests camera access from the browser\n- Status: ✓ **\"Ready\"** (green badge), ✗ **\"Denied\"** (red badge), or ✗ **\"Error\"** (red badge)\n- Includes a **\"Retry\"** button to re-request webcam permission\n- Auto-checks on page load if proctoring is required for the exam\n\n**Overall Status Message:**\n- ✓ **Green banner:** \"All checks passed! You are ready to start.\" — all requirements met\n- ✗ **Red banner:** \"Some checks failed\" — the Start button may be disabled\n\nThe card has a **color-coded border and background:**\n- Green border → all passed\n- Red border → failures detected\n- Blue border → still checking",
+            'A **System Ready Check** card verifies the candidate\'s browser supports required features:\n\n**Fullscreen Support:**\n- Automatically checks if the browser supports fullscreen mode\n- Status: ✓ **"Ready"** (green badge) or ✗ **"Unsupported"** (red badge)\n- This is a browser capability check — cannot be retried\n- Required for exam security to prevent tab switching\n\n**Webcam Permission (if proctoring is enabled):**\n- Requests camera access from the browser\n- Status: ✓ **"Ready"** (green badge), ✗ **"Denied"** (red badge), or ✗ **"Error"** (red badge)\n- Includes a **"Retry"** button to re-request webcam permission\n- Auto-checks on page load if proctoring is required for the exam\n\n**Overall Status Message:**\n- ✓ **Green banner:** "All checks passed! You are ready to start." — all requirements met\n- ✗ **Red banner:** "Some checks failed" — the Start button may be disabled\n\nThe card has a **color-coded border and background:**\n- Green border → all passed\n- Red border → failures detected\n- Blue border → still checking',
           descriptionAr:
-            "تتحقق بطاقة **فحص جاهزية النظام** من أن متصفح المرشح يدعم الميزات المطلوبة:\n\n**دعم ملء الشاشة:**\n- يتحقق تلقائيًا مما إذا كان المتصفح يدعم وضع ملء الشاشة\n- الحالة: ✓ **\"جاهز\"** (شارة خضراء) أو ✗ **\"غير مدعوم\"** (شارة حمراء)\n- هذا فحص قدرة المتصفح — لا يمكن إعادة المحاولة\n- مطلوب لأمان الاختبار لمنع تبديل علامات التبويب\n\n**إذن الكاميرا (إذا كانت المراقبة مفعلة):**\n- يطلب الوصول إلى الكاميرا من المتصفح\n- الحالة: ✓ **\"جاهز\"** (شارة خضراء)، ✗ **\"مرفوض\"** (شارة حمراء)، أو ✗ **\"خطأ\"** (شارة حمراء)\n- يتضمن زر **\"إعادة المحاولة\"** لإعادة طلب إذن الكاميرا\n- يتحقق تلقائيًا عند تحميل الصفحة إذا كانت المراقبة مطلوبة للاختبار\n\n**رسالة الحالة الإجمالية:**\n- ✓ **شعار أخضر:** \"جميع الفحوصات نجحت! أنت جاهز للبدء.\" — تم استيفاء جميع المتطلبات\n- ✗ **شعار أحمر:** \"فشلت بعض الفحوصات\" — قد يكون زر البدء معطلاً\n\nالبطاقة لها **حدود وخلفية ملونة:**\n- حد أخضر → نجح الجميع\n- حد أحمر → تم اكتشاف فشل\n- حد أزرق → لا يزال يتحقق",
+            'تتحقق بطاقة **فحص جاهزية النظام** من أن متصفح المرشح يدعم الميزات المطلوبة:\n\n**دعم ملء الشاشة:**\n- يتحقق تلقائيًا مما إذا كان المتصفح يدعم وضع ملء الشاشة\n- الحالة: ✓ **"جاهز"** (شارة خضراء) أو ✗ **"غير مدعوم"** (شارة حمراء)\n- هذا فحص قدرة المتصفح — لا يمكن إعادة المحاولة\n- مطلوب لأمان الاختبار لمنع تبديل علامات التبويب\n\n**إذن الكاميرا (إذا كانت المراقبة مفعلة):**\n- يطلب الوصول إلى الكاميرا من المتصفح\n- الحالة: ✓ **"جاهز"** (شارة خضراء)، ✗ **"مرفوض"** (شارة حمراء)، أو ✗ **"خطأ"** (شارة حمراء)\n- يتضمن زر **"إعادة المحاولة"** لإعادة طلب إذن الكاميرا\n- يتحقق تلقائيًا عند تحميل الصفحة إذا كانت المراقبة مطلوبة للاختبار\n\n**رسالة الحالة الإجمالية:**\n- ✓ **شعار أخضر:** "جميع الفحوصات نجحت! أنت جاهز للبدء." — تم استيفاء جميع المتطلبات\n- ✗ **شعار أحمر:** "فشلت بعض الفحوصات" — قد يكون زر البدء معطلاً\n\nالبطاقة لها **حدود وخلفية ملونة:**\n- حد أخضر → نجح الجميع\n- حد أحمر → تم اكتشاف فشل\n- حد أزرق → لا يزال يتحقق',
           imagePlaceholder: "/tutorials/candidate-portal-system-check.png",
         },
         {
@@ -5069,9 +5158,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Exam Information Card",
           titleAr: "بطاقة معلومات الاختبار",
           descriptionEn:
-            "Displays key exam details in a structured card:\n\n| Field | Icon | Description |\n| Duration | ⏱️ Clock | Exam time limit (e.g., \"60 minutes\") |\n| Total Questions | 📄 File | Number of questions in the exam |\n| Pass Score | 🎯 Target | Minimum score to pass (e.g., \"10 / 40\") |\n| Attempts | 🔄 Repeat | Used vs. maximum (e.g., \"0 / 1\") with remaining count |\n| Proctoring | 📷 Camera | Shows \"Proctoring Enabled\" badge if the exam requires live monitoring |\n\nThis gives candidates a quick overview of what the exam involves before they start.",
+            'Displays key exam details in a structured card:\n\n| Field | Icon | Description |\n| Duration | ⏱️ Clock | Exam time limit (e.g., "60 minutes") |\n| Total Questions | 📄 File | Number of questions in the exam |\n| Pass Score | 🎯 Target | Minimum score to pass (e.g., "10 / 40") |\n| Attempts | 🔄 Repeat | Used vs. maximum (e.g., "0 / 1") with remaining count |\n| Proctoring | 📷 Camera | Shows "Proctoring Enabled" badge if the exam requires live monitoring |\n\nThis gives candidates a quick overview of what the exam involves before they start.',
           descriptionAr:
-            "تعرض تفاصيل الاختبار الرئيسية في بطاقة منظمة:\n\n| الحقل | الأيقونة | الوصف |\n| المدة | ⏱️ ساعة | الحد الزمني للاختبار (مثلاً \"60 دقيقة\") |\n| إجمالي الأسئلة | 📄 ملف | عدد الأسئلة في الاختبار |\n| درجة النجاح | 🎯 هدف | الحد الأدنى للدرجة للنجاح (مثلاً \"10 / 40\") |\n| المحاولات | 🔄 تكرار | المستخدمة مقابل الحد الأقصى (مثلاً \"0 / 1\") مع العدد المتبقي |\n| المراقبة | 📷 كاميرا | تعرض شارة \"المراقبة مفعلة\" إذا كان الاختبار يتطلب مراقبة حية |\n\nيمنح هذا المرشحين نظرة سريعة على ما يتضمنه الاختبار قبل أن يبدأوا.",
+            'تعرض تفاصيل الاختبار الرئيسية في بطاقة منظمة:\n\n| الحقل | الأيقونة | الوصف |\n| المدة | ⏱️ ساعة | الحد الزمني للاختبار (مثلاً "60 دقيقة") |\n| إجمالي الأسئلة | 📄 ملف | عدد الأسئلة في الاختبار |\n| درجة النجاح | 🎯 هدف | الحد الأدنى للدرجة للنجاح (مثلاً "10 / 40") |\n| المحاولات | 🔄 تكرار | المستخدمة مقابل الحد الأقصى (مثلاً "0 / 1") مع العدد المتبقي |\n| المراقبة | 📷 كاميرا | تعرض شارة "المراقبة مفعلة" إذا كان الاختبار يتطلب مراقبة حية |\n\nيمنح هذا المرشحين نظرة سريعة على ما يتضمنه الاختبار قبل أن يبدأوا.',
           imagePlaceholder: "/tutorials/candidate-portal-exam-info.png",
         },
         {
@@ -5079,19 +5168,20 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Instructions, Rules & Security Notice",
           titleAr: "التعليمات والقواعد وإشعار الأمان",
           descriptionEn:
-            "Multiple cards display the exam rules and security requirements:\n\n**Default Instructions (always shown):**\n1. **Time Limit** — the exam will auto-submit when time expires\n2. **Fullscreen Mode** — you must remain in fullscreen (tab switching is detected)\n3. **Connection** — a stable internet connection is required\n4. **Answers** — your answers are regularly auto-saved during the exam\n\n**Custom Instructions (if the exam creator added them):**\n- Additional exam-specific rules appear as a numbered list\n- These are localized (English/Arabic) based on the selected exam language\n\n**Important Warnings (amber/orange border card):**\n- Do not refresh or close the browser during the exam\n- Do not switch tabs or windows during the exam\n- Ensure your device is fully charged or plugged in\n- Once submitted, you cannot retake the exam unless allowed\n\n**Security Notice (blue border card — if proctoring enabled):**\nShows required security features as badges:\n- 📷 **Webcam Required** — your camera will be active during the exam\n- 🖥️ **Fullscreen Required** — you must stay in fullscreen mode\n- 📋 **Prevent Copy/Paste** — copy and paste actions are blocked\n- Text: \"This exam is proctored. Your webcam and screen may be monitored.\"\n- Text: \"Any suspicious activity will be flagged for review.\"\n\n**Auto-Termination Warning (orange border card — if violations are tracked):**\n- ⚠️ \"This exam has automatic termination enabled. After **{N}** countable violations (such as tab switching, camera blocked, etc.), your exam will be automatically terminated.\"\n- The number {N} comes from the exam's **maxViolationWarnings** setting",
+            'Multiple cards display the exam rules and security requirements:\n\n**Default Instructions (always shown):**\n1. **Time Limit** — the exam will auto-submit when time expires\n2. **Fullscreen Mode** — you must remain in fullscreen (tab switching is detected)\n3. **Connection** — a stable internet connection is required\n4. **Answers** — your answers are regularly auto-saved during the exam\n\n**Custom Instructions (if the exam creator added them):**\n- Additional exam-specific rules appear as a numbered list\n- These are localized (English/Arabic) based on the selected exam language\n\n**Important Warnings (amber/orange border card):**\n- Do not refresh or close the browser during the exam\n- Do not switch tabs or windows during the exam\n- Ensure your device is fully charged or plugged in\n- Once submitted, you cannot retake the exam unless allowed\n\n**Security Notice (blue border card — if proctoring enabled):**\nShows required security features as badges:\n- 📷 **Webcam Required** — your camera will be active during the exam\n- 🖥️ **Fullscreen Required** — you must stay in fullscreen mode\n- 📋 **Prevent Copy/Paste** — copy and paste actions are blocked\n- Text: "This exam is proctored. Your webcam and screen may be monitored."\n- Text: "Any suspicious activity will be flagged for review."\n\n**Auto-Termination Warning (orange border card — if violations are tracked):**\n- ⚠️ "This exam has automatic termination enabled. After **{N}** countable violations (such as tab switching, camera blocked, etc.), your exam will be automatically terminated."\n- The number {N} comes from the exam\'s **maxViolationWarnings** setting',
           descriptionAr:
-            "تعرض بطاقات متعددة قواعد الاختبار ومتطلبات الأمان:\n\n**التعليمات الافتراضية (تظهر دائمًا):**\n1. **الحد الزمني** — سيتم تقديم الاختبار تلقائيًا عند انتهاء الوقت\n2. **وضع ملء الشاشة** — يجب البقاء في ملء الشاشة (يتم اكتشاف تبديل علامات التبويب)\n3. **الاتصال** — يلزم اتصال إنترنت مستقر\n4. **الإجابات** — يتم حفظ إجاباتك تلقائيًا بشكل منتظم أثناء الاختبار\n\n**التعليمات المخصصة (إذا أضافها منشئ الاختبار):**\n- تظهر قواعد إضافية خاصة بالاختبار كقائمة مرقمة\n- هذه مترجمة (إنجليزي/عربي) بناءً على لغة الاختبار المختارة\n\n**تحذيرات مهمة (بطاقة بحد عنبري/برتقالي):**\n- لا تقم بتحديث أو إغلاق المتصفح أثناء الاختبار\n- لا تقم بتبديل علامات التبويب أو النوافذ أثناء الاختبار\n- تأكد من أن جهازك مشحون بالكامل أو متصل بالطاقة\n- بمجرد التقديم، لا يمكنك إعادة الاختبار ما لم يُسمح بذلك\n\n**إشعار الأمان (بطاقة بحد أزرق — إذا كانت المراقبة مفعلة):**\nتعرض ميزات الأمان المطلوبة كشارات:\n- 📷 **الكاميرا مطلوبة** — ستكون كاميرتك نشطة أثناء الاختبار\n- 🖥️ **ملء الشاشة مطلوب** — يجب البقاء في وضع ملء الشاشة\n- 📋 **منع النسخ/اللصق** — يتم حظر إجراءات النسخ واللصق\n- نص: \"هذا الاختبار مراقب. قد تتم مراقبة كاميرتك وشاشتك.\"\n- نص: \"سيتم وضع علامة على أي نشاط مشبوه للمراجعة.\"\n\n**تحذير الإيقاف التلقائي (بطاقة بحد برتقالي — إذا كانت المخالفات متتبعة):**\n- ⚠️ \"هذا الاختبار يحتوي على إيقاف تلقائي مفعل. بعد **{عدد}** مخالفات قابلة للعد (مثل تبديل علامات التبويب، حجب الكاميرا، إلخ)، سيتم إيقاف اختبارك تلقائيًا.\"\n- الرقم {عدد} يأتي من إعداد **maxViolationWarnings** للاختبار",
-          imagePlaceholder: "/tutorials/candidate-portal-instructions-rules.png",
+            'تعرض بطاقات متعددة قواعد الاختبار ومتطلبات الأمان:\n\n**التعليمات الافتراضية (تظهر دائمًا):**\n1. **الحد الزمني** — سيتم تقديم الاختبار تلقائيًا عند انتهاء الوقت\n2. **وضع ملء الشاشة** — يجب البقاء في ملء الشاشة (يتم اكتشاف تبديل علامات التبويب)\n3. **الاتصال** — يلزم اتصال إنترنت مستقر\n4. **الإجابات** — يتم حفظ إجاباتك تلقائيًا بشكل منتظم أثناء الاختبار\n\n**التعليمات المخصصة (إذا أضافها منشئ الاختبار):**\n- تظهر قواعد إضافية خاصة بالاختبار كقائمة مرقمة\n- هذه مترجمة (إنجليزي/عربي) بناءً على لغة الاختبار المختارة\n\n**تحذيرات مهمة (بطاقة بحد عنبري/برتقالي):**\n- لا تقم بتحديث أو إغلاق المتصفح أثناء الاختبار\n- لا تقم بتبديل علامات التبويب أو النوافذ أثناء الاختبار\n- تأكد من أن جهازك مشحون بالكامل أو متصل بالطاقة\n- بمجرد التقديم، لا يمكنك إعادة الاختبار ما لم يُسمح بذلك\n\n**إشعار الأمان (بطاقة بحد أزرق — إذا كانت المراقبة مفعلة):**\nتعرض ميزات الأمان المطلوبة كشارات:\n- 📷 **الكاميرا مطلوبة** — ستكون كاميرتك نشطة أثناء الاختبار\n- 🖥️ **ملء الشاشة مطلوب** — يجب البقاء في وضع ملء الشاشة\n- 📋 **منع النسخ/اللصق** — يتم حظر إجراءات النسخ واللصق\n- نص: "هذا الاختبار مراقب. قد تتم مراقبة كاميرتك وشاشتك."\n- نص: "سيتم وضع علامة على أي نشاط مشبوه للمراجعة."\n\n**تحذير الإيقاف التلقائي (بطاقة بحد برتقالي — إذا كانت المخالفات متتبعة):**\n- ⚠️ "هذا الاختبار يحتوي على إيقاف تلقائي مفعل. بعد **{عدد}** مخالفات قابلة للعد (مثل تبديل علامات التبويب، حجب الكاميرا، إلخ)، سيتم إيقاف اختبارك تلقائيًا."\n- الرقم {عدد} يأتي من إعداد **maxViolationWarnings** للاختبار',
+          imagePlaceholder:
+            "/tutorials/candidate-portal-instructions-rules.png",
         },
         {
           id: "instructions-access-code",
           titleEn: "Access Code & Agreement",
           titleAr: "رمز الوصول والموافقة",
           descriptionEn:
-            "The bottom of the instructions page contains the final requirements before starting:\n\n**Access Code Input (if required):**\n- A text input field appears if the exam requires an **access code**\n- The candidate must enter the code provided by their instructor or exam administrator\n- If the code is wrong, a red error message appears: \"Enter the access code provided by your instructor\"\n- This adds an extra layer of security to prevent unauthorized exam starts\n\n**Agreement Checkbox:**\n- ☐ \"I have read and understood all instructions and agree to follow the exam rules.\"\n- This checkbox **must be checked** before the Start button becomes enabled\n- If not checked, the Start button remains grayed out\n\n**Start Exam Button:**\nThe large blue **\"Start Exam\"** button is enabled when ALL conditions are met:\n- ✓ Agreement checkbox is checked\n- ✓ All system ready checks passed (fullscreen, webcam if needed)\n- ✓ Access code entered correctly (if required)\n- ✓ Exam is eligible to start (within schedule, attempts remaining)\n\n**What happens when you click Start Exam:**\n1. The system verifies your eligibility one final time\n2. Saves your exam language preference\n3. Creates a new exam attempt (or resumes an existing one)\n4. Records your device information (browser, OS, screen resolution)\n5. Requests fullscreen mode (browser goes fullscreen)\n6. Navigates you to the **Exam Taking** page",
+            'The bottom of the instructions page contains the final requirements before starting:\n\n**Access Code Input (if required):**\n- A text input field appears if the exam requires an **access code**\n- The candidate must enter the code provided by their instructor or exam administrator\n- If the code is wrong, a red error message appears: "Enter the access code provided by your instructor"\n- This adds an extra layer of security to prevent unauthorized exam starts\n\n**Agreement Checkbox:**\n- ☐ "I have read and understood all instructions and agree to follow the exam rules."\n- This checkbox **must be checked** before the Start button becomes enabled\n- If not checked, the Start button remains grayed out\n\n**Start Exam Button:**\nThe large blue **"Start Exam"** button is enabled when ALL conditions are met:\n- ✓ Agreement checkbox is checked\n- ✓ All system ready checks passed (fullscreen, webcam if needed)\n- ✓ Access code entered correctly (if required)\n- ✓ Exam is eligible to start (within schedule, attempts remaining)\n\n**What happens when you click Start Exam:**\n1. The system verifies your eligibility one final time\n2. Saves your exam language preference\n3. Creates a new exam attempt (or resumes an existing one)\n4. Records your device information (browser, OS, screen resolution)\n5. Requests fullscreen mode (browser goes fullscreen)\n6. Navigates you to the **Exam Taking** page',
           descriptionAr:
-            "يحتوي أسفل صفحة التعليمات على المتطلبات النهائية قبل البدء:\n\n**إدخال رمز الوصول (إذا كان مطلوبًا):**\n- يظهر حقل إدخال نصي إذا كان الاختبار يتطلب **رمز وصول**\n- يجب على المرشح إدخال الرمز المقدم من المعلم أو مسؤول الاختبار\n- إذا كان الرمز خاطئًا، تظهر رسالة خطأ حمراء: \"أدخل رمز الوصول المقدم من معلمك\"\n- يضيف هذا طبقة إضافية من الأمان لمنع بدء الاختبار غير المصرح به\n\n**مربع اختيار الموافقة:**\n- ☐ \"لقد قرأت وفهمت جميع التعليمات وأوافق على اتباع قواعد الاختبار.\"\n- يجب **تحديد** مربع الاختيار هذا قبل أن يصبح زر البدء مفعلاً\n- إذا لم يتم تحديده، يظل زر البدء رماديًا\n\n**زر بدء الاختبار:**\nزر **\"بدء الاختبار\"** الأزرق الكبير يكون مفعلاً عند استيفاء جميع الشروط:\n- ✓ تم تحديد مربع اختيار الموافقة\n- ✓ نجحت جميع فحوصات جاهزية النظام (ملء الشاشة، الكاميرا إذا لزم الأمر)\n- ✓ تم إدخال رمز الوصول بشكل صحيح (إذا كان مطلوبًا)\n- ✓ الاختبار مؤهل للبدء (ضمن الجدول، محاولات متبقية)\n\n**ما يحدث عند النقر على بدء الاختبار:**\n1. يتحقق النظام من أهليتك مرة أخيرة\n2. يحفظ تفضيل لغة الاختبار\n3. ينشئ محاولة اختبار جديدة (أو يستأنف محاولة موجودة)\n4. يسجل معلومات جهازك (المتصفح، نظام التشغيل، دقة الشاشة)\n5. يطلب وضع ملء الشاشة (يدخل المتصفح في ملء الشاشة)\n6. ينقلك إلى صفحة **أداء الاختبار**",
+            'يحتوي أسفل صفحة التعليمات على المتطلبات النهائية قبل البدء:\n\n**إدخال رمز الوصول (إذا كان مطلوبًا):**\n- يظهر حقل إدخال نصي إذا كان الاختبار يتطلب **رمز وصول**\n- يجب على المرشح إدخال الرمز المقدم من المعلم أو مسؤول الاختبار\n- إذا كان الرمز خاطئًا، تظهر رسالة خطأ حمراء: "أدخل رمز الوصول المقدم من معلمك"\n- يضيف هذا طبقة إضافية من الأمان لمنع بدء الاختبار غير المصرح به\n\n**مربع اختيار الموافقة:**\n- ☐ "لقد قرأت وفهمت جميع التعليمات وأوافق على اتباع قواعد الاختبار."\n- يجب **تحديد** مربع الاختيار هذا قبل أن يصبح زر البدء مفعلاً\n- إذا لم يتم تحديده، يظل زر البدء رماديًا\n\n**زر بدء الاختبار:**\nزر **"بدء الاختبار"** الأزرق الكبير يكون مفعلاً عند استيفاء جميع الشروط:\n- ✓ تم تحديد مربع اختيار الموافقة\n- ✓ نجحت جميع فحوصات جاهزية النظام (ملء الشاشة، الكاميرا إذا لزم الأمر)\n- ✓ تم إدخال رمز الوصول بشكل صحيح (إذا كان مطلوبًا)\n- ✓ الاختبار مؤهل للبدء (ضمن الجدول، محاولات متبقية)\n\n**ما يحدث عند النقر على بدء الاختبار:**\n1. يتحقق النظام من أهليتك مرة أخيرة\n2. يحفظ تفضيل لغة الاختبار\n3. ينشئ محاولة اختبار جديدة (أو يستأنف محاولة موجودة)\n4. يسجل معلومات جهازك (المتصفح، نظام التشغيل، دقة الشاشة)\n5. يطلب وضع ملء الشاشة (يدخل المتصفح في ملء الشاشة)\n6. ينقلك إلى صفحة **أداء الاختبار**',
           imagePlaceholder: "/tutorials/candidate-portal-start-exam.png",
         },
       ],
@@ -5122,9 +5212,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Question Types & Answering",
           titleAr: "أنواع الأسئلة والإجابة",
           descriptionEn:
-            "The exam supports multiple question types. Each type has its own answer interface:\n\n**1. MCQ — Single Choice:**\n- Radio button options displayed as cards\n- Click on an option card to select it\n- The selected option is highlighted with a blue border and background\n- Hover effects on non-selected options\n- If an option has an image, it appears with a zoom-on-click feature\n\n**2. MCQ — Multiple Choice:**\n- Checkbox options displayed as cards\n- Click to select/deselect multiple options\n- Each selected option shows a checkbox mark\n- Visual feedback for all selected items\n- Options with images support zoom\n\n**3. True / False:**\n- Two radio button options: True and False\n- Clear visual separation between the two choices\n\n**4. Subjective / Short Answer:**\n- Textarea input field for text answers\n- Character limit display (if the exam enforces one)\n- Supports both rich text and plain text depending on exam settings\n- For numeric questions, a number input variant may appear\n\n**Question Card Features:**\n- **Question text** — localized (EN/AR based on selected language)\n- **Question image** — if present, shown with click-to-zoom modal\n- **Question number** — displayed if \"Show Question Numbers\" is enabled in exam settings\n- **Flag icon** — click to flag/unflag the question for later review",
+            'The exam supports multiple question types. Each type has its own answer interface:\n\n**1. MCQ — Single Choice:**\n- Radio button options displayed as cards\n- Click on an option card to select it\n- The selected option is highlighted with a blue border and background\n- Hover effects on non-selected options\n- If an option has an image, it appears with a zoom-on-click feature\n\n**2. MCQ — Multiple Choice:**\n- Checkbox options displayed as cards\n- Click to select/deselect multiple options\n- Each selected option shows a checkbox mark\n- Visual feedback for all selected items\n- Options with images support zoom\n\n**3. True / False:**\n- Two radio button options: True and False\n- Clear visual separation between the two choices\n\n**4. Subjective / Short Answer:**\n- Textarea input field for text answers\n- Character limit display (if the exam enforces one)\n- Supports both rich text and plain text depending on exam settings\n- For numeric questions, a number input variant may appear\n\n**Question Card Features:**\n- **Question text** — localized (EN/AR based on selected language)\n- **Question image** — if present, shown with click-to-zoom modal\n- **Question number** — displayed if "Show Question Numbers" is enabled in exam settings\n- **Flag icon** — click to flag/unflag the question for later review',
           descriptionAr:
-            "يدعم الاختبار أنواع أسئلة متعددة. كل نوع له واجهة إجابة خاصة:\n\n**1. اختيار من متعدد — اختيار واحد:**\n- خيارات أزرار الراديو معروضة كبطاقات\n- انقر على بطاقة خيار لتحديدها\n- الخيار المحدد مميز بحد أزرق وخلفية\n- تأثيرات التمرير على الخيارات غير المحددة\n- إذا كان للخيار صورة، تظهر مع ميزة التكبير عند النقر\n\n**2. اختيار من متعدد — اختيارات متعددة:**\n- خيارات مربعات الاختيار معروضة كبطاقات\n- انقر لتحديد/إلغاء تحديد خيارات متعددة\n- كل خيار محدد يعرض علامة اختيار\n- ملاحظات بصرية لجميع العناصر المحددة\n- الخيارات بصور تدعم التكبير\n\n**3. صح / خطأ:**\n- خيارا أزرار راديو: صح وخطأ\n- فصل بصري واضح بين الخيارين\n\n**4. إجابة ذاتية / قصيرة:**\n- حقل إدخال نصي للإجابات النصية\n- عرض حد الأحرف (إذا كان الاختبار يفرض واحدًا)\n- يدعم النص الغني والنص العادي حسب إعدادات الاختبار\n- للأسئلة الرقمية، قد يظهر متغير إدخال أرقام\n\n**ميزات بطاقة السؤال:**\n- **نص السؤال** — مترجم (EN/AR بناءً على اللغة المختارة)\n- **صورة السؤال** — إذا وجدت، تُعرض مع نافذة تكبير عند النقر\n- **رقم السؤال** — يُعرض إذا كان \"إظهار أرقام الأسئلة\" مفعلاً في إعدادات الاختبار\n- **أيقونة العلم** — انقر لتعليم/إلغاء تعليم السؤال للمراجعة لاحقًا",
+            'يدعم الاختبار أنواع أسئلة متعددة. كل نوع له واجهة إجابة خاصة:\n\n**1. اختيار من متعدد — اختيار واحد:**\n- خيارات أزرار الراديو معروضة كبطاقات\n- انقر على بطاقة خيار لتحديدها\n- الخيار المحدد مميز بحد أزرق وخلفية\n- تأثيرات التمرير على الخيارات غير المحددة\n- إذا كان للخيار صورة، تظهر مع ميزة التكبير عند النقر\n\n**2. اختيار من متعدد — اختيارات متعددة:**\n- خيارات مربعات الاختيار معروضة كبطاقات\n- انقر لتحديد/إلغاء تحديد خيارات متعددة\n- كل خيار محدد يعرض علامة اختيار\n- ملاحظات بصرية لجميع العناصر المحددة\n- الخيارات بصور تدعم التكبير\n\n**3. صح / خطأ:**\n- خيارا أزرار راديو: صح وخطأ\n- فصل بصري واضح بين الخيارين\n\n**4. إجابة ذاتية / قصيرة:**\n- حقل إدخال نصي للإجابات النصية\n- عرض حد الأحرف (إذا كان الاختبار يفرض واحدًا)\n- يدعم النص الغني والنص العادي حسب إعدادات الاختبار\n- للأسئلة الرقمية، قد يظهر متغير إدخال أرقام\n\n**ميزات بطاقة السؤال:**\n- **نص السؤال** — مترجم (EN/AR بناءً على اللغة المختارة)\n- **صورة السؤال** — إذا وجدت، تُعرض مع نافذة تكبير عند النقر\n- **رقم السؤال** — يُعرض إذا كان "إظهار أرقام الأسئلة" مفعلاً في إعدادات الاختبار\n- **أيقونة العلم** — انقر لتعليم/إلغاء تعليم السؤال للمراجعة لاحقًا',
           imagePlaceholder: "/tutorials/candidate-portal-question-types.png",
         },
         {
@@ -5132,9 +5222,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Sections & Timers",
           titleAr: "الأقسام والمؤقتات",
           descriptionEn:
-            "Exams may be organized into **sections**. Each section has its own rules and optional timer:\n\n**Two Timer Types:**\n\n**1. Exam-Wide Timer (always present):**\n- Counts down from the total exam duration (e.g., 60 minutes)\n- Updates every 1 second in the top bar\n- Color changes as time decreases:\n  - **Green** → plenty of time remaining\n  - **Yellow** → warning zone (less than ~5 minutes)\n  - **Red** → critical (very little time left)\n- When it reaches zero → **auto-submits** the entire exam\n\n**2. Section Timer (if sections have individual time limits):**\n- Each section has its own countdown timer\n- The section timer **only starts when you enter** (activate) that section\n- When a section timer reaches zero:\n  - ✓ Automatically **moves you to the next section**\n  - ✗ You **cannot go back** to the previous section\n  - A warning toast appears before the auto-advance\n\n**Section Navigation Rules:**\n\n**Lock Previous Sections (if enabled):**\n- Once you leave a section, you **cannot go back**\n- Only forward navigation is allowed between sections\n- The completed/timed-out section shows a **lock icon** in the sidebar\n\n**Moving to Next Section:**\n- When you click \"Next\" on the last question of a section, a **confirmation dialog** appears\n- \"Are you sure you want to move to the next section? You will not be able to return to this section.\"\n- You must **confirm** before advancing\n- This prevents accidental section changes\n\n**Prevent Back Navigation (if enabled):**\n- No backward navigation even within a section\n- The \"Previous\" button is hidden or disabled\n- Questions can only be answered in sequence",
+            'Exams may be organized into **sections**. Each section has its own rules and optional timer:\n\n**Two Timer Types:**\n\n**1. Exam-Wide Timer (always present):**\n- Counts down from the total exam duration (e.g., 60 minutes)\n- Updates every 1 second in the top bar\n- Color changes as time decreases:\n  - **Green** → plenty of time remaining\n  - **Yellow** → warning zone (less than ~5 minutes)\n  - **Red** → critical (very little time left)\n- When it reaches zero → **auto-submits** the entire exam\n\n**2. Section Timer (if sections have individual time limits):**\n- Each section has its own countdown timer\n- The section timer **only starts when you enter** (activate) that section\n- When a section timer reaches zero:\n  - ✓ Automatically **moves you to the next section**\n  - ✗ You **cannot go back** to the previous section\n  - A warning toast appears before the auto-advance\n\n**Section Navigation Rules:**\n\n**Lock Previous Sections (if enabled):**\n- Once you leave a section, you **cannot go back**\n- Only forward navigation is allowed between sections\n- The completed/timed-out section shows a **lock icon** in the sidebar\n\n**Moving to Next Section:**\n- When you click "Next" on the last question of a section, a **confirmation dialog** appears\n- "Are you sure you want to move to the next section? You will not be able to return to this section."\n- You must **confirm** before advancing\n- This prevents accidental section changes\n\n**Prevent Back Navigation (if enabled):**\n- No backward navigation even within a section\n- The "Previous" button is hidden or disabled\n- Questions can only be answered in sequence',
           descriptionAr:
-            "قد تكون الاختبارات منظمة في **أقسام**. كل قسم له قواعده الخاصة ومؤقت اختياري:\n\n**نوعان من المؤقتات:**\n\n**1. مؤقت الاختبار الكامل (موجود دائمًا):**\n- يعد تنازليًا من مدة الاختبار الإجمالية (مثلاً 60 دقيقة)\n- يتحدث كل ثانية في الشريط العلوي\n- يتغير اللون مع نقصان الوقت:\n  - **أخضر** → وقت كافٍ متبقي\n  - **أصفر** → منطقة تحذير (أقل من ~5 دقائق)\n  - **أحمر** → حرج (وقت قليل جدًا متبقي)\n- عند الوصول إلى الصفر → **تقديم تلقائي** للاختبار بالكامل\n\n**2. مؤقت القسم (إذا كانت للأقسام حدود زمنية فردية):**\n- كل قسم له مؤقته التنازلي الخاص\n- مؤقت القسم **يبدأ فقط عند دخولك** (تفعيل) ذلك القسم\n- عندما يصل مؤقت القسم إلى الصفر:\n  - ✓ **ينقلك تلقائيًا إلى القسم التالي**\n  - ✗ **لا يمكنك العودة** إلى القسم السابق\n  - يظهر إشعار تحذيري قبل الانتقال التلقائي\n\n**قواعد تنقل الأقسام:**\n\n**قفل الأقسام السابقة (إذا مفعل):**\n- بمجرد مغادرة القسم، **لا يمكنك العودة**\n- التنقل للأمام فقط مسموح بين الأقسام\n- القسم المكتمل/المنتهي وقته يعرض **أيقونة قفل** في الشريط الجانبي\n\n**الانتقال إلى القسم التالي:**\n- عند النقر على \"التالي\" في آخر سؤال من القسم، يظهر **مربع حوار تأكيد**\n- \"هل أنت متأكد أنك تريد الانتقال إلى القسم التالي؟ لن تتمكن من العودة إلى هذا القسم.\"\n- يجب **التأكيد** قبل التقدم\n- هذا يمنع تغييرات الأقسام العرضية\n\n**منع التنقل للخلف (إذا مفعل):**\n- لا تنقل للخلف حتى داخل القسم\n- زر \"السابق\" مخفي أو معطل\n- يمكن الإجابة على الأسئلة بالتسلسل فقط",
+            'قد تكون الاختبارات منظمة في **أقسام**. كل قسم له قواعده الخاصة ومؤقت اختياري:\n\n**نوعان من المؤقتات:**\n\n**1. مؤقت الاختبار الكامل (موجود دائمًا):**\n- يعد تنازليًا من مدة الاختبار الإجمالية (مثلاً 60 دقيقة)\n- يتحدث كل ثانية في الشريط العلوي\n- يتغير اللون مع نقصان الوقت:\n  - **أخضر** → وقت كافٍ متبقي\n  - **أصفر** → منطقة تحذير (أقل من ~5 دقائق)\n  - **أحمر** → حرج (وقت قليل جدًا متبقي)\n- عند الوصول إلى الصفر → **تقديم تلقائي** للاختبار بالكامل\n\n**2. مؤقت القسم (إذا كانت للأقسام حدود زمنية فردية):**\n- كل قسم له مؤقته التنازلي الخاص\n- مؤقت القسم **يبدأ فقط عند دخولك** (تفعيل) ذلك القسم\n- عندما يصل مؤقت القسم إلى الصفر:\n  - ✓ **ينقلك تلقائيًا إلى القسم التالي**\n  - ✗ **لا يمكنك العودة** إلى القسم السابق\n  - يظهر إشعار تحذيري قبل الانتقال التلقائي\n\n**قواعد تنقل الأقسام:**\n\n**قفل الأقسام السابقة (إذا مفعل):**\n- بمجرد مغادرة القسم، **لا يمكنك العودة**\n- التنقل للأمام فقط مسموح بين الأقسام\n- القسم المكتمل/المنتهي وقته يعرض **أيقونة قفل** في الشريط الجانبي\n\n**الانتقال إلى القسم التالي:**\n- عند النقر على "التالي" في آخر سؤال من القسم، يظهر **مربع حوار تأكيد**\n- "هل أنت متأكد أنك تريد الانتقال إلى القسم التالي؟ لن تتمكن من العودة إلى هذا القسم."\n- يجب **التأكيد** قبل التقدم\n- هذا يمنع تغييرات الأقسام العرضية\n\n**منع التنقل للخلف (إذا مفعل):**\n- لا تنقل للخلف حتى داخل القسم\n- زر "السابق" مخفي أو معطل\n- يمكن الإجابة على الأسئلة بالتسلسل فقط',
           tipEn:
             "Pay attention to section timers! When a section timer runs out, you are automatically moved forward and cannot return. Answer all questions in the current section before time expires.",
           tipAr:
@@ -5146,9 +5236,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Summary Panel",
           titleAr: "لوحة الملخص",
           descriptionEn:
-            "Click the **\"Summary\"** button in the top bar to open the summary panel. This gives you an overview of all questions in the exam:\n\n**What the Summary Shows:**\n- All questions listed by number (grouped by section if applicable)\n- Each question shows its status:\n  - ✅ **Answered** — the question has a saved answer (green indicator)\n  - ⭕ **Unanswered** — no answer provided yet (gray/empty indicator)\n  - 🚩 **Flagged** — question was flagged for review (orange flag icon)\n\n**Quick Navigation:**\n- Click on any question number in the summary to **jump directly** to that question\n- This is useful for reviewing flagged questions before submitting\n- Shows the total count: \"Answered: X / Y\" and \"Flagged: Z\"\n\n**Use the Summary Before Submitting:**\nBefore clicking Submit, open the summary to check:\n- Are there any unanswered questions you missed?\n- Did you flag questions you wanted to review?\n- Are all sections completed?",
+            'Click the **"Summary"** button in the top bar to open the summary panel. This gives you an overview of all questions in the exam:\n\n**What the Summary Shows:**\n- All questions listed by number (grouped by section if applicable)\n- Each question shows its status:\n  - ✅ **Answered** — the question has a saved answer (green indicator)\n  - ⭕ **Unanswered** — no answer provided yet (gray/empty indicator)\n  - 🚩 **Flagged** — question was flagged for review (orange flag icon)\n\n**Quick Navigation:**\n- Click on any question number in the summary to **jump directly** to that question\n- This is useful for reviewing flagged questions before submitting\n- Shows the total count: "Answered: X / Y" and "Flagged: Z"\n\n**Use the Summary Before Submitting:**\nBefore clicking Submit, open the summary to check:\n- Are there any unanswered questions you missed?\n- Did you flag questions you wanted to review?\n- Are all sections completed?',
           descriptionAr:
-            "انقر على زر **\"الملخص\"** في الشريط العلوي لفتح لوحة الملخص. يمنحك هذا نظرة عامة على جميع الأسئلة في الاختبار:\n\n**ما يعرضه الملخص:**\n- جميع الأسئلة مدرجة بالرقم (مجمعة بالقسم إذا كان ذلك ممكنًا)\n- كل سؤال يعرض حالته:\n  - ✅ **تمت الإجابة** — السؤال له إجابة محفوظة (مؤشر أخضر)\n  - ⭕ **بدون إجابة** — لم يتم تقديم إجابة بعد (مؤشر رمادي/فارغ)\n  - 🚩 **معلّم** — تم تعليم السؤال للمراجعة (أيقونة علم برتقالية)\n\n**التنقل السريع:**\n- انقر على أي رقم سؤال في الملخص **للقفز مباشرة** إلى ذلك السؤال\n- هذا مفيد لمراجعة الأسئلة المعلّمة قبل التقديم\n- يعرض العدد الإجمالي: \"تمت الإجابة: X / Y\" و \"معلّم: Z\"\n\n**استخدم الملخص قبل التقديم:**\nقبل النقر على تقديم، افتح الملخص للتحقق:\n- هل هناك أسئلة بدون إجابة فاتتك؟\n- هل علّمت أسئلة أردت مراجعتها؟\n- هل اكتملت جميع الأقسام؟",
+            'انقر على زر **"الملخص"** في الشريط العلوي لفتح لوحة الملخص. يمنحك هذا نظرة عامة على جميع الأسئلة في الاختبار:\n\n**ما يعرضه الملخص:**\n- جميع الأسئلة مدرجة بالرقم (مجمعة بالقسم إذا كان ذلك ممكنًا)\n- كل سؤال يعرض حالته:\n  - ✅ **تمت الإجابة** — السؤال له إجابة محفوظة (مؤشر أخضر)\n  - ⭕ **بدون إجابة** — لم يتم تقديم إجابة بعد (مؤشر رمادي/فارغ)\n  - 🚩 **معلّم** — تم تعليم السؤال للمراجعة (أيقونة علم برتقالية)\n\n**التنقل السريع:**\n- انقر على أي رقم سؤال في الملخص **للقفز مباشرة** إلى ذلك السؤال\n- هذا مفيد لمراجعة الأسئلة المعلّمة قبل التقديم\n- يعرض العدد الإجمالي: "تمت الإجابة: X / Y" و "معلّم: Z"\n\n**استخدم الملخص قبل التقديم:**\nقبل النقر على تقديم، افتح الملخص للتحقق:\n- هل هناك أسئلة بدون إجابة فاتتك؟\n- هل علّمت أسئلة أردت مراجعتها؟\n- هل اكتملت جميع الأقسام؟',
           imagePlaceholder: "/tutorials/candidate-portal-summary.png",
         },
         {
@@ -5166,9 +5256,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Answer Auto-Saving",
           titleAr: "الحفظ التلقائي للإجابات",
           descriptionEn:
-            "Your answers are **automatically saved** as you take the exam:\n\n**How Auto-Save Works:**\n- Every time you select an answer or type in a text field, the answer is **debounced and saved** to the server after a short delay\n- A status indicator shows the save state:\n  - 💾 **\"Saving...\"** — answer is being sent to the server\n  - ✅ **\"Saved\"** — answer successfully saved\n  - ❌ **\"Error\"** — save failed (will retry)\n- On section change, a **manual save** is triggered for all pending answers\n\n**What This Means:**\n- ✓ If your internet drops briefly, answers already saved are safe on the server\n- ✓ If your browser crashes, you can resume and your previously saved answers will be there\n- ✓ You don't need to click a \"Save\" button — it happens automatically\n- ✗ If you lose connection for a long time, unsaved answers are kept in the browser cache temporarily",
+            'Your answers are **automatically saved** as you take the exam:\n\n**How Auto-Save Works:**\n- Every time you select an answer or type in a text field, the answer is **debounced and saved** to the server after a short delay\n- A status indicator shows the save state:\n  - 💾 **"Saving..."** — answer is being sent to the server\n  - ✅ **"Saved"** — answer successfully saved\n  - ❌ **"Error"** — save failed (will retry)\n- On section change, a **manual save** is triggered for all pending answers\n\n**What This Means:**\n- ✓ If your internet drops briefly, answers already saved are safe on the server\n- ✓ If your browser crashes, you can resume and your previously saved answers will be there\n- ✓ You don\'t need to click a "Save" button — it happens automatically\n- ✗ If you lose connection for a long time, unsaved answers are kept in the browser cache temporarily',
           descriptionAr:
-            "يتم **حفظ إجاباتك تلقائيًا** أثناء أدائك للاختبار:\n\n**كيف يعمل الحفظ التلقائي:**\n- في كل مرة تختار إجابة أو تكتب في حقل نصي، يتم **حفظ الإجابة بتأخير** إلى الخادم\n- يعرض مؤشر الحالة حالة الحفظ:\n  - 💾 **\"جاري الحفظ...\"** — الإجابة يتم إرسالها إلى الخادم\n  - ✅ **\"تم الحفظ\"** — تم حفظ الإجابة بنجاح\n  - ❌ **\"خطأ\"** — فشل الحفظ (ستتم إعادة المحاولة)\n- عند تغيير القسم، يتم تشغيل **حفظ يدوي** لجميع الإجابات المعلقة\n\n**ما يعنيه هذا:**\n- ✓ إذا انقطع إنترنتك لفترة وجيزة، الإجابات المحفوظة مسبقًا آمنة على الخادم\n- ✓ إذا تعطل متصفحك، يمكنك الاستئناف وستكون إجاباتك المحفوظة سابقًا موجودة\n- ✓ لا تحتاج للنقر على زر \"حفظ\" — يحدث تلقائيًا\n- ✗ إذا فقدت الاتصال لفترة طويلة، يتم الاحتفاظ بالإجابات غير المحفوظة في ذاكرة التخزين المؤقت للمتصفح مؤقتًا",
+            'يتم **حفظ إجاباتك تلقائيًا** أثناء أدائك للاختبار:\n\n**كيف يعمل الحفظ التلقائي:**\n- في كل مرة تختار إجابة أو تكتب في حقل نصي، يتم **حفظ الإجابة بتأخير** إلى الخادم\n- يعرض مؤشر الحالة حالة الحفظ:\n  - 💾 **"جاري الحفظ..."** — الإجابة يتم إرسالها إلى الخادم\n  - ✅ **"تم الحفظ"** — تم حفظ الإجابة بنجاح\n  - ❌ **"خطأ"** — فشل الحفظ (ستتم إعادة المحاولة)\n- عند تغيير القسم، يتم تشغيل **حفظ يدوي** لجميع الإجابات المعلقة\n\n**ما يعنيه هذا:**\n- ✓ إذا انقطع إنترنتك لفترة وجيزة، الإجابات المحفوظة مسبقًا آمنة على الخادم\n- ✓ إذا تعطل متصفحك، يمكنك الاستئناف وستكون إجاباتك المحفوظة سابقًا موجودة\n- ✓ لا تحتاج للنقر على زر "حفظ" — يحدث تلقائيًا\n- ✗ إذا فقدت الاتصال لفترة طويلة، يتم الاحتفاظ بالإجابات غير المحفوظة في ذاكرة التخزين المؤقت للمتصفح مؤقتًا',
           imagePlaceholder: "/tutorials/candidate-portal-auto-save.png",
         },
       ],
@@ -5199,9 +5289,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Warning System",
           titleAr: "نظام التحذيرات",
           descriptionEn:
-            "When violations are detected, the candidate receives warnings through multiple channels:\n\n**Toast Notifications:**\n- Appear at the top of the screen\n- Show the violation type and a warning message\n- Auto-dismiss after a few seconds\n- Color-coded by severity\n\n**Warning Beep Sound:**\n- An audio alert plays using the browser's **AudioContext API**\n- Triggers on copy/paste attempts and security violations\n- Ensures candidates notice the warning even if not looking at the screen\n\n**Proctor Warning Dialog (Live Proctoring):**\n- If a live proctor is monitoring the exam, they can send **real-time warnings** via SignalR/WebRTC\n- A modal dialog appears on the candidate's screen with the proctor's warning message\n- Example: \"You have violated exam rules: Looking away from screen\"\n- The dialog must be dismissed before continuing\n- **\"Last Warning\"** variant uses more urgent styling (red border, larger text) to indicate this is the final warning before termination\n\n**Auto-Termination:**\n- If the exam has **maxViolationWarnings** set (e.g., 10 violations)\n- After reaching the maximum violation count, the exam is **automatically submitted**\n- The candidate sees an auto-termination message\n- The exam status changes to **\"Terminated\"**\n- The candidate cannot resume — it's treated as a final submission",
+            'When violations are detected, the candidate receives warnings through multiple channels:\n\n**Toast Notifications:**\n- Appear at the top of the screen\n- Show the violation type and a warning message\n- Auto-dismiss after a few seconds\n- Color-coded by severity\n\n**Warning Beep Sound:**\n- An audio alert plays using the browser\'s **AudioContext API**\n- Triggers on copy/paste attempts and security violations\n- Ensures candidates notice the warning even if not looking at the screen\n\n**Proctor Warning Dialog (Live Proctoring):**\n- If a live proctor is monitoring the exam, they can send **real-time warnings** via SignalR/WebRTC\n- A modal dialog appears on the candidate\'s screen with the proctor\'s warning message\n- Example: "You have violated exam rules: Looking away from screen"\n- The dialog must be dismissed before continuing\n- **"Last Warning"** variant uses more urgent styling (red border, larger text) to indicate this is the final warning before termination\n\n**Auto-Termination:**\n- If the exam has **maxViolationWarnings** set (e.g., 10 violations)\n- After reaching the maximum violation count, the exam is **automatically submitted**\n- The candidate sees an auto-termination message\n- The exam status changes to **"Terminated"**\n- The candidate cannot resume — it\'s treated as a final submission',
           descriptionAr:
-            "عند اكتشاف المخالفات، يتلقى المرشح تحذيرات عبر قنوات متعددة:\n\n**إشعارات منبثقة:**\n- تظهر في أعلى الشاشة\n- تعرض نوع المخالفة ورسالة تحذيرية\n- تختفي تلقائيًا بعد بضع ثوان\n- ملونة حسب الشدة\n\n**صوت تحذيري:**\n- يتم تشغيل تنبيه صوتي باستخدام واجهة **AudioContext** للمتصفح\n- يُشغل عند محاولات النسخ/اللصق والمخالفات الأمنية\n- يضمن أن المرشحين يلاحظون التحذير حتى لو لم ينظروا إلى الشاشة\n\n**مربع حوار تحذير المراقب (المراقبة الحية):**\n- إذا كان مراقب حي يراقب الاختبار، يمكنه إرسال **تحذيرات فورية** عبر SignalR/WebRTC\n- يظهر مربع حوار على شاشة المرشح مع رسالة تحذير المراقب\n- مثال: \"لقد انتهكت قواعد الاختبار: النظر بعيدًا عن الشاشة\"\n- يجب إغلاق مربع الحوار قبل المتابعة\n- متغير **\"التحذير الأخير\"** يستخدم تنسيقًا أكثر إلحاحًا (حد أحمر، نص أكبر) للإشارة إلى أن هذا آخر تحذير قبل الإيقاف\n\n**الإيقاف التلقائي:**\n- إذا كان للاختبار **حد أقصى لتحذيرات المخالفات** محدد (مثلاً 10 مخالفات)\n- بعد الوصول إلى الحد الأقصى لعدد المخالفات، يتم **تقديم الاختبار تلقائيًا**\n- يرى المرشح رسالة إيقاف تلقائي\n- تتغير حالة الاختبار إلى **\"موقوف\"**\n- لا يمكن للمرشح الاستئناف — يُعامل كتقديم نهائي",
+            'عند اكتشاف المخالفات، يتلقى المرشح تحذيرات عبر قنوات متعددة:\n\n**إشعارات منبثقة:**\n- تظهر في أعلى الشاشة\n- تعرض نوع المخالفة ورسالة تحذيرية\n- تختفي تلقائيًا بعد بضع ثوان\n- ملونة حسب الشدة\n\n**صوت تحذيري:**\n- يتم تشغيل تنبيه صوتي باستخدام واجهة **AudioContext** للمتصفح\n- يُشغل عند محاولات النسخ/اللصق والمخالفات الأمنية\n- يضمن أن المرشحين يلاحظون التحذير حتى لو لم ينظروا إلى الشاشة\n\n**مربع حوار تحذير المراقب (المراقبة الحية):**\n- إذا كان مراقب حي يراقب الاختبار، يمكنه إرسال **تحذيرات فورية** عبر SignalR/WebRTC\n- يظهر مربع حوار على شاشة المرشح مع رسالة تحذير المراقب\n- مثال: "لقد انتهكت قواعد الاختبار: النظر بعيدًا عن الشاشة"\n- يجب إغلاق مربع الحوار قبل المتابعة\n- متغير **"التحذير الأخير"** يستخدم تنسيقًا أكثر إلحاحًا (حد أحمر، نص أكبر) للإشارة إلى أن هذا آخر تحذير قبل الإيقاف\n\n**الإيقاف التلقائي:**\n- إذا كان للاختبار **حد أقصى لتحذيرات المخالفات** محدد (مثلاً 10 مخالفات)\n- بعد الوصول إلى الحد الأقصى لعدد المخالفات، يتم **تقديم الاختبار تلقائيًا**\n- يرى المرشح رسالة إيقاف تلقائي\n- تتغير حالة الاختبار إلى **"موقوف"**\n- لا يمكن للمرشح الاستئناف — يُعامل كتقديم نهائي',
           imagePlaceholder: "/tutorials/candidate-portal-warnings.png",
         },
         {
@@ -5242,9 +5332,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Manual Submission",
           titleAr: "التقديم اليدوي",
           descriptionEn:
-            "When you're ready to submit your exam:\n\n**Step 1: Click \"Submit Exam\"**\n- The Submit Exam button is at the bottom navigation bar\n- Clicking it opens a **confirmation dialog**\n\n**Step 2: Confirmation Dialog**\n- Title: \"Are you sure you want to submit?\"\n- Warning text explains that submission is **final** — you cannot go back or change answers\n- Two buttons:\n  - **\"Cancel\"** — returns to the exam\n  - **\"Submit\"** — confirms and submits\n\n**Step 3: Submission Process**\n- A loading spinner appears while the attempt is being submitted\n- All remaining unsaved answers are sent to the server\n- The attempt status changes to \"Submitted\"\n- Final events are logged (submission timestamp, total violations)\n\n**Step 4: Redirect to Results**\n- After successful submission, you are redirected to the **Results page**\n- URL: `/results/{attemptId}?submitted=true`\n- Webcam stops recording\n- Timers stop\n- Fullscreen mode is no longer enforced\n\n**Before Submitting — Use the Summary!**\nRecommended workflow:\n1. Open the **Summary panel** to check for unanswered questions\n2. Review any **flagged questions** you wanted to revisit\n3. Verify all sections are complete\n4. Then click Submit Exam",
+            'When you\'re ready to submit your exam:\n\n**Step 1: Click "Submit Exam"**\n- The Submit Exam button is at the bottom navigation bar\n- Clicking it opens a **confirmation dialog**\n\n**Step 2: Confirmation Dialog**\n- Title: "Are you sure you want to submit?"\n- Warning text explains that submission is **final** — you cannot go back or change answers\n- Two buttons:\n  - **"Cancel"** — returns to the exam\n  - **"Submit"** — confirms and submits\n\n**Step 3: Submission Process**\n- A loading spinner appears while the attempt is being submitted\n- All remaining unsaved answers are sent to the server\n- The attempt status changes to "Submitted"\n- Final events are logged (submission timestamp, total violations)\n\n**Step 4: Redirect to Results**\n- After successful submission, you are redirected to the **Results page**\n- URL: `/results/{attemptId}?submitted=true`\n- Webcam stops recording\n- Timers stop\n- Fullscreen mode is no longer enforced\n\n**Before Submitting — Use the Summary!**\nRecommended workflow:\n1. Open the **Summary panel** to check for unanswered questions\n2. Review any **flagged questions** you wanted to revisit\n3. Verify all sections are complete\n4. Then click Submit Exam',
           descriptionAr:
-            "عندما تكون مستعدًا لتقديم اختبارك:\n\n**الخطوة 1: انقر على \"تقديم الاختبار\"**\n- زر تقديم الاختبار في شريط التنقل السفلي\n- النقر عليه يفتح **مربع حوار تأكيد**\n\n**الخطوة 2: مربع حوار التأكيد**\n- العنوان: \"هل أنت متأكد أنك تريد التقديم؟\"\n- نص التحذير يوضح أن التقديم **نهائي** — لا يمكنك العودة أو تغيير الإجابات\n- زران:\n  - **\"إلغاء\"** — يعود إلى الاختبار\n  - **\"تقديم\"** — يؤكد ويقدم\n\n**الخطوة 3: عملية التقديم**\n- يظهر مؤشر تحميل أثناء تقديم المحاولة\n- يتم إرسال جميع الإجابات غير المحفوظة المتبقية إلى الخادم\n- تتغير حالة المحاولة إلى \"مُقدم\"\n- يتم تسجيل الأحداث النهائية (طابع وقت التقديم، إجمالي المخالفات)\n\n**الخطوة 4: التوجيه إلى النتائج**\n- بعد التقديم الناجح، يتم توجيهك إلى **صفحة النتائج**\n- الرابط: `/results/{attemptId}?submitted=true`\n- تتوقف الكاميرا عن التسجيل\n- تتوقف المؤقتات\n- لم يعد وضع ملء الشاشة مفروضًا\n\n**قبل التقديم — استخدم الملخص!**\nسير العمل الموصى به:\n1. افتح **لوحة الملخص** للتحقق من الأسئلة بدون إجابة\n2. راجع أي **أسئلة معلّمة** أردت إعادة زيارتها\n3. تحقق من اكتمال جميع الأقسام\n4. ثم انقر على تقديم الاختبار",
+            'عندما تكون مستعدًا لتقديم اختبارك:\n\n**الخطوة 1: انقر على "تقديم الاختبار"**\n- زر تقديم الاختبار في شريط التنقل السفلي\n- النقر عليه يفتح **مربع حوار تأكيد**\n\n**الخطوة 2: مربع حوار التأكيد**\n- العنوان: "هل أنت متأكد أنك تريد التقديم؟"\n- نص التحذير يوضح أن التقديم **نهائي** — لا يمكنك العودة أو تغيير الإجابات\n- زران:\n  - **"إلغاء"** — يعود إلى الاختبار\n  - **"تقديم"** — يؤكد ويقدم\n\n**الخطوة 3: عملية التقديم**\n- يظهر مؤشر تحميل أثناء تقديم المحاولة\n- يتم إرسال جميع الإجابات غير المحفوظة المتبقية إلى الخادم\n- تتغير حالة المحاولة إلى "مُقدم"\n- يتم تسجيل الأحداث النهائية (طابع وقت التقديم، إجمالي المخالفات)\n\n**الخطوة 4: التوجيه إلى النتائج**\n- بعد التقديم الناجح، يتم توجيهك إلى **صفحة النتائج**\n- الرابط: `/results/{attemptId}?submitted=true`\n- تتوقف الكاميرا عن التسجيل\n- تتوقف المؤقتات\n- لم يعد وضع ملء الشاشة مفروضًا\n\n**قبل التقديم — استخدم الملخص!**\nسير العمل الموصى به:\n1. افتح **لوحة الملخص** للتحقق من الأسئلة بدون إجابة\n2. راجع أي **أسئلة معلّمة** أردت إعادة زيارتها\n3. تحقق من اكتمال جميع الأقسام\n4. ثم انقر على تقديم الاختبار',
           imagePlaceholder: "/tutorials/candidate-portal-submit.png",
         },
         {
@@ -5252,9 +5342,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Automatic Submission Scenarios",
           titleAr: "سيناريوهات التقديم التلقائي",
           descriptionEn:
-            "The exam may be submitted automatically in several scenarios:\n\n**1. Time Expired (Exam Timer Reaches Zero):**\n- When the exam-wide timer counts down to zero\n- All current answers are saved\n- The exam is automatically submitted\n- An \"Exam time has expired\" message appears\n- Candidate is redirected to results page\n\n**2. Auto-Termination (Violation Limit Reached):**\n- If the exam has **maxViolationWarnings** configured\n- After the candidate exceeds the maximum number of allowed violations\n- The exam is force-submitted with status **\"Terminated\"**\n- A termination message appears explaining why\n- This is treated as a final submission — no resume possible\n\n**3. Proctor Force-Submit:**\n- A live proctor can **force-submit** the exam from the Proctor Center\n- This immediately submits the attempt regardless of remaining time\n- The candidate sees a notification that their exam was force-submitted\n- Status changes to \"ForceSubmitted\"\n\n**In All Auto-Submit Scenarios:**\n- ✓ All saved answers are preserved\n- ✓ The attempt is properly closed on the server\n- ✓ Webcam and timers stop\n- ✓ Candidate is redirected to the results page",
+            'The exam may be submitted automatically in several scenarios:\n\n**1. Time Expired (Exam Timer Reaches Zero):**\n- When the exam-wide timer counts down to zero\n- All current answers are saved\n- The exam is automatically submitted\n- An "Exam time has expired" message appears\n- Candidate is redirected to results page\n\n**2. Auto-Termination (Violation Limit Reached):**\n- If the exam has **maxViolationWarnings** configured\n- After the candidate exceeds the maximum number of allowed violations\n- The exam is force-submitted with status **"Terminated"**\n- A termination message appears explaining why\n- This is treated as a final submission — no resume possible\n\n**3. Proctor Force-Submit:**\n- A live proctor can **force-submit** the exam from the Proctor Center\n- This immediately submits the attempt regardless of remaining time\n- The candidate sees a notification that their exam was force-submitted\n- Status changes to "ForceSubmitted"\n\n**In All Auto-Submit Scenarios:**\n- ✓ All saved answers are preserved\n- ✓ The attempt is properly closed on the server\n- ✓ Webcam and timers stop\n- ✓ Candidate is redirected to the results page',
           descriptionAr:
-            "قد يتم تقديم الاختبار تلقائيًا في عدة سيناريوهات:\n\n**1. انتهاء الوقت (مؤقت الاختبار يصل إلى الصفر):**\n- عندما يعد مؤقت الاختبار الكامل تنازليًا إلى الصفر\n- يتم حفظ جميع الإجابات الحالية\n- يتم تقديم الاختبار تلقائيًا\n- تظهر رسالة \"انتهى وقت الاختبار\"\n- يتم توجيه المرشح إلى صفحة النتائج\n\n**2. الإيقاف التلقائي (تم الوصول إلى حد المخالفات):**\n- إذا كان للاختبار **حد أقصى لتحذيرات المخالفات** مُعد\n- بعد تجاوز المرشح الحد الأقصى لعدد المخالفات المسموح بها\n- يتم تقديم الاختبار إجباريًا بحالة **\"موقوف\"**\n- تظهر رسالة إيقاف توضح السبب\n- يُعامل كتقديم نهائي — لا يمكن الاستئناف\n\n**3. التقديم الإجباري من المراقب:**\n- يمكن للمراقب الحي **تقديم الاختبار إجباريًا** من مركز المراقب\n- يقدم المحاولة فورًا بغض النظر عن الوقت المتبقي\n- يرى المرشح إشعارًا بأن اختباره تم تقديمه إجباريًا\n- تتغير الحالة إلى \"مُقدم إجباريًا\"\n\n**في جميع سيناريوهات التقديم التلقائي:**\n- ✓ جميع الإجابات المحفوظة يتم الاحتفاظ بها\n- ✓ يتم إغلاق المحاولة بشكل صحيح على الخادم\n- ✓ تتوقف الكاميرا والمؤقتات\n- ✓ يتم توجيه المرشح إلى صفحة النتائج",
+            'قد يتم تقديم الاختبار تلقائيًا في عدة سيناريوهات:\n\n**1. انتهاء الوقت (مؤقت الاختبار يصل إلى الصفر):**\n- عندما يعد مؤقت الاختبار الكامل تنازليًا إلى الصفر\n- يتم حفظ جميع الإجابات الحالية\n- يتم تقديم الاختبار تلقائيًا\n- تظهر رسالة "انتهى وقت الاختبار"\n- يتم توجيه المرشح إلى صفحة النتائج\n\n**2. الإيقاف التلقائي (تم الوصول إلى حد المخالفات):**\n- إذا كان للاختبار **حد أقصى لتحذيرات المخالفات** مُعد\n- بعد تجاوز المرشح الحد الأقصى لعدد المخالفات المسموح بها\n- يتم تقديم الاختبار إجباريًا بحالة **"موقوف"**\n- تظهر رسالة إيقاف توضح السبب\n- يُعامل كتقديم نهائي — لا يمكن الاستئناف\n\n**3. التقديم الإجباري من المراقب:**\n- يمكن للمراقب الحي **تقديم الاختبار إجباريًا** من مركز المراقب\n- يقدم المحاولة فورًا بغض النظر عن الوقت المتبقي\n- يرى المرشح إشعارًا بأن اختباره تم تقديمه إجباريًا\n- تتغير الحالة إلى "مُقدم إجباريًا"\n\n**في جميع سيناريوهات التقديم التلقائي:**\n- ✓ جميع الإجابات المحفوظة يتم الاحتفاظ بها\n- ✓ يتم إغلاق المحاولة بشكل صحيح على الخادم\n- ✓ تتوقف الكاميرا والمؤقتات\n- ✓ يتم توجيه المرشح إلى صفحة النتائج',
           imagePlaceholder: "/tutorials/candidate-portal-auto-submit.png",
         },
         {
@@ -5262,9 +5352,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Results Page & Certificate",
           titleAr: "صفحة النتائج والشهادة",
           descriptionEn:
-            "After submission, you are redirected to the **Results page**:\n\n**\"Just Submitted\" State:**\n- If you were just redirected from the exam (URL has `?submitted=true`)\n- A **banner** shows \"Your exam has been submitted successfully\"\n- The system **polls for grading** to complete:\n  - Checks every 5 seconds, up to 6 times (30 seconds total)\n  - If grading is finished during polling, results display immediately\n  - If grading takes longer, a \"Grading in progress\" message shows\n\n**Results Display (after grading is complete):**\n- **Exam title** and attempt number\n- **Submission timestamp** — when the exam was submitted\n- **Score breakdown:**\n  - Total Score achieved\n  - Pass Score threshold\n  - ✅ **Passed** (green badge) or ✗ **Failed** (red badge)\n- **Time taken** — how long the candidate spent\n- **Questions attempted** vs total questions\n\n**Certificate Download (if passed):**\n- If the candidate **passed** the exam, a **\"Download Certificate\"** button appears\n- Click to generate and download a PDF certificate\n- The certificate is generated on-demand from the server\n\n**Available Actions:**\n- 🏠 **\"Back to My Exams\"** — returns to the exam list\n- 📋 **\"Share Results\"** — share results (if available)\n- 📜 **\"Download Certificate\"** — download PDF certificate (only if passed)\n\n**Returning Later:**\nFrom the My Exams page, click **\"View Results\"** on any Completed exam card to revisit the results page at any time.",
+            'After submission, you are redirected to the **Results page**:\n\n**"Just Submitted" State:**\n- If you were just redirected from the exam (URL has `?submitted=true`)\n- A **banner** shows "Your exam has been submitted successfully"\n- The system **polls for grading** to complete:\n  - Checks every 5 seconds, up to 6 times (30 seconds total)\n  - If grading is finished during polling, results display immediately\n  - If grading takes longer, a "Grading in progress" message shows\n\n**Results Display (after grading is complete):**\n- **Exam title** and attempt number\n- **Submission timestamp** — when the exam was submitted\n- **Score breakdown:**\n  - Total Score achieved\n  - Pass Score threshold\n  - ✅ **Passed** (green badge) or ✗ **Failed** (red badge)\n- **Time taken** — how long the candidate spent\n- **Questions attempted** vs total questions\n\n**Certificate Download (if passed):**\n- If the candidate **passed** the exam, a **"Download Certificate"** button appears\n- Click to generate and download a PDF certificate\n- The certificate is generated on-demand from the server\n\n**Available Actions:**\n- 🏠 **"Back to My Exams"** — returns to the exam list\n- 📋 **"Share Results"** — share results (if available)\n- 📜 **"Download Certificate"** — download PDF certificate (only if passed)\n\n**Returning Later:**\nFrom the My Exams page, click **"View Results"** on any Completed exam card to revisit the results page at any time.',
           descriptionAr:
-            "بعد التقديم، يتم توجيهك إلى **صفحة النتائج**:\n\n**حالة \"تم التقديم للتو\":**\n- إذا تم توجيهك للتو من الاختبار (الرابط يحتوي `?submitted=true`)\n- يعرض **شعار** \"تم تقديم اختبارك بنجاح\"\n- النظام **يستطلع لاكتمال التقييم**:\n  - يتحقق كل 5 ثوانٍ، حتى 6 مرات (30 ثانية إجمالاً)\n  - إذا اكتمل التقييم أثناء الاستطلاع، تُعرض النتائج فورًا\n  - إذا استغرق التقييم وقتًا أطول، تظهر رسالة \"التقييم قيد التقدم\"\n\n**عرض النتائج (بعد اكتمال التقييم):**\n- **عنوان الاختبار** ورقم المحاولة\n- **طابع وقت التقديم** — متى تم تقديم الاختبار\n- **تفصيل الدرجة:**\n  - الدرجة الإجمالية المحققة\n  - حد درجة النجاح\n  - ✅ **ناجح** (شارة خضراء) أو ✗ **راسب** (شارة حمراء)\n- **الوقت المستغرق** — كم قضى المرشح\n- **الأسئلة المحاولة** مقابل إجمالي الأسئلة\n\n**تنزيل الشهادة (إذا نجح):**\n- إذا **نجح** المرشح في الاختبار، يظهر زر **\"تنزيل الشهادة\"**\n- انقر لإنشاء وتنزيل شهادة PDF\n- يتم إنشاء الشهادة عند الطلب من الخادم\n\n**الإجراءات المتاحة:**\n- 🏠 **\"العودة إلى اختباراتي\"** — يعود إلى قائمة الاختبارات\n- 📋 **\"مشاركة النتائج\"** — مشاركة النتائج (إذا متاحة)\n- 📜 **\"تنزيل الشهادة\"** — تنزيل شهادة PDF (فقط إذا نجح)\n\n**العودة لاحقًا:**\nمن صفحة اختباراتي، انقر على **\"عرض النتائج\"** في أي بطاقة اختبار مكتمل لإعادة زيارة صفحة النتائج في أي وقت.",
+            'بعد التقديم، يتم توجيهك إلى **صفحة النتائج**:\n\n**حالة "تم التقديم للتو":**\n- إذا تم توجيهك للتو من الاختبار (الرابط يحتوي `?submitted=true`)\n- يعرض **شعار** "تم تقديم اختبارك بنجاح"\n- النظام **يستطلع لاكتمال التقييم**:\n  - يتحقق كل 5 ثوانٍ، حتى 6 مرات (30 ثانية إجمالاً)\n  - إذا اكتمل التقييم أثناء الاستطلاع، تُعرض النتائج فورًا\n  - إذا استغرق التقييم وقتًا أطول، تظهر رسالة "التقييم قيد التقدم"\n\n**عرض النتائج (بعد اكتمال التقييم):**\n- **عنوان الاختبار** ورقم المحاولة\n- **طابع وقت التقديم** — متى تم تقديم الاختبار\n- **تفصيل الدرجة:**\n  - الدرجة الإجمالية المحققة\n  - حد درجة النجاح\n  - ✅ **ناجح** (شارة خضراء) أو ✗ **غير ناجح** (شارة حمراء)\n- **الوقت المستغرق** — كم قضى المرشح\n- **الأسئلة المحاولة** مقابل إجمالي الأسئلة\n\n**تنزيل الشهادة (إذا نجح):**\n- إذا **نجح** المرشح في الاختبار، يظهر زر **"تنزيل الشهادة"**\n- انقر لإنشاء وتنزيل شهادة PDF\n- يتم إنشاء الشهادة عند الطلب من الخادم\n\n**الإجراءات المتاحة:**\n- 🏠 **"العودة إلى اختباراتي"** — يعود إلى قائمة الاختبارات\n- 📋 **"مشاركة النتائج"** — مشاركة النتائج (إذا متاحة)\n- 📜 **"تنزيل الشهادة"** — تنزيل شهادة PDF (فقط إذا نجح)\n\n**العودة لاحقًا:**\nمن صفحة اختباراتي، انقر على **"عرض النتائج"** في أي بطاقة اختبار مكتمل لإعادة زيارة صفحة النتائج في أي وقت.',
           imagePlaceholder: "/tutorials/candidate-portal-results.png",
         },
       ],
@@ -5273,9 +5363,9 @@ export const candidatePortalTutorial: TutorialModule = {
           titleEn: "Complete Exam Flow Timeline",
           titleAr: "الجدول الزمني الكامل لمسار الاختبار",
           contentEn:
-            "**Example: Candidate takes a 60-minute proctored exam with 3 sections**\n\n1. **10:00 AM** — Candidate clicks \"Start Exam\" on My Exams page\n2. **10:00 AM** — Instructions page: selects English, system check passes, agrees to rules, clicks Start\n3. **10:00 AM** — Browser enters fullscreen, webcam activates, exam timer starts (60:00)\n4. **10:00 AM** — Section 1 begins (20-minute timer). Candidate answers questions 1–10\n5. **10:15 AM** — Candidate finishes Section 1 early → clicks Next Section → confirms → moves to Section 2\n6. **10:15 AM** — Section 2 timer starts (15 minutes). Section 1 is now locked.\n7. **10:20 AM** — Candidate switches tabs accidentally → warning toast + violation #1\n8. **10:30 AM** — Section 2 timer expires → automatically advanced to Section 3\n9. **10:30 AM** — Section 3 begins (remaining exam time). Calculator available.\n10. **10:50 AM** — Candidate opens Summary → sees 2 unanswered questions → jumps to them\n11. **10:52 AM** — Candidate clicks Submit Exam → confirms → submission processing\n12. **10:52 AM** — Redirected to Results page → polling for grading...\n13. **10:52 AM** — Grading complete → Score: 35/40 → Passed ✅ → Download Certificate available",
+            '**Example: Candidate takes a 60-minute proctored exam with 3 sections**\n\n1. **10:00 AM** — Candidate clicks "Start Exam" on My Exams page\n2. **10:00 AM** — Instructions page: selects English, system check passes, agrees to rules, clicks Start\n3. **10:00 AM** — Browser enters fullscreen, webcam activates, exam timer starts (60:00)\n4. **10:00 AM** — Section 1 begins (20-minute timer). Candidate answers questions 1–10\n5. **10:15 AM** — Candidate finishes Section 1 early → clicks Next Section → confirms → moves to Section 2\n6. **10:15 AM** — Section 2 timer starts (15 minutes). Section 1 is now locked.\n7. **10:20 AM** — Candidate switches tabs accidentally → warning toast + violation #1\n8. **10:30 AM** — Section 2 timer expires → automatically advanced to Section 3\n9. **10:30 AM** — Section 3 begins (remaining exam time). Calculator available.\n10. **10:50 AM** — Candidate opens Summary → sees 2 unanswered questions → jumps to them\n11. **10:52 AM** — Candidate clicks Submit Exam → confirms → submission processing\n12. **10:52 AM** — Redirected to Results page → polling for grading...\n13. **10:52 AM** — Grading complete → Score: 35/40 → Passed ✅ → Download Certificate available',
           contentAr:
-            "**مثال: مرشح يؤدي اختبار مراقب مدته 60 دقيقة مع 3 أقسام**\n\n1. **10:00 صباحًا** — المرشح ينقر على \"بدء الاختبار\" في صفحة اختباراتي\n2. **10:00 صباحًا** — صفحة التعليمات: يختار الإنجليزية، فحص النظام ينجح، يوافق على القواعد، ينقر على بدء\n3. **10:00 صباحًا** — المتصفح يدخل ملء الشاشة، الكاميرا تنشط، مؤقت الاختبار يبدأ (60:00)\n4. **10:00 صباحًا** — القسم 1 يبدأ (مؤقت 20 دقيقة). المرشح يجيب على الأسئلة 1–10\n5. **10:15 صباحًا** — المرشح ينهي القسم 1 مبكرًا → ينقر القسم التالي → يؤكد → ينتقل إلى القسم 2\n6. **10:15 صباحًا** — مؤقت القسم 2 يبدأ (15 دقيقة). القسم 1 الآن مقفل.\n7. **10:20 صباحًا** — المرشح يبدل التبويب عن طريق الخطأ → إشعار تحذيري + مخالفة #1\n8. **10:30 صباحًا** — مؤقت القسم 2 ينتهي → تقدم تلقائي إلى القسم 3\n9. **10:30 صباحًا** — القسم 3 يبدأ (الوقت المتبقي من الاختبار). الآلة الحاسبة متاحة.\n10. **10:50 صباحًا** — المرشح يفتح الملخص → يرى سؤالين بدون إجابة → يقفز إليهما\n11. **10:52 صباحًا** — المرشح ينقر تقديم الاختبار → يؤكد → معالجة التقديم\n12. **10:52 صباحًا** — يتم التوجيه إلى صفحة النتائج → استطلاع للتقييم...\n13. **10:52 صباحًا** — التقييم مكتمل → الدرجة: 35/40 → ناجح ✅ → تنزيل الشهادة متاح",
+            '**مثال: مرشح يؤدي اختبار مراقب مدته 60 دقيقة مع 3 أقسام**\n\n1. **10:00 صباحًا** — المرشح ينقر على "بدء الاختبار" في صفحة اختباراتي\n2. **10:00 صباحًا** — صفحة التعليمات: يختار الإنجليزية، فحص النظام ينجح، يوافق على القواعد، ينقر على بدء\n3. **10:00 صباحًا** — المتصفح يدخل ملء الشاشة، الكاميرا تنشط، مؤقت الاختبار يبدأ (60:00)\n4. **10:00 صباحًا** — القسم 1 يبدأ (مؤقت 20 دقيقة). المرشح يجيب على الأسئلة 1–10\n5. **10:15 صباحًا** — المرشح ينهي القسم 1 مبكرًا → ينقر القسم التالي → يؤكد → ينتقل إلى القسم 2\n6. **10:15 صباحًا** — مؤقت القسم 2 يبدأ (15 دقيقة). القسم 1 الآن مقفل.\n7. **10:20 صباحًا** — المرشح يبدل التبويب عن طريق الخطأ → إشعار تحذيري + مخالفة #1\n8. **10:30 صباحًا** — مؤقت القسم 2 ينتهي → تقدم تلقائي إلى القسم 3\n9. **10:30 صباحًا** — القسم 3 يبدأ (الوقت المتبقي من الاختبار). الآلة الحاسبة متاحة.\n10. **10:50 صباحًا** — المرشح يفتح الملخص → يرى سؤالين بدون إجابة → يقفز إليهما\n11. **10:52 صباحًا** — المرشح ينقر تقديم الاختبار → يؤكد → معالجة التقديم\n12. **10:52 صباحًا** — يتم التوجيه إلى صفحة النتائج → استطلاع للتقييم...\n13. **10:52 صباحًا** — التقييم مكتمل → الدرجة: 35/40 → ناجح ✅ → تنزيل الشهادة متاح',
         },
       ],
     },

@@ -61,6 +61,7 @@ import {
   ScrollText,
   Bug,
   Activity,
+  FileKey,
 } from "lucide-react"
 
 interface NavItem {
@@ -179,7 +180,8 @@ const administrationNavGroup: NavGroup = {
     { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
     { icon: Landmark, labelKey: "nav.departments", href: "/departments" },
     { icon: Building2, labelKey: "nav.organization", href: "/organization" },
-    { icon: Settings, labelKey: "nav.settings", href: "/settings" },
+    // { icon: Settings, labelKey: "nav.settings", href: "/settings" },
+    { icon: FileKey, labelKey: "nav.license", href: "/settings/license" },
   ],
 }
 

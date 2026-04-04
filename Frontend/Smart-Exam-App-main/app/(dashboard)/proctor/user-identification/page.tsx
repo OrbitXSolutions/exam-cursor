@@ -428,7 +428,6 @@ export default function UserIdentificationPage() {
                         <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all" />
                       </TableHead>
                       <TableHead>{t("identityVerification.candidate")}</TableHead>
-                      <TableHead className="text-center">{t("identityVerification.faceMatch")}</TableHead>
                       <TableHead>{t("identityVerification.status")}</TableHead>
                       <TableHead>{t("identityVerification.submittedAt")}</TableHead>
                       <TableHead className="text-center">{t("identityVerification.actions")}</TableHead>
@@ -445,20 +444,11 @@ export default function UserIdentificationPage() {
                           />
                         </TableCell>
                         <TableCell className="font-medium">{item.candidateName}</TableCell>
-                        <TableCell className="text-center">
-                          {item.faceMatchScore !== null ? (
-                            <span className={`font-semibold ${faceMatchColor(item.faceMatchScore)}`}>
-                              {item.faceMatchScore}%
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </TableCell>
                         <TableCell><StatusBadge status={item.statusName} /></TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {new Date(item.submittedAt).toLocaleDateString(
                             language === "ar" ? "ar-SA" : "en-US",
-                            { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
+                            { timeZone: "Asia/Dubai", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
                           )}
                         </TableCell>
                         <TableCell className="text-center">
@@ -603,15 +593,7 @@ export default function UserIdentificationPage() {
               </div>
 
               {/* Scores */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    {t("identityVerification.faceMatchScore")}
-                  </p>
-                  <p className={`text-lg font-bold ${faceMatchColor(detail.faceMatchScore)}`}>
-                    {detail.faceMatchScore !== null ? `${detail.faceMatchScore}%` : "—"}
-                  </p>
-                </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">
                     {t("identityVerification.livenessCheck")}
@@ -619,14 +601,6 @@ export default function UserIdentificationPage() {
                   <Badge variant={livenessVariant(detail.livenessResult)}>
                     {livenessLabel(detail.livenessResult, t)}
                   </Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    {t("identityVerification.riskScore")}
-                  </p>
-                  <p className={`text-lg font-bold ${riskColor(detail.riskScore)}`}>
-                    {detail.riskScore !== null ? detail.riskScore : "—"}
-                  </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">
@@ -662,7 +636,7 @@ export default function UserIdentificationPage() {
                     <span className="text-muted-foreground">
                       {t("identityVerification.reviewedBy")}:
                     </span>
-                    <span>{detail.reviewedBy}</span>
+                    <span>{detail.reviewedByName ?? detail.reviewedBy}</span>
                   </div>
                 )}
                 {detail.reviewedAt && (
@@ -671,7 +645,7 @@ export default function UserIdentificationPage() {
                     <span className="text-muted-foreground">
                       {t("identityVerification.reviewedAt")}:
                     </span>
-                    <span>{new Date(detail.reviewedAt).toLocaleString()}</span>
+                    <span>{new Date(detail.reviewedAt).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}</span>
                   </div>
                 )}
               </div>
@@ -698,7 +672,7 @@ export default function UserIdentificationPage() {
                         className="flex items-start gap-2 text-xs border-b pb-2 last:border-0"
                       >
                         <span className="text-muted-foreground whitespace-nowrap">
-                          {new Date(log.timestamp).toLocaleString()}
+                          {new Date(log.timestamp).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}
                         </span>
                         <span className="font-medium">{log.action}</span>
                         {log.performedBy && (

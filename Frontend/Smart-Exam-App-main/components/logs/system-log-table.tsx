@@ -127,6 +127,7 @@ export function SystemLogTable({
   function formatTimestamp(ts: string) {
     const date = new Date(ts)
     return date.toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric", month: "short", day: "numeric",
       hour: "2-digit", minute: "2-digit", second: "2-digit",
     })

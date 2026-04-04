@@ -80,7 +80,7 @@ export default function VerifyCertificatePage() {
                     <p><strong>Exam:</strong> {result.examTitle}</p>
                     <p><strong>Candidate:</strong> {result.candidateName}</p>
                     <p><strong>Score:</strong> {result.score} / {result.maxScore}</p>
-                    <p><strong>Issued:</strong> {result.issuedAt ? new Date(result.issuedAt).toLocaleDateString() : "-"}</p>
+                    <p><strong>Issued:</strong> {result.issuedAt ? new Date(result.issuedAt).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" }) : "-"}</p>
                   </div>
                 </>
               ) : (

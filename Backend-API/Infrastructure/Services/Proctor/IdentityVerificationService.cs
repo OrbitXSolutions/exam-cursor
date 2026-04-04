@@ -99,7 +99,14 @@ public class IdentityVerificationService : IIdentityVerificationService
         if (entity == null)
             return ApiResponse<IdentityVerificationDetailDto>.FailureResponse("Verification not found");
 
-        return ApiResponse<IdentityVerificationDetailDto>.SuccessResponse(MapToDetailDto(entity));
+        string? reviewerName = null;
+        if (!string.IsNullOrEmpty(entity.ReviewedBy))
+        {
+            var reviewer = await _context.Users.FirstOrDefaultAsync(u => u.Id == entity.ReviewedBy);
+            reviewerName = reviewer?.DisplayName ?? reviewer?.FullName ?? reviewer?.UserName;
+        }
+
+        return ApiResponse<IdentityVerificationDetailDto>.SuccessResponse(MapToDetailDto(entity, reviewerName));
     }
 
     // ─── Single Action ──────────────────────────────────────────────────────
@@ -344,7 +351,7 @@ public class IdentityVerificationService : IIdentityVerificationService
         SubmittedAt = v.SubmittedAt
     };
 
-    private IdentityVerificationDetailDto MapToDetailDto(IdentityVerification v) => new()
+    private IdentityVerificationDetailDto MapToDetailDto(IdentityVerification v, string? reviewerName = null) => new()
     {
         Id = v.Id,
         ProctorSessionId = v.ProctorSessionId ?? 0,
@@ -370,6 +377,7 @@ public class IdentityVerificationService : IIdentityVerificationService
         RiskScore = v.RiskScore,
         Status = v.Status,
         ReviewedBy = v.ReviewedBy,
+        ReviewedByName = reviewerName,
         ReviewedAt = v.ReviewedAt,
         ReviewNotes = v.ReviewNotes,
         AssignedProctorId = v.AssignedProctorId,

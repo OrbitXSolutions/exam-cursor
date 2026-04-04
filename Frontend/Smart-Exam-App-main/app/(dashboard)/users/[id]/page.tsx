@@ -168,7 +168,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               <span className="text-muted-foreground">{language === "ar" ? "تاريخ الإنشاء" : "Created Date"}</span>
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}</span>
+                <span>{new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}</span>
               </div>
             </div>
           </CardContent>

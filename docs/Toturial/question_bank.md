@@ -58,4 +58,35 @@ The current implementation in the create page does exactly this two-step flow co
 now support only image
 easily can support audio/video. (addsOn)
 
+## Partial Scoring for MCQ Multi
+
+**Status: ✅ Implemented**
+
+### Database
+
+- `QuestionOptions.Points` column added (`decimal(10,2)`, nullable)
+- Migration: `20260403045255_AddOptionPoints`
+
+### Backend
+
+- `QuestionOption` entity: `decimal? Points` property
+- DTOs: `Points` field on `QuestionOptionDto`, `CreateQuestionOptionDto`, `UpdateQuestionOptionDto`
+- Validators: sum of option points must equal question total points (tolerance 0.01), each option points >= 0
+- `QuestionBankService`: Points mapped in all CRUD paths (create, read, update, bulk update)
+- `GradingService.GradeMcqAnswer()`:
+  - If option points set → score = sum of points for correctly selected options
+  - If option points null (legacy) → equal distribution: `total / correctCount` per correct option
+  - Wrong selections = 0 (no negative penalty)
+
+### Frontend
+
+- Create page (`/question-bank/create`): per-option Points input + real-time sum indicator for MCQ Multi
+- Edit page (`/question-bank/[id]/edit`): per-option Points input + sum indicator + validation on submit
+- Types updated: `QuestionOption.points`, `CreateQuestionRequest` options include points
+
+### Backward Compatibility
+
+- Nullable Points field — existing questions without points continue to work with equal distribution
+- No changes to MCQ Single or True/False grading
+
 ## Question with Excel

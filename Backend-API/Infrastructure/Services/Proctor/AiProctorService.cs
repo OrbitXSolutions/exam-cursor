@@ -47,7 +47,7 @@ public class AiProctorService : IAiProctorService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<ApiResponse<AiProctorAnalysisResponseDto>> GetAiRiskAnalysisAsync(int sessionId)
+    public async Task<ApiResponse<AiProctorAnalysisResponseDto>> GetAiRiskAnalysisAsync(int sessionId, string lang = "en")
     {
         try
         {
@@ -113,10 +113,10 @@ public class AiProctorService : IAiProctorService
             }
 
             // 7. Build the analysis prompt
-            var prompt = BuildAnalysisPrompt(session, eventSummary);
+            var prompt = BuildAnalysisPrompt(session, eventSummary, lang);
 
             // 8. Call OpenAI
-            var (aiResult, errorMessage) = await CallOpenAiAsync(prompt);
+            var (aiResult, errorMessage) = await CallOpenAiAsync(prompt, lang);
 
             if (aiResult == null)
                 return ApiResponse<AiProctorAnalysisResponseDto>.FailureResponse(
@@ -333,6 +333,31 @@ public class AiProctorService : IAiProctorService
             .OrderByDescending(g => g.Key)
             .ToDictionary(g => (int)g.Key, g => g.Count());
 
+        // --- Suspicious reconnect → answer spike detection ---
+        // Strong cheating signal: candidate disconnects, gets answers externally, reconnects and submits rapidly
+        var reconnectSignals = events
+            .Where(e => e.EventType == ProctorEventType.NetworkReconnected)
+            .OrderBy(e => e.OccurredAt)
+            .ToList();
+        int suspiciousReconnectCount = 0;
+        foreach (var reconnect in reconnectSignals)
+        {
+            int answerBurst = attemptEvents.Count(e =>
+                e.EventType == AttemptEventType.AnswerSaved &&
+                e.OccurredAt > reconnect.OccurredAt &&
+                e.OccurredAt <= reconnect.OccurredAt.AddSeconds(90));
+            if (answerBurst >= 4) suspiciousReconnectCount++;
+        }
+        if (suspiciousReconnectCount > 0)
+            patterns.Add($"CRITICAL: {suspiciousReconnectCount} network reconnect(s) each followed by 4+ answer submissions within 90 seconds — strong behavioral indicator of offline assistance");
+
+        // --- Late-phase violation concentration ---
+        // Violations in the last 20% of the session carry elevated significance
+        var latePhaseStart = session.StartedAt + TimeSpan.FromTicks((long)(sessionDuration.Ticks * 0.80));
+        var latePhaseViolationCount = violations.Count(v => v.OccurredAt >= latePhaseStart);
+        if (latePhaseViolationCount >= 3)
+            patterns.Add($"{latePhaseViolationCount} violation(s) concentrated in the final 20% of the session — elevated risk, possible last-minute cheating attempt");
+
         return new EventSummaryData
         {
             TotalEvents = session.TotalEvents,
@@ -413,34 +438,80 @@ public class AiProctorService : IAiProctorService
             AttemptEventTimeline = attemptEventTimeline,
             RiskProgressionTimeline = riskSnapshots,
             SeverityDistribution = severityDistribution,
+            // Sub-scores from rule engine
+            SubScoreFace = session.FaceScore,
+            SubScoreEye = session.EyeScore,
+            SubScoreBehavior = session.BehaviorScore,
+            SubScoreEnvironment = session.EnvironmentScore,
+            // Temporal risk signals
+            SuspiciousReconnectCount = suspiciousReconnectCount,
+            LatePhaseViolationCount = latePhaseViolationCount,
             // Session timing
             SessionStartedAt = session.StartedAt,
             SessionEndedAt = session.EndedAt
         };
     }
 
-    private static string BuildAnalysisPrompt(ProctorSession session, EventSummaryData summary)
+    private static string BuildAnalysisPrompt(ProctorSession session, EventSummaryData summary, string lang = "en")
     {
         var sb = new StringBuilder();
 
+        // ── Language Instruction ──
+        if (lang.Equals("ar", StringComparison.OrdinalIgnoreCase))
+        {
+            sb.AppendLine("CRITICAL LANGUAGE INSTRUCTION: You MUST write ALL text values in the JSON response in Arabic (العربية). Every string field — summaries, explanations, recommendations, verdicts, behavior descriptions, factor lists, timeline entries — must be in Arabic. Only JSON keys and enum values (like 'Low', 'Medium', 'High', 'Critical', 'Verified', 'Failed') remain in English. Numbers and technical identifiers stay as-is.");
+            sb.AppendLine();
+        }
+
         // ── System Role ──
         sb.AppendLine("You are a senior AI proctoring forensic analyst for a professional online examination system.");
-        sb.AppendLine("Your task is to produce a COMPREHENSIVE, PRODUCTION-GRADE proctoring report analyzing every aspect of this exam session.");
-        sb.AppendLine("This report will be reviewed by exam administrators and proctors to make official decisions.");
+        sb.AppendLine("You produce LEGALLY AND PROFESSIONALLY DEFENSIBLE integrity reports that will drive official administrative decisions.");
+        sb.AppendLine("Your verdicts will be reviewed by proctors and administrators. Inconsistency, vagueness, or evidence-free conclusions are unacceptable.");
+        sb.AppendLine("Every output you produce must be STRONGLY ANCHORED to the specific evidence presented below.");
         sb.AppendLine();
 
-        // ── Analysis Rules ──
-        sb.AppendLine("ANALYSIS RULES:");
-        sb.AppendLine("- Be objective and evidence-based — only reference events that actually occurred");
-        sb.AppendLine("- Consider the frequency, timing, severity, and CORRELATION of violations");
-        sb.AppendLine("- Distinguish between technical issues (network, browser) and intentional suspicious behavior");
-        sb.AppendLine("- Provide specific, actionable recommendations — not generic advice");
-        sb.AppendLine("- Support bilingual context (candidate may use Arabic or English)");
-        sb.AppendLine("- Be professional and fair — avoid assumptions without evidence");
-        sb.AppendLine("- Analyze temporal patterns: when violations cluster, what preceded them, what followed");
-        sb.AppendLine("- Cross-correlate: e.g., disconnects + rapid answers after reconnect = possible outside help");
-        sb.AppendLine("- Consider exam security settings when assessing violation severity");
-        sb.AppendLine("- If session was auto-terminated (max violations reached), this is a CRITICAL indicator");
+        // ── Mandatory Reasoning Protocol ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("MANDATORY ANALYSIS PROTOCOL — YOU MUST FOLLOW THESE STEPS IN ORDER");
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("STEP 1 — EVIDENCE INVENTORY: Enumerate only violations that ACTUALLY OCCURRED. Do not invent or assume events.");
+        sb.AppendLine("STEP 2 — PATTERN RECOGNITION: Identify correlations explicitly — bursts, disconnect+answer spikes, camera-blocked+face-absent, late-phase clusters.");
+        sb.AppendLine("STEP 3 — SECURITY CONTEXT: Weigh each violation against the exam's security settings.");
+        sb.AppendLine("         For example: PasteAttempt on a copy/paste-BLOCKED exam is far more intentional than on an unrestricted exam.");
+        sb.AppendLine("         FullscreenExited on a fullscreen-REQUIRED exam is a policy violation; on an unrestricted exam it is minor.");
+        sb.AppendLine("STEP 4 — SUB-SCORE REVIEW: The rule engine has computed 4 objective sub-scores. Reference them explicitly to justify each category rating.");
+        sb.AppendLine("STEP 5 — RISK SCORING: Apply the SCORING RUBRIC to arrive at your riskScore. You MUST anchor to the computed score (see SCORING ANCHOR below).");
+        sb.AppendLine("STEP 6 — VERDICT: Write integrityVerdict following the required 3-part structure (see VERDICT FORMAT GUIDE below).");
+        sb.AppendLine();
+
+        // ── Scoring Rubric ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("RISK SCORING RUBRIC — MANDATORY");
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("0–20 (Low):");
+        sb.AppendLine("  • 0–2 isolated violations with no pattern");
+        sb.AppendLine("  • No camera blocking, no face-absent events");
+        sb.AppendLine("  • No bursts, no disconnect spikes, no termination");
+        sb.AppendLine("  • Answer timing consistent with natural exam behavior");
+        sb.AppendLine();
+        sb.AppendLine("21–50 (Medium):");
+        sb.AppendLine("  • 3–7 violations, at most one category showing concern");
+        sb.AppendLine("  • Minor tab switches or window blurs, no persistent camera issues");
+        sb.AppendLine("  • No disconnect+answer spike, no burst patterns");
+        sb.AppendLine("  • Some anomalous timing but explainable");
+        sb.AppendLine();
+        sb.AppendLine("51–75 (High):");
+        sb.AppendLine("  • 8+ violations OR camera blocked once OR face absent 3+ times OR a verified burst pattern");
+        sb.AppendLine("  • Multiple violation categories affected");
+        sb.AppendLine("  • Disconnect + rapid answers (but not confirmed spike)");
+        sb.AppendLine("  • Session flagged by proctor, or repeated warnings sent");
+        sb.AppendLine();
+        sb.AppendLine("76–100 (Critical):");
+        sb.AppendLine("  • Session terminated by proctor or auto-terminated (max violations reached)");
+        sb.AppendLine("  • Camera blocked repeatedly OR face not detected 5+ times");
+        sb.AppendLine("  • Confirmed disconnect+answer-spike pattern (4+ answers in 90s after reconnect)");
+        sb.AppendLine("  • Multiple simultaneous critical violations across face, behavior, and environment categories");
+        sb.AppendLine("  • Identity verification failed or strong impersonation signal");
         sb.AppendLine();
 
         // ── 1. Candidate Identity ──
@@ -554,7 +625,20 @@ public class AiProctorService : IAiProctorService
         sb.AppendLine("═══════════════════════════════════════");
         sb.AppendLine("SECTION 5: RISK METRICS & VIOLATIONS");
         sb.AppendLine("═══════════════════════════════════════");
-        sb.AppendLine($"- Current Risk Score: {summary.RiskScore}/100");
+        sb.AppendLine($"- Current Risk Score (Rule Engine): {summary.RiskScore}/100");
+        sb.AppendLine($"  → This is computed by the rule-based risk engine. Your riskScore output MUST anchor to this value (see SCORING ANCHOR).");
+        sb.AppendLine();
+        sb.AppendLine("COMPUTED SUB-SCORES (from rule engine — ground truth for each category):");
+        var faceScoreStr = summary.SubScoreFace.HasValue ? $"{summary.SubScoreFace.Value:F0}/100" : "Not yet computed (no risk calculation triggered)";
+        var eyeScoreStr = summary.SubScoreEye.HasValue ? $"{summary.SubScoreEye.Value:F0}/100" : "Not yet computed";
+        var behaviorScoreStr = summary.SubScoreBehavior.HasValue ? $"{summary.SubScoreBehavior.Value:F0}/100" : "Not yet computed";
+        var envScoreStr = summary.SubScoreEnvironment.HasValue ? $"{summary.SubScoreEnvironment.Value:F0}/100" : "Not yet computed";
+        sb.AppendLine($"- Face Detection Score:  {faceScoreStr}  (100 = face always visible; 0 = face never visible / camera blocked)");
+        sb.AppendLine($"- Eye Tracking Score:    {eyeScoreStr}  (100 = eyes on screen; 0 = head turned away or camera blocked)");
+        sb.AppendLine($"- Behavior Score:        {behaviorScoreStr}  (100 = no behavioral violations; 0 = maximum tab switches, copy/paste, etc.)");
+        sb.AppendLine($"- Environment Score:     {envScoreStr}  (100 = stable environment; 0 = camera blocked, snapshot failures, fullscreen exits)");
+        sb.AppendLine("These sub-scores are computed from real event timestamps and weights. In your analysis, explicitly reference these scores and EXPLAIN what drove each one low (or high).");
+        sb.AppendLine();
         sb.AppendLine($"- Total Proctor Events: {summary.TotalEvents}");
         sb.AppendLine($"- Total Proctor Violations: {summary.TotalViolations}");
         sb.AppendLine($"- Total Attempt Events: {summary.TotalAttemptEvents}");
@@ -645,6 +729,29 @@ public class AiProctorService : IAiProctorService
         sb.AppendLine($"- Total Disconnect Duration (proctor-tracked): {summary.TotalDisconnectSeconds}s ({summary.TotalDisconnectSeconds / 60.0:F1} min)");
         sb.AppendLine($"- Total Disconnect Duration (attempt-tracked): {summary.AttemptTotalDisconnectSeconds}s ({summary.AttemptTotalDisconnectSeconds / 60.0:F1} min)");
         sb.AppendLine();
+        sb.AppendLine("DISCONNECT → ANSWER SPIKE CORRELATION:");
+        if (summary.SuspiciousReconnectCount > 0)
+        {
+            sb.AppendLine($"⚠️  CRITICAL SIGNAL DETECTED: {summary.SuspiciousReconnectCount} network reconnect(s) were each followed by 4+ answer submissions within 90 seconds.");
+            sb.AppendLine("    This is the strongest behavioral indicator of offline assistance (candidate disconnected to consult external materials,");
+            sb.AppendLine("    returned with answers, and rapidly submitted them). Treat this as a HIGH-WEIGHT aggravating factor.");
+        }
+        else if (summary.DisconnectCount > 0)
+        {
+            sb.AppendLine($"- {summary.DisconnectCount} disconnect(s) detected but no suspicious answer burst followed — network instability is possible.");
+            sb.AppendLine("  Consider whether disconnect timing correlates with difficult question clusters in your behavioral analysis.");
+        }
+        else
+        {
+            sb.AppendLine("- No network disconnects detected. Network was stable throughout the session.");
+        }
+        sb.AppendLine();
+        if (summary.LatePhaseViolationCount > 0)
+        {
+            sb.AppendLine($"LATE-PHASE VIOLATIONS: {summary.LatePhaseViolationCount} violation(s) occurred in the FINAL 20% of the session.");
+            sb.AppendLine("  Late-phase violations carry higher weight than early-phase ones — candidates are less likely to be setting up and more likely acting intentionally.");
+        }
+        sb.AppendLine();
 
         // ── 9. Event Timeline ──
         if (summary.EventTimeline.Count > 0)
@@ -689,105 +796,165 @@ public class AiProctorService : IAiProctorService
             sb.AppendLine();
         }
 
-        // ── 12. Analysis Guidelines ──
-        sb.AppendLine("═══════════════════════════════════════");
-        sb.AppendLine("ANALYSIS GUIDELINES FOR YOUR REPORT");
-        sb.AppendLine("═══════════════════════════════════════");
-        sb.AppendLine("- Analyze answer patterns: rapid answers after disconnects may indicate outside help or pre-known answers");
-        sb.AppendLine("- Consider disconnect frequency and duration — multiple short disconnects are MORE suspicious than one long one");
-        sb.AppendLine("- Factor in warnings sent relative to violations when assessing severity");
-        sb.AppendLine("- Calculator context: note if violations occurred during calculator-allowed questions (less suspicious)");
-        sb.AppendLine("- Cross-reference: if candidate was flagged/terminated AND has high violations, this is CRITICAL");
-        sb.AppendLine("- If countable violations reached max threshold (auto-termination), the session integrity is severely compromised");
-        sb.AppendLine("- Consider whether the exam security settings (fullscreen, lockdown) align with the violations seen");
-        sb.AppendLine("- Assess if IP address mismatch between session & attempt could indicate proxy or VPN usage");
-        sb.AppendLine("- CAMERA BLOCKED is a CRITICAL violation: it means the entire webcam feed was dark/covered, face detection and eye tracking are IMPOSSIBLE — this severely compromises proctoring integrity");
-        sb.AppendLine("- FaceNotDetected during a webcam-required exam is a HIGH severity violation — the candidate may have left or someone else may be present");
-        sb.AppendLine("- When CameraBlocked or FaceNotDetected occur, face detection and eye tracking scores should be rated VERY LOW — these are direct integrity failures");
-        sb.AppendLine("- AttemptEvents with source='smart_monitoring' are AI-detected violations from the client-side face detection system — treat them as VERIFIED detections");
-        sb.AppendLine("- The risk score (0-100) should reflect the OVERALL integrity risk of the entire session");
-        sb.AppendLine("- Provide mitigating factors: things that REDUCE suspicion (e.g., consistent timing, no tab switches)");
-        sb.AppendLine("- Provide aggravating factors: things that INCREASE suspicion (e.g., bursts, disconnects + rapid answers)");
-        sb.AppendLine("- Write detailed, professional prose — this is an official forensic analysis report");
+        // ── Scoring Anchor ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("SCORING ANCHOR — MANDATORY");
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine($"The rule engine has computed: riskScore = {summary.RiskScore}/100");
+        sb.AppendLine($"Your riskScore output MUST be within ±15 of this computed value.");
+        sb.AppendLine("If you believe the score should deviate by more than 15 points, you MUST state your specific justification in detailedAnalysis.");
+        sb.AppendLine("The riskLevel you output MUST match the riskScore band: 0-20=Low, 21-50=Medium, 51-75=High, 76-100=Critical.");
+        sb.AppendLine("DO NOT set riskLevel=Low with riskScore=65. DO NOT set riskLevel=Critical with riskScore=40. They must be consistent.");
         sb.AppendLine();
 
-        // ── 13. Response Format ──
-        sb.AppendLine("═══════════════════════════════════════");
-        sb.AppendLine("RESPOND IN EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSON):");
-        sb.AppendLine("═══════════════════════════════════════");
+        // ── Violation Interpretation Reference ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("VIOLATION WEIGHT REFERENCE (for per-violation impact assessment)");
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("CRITICAL weight violations (each appearance is a serious integrity concern):");
+        sb.AppendLine("  • CameraBlocked — entire webcam feed was dark/covered; face and eye detection IMPOSSIBLE during this time");
+        sb.AppendLine("  • MultipleFacesDetected — another person may have assisted the candidate");
+        sb.AppendLine("  • WebcamDenied — candidate refused camera access on a webcam-required exam");
+        sb.AppendLine("  • Terminated by proctor / auto-terminated — proctor judgment or threshold reached");
+        sb.AppendLine("HIGH weight violations:");
+        sb.AppendLine("  • FaceNotDetected (3+ events) — candidate repeatedly absent from camera");
+        sb.AppendLine("  • Disconnect+AnswerSpike — offline assistance strongly indicated");
+        sb.AppendLine("  • HeadTurnDetected (5+ events) — candidate repeatedly averted gaze from screen");
+        sb.AppendLine("MEDIUM weight violations:");
+        sb.AppendLine("  • TabSwitched (3+ events) — possible external resource access");
+        sb.AppendLine("  • CopyAttempt / PasteAttempt (on blocked exams) — deliberate policy violation");
+        sb.AppendLine("  • WindowBlur (5+ events) — sustained focus loss");
+        sb.AppendLine("LOW weight violations (context-dependent):");
+        sb.AppendLine("  • FullscreenExited (1-2 events) — may be accidental; more significant on fullscreen-required exams");
+        sb.AppendLine("  • SnapshotFailed — technical issue, not inherently suspicious");
+        sb.AppendLine("  • RightClickAttempt — minor, may be habitual behavior");
+        sb.AppendLine();
+
+        // ── Temporal & Contextual Rules ──
+        sb.AppendLine("TEMPORAL & CONTEXTUAL RULES:");
+        sb.AppendLine("- Violations in the FINAL 20% of the session are more suspicious than early violations (setup issues are less likely at end)");
+        sb.AppendLine("- If CameraBlocked and FaceNotDetected occur TOGETHER — the entire proctoring record is compromised; treat webcam data as unreliable");
+        sb.AppendLine("- If disconnect occurred < 2 minutes before exam submission — evaluate whether this is a last-minute outside-help attempt");
+        sb.AppendLine("- If candidate answered questions in <3 seconds each — consider whether they could have known answers in advance");
+        sb.AppendLine("- AttemptEvents with source='smart_monitoring' metadata are AI-detected from the client-side face detection system — VERIFIED detections");
+        sb.AppendLine("- Multiple short disconnects (3+) are MORE suspicious than one long disconnection (network instability can cause one but not repeated drops)");
+        sb.AppendLine("- If exam has browser lockdown enabled and tabs were switched — this is a lockdown bypass, extremely serious");
+        sb.AppendLine();
+
+        // ── Verdict Format Guide ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("VERDICT FORMAT GUIDE — integrityVerdict MUST follow this 3-part structure");
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("Part 1 — EVIDENCE LIST: State specifically what was found (e.g., '3 CameraBlocked events, 7 FaceNotDetected, 2 TabSwitched').");
+        sb.AppendLine("Part 2 — INTERPRETATION: Classify the behavior — is it a technical issue, possible evasion, or strong evidence of cheating?");
+        sb.AppendLine("         Use language like: 'This pattern is consistent with deliberate camera evasion' OR 'These events may indicate network instability'.");
+        sb.AppendLine("Part 3 — ACTIONABLE CONCLUSION: End with a DECISIVE RECOMMENDATION, one of:");
+        sb.AppendLine("         • 'This session should be INVALIDATED due to...'");
+        sb.AppendLine("         • 'This session should be FLAGGED for mandatory manual review before results are finalized.'");
+        sb.AppendLine("         • 'This session is CLEARED — violations are consistent with technical issues not intentional misconduct.'");
+        sb.AppendLine("         DO NOT use vague language like 'may require review' or 'some concerns'. Be decisive.");
+        sb.AppendLine();
+        sb.AppendLine("CALIBRATION EXAMPLES:");
+        sb.AppendLine("Critical verdict example: 'This session recorded 4 CameraBlocked events and 9 FaceNotDetected events, rendering the webcam monitoring data");
+        sb.AppendLine("  unreliable for approximately 40% of session duration. The session was auto-terminated at threshold. This session should be INVALIDATED.");
+        sb.AppendLine("  The candidate's score must not be finalized without a full manual investigation and re-examination.'");
+        sb.AppendLine("Low verdict example: 'This session recorded 1 FullscreenExited event with no other violations. The event timing suggests an accidental");
+        sb.AppendLine("  key press with immediate return to fullscreen. Answer timing is consistent and natural. This session is CLEARED — the single event");
+        sb.AppendLine("  does not indicate any intentional misconduct.'");
+        sb.AppendLine();
+
+        // ── Response Format ──
+        sb.AppendLine("════════════════════════════════════════════════════════");
+        sb.AppendLine("RESPOND IN EXACTLY THIS JSON FORMAT (raw JSON only — no markdown, no code blocks, no backticks):");
+        sb.AppendLine("Every field is REQUIRED. Empty strings or null values are NOT acceptable — every field must have meaningful content.");
+        sb.AppendLine("════════════════════════════════════════════════════════");
         sb.AppendLine("{");
-        sb.AppendLine("  \"riskLevel\": \"<Low|Medium|High|Critical>\",");
-        sb.AppendLine("  \"riskExplanation\": \"<2-3 sentence executive summary of risk assessment>\",");
-        sb.AppendLine("  \"suspiciousBehaviors\": [\"<specific behavior 1>\", \"<behavior 2>\"],");
-        sb.AppendLine("  \"recommendation\": \"<primary actionable recommendation>\",");
-        sb.AppendLine("  \"confidence\": <integer 0-100>,");
-        sb.AppendLine("  \"detailedAnalysis\": \"<comprehensive paragraph analyzing session behavior, patterns, and integrity assessment>\",");
-        sb.AppendLine("  \"executiveSummary\": \"<3-4 sentence professional overview covering who, what, when, and overall verdict>\",");
+        sb.AppendLine("  \"riskLevel\": \"<MUST match riskScore band: 0-20=Low, 21-50=Medium, 51-75=High, 76-100=Critical>\",");
+        sb.AppendLine($"  \"riskScore\": <integer 0-100. MUST be within ±15 of the rule-engine computed score of {summary.RiskScore}. Justify deviations in detailedAnalysis.>,");
+        sb.AppendLine("  \"confidence\": <integer 0-100. Reflect how confident you are given the evidence quality. High confidence requires rich event data; low if data is sparse or contradictory.>,");
+        sb.AppendLine("  \"riskExplanation\": \"<2-3 sentence executive summary citing SPECIFIC evidence: violation types, counts, and their direct impact on integrity assessment>\",");
+        sb.AppendLine("  \"integrityVerdict\": \"<3-part structure: [1] what was found [2] what it indicates [3] decisive actionable conclusion — INVALIDATED / FLAGGED / CLEARED>\",");
+        sb.AppendLine("  \"executiveSummary\": \"<3-4 sentence professional overview: candidate, exam, key violations, overall verdict. Must be standalone readable.>\",");
+        sb.AppendLine("  \"detailedAnalysis\": \"<Comprehensive forensic paragraph. MUST: cite specific event counts, address each sub-score, explain temporal patterns, state why riskScore was set at its chosen value, and address any riskScore deviation from the rule-engine score>\",");
+        sb.AppendLine("  \"suspiciousBehaviors\": [\"<specific observed behavior with count — e.g., 'Camera blocked 3 times (40% of session)'>\"],");
+        sb.AppendLine("  \"mitigatingFactors\": [\"<specific evidence reducing suspicion — e.g., 'Consistent answer timing (avg 45s/question)' or 'Only 1 minor violation in final 80% of exam'>\"],");
+        sb.AppendLine("  \"aggravatingFactors\": [\"<specific evidence increasing suspicion — e.g., 'Camera blocked during final 20% of session' or '4 answers submitted within 60s of reconnect'>\"],");
+        sb.AppendLine("  \"recommendation\": \"<single primary action: e.g., Invalidate session and require re-examination / Flag for manual review / Clear — no action required>\",");
+        sb.AppendLine("  \"recommendations\": [\"<action 1 with owner — e.g., 'Proctor: Review webcam footage between 14:22 and 14:45'>\", \"<action 2>\"],");
         sb.AppendLine("  \"candidateProfile\": {");
         sb.AppendLine("    \"name\": \"<candidate full name>\",");
         sb.AppendLine("    \"email\": \"<email or N/A>\",");
         sb.AppendLine("    \"rollNumber\": \"<roll number or N/A>\",");
         sb.AppendLine("    \"department\": \"<department or N/A>\",");
-        sb.AppendLine("    \"identityVerificationStatus\": \"<Verified/Pending/Failed/Not Required>\",");
-        sb.AppendLine("    \"deviceSummary\": \"<one-line summary: browser, OS, screen>\",");
-        sb.AppendLine("    \"networkSummary\": \"<one-line: IP, disconnect count, stability assessment>\"");
+        sb.AppendLine("    \"identityVerificationStatus\": \"<Verified/Pending/Failed/Not Required — include face match score if available>\",");
+        sb.AppendLine("    \"deviceSummary\": \"<browser name+version, OS, screen resolution in one line>\",");
+        sb.AppendLine("    \"networkSummary\": \"<IP address, disconnect count, stability assessment in one line>\"");
         sb.AppendLine("  },");
         sb.AppendLine("  \"sessionOverview\": {");
         sb.AppendLine("    \"examTitle\": \"<exam name>\",");
         sb.AppendLine("    \"sessionStatus\": \"<Active/Completed/Cancelled>\",");
         sb.AppendLine("    \"attemptStatus\": \"<Started/InProgress/Submitted/Expired/Terminated etc>\",");
         sb.AppendLine("    \"duration\": \"<X minutes of Y allowed>\",");
-        sb.AppendLine("    \"timeUsage\": \"<percentage of allowed time used with context>\",");
-        sb.AppendLine("    \"completionRate\": \"<X/Y questions answered (Z%)>\",");
-        sb.AppendLine("    \"terminationInfo\": \"<reason if terminated, or 'N/A'>\",");
-        sb.AppendLine("    \"proctorMode\": \"<Soft/Advanced with description>\"");
+        sb.AppendLine("    \"timeUsage\": \"<percentage of allowed time with interpretation — e.g., '82% — reasonable for exam size'>\",");
+        sb.AppendLine("    \"completionRate\": \"<X/Y questions answered (Z%) — note if unusually low>\",");
+        sb.AppendLine("    \"terminationInfo\": \"<reason if terminated — must specify who terminated and why, or 'Session completed normally'>\",");
+        sb.AppendLine("    \"proctorMode\": \"<Soft/Advanced with one-line description of what was monitored>\"");
         sb.AppendLine("  },");
         sb.AppendLine("  \"behaviorAnalysis\": {");
-        sb.AppendLine("    \"answerPatternSummary\": \"<detailed analysis of answer timing, changes, rapid answers>\",");
-        sb.AppendLine("    \"navigationBehavior\": \"<how candidate navigated: linear, jumping, revisiting>\",");
-        sb.AppendLine("    \"focusBehavior\": \"<tab switches, window blurs, fullscreen exits analysis>\",");
-        sb.AppendLine("    \"timingAnalysis\": \"<avg/fast/slow answer times, time distribution analysis>\",");
-        sb.AppendLine("    \"suspiciousPatterns\": \"<any correlated suspicious patterns found>\"");
-        sb.AppendLine("  },");
+        sb.AppendLine("    \"answerPatternSummary\": \"<Cite avg/fastest/slowest timings. Flag if fastest <3s. Note answer changes. Assess if pattern is consistent with natural exam behavior.>\",");
+        sb.AppendLine("    \"navigationBehavior\": \"<Linear / jumped around / revisited many questions — with context on what this indicates>\",");
+        sb.AppendLine("    \"focusBehavior\": \"<Specific counts: X tab switches, Y window blurs, Z fullscreen exits. Tie to exam security settings.>\",");
+        sb.AppendLine("    \"timingAnalysis\": \"<Distribution analysis: were answers clustered in time? Were there pauses that align with disconnects?>\",");
+        sb.AppendLine("    \"suspiciousPatterns\": \"<Specific correlated patterns found — or 'No suspicious behavioral patterns detected'>\"\n  },");
         sb.AppendLine("  \"violationAnalysis\": {");
         sb.AppendLine("    \"totalViolations\": <number>,");
         sb.AppendLine("    \"countableViolations\": <number>,");
-        sb.AppendLine("    \"thresholdStatus\": \"<X/Y violations used (Z%) — Safe/Warning/Critical>\",");
+        sb.AppendLine("    \"thresholdStatus\": \"<X/Y violations used (Z%) — Safe / At Warning Level / Threshold Reached>\",");
         sb.AppendLine("    \"violationBreakdown\": [");
-        sb.AppendLine("      { \"type\": \"<violation type>\", \"count\": <number>, \"severity\": \"<Low/Medium/High/Critical>\", \"impact\": \"<what this means>\" }");
+        sb.AppendLine("      { \"type\": \"<exact violation type name>\", \"count\": <number>, \"severity\": \"<Low/Medium/High/Critical>\", \"impact\": \"<one sentence: what this violation means for integrity>\" }");
         sb.AppendLine("    ],");
-        sb.AppendLine("    \"violationTrend\": \"<increasing/decreasing/steady/burst pattern description>\"");
+        sb.AppendLine("    \"violationTrend\": \"<increasing toward end / burst at start / steady / isolated — cite timestamps from timeline if available>\"");
         sb.AppendLine("  },");
         sb.AppendLine("  \"environmentAssessment\": {");
-        sb.AppendLine("    \"browserCompliance\": \"<supported browser? version adequate? any concerns?>\",");
-        sb.AppendLine("    \"networkStability\": \"<stable/unstable — based on disconnects, heartbeats, duration>\",");
-        sb.AppendLine("    \"webcamStatus\": \"<active/denied/blocked/not required>\",");
-        sb.AppendLine("    \"fullscreenCompliance\": \"<maintained/exited X times/not required>\",");
-        sb.AppendLine("    \"overallEnvironmentRisk\": \"<Low/Medium/High — overall environment risk>\"");
+        sb.AppendLine("    \"browserCompliance\": \"<Browser name+version. Is this a supported browser? Any known proctoring issues with this browser?>\",");
+        sb.AppendLine("    \"networkStability\": \"<Stable / Unstable — cite disconnect count and total duration. State if this is a concern.>\",");
+        sb.AppendLine("    \"webcamStatus\": \"<Active throughout / Blocked X times / Denied / Not required — cite FaceScore from rule engine>\",");
+        sb.AppendLine("    \"fullscreenCompliance\": \"<Maintained throughout / Exited X times / Not required by exam policy>\",");
+        sb.AppendLine("    \"overallEnvironmentRisk\": \"<Low/Medium/High — one sentence justification citing the EnvironmentScore>\"");
         sb.AppendLine("  },");
-        sb.AppendLine("  \"integrityVerdict\": \"<professional 2-3 sentence integrity verdict for the proctor's final review>\",");
-        sb.AppendLine("  \"riskScore\": <integer 0-100>,");
-        sb.AppendLine("  \"mitigatingFactors\": [\"<factor that reduces suspicion 1>\", \"<factor 2>\"],");
-        sb.AppendLine("  \"aggravatingFactors\": [\"<factor that increases suspicion 1>\", \"<factor 2>\"],");
-        sb.AppendLine("  \"recommendations\": [\"<specific action 1>\", \"<specific action 2>\"],");
-        sb.AppendLine("  \"riskTimeline\": [\"<chronological risk event 1>\", \"<risk event 2>\"]");
+        sb.AppendLine("  \"riskTimeline\": [\"<key risk event chronologically — e.g., '14:03:22 — CameraBlocked (first occurrence)'>\"]");
         sb.AppendLine("}");
 
         return sb.ToString();
     }
 
-    private async Task<(AiProctorAnalysisResponseDto? Result, string? ErrorMessage)> CallOpenAiAsync(string prompt)
+    private async Task<(AiProctorAnalysisResponseDto? Result, string? ErrorMessage)> CallOpenAiAsync(string prompt, string lang = "en")
     {
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAiSettings.ApiKey);
         client.Timeout = TimeSpan.FromSeconds(60);
+
+        var systemMessage = lang.Equals("ar", StringComparison.OrdinalIgnoreCase)
+            ? "You are a senior AI proctoring forensic analyst producing legally defensible, evidence-driven examination integrity reports. " +
+              "CRITICAL RULES: (1) Respond with valid JSON only — no markdown, no code blocks. " +
+              "(2) Every field in the requested schema must contain meaningful evidence-based content — no empty strings, no generic phrases. " +
+              "(3) riskScore must be within ±15 of the rule-engine computed score unless explicitly justified. " +
+              "(4) riskLevel must match the riskScore band exactly. " +
+              "(5) integrityVerdict must follow the 3-part structure: [evidence found] + [interpretation] + [decisive conclusion: INVALIDATED/FLAGGED/CLEARED]. " +
+              "IMPORTANT: All text values in the JSON must be written in Arabic (العربية). Only JSON keys and enum values remain in English."
+            : "You are a senior AI proctoring forensic analyst producing legally defensible, evidence-driven examination integrity reports. " +
+              "CRITICAL RULES: (1) Respond with valid JSON only — no markdown, no code blocks. " +
+              "(2) Every field in the requested schema must contain meaningful evidence-based content — no empty strings, no generic phrases. " +
+              "(3) riskScore must be within ±15 of the rule-engine computed score unless explicitly justified. " +
+              "(4) riskLevel must match the riskScore band exactly: 0-20=Low, 21-50=Medium, 51-75=High, 76-100=Critical. " +
+              "(5) integrityVerdict must follow the 3-part structure: [evidence found] + [interpretation] + [decisive conclusion: INVALIDATED/FLAGGED/CLEARED].";
 
         var requestBody = new
         {
             model = _openAiSettings.Model,
             messages = new[]
             {
-                new { role = "system", content = "You are a senior AI proctoring forensic analyst producing comprehensive, production-grade examination integrity reports. Always respond with valid JSON only. No markdown formatting. Every field in the requested schema must be populated with meaningful, evidence-based content." },
+                new { role = "system", content = systemMessage },
                 new { role = "user", content = prompt }
             },
             max_tokens = _openAiSettings.MaxTokens,
@@ -955,6 +1122,14 @@ public class AiProctorService : IAiProctorService
         public List<string> AttemptEventTimeline { get; set; } = new();
         public List<string> RiskProgressionTimeline { get; set; } = new();
         public Dictionary<int, int> SeverityDistribution { get; set; } = new();
+        // Sub-scores from rule engine calculation (null until first risk recalculation)
+        public decimal? SubScoreFace { get; set; }
+        public decimal? SubScoreEye { get; set; }
+        public decimal? SubScoreBehavior { get; set; }
+        public decimal? SubScoreEnvironment { get; set; }
+        // Temporal risk signals
+        public int SuspiciousReconnectCount { get; set; }
+        public int LatePhaseViolationCount { get; set; }
         // Session timing
         public DateTime SessionStartedAt { get; set; }
         public DateTime? SessionEndedAt { get; set; }

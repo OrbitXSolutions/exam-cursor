@@ -112,6 +112,7 @@ export default function AuditLogPage() {
   function formatTimestamp(timestamp: string) {
     const date = new Date(timestamp)
     return date.toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric",
       month: "short",
       day: "numeric",

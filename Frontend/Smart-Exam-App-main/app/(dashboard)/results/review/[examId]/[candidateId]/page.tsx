@@ -133,7 +133,7 @@ export default function ExamReviewPage() {
           <Badge variant={session.isPassed ? "default" : "destructive"}>
             {session.isPassed
               ? (language === "ar" ? "ناجح" : "PASSED")
-              : (language === "ar" ? "راسب" : "FAILED")}
+              : (language === "ar" ? "غير ناجح" : "FAILED")}
           </Badge>
           <Badge variant="outline">
             {session.totalScore?.toFixed(1)} / {session.maxPossibleScore} ({percentage.toFixed(1)}%)

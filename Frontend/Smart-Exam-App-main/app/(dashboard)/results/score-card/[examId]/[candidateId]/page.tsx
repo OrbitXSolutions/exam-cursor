@@ -123,7 +123,7 @@ export default function ScoreCardPage() {
         <Badge variant={session.isPassed ? "default" : "destructive"} className="text-base px-4 py-1">
           {session.isPassed
             ? (language === "ar" ? "ناجح" : "PASSED")
-            : (language === "ar" ? "راسب" : "FAILED")}
+            : (language === "ar" ? "غير ناجح" : "FAILED")}
         </Badge>
       </div>
 
@@ -153,7 +153,7 @@ export default function ScoreCardPage() {
               <p className="text-sm text-muted-foreground">{language === "ar" ? "تاريخ التصحيح" : "Graded At"}</p>
               <p className="font-medium">
                 {session.gradedAt
-                  ? new Date(session.gradedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")
+                  ? new Date(session.gradedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })
                   : "—"}
               </p>
             </div>

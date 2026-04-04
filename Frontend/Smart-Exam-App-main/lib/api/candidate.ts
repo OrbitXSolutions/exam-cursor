@@ -266,6 +266,7 @@ export interface AccessPolicy {
   preventScreenCapture: boolean;
   requireFullscreen: boolean;
   browserLockdown: boolean;
+  enableScreenMonitoring: boolean;
   maxViolationWarnings: number;
 }
 

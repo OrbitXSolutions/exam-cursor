@@ -42,6 +42,7 @@ export interface CreateQuestionRequest {
     textEn: string;
     textAr: string;
     isCorrect: boolean;
+    points?: number | null;
     order: number;
     attachmentPath?: string | null;
   }[];

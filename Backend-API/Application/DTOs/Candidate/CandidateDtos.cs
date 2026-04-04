@@ -86,6 +86,7 @@ public class CandidateAccessPolicyDto
     public bool PreventScreenCapture { get; set; }
     public bool RequireFullscreen { get; set; }
     public bool BrowserLockdown { get; set; }
+    public bool EnableScreenMonitoring { get; set; }
     /// <summary>
     /// Max countable violations before auto-termination (0 = disabled)
     /// </summary>
@@ -186,6 +187,11 @@ public class CandidateExamSettingsDto
     public bool PreventCopyPaste { get; set; }
     public bool PreventScreenCapture { get; set; }
     public bool BrowserLockdown { get; set; }
+
+    // Screen monitoring settings
+    public bool EnableScreenMonitoring { get; set; }
+    public ScreenMonitoringMode ScreenMonitoringMode { get; set; }
+    public int ScreenShareGracePeriod { get; set; }
 }
 
 /// <summary>

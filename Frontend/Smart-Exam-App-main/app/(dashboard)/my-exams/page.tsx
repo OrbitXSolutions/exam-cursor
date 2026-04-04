@@ -124,6 +124,7 @@ export default function MyExamsPage() {
   function formatDateTime(dateString: string | null) {
     if (!dateString) return "-"
     return new Date(dateString).toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       dateStyle: "medium",
       timeStyle: "short",
     })

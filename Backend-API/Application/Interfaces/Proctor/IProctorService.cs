@@ -132,7 +132,7 @@ public interface IProctorService
   /// <summary>
   /// Upload webcam snapshot directly (multipart)
   /// </summary>
-  Task<ApiResponse<ProctorEvidenceDto>> UploadSnapshotAsync(int attemptId, IFormFile file, string candidateId);
+  Task<ApiResponse<ProctorEvidenceDto>> UploadSnapshotAsync(int attemptId, IFormFile file, string candidateId, string? ipAddress = null, string? userAgent = null);
 
   /// <summary>
   /// Get evidence for a session

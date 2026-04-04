@@ -31,6 +31,7 @@ interface OptionInput {
   textEn: string
   textAr: string
   isCorrect: boolean
+  points?: number | null
   order: number
   originalId?: number
   imageFile?: File | null
@@ -123,6 +124,7 @@ export default function EditQuestionPage() {
               textEn: opt.textEn || opt.text || "",
               textAr: opt.textAr || "",
               isCorrect: opt.isCorrect,
+              points: opt.points ?? null,
               order: opt.order,
               originalId: opt.id,
               attachmentPath: opt.attachmentPath || null,
@@ -208,6 +210,8 @@ export default function EditQuestionPage() {
   }
 
   const selectedType = types.find((t) => String(t.id) === formData.questionTypeId)
+  const selectedTypeName = selectedType?.nameEn?.toLowerCase() || ""
+  const isMCQMulti = selectedTypeName === "mcq multi" || selectedTypeName === "mcq_multi" || selectedTypeName === "multiple choice (multi)"
   const isSubjectiveType = selectedType?.nameEn === "Subjective" || selectedType?.nameEn === "Essay" || selectedType?.nameEn === "Short Answer"
   const isEssayType = isSubjectiveType
 
@@ -283,6 +287,22 @@ export default function EditQuestionPage() {
       if (!hasCorrectAnswer) {
         toast.error(localizeText("At least one option must be marked as correct", "يجب تحديد خيار واحد كإجابة صحيحة على الأقل", language))
         return
+      }
+    }
+
+    // Partial scoring validation for MCQ_Multi
+    if (isMCQMulti) {
+      const hasAnyPoints = options.some((opt) => opt.points != null && opt.points !== undefined)
+      if (hasAnyPoints) {
+        const sum = options.reduce((acc, opt) => acc + (opt.points || 0), 0)
+        if (Math.abs(sum - formData.points) > 0.01) {
+          toast.error(localizeText(
+            `Sum of option points (${sum}) must equal question total points (${formData.points})`,
+            `مجموع نقاط الخيارات (${sum}) يجب أن يساوي إجمالي نقاط السؤال (${formData.points})`,
+            language
+          ))
+          return
+        }
       }
     }
 
@@ -386,6 +406,7 @@ export default function EditQuestionPage() {
               textEn: opt.textEn,
               textAr: opt.textAr || opt.textEn,
               isCorrect: opt.isCorrect,
+              points: isMCQMulti && opt.points != null ? opt.points : null,
               order: opt.order,
               attachmentPath: opt.attachmentPath || null,
             }))
@@ -685,7 +706,7 @@ export default function EditQuestionPage() {
                       id="points"
                       type="number"
                       min={0.5}
-                      step={0.5}
+                      step="any"
                       value={formData.points}
                       onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
                       className="w-full"
@@ -729,6 +750,19 @@ export default function EditQuestionPage() {
                   <CardDescription>{language === "ar" ? "تعديل خيارات الإجابة والإجابات الصحيحة" : "Edit answer options and correct answers"}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Partial Scoring Summary for MCQ_Multi */}
+                  {isMCQMulti && (() => {
+                    const hasAnyPoints = options.some((opt) => opt.points != null && opt.points !== undefined)
+                    if (!hasAnyPoints) return null
+                    const sum = options.reduce((acc, opt) => acc + (opt.points || 0), 0)
+                    const isValid = Math.abs(sum - formData.points) < 0.01
+                    return (
+                      <div className={`flex items-center justify-between rounded-lg border-2 px-4 py-2 text-sm font-medium ${isValid ? "border-green-300 bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-300 dark:border-green-700" : "border-destructive bg-destructive/10 text-destructive"}`}>
+                        <span>{language === "ar" ? "مجموع نقاط الخيارات" : "Option Points Sum"}: {sum}</span>
+                        <span>{language === "ar" ? "إجمالي نقاط السؤال" : "Question Total"}: {formData.points}</span>
+                      </div>
+                    )
+                  })()}
                   {options.map((option, index) => (
                     <div key={option.id} className="flex items-start gap-3 rounded-lg border p-3">
                       <div className="flex items-center gap-2 pt-2">
@@ -769,6 +803,24 @@ export default function EditQuestionPage() {
                           <p className="text-xs text-green-600 dark:text-green-400 font-medium">
                             {t("questionBank.correctAnswer")}
                           </p>
+                        )}
+                        {/* Per-option points for partial scoring (MCQ_Multi only) */}
+                        {isMCQMulti && (
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor={`option-edit-points-${option.id}`} className="text-xs text-muted-foreground whitespace-nowrap">
+                              {language === "ar" ? "النقاط" : "Points"}
+                            </Label>
+                            <Input
+                              id={`option-edit-points-${option.id}`}
+                              type="number"
+                              min={0}
+                              step="any"
+                              placeholder="0"
+                              value={option.points ?? ""}
+                              onChange={(e) => updateOption(option.id, { points: e.target.value === "" ? null : Number(e.target.value) })}
+                              className="h-8 w-24 text-sm"
+                            />
+                          </div>
                         )}
                         {/* Option Image */}
                         <div className="flex items-center gap-2">

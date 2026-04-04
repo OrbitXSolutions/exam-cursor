@@ -80,6 +80,21 @@ public class Exam : BaseEntity
     /// </summary>
     public bool RequireWebcam { get; set; }
 
+    /// <summary>
+    /// Enable screen monitoring (candidate shares screen with proctor)
+    /// </summary>
+    public bool EnableScreenMonitoring { get; set; }
+
+    /// <summary>
+    /// Screen monitoring mode: 0=Disabled, 1=Optional, 2=Required, 3=Strict
+    /// </summary>
+    public ScreenMonitoringMode ScreenMonitoringMode { get; set; } = ScreenMonitoringMode.Disabled;
+
+    /// <summary>
+    /// Grace period (seconds) before enforcing action in Strict mode (default 20)
+    /// </summary>
+    public int ScreenShareGracePeriod { get; set; } = 20;
+
     #endregion
 
     #region Security Settings

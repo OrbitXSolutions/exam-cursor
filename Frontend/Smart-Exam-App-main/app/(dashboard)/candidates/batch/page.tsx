@@ -279,7 +279,7 @@ export default function BatchPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {new Date(batch.createdDate).toLocaleDateString()}
+                      {new Date(batch.createdDate).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" })}
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>

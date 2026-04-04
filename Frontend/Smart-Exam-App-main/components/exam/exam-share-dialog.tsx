@@ -237,6 +237,7 @@ export function ExamShareDialog({
                   {isRTL ? "ينتهي الرابط في:" : "Link expires at:"}{" "}
                   {new Date(shareLink.expiresAt).toLocaleString(
                     isRTL ? "ar-SA" : "en-US",
+                    { timeZone: "Asia/Dubai" }
                   )}
                 </span>
               </div>

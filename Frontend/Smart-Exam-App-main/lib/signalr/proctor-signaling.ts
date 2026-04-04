@@ -85,6 +85,41 @@ export interface SignalingCallbacks {
     reason: string;
     message: string;
   }) => void;
+  // Screen share signaling callbacks
+  onScreenPeerJoined?: (event: {
+    userId: string;
+    connectionId: string;
+    role: PeerRole;
+    attemptId: number;
+  }) => void;
+  onScreenPeerLeft?: (event: {
+    userId: string;
+    connectionId: string;
+    attemptId: number;
+  }) => void;
+  onReceiveScreenOffer?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    sdp: string;
+    attemptId: number;
+  }) => void;
+  onReceiveScreenAnswer?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    sdp: string;
+    attemptId: number;
+  }) => void;
+  onReceiveScreenIceCandidate?: (event: {
+    fromConnectionId: string;
+    candidate: string;
+    attemptId: number;
+  }) => void;
+  onScreenShareStatusChanged?: (event: {
+    fromConnectionId: string;
+    fromUserId: string;
+    status: string;
+    attemptId: number;
+  }) => void;
   onReconnecting?: () => void;
   onReconnected?: () => void;
   onDisconnected?: (error?: Error) => void;
@@ -96,6 +131,7 @@ export class ProctorSignaling {
   private attemptId: number;
   private role: PeerRole;
   private disposed = false;
+  private joinedScreenRoom = false;
 
   constructor(
     attemptId: number,
@@ -267,6 +303,46 @@ export class ProctorSignaling {
       this.callbacks.onAttemptExpired?.(event);
     });
 
+    // Screen share signaling events
+    this.connection.on("ScreenPeerJoined", (event) => {
+      console.log("[SignalR] ScreenPeerJoined:", event);
+      this.callbacks.onScreenPeerJoined?.(event);
+    });
+
+    this.connection.on("ScreenPeerLeft", (event) => {
+      console.log("[SignalR] ScreenPeerLeft:", event);
+      this.callbacks.onScreenPeerLeft?.(event);
+    });
+
+    this.connection.on("ReceiveScreenOffer", (event) => {
+      console.log("[SignalR] ReceiveScreenOffer from:", event.fromConnectionId);
+      this.callbacks.onReceiveScreenOffer?.(event);
+    });
+
+    this.connection.on("ReceiveScreenAnswer", (event) => {
+      console.log(
+        "[SignalR] ReceiveScreenAnswer from:",
+        event.fromConnectionId,
+      );
+      this.callbacks.onReceiveScreenAnswer?.(event);
+    });
+
+    this.connection.on("ReceiveScreenIceCandidate", (event) => {
+      console.log(
+        "[SignalR] ReceiveScreenIceCandidate from:",
+        event.fromConnectionId,
+      );
+      this.callbacks.onReceiveScreenIceCandidate?.(event);
+    });
+
+    this.connection.on("ScreenShareStatusChanged", (event) => {
+      console.log(
+        `%c[SignalR] ScreenShareStatusChanged: ${event.status}`,
+        "color: #ff9800; font-weight: bold",
+      );
+      this.callbacks.onScreenShareStatusChanged?.(event);
+    });
+
     this.connection.onreconnecting(() => {
       console.log("[SignalR] Reconnecting...");
       this.callbacks.onReconnecting?.();
@@ -280,6 +356,14 @@ export class ProctorSignaling {
           this.attemptId,
           this.role,
         );
+        // Rejoin screen room if we were in it
+        if (this.joinedScreenRoom) {
+          await this.connection?.invoke(
+            "JoinScreenRoom",
+            this.attemptId,
+            this.role,
+          );
+        }
       } catch (e) {
         console.error("[SignalR] Failed to rejoin room:", e);
       }
@@ -420,14 +504,86 @@ export class ProctorSignaling {
     console.log(`[SignalR] \u2705 Termination sent to candidate`);
   }
 
+  // ── Screen share signaling methods ──────────────────────────────
+
+  /**
+   * Connect to the hub (if not connected) and join the screen signaling room.
+   * Used by ScreenSharePublisher and ScreenShareViewer.
+   */
+  async connectScreenRoom(): Promise<void> {
+    if (
+      !this.connection ||
+      this.connection.state !== signalR.HubConnectionState.Connected
+    ) {
+      await this.connect();
+    }
+    await this.connection?.invoke("JoinScreenRoom", this.attemptId, this.role);
+    this.joinedScreenRoom = true;
+    console.log(
+      `%c[SignalR] ✅ Joined screen room attempt_${this.attemptId}_screen as ${this.role}`,
+      "color: #4caf50; font-weight: bold",
+    );
+  }
+
+  async disconnectScreenRoom(): Promise<void> {
+    if (this.joinedScreenRoom && this.connection) {
+      try {
+        await this.connection.invoke("LeaveScreenRoom", this.attemptId);
+      } catch {
+        // ignore
+      }
+      this.joinedScreenRoom = false;
+    }
+  }
+
+  async sendScreenOffer(sdp: string): Promise<void> {
+    await this.connection?.invoke("SendScreenOffer", this.attemptId, sdp);
+  }
+
+  async sendScreenAnswer(
+    sdp: string,
+    targetConnectionId: string,
+  ): Promise<void> {
+    await this.connection?.invoke(
+      "SendScreenAnswer",
+      this.attemptId,
+      sdp,
+      targetConnectionId,
+    );
+  }
+
+  async sendScreenIceCandidate(
+    candidate: string,
+    targetConnectionId?: string,
+  ): Promise<void> {
+    await this.connection?.invoke(
+      "SendScreenIceCandidate",
+      this.attemptId,
+      candidate,
+      targetConnectionId ?? null,
+    );
+  }
+
+  async notifyScreenShareStatus(status: string): Promise<void> {
+    await this.connection?.invoke(
+      "NotifyScreenShareStatus",
+      this.attemptId,
+      status,
+    );
+  }
+
   async disconnect(): Promise<void> {
     this.disposed = true;
     if (this.connection) {
       try {
+        if (this.joinedScreenRoom) {
+          await this.connection.invoke("LeaveScreenRoom", this.attemptId);
+        }
         await this.connection.invoke("LeaveAttemptRoom", this.attemptId);
       } catch {
         // ignore - may already be disconnected
       }
+      this.joinedScreenRoom = false;
       try {
         await this.connection.stop();
       } catch {

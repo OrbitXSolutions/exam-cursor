@@ -247,4 +247,126 @@ public class ProctorHub : Hub
             message = $"Your exam time has been extended by {extraMinutes} minute(s)."
         });
     }
+
+    // ── Screen share signaling ────────────────────────────────────────
+
+    /// <summary>
+    /// Candidate or proctor joins the screen share signaling room.
+    /// Uses a separate group from webcam to avoid signal collision.
+    /// </summary>
+    public async Task JoinScreenRoom(int attemptId, string role)
+    {
+        var group = $"attempt_{attemptId}_screen";
+        await Groups.AddToGroupAsync(Context.ConnectionId, group);
+
+        await Clients.OthersInGroup(group).SendAsync("ScreenPeerJoined", new
+        {
+            userId = Context.UserIdentifier,
+            connectionId = Context.ConnectionId,
+            role,
+            attemptId
+        });
+
+        _logger.LogInformation("ProctorHub: {UserId} joined screen room {Group} as {Role}",
+            Context.UserIdentifier, group, role);
+    }
+
+    /// <summary>
+    /// Leave the screen share signaling room.
+    /// </summary>
+    public async Task LeaveScreenRoom(int attemptId)
+    {
+        var group = $"attempt_{attemptId}_screen";
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+
+        await Clients.OthersInGroup(group).SendAsync("ScreenPeerLeft", new
+        {
+            userId = Context.UserIdentifier,
+            connectionId = Context.ConnectionId,
+            attemptId
+        });
+
+        _logger.LogInformation("ProctorHub: {UserId} left screen room {Group}",
+            Context.UserIdentifier, group);
+    }
+
+    /// <summary>
+    /// Candidate sends screen share SDP offer to proctor(s).
+    /// </summary>
+    public async Task SendScreenOffer(int attemptId, string sdp)
+    {
+        var group = $"attempt_{attemptId}_screen";
+        _logger.LogInformation("ProctorHub: SendScreenOffer from {ConnId} for attempt {AttemptId}",
+            Context.ConnectionId, attemptId);
+        await Clients.OthersInGroup(group).SendAsync("ReceiveScreenOffer", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            sdp,
+            attemptId
+        });
+    }
+
+    /// <summary>
+    /// Proctor sends screen share SDP answer back to candidate.
+    /// </summary>
+    public async Task SendScreenAnswer(int attemptId, string sdp, string targetConnectionId)
+    {
+        _logger.LogInformation("ProctorHub: SendScreenAnswer from {ConnId} to {TargetConnId} for attempt {AttemptId}",
+            Context.ConnectionId, targetConnectionId, attemptId);
+        await Clients.Client(targetConnectionId).SendAsync("ReceiveScreenAnswer", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            sdp,
+            attemptId
+        });
+    }
+
+    /// <summary>
+    /// Exchange screen share ICE candidates between peers.
+    /// </summary>
+    public async Task SendScreenIceCandidate(int attemptId, string candidate, string? targetConnectionId = null)
+    {
+        var group = $"attempt_{attemptId}_screen";
+        _logger.LogInformation("ProctorHub: SendScreenIceCandidate from {ConnId} for attempt {AttemptId} (target={Target})",
+            Context.ConnectionId, attemptId, targetConnectionId ?? "broadcast");
+
+        if (!string.IsNullOrEmpty(targetConnectionId))
+        {
+            await Clients.Client(targetConnectionId).SendAsync("ReceiveScreenIceCandidate", new
+            {
+                fromConnectionId = Context.ConnectionId,
+                candidate,
+                attemptId
+            });
+        }
+        else
+        {
+            await Clients.OthersInGroup(group).SendAsync("ReceiveScreenIceCandidate", new
+            {
+                fromConnectionId = Context.ConnectionId,
+                candidate,
+                attemptId
+            });
+        }
+    }
+
+    /// <summary>
+    /// Candidate reports screen share status changes to proctor.
+    /// Status: "started", "stopped", "lost", "resumed", "denied"
+    /// </summary>
+    public async Task NotifyScreenShareStatus(int attemptId, string status)
+    {
+        var group = $"attempt_{attemptId}";
+        _logger.LogInformation("ProctorHub: NotifyScreenShareStatus from {ConnId} for attempt {AttemptId}: status={Status}",
+            Context.ConnectionId, attemptId, status);
+        await Clients.OthersInGroup(group).SendAsync("ScreenShareStatusChanged", new
+        {
+            fromConnectionId = Context.ConnectionId,
+            fromUserId = Context.UserIdentifier,
+            status,
+            attemptId
+        });
+    }
 }
