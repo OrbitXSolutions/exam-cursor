@@ -706,7 +706,7 @@ export default function EditQuestionPage() {
                       id="points"
                       type="number"
                       min={0.5}
-                      step={0.5}
+                      step="any"
                       value={formData.points}
                       onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
                       className="w-full"
@@ -814,7 +814,7 @@ export default function EditQuestionPage() {
                               id={`option-edit-points-${option.id}`}
                               type="number"
                               min={0}
-                              step={0.5}
+                              step="any"
                               placeholder="0"
                               value={option.points ?? ""}
                               onChange={(e) => updateOption(option.id, { points: e.target.value === "" ? null : Number(e.target.value) })}

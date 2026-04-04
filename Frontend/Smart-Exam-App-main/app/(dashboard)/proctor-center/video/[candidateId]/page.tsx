@@ -274,7 +274,7 @@ export default function CandidateVideoPage() {
                         </Badge>
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {new Date(session.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                        {new Date(session.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                       </div>
                       {session.totalViolations > 0 && (
                         <div className="flex items-center gap-1 mt-1 text-xs text-orange-600">
@@ -308,7 +308,7 @@ export default function CandidateVideoPage() {
                         <div>
                           <p className="text-xs text-muted-foreground">{language === "ar" ? "البداية" : "Started"}</p>
                           <p className="text-sm font-medium">
-                            {new Date(selectedSession.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                            {new Date(selectedSession.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                           </p>
                         </div>
                       </div>
@@ -405,7 +405,7 @@ export default function CandidateVideoPage() {
                               </div>
                             )}
                             <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded text-sm">
-                              {new Date(selectedImage.capturedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                              {new Date(selectedImage.capturedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                             </div>
                             <Button
                               variant="secondary"

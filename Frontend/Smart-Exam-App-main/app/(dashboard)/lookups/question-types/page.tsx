@@ -199,7 +199,7 @@ function QuestionTypesContent() {
                       <TableCell className="font-medium">{type.nameEn}</TableCell>
                       <TableCell dir="rtl">{type.nameAr}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {type.createdDate ? new Date(type.createdDate).toLocaleDateString() : "-"}
+                        {type.createdDate ? new Date(type.createdDate).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" }) : "-"}
                       </TableCell>
                     </TableRow>
                   ))}

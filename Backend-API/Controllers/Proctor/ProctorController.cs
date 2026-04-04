@@ -342,7 +342,9 @@ public class ProctorController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("No file provided");
 
-        var result = await _proctorService.UploadSnapshotAsync(attemptId, file, candidateId);
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var userAgent = Request.Headers["User-Agent"].ToString();
+        var result = await _proctorService.UploadSnapshotAsync(attemptId, file, candidateId, ipAddress, userAgent);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -497,9 +499,9 @@ public class ProctorController : ControllerBase
     /// </summary>
     [HttpGet("session/{sessionId}/ai-analysis")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
-    public async Task<IActionResult> GetAiRiskAnalysis(int sessionId)
+    public async Task<IActionResult> GetAiRiskAnalysis(int sessionId, [FromQuery] string lang = "en")
     {
-        var result = await _aiProctorService.GetAiRiskAnalysisAsync(sessionId);
+        var result = await _aiProctorService.GetAiRiskAnalysisAsync(sessionId, lang);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

@@ -911,6 +911,19 @@ export const translations = {
       reviewNotes: "Review Notes",
       reviewNotesPlaceholder: "Add notes for this decision...",
       submitReview: "Submit Review",
+      // Create Incident dialog
+      createIncidentCase: "Create Incident Case",
+      createIncidentCaseDesc:
+        "Manually create an incident case for investigation",
+      attemptIdLabel: "Attempt ID",
+      enterAttemptId: "Enter attempt ID",
+      incidentSeverityLabel: "Severity",
+      titleLabel: "Title",
+      briefIncidentTitle: "Brief incident title",
+      summaryLabel: "Summary",
+      describeWhatHappened: "Describe what happened...",
+      attemptIdTitleRequired: "Attempt ID and title are required",
+      failedToLoadIncidents: "Failed to load incidents",
       // Session detail page
       addTime: "Add Time",
       createIncident: "Create Incident",
@@ -1507,7 +1520,7 @@ export const translations = {
       proctorDashboard: "لوحة المراقب",
       assignToProctor: "تعيين للمراقب",
       bulkAuthApproval: "الموافقة الجماعية على المصادقة",
-      userIdentification: "تحديد المستخدم",
+      userIdentification: "تأكيد الهوية",
       // Candidates group
       candidates: "المرشحون",
       batch: "الدفعة",
@@ -2415,6 +2428,18 @@ export const translations = {
       reviewNotes: "ملاحظات المراجعة",
       reviewNotesPlaceholder: "أضف ملاحظات لهذا القرار...",
       submitReview: "إرسال المراجعة",
+      // Create Incident dialog
+      createIncidentCase: "إنشاء حالة حادثة",
+      createIncidentCaseDesc: "إنشاء حالة حادثة يدوياً للتحقيق",
+      attemptIdLabel: "معرّف المحاولة",
+      enterAttemptId: "أدخل معرّف المحاولة",
+      incidentSeverityLabel: "مستوى الخطورة",
+      titleLabel: "العنوان",
+      briefIncidentTitle: "عنوان مختصر للحادثة",
+      summaryLabel: "الملخص",
+      describeWhatHappened: "صف ما حدث...",
+      attemptIdTitleRequired: "معرّف المحاولة والعنوان مطلوبان",
+      failedToLoadIncidents: "فشل تحميل الحوادث",
       // Session detail page
       addTime: "إضافة وقت",
       createIncident: "إنشاء حادثة",
@@ -2582,7 +2607,7 @@ export const translations = {
 
     // Identity Verification
     identityVerification: {
-      title: "تحديد المستخدم",
+      title: "تأكيد الهوية",
       subtitle: "مراجعة وإدارة عمليات التحقق من هوية المرشحين",
       searchPlaceholder: "البحث باسم المرشح...",
       statusFilter: "الحالة",

@@ -231,17 +231,7 @@ export default function ProctorCenterPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10">
-              <Flag className="h-6 w-6 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{flaggedSessions.length}</p>
-              <p className="text-sm text-muted-foreground">{t("proctor.flaggedSessions")}</p>
-            </div>
-          </CardContent>
-        </Card>
+
         {/* AI Proctor Assistant — compact card, same height as KPIs */}
         <Card className="sm:col-span-2 border-purple-200/60 dark:border-purple-800/40 bg-white dark:bg-card">
           <CardContent className="flex items-center gap-4 p-4">
@@ -253,17 +243,6 @@ export default function ProctorCenterPage() {
               <p className="text-xs text-muted-foreground">{locale === "ar" ? "من يحتاج مراجعة الآن؟" : "Who needs review now?"}</p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <Checkbox
-                  id="useSampleData"
-                  checked={useSampleData}
-                  onCheckedChange={(checked) => setUseSampleData(!!checked)}
-                  className="h-3.5 w-3.5"
-                />
-                <label htmlFor="useSampleData" className="text-[10px] text-muted-foreground cursor-pointer select-none">
-                  {locale === "ar" ? "تجريبي" : "Demo"}
-                </label>
-              </div>
               <Button
                 variant="outline"
                 size="sm"
@@ -392,27 +371,8 @@ export default function ProctorCenterPage() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        {/* Flagged Filter */}
-        <Button
-          variant={filterMode === "flagged" ? "default" : "outline"}
-          size="sm"
-          className="gap-2"
-          onClick={() => setFilterMode(filterMode === "flagged" ? "all" : "flagged")}
-        >
-          <Flag className="h-4 w-4" />
-          {locale === "ar" ? `المُعلَّمة (${flaggedSessions.length})` : `Flagged (${flaggedSessions.length})`}
-        </Button>
-        {/* Demo Mode Toggle */}
-        <div className="flex items-center gap-2 ms-auto">
-          <Checkbox
-            id="demoMode"
-            checked={demoMode}
-            onCheckedChange={(checked) => setDemoMode(!!checked)}
-          />
-          <label htmlFor="demoMode" className="text-sm text-muted-foreground cursor-pointer select-none">
-            {locale === "ar" ? "بيانات تجريبية" : "Demo"}
-          </label>
-        </div>
+
+
       </div>
 
       {/* Sessions Grid */}
@@ -425,9 +385,7 @@ export default function ProctorCenterPage() {
             return (
             <Card
               key={session.id}
-              className={`overflow-hidden transition-shadow hover:shadow-md ${
-                session.flagged ? "border-amber-500/50 bg-amber-500/5" : ""
-              }`}
+              className="overflow-hidden transition-shadow hover:shadow-md"
             >
               {/* Snapshot Preview / Placeholder */}
               <div className="relative aspect-video bg-muted">
@@ -459,12 +417,7 @@ export default function ProctorCenterPage() {
                       Sample
                     </Badge>
                   )}
-                  {session.flagged && (
-                    <Badge variant="outline" className="bg-amber-500/20 border-amber-500/50 text-amber-600">
-                      <Flag className="h-3 w-3 me-1" />
-                      {t("proctor.flagged")}
-                    </Badge>
-                  )}
+
                 </div>
                 {session.incidentCount > 0 && (
                   <div className="absolute top-2 end-2">
@@ -514,19 +467,7 @@ export default function ProctorCenterPage() {
                             {t("proctor.viewDetails")}
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleFlag(session)}>
-                          <Flag className="h-4 w-4 me-2" />
-                          {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setSelectedSession(session)
-                            setWarningDialogOpen(true)
-                          }}
-                        >
-                          <MessageSquare className="h-4 w-4 me-2" />
-                          {t("proctor.sendWarning")}
-                        </DropdownMenuItem>
+
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
@@ -565,7 +506,7 @@ export default function ProctorCenterPage() {
                         {t("proctor.viewDetails")}
                       </Link>
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       size="sm"
                       className="flex-1 h-8 text-xs text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
@@ -576,7 +517,7 @@ export default function ProctorCenterPage() {
                     >
                       <MessageSquare className="h-3.5 w-3.5 me-1.5" />
                       {t("proctor.sendWarning")}
-                    </Button>
+                    </Button> */}
                   </div>
               </CardContent>
             </Card>

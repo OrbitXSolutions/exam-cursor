@@ -362,8 +362,8 @@ export default function NotificationLogsPage() {
                         </TableCell>
                         <TableCell className="text-xs whitespace-nowrap">
                           {log.sentAt
-                            ? new Date(log.sentAt).toLocaleString(language === "ar" ? "ar" : "en")
-                            : new Date(log.createdDate).toLocaleString(language === "ar" ? "ar" : "en")}
+                            ? new Date(log.sentAt).toLocaleString(language === "ar" ? "ar" : "en", { timeZone: "Asia/Dubai" })
+                            : new Date(log.createdDate).toLocaleString(language === "ar" ? "ar" : "en", { timeZone: "Asia/Dubai" })}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">

@@ -621,6 +621,7 @@ export default function DashboardPage() {
                       <Clock className="h-3 w-3" />
                       {exam.startAt
                         ? new Date(exam.startAt).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
+                          timeZone: "Asia/Dubai",
                           month: "short",
                           day: "numeric",
                           hour: "2-digit",

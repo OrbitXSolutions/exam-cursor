@@ -88,7 +88,7 @@ export default function ReportsPage() {
       `"${(c.candidateId || "").replace(/"/g, '""')}"`,
       Math.round(c.percentage),
       c.isPassed ? "Passed" : "Failed",
-      new Date(c.finalizedAt).toLocaleString(locale === "ar" ? "ar-SA" : "en-US"),
+      new Date(c.finalizedAt).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" }),
     ])
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })
@@ -288,6 +288,7 @@ export default function ReportsPage() {
                   </TableCell>
                   <TableCell>
                     {new Date(candidate.finalizedAt).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
+                      timeZone: "Asia/Dubai",
                       dateStyle: "short",
                       timeStyle: "short",
                     })}

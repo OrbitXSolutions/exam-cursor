@@ -710,8 +710,11 @@ export interface AiProctorAnalysis {
  */
 export async function getAiProctorAnalysis(
   sessionId: string,
+  lang: string = "en",
 ): Promise<AiProctorAnalysis> {
-  const res = await apiClient.get(`/Proctor/session/${sessionId}/ai-analysis`);
+  const res = await apiClient.get(
+    `/Proctor/session/${sessionId}/ai-analysis?lang=${lang}`,
+  );
   return res;
 }
 
@@ -1303,66 +1306,150 @@ export interface AttemptEventDto {
   occurredAt: string;
 }
 
-const EVENT_TYPE_NAMES: Record<number, string> = {
-  1: "Started",
-  2: "Answer Saved",
-  3: "Navigated",
-  4: "Tab Switched",
-  5: "Fullscreen Exited",
-  6: "Submitted",
-  7: "Timed Out",
-  8: "Window Blur",
-  9: "Window Focus",
-  10: "Copy Attempt",
-  11: "Paste Attempt",
-  12: "Right Click Attempt",
-  13: "Force Ended",
-  14: "Admin Resumed",
-  15: "Time Added",
-  16: "Webcam Denied",
-  17: "Snapshot Failed",
-  18: "Face Not Detected",
-  19: "Multiple Faces",
-  20: "Face Out of Frame",
-  21: "Camera Blocked",
-  22: "Head Turned Away",
+const EVENT_TYPE_NAMES: Record<number, { en: string; ar: string }> = {
+  1: { en: "Started", ar: "بدأ" },
+  2: { en: "Answer Saved", ar: "تم حفظ الإجابة" },
+  3: { en: "Navigated", ar: "انتقل" },
+  4: { en: "Tab Switched", ar: "تبديل علامة التبويب" },
+  5: { en: "Fullscreen Exited", ar: "خروج من ملء الشاشة" },
+  6: { en: "Submitted", ar: "تم التقديم" },
+  7: { en: "Timed Out", ar: "انتهى الوقت" },
+  8: { en: "Window Blur", ar: "فقدان تركيز النافذة" },
+  9: { en: "Window Focus", ar: "تركيز النافذة" },
+  10: { en: "Copy Attempt", ar: "محاولة نسخ" },
+  11: { en: "Paste Attempt", ar: "محاولة لصق" },
+  12: { en: "Right Click Attempt", ar: "محاولة نقر يمين" },
+  13: { en: "Force Ended", ar: "إنهاء إجباري" },
+  14: { en: "Admin Resumed", ar: "استئناف من المسؤول" },
+  15: { en: "Time Added", ar: "إضافة وقت" },
+  16: { en: "Webcam Denied", ar: "رفض الكاميرا" },
+  17: { en: "Snapshot Failed", ar: "فشل اللقطة" },
+  18: { en: "Face Not Detected", ar: "لم يتم اكتشاف الوجه" },
+  19: { en: "Multiple Faces", ar: "وجوه متعددة" },
+  20: { en: "Face Out of Frame", ar: "الوجه خارج الإطار" },
+  21: { en: "Camera Blocked", ar: "الكاميرا محجوبة" },
+  22: { en: "Head Turned Away", ar: "تحويل الرأس بعيداً" },
+  // Screen monitoring events
+  57: { en: "Screen Share Started", ar: "بدء مشاركة الشاشة" },
+  58: { en: "Screen Share Ended", ar: "انتهاء مشاركة الشاشة" },
+  70: { en: "Screen Share Requested", ar: "طلب مشاركة الشاشة" },
+  71: { en: "Screen Share Denied", ar: "رفض مشاركة الشاشة" },
+  72: { en: "Screen Share Lost", ar: "فقدان مشاركة الشاشة" },
+  73: { en: "Screen Share Resumed", ar: "استئناف مشاركة الشاشة" },
+  74: { en: "Screen Share Revoked", ar: "سحب إذن مشاركة الشاشة" },
+  75: { en: "Screen Share Track Ended", ar: "إيقاف مسار مشاركة الشاشة" },
 };
 
 const VIOLATION_TYPES = new Set([
-  4, 5, 8, 10, 11, 12, 16, 17, 18, 19, 20, 21, 22,
+  4,
+  5,
+  8,
+  10,
+  11,
+  12,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  71,
+  72,
+  74,
+  75, // Screen share violations
 ]);
 
-export function getEventTypeName(eventType: number): string {
-  return EVENT_TYPE_NAMES[eventType] ?? `Event ${eventType}`;
+export function getEventTypeName(eventType: number, locale?: string): string {
+  const entry = EVENT_TYPE_NAMES[eventType];
+  if (!entry)
+    return locale === "ar" ? `حدث ${eventType}` : `Event ${eventType}`;
+  return locale === "ar" ? entry.ar : entry.en;
 }
 
 export function isViolationEvent(eventType: number): boolean {
   return VIOLATION_TYPES.has(eventType);
 }
 
-export function getEventSeverity(eventType: number): string {
+const SEVERITY_LABELS: Record<string, { en: string; ar: string }> = {
+  Critical: { en: "Critical", ar: "حرج" },
+  High: { en: "High", ar: "مرتفع" },
+  Medium: { en: "Medium", ar: "متوسط" },
+  Low: { en: "Low", ar: "منخفض" },
+  Info: { en: "Info", ar: "معلومات" },
+};
+
+export function getEventSeverity(eventType: number, locale?: string): string {
+  let key: string;
   switch (eventType) {
     case 16:
-      return "Critical"; // Webcam Denied
     case 19:
-      return "Critical"; // Multiple Faces
+      key = "Critical";
+      break;
     case 4:
     case 5:
     case 18:
     case 21:
-      return "High"; // Tab Switch, Fullscreen Exit, Face Not Detected, Camera Blocked
+    case 71: // Screen Share Denied
+    case 74: // Screen Share Revoked
+      key = "High";
+      break;
     case 8:
     case 10:
     case 11:
     case 17:
     case 20:
     case 22:
-      return "Medium"; // Window Blur, Copy, Paste, Snapshot Fail, Face Out of Frame, Head Turned
+    case 72: // Screen Share Lost
+    case 75: // Screen Share Track Ended
+      key = "Medium";
+      break;
     case 12:
-      return "Low"; // Right Click
+      key = "Low";
+      break;
     default:
-      return "Info";
+      key = "Info";
   }
+  if (!locale) return key;
+  return SEVERITY_LABELS[key]?.[locale === "ar" ? "ar" : "en"] ?? key;
+}
+
+/** Translate violation type names from AI report (e.g. "FaceNotDetected" → Arabic) */
+const VIOLATION_TYPE_NAMES: Record<string, { en: string; ar: string }> = {
+  FaceNotDetected: { en: "Face Not Detected", ar: "لم يتم اكتشاف الوجه" },
+  TabSwitched: { en: "Tab Switched", ar: "تبديل علامة التبويب" },
+  FullscreenExited: { en: "Fullscreen Exited", ar: "خروج من ملء الشاشة" },
+  MultipleFaces: { en: "Multiple Faces", ar: "وجوه متعددة" },
+  WindowBlur: { en: "Window Blur", ar: "فقدان تركيز النافذة" },
+  CopyAttempt: { en: "Copy Attempt", ar: "محاولة نسخ" },
+  PasteAttempt: { en: "Paste Attempt", ar: "محاولة لصق" },
+  RightClickAttempt: { en: "Right Click Attempt", ar: "محاولة نقر يمين" },
+  WebcamDenied: { en: "Webcam Denied", ar: "رفض الكاميرا" },
+  SnapshotFailed: { en: "Snapshot Failed", ar: "فشل اللقطة" },
+  FaceOutOfFrame: { en: "Face Out of Frame", ar: "الوجه خارج الإطار" },
+  CameraBlocked: { en: "Camera Blocked", ar: "الكاميرا محجوبة" },
+  HeadTurnedAway: { en: "Head Turned Away", ar: "تحويل الرأس بعيداً" },
+  ScreenShareDenied: { en: "Screen Share Denied", ar: "رفض مشاركة الشاشة" },
+  ScreenShareLost: { en: "Screen Share Lost", ar: "فقدان مشاركة الشاشة" },
+  ScreenShareRevoked: {
+    en: "Screen Share Revoked",
+    ar: "سحب إذن مشاركة الشاشة",
+  },
+  ScreenShareTrackEnded: {
+    en: "Screen Share Track Ended",
+    ar: "إيقاف مسار مشاركة الشاشة",
+  },
+};
+
+export function translateViolationType(type: string, locale?: string): string {
+  const entry = VIOLATION_TYPE_NAMES[type];
+  if (entry) return locale === "ar" ? entry.ar : entry.en;
+  return type;
+}
+
+export function translateSeverity(severity: string, locale?: string): string {
+  if (!locale) return severity;
+  return SEVERITY_LABELS[severity]?.[locale === "ar" ? "ar" : "en"] ?? severity;
 }
 
 /**

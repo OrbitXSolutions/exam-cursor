@@ -267,8 +267,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Controllers
-builder.Services.AddControllers();
+// Controllers — serialize all DateTime values in Dubai timezone (UTC+4)
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new Smart_Core.Infrastructure.Json.DubaiDateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new Smart_Core.Infrastructure.Json.DubaiNullableDateTimeConverter());
+    });
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();

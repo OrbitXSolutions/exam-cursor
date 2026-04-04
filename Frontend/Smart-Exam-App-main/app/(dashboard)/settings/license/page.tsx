@@ -74,17 +74,29 @@ export default function LicensePage() {
     }
   }
 
-  function getStateBadge(state: string) {
-    const badges: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; labelAr: string }> = {
-      Active: { variant: "default", label: "Active", labelAr: "نشط" },
-      Warning: { variant: "secondary", label: "Warning", labelAr: "تحذير" },
-      GracePeriod: { variant: "secondary", label: "Grace Period", labelAr: "فترة السماح" },
-      Expired: { variant: "destructive", label: "Expired", labelAr: "منتهي" },
-      Invalid: { variant: "destructive", label: "Invalid", labelAr: "غير صالح" },
-      Missing: { variant: "outline", label: "Missing", labelAr: "غير موجود" },
+  function getStateColor(state: string) {
+    switch (state) {
+      case "Active": return "text-green-600 bg-green-50 border-green-200"
+      case "Warning": return "text-yellow-600 bg-yellow-50 border-yellow-200"
+      case "GracePeriod": return "text-orange-600 bg-orange-50 border-orange-200"
+      case "Expired": return "text-red-600 bg-red-50 border-red-200"
+      case "Invalid": return "text-red-600 bg-red-50 border-red-200"
+      case "Missing": return "text-muted-foreground bg-muted border-border"
+      default: return "text-muted-foreground bg-muted border-border"
     }
-    const b = badges[state] || { variant: "outline" as const, label: state, labelAr: state }
-    return <Badge variant={b.variant}>{language === "ar" ? b.labelAr : b.label}</Badge>
+  }
+
+  function getStateLabel(state: string) {
+    const labels: Record<string, { label: string; labelAr: string }> = {
+      Active: { label: "Active", labelAr: "نشط" },
+      Warning: { label: "Warning", labelAr: "تحذير" },
+      GracePeriod: { label: "Grace Period", labelAr: "فترة السماح" },
+      Expired: { label: "Expired", labelAr: "منتهي" },
+      Invalid: { label: "Invalid", labelAr: "غير صالح" },
+      Missing: { label: "Missing", labelAr: "غير موجود" },
+    }
+    const l = labels[state] || { label: state, labelAr: state }
+    return language === "ar" ? l.labelAr : l.label
   }
 
   function getStateIcon(state: string) {
@@ -102,6 +114,7 @@ export default function LicensePage() {
   function formatDate(dateStr: string | null) {
     if (!dateStr) return "—"
     return new Date(dateStr).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric", month: "long", day: "numeric",
     })
   }
@@ -130,12 +143,18 @@ export default function LicensePage() {
                 <div className="flex items-center gap-3">
                   {status && getStateIcon(status.state)}
                   <div>
-                    <CardTitle>{language === "ar" ? "حالة الرخصة" : "License Status"}</CardTitle>
+                    <CardTitle className="flex items-center gap-3">
+                      {language === "ar" ? "حالة الرخصة" : "License Status"}
+                      {status && (
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${getStateColor(status.state)}`}>
+                          {getStateLabel(status.state)}
+                        </span>
+                      )}
+                    </CardTitle>
                     <CardDescription>{status?.message || ""}</CardDescription>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {status && getStateBadge(status.state)}
                   <Button variant="ghost" size="icon" onClick={loadStatus} title="Refresh">
                     <RefreshCw className="h-4 w-4" />
                   </Button>
@@ -153,24 +172,10 @@ export default function LicensePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <FileKey className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "نوع الرخصة" : "License Type"}</p>
-                      <p className="font-medium">{status.licenseType || "—"}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "تاريخ الإصدار" : "Issued Date"}</p>
-                      <p className="font-medium">{formatDate(status.issuedAt)}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "تاريخ الانتهاء" : "Expiry Date"}</p>
-                      <p className="font-medium">{formatDate(status.expiresAt)}</p>
+                      <p className="text-xs text-muted-foreground">{language === "ar" ? "تاريخ الإصدار → الانتهاء" : "Issued → Expiry"}</p>
+                      <p className="font-medium">{formatDate(status.issuedAt)} — {formatDate(status.expiresAt)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -186,6 +191,13 @@ export default function LicensePage() {
                           )
                         ) : "—"}
                       </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <FileKey className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">{language === "ar" ? "نوع الرخصة" : "License Type"}</p>
+                      <p className="font-medium">{status.licenseType || "—"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

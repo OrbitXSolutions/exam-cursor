@@ -150,6 +150,7 @@ export default function CertificatePage() {
   const formatDate = (value: string | null | undefined) => {
     if (!value) return language === "ar" ? "غير متاح" : "Not available"
     return new Date(value).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric",
       month: "long",
       day: "numeric",

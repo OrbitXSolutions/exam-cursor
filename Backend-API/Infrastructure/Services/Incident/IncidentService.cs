@@ -89,18 +89,15 @@ public class IncidentService : IIncidentService
         _context.Set<IncidentCase>().Add(incidentCase);
         await _context.SaveChangesAsync();
 
-        // Audit log (fire-and-forget)
-        _ = Task.Run(async () =>
+        // Audit log
+        try
         {
-            try
-            {
-                await _auditService.LogSuccessAsync(
+            await _auditService.LogSuccessAsync(
                 AuditActions.IncidentCreated, "IncidentCase", incidentCase.Id.ToString(),
                 actorId: userId,
                 metadata: new { caseNumber = incidentCase.CaseNumber, severity = dto.Severity.ToString(), source = dto.Source.ToString(), attemptId = dto.AttemptId });
-            }
-            catch { }
-        });
+        }
+        catch { }
 
         // Add timeline event
         await AddTimelineEventAsync(incidentCase.Id, IncidentTimelineEventType.Created, userId,

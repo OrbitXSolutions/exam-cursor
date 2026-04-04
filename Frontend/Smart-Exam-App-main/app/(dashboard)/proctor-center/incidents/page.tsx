@@ -28,7 +28,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { DataTable, type Column } from "@/components/ui/data-table"
+import { DataTable } from "@/components/ui/data-table"
+import { type ColumnDef } from "@tanstack/react-table"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
@@ -67,7 +68,7 @@ export default function IncidentsPage() {
       const data = await getIncidents()
       setIncidents(data.items)
     } catch (error) {
-      toast.error("Failed to load incidents")
+      toast.error(t("proctor.failedToLoadIncidents"))
     } finally {
       setLoading(false)
     }
@@ -90,7 +91,7 @@ export default function IncidentsPage() {
   async function handleCreateIncident() {
     const attemptId = parseInt(newIncident.attemptId)
     if (!attemptId || !newIncident.titleEn.trim()) {
-      toast.error("Attempt ID and title are required")
+      toast.error(t("proctor.attemptIdTitleRequired"))
       return
     }
     try {
@@ -114,6 +115,7 @@ export default function IncidentsPage() {
 
   function formatDateTime(dateString: string) {
     return new Date(dateString).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       dateStyle: "medium",
       timeStyle: "short",
     })
@@ -159,47 +161,54 @@ export default function IncidentsPage() {
     return matchesSearch && matchesSeverity && matchesReviewed
   })
 
-  const columns: Column<Incident>[] = [
+  const columns: ColumnDef<Incident>[] = [
     {
-      key: "type",
+      id: "type",
       header: t("proctor.incidentType"),
-      render: (inc) => (
-        <div>
-          <p className="font-medium">{inc.type}</p>
-          <p className="text-sm text-muted-foreground truncate max-w-[200px]">{inc.description}</p>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const inc = row.original
+        return (
+          <div>
+            <p className="font-medium">{inc.type}</p>
+            <p className="text-sm text-muted-foreground truncate max-w-[200px]">{inc.description}</p>
+          </div>
+        )
+      },
     },
     {
-      key: "candidate",
+      id: "candidate",
       header: t("grading.candidate"),
-      render: (inc) => (
-        <div>
-          <p className="font-medium">{inc.candidateName}</p>
-          <p className="text-sm text-muted-foreground">{inc.examTitle}</p>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const inc = row.original
+        return (
+          <div>
+            <p className="font-medium">{inc.candidateName}</p>
+            <p className="text-sm text-muted-foreground">{inc.examTitle}</p>
+          </div>
+        )
+      },
     },
     {
-      key: "severity",
+      id: "severity",
       header: t("proctor.severity"),
-      render: (inc) => getSeverityBadge(inc.severity),
+      cell: ({ row }) => getSeverityBadge(row.original.severity),
     },
     {
-      key: "timestamp",
+      id: "timestamp",
       header: t("proctor.timestamp"),
-      render: (inc) => (
+      cell: ({ row }) => (
         <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
           <Clock className="h-4 w-4" />
-          {formatDateTime(inc.timestamp)}
+          {formatDateTime(row.original.timestamp)}
         </div>
       ),
     },
     {
-      key: "status",
+      id: "status",
       header: t("common.status"),
-      render: (inc) =>
-        inc.reviewed ? (
+      cell: ({ row }) => {
+        const inc = row.original
+        return inc.reviewed ? (
           <div className="flex items-center gap-1.5 text-emerald-600">
             <CheckCircle2 className="h-4 w-4" />
             <span className="text-sm">{t("proctor.reviewed")}</span>
@@ -209,38 +218,41 @@ export default function IncidentsPage() {
             <AlertTriangle className="h-3 w-3 me-1" />
             {t("proctor.pendingReview")}
           </Badge>
-        ),
+        )
+      },
     },
     {
-      key: "actions",
+      id: "actions",
       header: "",
-      className: "w-32",
-      render: (inc) => (
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild title="View Details">
-            <Link href={`/proctor-center/incidents/${inc.id}`}>
-              <FileText className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild title="View Session">
-            <Link href={`/proctor-center/${inc.sessionId}`}>
-              <Eye className="h-4 w-4" />
-            </Link>
-          </Button>
-          {!inc.reviewed && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSelectedIncident(inc)
-                setReviewDialogOpen(true)
-              }}
-            >
-              {t("proctor.review")}
+      cell: ({ row }) => {
+        const inc = row.original
+        return (
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild title="View Details">
+              <Link href={`/proctor-center/incidents/${inc.id}`}>
+                <FileText className="h-4 w-4" />
+              </Link>
             </Button>
-          )}
-        </div>
-      ),
+            <Button variant="ghost" size="sm" asChild title="View Session">
+              <Link href={`/proctor-center/${inc.sessionId}`}>
+                <Eye className="h-4 w-4" />
+              </Link>
+            </Button>
+            {!inc.reviewed && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedIncident(inc)
+                  setReviewDialogOpen(true)
+                }}
+              >
+                {t("proctor.review")}
+              </Button>
+            )}
+          </div>
+        )
+      },
     },
   ]
 
@@ -268,7 +280,7 @@ export default function IncidentsPage() {
         </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 me-2" />
-          Create Incident
+          {t("proctor.createIncident")}
         </Button>
       </div>
 
@@ -380,23 +392,23 @@ export default function IncidentsPage() {
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Create Incident Case</DialogTitle>
+            <DialogTitle>{t("proctor.createIncidentCase")}</DialogTitle>
             <DialogDescription>
-              Manually create an incident case for investigation
+              {t("proctor.createIncidentCaseDesc")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Attempt ID *</Label>
+              <Label>{t("proctor.attemptIdLabel")} *</Label>
               <Input
                 type="number"
-                placeholder="Enter attempt ID"
+                placeholder={t("proctor.enterAttemptId")}
                 value={newIncident.attemptId}
                 onChange={(e) => setNewIncident(prev => ({ ...prev, attemptId: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Severity *</Label>
+              <Label>{t("proctor.incidentSeverityLabel")} *</Label>
               <Select
                 value={newIncident.severity}
                 onValueChange={(v) => setNewIncident(prev => ({ ...prev, severity: v }))}
@@ -405,25 +417,25 @@ export default function IncidentsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Low</SelectItem>
-                  <SelectItem value="2">Medium</SelectItem>
-                  <SelectItem value="3">High</SelectItem>
-                  <SelectItem value="4">Critical</SelectItem>
+                  <SelectItem value="1">{t("proctor.severityLow")}</SelectItem>
+                  <SelectItem value="2">{t("proctor.severityMedium")}</SelectItem>
+                  <SelectItem value="3">{t("proctor.severityHigh")}</SelectItem>
+                  <SelectItem value="4">{t("proctor.severityCritical")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Title *</Label>
+              <Label>{t("proctor.titleLabel")} *</Label>
               <Input
-                placeholder="Brief incident title"
+                placeholder={t("proctor.briefIncidentTitle")}
                 value={newIncident.titleEn}
                 onChange={(e) => setNewIncident(prev => ({ ...prev, titleEn: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Summary</Label>
+              <Label>{t("proctor.summaryLabel")}</Label>
               <Textarea
-                placeholder="Describe what happened..."
+                placeholder={t("proctor.describeWhatHappened")}
                 value={newIncident.summaryEn}
                 onChange={(e) => setNewIncident(prev => ({ ...prev, summaryEn: e.target.value }))}
                 rows={3}
@@ -436,7 +448,7 @@ export default function IncidentsPage() {
             </Button>
             <Button onClick={handleCreateIncident} disabled={createLoading}>
               {createLoading ? <LoadingSpinner size="sm" className="me-2" /> : null}
-              Create Incident
+              {t("proctor.createIncident")}
             </Button>
           </DialogFooter>
         </DialogContent>

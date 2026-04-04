@@ -801,6 +801,7 @@ export interface IdentityVerificationDetail {
   status: number;
   statusName: string;
   reviewedBy: string | null;
+  reviewedByName: string | null;
   reviewedAt: string | null;
   reviewNotes: string | null;
   assignedProctorId: string | null;

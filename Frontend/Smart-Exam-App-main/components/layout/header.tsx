@@ -25,6 +25,7 @@ export function Header() {
     ? `${language === "ar" ? "مرحباً بعودتك" : "Welcome back"}, ${getLocalizedField(user, "fullName", language).split(" ")[0]}!`
     : ""
   const dateSubtitle = new Date().toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
+    timeZone: "Asia/Dubai",
     weekday: "long",
     year: "numeric",
     month: "long",

@@ -16,7 +16,7 @@ import {
   AttemptEventType,
   getAttemptTimer,
 } from "@/lib/api/candidate"
-import { uploadProctorSnapshot, getCandidateSessionStatus } from "@/lib/api/proctoring"
+import { uploadProctorSnapshot, getCandidateSessionStatus, updateSessionDeviceInfo } from "@/lib/api/proctoring"
 import { CandidatePublisher } from "@/lib/webrtc/candidate-publisher"
 import { ScreenSharePublisher, type ScreenShareStatus } from "@/lib/webrtc/screen-share-publisher"
 import { ChunkRecorder } from "@/lib/webrtc/chunk-recorder"
@@ -217,6 +217,7 @@ export default function ExamPage() {
   const screenSharePublisherRef = useRef<ScreenSharePublisher | null>(null) // Screen share publisher
   const screenShareGraceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined) // Strict mode grace timer
   const suppressFullscreenExitRef = useRef(false) // Suppress fullscreen-exit violations while starting screen share
+  const deviceInfoSentRef = useRef(false) // Track if device info has been sent to proctor session
 
   // Screen share state
   const [screenShareStatus, setScreenShareStatus] = useState<ScreenShareStatus>("idle")
@@ -525,9 +526,36 @@ export default function ExamPage() {
         )
 
         if (result.success) {
-          setLastSnapshotTime(new Date().toLocaleTimeString())
+          setLastSnapshotTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }))
           setLastSnapshotOk(true)
           setSnapshotFailStreak(0)
+          // First successful snapshot means the proctor session now exists — send device info once
+          if (!deviceInfoSentRef.current && session?.attemptId) {
+            deviceInfoSentRef.current = true
+            try {
+              const ua = navigator.userAgent
+              let browserName = "Unknown"
+              let browserVersion = ""
+              if (ua.includes("Edg/")) { browserName = "Edge"; browserVersion = ua.match(/Edg\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Chrome/")) { browserName = "Chrome"; browserVersion = ua.match(/Chrome\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Firefox/")) { browserName = "Firefox"; browserVersion = ua.match(/Firefox\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Safari/") && !ua.includes("Chrome")) { browserName = "Safari"; browserVersion = ua.match(/Version\/(\S+)/)?.[1] ?? "" }
+              let os = "Unknown"
+              if (ua.includes("Windows NT 10")) os = "Windows 10/11"
+              else if (ua.includes("Windows")) os = "Windows"
+              else if (ua.includes("Mac OS X")) os = "macOS " + (ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, ".") ?? "")
+              else if (ua.includes("Linux")) os = "Linux"
+              else if (ua.includes("Android")) os = "Android"
+              else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
+              await updateSessionDeviceInfo({
+                attemptId: session.attemptId,
+                browserName: browserName.trim(),
+                browserVersion: browserVersion.split(" ")[0],
+                operatingSystem: os.trim(),
+                screenResolution: `${screen.width}x${screen.height}`,
+              })
+            } catch { /* silent fail — never block exam */ }
+          }
         } else {
           setLastSnapshotOk(false)
           setSnapshotFailStreak((prev) => {
@@ -1406,7 +1434,7 @@ export default function ExamPage() {
             if (blob && session?.attemptId) {
               const result = await uploadProctorSnapshot(session.attemptId, blob, `snapshot_${Date.now()}.jpg`)
               if (result.success) {
-                setLastSnapshotTime(new Date().toLocaleTimeString())
+                setLastSnapshotTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }))
                 setLastSnapshotOk(true)
                 setSnapshotFailStreak(0)
               }

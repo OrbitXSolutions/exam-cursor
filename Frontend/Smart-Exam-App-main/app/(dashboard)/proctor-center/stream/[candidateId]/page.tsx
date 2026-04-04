@@ -249,7 +249,7 @@ export default function ScreenStreamPage() {
                     >
                       <div className="font-medium text-sm truncate">{session.examTitleEn}</div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {new Date(session.startedAt).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
+                        {new Date(session.startedAt).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                       </div>
                     </button>
                   ))}
@@ -272,7 +272,7 @@ export default function ScreenStreamPage() {
                       </Badge>
                     </div>
                     <CardDescription>
-                      {selectedSession.candidateName} • {new Date(selectedSession.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                      {selectedSession.candidateName} • {new Date(selectedSession.startedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -317,7 +317,7 @@ export default function ScreenStreamPage() {
                               </div>
                             )}
                             <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded text-sm">
-                              {new Date(selectedImage.capturedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                              {new Date(selectedImage.capturedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                             </div>
                             <Button
                               variant="secondary"

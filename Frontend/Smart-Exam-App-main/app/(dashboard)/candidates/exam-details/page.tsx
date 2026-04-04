@@ -34,6 +34,7 @@ import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-l
 function formatDateTime(dateStr: string | undefined | null, language: string): string {
   if (!dateStr) return "—"
   return new Date(dateStr).toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+    timeZone: "Asia/Dubai",
     year: "numeric", month: "short", day: "numeric",
     hour: "2-digit", minute: "2-digit",
   })
@@ -1143,7 +1144,7 @@ export default function CandidateExamDetailsPage() {
                     {/* ── Footer: Regenerate & Timestamp ── */}
                     <div className="pt-2 border-t flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground">
-                        {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleString(isRtl ? "ar-SA" : "en-US") : ""}
+                        {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleString(isRtl ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" }) : ""}
                       </span>
                       <Button
                         variant="ghost"

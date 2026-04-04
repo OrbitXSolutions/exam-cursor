@@ -35,6 +35,11 @@ public class ProctorSessionDto
     public bool IsTerminatedByProctor { get; set; }
     public string? TerminationReason { get; set; }
     public decimal? RiskScore { get; set; }
+    // Sub-scores from last risk calculation (null if not yet calculated)
+    public decimal? FaceScore { get; set; }
+    public decimal? EyeScore { get; set; }
+    public decimal? BehaviorScore { get; set; }
+    public decimal? EnvironmentScore { get; set; }
     public string RiskLevel => GetRiskLevel(RiskScore);
     public DateTime? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
@@ -166,6 +171,11 @@ public class ProctorSessionListDto
     // From Attempt entity
     public string? AttemptIpAddress { get; set; }
     public string? AttemptDeviceInfo { get; set; }
+    // Sub-scores
+    public decimal? FaceScore { get; set; }
+    public decimal? EyeScore { get; set; }
+    public decimal? BehaviorScore { get; set; }
+    public decimal? EnvironmentScore { get; set; }
 }
 
 /// <summary>
@@ -486,6 +496,11 @@ public class RiskCalculationResultDto
     public int ProctorSessionId { get; set; }
     public decimal RiskScore { get; set; }
     public string RiskLevel { get; set; } = string.Empty;
+    public decimal? FaceScore { get; set; }
+    public decimal? EyeScore { get; set; }
+    public decimal? BehaviorScore { get; set; }
+    public decimal? EnvironmentScore { get; set; }
+    public int SuspiciousReconnects { get; set; }
     public int TotalEvents { get; set; }
     public int TotalViolations { get; set; }
     public List<TriggeredRuleDto> TriggeredRules { get; set; } = new();

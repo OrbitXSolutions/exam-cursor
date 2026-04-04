@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
+import { translateServerMessage } from "@/lib/i18n/runtime"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
@@ -552,6 +553,7 @@ export default function SessionDetailPage() {
 
   function formatDateTime(dateString: string) {
     return new Date(dateString).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       dateStyle: "medium",
       timeStyle: "medium",
     })
@@ -597,12 +599,7 @@ export default function SessionDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">{session.candidateName}</h1>
-              {session.flagged && (
-                <Badge variant="outline" className="bg-amber-500/20 border-amber-500/50 text-amber-600">
-                  <Flag className="h-3 w-3 me-1" />
-                  {t("proctor.flagged")}
-                </Badge>
-              )}
+
               <Badge variant={session.status === "Active" ? "default" : "secondary"}>{session.status}</Badge>
             </div>
             <p className="text-muted-foreground mt-1">{session.examTitle}</p>
@@ -619,10 +616,7 @@ export default function SessionDetailPage() {
             <AlertTriangle className="h-4 w-4 me-2" />
             {t("proctor.createIncident")}
           </Button>
-          <Button variant="outline" onClick={handleToggleFlag}>
-            <Flag className="h-4 w-4 me-2" />
-            {session.flagged ? t("proctor.unflag") : t("proctor.flag")}
-          </Button>
+
           {session.status === "Active" && (
             <Button variant="outline" onClick={() => setWarningDialogOpen(true)}>
               <MessageSquare className="h-4 w-4 me-2" />
@@ -931,34 +925,35 @@ export default function SessionDetailPage() {
                 return (
                   <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
                     {filteredEvents.map((event) => {
-                      const severity = getEventSeverity(event.eventType)
+                      const severity = getEventSeverity(event.eventType, locale)
+                      const severityKey = getEventSeverity(event.eventType)
                       const isViolation = isViolationEvent(event.eventType)
                       return (
                         <div
                           key={event.id}
                           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm border ${
-                            severity === "Critical" ? "bg-destructive/5 border-destructive/20" :
-                            severity === "High" ? "bg-orange-500/5 border-orange-500/20" :
-                            severity === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
+                            severityKey === "Critical" ? "bg-destructive/5 border-destructive/20" :
+                            severityKey === "High" ? "bg-orange-500/5 border-orange-500/20" :
+                            severityKey === "Medium" ? "bg-amber-500/5 border-amber-500/20" :
                             isViolation ? "bg-blue-500/5 border-blue-500/20" :
                             "bg-muted/30 border-transparent"
                           }`}
                         >
                           <div className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                            severity === "Critical" ? "bg-destructive" :
-                            severity === "High" ? "bg-orange-500" :
-                            severity === "Medium" ? "bg-amber-500" :
+                            severityKey === "Critical" ? "bg-destructive" :
+                            severityKey === "High" ? "bg-orange-500" :
+                            severityKey === "Medium" ? "bg-amber-500" :
                             isViolation ? "bg-blue-500" :
                             "bg-muted-foreground"
                           }`} />
                           <div className="flex-1 min-w-0">
-                            <span className="font-medium">{event.eventTypeName || getEventTypeName(event.eventType)}</span>
+                            <span className="font-medium">{getEventTypeName(event.eventType, locale)}</span>
                             {(() => {
                               if (!event.metadataJson) return null
                               try {
                                 const meta = JSON.parse(event.metadataJson)
                                 if (meta.source === "smart_monitoring" && meta.detail) {
-                                  return <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{meta.detail}</p>
+                                  return <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{translateServerMessage(meta.detail, locale)}</p>
                                 }
                               } catch {}
                               return null
@@ -966,16 +961,16 @@ export default function SessionDetailPage() {
                           </div>
                           {isViolation && (
                             <Badge variant="outline" className={`text-xs flex-shrink-0 ${
-                              severity === "Critical" ? "border-destructive/50 text-destructive" :
-                              severity === "High" ? "border-orange-500/50 text-orange-600" :
-                              severity === "Medium" ? "border-amber-500/50 text-amber-600" :
+                              severityKey === "Critical" ? "border-destructive/50 text-destructive" :
+                              severityKey === "High" ? "border-orange-500/50 text-orange-600" :
+                              severityKey === "Medium" ? "border-amber-500/50 text-amber-600" :
                               "border-blue-500/50 text-blue-600"
                             }`}>
                               {severity}
                             </Badge>
                           )}
                           <span className="text-xs text-muted-foreground flex-shrink-0 tabular-nums">
-                            {new Date(event.occurredAt).toLocaleTimeString()}
+                            {new Date(event.occurredAt).toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" })}
                           </span>
                         </div>
                       )
@@ -1529,7 +1524,7 @@ export default function SessionDetailPage() {
                       aiAnalysis.riskLevel === "Medium" ? "bg-amber-500/10 border-amber-500/30 text-amber-600" :
                       "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
                     }>
-                      {aiAnalysis.riskLevel}
+                      {translateSeverity(aiAnalysis.riskLevel, locale)}
                     </Badge>
                   </div>
 
@@ -1558,11 +1553,11 @@ export default function SessionDetailPage() {
                     <details className="pt-2 border-t">
                       <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.candidateProfile")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.candidateProfile.name && <p><span className="font-medium text-foreground">Name:</span> {aiAnalysis.candidateProfile.name}</p>}
-                        {aiAnalysis.candidateProfile.department && <p><span className="font-medium text-foreground">Dept:</span> {aiAnalysis.candidateProfile.department}</p>}
-                        {aiAnalysis.candidateProfile.identityVerificationStatus && <p><span className="font-medium text-foreground">ID Status:</span> {aiAnalysis.candidateProfile.identityVerificationStatus}</p>}
-                        {aiAnalysis.candidateProfile.deviceSummary && <p><span className="font-medium text-foreground">Device:</span> {aiAnalysis.candidateProfile.deviceSummary}</p>}
-                        {aiAnalysis.candidateProfile.networkSummary && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.candidateProfile.networkSummary}</p>}
+                        {aiAnalysis.candidateProfile.name && <p><span className="font-medium text-foreground">{locale === "ar" ? "الاسم:" : "Name:"}</span> {aiAnalysis.candidateProfile.name}</p>}
+                        {aiAnalysis.candidateProfile.department && <p><span className="font-medium text-foreground">{locale === "ar" ? "القسم:" : "Dept:"}</span> {aiAnalysis.candidateProfile.department}</p>}
+                        {aiAnalysis.candidateProfile.identityVerificationStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "حالة التحقق:" : "ID Status:"}</span> {aiAnalysis.candidateProfile.identityVerificationStatus}</p>}
+                        {aiAnalysis.candidateProfile.deviceSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "الجهاز:" : "Device:"}</span> {aiAnalysis.candidateProfile.deviceSummary}</p>}
+                        {aiAnalysis.candidateProfile.networkSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "الشبكة:" : "Network:"}</span> {aiAnalysis.candidateProfile.networkSummary}</p>}
                       </div>
                     </details>
                   )}
@@ -1572,14 +1567,14 @@ export default function SessionDetailPage() {
                     <details className="pt-2 border-t">
                       <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.sessionOverview")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.sessionOverview.examTitle && <p><span className="font-medium text-foreground">Exam:</span> {aiAnalysis.sessionOverview.examTitle}</p>}
-                        {aiAnalysis.sessionOverview.duration && <p><span className="font-medium text-foreground">Duration:</span> {aiAnalysis.sessionOverview.duration}</p>}
-                        {aiAnalysis.sessionOverview.timeUsage && <p><span className="font-medium text-foreground">Time Usage:</span> {aiAnalysis.sessionOverview.timeUsage}</p>}
-                        {aiAnalysis.sessionOverview.completionRate && <p><span className="font-medium text-foreground">Completion:</span> {aiAnalysis.sessionOverview.completionRate}</p>}
-                        {aiAnalysis.sessionOverview.attemptStatus && <p><span className="font-medium text-foreground">Status:</span> {aiAnalysis.sessionOverview.attemptStatus}</p>}
-                        {aiAnalysis.sessionOverview.proctorMode && <p><span className="font-medium text-foreground">Proctor Mode:</span> {aiAnalysis.sessionOverview.proctorMode}</p>}
+                        {aiAnalysis.sessionOverview.examTitle && <p><span className="font-medium text-foreground">{locale === "ar" ? "الاختبار:" : "Exam:"}</span> {aiAnalysis.sessionOverview.examTitle}</p>}
+                        {aiAnalysis.sessionOverview.duration && <p><span className="font-medium text-foreground">{locale === "ar" ? "المدة:" : "Duration:"}</span> {aiAnalysis.sessionOverview.duration}</p>}
+                        {aiAnalysis.sessionOverview.timeUsage && <p><span className="font-medium text-foreground">{locale === "ar" ? "استخدام الوقت:" : "Time Usage:"}</span> {aiAnalysis.sessionOverview.timeUsage}</p>}
+                        {aiAnalysis.sessionOverview.completionRate && <p><span className="font-medium text-foreground">{locale === "ar" ? "معدل الإنجاز:" : "Completion:"}</span> {aiAnalysis.sessionOverview.completionRate}</p>}
+                        {aiAnalysis.sessionOverview.attemptStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "الحالة:" : "Status:"}</span> {aiAnalysis.sessionOverview.attemptStatus}</p>}
+                        {aiAnalysis.sessionOverview.proctorMode && <p><span className="font-medium text-foreground">{locale === "ar" ? "وضع المراقبة:" : "Proctor Mode:"}</span> {aiAnalysis.sessionOverview.proctorMode}</p>}
                         {aiAnalysis.sessionOverview.terminationInfo && aiAnalysis.sessionOverview.terminationInfo !== "N/A" && (
-                          <p className="text-destructive"><span className="font-medium">Termination:</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
+                          <p className="text-destructive"><span className="font-medium">{locale === "ar" ? "الإنهاء:" : "Termination:"}</span> {aiAnalysis.sessionOverview.terminationInfo}</p>
                         )}
                       </div>
                     </details>
@@ -1598,18 +1593,18 @@ export default function SessionDetailPage() {
                       </summary>
                       <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
                         {aiAnalysis.violationAnalysis.thresholdStatus && (
-                          <p><span className="font-medium text-foreground">Threshold:</span> {aiAnalysis.violationAnalysis.thresholdStatus}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "حالة العتبة:" : "Threshold:"}</span> {aiAnalysis.violationAnalysis.thresholdStatus}</p>
                         )}
                         {aiAnalysis.violationAnalysis.violationTrend && (
-                          <p><span className="font-medium text-foreground">Trend:</span> {aiAnalysis.violationAnalysis.violationTrend}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "الاتجاه:" : "Trend:"}</span> {aiAnalysis.violationAnalysis.violationTrend}</p>
                         )}
                         {aiAnalysis.violationAnalysis.violationBreakdown && aiAnalysis.violationAnalysis.violationBreakdown.length > 0 && (
                           <div className="space-y-1 mt-1">
                             {aiAnalysis.violationAnalysis.violationBreakdown.map((v: any, i: number) => (
                               <div key={i} className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                                <span className="text-[11px]">{v.type}</span>
+                                <span className="text-[11px]">{translateViolationType(v.type, locale)}</span>
                                 <div className="flex items-center gap-1.5">
-                                  <Badge variant="outline" className="text-[9px] h-4">{v.severity}</Badge>
+                                  <Badge variant="outline" className="text-[9px] h-4">{translateSeverity(v.severity, locale)}</Badge>
                                   <span className="text-[10px] font-medium">x{v.count}</span>
                                 </div>
                               </div>
@@ -1625,11 +1620,11 @@ export default function SessionDetailPage() {
                     <details className="pt-2 border-t">
                       <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.behaviorAnalysis")}</summary>
                       <div className="mt-1.5 space-y-1.5 text-xs text-muted-foreground">
-                        {aiAnalysis.behaviorAnalysis.answerPatternSummary && <p><span className="font-medium text-foreground">Answers:</span> {aiAnalysis.behaviorAnalysis.answerPatternSummary}</p>}
-                        {aiAnalysis.behaviorAnalysis.timingAnalysis && <p><span className="font-medium text-foreground">Timing:</span> {aiAnalysis.behaviorAnalysis.timingAnalysis}</p>}
-                        {aiAnalysis.behaviorAnalysis.focusBehavior && <p><span className="font-medium text-foreground">Focus:</span> {aiAnalysis.behaviorAnalysis.focusBehavior}</p>}
-                        {aiAnalysis.behaviorAnalysis.navigationBehavior && <p><span className="font-medium text-foreground">Navigation:</span> {aiAnalysis.behaviorAnalysis.navigationBehavior}</p>}
-                        {aiAnalysis.behaviorAnalysis.suspiciousPatterns && <p className="text-amber-600"><span className="font-medium">Suspicious:</span> {aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>}
+                        {aiAnalysis.behaviorAnalysis.answerPatternSummary && <p><span className="font-medium text-foreground">{locale === "ar" ? "أنماط الإجابة:" : "Answers:"}</span> {aiAnalysis.behaviorAnalysis.answerPatternSummary}</p>}
+                        {aiAnalysis.behaviorAnalysis.timingAnalysis && <p><span className="font-medium text-foreground">{locale === "ar" ? "تحليل التوقيت:" : "Timing:"}</span> {aiAnalysis.behaviorAnalysis.timingAnalysis}</p>}
+                        {aiAnalysis.behaviorAnalysis.focusBehavior && <p><span className="font-medium text-foreground">{locale === "ar" ? "سلوك التركيز:" : "Focus:"}</span> {aiAnalysis.behaviorAnalysis.focusBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.navigationBehavior && <p><span className="font-medium text-foreground">{locale === "ar" ? "سلوك التنقل:" : "Navigation:"}</span> {aiAnalysis.behaviorAnalysis.navigationBehavior}</p>}
+                        {aiAnalysis.behaviorAnalysis.suspiciousPatterns && <p className="text-amber-600"><span className="font-medium">{locale === "ar" ? "أنماط مشبوهة:" : "Suspicious:"}</span> {aiAnalysis.behaviorAnalysis.suspiciousPatterns}</p>}
                       </div>
                     </details>
                   )}
@@ -1639,12 +1634,12 @@ export default function SessionDetailPage() {
                     <details className="pt-2 border-t">
                       <summary className="text-xs font-medium cursor-pointer hover:text-purple-600 transition-colors">{t("proctor.environmentAssessment")}</summary>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                        {aiAnalysis.environmentAssessment.webcamStatus && <p><span className="font-medium text-foreground">Webcam:</span> {aiAnalysis.environmentAssessment.webcamStatus}</p>}
-                        {aiAnalysis.environmentAssessment.networkStability && <p><span className="font-medium text-foreground">Network:</span> {aiAnalysis.environmentAssessment.networkStability}</p>}
-                        {aiAnalysis.environmentAssessment.fullscreenCompliance && <p><span className="font-medium text-foreground">Fullscreen:</span> {aiAnalysis.environmentAssessment.fullscreenCompliance}</p>}
-                        {aiAnalysis.environmentAssessment.browserCompliance && <p><span className="font-medium text-foreground">Browser:</span> {aiAnalysis.environmentAssessment.browserCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.webcamStatus && <p><span className="font-medium text-foreground">{locale === "ar" ? "الكاميرا:" : "Webcam:"}</span> {aiAnalysis.environmentAssessment.webcamStatus}</p>}
+                        {aiAnalysis.environmentAssessment.networkStability && <p><span className="font-medium text-foreground">{locale === "ar" ? "الشبكة:" : "Network:"}</span> {aiAnalysis.environmentAssessment.networkStability}</p>}
+                        {aiAnalysis.environmentAssessment.fullscreenCompliance && <p><span className="font-medium text-foreground">{locale === "ar" ? "ملء الشاشة:" : "Fullscreen:"}</span> {aiAnalysis.environmentAssessment.fullscreenCompliance}</p>}
+                        {aiAnalysis.environmentAssessment.browserCompliance && <p><span className="font-medium text-foreground">{locale === "ar" ? "المتصفح:" : "Browser:"}</span> {aiAnalysis.environmentAssessment.browserCompliance}</p>}
                         {aiAnalysis.environmentAssessment.overallEnvironmentRisk && (
-                          <p><span className="font-medium text-foreground">Overall Risk:</span> {aiAnalysis.environmentAssessment.overallEnvironmentRisk}</p>
+                          <p><span className="font-medium text-foreground">{locale === "ar" ? "المخاطر العامة:" : "Overall Risk:"}</span> {aiAnalysis.environmentAssessment.overallEnvironmentRisk}</p>
                         )}
                       </div>
                     </details>
@@ -1746,7 +1741,7 @@ export default function SessionDetailPage() {
                   {/* Regenerate button */}
                   <div className="pt-2 border-t flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">
-                      {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleTimeString() : ""}
+                      {aiAnalysis.generatedAt ? new Date(aiAnalysis.generatedAt).toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }) : ""}
                     </span>
                     <Button
                       variant="ghost"

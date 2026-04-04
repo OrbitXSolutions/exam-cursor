@@ -79,6 +79,7 @@ export default function MyResultsPage() {
     if (!dateString) return "-"
     const date = new Date(dateString)
     return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       year: "numeric",
       month: "short",
       day: "numeric",
