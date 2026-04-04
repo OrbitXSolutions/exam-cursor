@@ -123,3 +123,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* RTL fix: Force dialog/alert-dialog centering to use physical left (not logical start) */
+[dir="rtl"] [data-slot="dialog-content"],
+[dir="rtl"] [data-slot="alert-dialog-content"] {
+  left: 50% !important;
+  right: auto !important;
+  inset-inline-start: unset !important;
+  transform: translate(-50%, -50%);
+}

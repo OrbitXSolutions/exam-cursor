@@ -40,6 +40,18 @@ public class CreateQuestionDtoValidator : AbstractValidator<CreateQuestionDto>
 
         RuleForEach(x => x.Options)
           .SetValidator(new CreateQuestionOptionDtoValidator());
+
+        // Cross-validation: option points sum must equal question points for MCQ_Multi
+        When(x => x.QuestionTypeId == 2 && x.Options.Any(o => o.Points.HasValue), () =>
+        {
+            RuleFor(x => x)
+                .Must(x => Math.Abs(x.Options.Sum(o => o.Points ?? 0) - x.Points) < 0.01m)
+                .WithMessage("Sum of option points must equal the question total points");
+
+            RuleForEach(x => x.Options)
+                .Must(o => !o.Points.HasValue || o.Points.Value >= 0)
+                .WithMessage("Each option points must be 0 or greater");
+        });
     }
 }
 

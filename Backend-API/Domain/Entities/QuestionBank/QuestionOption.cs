@@ -16,6 +16,10 @@ public class QuestionOption : BaseEntity
     // Correctness
     public bool IsCorrect { get; set; }
 
+    // Per-option points for partial scoring (MCQ_Multi)
+    // Null = legacy behavior (auto-distribute question points equally across correct options)
+    public decimal? Points { get; set; }
+
     // Ordering
     public int Order { get; set; }
 

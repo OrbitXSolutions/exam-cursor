@@ -34,7 +34,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera } from "lucide-react"
+import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera, Monitor } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
@@ -77,6 +78,10 @@ export default function ExamConfigurationPage() {
     requireFullscreen: true,
     browserLockdown: true,
     maxViolationWarnings: 0,
+    // Screen Monitoring
+    enableScreenMonitoring: false,
+    screenMonitoringMode: 0,
+    screenShareGracePeriod: 20,
   })
   
   // Result Message State
@@ -120,6 +125,9 @@ export default function ExamConfigurationPage() {
           requireFullscreen: examData.requireFullscreen || false,
           browserLockdown: examData.browserLockdown || false,
           maxViolationWarnings: examData.maxViolationWarnings ?? 0,
+          enableScreenMonitoring: examData.enableScreenMonitoring || false,
+          screenMonitoringMode: examData.screenMonitoringMode ?? 0,
+          screenShareGracePeriod: examData.screenShareGracePeriod ?? 20,
         })
       }
       
@@ -206,6 +214,9 @@ export default function ExamConfigurationPage() {
         requireFullscreen: formData.requireFullscreen,
         browserLockdown: formData.browserLockdown,
         maxViolationWarnings: formData.maxViolationWarnings,
+        enableScreenMonitoring: formData.enableScreenMonitoring,
+        screenMonitoringMode: formData.enableScreenMonitoring ? 3 : 0,
+        screenShareGracePeriod: formData.screenShareGracePeriod,
       }
       
       console.log("[v0] Saving exam settings (full payload):", updatePayload)
@@ -514,7 +525,8 @@ export default function ExamConfigurationPage() {
                         formData.preventCopyPaste &&
                         formData.preventScreenCapture &&
                         formData.requireFullscreen &&
-                        formData.browserLockdown
+                        formData.browserLockdown &&
+                        formData.enableScreenMonitoring
                       }
                       onCheckedChange={(checked) => {
                         setFormData((prev) => ({
@@ -526,6 +538,8 @@ export default function ExamConfigurationPage() {
                           preventScreenCapture: checked,
                           requireFullscreen: checked,
                           browserLockdown: checked,
+                          enableScreenMonitoring: checked,
+                          screenMonitoringMode: checked ? 3 : 0,
                         }))
                       }}
                     />
@@ -620,6 +634,62 @@ export default function ExamConfigurationPage() {
                       checked={formData.browserLockdown}
                       onCheckedChange={(checked) => updateField("browserLockdown", checked)}
                     />
+                  </div>
+
+                  {/* Screen Monitoring */}
+                  <div className="p-4 border-2 rounded-lg bg-linear-to-r from-purple-50/80 to-blue-50/80 dark:from-purple-950/30 dark:to-blue-950/30 border-purple-300 dark:border-purple-800">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Monitor className="h-5 w-5 text-purple-600" />
+                            <Label className="text-base font-bold">
+                              {language === "ar" ? "مراقبة الشاشة" : "Screen Monitoring"}
+                            </Label>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {language === "ar"
+                              ? "السماح للمراقب بمشاهدة شاشة المرشح أثناء الاختبار"
+                              : "Enable proctor to view candidate's screen during the exam"}
+                          </p>
+                        </div>
+                        <Switch
+                          checked={formData.enableScreenMonitoring}
+                          onCheckedChange={(checked) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              enableScreenMonitoring: checked,
+                              screenMonitoringMode: checked ? 3 : 0,
+                            }))
+                          }}
+                        />
+                      </div>
+
+                      {formData.enableScreenMonitoring && (
+                        <div className="space-y-4 pt-2 border-t border-purple-200 dark:border-purple-800">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">
+                              {language === "ar" ? "فترة السماح (بالثواني)" : "Grace Period (seconds)"}
+                            </Label>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="number"
+                                min={5}
+                                max={120}
+                                value={formData.screenShareGracePeriod}
+                                onChange={(e) => updateField("screenShareGracePeriod", Math.max(5, Math.min(120, Number(e.target.value) || 20)))}
+                                className="w-24 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-center font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                {language === "ar"
+                                  ? `تحذير ثم إجراء بعد ${formData.screenShareGracePeriod} ثانية`
+                                  : `Warning then action after ${formData.screenShareGracePeriod} seconds`}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="border-b" />

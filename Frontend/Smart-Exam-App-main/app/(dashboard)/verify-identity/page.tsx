@@ -269,12 +269,12 @@ export default function VerifyIdentityPage() {
           <CardContent className="space-y-4">
             {verificationStatus?.submittedAt && (
               <div className="text-sm text-muted-foreground text-center">
-                Submitted: {new Date(verificationStatus.submittedAt).toLocaleString()}
+                Submitted: {new Date(verificationStatus.submittedAt).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}
               </div>
             )}
             {verificationStatus?.reviewedAt && (
               <div className="text-sm text-muted-foreground text-center">
-                Reviewed: {new Date(verificationStatus.reviewedAt).toLocaleString()}
+                Reviewed: {new Date(verificationStatus.reviewedAt).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}
               </div>
             )}
             <div className="flex gap-3 justify-center">

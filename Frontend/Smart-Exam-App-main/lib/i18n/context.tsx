@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { DirectionProvider } from "@radix-ui/react-direction"
 import { translations, type Language } from "./translations"
 import { DEFAULT_LANGUAGE } from "./runtime"
 
@@ -64,7 +65,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const isRTL = language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
 
-  return <I18nContext.Provider value={{ language, locale: language, setLanguage, t, isRTL, dir }}>{children}</I18nContext.Provider>
+  return (
+    <DirectionProvider dir={dir}>
+      <I18nContext.Provider value={{ language, locale: language, setLanguage, t, isRTL, dir }}>{children}</I18nContext.Provider>
+    </DirectionProvider>
+  )
 }
 
 export function useI18n() {

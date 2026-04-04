@@ -266,7 +266,7 @@ export default function ResultsPage() {
                   <p className="text-sm text-muted-foreground">{t("results.submittedAt")}</p>
                   <p className="text-lg font-medium">
                     {new Date(result.submittedAt).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", {
-                      dateStyle: "short"
+                      timeZone: "Asia/Dubai", dateStyle: "short"
                     })}
                   </p>
                 </div>
@@ -316,7 +316,7 @@ export default function ResultsPage() {
             <div className="flex justify-between py-2 border-b">
               <span className="text-muted-foreground">{t("results.submittedAt")}</span>
               <span className="font-medium">
-                {new Date(result.submittedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US")}
+                {new Date(result.submittedAt).toLocaleString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
               </span>
             </div>
             {showScores && (

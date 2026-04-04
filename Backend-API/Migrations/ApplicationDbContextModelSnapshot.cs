@@ -352,6 +352,9 @@ namespace Smart_Core.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
+                    b.Property<bool>("EnableScreenMonitoring")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("EndAt")
                         .HasColumnType("datetime2");
 
@@ -414,6 +417,12 @@ namespace Smart_Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<byte>("ScreenMonitoringMode")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("ScreenShareGracePeriod")
+                        .HasColumnType("int");
 
                     b.Property<bool>("ShowCorrectAnswers")
                         .ValueGeneratedOnAdd()
@@ -4369,6 +4378,9 @@ namespace Smart_Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("BehaviorScore")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CalculatedAt")
                         .HasColumnType("datetime2");
 
@@ -4388,9 +4400,18 @@ namespace Smart_Core.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<decimal?>("EnvironmentScore")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("EventBreakdownJson")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
+
+                    b.Property<decimal?>("EyeScore")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("FaceScore")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -4444,6 +4465,9 @@ namespace Smart_Core.Migrations
                     b.Property<int>("AttemptId")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("BehaviorScore")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("BrowserName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4478,8 +4502,17 @@ namespace Smart_Core.Migrations
                     b.Property<DateTime?>("EndedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("EnvironmentScore")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("EyeScore")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("FaceScore")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("HeartbeatMissedCount")
                         .HasColumnType("int");
@@ -4850,6 +4883,9 @@ namespace Smart_Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<decimal?>("Points")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");

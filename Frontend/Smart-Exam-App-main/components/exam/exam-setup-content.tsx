@@ -556,7 +556,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
           <Link href="/exams/list">
-            <ArrowLeft className="h-4 w-4" />
+            {language === "ar" ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
           </Link>
         </Button>
         <div>
@@ -612,7 +612,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
               <CardContent className="space-y-4">
                 {/* Title */}
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                  <div className="space-y-2">
+                  <div className={`space-y-2${language === "ar" ? " sm:order-2" : ""}`}>
                     <Label htmlFor="titleEn">{t("exams.titleEn")} *</Label>
                     <Input
                       id="titleEn"
@@ -620,11 +620,12 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       onChange={(e) => updateField("titleEn", e.target.value)}
                       placeholder={t("exams.titleEnPlaceholder")}
                       className="w-full h-11"
+                      dir={language === "ar" ? "rtl" : "ltr"}
                       maxLength={500}
                       required
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className={`space-y-2${language === "ar" ? " sm:order-1" : ""}`}>
                     <Label htmlFor="titleAr">{t("exams.titleAr")}</Label>
                     <Input
                       id="titleAr"
@@ -640,7 +641,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
 
                 {/* Description */}
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                  <div className="space-y-2">
+                  <div className={`space-y-2${language === "ar" ? " sm:order-2" : ""}`}>
                     <Label htmlFor="descriptionEn">{t("exams.descriptionEn")}</Label>
                     <Textarea
                       id="descriptionEn"
@@ -648,10 +649,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       onChange={(e) => updateField("descriptionEn", e.target.value)}
                       placeholder={t("exams.descriptionEnPlaceholder")}
                       rows={3}
+                      dir={language === "ar" ? "rtl" : "ltr"}
                       maxLength={2000}
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className={`space-y-2${language === "ar" ? " sm:order-1" : ""}`}>
                     <Label htmlFor="descriptionAr">{t("exams.descriptionAr")}</Label>
                     <Textarea
                       id="descriptionAr"
@@ -660,6 +662,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       placeholder={t("exams.descriptionArPlaceholder")}
                       rows={3}
                       dir="rtl"
+                      className="text-right"
                       maxLength={2000}
                     />
                   </div>
@@ -731,6 +734,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                           value={formData.startAt}
                           onChange={(e) => updateField("startAt", e.target.value)}
                           className="w-full h-11"
+                          dir="ltr"
                           required
                         />
                       </div>
@@ -745,6 +749,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                           value={formData.endAt}
                           onChange={(e) => updateField("endAt", e.target.value)}
                           className="w-full h-11"
+                          dir="ltr"
                           required
                         />
                       </div>
@@ -777,6 +782,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       value={formData.durationMinutes}
                       onChange={(e) => updateField("durationMinutes", Number.parseInt(e.target.value) || 60)}
                       className="w-full h-11"
+                      dir="ltr"
                     />
                     <p className="text-xs text-muted-foreground">{t("exams.durationRange")}</p>
                   </div>
@@ -792,6 +798,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       value={formData.passScore}
                       onChange={(e) => updateField("passScore", Number.parseInt(e.target.value) || 0)}
                       className="w-full h-11"
+                      dir="ltr"
                     />
                     <p className="text-xs text-muted-foreground">{t("exams.passScoreHint")}</p>
                   </div>
@@ -807,6 +814,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                       value={formData.maxAttempts}
                       onChange={(e) => updateField("maxAttempts", Number.parseInt(e.target.value) || 1)}
                       className="w-full h-11"
+                      dir="ltr"
                     />
                     <p className="text-xs text-muted-foreground">{t("exams.maxAttemptsHint")}</p>
                   </div>

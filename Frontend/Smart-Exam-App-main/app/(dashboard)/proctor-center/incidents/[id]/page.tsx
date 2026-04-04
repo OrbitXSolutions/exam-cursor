@@ -186,6 +186,7 @@ export default function IncidentDetailPage() {
   function formatDateTime(dateString: string | undefined) {
     if (!dateString) return "—"
     return new Date(dateString).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
+      timeZone: "Asia/Dubai",
       dateStyle: "medium",
       timeStyle: "short",
     })

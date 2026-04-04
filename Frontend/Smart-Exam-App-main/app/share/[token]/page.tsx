@@ -323,6 +323,7 @@ export default function ShareExamPage() {
                   {isRTL ? "ينتهي الرابط في:" : "Link expires at:"}{" "}
                   {new Date(examInfo.expiresAt).toLocaleString(
                     isRTL ? "ar-SA" : "en-US",
+                    { timeZone: "Asia/Dubai" }
                   )}
                 </span>
               </div>

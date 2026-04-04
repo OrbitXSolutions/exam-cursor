@@ -51,6 +51,12 @@ public class ProctorSession : BaseEntity
     // Risk score (0..100)
     public decimal? RiskScore { get; set; }
 
+    // Sub-scores computed at last risk calculation (0..100)
+    public decimal? FaceScore { get; set; }
+    public decimal? EyeScore { get; set; }
+    public decimal? BehaviorScore { get; set; }
+    public decimal? EnvironmentScore { get; set; }
+
     // Last heartbeat tracking
     public DateTime? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }

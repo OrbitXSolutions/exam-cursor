@@ -64,6 +64,21 @@ public class ExamDto
     /// </summary>
     public bool RequireWebcam { get; set; }
 
+    /// <summary>
+    /// Enable screen monitoring (candidate shares screen with proctor)
+    /// </summary>
+    public bool EnableScreenMonitoring { get; set; }
+
+    /// <summary>
+    /// Screen monitoring mode: Disabled, Optional, Required, Strict
+    /// </summary>
+    public ScreenMonitoringMode ScreenMonitoringMode { get; set; }
+
+    /// <summary>
+    /// Grace period (seconds) before enforcing action in Strict mode
+    /// </summary>
+    public int ScreenShareGracePeriod { get; set; }
+
     #endregion
 
     #region Security Settings
@@ -205,6 +220,21 @@ public class SaveExamDto
     /// </summary>
     public bool RequireWebcam { get; set; }
 
+    /// <summary>
+    /// Enable screen monitoring (candidate shares screen with proctor)
+    /// </summary>
+    public bool EnableScreenMonitoring { get; set; }
+
+    /// <summary>
+    /// Screen monitoring mode: Disabled, Optional, Required, Strict
+    /// </summary>
+    public ScreenMonitoringMode ScreenMonitoringMode { get; set; } = ScreenMonitoringMode.Disabled;
+
+    /// <summary>
+    /// Grace period (seconds) before enforcing action in Strict mode (default 20)
+    /// </summary>
+    public int ScreenShareGracePeriod { get; set; } = 20;
+
     #endregion
 
     #region Security Settings
@@ -277,6 +307,21 @@ public class UpdateExamSettingsDto
     /// Require webcam to be enabled
     /// </summary>
     public bool RequireWebcam { get; set; }
+
+    /// <summary>
+    /// Enable screen monitoring (candidate shares screen with proctor)
+    /// </summary>
+    public bool EnableScreenMonitoring { get; set; }
+
+    /// <summary>
+    /// Screen monitoring mode: Disabled, Optional, Required, Strict
+    /// </summary>
+    public ScreenMonitoringMode ScreenMonitoringMode { get; set; } = ScreenMonitoringMode.Disabled;
+
+    /// <summary>
+    /// Grace period (seconds) before enforcing action in Strict mode (default 20)
+    /// </summary>
+    public int ScreenShareGracePeriod { get; set; } = 20;
 
     #endregion
 

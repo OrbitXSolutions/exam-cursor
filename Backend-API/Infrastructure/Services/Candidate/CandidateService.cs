@@ -159,6 +159,30 @@ public class CandidateService : ICandidateService
             .ToListAsync();
         var overrideExamIdSet = new HashSet<int>(adminOverrideExamIds);
 
+        // Pre-compute average points for builder section pools keyed by (SubjectId, TopicId?)
+        // This avoids async calls inside the synchronous Select() below
+        var builderSections = exams
+            .SelectMany(e => e.Sections)
+            .Where(s => s.SourceType.HasValue && s.PickCount > 0 && s.QuestionSubjectId.HasValue)
+            .Select(s => new { s.QuestionSubjectId, s.QuestionTopicId })
+            .Distinct()
+            .ToList();
+
+        var builderPoolAvgPoints = new Dictionary<(int SubjectId, int? TopicId), decimal>();
+        foreach (var pool in builderSections)
+        {
+            var poolQuery = _context.Questions
+                .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == pool.QuestionSubjectId!.Value);
+            if (pool.QuestionTopicId.HasValue)
+                poolQuery = poolQuery.Where(q => q.TopicId == pool.QuestionTopicId);
+            var count = await poolQuery.CountAsync();
+            if (count > 0)
+            {
+                var sum = await poolQuery.SumAsync(q => q.Points);
+                builderPoolAvgPoints[(pool.QuestionSubjectId!.Value, pool.QuestionTopicId)] = sum / count;
+            }
+        }
+
         var dtos = exams.Select(e =>
                {
                    // Calculate total questions and points including Builder sections
@@ -171,8 +195,12 @@ public class CandidateService : ICandidateService
                        {
                            // Builder section - use PickCount as question count
                            totalQuestions += section.PickCount;
-                           // Estimate points: use 1 point per question (actual points determined at attempt time)
-                           totalPoints += section.PickCount;
+                           // Use pre-computed average points from the question pool
+                           if (section.QuestionSubjectId.HasValue &&
+                               builderPoolAvgPoints.TryGetValue((section.QuestionSubjectId.Value, section.QuestionTopicId), out var avgPts))
+                               totalPoints += section.PickCount * avgPts;
+                           else
+                               totalPoints += section.PickCount; // fallback: 1 point per question
                        }
                        else
                        {
@@ -290,8 +318,22 @@ public class CandidateService : ICandidateService
             {
                 // Builder section - use PickCount as question count
                 totalQuestions += section.PickCount;
-                // Estimate points: use 1 point per question (actual points determined at attempt time)
-                totalPoints += section.PickCount;
+                // Calculate estimated points from the question pool
+                var poolQuery = _context.Questions
+                    .Where(q => q.IsActive && !q.IsDeleted && q.SubjectId == section.QuestionSubjectId);
+                if (section.QuestionTopicId.HasValue)
+                    poolQuery = poolQuery.Where(q => q.TopicId == section.QuestionTopicId);
+                var availableCount = await poolQuery.CountAsync();
+                if (availableCount > 0)
+                {
+                    var pointsSum = await poolQuery.SumAsync(q => q.Points);
+                    var avgPoints = pointsSum / availableCount;
+                    totalPoints += section.PickCount * avgPoints;
+                }
+                else
+                {
+                    totalPoints += section.PickCount; // fallback: 1 point per question
+                }
             }
             else
             {
@@ -322,6 +364,7 @@ public class CandidateService : ICandidateService
             PreventScreenCapture = exam.PreventScreenCapture,
             RequireFullscreen = exam.RequireFullscreen,
             BrowserLockdown = exam.BrowserLockdown,
+            EnableScreenMonitoring = exam.EnableScreenMonitoring,
             MaxViolationWarnings = exam.MaxViolationWarnings
         };
 
@@ -1801,6 +1844,9 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 PreventCopyPaste = exam.PreventCopyPaste,
                 PreventScreenCapture = exam.PreventScreenCapture,
                 BrowserLockdown = exam.BrowserLockdown,
+                EnableScreenMonitoring = exam.EnableScreenMonitoring,
+                ScreenMonitoringMode = exam.ScreenMonitoringMode,
+                ScreenShareGracePeriod = exam.ScreenShareGracePeriod,
             },
             Sections = sectionDtos,
             Questions = flatQuestions.OrderBy(q => q.Order).ToList(),

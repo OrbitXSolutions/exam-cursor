@@ -8,9 +8,9 @@ public class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOpti
 {
     public void Configure(EntityTypeBuilder<QuestionOption> builder)
     {
-      builder.ToTable("QuestionOptions");
+        builder.ToTable("QuestionOptions");
 
-builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
   .ValueGeneratedOnAdd();
@@ -19,12 +19,15 @@ builder.HasKey(x => x.Id);
  .IsRequired()
             .HasMaxLength(1000);
 
-     builder.Property(x => x.TextAr)
-  .IsRequired()
-        .HasMaxLength(1000);
+        builder.Property(x => x.TextAr)
+     .IsRequired()
+           .HasMaxLength(1000);
 
-    builder.Property(x => x.IsCorrect)
-   .HasDefaultValue(false);
+        builder.Property(x => x.IsCorrect)
+       .HasDefaultValue(false);
+
+        builder.Property(x => x.Points)
+            .HasColumnType("decimal(10,2)");
 
         builder.Property(x => x.Order)
             .HasDefaultValue(0);
@@ -32,26 +35,26 @@ builder.HasKey(x => x.Id);
         builder.Property(x => x.AttachmentPath)
       .HasMaxLength(1000);
 
-      builder.Property(x => x.CreatedBy)
+        builder.Property(x => x.CreatedBy)
+            .HasMaxLength(450);
+
+        builder.Property(x => x.UpdatedBy)
           .HasMaxLength(450);
 
-     builder.Property(x => x.UpdatedBy)
+        builder.Property(x => x.DeletedBy)
        .HasMaxLength(450);
 
-   builder.Property(x => x.DeletedBy)
-  .HasMaxLength(450);
-
-   // Indexes
+        // Indexes
         builder.HasIndex(x => x.QuestionId)
         .HasDatabaseName("IX_QuestionOptions_QuestionId");
 
         builder.HasIndex(x => new { x.QuestionId, x.Order })
    .HasDatabaseName("IX_QuestionOptions_QuestionId_Order");
 
-     builder.HasIndex(x => new { x.QuestionId, x.IsCorrect })
- .HasDatabaseName("IX_QuestionOptions_QuestionId_IsCorrect");
+        builder.HasIndex(x => new { x.QuestionId, x.IsCorrect })
+    .HasDatabaseName("IX_QuestionOptions_QuestionId_IsCorrect");
 
-  // Global query filter for soft delete
-     builder.HasQueryFilter(x => !x.IsDeleted);
+        // Global query filter for soft delete
+        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

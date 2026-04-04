@@ -914,24 +914,49 @@ public class GradingService : IGradingService
         }
 
         var selectedIds = JsonSerializer.Deserialize<List<int>>(answer.SelectedOptionIdsJson) ?? new List<int>();
-        var correctOptionIds = question.Options
-      .Where(o => o.IsCorrect && !o.IsDeleted)
-            .Select(o => o.Id)
-  .ToHashSet();
-
         var selectedSet = selectedIds.ToHashSet();
 
-        // Check if selected matches correct exactly
-        var isCorrect = selectedSet.SetEquals(correctOptionIds);
+        var correctOptions = question.Options
+            .Where(o => o.IsCorrect && !o.IsDeleted)
+            .ToList();
+        var correctOptionIds = correctOptions.Select(o => o.Id).ToHashSet();
 
-        if (isCorrect)
+        // MCQ_Multi partial scoring
+        var isMcqMulti = questionTypeName.Contains("multi");
+        if (isMcqMulti)
         {
-            return (maxPoints, true);
+            var hasOptionPoints = question.Options.Any(o => !o.IsDeleted && o.Points.HasValue);
+
+            if (hasOptionPoints)
+            {
+                // Per-option points defined: sum points of correctly selected options
+                var score = question.Options
+                    .Where(o => !o.IsDeleted && selectedSet.Contains(o.Id) && o.IsCorrect)
+                    .Sum(o => o.Points ?? 0);
+
+                // Cap at question max points
+                score = Math.Min(score, maxPoints);
+                var isFullScore = score == maxPoints;
+                return (score, isFullScore);
+            }
+            else
+            {
+                // Legacy: auto-distribute question points equally across correct options
+                if (correctOptions.Count == 0) return (0, false);
+
+                var pointPerCorrect = maxPoints / correctOptions.Count;
+                var correctlySelected = selectedSet.Count(id => correctOptionIds.Contains(id));
+                // Wrong selections (not in correct set) add 0 — no penalty
+                var score = correctlySelected * pointPerCorrect;
+                score = Math.Min(score, maxPoints);
+                var isFullScore = selectedSet.SetEquals(correctOptionIds);
+                return (score, isFullScore);
+            }
         }
 
-        // For MCQ multiple choice, could implement partial credit
-        // For now, all-or-nothing scoring
-        return (0, false);
+        // MCQ_Single / TrueFalse: all-or-nothing
+        var isCorrect = selectedSet.SetEquals(correctOptionIds);
+        return isCorrect ? (maxPoints, true) : (0, false);
     }
 
     private (decimal Score, bool IsCorrect) GradeShortAnswer(

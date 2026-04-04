@@ -7,6 +7,7 @@ export interface VideoConfig {
   enableLiveVideo: boolean;
   enableVideoRecording: boolean;
   enableSmartMonitoring: boolean;
+  enableScreenMonitoring: boolean;
   stunServers: string[];
 }
 
@@ -14,6 +15,7 @@ const DEFAULT_CONFIG: VideoConfig = {
   enableLiveVideo: false,
   enableVideoRecording: false,
   enableSmartMonitoring: false,
+  enableScreenMonitoring: false,
   stunServers: [],
 };
 
@@ -48,6 +50,7 @@ export async function getVideoConfig(): Promise<VideoConfig> {
         enableLiveVideo: data?.enableLiveVideo ?? false,
         enableVideoRecording: data?.enableVideoRecording ?? false,
         enableSmartMonitoring: data?.enableSmartMonitoring ?? false,
+        enableScreenMonitoring: data?.enableScreenMonitoring ?? false,
         stunServers: Array.isArray(data?.stunServers) ? data.stunServers : [],
       };
       console.log(

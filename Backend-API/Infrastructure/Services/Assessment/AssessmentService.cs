@@ -320,6 +320,11 @@ public class AssessmentService : IAssessmentService
       PreventScreenCapture = dto.PreventScreenCapture,
       RequireFullscreen = dto.RequireFullscreen,
       BrowserLockdown = dto.BrowserLockdown,
+      MaxViolationWarnings = dto.MaxViolationWarnings,
+      // Screen Monitoring Settings
+      EnableScreenMonitoring = dto.EnableScreenMonitoring,
+      ScreenMonitoringMode = dto.ScreenMonitoringMode,
+      ScreenShareGracePeriod = dto.ScreenShareGracePeriod,
       CreatedDate = DateTime.UtcNow,
       CreatedBy = createdBy
     };
@@ -430,6 +435,10 @@ public class AssessmentService : IAssessmentService
     entity.RequireFullscreen = dto.RequireFullscreen;
     entity.BrowserLockdown = dto.BrowserLockdown;
     entity.MaxViolationWarnings = dto.MaxViolationWarnings;
+    // Screen Monitoring Settings
+    entity.EnableScreenMonitoring = dto.EnableScreenMonitoring;
+    entity.ScreenMonitoringMode = dto.ScreenMonitoringMode;
+    entity.ScreenShareGracePeriod = dto.ScreenShareGracePeriod;
     entity.UpdatedDate = DateTime.UtcNow;
     entity.UpdatedBy = updatedBy;
 
@@ -585,6 +594,11 @@ public class AssessmentService : IAssessmentService
     entity.PreventScreenCapture = dto.PreventScreenCapture;
     entity.RequireFullscreen = dto.RequireFullscreen;
     entity.BrowserLockdown = dto.BrowserLockdown;
+
+    // Update Screen Monitoring Settings
+    entity.EnableScreenMonitoring = dto.EnableScreenMonitoring;
+    entity.ScreenMonitoringMode = dto.ScreenMonitoringMode;
+    entity.ScreenShareGracePeriod = dto.ScreenShareGracePeriod;
 
     entity.UpdatedDate = DateTime.UtcNow;
     entity.UpdatedBy = updatedBy;
@@ -1667,6 +1681,10 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       RequireFullscreen = exam.RequireFullscreen,
       BrowserLockdown = exam.BrowserLockdown,
       MaxViolationWarnings = exam.MaxViolationWarnings,
+      // Screen Monitoring Settings
+      EnableScreenMonitoring = exam.EnableScreenMonitoring,
+      ScreenMonitoringMode = exam.ScreenMonitoringMode,
+      ScreenShareGracePeriod = exam.ScreenShareGracePeriod,
       CreatedDate = exam.CreatedDate,
       UpdatedDate = exam.UpdatedDate,
       SectionsCount = exam.Sections?.Count ?? 0,

@@ -40,17 +40,46 @@ Done. Your API key is now in appsettings.Development.json, which is already giti
 
 # For grading MCQ multi
 
-The MCQ Multi grading uses All-or-Nothing approach:
+## ✅ Partial Scoring — IMPLEMENTED
 
-Problem: This is HARSH
-All-or-Nothing means:
+MCQ Multi now supports **per-option partial scoring**. The examiner assigns individual points to each option when creating the question.
+
+### How It Works
+
+- Each option in an MCQ Multi question has an optional **Points** field.
+- The sum of all option points must equal the question's total points.
+- During auto-grading, the candidate earns points for each **correctly selected** option.
+- Selecting a **wrong option** scores 0 (no negative penalty).
+- The final score = sum of points for correctly selected options, capped at max.
+
+### Legacy Behavior (Backward Compatible)
+
+- If **no option points are set** (all null), the system uses **equal distribution**: each correct option earns `total points / number of correct options`.
+- Existing questions without option points continue to work exactly as before.
+
+### Example (5 points, 3 correct options: A=2, B=1.5, C=1.5)
+
+| Candidate Selects       | Score |
+| ----------------------- | ----- |
+| A + B + C (all correct) | 5.0   |
+| A + B only              | 3.5   |
+| A only                  | 2.0   |
+| A + B + wrong D         | 3.5   |
+| None                    | 0     |
+
+### Previous Discussion (Archived)
+
+Previously the MCQ Multi grading used All-or-Nothing approach:
+
+Problem: This was HARSH
+All-or-Nothing meant:
 
 Candidate knows 2 out of 3 correct answers → gets ZERO
 Candidate selects all correct + 1 extra wrong → gets ZERO
 
 if you want:
-Recommendation: Implement Partial Credit Scoring
-This is the industry standard for MCQ Multi. Here's the formula:
+~~Recommendation: Implement Partial Credit Scoring~~ → **DONE — Implemented via per-option points**
+This is the industry standard for MCQ Multi. Here's the original formula discussed:
 
 Case 1 with Partial Credit (3 correct, 1 wrong, 2 points):
 Candidate selects Correct picked Wrong picked Calculation Score
@@ -66,6 +95,6 @@ A, B, C (2 correct + 1 wrong) 2/2 1/2 (1.0 - 0.5) × 2 1.0 pts
 A only (1 correct) 1/2 0/2 (0.5 - 0) × 2 1.0 pts
 0 selected 0/2 0/2 0 0 pts
 Question for you:
-Keep All-or-Nothing (current) — strict but simple?
-Add Partial Credit — fairer, industry standard?
-Make it configurable per exam — admin chooses grading mode (All-or-Nothing vs Partial Credit)?
+~~Keep All-or-Nothing (current) — strict but simple?~~ → No longer the only option
+~~Add Partial Credit — fairer, industry standard?~~ → **✅ IMPLEMENTED** (per-option points)
+~~Make it configurable per exam — admin chooses grading mode (All-or-Nothing vs Partial Credit)?~~ → Per-question: set option points for partial scoring, or leave blank for equal distribution

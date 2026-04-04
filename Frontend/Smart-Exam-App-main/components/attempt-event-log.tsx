@@ -225,6 +225,7 @@ function getEventLabel(eventTypeName: string, language: string): string {
 
 function formatTime(dateStr: string, language: string): string {
   return new Date(dateStr).toLocaleTimeString(language === "ar" ? "ar-SA" : "en-US", {
+    timeZone: "Asia/Dubai",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
@@ -233,6 +234,7 @@ function formatTime(dateStr: string, language: string): string {
 
 function formatDateTime(dateStr: string, language: string): string {
   return new Date(dateStr).toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+    timeZone: "Asia/Dubai",
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -314,7 +316,7 @@ export function AttemptEventLog({ events, className, maxHeight = "600px" }: Atte
     for (const event of filteredEvents) {
       const eventDate = new Date(event.occurredAt).toLocaleDateString(
         language === "ar" ? "ar-SA" : "en-US",
-        { year: "numeric", month: "short", day: "numeric" }
+        { timeZone: "Asia/Dubai", year: "numeric", month: "short", day: "numeric" }
       )
       if (eventDate !== currentDate) {
         currentDate = eventDate

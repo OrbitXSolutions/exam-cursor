@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -16,8 +16,9 @@ import {
   AttemptEventType,
   getAttemptTimer,
 } from "@/lib/api/candidate"
-import { uploadProctorSnapshot, getCandidateSessionStatus } from "@/lib/api/proctoring"
+import { uploadProctorSnapshot, getCandidateSessionStatus, updateSessionDeviceInfo } from "@/lib/api/proctoring"
 import { CandidatePublisher } from "@/lib/webrtc/candidate-publisher"
+import { ScreenSharePublisher, type ScreenShareStatus } from "@/lib/webrtc/screen-share-publisher"
 import { ChunkRecorder } from "@/lib/webrtc/chunk-recorder"
 import { getVideoConfig } from "@/lib/webrtc/video-config"
 import { SmartMonitoring, type ViolationType } from "@/lib/ai/smart-monitoring"
@@ -38,7 +39,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks, Calculator } from "lucide-react"
+import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks, Calculator, Monitor } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { ImageZoomModal } from "./image-zoom-modal"
 import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
@@ -213,6 +214,15 @@ export default function ExamPage() {
   const publisherRef = useRef<CandidatePublisher | null>(null) // WebRTC live video publisher
   const chunkRecorderRef = useRef<ChunkRecorder | null>(null) // Video chunk recorder
   const smartMonitoringRef = useRef<SmartMonitoring | null>(null) // AI face detection
+  const screenSharePublisherRef = useRef<ScreenSharePublisher | null>(null) // Screen share publisher
+  const screenShareGraceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined) // Strict mode grace timer
+  const suppressFullscreenExitRef = useRef(false) // Suppress fullscreen-exit violations while starting screen share
+  const deviceInfoSentRef = useRef(false) // Track if device info has been sent to proctor session
+
+  // Screen share state
+  const [screenShareStatus, setScreenShareStatus] = useState<ScreenShareStatus>("idle")
+  const [screenShareConsentOpen, setScreenShareConsentOpen] = useState(false)
+  const [screenShareConsentMode, setScreenShareConsentMode] = useState<"optional" | "required" | "strict">("optional")
 
   // Computed values
   const sections = session?.sections || []
@@ -373,6 +383,7 @@ export default function ExamPage() {
 
       // Monitor fullscreen changes only if fullscreen is required
       const handleFullscreenChange = settings?.requireFullscreen ? () => {
+        if (suppressFullscreenExitRef.current) return // Skip during screen share start
         if (!document.fullscreenElement) {
           logAttemptEvent(session.attemptId, {
             eventType: AttemptEventType.FullscreenExited,
@@ -515,9 +526,36 @@ export default function ExamPage() {
         )
 
         if (result.success) {
-          setLastSnapshotTime(new Date().toLocaleTimeString())
+          setLastSnapshotTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }))
           setLastSnapshotOk(true)
           setSnapshotFailStreak(0)
+          // First successful snapshot means the proctor session now exists — send device info once
+          if (!deviceInfoSentRef.current && session?.attemptId) {
+            deviceInfoSentRef.current = true
+            try {
+              const ua = navigator.userAgent
+              let browserName = "Unknown"
+              let browserVersion = ""
+              if (ua.includes("Edg/")) { browserName = "Edge"; browserVersion = ua.match(/Edg\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Chrome/")) { browserName = "Chrome"; browserVersion = ua.match(/Chrome\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Firefox/")) { browserName = "Firefox"; browserVersion = ua.match(/Firefox\/(\S+)/)?.[1] ?? "" }
+              else if (ua.includes("Safari/") && !ua.includes("Chrome")) { browserName = "Safari"; browserVersion = ua.match(/Version\/(\S+)/)?.[1] ?? "" }
+              let os = "Unknown"
+              if (ua.includes("Windows NT 10")) os = "Windows 10/11"
+              else if (ua.includes("Windows")) os = "Windows"
+              else if (ua.includes("Mac OS X")) os = "macOS " + (ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, ".") ?? "")
+              else if (ua.includes("Linux")) os = "Linux"
+              else if (ua.includes("Android")) os = "Android"
+              else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
+              await updateSessionDeviceInfo({
+                attemptId: session.attemptId,
+                browserName: browserName.trim(),
+                browserVersion: browserVersion.split(" ")[0],
+                operatingSystem: os.trim(),
+                screenResolution: `${screen.width}x${screen.height}`,
+              })
+            } catch { /* silent fail — never block exam */ }
+          }
         } else {
           setLastSnapshotOk(false)
           setSnapshotFailStreak((prev) => {
@@ -607,7 +645,7 @@ export default function ExamPage() {
                     // Show notification toast
                     toast.success(
                       t("exam.timeExtendedByMinutes", { minutes: event.extraMinutes }),
-                      { duration: 8000, icon: "â°" }
+                      { duration: 8000, icon: "⏰" }
                     )
                   },
                   onAttemptExpired: (event) => {
@@ -690,7 +728,7 @@ export default function ExamPage() {
                     toast.warning(translateCandidateMessage(event.message) ?? event.message, {
                       duration: 8000,
                       id: `smart-monitoring-${event.type}`,
-                      icon: "âš ï¸",
+                      icon: "⚠️",
                       style: {
                         fontSize: "15px",
                         fontWeight: 500,
@@ -731,6 +769,17 @@ export default function ExamPage() {
             } else if (!cfg.enableSmartMonitoring) {
               console.log('[ExamPage] enableSmartMonitoring=false, skipping AI detection')
             }
+
+            // Screen share initialization (guarded by per-exam settings)
+            const screenSettings = session?.examSettings
+            if (cfg.enableScreenMonitoring && screenSettings?.enableScreenMonitoring && screenSettings.screenMonitoringMode > 0) {
+              const modeMap = { 1: "optional", 2: "required", 3: "strict" } as const
+              const mode = modeMap[screenSettings.screenMonitoringMode as 1 | 2 | 3] ?? "optional"
+              console.log(`%c[ExamPage] Screen monitoring enabled, mode=${mode}`, 'color: #9c27b0; font-weight: bold')
+              setScreenShareConsentMode(mode)
+              // Auto-start screen share (candidate already tested on instructions page)
+              autoStartScreenShare()
+            }
           }).catch((err) => {
             console.warn("[Proctor] Video config fetch failed (non-fatal):", err)
           })
@@ -750,6 +799,9 @@ export default function ExamPage() {
       // Stop smart monitoring
       smartMonitoringRef.current?.dispose()
       smartMonitoringRef.current = null
+      // Stop screen share
+      screenSharePublisherRef.current?.stop().catch(() => {})
+      screenSharePublisherRef.current = null
       // Stop webcam stream on cleanup
       if (webcamStreamRef.current) {
         webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -1034,6 +1086,137 @@ export default function ExamPage() {
     }
   }
 
+  // ── Screen Share Handlers ──────────────────────────────────────────
+
+  async function startScreenSharePublisher() {
+    if (!session) return
+    // Clean up previous publisher if any
+    if (screenSharePublisherRef.current) {
+      await screenSharePublisherRef.current.stop().catch(() => {})
+      screenSharePublisherRef.current = null
+    }
+    const publisher = new ScreenSharePublisher(session.attemptId, {
+      onStatusChange: (status) => {
+        console.log(`%c[ExamPage] Screen share status: ${status}`, "color: #9c27b0; font-weight: bold")
+        setScreenShareStatus(status)
+
+        // Log events for key status changes
+        if (status === "active") {
+          logAttemptEvent(session.attemptId, { eventType: "ScreenShareStarted" }).catch(() => {})
+        } else if (status === "stopped" || status === "failed") {
+          logAttemptEvent(session.attemptId, { eventType: "ScreenShareEnded" }).catch(() => {})
+          handleScreenShareStopped()
+        } else if (status === "lost") {
+          logAttemptEvent(session.attemptId, { eventType: "ScreenShareLost" }).catch(() => {})
+          handleScreenShareStopped()
+        } else if (status === "denied") {
+          logAttemptEvent(session.attemptId, { eventType: "ScreenShareDenied" }).catch(() => {})
+        }
+      },
+      onTrackEnded: () => {
+        logAttemptEvent(session.attemptId, { eventType: "ScreenShareTrackEnded" }).catch(() => {})
+      },
+      onError: (error) => {
+        console.warn("[ExamPage] Screen share error:", error.message)
+      },
+    })
+    screenSharePublisherRef.current = publisher
+    const started = await publisher.start()
+    if (!started) {
+      setScreenShareStatus("denied")
+    }
+    return started
+  }
+
+  /** Auto-start screen share without consent dialog, suppress fullscreen-exit violations during getDisplayMedia() */
+  async function autoStartScreenShare() {
+    if (!session) return
+    suppressFullscreenExitRef.current = true
+    logAttemptEvent(session.attemptId, { eventType: "ScreenShareRequested" }).catch(() => {})
+    if (screenShareGraceTimerRef.current) { clearTimeout(screenShareGraceTimerRef.current); screenShareGraceTimerRef.current = undefined }
+    try {
+      const started = await startScreenSharePublisher()
+      if (!started && (screenShareConsentMode === "required" || screenShareConsentMode === "strict")) {
+        toast.error(
+          localizeText("Screen sharing is required", "مشاركة الشاشة مطلوبة", language),
+          { description: localizeText("Please allow screen sharing to continue.", "يرجى السماح بمشاركة الشاشة للمتابعة.", language) }
+        )
+        setTimeout(() => autoStartScreenShare(), 1500)
+      }
+    } finally {
+      suppressFullscreenExitRef.current = false
+      if (session?.examSettings?.requireFullscreen && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {})
+      }
+    }
+  }
+
+  function handleScreenShareStopped() {
+    if (!session) return
+    const mode = screenShareConsentMode
+
+    if (mode === "optional") {
+      // Just log, no enforcement
+      return
+    }
+
+    if (mode === "required") {
+      // Warn and auto-restart screen share
+      toast.warning(
+        localizeText("Screen sharing stopped", "توقفت مشاركة الشاشة", language),
+        {
+          description: localizeText(
+            "Please re-share your screen to continue.",
+            "يرجى إعادة مشاركة شاشتك للمتابعة.",
+            language
+          ),
+          duration: 10000,
+        }
+      )
+      autoStartScreenShare()
+      return
+    }
+
+    if (mode === "strict") {
+      const gracePeriod = session?.examSettings?.screenShareGracePeriod ?? 20
+      toast.warning(
+        localizeText("Screen sharing stopped!", "توقفت مشاركة الشاشة!", language),
+        {
+          description: localizeText(
+            `You have ${gracePeriod} seconds to resume screen sharing before an action is taken.`,
+            `لديك ${gracePeriod} ثانية لاستئناف مشاركة الشاشة قبل اتخاذ إجراء.`,
+            language
+          ),
+          duration: gracePeriod * 1000,
+        }
+      )
+      // Start grace period timer
+      if (screenShareGraceTimerRef.current) clearTimeout(screenShareGraceTimerRef.current)
+      screenShareGraceTimerRef.current = setTimeout(() => {
+        // Check if screen share resumed during grace period
+        if (screenSharePublisherRef.current?.currentStatus === "active") return
+        // Grace period expired — log violation (counts toward MaxViolationWarnings)
+        logAttemptEvent(session.attemptId, {
+          eventType: "ScreenSharePermissionRevoked",
+          metadataJson: JSON.stringify({ reason: "grace_period_expired", gracePeriodSeconds: gracePeriod }),
+        }).catch(() => {})
+        // Auto-restart screen share
+        autoStartScreenShare()
+      }, gracePeriod * 1000)
+      return
+    }
+  }
+
+  async function handleScreenShareAccept() {
+    setScreenShareConsentOpen(false)
+    await autoStartScreenShare()
+  }
+
+  function handleScreenShareSkip() {
+    setScreenShareConsentOpen(false)
+    logAttemptEvent(session!.attemptId, { eventType: "ScreenShareDenied", metadataJson: JSON.stringify({ reason: "user_skipped" }) }).catch(() => {})
+  }
+
   // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
   function stopAllBackgroundActivity() {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = undefined }
@@ -1047,6 +1230,10 @@ export default function ExamPage() {
     // Stop smart monitoring
     smartMonitoringRef.current?.dispose()
     smartMonitoringRef.current = null
+    // Stop screen share publisher
+    screenSharePublisherRef.current?.stop().catch(() => {})
+    screenSharePublisherRef.current = null
+    if (screenShareGraceTimerRef.current) { clearTimeout(screenShareGraceTimerRef.current); screenShareGraceTimerRef.current = undefined }
     // Stop webcam stream
     if (webcamStreamRef.current) {
       webcamStreamRef.current.getTracks().forEach((t) => t.stop())
@@ -1247,7 +1434,7 @@ export default function ExamPage() {
             if (blob && session?.attemptId) {
               const result = await uploadProctorSnapshot(session.attemptId, blob, `snapshot_${Date.now()}.jpg`)
               if (result.success) {
-                setLastSnapshotTime(new Date().toLocaleTimeString())
+                setLastSnapshotTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Dubai" }))
                 setLastSnapshotOk(true)
                 setSnapshotFailStreak(0)
               }
@@ -1473,6 +1660,35 @@ export default function ExamPage() {
                     ? `${lastSnapshotTime}`
                     : "..."
                   : t("common.off")}
+              </span>
+            </div>
+            )}
+
+            {/* Screen share indicator (only if screen monitoring enabled) */}
+            {session?.examSettings?.enableScreenMonitoring && (
+            <div
+              role={screenShareStatus !== "active" ? "button" : undefined}
+              tabIndex={screenShareStatus !== "active" ? 0 : undefined}
+              onClick={screenShareStatus !== "active" ? () => autoStartScreenShare() : undefined}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs",
+                screenShareStatus === "active"
+                  ? "border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900 dark:bg-purple-950 dark:text-purple-300"
+                  : screenShareStatus === "lost" || screenShareStatus === "failed"
+                    ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900"
+                    : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900",
+              )}
+              title={screenShareStatus !== "active" ? localizeText("Click to share screen", "اضغط لمشاركة الشاشة", language) : undefined}
+            >
+              <Monitor className="h-3 w-3" />
+              <span className="hidden sm:inline">
+                {screenShareStatus === "active"
+                  ? t("exam.screenSharing")
+                  : screenShareStatus === "lost"
+                    ? t("exam.screenLost")
+                    : screenShareStatus === "failed"
+                      ? t("exam.screenFailed")
+                      : t("exam.screenOff")}
               </span>
             </div>
             )}
@@ -2039,6 +2255,8 @@ export default function ExamPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
 
       {/* Last Warning Dialog â€” blocking modal before auto-termination */}
       <AlertDialog open={lastWarningOpen}>

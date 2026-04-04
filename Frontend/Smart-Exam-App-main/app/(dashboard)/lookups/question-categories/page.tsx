@@ -211,7 +211,7 @@ function QuestionCategoriesContent() {
                       <TableCell className="font-medium">{category.nameEn}</TableCell>
                       <TableCell dir="rtl">{category.nameAr}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {category.createdDate ? new Date(category.createdDate).toLocaleDateString() : "-"}
+                        {category.createdDate ? new Date(category.createdDate).toLocaleDateString("en-US", { timeZone: "Asia/Dubai" }) : "-"}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>

@@ -16,6 +16,7 @@ public interface IAiProctorService
     /// a human-readable risk explanation and recommendation.
     /// </summary>
     /// <param name="sessionId">The proctor session to analyze</param>
+    /// <param name="lang">Language code for the report (e.g. "ar" for Arabic, default English)</param>
     /// <returns>AI risk analysis with explanation, suspicious behaviors, and recommendation</returns>
-    Task<ApiResponse<AiProctorAnalysisResponseDto>> GetAiRiskAnalysisAsync(int sessionId);
+    Task<ApiResponse<AiProctorAnalysisResponseDto>> GetAiRiskAnalysisAsync(int sessionId, string lang = "en");
 }

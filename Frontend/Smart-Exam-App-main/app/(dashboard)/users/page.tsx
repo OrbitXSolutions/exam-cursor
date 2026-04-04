@@ -321,7 +321,7 @@ export default function UsersPage() {
                         <StatusBadge status={user.isActive ? "Active" : "Inactive"} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US")}
+                        {new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>

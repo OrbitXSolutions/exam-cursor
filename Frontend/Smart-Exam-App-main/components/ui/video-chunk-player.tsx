@@ -108,6 +108,8 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     const video = videoRef.current
     if (!video) return
 
+    let aborted = false
+
     // Check MSE support
     if (!("MediaSource" in window)) {
       setError("Your browser does not support MediaSource Extensions (MSE). Please use Chrome, Edge, or Firefox.")
@@ -143,49 +145,60 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     video.src = objectUrl
 
     mediaSource.addEventListener("sourceopen", async () => {
+      if (aborted) return
+      let sourceBuffer: SourceBuffer
       try {
         // Revoke object URL early — source is already attached
         URL.revokeObjectURL(objectUrl)
 
-        const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec)
+        sourceBuffer = mediaSource.addSourceBuffer(mimeCodec)
         sourceBufferRef.current = sourceBuffer
         sourceBuffer.mode = "sequence" // Append in order, browser calculates timestamps
 
         // Fetch and append all chunks sequentially
         for (let i = 0; i < chunkData.chunks.length; i++) {
+          if (aborted || mediaSource.readyState !== "open") break
+
           const chunk = chunkData.chunks[i]
           const url = getChunkUrl(chunk.filename)
 
           const response = await fetch(url)
+          if (aborted || mediaSource.readyState !== "open") break
           if (!response.ok) {
             console.warn(`[MSE] Failed to fetch chunk ${i}: ${response.status}`)
             continue
           }
 
           const arrayBuffer = await response.arrayBuffer()
+          if (aborted || mediaSource.readyState !== "open") break
 
           // Wait for sourceBuffer to be ready
-          await new Promise<void>((resolve, reject) => {
-            if (!sourceBuffer.updating) {
-              resolve()
-              return
-            }
-            const onUpdateEnd = () => {
-              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-              sourceBuffer.removeEventListener("error", onError)
-              resolve()
-            }
-            const onError = () => {
-              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-              sourceBuffer.removeEventListener("error", onError)
-              reject(new Error(`SourceBuffer error before chunk ${i}`))
-            }
-            sourceBuffer.addEventListener("updateend", onUpdateEnd)
-            sourceBuffer.addEventListener("error", onError)
-          })
+          if (sourceBuffer.updating) {
+            await new Promise<void>((resolve, reject) => {
+              const onUpdateEnd = () => {
+                sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+                sourceBuffer.removeEventListener("error", onError)
+                resolve()
+              }
+              const onError = () => {
+                sourceBuffer.removeEventListener("updateend", onUpdateEnd)
+                sourceBuffer.removeEventListener("error", onError)
+                reject(new Error(`SourceBuffer error before chunk ${i}`))
+              }
+              sourceBuffer.addEventListener("updateend", onUpdateEnd)
+              sourceBuffer.addEventListener("error", onError)
+            })
+          }
+
+          if (aborted || mediaSource.readyState !== "open") break
 
           // Append the buffer
-          sourceBuffer.appendBuffer(arrayBuffer)
+          try {
+            sourceBuffer.appendBuffer(arrayBuffer)
+          } catch (appendErr) {
+            console.warn(`[MSE] appendBuffer failed for chunk ${i}:`, appendErr)
+            break
+          }
 
           // Wait for append to complete
           await new Promise<void>((resolve, reject) => {
@@ -203,9 +216,13 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
             sourceBuffer.addEventListener("error", onError)
           })
 
+          if (aborted) break
+
           appendedChunksRef.current = i + 1
           setLoadingProgress(Math.round(((i + 1) / chunkData.chunks.length) * 100))
         }
+
+        if (aborted) return
 
         // All chunks appended — signal end of stream
         allBufferedRef.current = true
@@ -227,13 +244,16 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
           video.addEventListener("durationchange", onDuration)
         }
       } catch (err: any) {
-        console.error("[MSE] Error during chunk loading:", err)
-        setError(err?.message || "Error loading video chunks via MSE")
+        if (!aborted) {
+          console.error("[MSE] Error during chunk loading:", err)
+          setError(err?.message || "Error loading video chunks via MSE")
+        }
       }
     })
 
     return () => {
-      // Cleanup
+      // Cleanup — signal abort to the async loop
+      aborted = true
       mediaSourceRef.current = null
       sourceBufferRef.current = null
       if (video) {
