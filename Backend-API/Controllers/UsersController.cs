@@ -46,6 +46,17 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
+    /// Get staff users (excludes Candidate and SuperDev) with server-side pagination
+    /// </summary>
+    [HttpGet("staff")]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResponse<UserDto>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetStaffUsers([FromQuery] StaffUserFilterDto filter)
+    {
+        var result = await _userService.GetStaffUsersAsync(filter);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get user by ID
     /// </summary>
     [HttpGet("{id}")]

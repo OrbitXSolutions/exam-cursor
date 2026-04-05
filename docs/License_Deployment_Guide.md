@@ -37,11 +37,11 @@ All deployments share the **same public key** (`public.pem`).
 
 ## Prerequisites
 
-| Item | Location | Notes |
-|------|----------|-------|
-| LicenseSigner tool | `LicenseSigner/` folder | .NET 8 console app |
-| RSA keypair | Generated once by vendor | `private.pem` + `public.pem` |
-| Domain names | The exact domains where the system will run | e.g., `exams.clientA.com`, `exams.clientB.com` |
+| Item               | Location                                    | Notes                                          |
+| ------------------ | ------------------------------------------- | ---------------------------------------------- |
+| LicenseSigner tool | `LicenseSigner/` folder                     | .NET 8 console app                             |
+| RSA keypair        | Generated once by vendor                    | `private.pem` + `public.pem`                   |
+| Domain names       | The exact domains where the system will run | e.g., `exams.clientA.com`, `exams.clientB.com` |
 
 ---
 
@@ -57,6 +57,7 @@ dotnet run -- generate-keys
 ```
 
 **Output:**
+
 ```
 ✅ RSA-2048 keypair generated successfully.
    private.pem — KEEP SECRET (vendor only, NEVER deploy)
@@ -64,6 +65,7 @@ dotnet run -- generate-keys
 ```
 
 **Files created:**
+
 - `LicenseSigner/private.pem` — **KEEP SECRET**, never share, never deploy to any server
 - `LicenseSigner/public.pem` — Will be copied to every deployment
 
@@ -92,6 +94,7 @@ Validity in days from now (default 365): 365
 ```
 
 **Output:**
+
 ```
 ✅ License signed successfully!
    Output: license_Client_A_Company_20260404.json (and license.json)
@@ -104,10 +107,12 @@ Validity in days from now (default 365): 365
 ```
 
 **Files created:**
+
 - `LicenseSigner/license_Client_A_Company_20260404.json` — named copy (for your archive)
 - `LicenseSigner/license.json` — working copy (will be overwritten by next sign)
 
 **Rename/save the license file for clarity:**
+
 ```powershell
 copy license_Client_A_Company_20260404.json license_domainA.json
 ```
@@ -136,6 +141,7 @@ Validity in days from now (default 365): 365
 ```
 
 **Output:**
+
 ```
 ✅ License signed successfully!
    Output: license_Client_B_Company_20260404.json (and license.json)
@@ -154,6 +160,7 @@ Validity in days from now (default 365): 365
 ```powershell
 dotnet run -- verify-license license_Client_A_Company_20260404.json
 ```
+
 ```
   Customer:      Client A Company
   Domain:        exams.clienta.com
@@ -164,6 +171,7 @@ dotnet run -- verify-license license_Client_A_Company_20260404.json
 ```powershell
 dotnet run -- verify-license license_Client_B_Company_20260404.json
 ```
+
 ```
   Customer:      Client B Company
   Domain:        exams.clientb.com
@@ -185,6 +193,7 @@ Backend-API/
 ```
 
 **Commands on Server A:**
+
 ```bash
 # Create the License directory if it doesn't exist
 mkdir -p /path/to/Backend-API/License
@@ -210,6 +219,7 @@ Backend-API/
 ```
 
 **Commands on Server B:**
+
 ```bash
 mkdir -p /path/to/Backend-API/License
 
@@ -227,6 +237,7 @@ cp license_Client_B_Company_20260404.json /path/to/Backend-API/License/license.j
 After deploying, start the backend on each server and verify the license is active:
 
 **Via API:**
+
 ```bash
 # On Server A
 curl https://exams.clientA.com/api/license/status -H "Authorization: Bearer <token>"
@@ -236,6 +247,7 @@ curl https://exams.clientB.com/api/license/status -H "Authorization: Bearer <tok
 ```
 
 **Expected response (Active license):**
+
 ```json
 {
   "success": true,
@@ -260,14 +272,14 @@ Login as Admin → Settings → License → Verify the status card shows **Activ
 
 ## What Happens If...
 
-| Scenario | Behavior |
-|----------|----------|
-| **No license file deployed** | System runs normally with a warning. No blocking. |
-| **Wrong domain** (license says `clientA.com` but app runs on `clientB.com`) | Creates, updates, deletes are **blocked** (middleware returns 403). Reads still work. |
-| **License expired, within grace period** | System shows orange warning banner. All operations continue. |
-| **License expired, grace period also ended** | POST/PUT/PATCH/DELETE are **blocked**. GET requests still work. License upload still works. |
-| **Tampered license file** | Treated as Invalid. System runs with warning, no blocking. |
-| **Same license on both servers** | Only the server matching the `licensedDomain` will work fully. The other will have domain mismatch. |
+| Scenario                                                                    | Behavior                                                                                            |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **No license file deployed**                                                | System runs normally with a warning. No blocking.                                                   |
+| **Wrong domain** (license says `clientA.com` but app runs on `clientB.com`) | Creates, updates, deletes are **blocked** (middleware returns 403). Reads still work.               |
+| **License expired, within grace period**                                    | System shows orange warning banner. All operations continue.                                        |
+| **License expired, grace period also ended**                                | POST/PUT/PATCH/DELETE are **blocked**. GET requests still work. License upload still works.         |
+| **Tampered license file**                                                   | Treated as Invalid. System runs with warning, no blocking.                                          |
+| **Same license on both servers**                                            | Only the server matching the `licensedDomain` will work fully. The other will have domain mismatch. |
 
 ---
 
@@ -304,13 +316,13 @@ dotnet run -- verify-license license_ClientName_20260404.json
 
 ## Security Reminders
 
-| Rule | Details |
-|------|---------|
-| **NEVER deploy `private.pem`** | The private key stays on the vendor's machine only |
-| **`public.pem` is safe to deploy** | It can only verify signatures, not create them |
-| **Each domain gets its own `license.json`** | You cannot reuse one domain's license on another domain |
-| **License files are tamper-proof** | Any modification invalidates the RSA signature |
-| **Keep an archive of signed licenses** | Store named copies (e.g., `license_ClientA_20260404.json`) for reference |
+| Rule                                        | Details                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------ |
+| **NEVER deploy `private.pem`**              | The private key stays on the vendor's machine only                       |
+| **`public.pem` is safe to deploy**          | It can only verify signatures, not create them                           |
+| **Each domain gets its own `license.json`** | You cannot reuse one domain's license on another domain                  |
+| **License files are tamper-proof**          | Any modification invalidates the RSA signature                           |
+| **Keep an archive of signed licenses**      | Store named copies (e.g., `license_ClientA_20260404.json`) for reference |
 
 ---
 
@@ -326,3 +338,6 @@ When a license is approaching expiry (40-day warning banner will appear):
    - Upload via Admin UI: **Settings → License → Upload License** (no restart required)
 
 The system will pick up the new license automatically.
+
+Command
+"Client1`nStandard`nsmartexam-sable.vercel.app`n0`n30`n2026-01-01`n2026-04-07" | dotnet run -- sign-license

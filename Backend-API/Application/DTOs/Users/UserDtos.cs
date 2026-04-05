@@ -50,8 +50,23 @@ public class UserFilterDto
 {
     public string? Search { get; set; }
     public string? Role { get; set; }
+    public List<string>? ExcludeRoles { get; set; }
     public UserStatus? Status { get; set; }
     public bool? IsBlocked { get; set; }
+    public int? DepartmentId { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+}
+
+/// <summary>
+/// Filter DTO for the /Users/staff endpoint.
+/// Candidate and SuperDev are always excluded server-side via SQL JOIN.
+/// </summary>
+public class StaffUserFilterDto
+{
+    public string? Search { get; set; }
+    public string? Role { get; set; }
+    public UserStatus? Status { get; set; }
     public int? DepartmentId { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;

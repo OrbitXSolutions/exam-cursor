@@ -37,7 +37,9 @@ function mapUserDtoToUser(dto: UserDto): User {
 export async function getUsers(params?: {
   search?: string;
   role?: string;
+  excludeRoles?: string[];
   isActive?: boolean;
+  status?: "active" | "inactive";
   departmentId?: number;
   page?: number;
   pageSize?: number;
@@ -50,13 +52,57 @@ export async function getUsers(params?: {
     if (params?.role && params.role !== "all") query.set("Role", params.role);
     if (params?.departmentId)
       query.set("DepartmentId", String(params.departmentId));
+    if (params?.status === "active") query.set("Status", "1");
+    else if (params?.status === "inactive") query.set("Status", "2");
+    if (params?.excludeRoles && params.excludeRoles.length > 0) {
+      params.excludeRoles.forEach((r) => query.append("ExcludeRoles", r));
+    }
     const raw = await apiClient.get<{ items?: UserDto[]; totalCount?: number }>(
       `/Users?${query}`,
     );
     const items = raw?.items ?? [];
     const totalCount = raw?.totalCount ?? items.length;
     const size = params?.pageSize ?? 50;
-    return { items: items.map(mapUserDtoToUser), totalCount, totalPages: Math.ceil(totalCount / size) || 0 };
+    return {
+      items: items.map(mapUserDtoToUser),
+      totalCount,
+      totalPages: Math.ceil(totalCount / size) || 0,
+    };
+  } catch {
+    return { items: [], totalCount: 0, totalPages: 0 };
+  }
+}
+
+/// Dedicated staff users endpoint — Candidate and SuperDev always excluded server-side via SQL JOIN
+export async function getStaffUsers(params?: {
+  search?: string;
+  role?: string;
+  status?: "active" | "inactive";
+  departmentId?: number;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ items: User[]; totalCount: number; totalPages: number }> {
+  try {
+    const query = new URLSearchParams();
+    query.set("PageNumber", String(params?.page ?? 1));
+    query.set("PageSize", String(params?.pageSize ?? 10));
+    if (params?.search) query.set("Search", params.search);
+    if (params?.role && params.role !== "all") query.set("Role", params.role);
+    if (params?.departmentId)
+      query.set("DepartmentId", String(params.departmentId));
+    if (params?.status === "active") query.set("Status", "1");
+    else if (params?.status === "inactive") query.set("Status", "2");
+    const raw = await apiClient.get<{ items?: UserDto[]; totalCount?: number }>(
+      `/Users/staff?${query}`,
+    );
+    const items = raw?.items ?? [];
+    const totalCount = raw?.totalCount ?? items.length;
+    const size = params?.pageSize ?? 10;
+    return {
+      items: items.map(mapUserDtoToUser),
+      totalCount,
+      totalPages: Math.ceil(totalCount / size) || 0,
+    };
   } catch {
     return { items: [], totalCount: 0, totalPages: 0 };
   }
@@ -331,10 +377,10 @@ export interface DepartmentListItem {
 
 export async function getDepartmentsList(): Promise<DepartmentListItem[]> {
   try {
-    const raw = await apiClient.get<DepartmentListItem[]>(
+    const raw = await apiClient.get<{ items: DepartmentListItem[] }>(
       "/Departments?includeInactive=false",
     );
-    return raw ?? [];
+    return Array.isArray(raw) ? raw : (raw?.items ?? []);
   } catch {
     return [];
   }

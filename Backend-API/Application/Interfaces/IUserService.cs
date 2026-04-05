@@ -8,6 +8,7 @@ public interface IUserService
 {
     Task<ApiResponse<UserDetailDto>> CreateUserAsync(CreateUserDto dto, string createdBy);
     Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter);
+    Task<ApiResponse<PaginatedResponse<UserDto>>> GetStaffUsersAsync(StaffUserFilterDto filter);
     Task<ApiResponse<UserDetailDto>> GetUserByIdAsync(string userId);
     Task<ApiResponse<UserDetailDto>> GetUserByEmailAsync(string email);
     Task<ApiResponse<List<UserDto>>> GetUsersByRoleAsync(string roleName);
