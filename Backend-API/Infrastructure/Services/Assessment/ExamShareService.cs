@@ -18,15 +18,18 @@ public class ExamShareService : IExamShareService
     private readonly ApplicationDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
     public ExamShareService(
         ApplicationDbContext context,
         ITokenService tokenService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
         _tokenService = tokenService;
         _userManager = userManager;
+        _cache = cache;
     }
 
     // ========== Admin endpoints ==========
@@ -85,6 +88,7 @@ public class ExamShareService : IExamShareService
         _context.Set<ExamShareLink>().Add(shareLink);
         await _context.SaveChangesAsync();
 
+        _cache.RemoveByPrefix(CacheKeys.ExamSharePrefix);
         return ApiResponse<ExamShareLinkDto>.SuccessResponse(
             MapToDto(shareLink, baseUrl),
             "Share link generated successfully");
@@ -92,13 +96,19 @@ public class ExamShareService : IExamShareService
 
     public async Task<ApiResponse<ExamShareLinkDto>> GetShareLinkAsync(int examId, string baseUrl)
     {
+        var cacheKey = CacheKeys.ShareLinkByExam(examId);
+        if (_cache.TryGet<ExamShareLinkDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<ExamShareLinkDto>.SuccessResponse(cached);
+
         var link = await _context.Set<ExamShareLink>()
             .FirstOrDefaultAsync(l => l.ExamId == examId && l.IsActive && !l.IsDeleted);
 
         if (link == null)
             return ApiResponse<ExamShareLinkDto>.FailureResponse("No active share link found for this exam");
 
-        return ApiResponse<ExamShareLinkDto>.SuccessResponse(MapToDto(link, baseUrl));
+        var dto = MapToDto(link, baseUrl);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<ExamShareLinkDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<bool>> RevokeShareLinkAsync(int examId, string updatedBy)
@@ -115,6 +125,7 @@ public class ExamShareService : IExamShareService
 
         await _context.SaveChangesAsync();
 
+        _cache.RemoveByPrefix(CacheKeys.ExamSharePrefix);
         return ApiResponse<bool>.SuccessResponse(true, "Share link revoked successfully");
     }
 
@@ -122,6 +133,10 @@ public class ExamShareService : IExamShareService
 
     public async Task<ApiResponse<PublicExamInfoDto>> GetExamByShareTokenAsync(string shareToken)
     {
+        var cacheKey = CacheKeys.ShareByToken(shareToken);
+        if (_cache.TryGet<PublicExamInfoDto>(cacheKey, out var cachedInfo) && cachedInfo != null)
+            return ApiResponse<PublicExamInfoDto>.SuccessResponse(cachedInfo);
+
         var link = await ValidateShareTokenAsync(shareToken);
         if (link == null)
             return ApiResponse<PublicExamInfoDto>.FailureResponse("Invalid or expired share link");
@@ -132,7 +147,7 @@ public class ExamShareService : IExamShareService
         var org = await _context.OrganizationSettings
             .FirstOrDefaultAsync(o => o.IsActive);
 
-        return ApiResponse<PublicExamInfoDto>.SuccessResponse(new PublicExamInfoDto
+        var examInfo = new PublicExamInfoDto
         {
             ExamId = exam.Id,
             TitleEn = exam.TitleEn,
@@ -144,7 +159,9 @@ public class ExamShareService : IExamShareService
             ExpiresAt = link.ExpiresAt,
             OrganizationName = org?.Name,
             OrganizationLogoUrl = org?.LogoPath
-        });
+        };
+        _cache.Set(cacheKey, examInfo, CacheKeys.Thirty);
+        return ApiResponse<PublicExamInfoDto>.SuccessResponse(examInfo);
     }
 
     public async Task<ApiResponse<List<ShareCandidateDto>>> GetCandidatesByShareTokenAsync(

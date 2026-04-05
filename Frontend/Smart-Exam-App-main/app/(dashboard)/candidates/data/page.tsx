@@ -49,7 +49,7 @@ export default function CandidatesDataPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [page, setPage] = useState(1)
-  const [pageSize] = useState(20)
+  const [pageSize, setPageSize] = useState(10)
 
   // ── Dialog state ───────────────────────────────────────────
   const [formOpen, setFormOpen] = useState(false)
@@ -94,6 +94,11 @@ export default function CandidatesDataPage() {
       setLoading(false)
     }
   }, [search, statusFilter, page, pageSize])
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value))
+    setPage(1)
+  }
 
   useEffect(() => { loadCandidates() }, [loadCandidates])
 
@@ -434,13 +439,26 @@ export default function CandidatesDataPage() {
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
+              {totalCount > 0 && (
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    {isAr
-                      ? `عرض ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, totalCount)} من ${totalCount}`
-                      : `Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, totalCount)} of ${totalCount}`}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      {isAr
+                        ? `عرض ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, totalCount)} من ${totalCount}`
+                        : `Showing ${(page - 1) * pageSize + 1}-${Math.min(page * pageSize, totalCount)} of ${totalCount}`}
+                    </p>
+                    <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                      <SelectTrigger className="h-8 w-[70px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
                       <ChevronLeft className="h-4 w-4" />

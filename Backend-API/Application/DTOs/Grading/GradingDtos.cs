@@ -44,6 +44,7 @@ public class GradingSessionListDto
     public string ExamTitleAr { get; set; } = string.Empty;
     public string CandidateId { get; set; } = string.Empty;
     public string CandidateName { get; set; } = string.Empty;
+    public string? CandidateRollNo { get; set; }
     public GradingStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public decimal? TotalScore { get; set; }

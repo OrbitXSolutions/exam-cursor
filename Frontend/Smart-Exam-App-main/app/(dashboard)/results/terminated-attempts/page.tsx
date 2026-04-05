@@ -49,6 +49,7 @@ import {
 } from "lucide-react"
 
 const ALL_EXAMS_VALUE = "__all__"
+const STATUS_ALL = "all"
 
 function formatDateTime(dateStr: string | undefined | null, lang: string): string {
   if (!dateStr) return "—"
@@ -79,6 +80,10 @@ export default function TerminatedAttemptsPage() {
   const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [terminationStatus, setTerminationStatus] = useState(STATUS_ALL)
 
   // Allow New Attempt dialog
   const [newAttemptOpen, setNewAttemptOpen] = useState(false)
@@ -104,41 +109,45 @@ export default function TerminatedAttemptsPage() {
     return () => { cancelled = true }
   }, [])
 
-  // Load candidates
+  // Load candidates (server-side filtered: onlyTerminated=true)
   useEffect(() => {
     let cancelled = false
     setLoadingData(true)
     const examIdParam = selectedExamId !== ALL_EXAMS_VALUE ? Number(selectedExamId) : undefined
 
-    getCandidateResultList(examIdParam, { pageNumber: 1, pageSize: 500 })
+    getCandidateResultList(examIdParam, {
+      pageNumber: currentPage,
+      pageSize,
+      onlyTerminated: true,
+      statusFilter: terminationStatus !== STATUS_ALL ? terminationStatus : undefined,
+    })
       .then((res) => {
         if (!cancelled) {
           setAllCandidates(res?.items ?? [])
+          setTotalCount(res?.totalCount ?? 0)
         }
       })
-      .catch(() => { if (!cancelled) setAllCandidates([]) })
+      .catch(() => { if (!cancelled) { setAllCandidates([]); setTotalCount(0) } })
       .finally(() => { if (!cancelled) setLoadingData(false) })
 
     return () => { cancelled = true }
-  }, [selectedExamId, refreshKey])
+  }, [selectedExamId, refreshKey, currentPage, pageSize, terminationStatus])
 
-  // Filter to only terminated/force-submitted/expired
-  const terminatedAttempts = useMemo(() => {
-    return allCandidates.filter(
-      (c) => c.attemptStatusName === "Terminated" || c.attemptStatusName === "ForceSubmitted" || c.attemptStatusName === "Expired"
-    )
-  }, [allCandidates])
-
-  // Search filter
+  // Search filter (status filtering done server-side with onlyTerminated=true)
   const filteredAttempts = useMemo(() => {
-    if (!searchQuery.trim()) return terminatedAttempts
+    if (!searchQuery.trim()) return allCandidates
     const q = searchQuery.trim().toLowerCase()
-    return terminatedAttempts.filter(
+    return allCandidates.filter(
       (row) =>
         (row.candidateName ?? "").toLowerCase().includes(q) ||
         (row.candidateEmail ?? "").toLowerCase().includes(q)
     )
-  }, [terminatedAttempts, searchQuery])
+  }, [allCandidates, searchQuery])
+
+  const handleExamChange = (v: string) => { setSelectedExamId(v); setCurrentPage(1) }
+  const handleSearchChange = (v: string) => { setSearchQuery(v); setCurrentPage(1) }
+  const handlePageSizeChange = (v: string) => { setPageSize(Number(v)); setCurrentPage(1) }
+  const handleStatusFilterChange = (v: string) => { setTerminationStatus(v); setCurrentPage(1) }
 
   const getExamTitle = (exam: ExamDropdownItem) =>
     (isAr ? exam.titleAr : exam.titleEn) || ""
@@ -265,52 +274,8 @@ export default function TerminatedAttemptsPage() {
         </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">
-            {isAr ? "الاختبار" : "Exam"}
-          </Label>
-          <div className="flex items-center gap-2">
-            <Select value={selectedExamId} onValueChange={(v) => v && setSelectedExamId(v)}>
-              <SelectTrigger className="w-[260px]">
-                <SelectValue placeholder={isAr ? "اختر اختباراً" : "Select exam"} />
-              </SelectTrigger>
-              <SelectContent position="popper" sideOffset={4}>
-                <SelectItem value={ALL_EXAMS_VALUE}>
-                  {isAr ? "جميع الاختبارات" : "All exams"}
-                </SelectItem>
-                {exams.map((exam) => (
-                  <SelectItem key={exam.id} value={String(exam.id)}>
-                    {getExamTitle(exam)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="button" variant="outline" size="icon" onClick={reload}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">
-            {isAr ? "بحث" : "Search"}
-          </Label>
-          <div className="relative w-[260px]">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={isAr ? "الاسم أو البريد الإلكتروني..." : "Name or email..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="flex items-center gap-4 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900">
@@ -318,25 +283,10 @@ export default function TerminatedAttemptsPage() {
             </div>
             <div>
               <p className="text-xl font-bold">
-                {terminatedAttempts.filter((a) => a.attemptStatusName === "Terminated").length}
+                {allCandidates.filter((a) => a.attemptStatusName === "Terminated").length}
               </p>
               <p className="text-xs text-muted-foreground">
                 {isAr ? "أُنهي بواسطة المراقب" : "Terminated by Proctor"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900">
-              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-300" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">
-                {terminatedAttempts.filter((a) => a.attemptStatusName === "ForceSubmitted").length}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isAr ? "أُنهي قسراً بواسطة المشرف" : "Force Ended by Admin"}
               </p>
             </div>
           </CardContent>
@@ -348,7 +298,7 @@ export default function TerminatedAttemptsPage() {
             </div>
             <div>
               <p className="text-xl font-bold">
-                {terminatedAttempts.filter((a) => a.attemptStatusName === "Expired").length}
+                {allCandidates.filter((a) => a.attemptStatusName === "Expired").length}
               </p>
               <p className="text-xs text-muted-foreground">
                 {isAr ? "منتهي الصلاحية" : "Expired"}
@@ -362,7 +312,7 @@ export default function TerminatedAttemptsPage() {
               <ShieldAlert className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </div>
             <div>
-              <p className="text-xl font-bold">{filteredAttempts.length}</p>
+              <p className="text-xl font-bold">{totalCount}</p>
               <p className="text-xs text-muted-foreground">
                 {isAr ? "إجمالي المحاولات المُنهاة" : "Total Terminated"}
               </p>
@@ -372,23 +322,67 @@ export default function TerminatedAttemptsPage() {
       </div>
 
       {/* Table */}
-      {loadingData ? (
-        <div className="flex min-h-[200px] items-center justify-center">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : filteredAttempts.length === 0 ? (
-        <EmptyState
-          icon={ShieldAlert}
-          title={isAr ? "لا توجد محاولات مُنهاة" : "No terminated attempts"}
-          description={
-            isAr
-              ? "لم يتم إنهاء أي محاولة بواسطة المراقب أو المشرف"
-              : "No attempts have been terminated by proctor or admin"
-          }
-        />
-      ) : (
-        <Card>
-          <CardContent className="p-0">
+      <Card>
+        <CardContent className="p-4 border-b">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{isAr ? "الاختبار" : "Exam"}</Label>
+              <div className="flex items-center gap-2">
+                <Select value={selectedExamId} onValueChange={(v) => v && handleExamChange(v)}>
+                  <SelectTrigger className="w-[220px]">
+                    <SelectValue placeholder={isAr ? "اختر اختباراً" : "Select exam"} />
+                  </SelectTrigger>
+                  <SelectContent position="popper" sideOffset={4}>
+                    <SelectItem value={ALL_EXAMS_VALUE}>{isAr ? "جميع الاختبارات" : "All exams"}</SelectItem>
+                    {exams.map((exam) => (
+                      <SelectItem key={exam.id} value={String(exam.id)}>{getExamTitle(exam)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button type="button" variant="outline" size="icon" onClick={reload}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{isAr ? "الحالة" : "Status"}</Label>
+              <Select value={terminationStatus} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4}>
+                  <SelectItem value={STATUS_ALL}>{isAr ? "الكل" : "All"}</SelectItem>
+                  <SelectItem value="Terminated">{isAr ? "أُنهي بواسطة المراقب" : "Terminated"}</SelectItem>
+                  <SelectItem value="Expired">{isAr ? "منتهي الصلاحية" : "Expired"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label className="text-sm font-medium">{isAr ? "بحث" : "Search"}</Label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder={isAr ? "الاسم أو البريد الإلكتروني..." : "Name or email..."}
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+        <CardContent className="p-0">
+          {loadingData ? (
+            <div className="flex min-h-[200px] items-center justify-center">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : filteredAttempts.length === 0 ? (
+            <EmptyState
+              icon={ShieldAlert}
+              title={isAr ? "لا توجد محاولات مُنهاة" : "No terminated attempts"}
+              description={isAr ? "لا توجد نتائج تطابق الفلاتر" : "No results match your filters"}
+            />
+          ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -413,8 +407,8 @@ export default function TerminatedAttemptsPage() {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">{row.candidateName}</span>
-                            {row.candidateEmail && (
-                              <span className="text-xs text-muted-foreground">{row.candidateEmail}</span>
+                            {row.candidateRollNo && (
+                              <span className="text-xs text-muted-foreground">{row.candidateRollNo}</span>
                             )}
                           </div>
                         </TableCell>
@@ -492,9 +486,39 @@ export default function TerminatedAttemptsPage() {
                 </TableBody>
               </Table>
             </div>
+          )}
+        </CardContent>
+        {filteredAttempts.length > 0 && (
+          <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{isAr ? "عرض" : "Show"}</span>
+              <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                <SelectTrigger className="h-8 w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>{isAr ? "سجل لكل صفحة" : "records per page"}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground me-2">
+                {isAr
+                  ? `صفحة ${currentPage} من ${Math.ceil(totalCount / pageSize) || 1}`
+                  : `Page ${currentPage} of ${Math.ceil(totalCount / pageSize) || 1}`}
+              </span>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹</Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.min(Math.ceil(totalCount / pageSize), p + 1))} disabled={currentPage >= Math.ceil(totalCount / pageSize)}>›</Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(Math.ceil(totalCount / pageSize))} disabled={currentPage >= Math.ceil(totalCount / pageSize)}>»</Button>
+            </div>
           </CardContent>
-        </Card>
-      )}
+        )}
+      </Card>
 
       {/* Termination Reason Dialog */}
       <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>

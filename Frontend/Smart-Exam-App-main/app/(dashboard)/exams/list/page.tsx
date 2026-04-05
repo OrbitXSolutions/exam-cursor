@@ -56,6 +56,8 @@ import {
   Mail,
   Loader2,
   Share2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { ExamShareDialog } from "@/components/exam/exam-share-dialog"
 
@@ -75,6 +77,10 @@ export default function ExamsListPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [examToDelete, setExamToDelete] = useState<Exam | null>(null)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
@@ -91,20 +97,48 @@ export default function ExamsListPage() {
   const [shareExam, setShareExam] = useState<Exam | null>(null)
 
   useEffect(() => {
-    fetchExams()
-  }, [])
+    fetchExams(currentPage, pageSize, statusFilter, searchQuery)
+  }, [currentPage, pageSize, statusFilter, searchQuery])
 
-  async function fetchExams() {
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value))
+    setCurrentPage(1)
+  }
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value)
+    setCurrentPage(1)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  function getStatusParams(status: string): { isActive?: boolean; isPublished?: boolean } {
+    if (status === "Draft") return { isActive: true, isPublished: false }
+    if (status === "Published") return { isPublished: true }
+    if (status === "Archived") return { isActive: false }
+    return {}
+  }
+
+  async function fetchExams(page = currentPage, size = pageSize, status = statusFilter, search = searchQuery) {
     try {
       setLoading(true)
-      const response = await getExams()
-      if (response?.items && Array.isArray(response.items)) {
-        setExams(response.items)
-      } else {
-        setExams([])
-      }
+      const statusParams = getStatusParams(status)
+      const response = await getExams({
+        pageNumber: page,
+        pageSize: size,
+        search: search || undefined,
+        ...statusParams,
+      })
+      setExams(response?.items ?? [])
+      setTotalCount(response?.totalCount ?? 0)
+      setTotalPages(response?.totalPages ?? 0)
     } catch {
       setExams([])
+      setTotalCount(0)
+      setTotalPages(0)
     } finally {
       setLoading(false)
     }
@@ -183,14 +217,7 @@ export default function ExamsListPage() {
     }
   }
 
-  const filteredExams = exams.filter((exam) => {
-    const title = getExamTitle(exam, language) || ""
-    const status = getExamStatus(exam)
-
-    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  const filteredExams = exams
 
   if (loading) {
     return (
@@ -237,11 +264,10 @@ export default function ExamsListPage() {
               <Input
                 placeholder={t("common.search") || "Search..."}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-9"
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={t("common.status") || "Status"} />
               </SelectTrigger>
@@ -442,6 +468,38 @@ export default function ExamsListPage() {
                   })}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {/* Pagination */}
+          {totalCount > 0 && (
+            <div className="flex items-center justify-between p-4 border-t">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? `عرض ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} من ${totalCount}`
+                    : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
+                </p>
+                <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
+                <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

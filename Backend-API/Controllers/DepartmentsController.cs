@@ -14,25 +14,29 @@ public class DepartmentsController : ControllerBase
     private readonly IDepartmentService _departmentService;
 
     public DepartmentsController(IDepartmentService departmentService)
- {
+    {
         _departmentService = departmentService;
     }
 
     /// <summary>
     /// Get all departments
     /// </summary>
-[HttpGet]
+    [HttpGet]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
-    public async Task<IActionResult> GetAll([FromQuery] bool includeInactive = false)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search = null,
+        [FromQuery] bool includeInactive = false,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var result = await _departmentService.GetAllAsync(includeInactive);
-      return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _departmentService.GetAllAsync(search, includeInactive, pageNumber, pageSize);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
-  /// <summary>
+    /// <summary>
     /// Get department by ID
     /// </summary>
- [HttpGet("{id}")]
+    [HttpGet("{id}")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -40,15 +44,15 @@ public class DepartmentsController : ControllerBase
         return result.Success ? Ok(result) : NotFound(result);
     }
 
- /// <summary>
+    /// <summary>
     /// Create a new department
     /// </summary>
     [HttpPost]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> Create([FromBody] CreateDepartmentRequest request)
- {
+    {
         var result = await _departmentService.CreateAsync(request);
-        return result.Success 
+        return result.Success
    ? CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result)
         : BadRequest(result);
     }
@@ -59,9 +63,9 @@ public class DepartmentsController : ControllerBase
     [HttpPut("{id}")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateDepartmentRequest request)
-{
- var result = await _departmentService.UpdateAsync(id, request);
-  return result.Success ? Ok(result) : BadRequest(result);
+    {
+        var result = await _departmentService.UpdateAsync(id, request);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -71,35 +75,35 @@ public class DepartmentsController : ControllerBase
     [Authorize(Roles = AppRoles.SuperDev)]
     public async Task<IActionResult> Delete(int id)
     {
-  var result = await _departmentService.DeleteAsync(id);
-  return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _departmentService.DeleteAsync(id);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Activate a department
     /// </summary>
     [HttpPost("{id}/activate")]
- [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> Activate(int id)
     {
-     var result = await _departmentService.ActivateAsync(id);
+        var result = await _departmentService.ActivateAsync(id);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Deactivate a department
     /// </summary>
     [HttpPost("{id}/deactivate")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
-  public async Task<IActionResult> Deactivate(int id)
-  {
+    public async Task<IActionResult> Deactivate(int id)
+    {
         var result = await _departmentService.DeactivateAsync(id);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Assign a user to a department
- /// </summary>
+    /// </summary>
     [HttpPost("assign-user")]
     [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> AssignUser([FromBody] AssignUserToDepartmentRequest request)
@@ -112,7 +116,7 @@ public class DepartmentsController : ControllerBase
     /// Remove a user from their department
     /// </summary>
     [HttpPost("remove-user/{userId}")]
- [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> RemoveUser(string userId)
     {
         var result = await _departmentService.RemoveUserFromDepartmentAsync(userId);
@@ -122,12 +126,12 @@ public class DepartmentsController : ControllerBase
     /// <summary>
     /// Get all users in a department
     /// </summary>
-[HttpGet("{id}/users")]
- [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [HttpGet("{id}/users")]
+    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
     public async Task<IActionResult> GetDepartmentUsers(int id)
-{
+    {
         var result = await _departmentService.GetUsersByDepartmentAsync(id);
-      return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -148,6 +152,6 @@ public class DepartmentsController : ControllerBase
     public async Task<IActionResult> GetMyDepartment()
     {
         var result = await _departmentService.GetUserDepartmentAsync(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "");
-   return result.Success ? Ok(result) : NotFound(result);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 }

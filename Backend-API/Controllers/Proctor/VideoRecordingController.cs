@@ -105,7 +105,7 @@ public class VideoRecordingController : ControllerBase
     /// </summary>
     [HttpPost("video-chunk/{attemptId}")]
     [RequestSizeLimit(10 * 1024 * 1024)] // 10MB per chunk max
-    public async Task<IActionResult> UploadVideoChunk(int attemptId, IFormFile chunk, [FromForm] int chunkIndex, [FromForm] long? timestamp)
+    public async Task<IActionResult> UploadVideoChunk(int attemptId, IFormFile chunk, [FromForm] int chunkIndex, [FromForm] long? timestamp, [FromForm] string? mimeType = null)
     {
         // Feature flag check
         if (!await IsVideoRecordingEnabled())
@@ -136,6 +136,14 @@ public class VideoRecordingController : ControllerBase
             await using (var stream = new FileStream(chunkPath, FileMode.Create, FileAccess.Write))
             {
                 await chunk.CopyToAsync(stream);
+            }
+
+            // Persist the recording mimeType alongside the chunks so playback is deterministic
+            if (chunkIndex == 0 && !string.IsNullOrWhiteSpace(mimeType))
+            {
+                var metadataPath = Path.Combine(chunkDir, "metadata.json");
+                await System.IO.File.WriteAllTextAsync(metadataPath,
+                    System.Text.Json.JsonSerializer.Serialize(new { mimeType }));
             }
 
             _logger.LogDebug("Video chunk {ChunkIndex} saved for attempt {AttemptId} ({Size}KB)",
@@ -442,6 +450,21 @@ public class VideoRecordingController : ControllerBase
                 };
             }).ToList();
 
+            // Read stored mimeType from metadata.json if available (written on first chunk upload)
+            string? storedMimeType = null;
+            var metadataPath = Path.Combine(chunkDir, "metadata.json");
+            if (System.IO.File.Exists(metadataPath))
+            {
+                try
+                {
+                    var json = System.IO.File.ReadAllText(metadataPath);
+                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("mimeType", out var mt))
+                        storedMimeType = mt.GetString();
+                }
+                catch { }
+            }
+
             return Ok(ApiResponse<object>.SuccessResponse(new
             {
                 attemptId,
@@ -449,6 +472,7 @@ public class VideoRecordingController : ControllerBase
                 totalSizeBytes = chunks.Sum(c => c.sizeBytes),
                 chunkDurationMs = 3000,
                 chunks,
+                mimeType = storedMimeType,
             }));
         }
         catch (Exception ex)

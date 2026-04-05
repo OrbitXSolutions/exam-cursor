@@ -101,31 +101,44 @@ public class DepartmentService : IDepartmentService
         return ApiResponse<DepartmentResponse>.SuccessResponse(MapToResponse(department, userCount));
     }
 
-    public async Task<ApiResponse<List<DepartmentListResponse>>> GetAllAsync(bool includeInactive = false)
+    public async Task<ApiResponse<PaginatedResponse<DepartmentListResponse>>> GetAllAsync(string? search = null, bool includeInactive = false, int pageNumber = 1, int pageSize = 10)
     {
-        var cacheKey = includeInactive ? CacheKeys.DepartmentsAllInactive : CacheKeys.DepartmentsAll;
+        var query = _context.Departments.AsQueryable();
 
-        var departments = await _cache.GetOrCreateAsync(cacheKey, async () =>
+        if (!includeInactive)
+            query = query.Where(d => d.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(search))
         {
-            var query = _context.Departments.AsQueryable();
+            var s = search.ToLower();
+            query = query.Where(d => d.NameEn.ToLower().Contains(s) || d.NameAr.Contains(s) || (d.Code != null && d.Code.ToLower().Contains(s)));
+        }
 
-            if (!includeInactive)
-                query = query.Where(d => d.IsActive);
+        query = query.OrderBy(d => d.NameEn);
 
-            return await query
-                .OrderBy(d => d.NameEn)
-                .Select(d => new DepartmentListResponse(
-                    d.Id,
-                    d.NameEn,
-                    d.NameAr,
-                    d.Code,
-                    d.IsActive,
-                    d.Users.Count(u => !u.IsDeleted)
-                ))
-                .ToListAsync();
-        }, CacheKeys.Medium);
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(d => new DepartmentListResponse(
+                d.Id,
+                d.NameEn,
+                d.NameAr,
+                d.Code,
+                d.IsActive,
+                d.Users.Count(u => !u.IsDeleted)
+            ))
+            .ToListAsync();
 
-        return ApiResponse<List<DepartmentListResponse>>.SuccessResponse(departments);
+        var response = new PaginatedResponse<DepartmentListResponse>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+
+        return ApiResponse<PaginatedResponse<DepartmentListResponse>>.SuccessResponse(response);
     }
 
     public async Task<ApiResponse<DepartmentResponse>> UpdateAsync(int id, UpdateDepartmentRequest request)
@@ -363,7 +376,7 @@ public class DepartmentService : IDepartmentService
             .Select(u => u.DepartmentId)
             .FirstOrDefaultAsync();
 
-        _cache.Set(cacheKey, deptId, CacheKeys.Medium);
+        _cache.Set(cacheKey, deptId, CacheKeys.VeryLong);
         return deptId;
     }
 

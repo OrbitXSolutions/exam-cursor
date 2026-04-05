@@ -30,8 +30,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Plus, Search, MoreHorizontal, Edit, Trash2, Building2, Loader2, Power, PowerOff, Users } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Edit, Trash2, Building2, Loader2, Power, PowerOff, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   getDepartments,
   createDepartment,
@@ -49,6 +50,10 @@ function DepartmentsContent() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [showInactive, setShowInactive] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -71,18 +76,35 @@ function DepartmentsContent() {
 
   useEffect(() => {
     loadDepartments()
-  }, [showInactive])
+  }, [currentPage, pageSize, searchQuery, showInactive])
 
   const loadDepartments = async () => {
     setLoading(true)
     try {
-      const result = await getDepartments(showInactive)
-      setDepartments(result || [])
+      const result = await getDepartments({
+        includeInactive: showInactive,
+        search: searchQuery || undefined,
+        pageNumber: currentPage,
+        pageSize,
+      })
+      setDepartments(result.items || [])
+      setTotalCount(result.totalCount || 0)
+      setTotalPages(result.totalPages || 0)
     } catch (error) {
       toast.error(language === "ar" ? "فشل تحميل الأقسام" : "Failed to load departments")
     } finally {
       setLoading(false)
     }
+  }
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value))
+    setCurrentPage(1)
+  }
+
+  const handleShowInactiveChange = (checked: boolean) => {
+    setShowInactive(checked)
+    setCurrentPage(1)
   }
 
   const handleCreate = () => {
@@ -136,7 +158,7 @@ function DepartmentsContent() {
         toast.success(language === "ar" ? "تم تحديث القسم بنجاح" : "Department updated successfully")
       }
       setDialogOpen(false)
-      await loadDepartments()
+          loadDepartments()
     } catch (error: any) {
       toast.error(error?.message || (language === "ar" ? "حدث خطأ" : "An error occurred"))
     } finally {
@@ -153,7 +175,7 @@ function DepartmentsContent() {
       toast.success(language === "ar" ? "تم حذف القسم بنجاح" : "Department deleted successfully")
       setDeleteDialogOpen(false)
       setDepartmentToDelete(null)
-      await loadDepartments()
+      loadDepartments()
     } catch (error: any) {
       toast.error(error?.message || (language === "ar" ? "فشل حذف القسم" : "Failed to delete department"))
     } finally {
@@ -170,21 +192,11 @@ function DepartmentsContent() {
         await activateDepartment(department.id)
         toast.success(language === "ar" ? "تم تفعيل القسم" : "Department activated")
       }
-      await loadDepartments()
+      loadDepartments()
     } catch (error: any) {
       toast.error(error?.message || (language === "ar" ? "حدث خطأ" : "An error occurred"))
     }
   }
-
-  const filteredDepartments = departments.filter((dept) => {
-    if (!searchQuery) return true
-    const search = searchQuery.toLowerCase()
-    return (
-      dept.nameEn.toLowerCase().includes(search) ||
-      dept.nameAr.includes(searchQuery) ||
-      (dept.code && dept.code.toLowerCase().includes(search))
-    )
-  })
 
   return (
     <div className="flex flex-col">
@@ -203,13 +215,13 @@ function DepartmentsContent() {
             <Input
               placeholder={language === "ar" ? "بحث في الأقسام..." : "Search departments..."}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
               className="ps-10"
             />
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Switch checked={showInactive} onCheckedChange={setShowInactive} id="show-inactive" />
+              <Switch checked={showInactive} onCheckedChange={handleShowInactiveChange} id="show-inactive" />
               <Label htmlFor="show-inactive" className="text-sm cursor-pointer">
                 {language === "ar" ? "عرض المعطلة" : "Show Inactive"}
               </Label>
@@ -226,7 +238,7 @@ function DepartmentsContent() {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : filteredDepartments.length === 0 ? (
+        ) : departments.length === 0 ? (
           <EmptyState
             icon={Building2}
             title={searchQuery ? (language === "ar" ? "لا توجد نتائج" : "No departments found") : (language === "ar" ? "لا توجد أقسام" : "No departments yet")}
@@ -256,9 +268,9 @@ function DepartmentsContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredDepartments.map((department, index) => (
+                  {departments.map((department, index) => (
                     <TableRow key={department.id}>
-                      <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                      <TableCell className="text-muted-foreground">{(currentPage - 1) * pageSize + index + 1}</TableCell>
                       <TableCell className="font-medium">{department.nameEn}</TableCell>
                       <TableCell dir="rtl">{department.nameAr}</TableCell>
                       <TableCell className="text-muted-foreground">{department.code || "—"}</TableCell>
@@ -318,6 +330,38 @@ function DepartmentsContent() {
                   ))}
                 </TableBody>
               </Table>
+              {/* Pagination */}
+              {totalCount > 0 && (
+                <div className="flex items-center justify-between p-4 border-t">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      {language === "ar"
+                        ? `عرض ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} من ${totalCount}`
+                        : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
+                    </p>
+                    <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                      <SelectTrigger className="h-8 w-[70px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
+                    <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

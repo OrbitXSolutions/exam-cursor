@@ -3,7 +3,9 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.ExamOperations;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.ExamOperations;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Entities.Proctor;
@@ -16,17 +18,23 @@ public class ExamOperationsService : IExamOperationsService
 {
     private readonly ApplicationDbContext _db;
     private readonly ILogger<ExamOperationsService> _logger;
+    private readonly ICacheService _cache;
 
-    public ExamOperationsService(ApplicationDbContext db, ILogger<ExamOperationsService> logger)
+    public ExamOperationsService(ApplicationDbContext db, ILogger<ExamOperationsService> logger, ICacheService cache)
     {
         _db = db;
         _logger = logger;
+        _cache = cache;
     }
 
     // ── List candidates for exam operations ────────────────────
     public async Task<ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>> GetCandidatesAsync(
         ExamOperationsFilterDto filter)
     {
+        var cacheKey = CacheKeys.ExamOpsCandidates(filter.ExamId, JsonSerializer.Serialize(filter));
+        if (_cache.TryGet<PaginatedResponse<ExamOperationsCandidateDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>.SuccessResponse(cached);
+
         // Base: candidates who have been assigned OR have attempts for the exam
         var query = _db.Users
             .Where(u => !u.IsBlocked && !u.IsDeleted);
@@ -146,14 +154,15 @@ public class ExamOperationsService : IExamOperationsService
             };
         }).ToList();
 
-        return ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>.SuccessResponse(
-            new PaginatedResponse<ExamOperationsCandidateDto>
-            {
-                Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
-                TotalCount = totalCount
-            });
+        var pagedResult = new PaginatedResponse<ExamOperationsCandidateDto>
+        {
+            Items = items,
+            PageNumber = filter.PageNumber,
+            PageSize = filter.PageSize,
+            TotalCount = totalCount
+        };
+        _cache.Set(cacheKey, pagedResult, CacheKeys.Short);
+        return ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>.SuccessResponse(pagedResult);
     }
 
     // ── Allow New Attempt (Admin Override) ──────────────────────
@@ -249,6 +258,7 @@ public class ExamOperationsService : IExamOperationsService
             "[ExamOps] AllowNewAttempt: Admin {AdminId} granted override for Candidate {CandidateId} on Exam {ExamId}. OverrideId={OverrideId} TraceId={TraceId}",
             adminUserId, dto.CandidateId, dto.ExamId, overrideRecord.Id, traceId);
 
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
         return ApiResponse<AllowNewAttemptResultDto>.SuccessResponse(
             new AllowNewAttemptResultDto
             {
@@ -343,6 +353,7 @@ public class ExamOperationsService : IExamOperationsService
             "[ExamOps] AddTime: Admin {AdminId} added {Minutes}m to Attempt {AttemptId}. TraceId={TraceId}",
             adminUserId, dto.ExtraMinutes, attempt.Id, traceId);
 
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
         return ApiResponse<OperationAddTimeResultDto>.SuccessResponse(
             new OperationAddTimeResultDto
             {
@@ -436,6 +447,7 @@ public class ExamOperationsService : IExamOperationsService
             "[ExamOps] Terminate: Admin {AdminId} terminated Attempt {AttemptId}. TraceId={TraceId}",
             adminUserId, attempt.Id, traceId);
 
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
         return ApiResponse<TerminateAttemptResultDto>.SuccessResponse(
             new TerminateAttemptResultDto
             {
@@ -496,6 +508,7 @@ public class ExamOperationsService : IExamOperationsService
             ? Math.Max(0, (int)(attempt.ExpiresAt.Value - now).TotalSeconds)
             : 0;
 
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
         return ApiResponse<ResumeAttemptOperationResultDto>.SuccessResponse(
             new ResumeAttemptOperationResultDto
             {

@@ -14,7 +14,8 @@ import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { EmptyState } from "@/components/ui/empty-state"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Search, ClipboardCheck, Clock, User, FileText, ChevronRight, CheckCircle, BarChart3 } from "lucide-react"
+import { Search, ClipboardCheck, Clock, User, FileText, ChevronRight, CheckCircle, BarChart3, ChevronLeft } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 
 function getLocalizedField(obj: GradingSessionListItem, fieldBase: string, language: string): string {
@@ -30,34 +31,56 @@ export default function GradingPage() {
   const router = useRouter()
   const [submissions, setSubmissions] = useState<GradingSessionListItem[]>([])
   const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [examFilter, setExamFilter] = useState<string>("all")
   const [listFilter, setListFilter] = useState<ListFilter>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   useEffect(() => {
-    loadSubmissions()
-  }, [listFilter])
+    let cancelled = false
 
-  async function loadSubmissions() {
-    try {
-      setLoading(true)
-      if (listFilter === "pending") {
-        const response = await getManualGradingRequired({ pageNumber: 1, pageSize: 50 })
-        setSubmissions(response.items || [])
-        setTotalCount(response.totalCount || 0)
-      } else {
-        const response = await getGradingSessions({ pageNumber: 1, pageSize: 50 })
-        setSubmissions(response.items || [])
-        setTotalCount(response.totalCount || 0)
+    async function loadSubmissions() {
+      try {
+        setLoading(true)
+        if (listFilter === "pending") {
+          const response = await getManualGradingRequired({ pageNumber: currentPage, pageSize })
+          if (!cancelled) {
+            setSubmissions(response.items || [])
+            setTotalCount(response.totalCount || 0)
+            setTotalPages(response.totalPages || 0)
+          }
+        } else {
+          const response = await getGradingSessions({ pageNumber: currentPage, pageSize })
+          if (!cancelled) {
+            setSubmissions(response.items || [])
+            setTotalCount(response.totalCount || 0)
+            setTotalPages(response.totalPages || 0)
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to load grading list:", error)
+          setSubmissions([])
+          setTotalCount(0)
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-    } catch (error) {
-      console.error("Failed to load grading list:", error)
-      setSubmissions([])
-      setTotalCount(0)
-    } finally {
-      setLoading(false)
     }
+
+    loadSubmissions()
+
+    return () => {
+      cancelled = true
+    }
+  }, [listFilter, currentPage, pageSize])
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value))
+    setCurrentPage(1)
   }
 
   function formatDateTime(dateString: string | null) {
@@ -94,19 +117,6 @@ export default function GradingPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">{t("grading.title")}</h1>
         <p className="text-muted-foreground mt-1">{t("grading.subtitle")}</p>
-      </div>
-
-      {/* Show: Pending only | All (including completed) */}
-      <div className="flex flex-wrap items-center gap-4">
-        <Label className="text-sm font-medium">{language === "ar" ? "عرض" : "Show"}</Label>
-        <select
-          value={listFilter}
-          onChange={(e) => setListFilter(e.target.value as ListFilter)}
-          className="flex h-10 w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-        >
-          <option value="all">{language === "ar" ? "الكل (بما فيها المكتملة)" : "All (including completed)"}</option>
-          <option value="pending">{language === "ar" ? "قيد الانتظار فقط" : "Pending only"}</option>
-        </select>
       </div>
 
       {/* Stats */}
@@ -153,27 +163,44 @@ export default function GradingPage() {
       <Card>
         <CardHeader className="pb-4">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t("grading.searchPlaceholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-9"
-              />
+            <div className="flex flex-col gap-1">
+              <Label className="text-sm font-medium">{language === "ar" ? "عرض" : "Show"}</Label>
+              <select
+                value={listFilter}
+                onChange={(e) => { setListFilter(e.target.value as ListFilter); setCurrentPage(1) }}
+                className="flex h-10 w-full sm:w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="all">{language === "ar" ? "الكل (بما فيها المكتملة)" : "All (including completed)"}</option>
+                <option value="pending">{language === "ar" ? "قيد الانتظار فقط" : "Pending only"}</option>
+              </select>
             </div>
-            <select
-              value={examFilter}
-              onChange={(e) => setExamFilter(e.target.value)}
-              className="flex h-10 w-full sm:w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="all">{t("common.all")}</option>
-              {examOptions.map(([id, title]) => (
-                <option key={id} value={id}>
-                  {title}
-                </option>
-              ))}
-            </select>
+            <div className="flex flex-col gap-1">
+              <Label className="text-sm font-medium">{language === "ar" ? "تصفية حسب الاختبار" : "Filter by Exam"}</Label>
+              <select
+                value={examFilter}
+                onChange={(e) => setExamFilter(e.target.value)}
+                className="flex h-10 w-full sm:w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="all">{t("common.all")}</option>
+                {examOptions.map(([id, title]) => (
+                  <option key={id} value={id}>
+                    {title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1 flex-1">
+              <Label className="text-sm font-medium">{language === "ar" ? "بحث" : "Search"}</Label>
+              <div className="relative">
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("grading.searchPlaceholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="ps-9"
+                />
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -196,17 +223,11 @@ export default function GradingPage() {
                     <TableHead>{t("grading.exam")}</TableHead>
                     <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                     <TableHead>{t("grading.progress")}</TableHead>
-                    <TableHead>{t("grading.autoScore")}</TableHead>
-                    <TableHead>{t("grading.waiting")}</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredSubmissions.map((sub) => {
-                    const autoScore =
-                      sub.maxPossibleScore > 0 && sub.totalScore != null
-                        ? Math.round((sub.totalScore / sub.maxPossibleScore) * 100)
-                        : 0
                     const manualCount = sub.manualGradingRequired ?? 0
                     const isCompleted = sub.status === GradingStatus.Completed || sub.status === GradingStatus.AutoGraded
                     return (
@@ -218,7 +239,9 @@ export default function GradingPage() {
                             </div>
                             <div>
                               <p className="font-medium">{sub.candidateName}</p>
-                              <p className="text-sm text-muted-foreground">{sub.candidateId}</p>
+                              {sub.candidateRollNo && (
+                                <p className="text-sm text-muted-foreground">{sub.candidateRollNo}</p>
+                              )}
                             </div>
                           </div>
                         </TableCell>
@@ -256,17 +279,6 @@ export default function GradingPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="font-mono">
-                            {autoScore}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                            <Clock className="h-4 w-4" />
-                            <span>{formatDateTime(sub.gradedAt)}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
                           <div className="flex items-center gap-2">
                             {isCompleted && (
                               <Button
@@ -300,6 +312,38 @@ export default function GradingPage() {
                   })}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {/* Pagination */}
+          {totalCount > 0 && (
+            <div className="flex items-center justify-between p-4 border-t">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? `عرض ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} من ${totalCount}`
+                    : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
+                </p>
+                <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
+                <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

@@ -41,13 +41,28 @@ export interface UpdateDepartmentRequest {
   isActive: boolean;
 }
 
+export interface DepartmentPaginatedResponse {
+  items: DepartmentListItem[];
+  totalCount: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+}
+
 // Departments API
-export async function getDepartments(
-  includeInactive = false,
-): Promise<DepartmentListItem[]> {
+export async function getDepartments(params?: {
+  includeInactive?: boolean;
+  search?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}): Promise<DepartmentPaginatedResponse> {
   const queryParams = new URLSearchParams();
-  if (includeInactive) queryParams.append("includeInactive", "true");
-  const result = await apiClient.get<DepartmentListItem[]>(
+  if (params?.includeInactive) queryParams.append("includeInactive", "true");
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.pageNumber)
+    queryParams.append("pageNumber", String(params.pageNumber));
+  if (params?.pageSize) queryParams.append("pageSize", String(params.pageSize));
+  const result = await apiClient.get<DepartmentPaginatedResponse>(
     `/Departments?${queryParams.toString()}`,
   );
   return result;

@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, BookOpen, Loader2 } from "lucide-react"
@@ -44,6 +45,10 @@ function SubjectsContent() {
   const [subjects, setSubjects] = useState<QuestionSubject[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -58,20 +63,32 @@ function SubjectsContent() {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    loadSubjects()
-  }, [])
-
-  const loadSubjects = async () => {
+    let cancelled = false
     setLoading(true)
-    try {
-      const result = await getQuestionSubjects({ pageSize: 100 })
-      setSubjects(result.items || [])
-    } catch (error) {
-      toast.error(language === "ar" ? "فشل في تحميل المواد" : "Failed to load subjects")
-    } finally {
-      setLoading(false)
-    }
-  }
+    getQuestionSubjects({
+      pageNumber: currentPage,
+      pageSize,
+      search: searchQuery.trim() || undefined,
+    })
+      .then((result) => {
+        if (!cancelled) {
+          setSubjects(result.items || [])
+          setTotalCount(result.totalCount || 0)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) toast.error(language === "ar" ? "فشل في تحميل المواد" : "Failed to load subjects")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [currentPage, pageSize, searchQuery, refreshKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadSubjects = () => setRefreshKey((k) => k + 1)
+
+  const handleSearchChange = (value: string) => { setSearchQuery(value); setCurrentPage(1) }
+  const handlePageSizeChange = (value: string) => { setPageSize(Number(value)); setCurrentPage(1) }
 
   const handleCreate = () => {
     setDialogMode("create")
@@ -137,10 +154,7 @@ function SubjectsContent() {
     }
   }
 
-  const filteredSubjects = subjects.filter((subject) => {
-    const query = searchQuery.toLowerCase()
-    return subject.nameEn.toLowerCase().includes(query) || subject.nameAr.toLowerCase().includes(query)
-  })
+  const totalPages = Math.ceil(totalCount / pageSize) || 1
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -166,7 +180,7 @@ function SubjectsContent() {
                 <Input
                   placeholder={language === "ar" ? "البحث عن مادة..." : "Search subjects..."}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className={language === "ar" ? "pr-10" : "pl-10"}
                 />
               </div>
@@ -176,7 +190,7 @@ function SubjectsContent() {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
-            ) : filteredSubjects.length === 0 ? (
+            ) : subjects.length === 0 ? (
               <EmptyState
                 icon={BookOpen}
                 title={language === "ar" ? "لا توجد مواد" : "No subjects found"}
@@ -209,7 +223,7 @@ function SubjectsContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSubjects.map((subject) => (
+                  {subjects.map((subject) => (
                     <TableRow key={subject.id}>
                       <TableCell className="font-medium">{subject.nameEn}</TableCell>
                       <TableCell>{subject.nameAr}</TableCell>
@@ -242,6 +256,37 @@ function SubjectsContent() {
               </Table>
             )}
           </CardContent>
+          {/* Pagination */}
+          {totalCount > 0 && (
+            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{language === "ar" ? "عرض" : "Show"}</span>
+                <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="h-8 w-[80px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>{language === "ar" ? "سجل لكل صفحة" : "records per page"}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground me-2">
+                  {language === "ar"
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`}
+                </span>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}>›</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(totalPages)} disabled={currentPage >= totalPages}>»</Button>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Create/Edit Dialog */}

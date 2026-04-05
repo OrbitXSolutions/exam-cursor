@@ -210,41 +210,46 @@ public class LookupsService : ILookupsService
 
     public async Task<ApiResponse<PaginatedResponse<QuestionTypeDto>>> GetAllQuestionTypesAsync(QuestionTypeSearchDto searchDto)
     {
-        var query = _context.QuestionTypes.AsQueryable();
+        var cacheKey = $"{CacheKeys.QuestionTypesPrefix}{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
-        // Include deleted if requested
-        if (searchDto.IncludeDeleted)
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            query = query.IgnoreQueryFilters();
-        }
+            var query = _context.QuestionTypes.AsQueryable();
 
-        // Search filter
-        if (!string.IsNullOrWhiteSpace(searchDto.Search))
-        {
-            var search = searchDto.Search.ToLower();
-            query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
-                x.NameAr.Contains(search));
-        }
+            // Include deleted if requested
+            if (searchDto.IncludeDeleted)
+            {
+                query = query.IgnoreQueryFilters();
+            }
 
-        // Sort by newest to oldest
-        query = query.OrderByDescending(x => x.CreatedDate);
+            // Search filter
+            if (!string.IsNullOrWhiteSpace(searchDto.Search))
+            {
+                var search = searchDto.Search.ToLower();
+                query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
+                    x.NameAr.Contains(search));
+            }
 
-        // Pagination
-        var totalCount = await query.CountAsync();
-        var items = await query
-                  .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
-               .ToListAsync();
+            // Sort by newest to oldest
+            query = query.OrderByDescending(x => x.CreatedDate);
 
-        var response = new PaginatedResponse<QuestionTypeDto>
-        {
-            Items = items.Adapt<List<QuestionTypeDto>>(),
-            PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-            TotalCount = totalCount
-        };
+            // Pagination
+            var totalCount = await query.CountAsync();
+            var items = await query
+                      .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
+                .Take(searchDto.PageSize)
+                   .ToListAsync();
 
-        return ApiResponse<PaginatedResponse<QuestionTypeDto>>.SuccessResponse(response);
+            var response = new PaginatedResponse<QuestionTypeDto>
+            {
+                Items = items.Adapt<List<QuestionTypeDto>>(),
+                PageNumber = searchDto.PageNumber,
+                PageSize = searchDto.PageSize,
+                TotalCount = totalCount
+            };
+
+            return ApiResponse<PaginatedResponse<QuestionTypeDto>>.SuccessResponse(response);
+        }, CacheKeys.VeryLong);
     }
 
     public async Task<ApiResponse<QuestionTypeDto>> GetQuestionTypeByIdAsync(int id)
@@ -365,68 +370,76 @@ public class LookupsService : ILookupsService
 
     public async Task<ApiResponse<PaginatedResponse<QuestionSubjectDto>>> GetAllQuestionSubjectsAsync(QuestionSubjectSearchDto searchDto)
     {
-        var query = _context.QuestionSubjects
-            .Include(x => x.Topics)
-            .Include(x => x.Department)
-            .AsQueryable();
+        // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
+        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        int? resolvedDeptId = null;
+        if (!isSuperDev)
+            resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        // Include deleted if requested
-        if (searchDto.IncludeDeleted)
-        {
-            query = query.IgnoreQueryFilters();
-        }
+        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var cacheKey = $"{CacheKeys.SubjectsPrefix}{deptScope}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
-        // Department isolation: filter by user's department (SuperDev sees all)
-        if (!await IsCurrentUserSuperDevAsync())
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
+            var query = _context.QuestionSubjects
+                .Include(x => x.Topics)
+                .Include(x => x.Department)
+                .AsQueryable();
+
+            // Include deleted if requested
+            if (searchDto.IncludeDeleted)
             {
-                query = query.Where(x => x.DepartmentId == userDepartmentId.Value);
+                query = query.IgnoreQueryFilters();
             }
-        }
 
-        // Search filter
-        if (!string.IsNullOrWhiteSpace(searchDto.Search))
-        {
-            var search = searchDto.Search.ToLower();
-            query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
-                x.NameAr.Contains(search));
-        }
+            // Department isolation: filter by user's department (SuperDev sees all)
+            if (!isSuperDev && resolvedDeptId.HasValue)
+            {
+                query = query.Where(x => x.DepartmentId == resolvedDeptId.Value);
+            }
 
-        // Sort by newest to oldest
-        query = query.OrderByDescending(x => x.CreatedDate);
+            // Search filter
+            if (!string.IsNullOrWhiteSpace(searchDto.Search))
+            {
+                var search = searchDto.Search.ToLower();
+                query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
+                    x.NameAr.Contains(search));
+            }
 
-        // Pagination
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
-            .ToListAsync();
+            // Sort by newest to oldest
+            query = query.OrderByDescending(x => x.CreatedDate);
 
-        var dtos = items.Select(x => new QuestionSubjectDto
-        {
-            Id = x.Id,
-            NameEn = x.NameEn,
-            NameAr = x.NameAr,
-            DepartmentId = x.DepartmentId,
-            DepartmentNameEn = x.Department?.NameEn ?? string.Empty,
-            DepartmentNameAr = x.Department?.NameAr ?? string.Empty,
-            TopicsCount = x.Topics.Count(t => !t.IsDeleted),
-            CreatedDate = x.CreatedDate,
-            UpdatedDate = x.UpdatedDate,
-            IsDeleted = x.IsDeleted
-        }).ToList();
+            // Pagination
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
+                .Take(searchDto.PageSize)
+                .ToListAsync();
 
-        var response = new PaginatedResponse<QuestionSubjectDto>
-        {
-            Items = dtos,
-            PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-            TotalCount = totalCount
-        };
+            var dtos = items.Select(x => new QuestionSubjectDto
+            {
+                Id = x.Id,
+                NameEn = x.NameEn,
+                NameAr = x.NameAr,
+                DepartmentId = x.DepartmentId,
+                DepartmentNameEn = x.Department?.NameEn ?? string.Empty,
+                DepartmentNameAr = x.Department?.NameAr ?? string.Empty,
+                TopicsCount = x.Topics.Count(t => !t.IsDeleted),
+                CreatedDate = x.CreatedDate,
+                UpdatedDate = x.UpdatedDate,
+                IsDeleted = x.IsDeleted
+            }).ToList();
 
-        return ApiResponse<PaginatedResponse<QuestionSubjectDto>>.SuccessResponse(response);
+            var response = new PaginatedResponse<QuestionSubjectDto>
+            {
+                Items = dtos,
+                PageNumber = searchDto.PageNumber,
+                PageSize = searchDto.PageSize,
+                TotalCount = totalCount
+            };
+
+            return ApiResponse<PaginatedResponse<QuestionSubjectDto>>.SuccessResponse(response);
+        }, CacheKeys.VeryLong);
     }
 
     public async Task<ApiResponse<QuestionSubjectDto>> GetQuestionSubjectByIdAsync(int id)
@@ -638,72 +651,80 @@ public class LookupsService : ILookupsService
 
     public async Task<ApiResponse<PaginatedResponse<QuestionTopicDto>>> GetAllQuestionTopicsAsync(QuestionTopicSearchDto searchDto)
     {
-        var query = _context.QuestionTopics
-            .Include(x => x.Subject)
-            .AsQueryable();
+        // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
+        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        int? resolvedDeptId = null;
+        if (!isSuperDev)
+            resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        // Include deleted if requested
-        if (searchDto.IncludeDeleted)
-        {
-            query = query.IgnoreQueryFilters();
-        }
+        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var cacheKey = $"{CacheKeys.TopicsPrefix}{deptScope}:{searchDto.SubjectId}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
-        // Department isolation: filter topics via Subject.DepartmentId (SuperDev sees all)
-        if (!await IsCurrentUserSuperDevAsync())
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
+            var query = _context.QuestionTopics
+                .Include(x => x.Subject)
+                .AsQueryable();
+
+            // Include deleted if requested
+            if (searchDto.IncludeDeleted)
             {
-                query = query.Where(x => x.Subject.DepartmentId == userDepartmentId.Value);
+                query = query.IgnoreQueryFilters();
             }
-        }
 
-        // Filter by subject
-        if (searchDto.SubjectId.HasValue)
-        {
-            query = query.Where(x => x.SubjectId == searchDto.SubjectId.Value);
-        }
+            // Department isolation: filter topics via Subject.DepartmentId (SuperDev sees all)
+            if (!isSuperDev && resolvedDeptId.HasValue)
+            {
+                query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
+            }
 
-        // Search filter
-        if (!string.IsNullOrWhiteSpace(searchDto.Search))
-        {
-            var search = searchDto.Search.ToLower();
-            query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
-                x.NameAr.Contains(search));
-        }
+            // Filter by subject
+            if (searchDto.SubjectId.HasValue)
+            {
+                query = query.Where(x => x.SubjectId == searchDto.SubjectId.Value);
+            }
 
-        // Sort by newest to oldest
-        query = query.OrderByDescending(x => x.CreatedDate);
+            // Search filter
+            if (!string.IsNullOrWhiteSpace(searchDto.Search))
+            {
+                var search = searchDto.Search.ToLower();
+                query = query.Where(x => x.NameEn.ToLower().Contains(search) ||
+                    x.NameAr.Contains(search));
+            }
 
-        // Pagination
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
-            .ToListAsync();
+            // Sort by newest to oldest
+            query = query.OrderByDescending(x => x.CreatedDate);
 
-        var dtos = items.Select(x => new QuestionTopicDto
-        {
-            Id = x.Id,
-            NameEn = x.NameEn,
-            NameAr = x.NameAr,
-            SubjectId = x.SubjectId,
-            SubjectNameEn = x.Subject.NameEn,
-            SubjectNameAr = x.Subject.NameAr,
-            CreatedDate = x.CreatedDate,
-            UpdatedDate = x.UpdatedDate,
-            IsDeleted = x.IsDeleted
-        }).ToList();
+            // Pagination
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
+                .Take(searchDto.PageSize)
+                .ToListAsync();
 
-        var response = new PaginatedResponse<QuestionTopicDto>
-        {
-            Items = dtos,
-            PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-            TotalCount = totalCount
-        };
+            var dtos = items.Select(x => new QuestionTopicDto
+            {
+                Id = x.Id,
+                NameEn = x.NameEn,
+                NameAr = x.NameAr,
+                SubjectId = x.SubjectId,
+                SubjectNameEn = x.Subject.NameEn,
+                SubjectNameAr = x.Subject.NameAr,
+                CreatedDate = x.CreatedDate,
+                UpdatedDate = x.UpdatedDate,
+                IsDeleted = x.IsDeleted
+            }).ToList();
 
-        return ApiResponse<PaginatedResponse<QuestionTopicDto>>.SuccessResponse(response);
+            var response = new PaginatedResponse<QuestionTopicDto>
+            {
+                Items = dtos,
+                PageNumber = searchDto.PageNumber,
+                PageSize = searchDto.PageSize,
+                TotalCount = totalCount
+            };
+
+            return ApiResponse<PaginatedResponse<QuestionTopicDto>>.SuccessResponse(response);
+        }, CacheKeys.VeryLong);
     }
 
     public async Task<ApiResponse<QuestionTopicDto>> GetQuestionTopicByIdAsync(int id)
