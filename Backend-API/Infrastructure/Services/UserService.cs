@@ -1,5 +1,6 @@
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Auth;
 using Smart_Core.Application.DTOs.Common;
@@ -7,6 +8,7 @@ using Smart_Core.Application.DTOs.Users;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
+using Smart_Core.Infrastructure.Data;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -14,11 +16,13 @@ public class UserService : IUserService
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly ICacheService _cache;
+  private readonly ApplicationDbContext _context;
 
-  public UserService(UserManager<ApplicationUser> userManager, ICacheService cache)
+  public UserService(UserManager<ApplicationUser> userManager, ICacheService cache, ApplicationDbContext context)
   {
     _userManager = userManager;
     _cache = cache;
+    _context = context;
   }
 
   private void InvalidateUserCache()
@@ -79,7 +83,10 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter)
   {
-    var cacheKey = $"{CacheKeys.UsersPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.IsBlocked}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+    var excludeKey = filter.ExcludeRoles != null && filter.ExcludeRoles.Count > 0
+      ? string.Join(",", filter.ExcludeRoles.OrderBy(r => r).Select(r => r.ToLower()))
+      : "";
+    var cacheKey = $"{CacheKeys.UsersPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.IsBlocked}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{excludeKey}:{filter.PageNumber}:{filter.PageSize}";
     return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
       var query = _userManager.Users.Include(u => u.Department).AsQueryable();
@@ -122,6 +129,19 @@ public class UserService : IUserService
         query = query.Where(u => userIdsInRole.Contains(u.Id));
       }
 
+      // Exclude specific roles BEFORE pagination so counts are accurate
+      if (filter.ExcludeRoles != null && filter.ExcludeRoles.Count > 0)
+      {
+        var excludedUserIds = new HashSet<string>();
+        foreach (var excludeRole in filter.ExcludeRoles)
+        {
+          var usersInExcludeRole = await _userManager.GetUsersInRoleAsync(excludeRole);
+          foreach (var u in usersInExcludeRole)
+            excludedUserIds.Add(u.Id);
+        }
+        query = query.Where(u => !excludedUserIds.Contains(u.Id));
+      }
+
       var totalCount = await query.CountAsync();
 
       var users = await query
@@ -129,6 +149,78 @@ public class UserService : IUserService
      .Skip((filter.PageNumber - 1) * filter.PageSize)
    .Take(filter.PageSize)
   .ToListAsync();
+
+      var userDtos = new List<UserDto>();
+      foreach (var user in users)
+      {
+        var roles = await _userManager.GetRolesAsync(user);
+        var userDto = user.Adapt<UserDto>();
+        userDto.Roles = roles.ToList();
+        userDto.Status = user.Status.ToString();
+        userDto.DepartmentId = user.DepartmentId;
+        userDto.DepartmentNameEn = user.Department?.NameEn;
+        userDto.DepartmentNameAr = user.Department?.NameAr;
+        userDtos.Add(userDto);
+      }
+
+      return ApiResponse<PaginatedResponse<UserDto>>.SuccessResponse(new PaginatedResponse<UserDto>
+      {
+        Items = userDtos,
+        PageNumber = filter.PageNumber,
+        PageSize = filter.PageSize,
+        TotalCount = totalCount
+      });
+    }, CacheKeys.VeryLong);
+  }
+
+  public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetStaffUsersAsync(StaffUserFilterDto filter)
+  {
+    var cacheKey = $"{CacheKeys.UsersPrefix}staff:{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+    return await _cache.GetOrCreateAsync(cacheKey, async () =>
+    {
+      // Excluded roles resolved via SQL subquery — no memory loading
+      var excludedRoleNames = new[] { AppRoles.Candidate, AppRoles.SuperDev };
+      var excludedUserIds = _context.Set<Microsoft.AspNetCore.Identity.IdentityUserRole<string>>()
+        .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+        .Where(x => excludedRoleNames.Contains(x.Name))
+        .Select(x => x.UserId);
+
+      var query = _context.Users
+        .Include(u => u.Department)
+        .Where(u => !excludedUserIds.Contains(u.Id));
+
+      if (!string.IsNullOrWhiteSpace(filter.Search))
+      {
+        var search = filter.Search.ToLower();
+        query = query.Where(u =>
+          u.Email!.ToLower().Contains(search) ||
+          (u.DisplayName != null && u.DisplayName.ToLower().Contains(search)) ||
+          (u.FullName != null && u.FullName.ToLower().Contains(search)));
+      }
+
+      if (filter.Status.HasValue)
+        query = query.Where(u => u.Status == filter.Status.Value);
+
+      if (filter.DepartmentId.HasValue)
+        query = query.Where(u => u.DepartmentId == filter.DepartmentId.Value);
+
+      // Role filter: resolve to user IDs via subquery
+      if (!string.IsNullOrWhiteSpace(filter.Role))
+      {
+        var roleUserIds = _context.Set<Microsoft.AspNetCore.Identity.IdentityUserRole<string>>()
+          .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+          .Where(x => x.Name == filter.Role)
+          .Select(x => x.UserId);
+        query = query.Where(u => roleUserIds.Contains(u.Id));
+      }
+
+      var totalCount = await query.CountAsync();
+
+      var users = await query
+        .OrderByDescending(u => u.CreatedDate)
+        .Skip((filter.PageNumber - 1) * filter.PageSize)
+        .Take(filter.PageSize)
+        .ToListAsync();
 
       var userDtos = new List<UserDto>();
       foreach (var user in users)

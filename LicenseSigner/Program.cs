@@ -58,7 +58,7 @@ class Program
         Console.WriteLine();
         Console.WriteLine("Usage:");
         Console.WriteLine("  LicenseSigner generate-keys                  Generate RSA keypair");
-        Console.WriteLine("  LicenseSigner sign-license                   Sign a new license (interactive)");
+        Console.WriteLine("  LicenseSigner sign-license                   Sign a new license (interactive, explicit dates)");
         Console.WriteLine("  LicenseSigner verify-license [license.json]  Verify a license file");
         Console.WriteLine();
     }
@@ -110,16 +110,22 @@ class Program
         var graceInput = Console.ReadLine()?.Trim();
         var gracePeriodDays = string.IsNullOrEmpty(graceInput) ? 30 : int.Parse(graceInput);
 
-        Console.Write("Validity in days from now (default 365): ");
-        var daysInput = Console.ReadLine()?.Trim();
-        var validityDays = string.IsNullOrEmpty(daysInput) ? 365 : int.Parse(daysInput);
+        Console.Write("Issued Date (YYYY-MM-DD, blank = today UTC): ");
+        var issuedInput = Console.ReadLine()?.Trim();
+        var issuedAt = string.IsNullOrEmpty(issuedInput)
+            ? DateTime.UtcNow
+            : DateTime.SpecifyKind(DateTime.ParseExact(issuedInput, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTimeKind.Utc);
+
+        Console.Write("Expiry Date (YYYY-MM-DD): ");
+        var expiryInput = Console.ReadLine()?.Trim();
+        var expiresAt = DateTime.SpecifyKind(DateTime.ParseExact(expiryInput!, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTimeKind.Utc);
 
         var license = new LicenseData
         {
             CustomerName = customerName,
             LicenseType = licenseType,
-            IssuedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(validityDays),
+            IssuedAt = issuedAt,
+            ExpiresAt = expiresAt,
             GracePeriodDays = gracePeriodDays,
             MaxUsers = maxUsers,
             LicensedDomain = domain.ToLowerInvariant(),
