@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
 import type { User } from "@/lib/types"
-import { getUsers, getUserById, updateUser, deleteUser, getDepartmentsList } from "@/lib/api/admin"
+import { getUsers, getStaffUsers, getUserById, updateUser, deleteUser, getDepartmentsList } from "@/lib/api/admin"
 import type { DepartmentListItem } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -63,16 +63,38 @@ export default function UsersPage() {
   const [pageSize, setPageSize] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [globalTotalCount, setGlobalTotalCount] = useState(0)
+  const [globalActiveCount, setGlobalActiveCount] = useState(0)
+  const [globalInactiveCount, setGlobalInactiveCount] = useState(0)
+  const [globalAdminCount, setGlobalAdminCount] = useState(0)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
   useEffect(() => {
     loadUsers()
-  }, [currentPage, pageSize, roleFilter, departmentFilter])
+  }, [currentPage, pageSize, roleFilter, departmentFilter, statusFilter])
 
   useEffect(() => {
     getDepartmentsList().then(setDepartments).catch(() => setDepartments([]))
+    loadGlobalStats()
   }, [])
+
+  async function loadGlobalStats() {
+    try {
+      const [totalRes, activeRes, inactiveRes, adminRes] = await Promise.all([
+        getStaffUsers({ pageSize: 1 }),
+        getStaffUsers({ status: "active", pageSize: 1 }),
+        getStaffUsers({ status: "inactive", pageSize: 1 }),
+        getStaffUsers({ role: "Admin", pageSize: 1 }),
+      ])
+      setGlobalTotalCount(totalRes.totalCount)
+      setGlobalActiveCount(activeRes.totalCount)
+      setGlobalInactiveCount(inactiveRes.totalCount)
+      setGlobalAdminCount(adminRes.totalCount)
+    } catch {
+      // stats are non-critical
+    }
+  }
 
   // Debounce search
   useEffect(() => {
@@ -98,9 +120,10 @@ export default function UsersPage() {
   async function loadUsers() {
     setLoading(true)
     try {
-      const res = await getUsers({
+      const res = await getStaffUsers({
         search: search || undefined,
         role: roleFilter === "all" ? undefined : roleFilter,
+        status: statusFilter === "all" ? undefined : (statusFilter as "active" | "inactive"),
         departmentId: departmentFilter === "all" ? undefined : Number(departmentFilter),
         page: currentPage,
         pageSize,
@@ -117,12 +140,8 @@ export default function UsersPage() {
     }
   }
 
-  // Hide Candidate (separate page) and SuperDev from this list
-  const filteredUsers = users.filter((user) => {
-    if (user.role === "Candidate" || user.role === "SuperDev") return false
-    const matchesStatus = statusFilter === "all" || (statusFilter === "active" ? user.isActive : !user.isActive)
-    return matchesStatus
-  })
+  // Backend already excludes Candidate and SuperDev via ExcludeRoles filter
+  const filteredUsers = users
 
   async function handleDeleteUser() {
     if (!userToDelete) return
@@ -164,10 +183,10 @@ export default function UsersPage() {
   }
 
   const stats = {
-    total: totalCount,
-    active: filteredUsers.filter((u) => u.isActive).length,
-    inactive: filteredUsers.filter((u) => !u.isActive).length,
-    admins: filteredUsers.filter((u) => u.role === "Admin" || u.role === "SuperAdmin").length,
+    total: globalTotalCount,
+    active: globalActiveCount,
+    inactive: globalInactiveCount,
+    admins: globalAdminCount,
   }
 
   if (loading && users.length === 0) {
@@ -271,7 +290,7 @@ export default function UsersPage() {
                 <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1) }}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={language === "ar" ? "الحالة" : "Status"} />
               </SelectTrigger>

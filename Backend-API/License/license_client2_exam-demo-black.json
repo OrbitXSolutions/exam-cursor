@@ -1,0 +1,10 @@
+{
+  "customerName": "Client2",
+  "licenseType": "Standard",
+  "issuedAt": "2026-04-01T00:00:00Z",
+  "expiresAt": "2026-12-07T00:00:00Z",
+  "gracePeriodDays": 30,
+  "maxUsers": 0,
+  "licensedDomain": "exam-demo-black.vercel.app",
+  "signature": "YKYw5DnO8kc2ZbuQr8lZaqGoH0o92nYWFRs7PPUeD9CxFE9P89GD3Odg8Dnthr6vrPeC4ZrjnK9W12/V0zZC8Ad3rfJ+DZBTxvhEDbC18gPb5sjaX9oBSYN80kHrV6fLgEmUuqxp+ZnE3fZUoCyQgUg2bLLhePBAUt0oiJBr5Vx5V2TUpu2VXgprwaOWaQzw+YqyGZK6BLv3IyUjbcbd01vDfs6De6GNUQWFj8fHzpBp2wD+CJv3szmU5a0oHQvif0aB3OfNdjGcU70ReARdYlC+QL5jjswHv7EQLEVxcXxW6UdEGkL/w701t+DdRO2xQSjYV2pJWhDD45wr0cVAHg=="
+}
