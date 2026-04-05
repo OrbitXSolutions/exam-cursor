@@ -81,6 +81,7 @@ export default function LoginPage() {
             <Shield className="h-6 w-6" />
           </div>
           <span className="text-2xl font-bold">SmartExam</span>
+          <span className="ml-2 rounded-full bg-primary-foreground/20 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-primary-foreground">Demo V1</span>
         </Link>
 
         <div className="space-y-6">
@@ -136,6 +137,7 @@ export default function LoginPage() {
                 <Shield className="h-5 w-5" />
               </div>
               <span className="text-xl font-bold">SmartExam</span>
+              <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold tracking-wide text-primary">Demo V1</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
