@@ -168,7 +168,7 @@ export default function DashboardPage() {
   }
 
   const licenseWarningBanner = () => {
-    if (!licenseStatus || licenseStatus.state === "Active") return null
+    if (!licenseStatus || licenseStatus.stateText === "Active") return null
 
     let bgClass = ""
     let borderClass = ""
@@ -176,7 +176,7 @@ export default function DashboardPage() {
     let icon = <Info className="h-5 w-5" />
     let message = ""
 
-    switch (licenseStatus.state) {
+    switch (licenseStatus.stateText) {
       case "Warning":
         bgClass = "bg-yellow-50 dark:bg-yellow-950/30"
         borderClass = "border-yellow-300 dark:border-yellow-700"

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,17 +19,20 @@ public class ExamAssignmentService : IExamAssignmentService
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly INotificationService _notificationService;
     private readonly ILogger<ExamAssignmentService> _logger;
+    private readonly ICacheService _cache;
 
     public ExamAssignmentService(
         ApplicationDbContext db,
         RoleManager<ApplicationRole> roleManager,
         INotificationService notificationService,
-        ILogger<ExamAssignmentService> logger)
+        ILogger<ExamAssignmentService> logger,
+        ICacheService cache)
     {
         _db = db;
         _roleManager = roleManager;
         _notificationService = notificationService;
         _logger = logger;
+        _cache = cache;
     }
 
     // ── Candidate list with computed flags ─────────────────────
@@ -40,7 +44,9 @@ public class ExamAssignmentService : IExamAssignmentService
             return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.FailureResponse("ExamId is required.");
         if (filter.ScheduleFrom >= filter.ScheduleTo)
             return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.FailureResponse("ScheduleTo must be after ScheduleFrom.");
-
+        var cacheKey = CacheKeys.ExamAssignmentCandidates(filter.ExamId, JsonSerializer.Serialize(filter));
+        if (_cache.TryGet<PaginatedResponse<AssignmentCandidateDto>>(cacheKey, out var cachedPage) && cachedPage != null)
+            return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.SuccessResponse(cachedPage);
         // Get candidate role IDs
         var candidateRole = await _roleManager.FindByNameAsync(AppRoles.Candidate);
         if (candidateRole == null)
@@ -125,14 +131,15 @@ public class ExamAssignmentService : IExamAssignmentService
             ExamStarted = startedSet.Contains(u.Id),
         }).ToList();
 
-        return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.SuccessResponse(
-            new PaginatedResponse<AssignmentCandidateDto>
-            {
-                Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
-                TotalCount = totalCount
-            });
+        var page = new PaginatedResponse<AssignmentCandidateDto>
+        {
+            Items = items,
+            PageNumber = filter.PageNumber,
+            PageSize = filter.PageSize,
+            TotalCount = totalCount
+        };
+        _cache.Set(cacheKey, page, CacheKeys.Thirty);
+        return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.SuccessResponse(page);
     }
 
     // ── Assign ─────────────────────────────────────────────────
@@ -245,6 +252,7 @@ public class ExamAssignmentService : IExamAssignmentService
             }
         }
 
+        _cache.RemoveByPrefix(CacheKeys.ExamAssignmentPrefix);
         return ApiResponse<AssignmentResultDto>.SuccessResponse(result,
             $"{result.SuccessCount} candidate(s) assigned successfully.");
     }
@@ -305,6 +313,7 @@ public class ExamAssignmentService : IExamAssignmentService
         }
 
         await _db.SaveChangesAsync();
+        _cache.RemoveByPrefix(CacheKeys.ExamAssignmentPrefix);
 
         return ApiResponse<AssignmentResultDto>.SuccessResponse(result,
             $"{result.SuccessCount} candidate(s) unassigned successfully.");

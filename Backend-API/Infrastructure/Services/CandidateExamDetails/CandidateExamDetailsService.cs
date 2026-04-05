@@ -2,7 +2,9 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.CandidateExamDetails;
 using Smart_Core.Application.DTOs.Common;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.CandidateExamDetails;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 
@@ -11,18 +13,22 @@ namespace Smart_Core.Infrastructure.Services.CandidateExamDetails;
 public class CandidateExamDetailsService : ICandidateExamDetailsService
 {
     private readonly ApplicationDbContext _db;
+    private readonly ICacheService _cache;
 
-    public CandidateExamDetailsService(ApplicationDbContext db)
+    public CandidateExamDetailsService(ApplicationDbContext db, ICacheService cache)
     {
         _db = db;
+        _cache = cache;
     }
 
     // ── Main Endpoint: Get Full Exam Details ───────────────────────────────────
 
     public async Task<ApiResponse<CandidateExamDetailsDto>> GetExamDetailsAsync(
         CandidateExamDetailsQueryDto query)
-    {
-        // ── 1. Validate & fetch candidate ──
+    {        // Short TTL (2 min) — contains live data like RemainingSeconds
+        var cacheKey = CacheKeys.CandidateExamDetails(query.CandidateId, query.ExamId, query.AttemptId);
+        if (_cache.TryGet<CandidateExamDetailsDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<CandidateExamDetailsDto>.SuccessResponse(cached);        // ── 1. Validate & fetch candidate ──
         var candidate = await _db.Users
             .Where(u => u.Id == query.CandidateId)
             .Select(u => new ExamDetailsCandidateDto
@@ -335,6 +341,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
 
         dto.ResultInfo = resultInfo;
 
+        _cache.Set(cacheKey, dto, CacheKeys.Short);
         return ApiResponse<CandidateExamDetailsDto>.SuccessResponse(dto);
     }
 
@@ -343,6 +350,10 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
     public async Task<ApiResponse<List<CandidateExamBriefDto>>> GetCandidateExamsAsync(
         string candidateId)
     {
+        var cacheKey = CacheKeys.CandidateExamsList(candidateId);
+        if (_cache.TryGet<List<CandidateExamBriefDto>>(cacheKey, out var cachedList) && cachedList != null)
+            return ApiResponse<List<CandidateExamBriefDto>>.SuccessResponse(cachedList);
+
         // Validate candidate exists
         var exists = await _db.Users.AnyAsync(u => u.Id == candidateId);
         if (!exists)
@@ -382,6 +393,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
             .OrderByDescending(e => e.LastAttemptAt)
             .ToList();
 
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
         return ApiResponse<List<CandidateExamBriefDto>>.SuccessResponse(result);
     }
 

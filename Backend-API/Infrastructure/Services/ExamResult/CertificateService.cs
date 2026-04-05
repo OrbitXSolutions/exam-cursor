@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.ExamResult;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.ExamResult;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Infrastructure.Data;
 
@@ -10,11 +12,15 @@ namespace Smart_Core.Infrastructure.Services.ExamResult;
 public class CertificateService : ICertificateService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICacheService _cache;
 
-    public CertificateService(ApplicationDbContext context)
+    public CertificateService(ApplicationDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
+
+    private void InvalidateCertificateCache() => _cache.RemoveByPrefix(CacheKeys.CertificatesPrefix);
 
     public async Task<ApiResponse<CertificateDto>> CreateForResultAsync(int resultId, string userId)
     {
@@ -63,11 +69,19 @@ public class CertificateService : ICertificateService
         _context.Set<Certificate>().Add(cert);
         await _context.SaveChangesAsync();
 
+        InvalidateCertificateCache();
         return ApiResponse<CertificateDto>.SuccessResponse(MapToDto(cert));
     }
 
     public async Task<ApiResponse<CertificateDto>> GetByIdAsync(int certificateId, string? candidateId = null)
     {
+        var cacheKey = candidateId == null
+            ? CacheKeys.CertificateById(certificateId)
+            : $"{CacheKeys.CertificateById(certificateId)}:{candidateId}";
+
+        if (_cache.TryGet<CertificateDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<CertificateDto>.SuccessResponse(cached);
+
         var cert = await _context.Set<Certificate>().FirstOrDefaultAsync(c => c.Id == certificateId);
         if (cert == null)
             return ApiResponse<CertificateDto>.FailureResponse("Certificate not found");
@@ -78,11 +92,20 @@ public class CertificateService : ICertificateService
         if (cert.IsRevoked)
             return ApiResponse<CertificateDto>.FailureResponse("Certificate has been revoked");
 
-        return ApiResponse<CertificateDto>.SuccessResponse(MapToDto(cert));
+        var dto = MapToDto(cert);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<CertificateDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<CertificateDto>> GetByResultIdAsync(int resultId, string? candidateId = null)
     {
+        var cacheKey = candidateId == null
+            ? CacheKeys.CertificateByResult(resultId)
+            : $"{CacheKeys.CertificateByResult(resultId)}:{candidateId}";
+
+        if (_cache.TryGet<CertificateDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<CertificateDto>.SuccessResponse(cached);
+
         var cert = await _context.Set<Certificate>()
             .FirstOrDefaultAsync(c => c.ResultId == resultId);
 
@@ -95,11 +118,17 @@ public class CertificateService : ICertificateService
         if (cert.IsRevoked)
             return ApiResponse<CertificateDto>.FailureResponse("Certificate has been revoked");
 
-        return ApiResponse<CertificateDto>.SuccessResponse(MapToDto(cert));
+        var dto = MapToDto(cert);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<CertificateDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<CertificateDto>> GetByCodeAsync(string code)
     {
+        var cacheKey = CacheKeys.CertificateByCode(code);
+        if (_cache.TryGet<CertificateDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<CertificateDto>.SuccessResponse(cached);
+
         var cert = await _context.Set<Certificate>()
             .FirstOrDefaultAsync(c => c.CertificateCode == code);
 
@@ -109,23 +138,31 @@ public class CertificateService : ICertificateService
         if (cert.IsRevoked)
             return ApiResponse<CertificateDto>.FailureResponse("Certificate has been revoked");
 
-        return ApiResponse<CertificateDto>.SuccessResponse(MapToDto(cert));
+        var dto = MapToDto(cert);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<CertificateDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<CertificateVerificationDto>> VerifyAsync(string code)
     {
+        var cacheKey = $"certs:verify:{code}";
+        if (_cache.TryGet<CertificateVerificationDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<CertificateVerificationDto>.SuccessResponse(cached);
+
         var cert = await _context.Set<Certificate>()
             .FirstOrDefaultAsync(c => c.CertificateCode == code);
 
+        CertificateVerificationDto result;
         if (cert == null)
-            return ApiResponse<CertificateVerificationDto>.SuccessResponse(new CertificateVerificationDto
-            {
-                IsValid = false,
-                Message = "Certificate not found"
-            });
+        {
+            result = new CertificateVerificationDto { IsValid = false, Message = "Certificate not found" };
+            _cache.Set(cacheKey, result, CacheKeys.Thirty);
+            return ApiResponse<CertificateVerificationDto>.SuccessResponse(result);
+        }
 
         if (cert.IsRevoked)
-            return ApiResponse<CertificateVerificationDto>.SuccessResponse(new CertificateVerificationDto
+        {
+            result = new CertificateVerificationDto
             {
                 IsValid = false,
                 Message = "This certificate has been revoked",
@@ -135,9 +172,12 @@ public class CertificateService : ICertificateService
                 Score = cert.Score,
                 MaxScore = cert.MaxScore,
                 IssuedAt = cert.IssuedAt
-            });
+            };
+            _cache.Set(cacheKey, result, CacheKeys.Thirty);
+            return ApiResponse<CertificateVerificationDto>.SuccessResponse(result);
+        }
 
-        return ApiResponse<CertificateVerificationDto>.SuccessResponse(new CertificateVerificationDto
+        result = new CertificateVerificationDto
         {
             IsValid = true,
             Message = "Certificate is valid",
@@ -147,17 +187,25 @@ public class CertificateService : ICertificateService
             Score = cert.Score,
             MaxScore = cert.MaxScore,
             IssuedAt = cert.IssuedAt
-        });
+        };
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
+        return ApiResponse<CertificateVerificationDto>.SuccessResponse(result);
     }
 
     public async Task<ApiResponse<List<CertificateDto>>> GetMyCertificatesAsync(string candidateId)
     {
+        var cacheKey = CacheKeys.CertificatesByCandidate(candidateId);
+        if (_cache.TryGet<List<CertificateDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<List<CertificateDto>>.SuccessResponse(cached);
+
         var certs = await _context.Set<Certificate>()
             .Where(c => c.CandidateId == candidateId && !c.IsRevoked)
             .OrderByDescending(c => c.IssuedAt)
             .ToListAsync();
 
-        return ApiResponse<List<CertificateDto>>.SuccessResponse(certs.Select(MapToDto).ToList());
+        var result = certs.Select(MapToDto).ToList();
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
+        return ApiResponse<List<CertificateDto>>.SuccessResponse(result);
     }
 
     public async Task<ApiResponse<bool>> RevokeAsync(int certificateId, string reason, string userId)
@@ -174,6 +222,7 @@ public class CertificateService : ICertificateService
         cert.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
+        InvalidateCertificateCache();
         return ApiResponse<bool>.SuccessResponse(true, "Certificate revoked");
     }
 
@@ -194,6 +243,7 @@ public class CertificateService : ICertificateService
         cert.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
+        InvalidateCertificateCache();
         return ApiResponse<CertificateDto>.SuccessResponse(MapToDto(cert), "Certificate regenerated");
     }
 

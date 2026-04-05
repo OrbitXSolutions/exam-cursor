@@ -79,74 +79,78 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter)
   {
-    var query = _userManager.Users.Include(u => u.Department).AsQueryable();
-
-    if (!string.IsNullOrWhiteSpace(filter.Search))
+    var cacheKey = $"{CacheKeys.UsersPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.IsBlocked}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+    return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
-      var search = filter.Search.ToLower();
-      query = query.Where(u =>
-        u.Email!.ToLower().Contains(search) ||
-        (u.DisplayName != null && u.DisplayName.ToLower().Contains(search)) ||
-     (u.FullName != null && u.FullName.ToLower().Contains(search)));
-    }
+      var query = _userManager.Users.Include(u => u.Department).AsQueryable();
 
-    if (filter.Status.HasValue)
-    {
-      query = query.Where(u => u.Status == filter.Status.Value);
-    }
+      if (!string.IsNullOrWhiteSpace(filter.Search))
+      {
+        var search = filter.Search.ToLower();
+        query = query.Where(u =>
+          u.Email!.ToLower().Contains(search) ||
+          (u.DisplayName != null && u.DisplayName.ToLower().Contains(search)) ||
+       (u.FullName != null && u.FullName.ToLower().Contains(search)));
+      }
 
-    if (filter.IsBlocked.HasValue)
-    {
-      query = query.Where(u => u.IsBlocked == filter.IsBlocked.Value);
-    }
+      if (filter.Status.HasValue)
+      {
+        query = query.Where(u => u.Status == filter.Status.Value);
+      }
 
-    if (filter.DepartmentId.HasValue)
-    {
-      query = query.Where(u => u.DepartmentId == filter.DepartmentId.Value);
-    }
+      if (filter.IsBlocked.HasValue)
+      {
+        query = query.Where(u => u.IsBlocked == filter.IsBlocked.Value);
+      }
 
-    // Filter by role BEFORE pagination so counts and pages are accurate
-    if (!string.IsNullOrWhiteSpace(filter.Role))
-    {
-      var userIdsInRole = await _cache.GetOrCreateAsync(
-        CacheKeys.UsersInRole(filter.Role),
-        async () =>
-        {
-          var usersInRole = await _userManager.GetUsersInRoleAsync(filter.Role);
-          return usersInRole.Select(u => u.Id).ToHashSet();
-        },
-        CacheKeys.Medium);
-      query = query.Where(u => userIdsInRole.Contains(u.Id));
-    }
+      if (filter.DepartmentId.HasValue)
+      {
+        query = query.Where(u => u.DepartmentId == filter.DepartmentId.Value);
+      }
 
-    var totalCount = await query.CountAsync();
+      // Filter by role BEFORE pagination so counts and pages are accurate
+      if (!string.IsNullOrWhiteSpace(filter.Role))
+      {
+        var userIdsInRole = await _cache.GetOrCreateAsync(
+          CacheKeys.UsersInRole(filter.Role),
+          async () =>
+          {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(filter.Role);
+            return usersInRole.Select(u => u.Id).ToHashSet();
+          },
+          CacheKeys.VeryLong);
+        query = query.Where(u => userIdsInRole.Contains(u.Id));
+      }
 
-    var users = await query
-        .OrderByDescending(u => u.CreatedDate)
-   .Skip((filter.PageNumber - 1) * filter.PageSize)
- .Take(filter.PageSize)
-.ToListAsync();
+      var totalCount = await query.CountAsync();
 
-    var userDtos = new List<UserDto>();
-    foreach (var user in users)
-    {
-      var roles = await _userManager.GetRolesAsync(user);
-      var userDto = user.Adapt<UserDto>();
-      userDto.Roles = roles.ToList();
-      userDto.Status = user.Status.ToString();
-      userDto.DepartmentId = user.DepartmentId;
-      userDto.DepartmentNameEn = user.Department?.NameEn;
-      userDto.DepartmentNameAr = user.Department?.NameAr;
-      userDtos.Add(userDto);
-    }
+      var users = await query
+          .OrderByDescending(u => u.CreatedDate)
+     .Skip((filter.PageNumber - 1) * filter.PageSize)
+   .Take(filter.PageSize)
+  .ToListAsync();
 
-    return ApiResponse<PaginatedResponse<UserDto>>.SuccessResponse(new PaginatedResponse<UserDto>
-    {
-      Items = userDtos,
-      PageNumber = filter.PageNumber,
-      PageSize = filter.PageSize,
-      TotalCount = totalCount
-    });
+      var userDtos = new List<UserDto>();
+      foreach (var user in users)
+      {
+        var roles = await _userManager.GetRolesAsync(user);
+        var userDto = user.Adapt<UserDto>();
+        userDto.Roles = roles.ToList();
+        userDto.Status = user.Status.ToString();
+        userDto.DepartmentId = user.DepartmentId;
+        userDto.DepartmentNameEn = user.Department?.NameEn;
+        userDto.DepartmentNameAr = user.Department?.NameAr;
+        userDtos.Add(userDto);
+      }
+
+      return ApiResponse<PaginatedResponse<UserDto>>.SuccessResponse(new PaginatedResponse<UserDto>
+      {
+        Items = userDtos,
+        PageNumber = filter.PageNumber,
+        PageSize = filter.PageSize,
+        TotalCount = totalCount
+      });
+    }, CacheKeys.VeryLong);
   }
 
   public async Task<ApiResponse<UserDetailDto>> GetUserByIdAsync(string userId)
@@ -186,18 +190,22 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<List<UserDto>>> GetUsersByRoleAsync(string roleName)
   {
-    var users = await _userManager.GetUsersInRoleAsync(roleName);
-    var userDtos = users.Adapt<List<UserDto>>();
-
-    foreach (var userDto in userDtos)
+    var cacheKey = $"{CacheKeys.UsersPrefix}byrole:{roleName.ToLower()}";
+    return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
-      var user = users.First(u => u.Id == userDto.Id);
-      var roles = await _userManager.GetRolesAsync(user);
-      userDto.Roles = roles.ToList();
-      userDto.Status = user.Status.ToString();
-    }
+      var users = await _userManager.GetUsersInRoleAsync(roleName);
+      var userDtos = users.Adapt<List<UserDto>>();
 
-    return ApiResponse<List<UserDto>>.SuccessResponse(userDtos);
+      foreach (var userDto in userDtos)
+      {
+        var user = users.First(u => u.Id == userDto.Id);
+        var roles = await _userManager.GetRolesAsync(user);
+        userDto.Roles = roles.ToList();
+        userDto.Status = user.Status.ToString();
+      }
+
+      return ApiResponse<List<UserDto>>.SuccessResponse(userDtos);
+    }, CacheKeys.VeryLong);
   }
 
   public async Task<ApiResponse<UserDetailDto>> UpdateUserAsync(string userId, UpdateUserDto dto, string updatedBy)

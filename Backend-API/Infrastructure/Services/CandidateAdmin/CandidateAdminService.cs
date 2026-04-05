@@ -19,107 +19,119 @@ public class CandidateAdminService : ICandidateAdminService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IEncryptionService _encryption;
+    private readonly ICacheService _cache;
 
     public CandidateAdminService(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        IEncryptionService encryption)
+        IEncryptionService encryption,
+        ICacheService cache)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
         _encryption = encryption;
+        _cache = cache;
+    }
+
+    private void InvalidateCandidateCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
     }
 
     // ── List ───────────────────────────────────────────────────
     public async Task<ApiResponse<PaginatedResponse<CandidateListDto>>> GetCandidatesAsync(CandidateFilterDto filter)
     {
-        // Get all candidate user IDs
-        var candidateRole = await _roleManager.FindByNameAsync(AppRoles.Candidate);
-        if (candidateRole == null)
-            return ApiResponse<PaginatedResponse<CandidateListDto>>.SuccessResponse(
-                new PaginatedResponse<CandidateListDto>());
-
-        var candidateUserIds = await _db.UserRoles
-            .Where(ur => ur.RoleId == candidateRole.Id)
-            .Select(ur => ur.UserId)
-            .ToListAsync();
-
-        var query = _db.Users
-            .Where(u => candidateUserIds.Contains(u.Id) && !u.IsDeleted);
-
-        // Search
-        if (!string.IsNullOrWhiteSpace(filter.Search))
+        var cacheKey = $"{CacheKeys.CandidatesPrefix}admin:{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            var s = filter.Search.ToLower();
-            query = query.Where(u =>
-                (u.FullName != null && u.FullName.ToLower().Contains(s)) ||
-                (u.FullNameAr != null && u.FullNameAr.ToLower().Contains(s)) ||
-                u.Email!.ToLower().Contains(s) ||
-                (u.RollNo != null && u.RollNo.ToLower().Contains(s)) ||
-                (u.PhoneNumber != null && u.PhoneNumber.Contains(s)));
-        }
+            // Get all candidate user IDs
+            var candidateRole = await _roleManager.FindByNameAsync(AppRoles.Candidate);
+            if (candidateRole == null)
+                return ApiResponse<PaginatedResponse<CandidateListDto>>.SuccessResponse(
+                    new PaginatedResponse<CandidateListDto>());
 
-        // Status filter
-        if (!string.IsNullOrWhiteSpace(filter.Status))
-        {
-            if (filter.Status.Equals("Blocked", StringComparison.OrdinalIgnoreCase))
-                query = query.Where(u => u.IsBlocked);
-            else if (filter.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
-                query = query.Where(u => !u.IsBlocked);
-        }
+            var candidateUserIds = await _db.UserRoles
+                .Where(ur => ur.RoleId == candidateRole.Id)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
 
-        var totalCount = await query.CountAsync();
+            var query = _db.Users
+                .Where(u => candidateUserIds.Contains(u.Id) && !u.IsDeleted);
 
-        // Sort
-        query = (filter.SortBy?.ToLower(), filter.SortDir?.ToLower()) switch
-        {
-            ("fullname", "asc") => query.OrderBy(u => u.FullName),
-            ("fullname", _) => query.OrderByDescending(u => u.FullName),
-            ("email", "asc") => query.OrderBy(u => u.Email),
-            ("email", _) => query.OrderByDescending(u => u.Email),
-            ("rollno", "asc") => query.OrderBy(u => u.RollNo),
-            ("rollno", _) => query.OrderByDescending(u => u.RollNo),
-            _ => query.OrderByDescending(u => u.CreatedDate),
-        };
-
-        var users = await query
-            .Skip((filter.PageNumber - 1) * filter.PageSize)
-            .Take(filter.PageSize)
-            .ToListAsync();
-
-        // Resolve CreatedBy names in batch
-        var creatorIds = users.Where(u => u.CreatedBy != null).Select(u => u.CreatedBy!).Distinct().ToList();
-        var creators = await _db.Users
-            .Where(u => creatorIds.Contains(u.Id))
-            .Select(u => new { u.Id, u.FullName, u.Email })
-            .ToDictionaryAsync(u => u.Id);
-
-        var items = users.Select(u => new CandidateListDto
-        {
-            Id = u.Id,
-            FullName = u.FullName,
-            FullNameAr = u.FullNameAr,
-            Email = u.Email!,
-            RollNo = u.RollNo,
-            Mobile = u.PhoneNumber,
-            Status = u.IsBlocked ? "Blocked" : "Active",
-            IsBlocked = u.IsBlocked,
-            CreatedDate = u.CreatedDate,
-            CreatedBy = u.CreatedBy,
-            CreatedByName = u.CreatedBy != null && creators.TryGetValue(u.CreatedBy, out var c)
-                ? (c.FullName ?? c.Email) : null
-        }).ToList();
-
-        return ApiResponse<PaginatedResponse<CandidateListDto>>.SuccessResponse(
-            new PaginatedResponse<CandidateListDto>
+            // Search
+            if (!string.IsNullOrWhiteSpace(filter.Search))
             {
-                Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
-                TotalCount = totalCount
-            });
+                var s = filter.Search.ToLower();
+                query = query.Where(u =>
+                    (u.FullName != null && u.FullName.ToLower().Contains(s)) ||
+                    (u.FullNameAr != null && u.FullNameAr.ToLower().Contains(s)) ||
+                    u.Email!.ToLower().Contains(s) ||
+                    (u.RollNo != null && u.RollNo.ToLower().Contains(s)) ||
+                    (u.PhoneNumber != null && u.PhoneNumber.Contains(s)));
+            }
+
+            // Status filter
+            if (!string.IsNullOrWhiteSpace(filter.Status))
+            {
+                if (filter.Status.Equals("Blocked", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(u => u.IsBlocked);
+                else if (filter.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(u => !u.IsBlocked);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            // Sort
+            query = (filter.SortBy?.ToLower(), filter.SortDir?.ToLower()) switch
+            {
+                ("fullname", "asc") => query.OrderBy(u => u.FullName),
+                ("fullname", _) => query.OrderByDescending(u => u.FullName),
+                ("email", "asc") => query.OrderBy(u => u.Email),
+                ("email", _) => query.OrderByDescending(u => u.Email),
+                ("rollno", "asc") => query.OrderBy(u => u.RollNo),
+                ("rollno", _) => query.OrderByDescending(u => u.RollNo),
+                _ => query.OrderByDescending(u => u.CreatedDate),
+            };
+
+            var users = await query
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+            // Resolve CreatedBy names in batch
+            var creatorIds = users.Where(u => u.CreatedBy != null).Select(u => u.CreatedBy!).Distinct().ToList();
+            var creators = await _db.Users
+                .Where(u => creatorIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.FullName, u.Email })
+                .ToDictionaryAsync(u => u.Id);
+
+            var items = users.Select(u => new CandidateListDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                FullNameAr = u.FullNameAr,
+                Email = u.Email!,
+                RollNo = u.RollNo,
+                Mobile = u.PhoneNumber,
+                Status = u.IsBlocked ? "Blocked" : "Active",
+                IsBlocked = u.IsBlocked,
+                CreatedDate = u.CreatedDate,
+                CreatedBy = u.CreatedBy,
+                CreatedByName = u.CreatedBy != null && creators.TryGetValue(u.CreatedBy, out var c)
+                    ? (c.FullName ?? c.Email) : null
+            }).ToList();
+
+            return ApiResponse<PaginatedResponse<CandidateListDto>>.SuccessResponse(
+                new PaginatedResponse<CandidateListDto>
+                {
+                    Items = items,
+                    PageNumber = filter.PageNumber,
+                    PageSize = filter.PageSize,
+                    TotalCount = totalCount
+                });
+        }, CacheKeys.VeryLong);
     }
 
     // ── Get by ID ──────────────────────────────────────────────
@@ -183,6 +195,7 @@ public class CandidateAdminService : ICandidateAdminService
 
         await _userManager.AddToRoleAsync(user, AppRoles.Candidate);
 
+        InvalidateCandidateCache();
         return ApiResponse<CandidateListDto>.SuccessResponse(MapToDto(user), "Candidate created successfully.");
     }
 
@@ -235,6 +248,7 @@ public class CandidateAdminService : ICandidateAdminService
                     pwResult.Errors.Select(e => e.Description).ToList());
         }
 
+        InvalidateCandidateCache();
         return ApiResponse<CandidateListDto>.SuccessResponse(MapToDto(user), "Candidate updated successfully.");
     }
 
@@ -252,6 +266,7 @@ public class CandidateAdminService : ICandidateAdminService
         user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
 
+        InvalidateCandidateCache();
         return ApiResponse<bool>.SuccessResponse(true, "Candidate blocked successfully.");
     }
 
@@ -266,6 +281,7 @@ public class CandidateAdminService : ICandidateAdminService
         user.UpdatedBy = updatedBy;
         await _userManager.UpdateAsync(user);
 
+        InvalidateCandidateCache();
         return ApiResponse<bool>.SuccessResponse(true, "Candidate unblocked successfully.");
     }
 
@@ -291,6 +307,7 @@ public class CandidateAdminService : ICandidateAdminService
         user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
 
+        InvalidateCandidateCache();
         return ApiResponse<bool>.SuccessResponse(true, "Candidate deleted successfully.");
     }
 

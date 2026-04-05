@@ -19,6 +19,7 @@ export interface ChunkRecorderCallbacks {
 export class ChunkRecorder {
   private mediaRecorder: MediaRecorder | null = null;
   private stream: MediaStream | null = null;
+  private recordingMimeType: string | null = null;
   private attemptId: number;
   private callbacks: ChunkRecorderCallbacks;
   private chunkIndex = 0;
@@ -57,6 +58,7 @@ export class ChunkRecorder {
         mimeType,
         videoBitsPerSecond: 500000, // 500kbps — small file sizes
       });
+      this.recordingMimeType = this.mediaRecorder.mimeType || mimeType;
 
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
@@ -151,6 +153,10 @@ export class ChunkRecorder {
       formData.append("chunk", blob, `chunk_${chunkIndex}.webm`);
       formData.append("chunkIndex", String(chunkIndex));
       formData.append("timestamp", String(Date.now()));
+      // Include the actual recording mimeType on chunk 0 so playback can use it deterministically
+      if (chunkIndex === 0 && this.recordingMimeType) {
+        formData.append("mimeType", this.recordingMimeType);
+      }
 
       const response = await fetch(
         `/api/proxy/Proctor/video-chunk/${this.attemptId}`,

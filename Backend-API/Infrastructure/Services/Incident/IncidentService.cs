@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Audit;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Incident;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Audit;
 using Smart_Core.Application.Interfaces.Incident;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Incident;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
@@ -16,12 +18,16 @@ public class IncidentService : IIncidentService
 {
     private readonly ApplicationDbContext _context;
     private readonly IAuditService _auditService;
+    private readonly ICacheService _cache;
 
-    public IncidentService(ApplicationDbContext context, IAuditService auditService)
+    public IncidentService(ApplicationDbContext context, IAuditService auditService, ICacheService cache)
     {
         _context = context;
         _auditService = auditService;
+        _cache = cache;
     }
+
+    private void InvalidateIncidentCache() => _cache.RemoveByPrefix(CacheKeys.IncidentsPrefix);
 
     #region Case Management
 
@@ -136,6 +142,10 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> GetCaseAsync(int caseId)
     {
+        var cacheKey = CacheKeys.IncidentCaseById(caseId);
+        if (_cache.TryGet<IncidentCaseDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<IncidentCaseDto>.SuccessResponse(cached);
+
         var incidentCase = await GetCaseWithIncludesAsync(caseId);
 
         if (incidentCase == null)
@@ -143,11 +153,17 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
         }
 
-        return ApiResponse<IncidentCaseDto>.SuccessResponse(MapToCaseDto(incidentCase));
+        var dto = MapToCaseDto(incidentCase);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<IncidentCaseDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<IncidentCaseDto>> GetCaseByAttemptAsync(int attemptId)
     {
+        var cacheKey = CacheKeys.IncidentCaseByAttempt(attemptId);
+        if (_cache.TryGet<IncidentCaseDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<IncidentCaseDto>.SuccessResponse(cached);
+
         var incidentCase = await _context.Set<IncidentCase>()
      .Include(c => c.Exam)
   .Include(c => c.Attempt)
@@ -165,7 +181,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCaseDto>.FailureResponse("No incident case found for this attempt");
         }
 
-        return ApiResponse<IncidentCaseDto>.SuccessResponse(MapToCaseDto(incidentCase));
+        var dto = MapToCaseDto(incidentCase);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<IncidentCaseDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<IncidentCaseDto>> UpdateCaseAsync(UpdateIncidentCaseDto dto, string userId)
@@ -215,11 +233,16 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         await _context.SaveChangesAsync();
 
+        InvalidateIncidentCache();
         return await GetCaseAsync(incidentCase.Id);
     }
 
     public async Task<ApiResponse<PaginatedResponse<IncidentCaseListDto>>> GetCasesAsync(IncidentCaseSearchDto searchDto)
     {
+        var cacheKey = CacheKeys.IncidentCasesList(JsonSerializer.Serialize(searchDto));
+        if (_cache.TryGet<PaginatedResponse<IncidentCaseListDto>>(cacheKey, out var cachedList) && cachedList != null)
+            return ApiResponse<PaginatedResponse<IncidentCaseListDto>>.SuccessResponse(cachedList);
+
         var query = _context.Set<IncidentCase>()
              .Include(c => c.Exam)
           .Include(c => c.Candidate)
@@ -236,14 +259,15 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             .Take(searchDto.PageSize)
             .ToListAsync();
 
-        return ApiResponse<PaginatedResponse<IncidentCaseListDto>>.SuccessResponse(
-                 new PaginatedResponse<IncidentCaseListDto>
-                 {
-                     Items = items.Select(MapToCaseListDto).ToList(),
-                     PageNumber = searchDto.PageNumber,
-                     PageSize = searchDto.PageSize,
-                     TotalCount = totalCount
-                 });
+        var pagedResult = new PaginatedResponse<IncidentCaseListDto>
+        {
+            Items = items.Select(MapToCaseListDto).ToList(),
+            PageNumber = searchDto.PageNumber,
+            PageSize = searchDto.PageSize,
+            TotalCount = totalCount
+        };
+        _cache.Set(cacheKey, pagedResult, CacheKeys.Thirty);
+        return ApiResponse<PaginatedResponse<IncidentCaseListDto>>.SuccessResponse(pagedResult);
     }
 
     public async Task<ApiResponse<PaginatedResponse<IncidentCaseListDto>>> GetExamCasesAsync(
@@ -307,6 +331,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             $"?? ??????? ??? {assignee.FullName ?? assignee.UserName}",
             new { assigneeId = dto.AssigneeId, assigneeName = assignee.FullName, previousAssignee });
 
+        InvalidateIncidentCache();
         return await GetCaseAsync(incidentCase.Id);
     }
 
@@ -352,6 +377,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
         $"?? ????? ?????? ?? {oldStatus} ??? {dto.NewStatus}",
      new { oldStatus = oldStatus.ToString(), newStatus = dto.NewStatus.ToString(), reason = dto.Reason });
 
+        InvalidateIncidentCache();
         return await GetCaseAsync(incidentCase.Id);
     }
 
@@ -393,6 +419,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             $"?? ????? ??? ??????: {reason}",
       new { previousStatus = oldStatus.ToString(), reason });
 
+        InvalidateIncidentCache();
         return await GetCaseAsync(incidentCase.Id);
     }
 
@@ -444,11 +471,16 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
  "?? ??? ?????? ???????",
       new { evidenceId = dto.ProctorEvidenceId, eventId = dto.ProctorEventId });
 
+        InvalidateIncidentCache();
         return ApiResponse<IncidentEvidenceLinkDto>.SuccessResponse(MapToEvidenceLinkDto(evidenceLink));
     }
 
     public async Task<ApiResponse<List<IncidentEvidenceLinkDto>>> GetCaseEvidenceAsync(int caseId)
     {
+        var cacheKey = CacheKeys.IncidentEvidence(caseId);
+        if (_cache.TryGet<List<IncidentEvidenceLinkDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<List<IncidentEvidenceLinkDto>>.SuccessResponse(cached);
+
         var evidenceLinks = await _context.Set<IncidentEvidenceLink>()
                 .Include(e => e.ProctorEvidence)
                 .Include(e => e.ProctorEvent)
@@ -456,8 +488,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
          .OrderBy(e => e.Order)
                 .ToListAsync();
 
-        return ApiResponse<List<IncidentEvidenceLinkDto>>.SuccessResponse(
-      evidenceLinks.Select(MapToEvidenceLinkDto).ToList());
+        var result = evidenceLinks.Select(MapToEvidenceLinkDto).ToList();
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
+        return ApiResponse<List<IncidentEvidenceLinkDto>>.SuccessResponse(result);
     }
 
     public async Task<ApiResponse<bool>> RemoveEvidenceLinkAsync(int linkId, string userId)
@@ -482,6 +515,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         await _context.SaveChangesAsync();
 
+        InvalidateIncidentCache();
         return ApiResponse<bool>.SuccessResponse(true, "Evidence link removed");
     }
 
@@ -569,22 +603,29 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
     $"?? ????? ??????: {dto.Outcome}",
        new { outcome = dto.Outcome.ToString(), closeCase = dto.CloseCase });
 
+        InvalidateIncidentCache();
         return ApiResponse<IncidentDecisionHistoryDto>.SuccessResponse(MapToDecisionDto(decision));
     }
 
     public async Task<ApiResponse<List<IncidentDecisionHistoryDto>>> GetDecisionHistoryAsync(int caseId)
     {
+        var cacheKey = CacheKeys.IncidentDecisions(caseId);
+        if (_cache.TryGet<List<IncidentDecisionHistoryDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<List<IncidentDecisionHistoryDto>>.SuccessResponse(cached);
+
         var decisions = await _context.Set<IncidentDecisionHistory>()
        .Where(d => d.IncidentCaseId == caseId)
                  .OrderByDescending(d => d.DecidedAt)
                  .ToListAsync();
 
-        return ApiResponse<List<IncidentDecisionHistoryDto>>.SuccessResponse(
-            decisions.Select(MapToDecisionDto).ToList());
+        var result = decisions.Select(MapToDecisionDto).ToList();
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
+        return ApiResponse<List<IncidentDecisionHistoryDto>>.SuccessResponse(result);
     }
 
     public async Task<ApiResponse<IncidentDecisionHistoryDto>> GetLatestDecisionAsync(int caseId)
     {
+        // Latest decision is covered by the full decisions list cache; skip per-item cache
         var decision = await _context.Set<IncidentDecisionHistory>()
            .Where(d => d.IncidentCaseId == caseId)
         .OrderByDescending(d => d.DecidedAt)
@@ -634,6 +675,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
      "?? ????? ?????",
          new { commentId = comment.Id, isVisibleToCandidate = dto.IsVisibleToCandidate });
 
+        InvalidateIncidentCache();
         return ApiResponse<IncidentCommentDto>.SuccessResponse(MapToCommentDto(comment));
     }
 
@@ -661,6 +703,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         await _context.SaveChangesAsync();
 
+        InvalidateIncidentCache();
         return ApiResponse<IncidentCommentDto>.SuccessResponse(MapToCommentDto(comment));
     }
 
@@ -680,11 +723,16 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         await _context.SaveChangesAsync();
 
+        InvalidateIncidentCache();
         return ApiResponse<bool>.SuccessResponse(true, "Comment deleted");
     }
 
     public async Task<ApiResponse<List<IncidentCommentDto>>> GetCommentsAsync(int caseId, bool includeInternal = true)
     {
+        var cacheKey = CacheKeys.IncidentComments(caseId) + (includeInternal ? ":all" : ":public");
+        if (_cache.TryGet<List<IncidentCommentDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<List<IncidentCommentDto>>.SuccessResponse(cached);
+
         var query = _context.Set<IncidentComment>()
             .Where(c => c.IncidentCaseId == caseId);
 
@@ -697,8 +745,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             .OrderBy(c => c.CreatedDate)
             .ToListAsync();
 
-        return ApiResponse<List<IncidentCommentDto>>.SuccessResponse(
-            comments.Select(MapToCommentDto).ToList());
+        var result = comments.Select(MapToCommentDto).ToList();
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
+        return ApiResponse<List<IncidentCommentDto>>.SuccessResponse(result);
     }
 
     #endregion

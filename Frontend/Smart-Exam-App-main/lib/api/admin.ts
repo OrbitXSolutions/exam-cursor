@@ -41,7 +41,7 @@ export async function getUsers(params?: {
   departmentId?: number;
   page?: number;
   pageSize?: number;
-}): Promise<{ items: User[]; totalCount: number }> {
+}): Promise<{ items: User[]; totalCount: number; totalPages: number }> {
   try {
     const query = new URLSearchParams();
     query.set("PageNumber", String(params?.page ?? 1));
@@ -55,9 +55,10 @@ export async function getUsers(params?: {
     );
     const items = raw?.items ?? [];
     const totalCount = raw?.totalCount ?? items.length;
-    return { items: items.map(mapUserDtoToUser), totalCount };
+    const size = params?.pageSize ?? 50;
+    return { items: items.map(mapUserDtoToUser), totalCount, totalPages: Math.ceil(totalCount / size) || 0 };
   } catch {
-    return { items: [], totalCount: 0 };
+    return { items: [], totalCount: 0, totalPages: 0 };
   }
 }
 

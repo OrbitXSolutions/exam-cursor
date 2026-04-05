@@ -54,118 +54,126 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<PaginatedResponse<QuestionListDto>>> GetAllQuestionsAsync(QuestionSearchDto searchDto)
     {
-        var query = _context.Questions
-                   .Include(x => x.QuestionType)
-              .Include(x => x.QuestionCategory)
-                   .Include(x => x.Subject)
-                   .Include(x => x.Topic)
-                 .Include(x => x.Options)
-                   .Include(x => x.Attachments)
-          .AsQueryable();
+        // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
+        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        int? resolvedDeptId = null;
+        if (!isSuperDev)
+            resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        // Include deleted if requested
-        if (searchDto.IncludeDeleted)
-        {
-            query = query.IgnoreQueryFilters();
-        }
+        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var cacheKey = $"{CacheKeys.QuestionsPrefix}{deptScope}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.QuestionTypeId}:{searchDto.QuestionCategoryId}:{searchDto.SubjectId}:{searchDto.TopicId}:{searchDto.DifficultyLevel}:{searchDto.IsActive}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
-        // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
-        if (!await IsCurrentUserSuperDevAsync())
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
+            var query = _context.Questions
+                       .Include(x => x.QuestionType)
+                  .Include(x => x.QuestionCategory)
+                       .Include(x => x.Subject)
+                       .Include(x => x.Topic)
+                     .Include(x => x.Options)
+                       .Include(x => x.Attachments)
+              .AsQueryable();
+
+            // Include deleted if requested
+            if (searchDto.IncludeDeleted)
             {
-                query = query.Where(x => x.Subject.DepartmentId == userDepartmentId.Value);
+                query = query.IgnoreQueryFilters();
             }
-        }
 
-        // Search filter (searches both English and Arabic)
-        if (!string.IsNullOrWhiteSpace(searchDto.Search))
-        {
-            var search = searchDto.Search.ToLower();
-            query = query.Where(x =>
-       x.BodyEn.ToLower().Contains(search) ||
-                x.BodyAr.ToLower().Contains(search));
-        }
+            // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
+            if (!isSuperDev && resolvedDeptId.HasValue)
+            {
+                query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
+            }
 
-        // Filter by QuestionTypeId
-        if (searchDto.QuestionTypeId.HasValue)
-        {
-            query = query.Where(x => x.QuestionTypeId == searchDto.QuestionTypeId.Value);
-        }
+            // Search filter (searches both English and Arabic)
+            if (!string.IsNullOrWhiteSpace(searchDto.Search))
+            {
+                var search = searchDto.Search.ToLower();
+                query = query.Where(x =>
+           x.BodyEn.ToLower().Contains(search) ||
+                    x.BodyAr.ToLower().Contains(search));
+            }
 
-        // Filter by QuestionCategoryId
-        if (searchDto.QuestionCategoryId.HasValue)
-        {
-            query = query.Where(x => x.QuestionCategoryId == searchDto.QuestionCategoryId.Value);
-        }
+            // Filter by QuestionTypeId
+            if (searchDto.QuestionTypeId.HasValue)
+            {
+                query = query.Where(x => x.QuestionTypeId == searchDto.QuestionTypeId.Value);
+            }
 
-        // Filter by SubjectId
-        if (searchDto.SubjectId.HasValue)
-        {
-            query = query.Where(x => x.SubjectId == searchDto.SubjectId.Value);
-        }
+            // Filter by QuestionCategoryId
+            if (searchDto.QuestionCategoryId.HasValue)
+            {
+                query = query.Where(x => x.QuestionCategoryId == searchDto.QuestionCategoryId.Value);
+            }
 
-        // Filter by TopicId
-        if (searchDto.TopicId.HasValue)
-        {
-            query = query.Where(x => x.TopicId == searchDto.TopicId.Value);
-        }
+            // Filter by SubjectId
+            if (searchDto.SubjectId.HasValue)
+            {
+                query = query.Where(x => x.SubjectId == searchDto.SubjectId.Value);
+            }
 
-        // Filter by DifficultyLevel
-        if (searchDto.DifficultyLevel.HasValue)
-        {
-            query = query.Where(x => x.DifficultyLevel == searchDto.DifficultyLevel.Value);
-        }
+            // Filter by TopicId
+            if (searchDto.TopicId.HasValue)
+            {
+                query = query.Where(x => x.TopicId == searchDto.TopicId.Value);
+            }
 
-        // Filter by IsActive
-        if (searchDto.IsActive.HasValue)
-        {
-            query = query.Where(x => x.IsActive == searchDto.IsActive.Value);
-        }
+            // Filter by DifficultyLevel
+            if (searchDto.DifficultyLevel.HasValue)
+            {
+                query = query.Where(x => x.DifficultyLevel == searchDto.DifficultyLevel.Value);
+            }
 
-        // Sort by newest to oldest
-        query = query.OrderByDescending(x => x.CreatedDate);
+            // Filter by IsActive
+            if (searchDto.IsActive.HasValue)
+            {
+                query = query.Where(x => x.IsActive == searchDto.IsActive.Value);
+            }
 
-        // Pagination
-        var totalCount = await query.CountAsync();
-        var items = await query
-         .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-                 .Take(searchDto.PageSize)
-                 .ToListAsync();
+            // Sort by newest to oldest
+            query = query.OrderByDescending(x => x.CreatedDate);
 
-        var itemDtos = items.Select(x => new QuestionListDto
-        {
-            Id = x.Id,
-            BodyEn = x.BodyEn,
-            BodyAr = x.BodyAr,
-            QuestionTypeNameEn = x.QuestionType?.NameEn ?? string.Empty,
-            QuestionTypeNameAr = x.QuestionType?.NameAr ?? string.Empty,
-            QuestionCategoryNameEn = x.QuestionCategory?.NameEn ?? string.Empty,
-            QuestionCategoryNameAr = x.QuestionCategory?.NameAr ?? string.Empty,
-            SubjectId = x.SubjectId,
-            SubjectNameEn = x.Subject?.NameEn ?? string.Empty,
-            SubjectNameAr = x.Subject?.NameAr ?? string.Empty,
-            TopicId = x.TopicId,
-            TopicNameEn = x.Topic?.NameEn,
-            TopicNameAr = x.Topic?.NameAr,
-            Points = x.Points,
-            DifficultyLevel = x.DifficultyLevel,
-            IsActive = x.IsActive,
-            IsCalculatorAllowed = x.IsCalculatorAllowed,
-            CreatedDate = x.CreatedDate,
-            AttachmentsCount = x.Attachments.Count
-        }).ToList();
+            // Pagination
+            var totalCount = await query.CountAsync();
+            var items = await query
+             .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
+                     .Take(searchDto.PageSize)
+                     .ToListAsync();
 
-        var response = new PaginatedResponse<QuestionListDto>
-        {
-            Items = itemDtos,
-            PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-            TotalCount = totalCount
-        };
+            var itemDtos = items.Select(x => new QuestionListDto
+            {
+                Id = x.Id,
+                BodyEn = x.BodyEn,
+                BodyAr = x.BodyAr,
+                QuestionTypeNameEn = x.QuestionType?.NameEn ?? string.Empty,
+                QuestionTypeNameAr = x.QuestionType?.NameAr ?? string.Empty,
+                QuestionCategoryNameEn = x.QuestionCategory?.NameEn ?? string.Empty,
+                QuestionCategoryNameAr = x.QuestionCategory?.NameAr ?? string.Empty,
+                SubjectId = x.SubjectId,
+                SubjectNameEn = x.Subject?.NameEn ?? string.Empty,
+                SubjectNameAr = x.Subject?.NameAr ?? string.Empty,
+                TopicId = x.TopicId,
+                TopicNameEn = x.Topic?.NameEn,
+                TopicNameAr = x.Topic?.NameAr,
+                Points = x.Points,
+                DifficultyLevel = x.DifficultyLevel,
+                IsActive = x.IsActive,
+                IsCalculatorAllowed = x.IsCalculatorAllowed,
+                CreatedDate = x.CreatedDate,
+                AttachmentsCount = x.Attachments.Count
+            }).ToList();
 
-        return ApiResponse<PaginatedResponse<QuestionListDto>>.SuccessResponse(response);
+            var response = new PaginatedResponse<QuestionListDto>
+            {
+                Items = itemDtos,
+                PageNumber = searchDto.PageNumber,
+                PageSize = searchDto.PageSize,
+                TotalCount = totalCount
+            };
+
+            return ApiResponse<PaginatedResponse<QuestionListDto>>.SuccessResponse(response);
+        }, CacheKeys.VeryLong);
     }
 
     public async Task<ApiResponse<QuestionDto>> GetQuestionByIdAsync(int id)

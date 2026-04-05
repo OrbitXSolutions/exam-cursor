@@ -68,7 +68,14 @@ export default function CandidateResultPage() {
   const [loadingCandidates, setLoadingCandidates] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [publishingIds, setPublishingIds] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const retryRef = useRef(false)
+
+  const handleExamChange = (v: string) => { setSelectedExamId(v); setCurrentPage(1) }
+  const handleStatusChange = (v: string) => { setResultStatus(v); setCurrentPage(1) }
+  const handleSearchChange = (v: string) => { setSearchQuery(v); setCurrentPage(1) }
+  const handlePageSizeChange = (v: string) => { setPageSize(Number(v)); setCurrentPage(1) }
 
   const loadCandidates = useCallback(() => {
     setRefreshKey((k) => k + 1)
@@ -98,7 +105,7 @@ export default function CandidateResultPage() {
 
     const fetchData = async () => {
       try {
-        const res = await getCandidateResultList(examIdParam, { pageNumber: 1, pageSize: 200 })
+        const res = await getCandidateResultList(examIdParam, { pageNumber: currentPage, pageSize, excludeTerminated: true })
         if (cancelled) return
 
         const list = res?.items ?? []
@@ -119,19 +126,13 @@ export default function CandidateResultPage() {
 
     fetchData()
     return () => { cancelled = true }
-  }, [selectedExamId, refreshKey, fromGrading])
+  }, [selectedExamId, refreshKey, fromGrading, currentPage, pageSize])
 
-  // Hide expired/terminated/force-submitted (shown on Terminated Attempts page)
-  const nonTerminatedCandidates = useMemo(() => {
-    return candidates.filter(
-      (c) => c.attemptStatusName !== "Terminated" && c.attemptStatusName !== "ForceSubmitted" && c.attemptStatusName !== "Expired"
-    )
-  }, [candidates])
-
+  // Backend now excludes Terminated/Expired/ForceSubmitted via excludeTerminated=true
   const statusFilteredCandidates = useMemo(() => {
-    if (resultStatus === RESULT_STATUS_ALL) return nonTerminatedCandidates
+    if (resultStatus === RESULT_STATUS_ALL) return candidates
     
-    return nonTerminatedCandidates.filter((c) => {
+    return candidates.filter((c) => {
       switch (resultStatus) {
         case RESULT_STATUS_PASSED:
           return c.isPassed === true
@@ -149,7 +150,7 @@ export default function CandidateResultPage() {
           return true
       }
     })
-  }, [nonTerminatedCandidates, resultStatus])
+  }, [candidates, resultStatus])
 
   const filteredCandidates = useMemo(() => {
     if (!searchQuery.trim()) return statusFilteredCandidates
@@ -271,75 +272,13 @@ export default function CandidateResultPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="exam-filter" className="text-sm font-medium">
-            {language === "ar" ? "الاختبار" : "Exam"}
-          </Label>
-          <div className="flex items-center gap-2">
-            <Select value={selectedExamId} onValueChange={(v) => v && setSelectedExamId(v)}>
-              <SelectTrigger id="exam-filter" className="w-[240px]">
-                <SelectValue placeholder={language === "ar" ? "اختر اختبارا" : "Select exam"} />
-              </SelectTrigger>
-              <SelectContent position="popper" sideOffset={4}>
-                <SelectItem value={ALL_EXAMS_VALUE}>
-                  {language === "ar" ? "جميع الاختبارات" : "All exams"}
-                </SelectItem>
-                {exams.map((exam) => (
-                  <SelectItem key={exam.id} value={String(exam.id)}>
-                    {getExamTitle(exam)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="button" variant="outline" size="icon" onClick={loadCandidates} title={language === "ar" ? "تحديث القائمة" : "Refresh list"}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status-filter" className="text-sm font-medium">
-            {language === "ar" ? "حالة النتيجة" : "Result Status"}
-          </Label>
-          <Select value={resultStatus} onValueChange={setResultStatus}>
-            <SelectTrigger id="status-filter" className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent position="popper" sideOffset={4}>
-              <SelectItem value={RESULT_STATUS_ALL}>{language === "ar" ? "الكل" : "All"}</SelectItem>
-              <SelectItem value={RESULT_STATUS_PASSED}>{language === "ar" ? "ناجح" : "Passed"}</SelectItem>
-              <SelectItem value={RESULT_STATUS_FAILED}>{language === "ar" ? "غير ناجح" : "Failed"}</SelectItem>
-              <SelectItem value={RESULT_STATUS_UNDER_REVIEW}>{language === "ar" ? "قيد المراجعة" : "Under Review"}</SelectItem>
-              <SelectItem value={RESULT_STATUS_NOT_PUBLISHED}>{language === "ar" ? "غير منشور" : "Not Published"}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="search-candidates" className="text-sm font-medium">
-            {language === "ar" ? "بحث" : "Search"}
-          </Label>
-          <div className="relative w-[240px]">
-            <Search className="absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="search-candidates"
-              placeholder={language === "ar" ? "الاسم أو البريد الإلكتروني..." : "Name or email..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="ps-8"
-            />
-          </div>
-        </div>
-      </div>
-
       <Card>
         <CardContent className="flex items-center gap-4 p-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <BookOpen className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <p className="text-2xl font-bold">{filteredCandidates.length}</p>
+            <p className="text-2xl font-bold">{totalCount}</p>
             <p className="text-sm text-muted-foreground">
               {language === "ar" ? "إجمالي المرشحين" : "Total candidates"}
               {(searchQuery.trim() || resultStatus !== RESULT_STATUS_ALL) && (
@@ -350,25 +289,82 @@ export default function CandidateResultPage() {
         </CardContent>
       </Card>
 
-      {loadingCandidates ? (
-        <div className="flex min-h-[200px] items-center justify-center">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : filteredCandidates.length === 0 ? (
-        <EmptyState
-          icon={BarChart3}
-          title={language === "ar" ? "لا يوجد مرشحون" : "No candidates"}
-          description={
-            searchQuery.trim() || resultStatus !== RESULT_STATUS_ALL
-              ? (language === "ar" ? "لا توجد نتائج تطابق الفلاتر" : "No results match your filters")
-              : fromGrading
-                ? (language === "ar" ? "انقر على زر التحديث أعلاه" : "Click refresh button above")
-                : (language === "ar" ? "لم يتم تعيين مرشحين بعد" : "No candidates yet")
-          }
-        />
-      ) : (
-        <Card>
+      <Card>
+        <CardContent className="p-4 border-b">
+          <div className="flex flex-wrap items-end gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="exam-filter" className="text-sm font-medium">
+                  {language === "ar" ? "الاختبار" : "Exam"}
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Select value={selectedExamId} onValueChange={(v) => v && handleExamChange(v)}>
+                    <SelectTrigger id="exam-filter" className="w-[240px]">
+                      <SelectValue placeholder={language === "ar" ? "اختر اختبارا" : "Select exam"} />
+                    </SelectTrigger>
+                    <SelectContent position="popper" sideOffset={4}>
+                      <SelectItem value={ALL_EXAMS_VALUE}>
+                        {language === "ar" ? "جميع الاختبارات" : "All exams"}
+                      </SelectItem>
+                      {exams.map((exam) => (
+                        <SelectItem key={exam.id} value={String(exam.id)}>
+                          {getExamTitle(exam)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button type="button" variant="outline" size="icon" onClick={loadCandidates} title={language === "ar" ? "تحديث القائمة" : "Refresh list"}>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status-filter" className="text-sm font-medium">
+                  {language === "ar" ? "حالة النتيجة" : "Result Status"}
+                </Label>
+                <Select value={resultStatus} onValueChange={handleStatusChange}>
+                  <SelectTrigger id="status-filter" className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper" sideOffset={4}>
+                    <SelectItem value={RESULT_STATUS_ALL}>{language === "ar" ? "الكل" : "All"}</SelectItem>
+                    <SelectItem value={RESULT_STATUS_PASSED}>{language === "ar" ? "ناجح" : "Passed"}</SelectItem>
+                    <SelectItem value={RESULT_STATUS_FAILED}>{language === "ar" ? "غير ناجح" : "Failed"}</SelectItem>
+                    <SelectItem value={RESULT_STATUS_UNDER_REVIEW}>{language === "ar" ? "قيد المراجعة" : "Under Review"}</SelectItem>
+                    <SelectItem value={RESULT_STATUS_NOT_PUBLISHED}>{language === "ar" ? "غير منشور" : "Not Published"}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="search-candidates" className="text-sm font-medium">
+                  {language === "ar" ? "بحث" : "Search"}
+                </Label>
+                <div className="relative">
+                  <Search className="absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="search-candidates"
+                    placeholder={language === "ar" ? "الاسم أو البريد الإلكتروني..." : "Name or email..."}
+                    value={searchQuery}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="ps-8"
+                  />
+                </div>
+              </div>
+            </div>
+          </CardContent>
           <CardContent className="p-0">
+            {loadingCandidates ? (
+              <div className="flex min-h-[200px] items-center justify-center">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : filteredCandidates.length === 0 ? (
+              <EmptyState
+                icon={BarChart3}
+                title={language === "ar" ? "لا يوجد مرشحون" : "No candidates"}
+                description={language === "ar" ? "لا توجد نتائج تطابق الفلاتر" : "No results match your filters"}
+              />
+            ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -377,7 +373,6 @@ export default function CandidateResultPage() {
                     <TableHead>{language === "ar" ? "الاختبار" : "Exam"}</TableHead>
                     <TableHead>{language === "ar" ? "المرشح" : "Candidate"}</TableHead>
                     <TableHead>{language === "ar" ? "الدرجة" : "Score"}</TableHead>
-                    <TableHead>{language === "ar" ? "النسبة" : "Percentage"}</TableHead>
                     <TableHead>{language === "ar" ? "حالة المحاولة" : "Attempt Status"}</TableHead>
                     <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                     <TableHead>{language === "ar" ? "حالة التصحيح" : "Grading Status"}</TableHead>
@@ -404,13 +399,12 @@ export default function CandidateResultPage() {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">{row.candidateName}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {language === "ar" ? `المحاولة #${row.attemptNumber ?? 1}` : `Attempt #${row.attemptNumber ?? 1}`}
-                            </span>
+                            {row.candidateRollNo && (
+                              <span className="text-xs text-muted-foreground">{row.candidateRollNo}</span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>{row.score != null ? `${row.score.toFixed(1)}/${row.maxPossibleScore ?? 100}` : "—"}</TableCell>
-                        <TableCell>{row.percentage != null ? `${row.percentage.toFixed(2)}%` : "—"}</TableCell>
                         <TableCell>
                           {(() => {
                             const s = row.attemptStatusName ?? "Submitted"
@@ -499,9 +493,48 @@ export default function CandidateResultPage() {
                 </TableBody>
               </Table>
             </div>
+            )}
           </CardContent>
+          {/* Pagination */}
+          {filteredCandidates.length > 0 && (
+          <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{language === "ar" ? "عرض" : "Show"}</span>
+              <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                <SelectTrigger className="h-8 w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>{language === "ar" ? "سجل لكل صفحة" : "records per page"}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground me-2">
+                {language === "ar"
+                  ? `صفحة ${currentPage} من ${Math.ceil(totalCount / pageSize) || 1}`
+                  : `Page ${currentPage} of ${Math.ceil(totalCount / pageSize) || 1}`}
+              </span>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+                {language === "ar" ? "«" : "«"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                {language === "ar" ? "›" : "‹"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.min(Math.ceil(totalCount / pageSize), p + 1))} disabled={currentPage >= Math.ceil(totalCount / pageSize)}>
+                {language === "ar" ? "‹" : "›"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(Math.ceil(totalCount / pageSize))} disabled={currentPage >= Math.ceil(totalCount / pageSize)}>
+                {language === "ar" ? "»" : "»"}
+              </Button>
+            </div>
+          </CardContent>
+          )}
         </Card>
-      )}
     </div>
   )
 }

@@ -20,6 +20,8 @@ export interface GetQuestionsParams {
   search?: string;
   questionTypeId?: number;
   questionCategoryId?: number;
+  subjectId?: number;
+  topicId?: number;
   difficultyLevel?: DifficultyLevel;
   isActive?: boolean;
   includeDeleted?: boolean;
