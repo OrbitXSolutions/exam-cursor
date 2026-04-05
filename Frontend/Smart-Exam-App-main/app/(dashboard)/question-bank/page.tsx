@@ -71,41 +71,58 @@ export default function QuestionBankPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [questionToDelete, setQuestionToDelete] = useState<Question | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const fetchData = async () => {
+  // Load reference data (subjects, types) once for dropdowns
+  useEffect(() => {
+    Promise.all([
+      getQuestionSubjects({ pageSize: 1000 }),
+      getQuestionTypes(),
+    ])
+      .then(([subjectsRes, typesRes]) => {
+        setSubjects(subjectsRes?.items || [])
+        setTypes(typesRes?.items || [])
+      })
+      .catch(() => {})
+  }, [])
+
+  // Load questions with server-side pagination and filters
+  useEffect(() => {
+    let cancelled = false
     setLoading(true)
     setError(null)
-    try {
-      // Fetch questions, subjects, and types in parallel
-      const [questionsRes, subjectsRes, typesRes] = await Promise.all([
-        getQuestions({ pageSize: 100 }),
-        getQuestionSubjects({ pageSize: 100 }),
-        getQuestionTypes(),
-      ])
+    getQuestions({
+      pageNumber: currentPage,
+      pageSize,
+      search: searchQuery.trim() || undefined,
+      subjectId: selectedSubject !== "all" ? Number(selectedSubject) : undefined,
+      topicId: selectedTopic !== "all" ? Number(selectedTopic) : undefined,
+      questionTypeId: selectedType !== "all" ? Number(selectedType) : undefined,
+      difficultyLevel: selectedDifficulty !== "all" ? Number(selectedDifficulty) as DifficultyLevel : undefined,
+    })
+      .then((res) => {
+        if (!cancelled) {
+          setQuestions(Array.isArray(res?.items) ? res.items : [])
+          setTotalCount(res?.totalCount ?? 0)
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching questions:", err)
+        if (!cancelled) {
+          setError(localizeText("Failed to load data. Please try again.", "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.", language))
+          toast.error(localizeText("Failed to load questions", "فشل تحميل الأسئلة", language))
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [currentPage, pageSize, searchQuery, selectedSubject, selectedTopic, selectedType, selectedDifficulty, refreshKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-      // Handle questions response
-      const items = questionsRes?.items || []
-      setQuestions(Array.isArray(items) ? items : [])
-
-      // Handle subjects response
-      const subjectsData = subjectsRes?.items || []
-      setSubjects(Array.isArray(subjectsData) ? subjectsData : [])
-
-      // Handle types response
-      const typesData = typesRes?.items || []
-      setTypes(Array.isArray(typesData) ? typesData : [])
-    } catch (err) {
-      console.error("Error fetching data:", err)
-      setError(localizeText("Failed to load data. Please try again.", "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.", language))
-      toast.error(localizeText("Failed to load questions", "فشل تحميل الأسئلة", language))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
+  const fetchData = () => { setRefreshKey((k) => k + 1) }
 
   // Fetch topics when subject changes
   useEffect(() => {
@@ -116,7 +133,7 @@ export default function QuestionBankPage() {
     }
     const fetchTopicsForSubject = async () => {
       try {
-        const res = await getQuestionTopics({ subjectId: Number(selectedSubject), pageSize: 100 })
+        const res = await getQuestionTopics({ subjectId: Number(selectedSubject), pageSize: 1000 })
         setTopics(res?.items || [])
         setSelectedTopic("all")
       } catch {
@@ -132,7 +149,7 @@ export default function QuestionBankPage() {
     try {
       const result = await deleteQuestion(questionToDelete.id)
       if (result) {
-        setQuestions(questions.filter((q) => q.id !== questionToDelete.id))
+        setRefreshKey((k) => k + 1)
         toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       } else {
         toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
@@ -150,7 +167,7 @@ export default function QuestionBankPage() {
     try {
       const result = await toggleQuestionStatus(question.id)
       if (result) {
-        setQuestions(questions.map((q) => (q.id === question.id ? { ...q, isActive: !q.isActive } : q)))
+        setRefreshKey((k) => k + 1)
         toast.success(
           question.isActive
             ? localizeText("Question deactivated successfully", "تم تعطيل السؤال بنجاح", language)
@@ -164,17 +181,7 @@ export default function QuestionBankPage() {
     }
   }
 
-  const filteredQuestions = questions.filter((q) => {
-    const bodyEn = q.bodyEn || q.body || ""
-    const bodyAr = q.bodyAr || ""
-    const searchLower = searchQuery.toLowerCase()
-    const matchesSearch = !searchQuery || bodyEn.toLowerCase().includes(searchLower) || bodyAr.toLowerCase().includes(searchLower)
-    const matchesSubject = selectedSubject === "all" || q.subjectId === Number(selectedSubject)
-    const matchesTopic = selectedTopic === "all" || q.topicId === Number(selectedTopic)
-    const matchesType = selectedType === "all" || q.questionTypeId === Number(selectedType)
-    const matchesDifficulty = selectedDifficulty === "all" || q.difficultyLevel === Number(selectedDifficulty)
-    return matchesSearch && matchesSubject && matchesTopic && matchesType && matchesDifficulty
-  })
+  const totalPages = Math.ceil(totalCount / pageSize) || 1
 
   const clearFilters = () => {
     setSearchQuery("")
@@ -182,6 +189,7 @@ export default function QuestionBankPage() {
     setSelectedTopic("all")
     setSelectedType("all")
     setSelectedDifficulty("all")
+    setCurrentPage(1)
   }
 
   const hasActiveFilters =
@@ -228,7 +236,7 @@ export default function QuestionBankPage() {
               <Input
                 placeholder={`${t("common.search")} ${language === "ar" ? "الأسئلة..." : "questions..."}`}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
                 className={language === "ar" ? "pr-10" : "pl-10"}
               />
             </div>
@@ -271,7 +279,7 @@ export default function QuestionBankPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 w-full">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{language === "ar" ? "المادة" : "Subject"}</label>
-                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                  <Select value={selectedSubject} onValueChange={(v) => { setSelectedSubject(v); setCurrentPage(1) }}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع المواد" : "All Subjects"} />
                     </SelectTrigger>
@@ -287,7 +295,7 @@ export default function QuestionBankPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{language === "ar" ? "الموضوع" : "Topic"}</label>
-                  <Select value={selectedTopic} onValueChange={setSelectedTopic} disabled={selectedSubject === "all" || topics.length === 0}>
+                  <Select value={selectedTopic} onValueChange={(v) => { setSelectedTopic(v); setCurrentPage(1) }} disabled={selectedSubject === "all" || topics.length === 0}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع المواضيع" : "All Topics"} />
                     </SelectTrigger>
@@ -303,7 +311,7 @@ export default function QuestionBankPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("questionBank.questionType")}</label>
-                  <Select value={selectedType} onValueChange={setSelectedType}>
+                  <Select value={selectedType} onValueChange={(v) => { setSelectedType(v); setCurrentPage(1) }}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع الأنواع" : "All Types"} />
                     </SelectTrigger>
@@ -319,7 +327,7 @@ export default function QuestionBankPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("questionBank.difficulty")}</label>
-                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                  <Select value={selectedDifficulty} onValueChange={(v) => { setSelectedDifficulty(v); setCurrentPage(1) }}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={language === "ar" ? "جميع المستويات" : "All Difficulties"} />
                     </SelectTrigger>
@@ -337,7 +345,7 @@ export default function QuestionBankPage() {
         )}
 
         {/* Results */}
-        {filteredQuestions.length === 0 ? (
+        {questions.length === 0 ? (
           <EmptyState
             icon={FileQuestion}
             title={hasActiveFilters
@@ -368,8 +376,8 @@ export default function QuestionBankPage() {
           <>
             <div className="text-sm text-muted-foreground">
               {language === "ar"
-                ? `عرض ${filteredQuestions.length} من ${questions.length} سؤال`
-                : `Showing ${filteredQuestions.length} of ${questions.length} questions`}
+                ? `عرض ${questions.length} من ${totalCount} سؤال`
+                : `Showing ${questions.length} of ${totalCount} questions`}
             </div>
             <div className="rounded-md border">
               <Table>
@@ -385,7 +393,7 @@ export default function QuestionBankPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredQuestions.map((question) => (
+                  {questions.map((question) => (
                     <TableRow key={question.id}>
                       <TableCell>
                         <div className="max-w-md">
@@ -481,6 +489,37 @@ export default function QuestionBankPage() {
                 </TableBody>
               </Table>
             </div>
+            {/* Pagination */}
+            {totalCount > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>{language === "ar" ? "عرض" : "Show"}</span>
+                  <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(1) }}>
+                    <SelectTrigger className="h-8 w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span>{language === "ar" ? "سجل لكل صفحة" : "records per page"}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm text-muted-foreground me-2">
+                    {language === "ar"
+                      ? `صفحة ${currentPage} من ${totalPages}`
+                      : `Page ${currentPage} of ${totalPages}`}
+                  </span>
+                  <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}>›</Button>
+                  <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(totalPages)} disabled={currentPage >= totalPages}>»</Button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

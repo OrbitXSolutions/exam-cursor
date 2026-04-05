@@ -41,6 +41,7 @@ import {
   Fingerprint,
   User,
 } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 interface ProctorSession {
   id: number
@@ -84,6 +85,7 @@ interface AIAnalysis {
   environmentScore: number
   suspiciousActivities: string[]
   recommendations: string[]
+  noCameraData?: boolean
 }
 
 // AttemptEvent type imported from shared component
@@ -196,6 +198,13 @@ export default function AIReportPage() {
     const eyeTrackingScore   = backendSubScoresAvailable ? sess.eyeScore!  : fallbackEyeScore
     const behaviorScore      = backendSubScoresAvailable ? sess.behaviorScore! : fallbackBehaviorScore
     const environmentScore   = backendSubScoresAvailable ? sess.environmentScore! : fallbackEnvironmentScore
+
+    // ── Detect no-camera-data state ──
+    // If backend sub-scores are unavailable AND there are zero camera events,
+    // the face/eye scores default to 100% which is misleading (camera may be broken/black).
+    const noCameraData =
+      !backendSubScoresAvailable &&
+      [16, 18, 19, 20, 21, 22].every((t) => !counts[t])
 
     // ── Overall Risk Score ──
     // Source of truth: Backend Rule Engine (ProctorSession.RiskScore)
@@ -334,6 +343,7 @@ export default function AIReportPage() {
       environmentScore,
       suspiciousActivities,
       recommendations,
+      noCameraData,
     }
   }
 
@@ -535,45 +545,130 @@ export default function AIReportPage() {
             </CardContent>
           </Card>
 
+          {/* No-camera-data warning banner */}
+          {analysis.noCameraData && (
+            <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-amber-600" />
+              <div>
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                  {language === "ar" ? "لا توجد بيانات كاميرا" : "No Camera Data Available"}
+                </p>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">
+                  {language === "ar"
+                    ? "لم يتم تسجيل أي أحداث مراقبة بالكاميرا في هذه الجلسة. قد تكون الكاميرا لم تعمل بشكل صحيح. درجات كشف الوجه وتتبع العين غير موثوقة."
+                    : "No camera monitoring events were recorded for this session. The camera feed may have been non-functional (black screen). Face Detection and Eye Tracking scores are unreliable — manual review recommended."}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Analysis Scores */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            {/* Face Detection */}
+            <Card className={analysis.noCameraData ? "border-amber-500/40" : ""}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 mb-3">
                   <Camera className={`h-5 w-5 ${getScoreColor(analysis.faceDetectionScore)}`} />
-                  <span className="font-medium">
+                  <span className="font-medium flex-1">
                     {language === "ar" ? "كشف الوجه" : "Face Detection"}
                   </span>
+                  {analysis.noCameraData && (
+                    <span title={language === "ar" ? "بيانات غير موثوقة" : "Unreliable data"}>
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                    </span>
+                  )}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-72 text-xs space-y-1.5 p-3">
+                      <p className="font-semibold text-sm">{language === "ar" ? "كيف يُحسب؟" : "How is this calculated?"}</p>
+                      <p className="text-muted-foreground">
+                        {language === "ar"
+                          ? "يبدأ من 100% ويُخصم منه: غياب الوجه (نسبة من مدة الجلسة ×70%)، وجوه متعددة (−12 لكل حدث)، الكاميرا محجوبة (نسبة ×85%)، رفض الكاميرا (−25 ثابت)."
+                          : "Starts at 100%. Deductions: Face not detected (duration ratio ×85%), multiple faces (−12 pts each), camera blocked (duration ratio ×85%), webcam denied (−25 pts fixed)."}
+                      </p>
+                      {analysis.noCameraData && (
+                        <p className="text-amber-600 font-medium">
+                          {language === "ar" ? "⚠ لا توجد أحداث كاميرا — النتيجة غير موثوقة" : "⚠ No camera events logged — score unreliable"}
+                        </p>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <div className={`text-3xl font-bold ${getScoreColor(analysis.faceDetectionScore)} mb-2`}>
+                <div className={`text-3xl font-bold ${analysis.noCameraData ? "text-amber-500" : getScoreColor(analysis.faceDetectionScore)} mb-2`}>
                   {analysis.faceDetectionScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.faceDetectionScore} className={`h-2 ${getProgressColor(analysis.faceDetectionScore)}`} />
+                <Progress value={analysis.faceDetectionScore} className={`h-2 ${analysis.noCameraData ? "[&>div]:bg-amber-400" : getProgressColor(analysis.faceDetectionScore)}`} />
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Eye Tracking */}
+            <Card className={analysis.noCameraData ? "border-amber-500/40" : ""}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 mb-3">
                   <Eye className={`h-5 w-5 ${getScoreColor(analysis.eyeTrackingScore)}`} />
-                  <span className="font-medium">
+                  <span className="font-medium flex-1">
                     {language === "ar" ? "تتبع العين" : "Eye Tracking"}
                   </span>
+                  {analysis.noCameraData && (
+                    <span title={language === "ar" ? "بيانات غير موثوقة" : "Unreliable data"}>
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                    </span>
+                  )}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-72 text-xs space-y-1.5 p-3">
+                      <p className="font-semibold text-sm">{language === "ar" ? "كيف يُحسب؟" : "How is this calculated?"}</p>
+                      <p className="text-muted-foreground">
+                        {language === "ar"
+                          ? "يبدأ من 100% ويُخصم منه: التفات الرأس (−7 لكل حدث)، الوجه خارج الإطار (−6 لكل حدث)، الكاميرا محجوبة (نسبة ×80%). محدود بدرجة كشف الوجه."
+                          : "Starts at 100%. Deductions: Head turned away (−7 pts each), face out of frame (−6 pts each), camera blocked (duration ratio ×80%). Capped by the Face Detection score."}
+                      </p>
+                      {analysis.noCameraData && (
+                        <p className="text-amber-600 font-medium">
+                          {language === "ar" ? "⚠ لا توجد أحداث كاميرا — النتيجة غير موثوقة" : "⚠ No camera events logged — score unreliable"}
+                        </p>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <div className={`text-3xl font-bold ${getScoreColor(analysis.eyeTrackingScore)} mb-2`}>
+                <div className={`text-3xl font-bold ${analysis.noCameraData ? "text-amber-500" : getScoreColor(analysis.eyeTrackingScore)} mb-2`}>
                   {analysis.eyeTrackingScore.toFixed(0)}%
                 </div>
-                <Progress value={analysis.eyeTrackingScore} className={`h-2 ${getProgressColor(analysis.eyeTrackingScore)}`} />
+                <Progress value={analysis.eyeTrackingScore} className={`h-2 ${analysis.noCameraData ? "[&>div]:bg-amber-400" : getProgressColor(analysis.eyeTrackingScore)}`} />
               </CardContent>
             </Card>
 
+            {/* Behavior */}
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 mb-3">
                   <Clock className={`h-5 w-5 ${getScoreColor(analysis.behaviorScore)}`} />
-                  <span className="font-medium">
+                  <span className="font-medium flex-1">
                     {language === "ar" ? "السلوك" : "Behavior"}
                   </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-72 text-xs space-y-1.5 p-3">
+                      <p className="font-semibold text-sm">{language === "ar" ? "كيف يُحسب؟" : "How is this calculated?"}</p>
+                      <p className="text-muted-foreground">
+                        {language === "ar"
+                          ? "يبدأ من 100% ويُخصم منه: تبديل التبويب (−8 لكل حدث)، فقدان تركيز النافذة (−4 لكل حدث)، محاولات النسخ (−10 لكل حدث)، محاولات اللصق (−10 لكل حدث)، اختصارات لوحة المفاتيح (−5 لكل حدث)."
+                          : "Starts at 100%. Deductions: Tab switch (−8 pts each), window focus loss (−4 pts each), copy attempt (−10 pts each), paste attempt (−10 pts each), keyboard shortcut (−5 pts each)."}
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className={`text-3xl font-bold ${getScoreColor(analysis.behaviorScore)} mb-2`}>
                   {analysis.behaviorScore.toFixed(0)}%
@@ -582,13 +677,29 @@ export default function AIReportPage() {
               </CardContent>
             </Card>
 
+            {/* Environment */}
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 mb-3">
                   <Monitor className={`h-5 w-5 ${getScoreColor(analysis.environmentScore)}`} />
-                  <span className="font-medium">
+                  <span className="font-medium flex-1">
                     {language === "ar" ? "البيئة" : "Environment"}
                   </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="w-72 text-xs space-y-1.5 p-3">
+                      <p className="font-semibold text-sm">{language === "ar" ? "كيف يُحسب؟" : "How is this calculated?"}</p>
+                      <p className="text-muted-foreground">
+                        {language === "ar"
+                          ? "يبدأ من 100% ويُخصم منه: الخروج من وضع ملء الشاشة (−10 لكل حدث)، الكاميرا محجوبة (نسبة مدة الحجب ×50%)، مشاركة الشاشة (−8 لكل حدث)."
+                          : "Starts at 100%. Deductions: Fullscreen exit (−10 pts each), camera blocked (blocked duration ratio ×50%), screen sharing detected (−8 pts each)."}
+                      </p>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className={`text-3xl font-bold ${getScoreColor(analysis.environmentScore)} mb-2`}>
                   {analysis.environmentScore.toFixed(0)}%

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,20 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<PaginatedResponse<ExamListDto>>> GetAllExamsAsync(ExamSearchDto searchDto)
   {
+    // ── Resolve dept scope for cache key (pre-resolve to avoid duplicate async calls) ──
+    bool isSuperDev = false;
+    int? scopedDeptId = null;
+    if (searchDto.FilterByUserDepartment)
+    {
+      isSuperDev = await IsCurrentUserSuperDevAsync();
+      if (!isSuperDev)
+        scopedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+    }
+    var deptScope = isSuperDev ? "all" : (scopedDeptId?.ToString() ?? "none");
+    var cacheKey = $"{CacheKeys.ExamsPrefix}list:{deptScope}:{JsonSerializer.Serialize(searchDto)}";
+    if (_cache.TryGet<PaginatedResponse<ExamListDto>>(cacheKey, out var cachedPage) && cachedPage != null)
+      return ApiResponse<PaginatedResponse<ExamListDto>>.SuccessResponse(cachedPage);
+
     var query = _context.Exams.AsQueryable();
 
     // Include deleted if requested
@@ -61,16 +76,14 @@ public class AssessmentService : IAssessmentService
       query = query.IgnoreQueryFilters();
     }
 
-    // Department-based access control
+    // Department-based access control (uses pre-resolved values)
     if (searchDto.FilterByUserDepartment)
     {
-      var isSuperDev = await IsCurrentUserSuperDevAsync();
       if (!isSuperDev)
       {
-        var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-        if (userDepartmentId.HasValue)
+        if (scopedDeptId.HasValue)
         {
-          query = query.Where(x => x.DepartmentId == userDepartmentId.Value);
+          query = query.Where(x => x.DepartmentId == scopedDeptId.Value);
         }
         else
         {
@@ -175,6 +188,7 @@ public class AssessmentService : IAssessmentService
       TotalCount = totalCount
     };
 
+    _cache.Set(cacheKey, response, CacheKeys.Thirty);
     return ApiResponse<PaginatedResponse<ExamListDto>>.SuccessResponse(response);
   }
 
@@ -182,15 +196,23 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<List<ExamDropdownItemDto>>> GetExamsForDropdownAsync()
   {
-    var query = _context.Exams.AsQueryable();
-
+    // Resolve filter context first to build a dept-aware cache key
+    int? filterDeptId = null;
     if (!await IsCurrentUserSuperDevAsync())
     {
-      var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-      if (userDepartmentId.HasValue)
-        query = query.Where(x => x.DepartmentId == userDepartmentId.Value);
+      var userDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+      if (userDeptId.HasValue)
+        filterDeptId = userDeptId;
       // When user has no department (e.g. some Admin accounts), still return all exams so dropdown works
     }
+
+    var cacheKey = CacheKeys.ExamDropdownByDept(filterDeptId);
+    if (_cache.TryGet<List<ExamDropdownItemDto>>(cacheKey, out var cachedItems) && cachedItems != null)
+      return ApiResponse<List<ExamDropdownItemDto>>.SuccessResponse(cachedItems);
+
+    var query = _context.Exams.AsQueryable();
+    if (filterDeptId.HasValue)
+      query = query.Where(x => x.DepartmentId == filterDeptId.Value);
 
     var items = await query
         .OrderByDescending(x => x.CreatedDate)
@@ -203,36 +225,40 @@ public class AssessmentService : IAssessmentService
         })
         .ToListAsync();
 
+    _cache.Set(cacheKey, items, CacheKeys.Thirty);
     return ApiResponse<List<ExamDropdownItemDto>>.SuccessResponse(items);
   }
 
   public async Task<ApiResponse<ExamDto>> GetExamByIdAsync(int id)
   {
-    var entity = await _context.Exams
-        .Include(x => x.Department)
+    var cacheKey = CacheKeys.ExamById(id);
+    if (!_cache.TryGet<ExamDto>(cacheKey, out var cachedDto) || cachedDto == null)
+    {
+      var entity = await _context.Exams
+          .Include(x => x.Department)
+          .Include(x => x.Sections.OrderBy(s => s.Order))
+         .ThenInclude(s => s.Topics.OrderBy(t => t.Order))
         .Include(x => x.Sections.OrderBy(s => s.Order))
-       .ThenInclude(s => s.Topics.OrderBy(t => t.Order))
-      .Include(x => x.Sections.OrderBy(s => s.Order))
-  .ThenInclude(s => s.Questions.OrderBy(q => q.Order))
-.ThenInclude(q => q.Question)
-.ThenInclude(q => q.QuestionType)
-.Include(x => x.Instructions.OrderBy(i => i.Order))
-   .Include(x => x.AccessPolicy)
- .FirstOrDefaultAsync(x => x.Id == id);
+    .ThenInclude(s => s.Questions.OrderBy(q => q.Order))
+  .ThenInclude(q => q.Question)
+  .ThenInclude(q => q.QuestionType)
+  .Include(x => x.Instructions.OrderBy(i => i.Order))
+     .Include(x => x.AccessPolicy)
+   .FirstOrDefaultAsync(x => x.Id == id);
 
-    if (entity == null)
-    {
-      return ApiResponse<ExamDto>.FailureResponse("Exam not found");
+      if (entity == null)
+        return ApiResponse<ExamDto>.FailureResponse("Exam not found");
+
+      cachedDto = MapToExamDto(entity);
+      _cache.Set(cacheKey, cachedDto, CacheKeys.Thirty);
     }
 
-    // Check department access
-    var hasAccess = await HasAccessToExamAsync(entity.DepartmentId);
+    // Access check always runs — not cached (user-specific)
+    var hasAccess = await HasAccessToExamAsync(cachedDto.DepartmentId);
     if (!hasAccess)
-    {
       return ApiResponse<ExamDto>.FailureResponse("You do not have access to this exam");
-    }
 
-    return ApiResponse<ExamDto>.SuccessResponse(MapToExamDto(entity));
+    return ApiResponse<ExamDto>.SuccessResponse(cachedDto);
   }
 
   public async Task<ApiResponse<ExamDto>> CreateExamAsync(SaveExamDto dto, string createdBy)
@@ -615,11 +641,13 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<List<ExamSectionDto>>> GetExamSectionsAsync(int examId)
   {
+    var cacheKey = CacheKeys.ExamSectionsByExam(examId);
+    if (_cache.TryGet<List<ExamSectionDto>>(cacheKey, out var cachedSections) && cachedSections != null)
+      return ApiResponse<List<ExamSectionDto>>.SuccessResponse(cachedSections);
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
-    {
       return ApiResponse<List<ExamSectionDto>>.FailureResponse("Exam not found");
-    }
 
     var sections = await _context.ExamSections
       .Include(x => x.Topics.OrderBy(t => t.Order))
@@ -631,11 +659,16 @@ public class AssessmentService : IAssessmentService
  .ToListAsync();
 
     var dtos = sections.Select(MapToExamSectionDto).ToList();
+    _cache.Set(cacheKey, dtos, CacheKeys.Thirty);
     return ApiResponse<List<ExamSectionDto>>.SuccessResponse(dtos);
   }
 
   public async Task<ApiResponse<ExamSectionDto>> GetSectionByIdAsync(int sectionId)
   {
+    var cacheKey = CacheKeys.ExamSectionById(sectionId);
+    if (_cache.TryGet<ExamSectionDto>(cacheKey, out var cachedSection) && cachedSection != null)
+      return ApiResponse<ExamSectionDto>.SuccessResponse(cachedSection);
+
     var section = await _context.ExamSections
                .Include(x => x.Questions.OrderBy(q => q.Order))
         .ThenInclude(q => q.Question)
@@ -643,11 +676,11 @@ public class AssessmentService : IAssessmentService
             .FirstOrDefaultAsync(x => x.Id == sectionId);
 
     if (section == null)
-    {
       return ApiResponse<ExamSectionDto>.FailureResponse("Section not found");
-    }
 
-    return ApiResponse<ExamSectionDto>.SuccessResponse(MapToExamSectionDto(section));
+    var dto = MapToExamSectionDto(section);
+    _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+    return ApiResponse<ExamSectionDto>.SuccessResponse(dto);
   }
 
   public async Task<ApiResponse<ExamSectionDto>> CreateSectionAsync(int examId, SaveExamSectionDto dto, string createdBy)
@@ -844,11 +877,13 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> GetSectionQuestionsAsync(int sectionId)
   {
+    var cacheKey = CacheKeys.ExamSectionQuestions(sectionId);
+    if (_cache.TryGet<List<ExamQuestionDto>>(cacheKey, out var cachedQuestions) && cachedQuestions != null)
+      return ApiResponse<List<ExamQuestionDto>>.SuccessResponse(cachedQuestions);
+
     var sectionExists = await _context.ExamSections.AnyAsync(x => x.Id == sectionId);
     if (!sectionExists)
-    {
       return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Section not found");
-    }
 
     var questions = await _context.ExamQuestions
          .Include(x => x.Question)
@@ -858,6 +893,7 @@ x.Order == dto.Order &&
    .ToListAsync();
 
     var dtos = questions.Select(MapToExamQuestionDto).ToList();
+    _cache.Set(cacheKey, dtos, CacheKeys.Thirty);
     return ApiResponse<List<ExamQuestionDto>>.SuccessResponse(dtos);
   }
 

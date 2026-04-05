@@ -30,6 +30,7 @@ export interface CandidateResultListItem {
   candidateId: string;
   candidateName: string;
   candidateEmail?: string;
+  candidateRollNo?: string;
   totalAttempts: number;
   attemptId: number;
   attemptNumber: number;
@@ -115,14 +116,28 @@ export async function getExamCandidateSummaries(
  */
 export async function getCandidateResultList(
   examId: number | undefined,
-  params?: { pageNumber?: number; pageSize?: number },
+  params?: {
+    pageNumber?: number;
+    pageSize?: number;
+    excludeTerminated?: boolean;
+    onlyTerminated?: boolean;
+    statusFilter?: string;
+  },
 ): Promise<CandidateResultListResponse> {
   const query = new URLSearchParams();
   query.set("pageNumber", String(params?.pageNumber ?? 1));
-  query.set("pageSize", String(params?.pageSize ?? 100));
+  query.set("pageSize", String(params?.pageSize ?? 10));
   if (examId != null && examId > 0) query.set("examId", String(examId));
+  if (params?.excludeTerminated !== undefined)
+    query.set("excludeTerminated", String(params.excludeTerminated));
+  if (params?.onlyTerminated !== undefined)
+    query.set("onlyTerminated", String(params.onlyTerminated));
+  if (params?.statusFilter)
+    query.set("statusFilter", params.statusFilter);
 
-  const raw = await apiClient.get<unknown>(`/ExamResult/candidate-result-list?${query}`);
+  const raw = await apiClient.get<unknown>(
+    `/ExamResult/candidate-result-list?${query}`,
+  );
   const inner =
     raw && typeof raw === "object"
       ? (((raw as Record<string, unknown>).data ??
@@ -130,18 +145,31 @@ export async function getCandidateResultList(
           raw) as Record<string, unknown>)
       : {};
 
-  const items = (inner?.items ?? inner?.Items ?? []) as CandidateResultListItem[];
-  const summary = (inner?.summary ?? inner?.Summary ?? {}) as CandidateResultListSummary;
+  const items = (inner?.items ??
+    inner?.Items ??
+    []) as CandidateResultListItem[];
+  const summary = (inner?.summary ??
+    inner?.Summary ??
+    {}) as CandidateResultListSummary;
   const list = Array.isArray(items) ? items : [];
 
   return {
     items: list,
-    pageNumber: (inner?.pageNumber ?? inner?.PageNumber ?? params?.pageNumber ?? 1) as number,
-    pageSize: (inner?.pageSize ?? inner?.PageSize ?? params?.pageSize ?? 100) as number,
-    totalCount: (inner?.totalCount ?? inner?.TotalCount ?? list.length) as number,
+    pageNumber: (inner?.pageNumber ??
+      inner?.PageNumber ??
+      params?.pageNumber ??
+      1) as number,
+    pageSize: (inner?.pageSize ??
+      inner?.PageSize ??
+      params?.pageSize ??
+      100) as number,
+    totalCount: (inner?.totalCount ??
+      inner?.TotalCount ??
+      list.length) as number,
     summary: {
-      totalCandidates:
-        (summary?.totalCandidates ?? (summary as Record<string, unknown>)?.TotalCandidates ?? list.length) as number,
+      totalCandidates: (summary?.totalCandidates ??
+        (summary as Record<string, unknown>)?.TotalCandidates ??
+        list.length) as number,
     },
   };
 }
@@ -174,14 +202,18 @@ export async function getAttemptIdForCandidate(
       gradingQuery.set("CandidateId", candidateId);
       gradingQuery.set("PageSize", "1");
 
-      const gradingRaw = await apiClient.get<unknown>(`/Grading?${gradingQuery}`);
+      const gradingRaw = await apiClient.get<unknown>(
+        `/Grading?${gradingQuery}`,
+      );
       const gradingInner =
         gradingRaw && typeof gradingRaw === "object"
           ? (((gradingRaw as Record<string, unknown>).data ??
               (gradingRaw as Record<string, unknown>).Data ??
               gradingRaw) as Record<string, unknown>)
           : {};
-      const gradingItems = (gradingInner?.items ?? gradingInner?.Items ?? []) as { attemptId?: number; id?: number }[];
+      const gradingItems = (gradingInner?.items ??
+        gradingInner?.Items ??
+        []) as { attemptId?: number; id?: number }[];
 
       if (Array.isArray(gradingItems) && gradingItems.length > 0) {
         return gradingItems[0].attemptId ?? gradingItems[0].id ?? null;

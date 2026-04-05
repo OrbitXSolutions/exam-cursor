@@ -25,6 +25,7 @@ public class GradingService : IGradingService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICacheService _cache;
 
     public GradingService(
         ApplicationDbContext context,
@@ -32,7 +33,8 @@ public class GradingService : IGradingService
         ILogger<GradingService> logger,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ICacheService cache)
     {
         _context = context;
         _examResultService = examResultService;
@@ -40,7 +42,10 @@ public class GradingService : IGradingService
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _cache = cache;
     }
+
+    private void InvalidateGradingCache() => _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
     {
@@ -191,6 +196,7 @@ public class GradingService : IGradingService
 
         await _context.SaveChangesAsync();
 
+        InvalidateGradingCache();
         return ApiResponse<GradingInitiatedDto>.SuccessResponse(new GradingInitiatedDto
         {
             GradingSessionId = gradingSession.Id,
@@ -207,6 +213,10 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<GradingSessionDto>> GetGradingSessionAsync(int gradingSessionId)
     {
+        var cacheKey = CacheKeys.GradingSessionById(gradingSessionId);
+        if (_cache.TryGet<GradingSessionDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<GradingSessionDto>.SuccessResponse(cached);
+
         var session = await _context.Set<GradingSession>()
           .Include(gs => gs.Attempt)
      .ThenInclude(a => a.Exam)
@@ -231,11 +241,17 @@ public class GradingService : IGradingService
             return ApiResponse<GradingSessionDto>.FailureResponse("Grading session not found");
         }
 
-        return ApiResponse<GradingSessionDto>.SuccessResponse(MapToGradingSessionDto(session));
+        var dto = MapToGradingSessionDto(session);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<GradingSessionDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<GradingSessionDto>> GetGradingSessionByAttemptAsync(int attemptId)
     {
+        var cacheKey = CacheKeys.GradingSessionByAttempt(attemptId);
+        if (_cache.TryGet<GradingSessionDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<GradingSessionDto>.SuccessResponse(cached);
+
         var session = await _context.Set<GradingSession>()
   .Include(gs => gs.Attempt)
       .ThenInclude(a => a.Exam)
@@ -260,7 +276,9 @@ public class GradingService : IGradingService
             return ApiResponse<GradingSessionDto>.FailureResponse("Grading session not found for this attempt");
         }
 
-        return ApiResponse<GradingSessionDto>.SuccessResponse(MapToGradingSessionDto(session));
+        var dto = MapToGradingSessionDto(session);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<GradingSessionDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<GradingCompletedDto>> CompleteGradingAsync(CompleteGradingDto dto, string graderId)
@@ -329,6 +347,8 @@ public class GradingService : IGradingService
         if (!finalizeResult.Success && finalizeResult.Message != null && !finalizeResult.Message.Contains("already exists"))
             _logger.LogWarning("Finalize result after grading complete failed: {Message}", finalizeResult.Message);
 
+        InvalidateGradingCache();
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
         return ApiResponse<GradingCompletedDto>.SuccessResponse(new GradingCompletedDto
         {
             GradingSessionId = session.Id,
@@ -403,6 +423,7 @@ public class GradingService : IGradingService
 
         await _context.SaveChangesAsync();
 
+        InvalidateGradingCache();
         return ApiResponse<GradeSubmittedDto>.SuccessResponse(new GradeSubmittedDto
         {
             GradedAnswerId = gradedAnswer.Id,
@@ -442,6 +463,7 @@ public class GradingService : IGradingService
         }
 
         var allSuccess = results.All(r => r.Success);
+        InvalidateGradingCache();
         return allSuccess
                ? ApiResponse<List<GradeSubmittedDto>>.SuccessResponse(results, "All grades submitted successfully")
                : ApiResponse<List<GradeSubmittedDto>>.SuccessResponse(results, "Some grades could not be submitted");
@@ -449,6 +471,10 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<List<GradedAnswerDto>>> GetManualGradingQueueAsync(int gradingSessionId)
     {
+        var cacheKey = CacheKeys.GradingQueueById(gradingSessionId);
+        if (_cache.TryGet<List<GradedAnswerDto>>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<List<GradedAnswerDto>>.SuccessResponse(cached);
+
         var session = await _context.Set<GradingSession>()
             .Include(gs => gs.Attempt)
     .ThenInclude(a => a.Questions)
@@ -470,6 +496,7 @@ public class GradingService : IGradingService
                .Select(a => MapToGradedAnswerDto(a, session.Attempt.Questions.FirstOrDefault(q => q.QuestionId == a.QuestionId)?.Points ?? 0))
                  .ToList();
 
+        _cache.Set(cacheKey, manualGradingAnswers, CacheKeys.Thirty);
         return ApiResponse<List<GradedAnswerDto>>.SuccessResponse(manualGradingAnswers);
     }
 
@@ -538,6 +565,8 @@ public class GradingService : IGradingService
 
         await _context.SaveChangesAsync();
 
+        InvalidateGradingCache();
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
         return ApiResponse<RegradeResultDto>.SuccessResponse(new RegradeResultDto
         {
             GradedAnswerId = gradedAnswer.Id,
@@ -555,6 +584,15 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<PaginatedResponse<GradingSessionListDto>>> GetGradingSessionsAsync(GradingSearchDto searchDto)
     {
+        // Pre-resolve dept scope for cache key + query isolation
+        bool isSuperDevGs = await IsCurrentUserSuperDevAsync();
+        int? deptIdGs = isSuperDevGs ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
+        var deptScopeGs = isSuperDevGs ? "all" : (deptIdGs?.ToString() ?? "none");
+
+        var cacheKey = CacheKeys.GradingList(deptScopeGs, JsonSerializer.Serialize(searchDto));
+        if (_cache.TryGet<PaginatedResponse<GradingSessionListDto>>(cacheKey, out var cachedGs) && cachedGs != null)
+            return ApiResponse<PaginatedResponse<GradingSessionListDto>>.SuccessResponse(cachedGs);
+
         var query = _context.Set<GradingSession>()
             .Include(gs => gs.Attempt)
     .ThenInclude(a => a.Exam)
@@ -566,13 +604,9 @@ public class GradingService : IGradingService
  .AsQueryable();
 
         // Department isolation: filter grading sessions via Exam.DepartmentId (SuperDev sees all)
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!isSuperDevGs && deptIdGs.HasValue)
         {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
-            {
-                query = query.Where(gs => gs.Attempt.Exam.DepartmentId == userDepartmentId.Value);
-            }
+            query = query.Where(gs => gs.Attempt.Exam.DepartmentId == deptIdGs.Value);
         }
 
         // Filters
@@ -629,14 +663,15 @@ public class GradingService : IGradingService
 
         var dtos = items.Select(s => MapToGradingSessionListDto(s, finalizedSet.Contains(s.AttemptId))).ToList();
 
-        return ApiResponse<PaginatedResponse<GradingSessionListDto>>.SuccessResponse(
-       new PaginatedResponse<GradingSessionListDto>
-       {
-           Items = dtos,
-           PageNumber = searchDto.PageNumber,
-           PageSize = searchDto.PageSize,
-           TotalCount = totalCount
-       });
+        var pagedResult = new PaginatedResponse<GradingSessionListDto>
+        {
+            Items = dtos,
+            PageNumber = searchDto.PageNumber,
+            PageSize = searchDto.PageSize,
+            TotalCount = totalCount
+        };
+        _cache.Set(cacheKey, pagedResult, CacheKeys.Thirty);
+        return ApiResponse<PaginatedResponse<GradingSessionListDto>>.SuccessResponse(pagedResult);
     }
 
     public async Task<ApiResponse<PaginatedResponse<GradingSessionListDto>>> GetManualGradingRequiredAsync(GradingSearchDto searchDto)
@@ -647,6 +682,10 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<ExamGradingStatsDto>> GetExamGradingStatsAsync(int examId)
     {
+        var cacheKey = CacheKeys.GradingStats(examId);
+        if (_cache.TryGet<ExamGradingStatsDto>(cacheKey, out var cachedStats) && cachedStats != null)
+            return ApiResponse<ExamGradingStatsDto>.SuccessResponse(cachedStats);
+
         var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
         if (exam == null)
         {
@@ -690,11 +729,16 @@ public class GradingService : IGradingService
     : 0
         };
 
+        _cache.Set(cacheKey, stats, CacheKeys.Thirty);
         return ApiResponse<ExamGradingStatsDto>.SuccessResponse(stats);
     }
 
     public async Task<ApiResponse<List<QuestionGradingStatsDto>>> GetQuestionGradingStatsAsync(int examId)
     {
+        var cacheKey = CacheKeys.GradingQuestionStats(examId);
+        if (_cache.TryGet<List<QuestionGradingStatsDto>>(cacheKey, out var cachedQStats) && cachedQStats != null)
+            return ApiResponse<List<QuestionGradingStatsDto>>.SuccessResponse(cachedQStats);
+
         // Department isolation check
         if (!await IsCurrentUserSuperDevAsync())
         {
@@ -742,6 +786,7 @@ public class GradingService : IGradingService
       })
             .ToList();
 
+        _cache.Set(cacheKey, stats, CacheKeys.Thirty);
         return ApiResponse<List<QuestionGradingStatsDto>>.SuccessResponse(stats);
     }
 
@@ -751,6 +796,10 @@ public class GradingService : IGradingService
 
     public async Task<ApiResponse<CandidateGradingResultDto>> GetCandidateResultAsync(int attemptId, string candidateId)
     {
+        var cacheKey = CacheKeys.GradingCandidateResult(attemptId);
+        if (_cache.TryGet<CandidateGradingResultDto>(cacheKey, out var cachedCr) && cachedCr != null)
+            return ApiResponse<CandidateGradingResultDto>.SuccessResponse(cachedCr);
+
         var session = await _context.Set<GradingSession>()
            .Include(gs => gs.Attempt)
              .ThenInclude(a => a.Exam)
@@ -825,11 +874,16 @@ public class GradingService : IGradingService
          }).ToList()
         };
 
+        _cache.Set(cacheKey, result, CacheKeys.Thirty);
         return ApiResponse<CandidateGradingResultDto>.SuccessResponse(result);
     }
 
     public async Task<ApiResponse<bool>> IsGradingCompleteAsync(int attemptId)
     {
+        var completeCacheKey = CacheKeys.GradingIsComplete(attemptId);
+        if (_cache.TryGet<bool?>(completeCacheKey, out var cachedComplete) && cachedComplete.HasValue)
+            return ApiResponse<bool>.SuccessResponse(cachedComplete.Value);
+
         var session = await _context.Set<GradingSession>()
                  .FirstOrDefaultAsync(gs => gs.AttemptId == attemptId);
 
@@ -839,6 +893,7 @@ public class GradingService : IGradingService
         }
 
         var isComplete = session.Status == GradingStatus.Completed || session.Status == GradingStatus.AutoGraded;
+        _cache.Set(completeCacheKey, (bool?)isComplete, CacheKeys.Thirty);
         return ApiResponse<bool>.SuccessResponse(isComplete);
     }
 
@@ -1092,6 +1147,7 @@ public class GradingService : IGradingService
             ExamTitleAr = session.Attempt.Exam.TitleAr,
             CandidateId = session.Attempt.CandidateId,
             CandidateName = session.Attempt.Candidate?.FullName ?? session.Attempt.Candidate?.DisplayName ?? "",
+            CandidateRollNo = session.Attempt.Candidate?.RollNo,
             Status = session.Status,
             TotalScore = session.TotalScore,
             MaxPossibleScore = maxPossibleScore,

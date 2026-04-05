@@ -129,7 +129,7 @@ public interface IExamResultService
     /// <summary>
     /// Get combined candidate result list with grading status in a single request
     /// </summary>
-    Task<ApiResponse<CandidateResultListResponseDto>> GetCandidateResultListAsync(int? examId, int pageNumber, int pageSize);
+    Task<ApiResponse<CandidateResultListResponseDto>> GetCandidateResultListAsync(int? examId, int pageNumber, int pageSize, bool excludeTerminated = true, bool onlyTerminated = false, string? statusFilter = null);
 
     #endregion
 

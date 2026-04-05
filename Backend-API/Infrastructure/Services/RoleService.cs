@@ -51,22 +51,23 @@ public class RoleService : IRoleService
       }
 
       return list;
-    }, CacheKeys.Medium);
+    }, CacheKeys.VeryLong);
 
     return ApiResponse<List<RoleDto>>.SuccessResponse(roleDtos);
   }
 
   public async Task<ApiResponse<RoleDto>> GetRoleByIdAsync(string roleId)
   {
+    var cacheKey = CacheKeys.RoleById(roleId);
+    if (_cache.TryGet<ApiResponse<RoleDto>>(cacheKey, out var cached))
+      return cached!;
+
     var role = await _roleManager.FindByIdAsync(roleId);
     if (role == null)
-    {
       return ApiResponse<RoleDto>.FailureResponse("Role not found.");
-    }
 
     var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name!);
-
-    return ApiResponse<RoleDto>.SuccessResponse(new RoleDto
+    var result = ApiResponse<RoleDto>.SuccessResponse(new RoleDto
     {
       Id = role.Id,
       Name = role.Name!,
@@ -74,6 +75,8 @@ public class RoleService : IRoleService
       CreatedDate = role.CreatedDate,
       UserCount = usersInRole.Count
     });
+    _cache.Set(cacheKey, result, CacheKeys.VeryLong);
+    return result;
   }
 
   public async Task<ApiResponse<RoleDto>> CreateRoleAsync(CreateRoleDto dto, string createdBy)
@@ -250,15 +253,16 @@ public class RoleService : IRoleService
 
   public async Task<ApiResponse<UsersInRoleDto>> GetUsersInRoleAsync(string roleName)
   {
+    var cacheKey = CacheKeys.UsersInRole(roleName);
+    if (_cache.TryGet<ApiResponse<UsersInRoleDto>>(cacheKey, out var cached))
+      return cached!;
+
     var role = await _roleManager.FindByNameAsync(roleName);
     if (role == null)
-    {
       return ApiResponse<UsersInRoleDto>.FailureResponse("Role not found.");
-    }
 
     var users = await _userManager.GetUsersInRoleAsync(roleName);
-
-    return ApiResponse<UsersInRoleDto>.SuccessResponse(new UsersInRoleDto
+    var result = ApiResponse<UsersInRoleDto>.SuccessResponse(new UsersInRoleDto
     {
       RoleId = role.Id,
       RoleName = role.Name!,
@@ -270,5 +274,7 @@ public class RoleService : IRoleService
         FullName = u.FullName
       }).ToList()
     });
+    _cache.Set(cacheKey, result, CacheKeys.VeryLong);
+    return result;
   }
 }

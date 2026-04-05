@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Attempt;
 using Smart_Core.Application.DTOs.Common;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Attempt;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
@@ -18,6 +20,7 @@ public class AttemptService : IAttemptService
   private readonly ApplicationDbContext _context;
   private readonly IHubContext<ProctorHub> _proctorHub;
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly ICacheService _cache;
 
   // Violation event types that should be pushed to proctor in real time
   private static readonly HashSet<AttemptEventType> ViolationEventTypes = new()
@@ -51,11 +54,12 @@ public class AttemptService : IAttemptService
     AttemptEventType.CameraBlocked,    // Intentional covering of camera
   };
 
-  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub, IHttpContextAccessor httpContextAccessor)
+  public AttemptService(ApplicationDbContext context, IHubContext<ProctorHub> proctorHub, IHttpContextAccessor httpContextAccessor, ICacheService cache)
   {
     _context = context;
     _proctorHub = proctorHub;
     _httpContextAccessor = httpContextAccessor;
+    _cache = cache;
   }
 
   #region Attempt Lifecycle
@@ -423,6 +427,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     var totalQuestions = attempt.Questions.Count;
     var answeredQuestions = attempt.Questions.Count(q => q.Answers.Any());
 
+    _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
     return ApiResponse<AttemptSubmittedDto>.SuccessResponse(new AttemptSubmittedDto
     {
       AttemptId = attemptId,
@@ -1056,6 +1061,10 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
   public async Task<ApiResponse<AttemptDto>> GetAttemptByIdAsync(int attemptId)
   {
+    var cacheKey = CacheKeys.AttemptById(attemptId);
+    if (_cache.TryGet<AttemptDto>(cacheKey, out var cached) && cached != null)
+      return ApiResponse<AttemptDto>.SuccessResponse(cached);
+
     var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
    .Include(a => a.Exam)
         .Include(a => a.Candidate)
@@ -1068,11 +1077,17 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptDto>.FailureResponse("Attempt not found");
     }
 
-    return ApiResponse<AttemptDto>.SuccessResponse(MapToAttemptDto(attempt));
+    var dto = MapToAttemptDto(attempt);
+    _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+    return ApiResponse<AttemptDto>.SuccessResponse(dto);
   }
 
   public async Task<ApiResponse<AttemptDetailDto>> GetAttemptDetailsAsync(int attemptId)
   {
+    var cacheKey = CacheKeys.AttemptDetailById(attemptId);
+    if (_cache.TryGet<AttemptDetailDto>(cacheKey, out var cachedDetail) && cachedDetail != null)
+      return ApiResponse<AttemptDetailDto>.SuccessResponse(cachedDetail);
+
     var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
   .Include(a => a.Exam)
       .Include(a => a.Candidate)
@@ -1136,11 +1151,16 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       })).ToList()
     };
 
+    _cache.Set(cacheKey, dto, CacheKeys.Thirty);
     return ApiResponse<AttemptDetailDto>.SuccessResponse(dto);
   }
 
   public async Task<ApiResponse<PaginatedResponse<AttemptListDto>>> GetAttemptsAsync(AttemptSearchDto searchDto)
   {
+    var cacheKey = CacheKeys.AttemptsList(System.Text.Json.JsonSerializer.Serialize(searchDto));
+    if (_cache.TryGet<PaginatedResponse<AttemptListDto>>(cacheKey, out var cachedList) && cachedList != null)
+      return ApiResponse<PaginatedResponse<AttemptListDto>>.SuccessResponse(cachedList);
+
     var query = _context.Set<Domain.Entities.Attempt.Attempt>()
         .Include(a => a.Exam)
         .Include(a => a.Candidate)
@@ -1187,18 +1207,23 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
     var dtos = items.Select(MapToAttemptListDto).ToList();
 
-    return ApiResponse<PaginatedResponse<AttemptListDto>>.SuccessResponse(
-     new PaginatedResponse<AttemptListDto>
-     {
-       Items = dtos,
-       PageNumber = searchDto.PageNumber,
-       PageSize = searchDto.PageSize,
-       TotalCount = totalCount
-     });
+    var pagedResult = new PaginatedResponse<AttemptListDto>
+    {
+      Items = dtos,
+      PageNumber = searchDto.PageNumber,
+      PageSize = searchDto.PageSize,
+      TotalCount = totalCount
+    };
+    _cache.Set(cacheKey, pagedResult, CacheKeys.Thirty);
+    return ApiResponse<PaginatedResponse<AttemptListDto>>.SuccessResponse(pagedResult);
   }
 
   public async Task<ApiResponse<List<AttemptListDto>>> GetCandidateExamAttemptsAsync(int examId, string candidateId)
   {
+    var cacheKey = CacheKeys.AttemptsByExamCandidate(examId, candidateId);
+    if (_cache.TryGet<List<AttemptListDto>>(cacheKey, out var cachedCea) && cachedCea != null)
+      return ApiResponse<List<AttemptListDto>>.SuccessResponse(cachedCea);
+
     var attempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
             .Include(a => a.Exam)
             .Include(a => a.Candidate)
@@ -1206,8 +1231,9 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
               .OrderByDescending(a => a.AttemptNumber)
            .ToListAsync();
 
-    return ApiResponse<List<AttemptListDto>>.SuccessResponse(
-     attempts.Select(MapToAttemptListDto).ToList());
+    var result = attempts.Select(MapToAttemptListDto).ToList();
+    _cache.Set(cacheKey, result, CacheKeys.Thirty);
+    return ApiResponse<List<AttemptListDto>>.SuccessResponse(result);
   }
 
   public async Task<ApiResponse<PaginatedResponse<AttemptListDto>>> GetCandidateAttemptsAsync(
@@ -1256,6 +1282,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
     await _context.SaveChangesAsync();
 
+    _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
     return ApiResponse<bool>.SuccessResponse(true, "Attempt cancelled successfully");
   }
 
@@ -1301,6 +1328,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
     await _context.SaveChangesAsync();
 
+    _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
     return ApiResponse<AttemptSubmittedDto>.SuccessResponse(new AttemptSubmittedDto
     {
       AttemptId = attemptId,

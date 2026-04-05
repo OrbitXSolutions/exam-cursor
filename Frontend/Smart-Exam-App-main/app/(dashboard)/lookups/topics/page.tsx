@@ -55,6 +55,10 @@ function TopicsContent() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterSubjectId, setFilterSubjectId] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -68,42 +72,44 @@ function TopicsContent() {
   const [topicToDelete, setTopicToDelete] = useState<QuestionTopic | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  // Load subjects once for dropdown
   useEffect(() => {
-    loadData()
+    getQuestionSubjects({ pageSize: 1000 })
+      .then((res) => setSubjects(res.items || []))
+      .catch(() => {})
   }, [])
 
+  // Load topics with server-side pagination
   useEffect(() => {
-    loadTopics()
-  }, [filterSubjectId])
-
-  const loadData = async () => {
+    let cancelled = false
     setLoading(true)
-    try {
-      const [topicsResult, subjectsResult] = await Promise.all([
-        getQuestionTopics({ pageSize: 100 }),
-        getQuestionSubjects({ pageSize: 100 })
-      ])
-      setTopics(topicsResult.items || [])
-      setSubjects(subjectsResult.items || [])
-    } catch (error) {
-      toast.error(language === "ar" ? "فشل في تحميل البيانات" : "Failed to load data")
-    } finally {
-      setLoading(false)
-    }
-  }
+    const subjectId = filterSubjectId !== "all" ? Number(filterSubjectId) : undefined
+    getQuestionTopics({
+      pageNumber: currentPage,
+      pageSize,
+      search: searchQuery.trim() || undefined,
+      subjectId,
+    })
+      .then((result) => {
+        if (!cancelled) {
+          setTopics(result.items || [])
+          setTotalCount(result.totalCount || 0)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) toast.error(language === "ar" ? "فشل في تحميل المواضيع" : "Failed to load topics")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [currentPage, pageSize, searchQuery, filterSubjectId, refreshKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadTopics = async () => {
-    setLoading(true)
-    try {
-      const subjectId = filterSubjectId !== "all" ? Number(filterSubjectId) : undefined
-      const result = await getQuestionTopics({ pageSize: 100, subjectId })
-      setTopics(result.items || [])
-    } catch (error) {
-      toast.error(language === "ar" ? "فشل في تحميل المواضيع" : "Failed to load topics")
-    } finally {
-      setLoading(false)
-    }
-  }
+  const loadTopics = () => setRefreshKey((k) => k + 1)
+
+  const handleSearchChange = (value: string) => { setSearchQuery(value); setCurrentPage(1) }
+  const handleFilterSubjectChange = (value: string) => { setFilterSubjectId(value); setCurrentPage(1) }
+  const handlePageSizeChange = (value: string) => { setPageSize(Number(value)); setCurrentPage(1) }
 
   const handleCreate = () => {
     setDialogMode("create")
@@ -173,10 +179,7 @@ function TopicsContent() {
     }
   }
 
-  const filteredTopics = topics.filter((topic) => {
-    const query = searchQuery.toLowerCase()
-    return topic.nameEn.toLowerCase().includes(query) || topic.nameAr.toLowerCase().includes(query)
-  })
+  const totalPages = Math.ceil(totalCount / pageSize) || 1
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -202,12 +205,12 @@ function TopicsContent() {
                 <Input
                   placeholder={language === "ar" ? "البحث عن موضوع..." : "Search topics..."}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className={language === "ar" ? "pr-10" : "pl-10"}
                 />
               </div>
               <div className="w-[200px]">
-                <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
+                <Select value={filterSubjectId} onValueChange={handleFilterSubjectChange}>
                   <SelectTrigger>
                     <Filter className="me-2 h-4 w-4" />
                     <SelectValue placeholder={language === "ar" ? "جميع المواد" : "All Subjects"} />
@@ -238,7 +241,7 @@ function TopicsContent() {
                     : "You need to create a subject first before adding topics"
                 }
               />
-            ) : filteredTopics.length === 0 ? (
+            ) : topics.length === 0 ? (
               <EmptyState
                 icon={Hash}
                 title={language === "ar" ? "لا توجد مواضيع" : "No topics found"}
@@ -271,7 +274,7 @@ function TopicsContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTopics.map((topic) => (
+                  {topics.map((topic) => (
                     <TableRow key={topic.id}>
                       <TableCell className="font-medium">{topic.nameEn}</TableCell>
                       <TableCell>{topic.nameAr}</TableCell>
@@ -304,6 +307,37 @@ function TopicsContent() {
               </Table>
             )}
           </CardContent>
+          {/* Pagination */}
+          {totalCount > 0 && (
+            <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{language === "ar" ? "عرض" : "Show"}</span>
+                <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="h-8 w-[80px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>{language === "ar" ? "سجل لكل صفحة" : "records per page"}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground me-2">
+                  {language === "ar"
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`}
+                </span>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages}>›</Button>
+                <Button variant="outline" size="sm" className="h-8 px-3" onClick={() => setCurrentPage(totalPages)} disabled={currentPage >= totalPages}>»</Button>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Create/Edit Dialog */}

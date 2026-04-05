@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Batch;
 using Smart_Core.Application.DTOs.Common;
+using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Batch;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
@@ -16,88 +17,100 @@ public class BatchService : IBatchService
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly ICacheService _cache;
 
     public BatchService(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        ICacheService cache)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
+        _cache = cache;
+    }
+
+    private void InvalidateBatchCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.BatchesPrefix);
     }
 
     // ── List ───────────────────────────────────────────────────
     public async Task<ApiResponse<PaginatedResponse<BatchListDto>>> GetBatchesAsync(BatchFilterDto filter)
     {
-        var query = _db.Batches.Where(b => !b.IsDeleted);
-
-        // Search
-        if (!string.IsNullOrWhiteSpace(filter.Search))
+        var cacheKey = $"{CacheKeys.BatchesPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+        return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
-            var s = filter.Search.ToLower();
-            query = query.Where(b =>
-                b.Name.ToLower().Contains(s) ||
-                (b.Description != null && b.Description.ToLower().Contains(s)));
-        }
+            var query = _db.Batches.Where(b => !b.IsDeleted);
 
-        // Status filter
-        if (!string.IsNullOrWhiteSpace(filter.Status))
-        {
-            if (filter.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
-                query = query.Where(b => b.IsActive);
-            else if (filter.Status.Equals("Inactive", StringComparison.OrdinalIgnoreCase))
-                query = query.Where(b => !b.IsActive);
-        }
-
-        var totalCount = await query.CountAsync();
-
-        // Sort
-        query = (filter.SortBy?.ToLower(), filter.SortDir?.ToLower()) switch
-        {
-            ("name", "asc") => query.OrderBy(b => b.Name),
-            ("name", _) => query.OrderByDescending(b => b.Name),
-            ("candidatecount", "asc") => query.OrderBy(b => b.BatchCandidates.Count),
-            ("candidatecount", _) => query.OrderByDescending(b => b.BatchCandidates.Count),
-            ("isactive", "asc") => query.OrderBy(b => b.IsActive),
-            ("isactive", _) => query.OrderByDescending(b => b.IsActive),
-            _ => query.OrderByDescending(b => b.CreatedDate),
-        };
-
-        var batches = await query
-            .Include(b => b.BatchCandidates)
-            .Skip((filter.PageNumber - 1) * filter.PageSize)
-            .Take(filter.PageSize)
-            .ToListAsync();
-
-        // Resolve creator names
-        var creatorIds = batches.Where(b => b.CreatedBy != null).Select(b => b.CreatedBy!).Distinct().ToList();
-        var creators = await _db.Users
-            .Where(u => creatorIds.Contains(u.Id))
-            .Select(u => new { u.Id, u.FullName, u.Email })
-            .ToDictionaryAsync(u => u.Id);
-
-        var items = batches.Select(b => new BatchListDto
-        {
-            Id = b.Id,
-            Name = b.Name,
-            Description = b.Description,
-            IsActive = b.IsActive,
-            CandidateCount = b.BatchCandidates.Count,
-            CreatedDate = b.CreatedDate,
-            CreatedBy = b.CreatedBy,
-            CreatedByName = b.CreatedBy != null && creators.TryGetValue(b.CreatedBy, out var c)
-                ? (c.FullName ?? c.Email) : null
-        }).ToList();
-
-        return ApiResponse<PaginatedResponse<BatchListDto>>.SuccessResponse(
-            new PaginatedResponse<BatchListDto>
+            // Search
+            if (!string.IsNullOrWhiteSpace(filter.Search))
             {
-                Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
-                TotalCount = totalCount
-            });
+                var s = filter.Search.ToLower();
+                query = query.Where(b =>
+                    b.Name.ToLower().Contains(s) ||
+                    (b.Description != null && b.Description.ToLower().Contains(s)));
+            }
+
+            // Status filter
+            if (!string.IsNullOrWhiteSpace(filter.Status))
+            {
+                if (filter.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(b => b.IsActive);
+                else if (filter.Status.Equals("Inactive", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(b => !b.IsActive);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            // Sort
+            query = (filter.SortBy?.ToLower(), filter.SortDir?.ToLower()) switch
+            {
+                ("name", "asc") => query.OrderBy(b => b.Name),
+                ("name", _) => query.OrderByDescending(b => b.Name),
+                ("candidatecount", "asc") => query.OrderBy(b => b.BatchCandidates.Count),
+                ("candidatecount", _) => query.OrderByDescending(b => b.BatchCandidates.Count),
+                ("isactive", "asc") => query.OrderBy(b => b.IsActive),
+                ("isactive", _) => query.OrderByDescending(b => b.IsActive),
+                _ => query.OrderByDescending(b => b.CreatedDate),
+            };
+
+            var batches = await query
+                .Include(b => b.BatchCandidates)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+            // Resolve creator names
+            var creatorIds = batches.Where(b => b.CreatedBy != null).Select(b => b.CreatedBy!).Distinct().ToList();
+            var creators = await _db.Users
+                .Where(u => creatorIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.FullName, u.Email })
+                .ToDictionaryAsync(u => u.Id);
+
+            var items = batches.Select(b => new BatchListDto
+            {
+                Id = b.Id,
+                Name = b.Name,
+                Description = b.Description,
+                IsActive = b.IsActive,
+                CandidateCount = b.BatchCandidates.Count,
+                CreatedDate = b.CreatedDate,
+                CreatedBy = b.CreatedBy,
+                CreatedByName = b.CreatedBy != null && creators.TryGetValue(b.CreatedBy, out var c)
+                    ? (c.FullName ?? c.Email) : null
+            }).ToList();
+
+            return ApiResponse<PaginatedResponse<BatchListDto>>.SuccessResponse(
+                new PaginatedResponse<BatchListDto>
+                {
+                    Items = items,
+                    PageNumber = filter.PageNumber,
+                    PageSize = filter.PageSize,
+                    TotalCount = totalCount
+                });
+        }, CacheKeys.VeryLong);
     }
 
     // ── Get by ID (with candidates) ───────────────────────────
@@ -176,6 +189,7 @@ public class BatchService : IBatchService
         _db.Batches.Add(batch);
         await _db.SaveChangesAsync();
 
+        InvalidateBatchCache();
         return ApiResponse<BatchListDto>.SuccessResponse(new BatchListDto
         {
             Id = batch.Id,
@@ -215,6 +229,7 @@ public class BatchService : IBatchService
 
         await _db.SaveChangesAsync();
 
+        InvalidateBatchCache();
         return ApiResponse<BatchListDto>.SuccessResponse(new BatchListDto
         {
             Id = batch.Id,
@@ -239,6 +254,7 @@ public class BatchService : IBatchService
         batch.UpdatedDate = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+        InvalidateBatchCache();
         return ApiResponse<bool>.SuccessResponse(true, "Batch deleted successfully.");
     }
 
@@ -254,6 +270,7 @@ public class BatchService : IBatchService
         batch.UpdatedDate = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+        InvalidateBatchCache();
         return ApiResponse<bool>.SuccessResponse(true,
             batch.IsActive ? "Batch activated successfully." : "Batch deactivated successfully.");
     }
@@ -313,6 +330,7 @@ public class BatchService : IBatchService
         }
 
         await _db.SaveChangesAsync();
+        InvalidateBatchCache();
         return ApiResponse<BatchCandidateChangeResultDto>.SuccessResponse(result,
             $"{result.AffectedCount} candidate(s) added to batch.");
     }
@@ -339,6 +357,7 @@ public class BatchService : IBatchService
         _db.BatchCandidates.RemoveRange(toRemove);
         await _db.SaveChangesAsync();
 
+        InvalidateBatchCache();
         return ApiResponse<BatchCandidateChangeResultDto>.SuccessResponse(result,
             $"{result.AffectedCount} candidate(s) removed from batch.");
     }

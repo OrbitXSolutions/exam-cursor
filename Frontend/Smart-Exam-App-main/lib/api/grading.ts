@@ -12,6 +12,7 @@ export interface GradingSessionListItem {
   examTitleAr: string;
   candidateId: string;
   candidateName: string;
+  candidateRollNo: string | null;
   status: number;
   statusName: string;
   totalScore: number | null;

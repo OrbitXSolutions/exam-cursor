@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Audit;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Audit;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
@@ -16,6 +17,7 @@ public class AuditService : IAuditService
     private readonly ApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<AuditService> _logger;
+    private readonly ICacheService _cache;
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = false,
@@ -25,11 +27,13 @@ public class AuditService : IAuditService
     public AuditService(
       ApplicationDbContext context,
         ICurrentUserService currentUserService,
-        ILogger<AuditService> logger)
+        ILogger<AuditService> logger,
+        ICacheService cache)
     {
         _context = context;
         _currentUserService = currentUserService;
         _logger = logger;
+        _cache = cache;
     }
 
     #region Audit Logging
@@ -257,16 +261,24 @@ public class AuditService : IAuditService
 
     public async Task<ApiResponse<List<AuditRetentionPolicyDto>>> GetRetentionPoliciesAsync()
     {
+        if (_cache.TryGet<List<AuditRetentionPolicyDto>>(CacheKeys.AuditPoliciesAll, out var cached) && cached != null)
+            return ApiResponse<List<AuditRetentionPolicyDto>>.SuccessResponse(cached);
+
         var policies = await _context.Set<AuditRetentionPolicy>()
       .OrderBy(x => x.Priority)
        .ToListAsync();
 
-        return ApiResponse<List<AuditRetentionPolicyDto>>.SuccessResponse(
-              policies.Select(MapToPolicyDto).ToList());
+        var dtos = policies.Select(MapToPolicyDto).ToList();
+        _cache.Set(CacheKeys.AuditPoliciesAll, dtos, CacheKeys.Thirty);
+        return ApiResponse<List<AuditRetentionPolicyDto>>.SuccessResponse(dtos);
     }
 
     public async Task<ApiResponse<AuditRetentionPolicyDto>> GetRetentionPolicyAsync(int policyId)
     {
+        var cacheKey = CacheKeys.AuditPolicyById(policyId);
+        if (_cache.TryGet<AuditRetentionPolicyDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(cached);
+
         var policy = await _context.Set<AuditRetentionPolicy>()
               .FirstOrDefaultAsync(x => x.Id == policyId);
 
@@ -275,7 +287,9 @@ public class AuditService : IAuditService
             return ApiResponse<AuditRetentionPolicyDto>.FailureResponse("Policy not found");
         }
 
-        return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(MapToPolicyDto(policy));
+        var dto = MapToPolicyDto(policy);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(dto);
     }
 
     public async Task<ApiResponse<AuditRetentionPolicyDto>> CreateRetentionPolicyAsync(
@@ -309,6 +323,7 @@ public class AuditService : IAuditService
         await LogSuccessAsync(AuditActions.AuditRetentionExecuted, "AuditRetentionPolicy", policy.Id.ToString(),
              userId, after: new { policy.NameEn, policy.RetentionDays });
 
+        _cache.RemoveByPrefix(CacheKeys.AuditPoliciesPrefix);
         return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(MapToPolicyDto(policy));
     }
 
@@ -345,6 +360,7 @@ public class AuditService : IAuditService
 
         await _context.SaveChangesAsync();
 
+        _cache.RemoveByPrefix(CacheKeys.AuditPoliciesPrefix);
         return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(MapToPolicyDto(policy));
     }
 
@@ -369,6 +385,7 @@ public class AuditService : IAuditService
 
         await _context.SaveChangesAsync();
 
+        _cache.RemoveByPrefix(CacheKeys.AuditPoliciesPrefix);
         return ApiResponse<bool>.SuccessResponse(true, "Policy deleted");
     }
 
@@ -400,6 +417,7 @@ public class AuditService : IAuditService
 
         await _context.SaveChangesAsync();
 
+        _cache.RemoveByPrefix(CacheKeys.AuditPoliciesPrefix);
         return ApiResponse<AuditRetentionPolicyDto>.SuccessResponse(MapToPolicyDto(policy));
     }
 

@@ -295,9 +295,12 @@ public class ExamResultController : ControllerBase
     public async Task<IActionResult> GetCandidateResultList(
         [FromQuery] int? examId,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 100)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] bool excludeTerminated = true,
+        [FromQuery] bool onlyTerminated = false,
+        [FromQuery] string? statusFilter = null)
     {
-        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize);
+        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize, excludeTerminated, onlyTerminated, statusFilter);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

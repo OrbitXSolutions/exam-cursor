@@ -172,20 +172,28 @@ export async function getExamListForDropdown(): Promise<ExamDropdownItem[]> {
 export async function getExams(params?: {
   pageNumber?: number;
   pageSize?: number;
+  search?: string;
+  isActive?: boolean;
+  isPublished?: boolean;
 }): Promise<PagedResult<Exam>> {
   try {
     const query = new URLSearchParams();
     query.set("PageNumber", String(params?.pageNumber ?? 1));
-    query.set("PageSize", String(params?.pageSize ?? 50));
+    query.set("PageSize", String(params?.pageSize ?? 10));
+    if (params?.search) query.set("Search", params.search);
+    if (params?.isActive !== undefined)
+      query.set("IsActive", String(params.isActive));
+    if (params?.isPublished !== undefined)
+      query.set("IsPublished", String(params.isPublished));
     const response = await apiClient.get<unknown>(`/Assessment/exams?${query}`);
     const { items, totalCount } = normalizePagedResponse<Exam>(response);
     return {
       items,
       totalCount,
       pageNumber: params?.pageNumber ?? 1,
-      pageSize: params?.pageSize ?? 50,
+      pageSize: params?.pageSize ?? 10,
       totalPages: Math.ceil(
-        (totalCount || items.length) / (params?.pageSize ?? 50),
+        (totalCount || items.length) / (params?.pageSize ?? 10),
       ),
     };
   } catch (err) {
@@ -194,7 +202,7 @@ export async function getExams(params?: {
       items: [],
       totalCount: 0,
       pageNumber: params?.pageNumber ?? 1,
-      pageSize: params?.pageSize ?? 50,
+      pageSize: params?.pageSize ?? 10,
       totalPages: 0,
     };
   }
@@ -321,13 +329,13 @@ export async function unpublishExam(id: string | number): Promise<boolean> {
 // ============ SHARE LINKS ============
 
 export interface ExamShareLink {
-  id: number
-  examId: number
-  shareToken: string
-  shareUrl: string
-  expiresAt?: string
-  isActive: boolean
-  createdDate: string
+  id: number;
+  examId: number;
+  shareToken: string;
+  shareUrl: string;
+  expiresAt?: string;
+  isActive: boolean;
+  createdDate: string;
 }
 
 export async function generateShareLink(

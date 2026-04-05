@@ -43,6 +43,8 @@ import {
   UserCheck,
   UserX,
   Shield,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { toast } from "sonner"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -57,16 +59,41 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
   const [departments, setDepartments] = useState<DepartmentListItem[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
   useEffect(() => {
     loadUsers()
-  }, [roleFilter, statusFilter, departmentFilter])
+  }, [currentPage, pageSize, roleFilter, departmentFilter])
 
   useEffect(() => {
     getDepartmentsList().then(setDepartments).catch(() => setDepartments([]))
   }, [])
+
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => loadUsers(), 300)
+    return () => clearTimeout(t)
+  }, [search])
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value))
+    setCurrentPage(1)
+  }
+
+  const handleRoleFilterChange = (value: string) => {
+    setRoleFilter(value)
+    setCurrentPage(1)
+  }
+
+  const handleDepartmentFilterChange = (value: string) => {
+    setDepartmentFilter(value)
+    setCurrentPage(1)
+  }
 
   async function loadUsers() {
     setLoading(true)
@@ -74,12 +101,13 @@ export default function UsersPage() {
       const res = await getUsers({
         search: search || undefined,
         role: roleFilter === "all" ? undefined : roleFilter,
-        isActive: statusFilter === "all" ? undefined : statusFilter === "active",
         departmentId: departmentFilter === "all" ? undefined : Number(departmentFilter),
-        page: 1,
-        pageSize: 100,
+        page: currentPage,
+        pageSize,
       })
       setUsers(res.items)
+      setTotalCount(res.totalCount)
+      setTotalPages(res.totalPages)
     } catch (e) {
       console.error("Failed to load users", e)
       toast.error(localizeText("Failed to load users", "فشل تحميل المستخدمين", language))
@@ -89,20 +117,11 @@ export default function UsersPage() {
     }
   }
 
-  useEffect(() => {
-    const t = setTimeout(() => loadUsers(), 300)
-    return () => clearTimeout(t)
-  }, [search])
-
   // Hide Candidate (separate page) and SuperDev from this list
   const filteredUsers = users.filter((user) => {
     if (user.role === "Candidate" || user.role === "SuperDev") return false
-    const name = getLocalizedField(user, "fullName", language).toLowerCase()
-    const matchesSearch =
-      !search || name.includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
-    const matchesRole = roleFilter === "all" || user.role === roleFilter
     const matchesStatus = statusFilter === "all" || (statusFilter === "active" ? user.isActive : !user.isActive)
-    return matchesSearch && matchesRole && matchesStatus
+    return matchesStatus
   })
 
   async function handleDeleteUser() {
@@ -145,7 +164,7 @@ export default function UsersPage() {
   }
 
   const stats = {
-    total: filteredUsers.length,
+    total: totalCount,
     active: filteredUsers.filter((u) => u.isActive).length,
     inactive: filteredUsers.filter((u) => !u.isActive).length,
     admins: filteredUsers.filter((u) => u.role === "Admin" || u.role === "SuperAdmin").length,
@@ -238,7 +257,7 @@ export default function UsersPage() {
                 className="ps-9"
               />
             </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <Select value={roleFilter} onValueChange={handleRoleFilterChange}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={language === "ar" ? "الدور" : "Role"} />
               </SelectTrigger>
@@ -262,7 +281,7 @@ export default function UsersPage() {
                 <SelectItem value="inactive">{language === "ar" ? "غير نشط" : "Inactive"}</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+            <Select value={departmentFilter} onValueChange={handleDepartmentFilterChange}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder={language === "ar" ? "القسم" : "Department"} />
               </SelectTrigger>
@@ -363,6 +382,38 @@ export default function UsersPage() {
               </TableBody>
             </Table>
           </div>
+          {/* Pagination */}
+          {totalCount > 0 && (
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  {language === "ar"
+                    ? `عرض ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} من ${totalCount}`
+                    : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
+                </p>
+                <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
+                <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

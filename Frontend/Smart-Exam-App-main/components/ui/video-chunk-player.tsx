@@ -29,6 +29,7 @@ interface ChunkListResponse {
   totalSizeBytes: number
   chunkDurationMs: number
   chunks: ChunkInfo[]
+  mimeType?: string
 }
 
 interface VideoChunkPlayerProps {
@@ -36,14 +37,17 @@ interface VideoChunkPlayerProps {
   className?: string
 }
 
-/**
- * MSE-based video chunk player.
- *
- * Uses MediaSource Extensions to stitch WebM chunks together in the browser.
- * Chunk 0 contains the WebM EBML header + initialization segment; subsequent
- * chunks contain only Cluster data. MSE handles this seamlessly by appending
- * each chunk's ArrayBuffer into a single SourceBuffer.
- */
+// MSE codec candidates in priority order.
+// VP9+opus and VP8+opus cover the common Chrome/Firefox MediaRecorder output (video+mic audio).
+const PLAYBACK_CODECS = [
+  'video/webm; codecs="vp9, opus"',
+  'video/webm; codecs="vp8, opus"',
+  'video/webm; codecs="vp9"',
+  'video/webm; codecs="vp8, vorbis"',
+  'video/webm; codecs="vp8"',
+  'video/webm',
+]
+
 export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -102,7 +106,10 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     if (attemptId) fetchChunks()
   }, [attemptId])
 
-  // Set up MSE and append all chunks once chunkData arrives
+  // Set up MSE with codec auto-detect and retry logic.
+  // If chunk 0 (the EBML init segment) fails with one codec, we try the next candidate.
+  // This handles the common case where the recording codec (e.g. vp9+opus) differs
+  // from what isTypeSupported() picks for playback (e.g. vp9 without audio codec).
   useEffect(() => {
     if (!chunkData || chunkData.totalChunks === 0) return
     const video = videoRef.current
@@ -110,155 +117,170 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
 
     let aborted = false
 
-    // Check MSE support
     if (!("MediaSource" in window)) {
       setError("Your browser does not support MediaSource Extensions (MSE). Please use Chrome, Edge, or Firefox.")
       return
     }
 
-    // Find supported MSE codec
-    const codecs = [
-      'video/webm; codecs="vp9"',
-      'video/webm; codecs="vp8"',
-      'video/webm; codecs="vp8, vorbis"',
-      'video/webm; codecs="vp9, opus"',
-      'video/webm',
-    ]
-    let mimeCodec = ""
-    for (const c of codecs) {
-      if (MediaSource.isTypeSupported(c)) {
-        mimeCodec = c
-        break
-      }
-    }
-    if (!mimeCodec) {
+    // If the backend stored the original recording mimeType, try that first
+    const storedMime = chunkData.mimeType
+    const codecPriority = storedMime
+      ? [storedMime, ...PLAYBACK_CODECS.filter(c => c !== storedMime)]
+      : PLAYBACK_CODECS
+    const supportedCodecs = codecPriority.filter(c => MediaSource.isTypeSupported(c))
+
+    if (supportedCodecs.length === 0) {
       setError("No supported WebM codec found for MSE playback.")
       return
     }
 
-    const mediaSource = new MediaSource()
-    mediaSourceRef.current = mediaSource
-    appendedChunksRef.current = 0
-    allBufferedRef.current = false
+    function waitForUpdateEnd(sb: SourceBuffer): Promise<void> {
+      if (!sb.updating) return Promise.resolve()
+      return new Promise(resolve => {
+        const onEnd = () => { sb.removeEventListener("updateend", onEnd); resolve() }
+        sb.addEventListener("updateend", onEnd)
+      })
+    }
 
-    const objectUrl = URL.createObjectURL(mediaSource)
-    video.src = objectUrl
+    function appendChunk(sb: SourceBuffer, buf: ArrayBuffer): Promise<boolean> {
+      return new Promise(resolve => {
+        const onUpdateEnd = () => {
+          sb.removeEventListener("updateend", onUpdateEnd)
+          sb.removeEventListener("error", onSourceError)
+          resolve(true)
+        }
+        const onSourceError = () => {
+          sb.removeEventListener("updateend", onUpdateEnd)
+          sb.removeEventListener("error", onSourceError)
+          resolve(false)
+        }
+        sb.addEventListener("updateend", onUpdateEnd)
+        sb.addEventListener("error", onSourceError)
+        try {
+          sb.appendBuffer(buf)
+        } catch {
+          sb.removeEventListener("updateend", onUpdateEnd)
+          sb.removeEventListener("error", onSourceError)
+          resolve(false)
+        }
+      })
+    }
 
-    mediaSource.addEventListener("sourceopen", async () => {
-      if (aborted) return
-      let sourceBuffer: SourceBuffer
-      try {
-        // Revoke object URL early — source is already attached
-        URL.revokeObjectURL(objectUrl)
+    function tryWithCodec(codec: string): Promise<boolean> {
+      if (aborted) return Promise.resolve(false)
+      return new Promise(resolve => {
+        const ms = new MediaSource()
+        mediaSourceRef.current = ms
+        appendedChunksRef.current = 0
+        allBufferedRef.current = false
 
-        sourceBuffer = mediaSource.addSourceBuffer(mimeCodec)
-        sourceBufferRef.current = sourceBuffer
-        sourceBuffer.mode = "sequence" // Append in order, browser calculates timestamps
+        const objectUrl = URL.createObjectURL(ms)
+        video.src = objectUrl
 
-        // Fetch and append all chunks sequentially
-        for (let i = 0; i < chunkData.chunks.length; i++) {
-          if (aborted || mediaSource.readyState !== "open") break
-
-          const chunk = chunkData.chunks[i]
-          const url = getChunkUrl(chunk.filename)
-
-          const response = await fetch(url)
-          if (aborted || mediaSource.readyState !== "open") break
-          if (!response.ok) {
-            console.warn(`[MSE] Failed to fetch chunk ${i}: ${response.status}`)
-            continue
-          }
-
-          const arrayBuffer = await response.arrayBuffer()
-          if (aborted || mediaSource.readyState !== "open") break
-
-          // Wait for sourceBuffer to be ready
-          if (sourceBuffer.updating) {
-            await new Promise<void>((resolve, reject) => {
-              const onUpdateEnd = () => {
-                sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-                sourceBuffer.removeEventListener("error", onError)
-                resolve()
-              }
-              const onError = () => {
-                sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-                sourceBuffer.removeEventListener("error", onError)
-                reject(new Error(`SourceBuffer error before chunk ${i}`))
-              }
-              sourceBuffer.addEventListener("updateend", onUpdateEnd)
-              sourceBuffer.addEventListener("error", onError)
-            })
-          }
-
-          if (aborted || mediaSource.readyState !== "open") break
-
-          // Append the buffer
+        ms.addEventListener("sourceopen", async () => {
           try {
-            sourceBuffer.appendBuffer(arrayBuffer)
-          } catch (appendErr) {
-            console.warn(`[MSE] appendBuffer failed for chunk ${i}:`, appendErr)
-            break
-          }
+            if (aborted || ms.readyState !== "open") { resolve(false); return }
+            URL.revokeObjectURL(objectUrl)
 
-          // Wait for append to complete
-          await new Promise<void>((resolve, reject) => {
-            const onUpdateEnd = () => {
-              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-              sourceBuffer.removeEventListener("error", onError)
-              resolve()
+            let sb: SourceBuffer
+            try {
+              sb = ms.addSourceBuffer(codec)
+              sourceBufferRef.current = sb
+              sb.mode = "sequence"
+            } catch { resolve(false); return }
+
+            // Validate codec by appending chunk 0 (the EBML initialization segment).
+            // A SourceBuffer error here means codec mismatch — try the next one.
+            let res0: Response | null = null
+            try { res0 = await fetch(getChunkUrl(chunkData.chunks[0].filename)) } catch {}
+            if (!res0 || !res0.ok || aborted) { resolve(false); return }
+
+            let buf0: ArrayBuffer | null = null
+            try { buf0 = await res0.arrayBuffer() } catch {}
+            if (!buf0 || aborted) { resolve(false); return }
+
+            await waitForUpdateEnd(sb)
+            if (aborted) { resolve(false); return }
+
+            const initOk = await appendChunk(sb, buf0)
+            if (!initOk) {
+              // Codec mismatch — signal decode error and let caller try next codec
+              if (ms.readyState === "open") try { ms.endOfStream("decode") } catch {}
+              resolve(false)
+              return
             }
-            const onError = () => {
-              sourceBuffer.removeEventListener("updateend", onUpdateEnd)
-              sourceBuffer.removeEventListener("error", onError)
-              reject(new Error(`SourceBuffer error appending chunk ${i}`))
+
+            appendedChunksRef.current = 1
+            setLoadingProgress(Math.round((1 / chunkData.chunks.length) * 100))
+
+            // Codec confirmed — feed remaining chunks
+            for (let i = 1; i < chunkData.chunks.length; i++) {
+              if (aborted || ms.readyState !== "open") break
+
+              let res: Response | null = null
+              try { res = await fetch(getChunkUrl(chunkData.chunks[i].filename)) } catch {}
+              if (!res || !res.ok || aborted || ms.readyState !== "open") continue
+
+              let buf: ArrayBuffer | null = null
+              try { buf = await res.arrayBuffer() } catch {}
+              if (!buf) continue
+
+              await waitForUpdateEnd(sb)
+              if (aborted || ms.readyState !== "open") break
+
+              await appendChunk(sb, buf) // non-init chunk errors are non-fatal
+              appendedChunksRef.current = i + 1
+              setLoadingProgress(Math.round(((i + 1) / chunkData.chunks.length) * 100))
             }
-            sourceBuffer.addEventListener("updateend", onUpdateEnd)
-            sourceBuffer.addEventListener("error", onError)
-          })
 
-          if (aborted) break
+            if (aborted) { resolve(true); return }
 
-          appendedChunksRef.current = i + 1
-          setLoadingProgress(Math.round(((i + 1) / chunkData.chunks.length) * 100))
-        }
+            allBufferedRef.current = true
+            if (ms.readyState === "open") try { ms.endOfStream() } catch {}
 
-        if (aborted) return
-
-        // All chunks appended — signal end of stream
-        allBufferedRef.current = true
-        if (mediaSource.readyState === "open") {
-          mediaSource.endOfStream()
-        }
-
-        // Use the actual buffered duration from the browser
-        if (video.duration && isFinite(video.duration)) {
-          setTotalDuration(video.duration)
-        } else {
-          // Wait for durationchange
-          const onDuration = () => {
             if (video.duration && isFinite(video.duration)) {
               setTotalDuration(video.duration)
+            } else {
+              const onDuration = () => {
+                if (video.duration && isFinite(video.duration)) setTotalDuration(video.duration)
+                video.removeEventListener("durationchange", onDuration)
+              }
+              video.addEventListener("durationchange", onDuration)
             }
-            video.removeEventListener("durationchange", onDuration)
+
+            resolve(true)
+          } catch (err: unknown) {
+            if (!aborted) console.error("[MSE] Unexpected error with codec", codec, err)
+            resolve(false)
           }
-          video.addEventListener("durationchange", onDuration)
-        }
-      } catch (err: any) {
+        }, { once: true })
+      })
+    }
+
+    async function tryAllCodecs() {
+      for (const codec of supportedCodecs) {
+        if (aborted) return
+        const success = await tryWithCodec(codec)
+        if (success) return
+        // Clean up before trying next codec
         if (!aborted) {
-          console.error("[MSE] Error during chunk loading:", err)
-          setError(err?.message || "Error loading video chunks via MSE")
+          video.src = ""
+          mediaSourceRef.current = null
+          sourceBufferRef.current = null
         }
       }
-    })
+      if (!aborted) {
+        setError("Could not play video: no compatible codec found. The recording may be in an unsupported format.")
+      }
+    }
+
+    tryAllCodecs()
 
     return () => {
-      // Cleanup — signal abort to the async loop
       aborted = true
       mediaSourceRef.current = null
       sourceBufferRef.current = null
-      if (video) {
-        video.src = ""
-      }
+      if (video) video.src = ""
     }
   }, [chunkData, getChunkUrl])
 

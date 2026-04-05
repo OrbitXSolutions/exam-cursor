@@ -10,6 +10,7 @@ namespace Smart_Core.Application.DTOs.ExamResult
         public string CandidateId { get; set; } = string.Empty;
         public string CandidateName { get; set; } = string.Empty;
         public string? CandidateEmail { get; set; }
+        public string? CandidateRollNo { get; set; }
         public int TotalAttempts { get; set; }
         public int AttemptId { get; set; }
         public int AttemptNumber { get; set; }
