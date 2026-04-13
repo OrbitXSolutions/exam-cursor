@@ -404,7 +404,7 @@ export default function MyExamsPage() {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{t("common.points")}</p>
-                        <p className="text-lg font-bold text-foreground">{exam.totalPoints}</p>
+                        <p className="text-lg font-bold text-foreground">{Number(exam.totalPoints).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                     

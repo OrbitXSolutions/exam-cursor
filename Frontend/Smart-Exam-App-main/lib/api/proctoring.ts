@@ -925,7 +925,18 @@ export async function submitCandidateVerification(
     body: formData,
   });
 
-  const result = await res.json();
+  const responseText = await res.text();
+  let result: any;
+  try {
+    result = JSON.parse(responseText);
+  } catch {
+    throw new Error(
+      res.ok
+        ? "Verification submission failed"
+        : `Server error (${res.status}). Please try again.`,
+    );
+  }
+
   if (result.success && result.data) {
     return result.data;
   }
