@@ -62,8 +62,10 @@ export function QuestionRenderer({
 }: QuestionRendererProps) {
   const questionType = getQuestionType(question.questionTypeId, question.questionTypeName)
 
+  const dir = language === "ar" ? "rtl" : "ltr"
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" dir={dir}>
       {/* Answer Area — question image is now displayed in the parent card header */}
       {renderAnswerComponent(questionType, question, answer, language, onAnswerChange)}
     </div>
@@ -153,8 +155,10 @@ function MCQSingleChoice({
   // Sort options by order
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
+  const dir = language === "ar" ? "rtl" : "ltr"
+
   return (
-    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2">
+    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOption === option.id.toString()
@@ -170,6 +174,7 @@ function MCQSingleChoice({
             <Label
               htmlFor={`option-${option.id}`}
               className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
+              dir={dir}
             >
               <RadioGroupItem
                 value={option.id.toString()}
@@ -229,8 +234,10 @@ function MCQMultipleChoice({
   // Sort options by order
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
+  const dir = language === "ar" ? "rtl" : "ltr"
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOptions.has(option.id)
@@ -246,6 +253,7 @@ function MCQMultipleChoice({
             <Label
               htmlFor={`option-${option.id}`}
               className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
+              dir={dir}
             >
               <Checkbox
                 id={`option-${option.id}`}
@@ -300,8 +308,10 @@ function TrueFalse({
   // Sort options by order
   const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
 
+  const dir = language === "ar" ? "rtl" : "ltr"
+
   return (
-    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2">
+    <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
         const optionText = getLocalizedField(option, "text", language)
         const isSelected = selectedOption === option.id.toString()
@@ -317,6 +327,7 @@ function TrueFalse({
             <Label
               htmlFor={`option-${option.id}`}
               className="flex cursor-pointer items-center gap-3 px-4 py-2.5"
+              dir={dir}
             >
               <RadioGroupItem
                 value={option.id.toString()}

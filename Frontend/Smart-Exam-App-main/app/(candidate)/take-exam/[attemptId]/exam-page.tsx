@@ -2558,7 +2558,7 @@ function QuestionCard({
   const questionImage = primaryImage || anyImage
 
   return (
-    <Card className="shadow-sm">
+    <Card className="shadow-sm" dir={language === "ar" ? "rtl" : "ltr"}>
       <CardHeader className="border-b bg-muted/20 py-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-2">
