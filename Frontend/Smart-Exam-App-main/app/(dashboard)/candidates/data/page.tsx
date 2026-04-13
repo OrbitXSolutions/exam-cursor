@@ -138,11 +138,18 @@ export default function CandidatesDataPage() {
     if (!formData.email.trim()) err.email = isAr ? "البريد مطلوب" : "Email is required"
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       err.email = isAr ? "بريد غير صالح" : "Invalid email format"
-    if (!formData.rollNo.trim()) err.rollNo = isAr ? "رقم القيد مطلوب" : "Roll No is required"
     if (formMode === "create" && !formData.password.trim())
       err.password = isAr ? "كلمة المرور مطلوبة" : "Password is required"
-    if (formData.password && formData.password.length < 6)
-      err.password = isAr ? "6 أحرف على الأقل" : "At least 6 characters"
+    if (formData.password) {
+      if (formData.password.length < 8)
+        err.password = isAr ? "8 أحرف على الأقل" : "At least 8 characters"
+      else if (!/[A-Z]/.test(formData.password))
+        err.password = isAr ? "يجب أن تحتوي على حرف كبير" : "Must contain an uppercase letter"
+      else if (!/[a-z]/.test(formData.password))
+        err.password = isAr ? "يجب أن تحتوي على حرف صغير" : "Must contain a lowercase letter"
+      else if (!/[^a-zA-Z0-9]/.test(formData.password))
+        err.password = isAr ? "يجب أن تحتوي على رمز خاص" : "Must contain a special character"
+    }
     setFormErrors(err)
     return Object.keys(err).length === 0
   }
@@ -530,11 +537,18 @@ export default function CandidatesDataPage() {
                 onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
                 placeholder={formMode === "edit" ? (isAr ? "اتركه فارغاً للإبقاء" : "Leave empty to keep current") : ""}
               />
-              {formErrors.password && <p className="text-xs text-destructive">{formErrors.password}</p>}
+              {formErrors.password
+                ? <p className="text-xs text-destructive">{formErrors.password}</p>
+                : <p className="text-xs text-muted-foreground">
+                    {isAr
+                      ? "8 أحرف على الأقل، حرف كبير، حرف صغير، ورمز خاص (!@#$...)"
+                      : "Min 8 chars, uppercase, lowercase & special character (!@#$...)"}
+                  </p>
+              }
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>{isAr ? "رقم القيد" : "Roll No"} *</Label>
+                <Label>{isAr ? "رقم القيد" : "Roll No"}</Label>
                 <Input
                   value={formData.rollNo}
                   onChange={(e) => setFormData(d => ({ ...d, rollNo: e.target.value }))}

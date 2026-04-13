@@ -94,16 +94,33 @@ export async function POST(
     const headers: Record<string, string> = {};
     const auth = request.headers.get("authorization");
     if (auth) headers["Authorization"] = auth;
-    if (isMultipart) headers["Content-Type"] = contentType;
-    else headers["Content-Type"] = "application/json";
 
-    const body = isMultipart
-      ? await request.arrayBuffer()
-      : JSON.stringify(await request.json().catch(() => ({})));
+    let body: BodyInit;
+    if (isMultipart) {
+      // Use formData() — fetch will set the correct Content-Type + boundary automatically
+      body = await request.formData();
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(await request.json().catch(() => ({})));
+    }
 
     const response = await fetch(url, { method: "POST", headers, body });
 
-    const data = await response.json().catch(() => ({}));
+    const responseText = await response.text();
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      // Backend returned non-JSON (HTML error page etc.)
+      data = {
+        success: false,
+        message: response.ok
+          ? "Unexpected response from server"
+          : `Server error (${response.status})`,
+        data: null,
+        errors: [],
+      };
+    }
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error(`[Proxy POST Error] ${url}`, error);
