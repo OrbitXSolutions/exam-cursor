@@ -39,6 +39,7 @@ public class PublicExamInfoDto
     // Organization branding
     public string? OrganizationName { get; set; }
     public string? OrganizationLogoUrl { get; set; }
+    public bool IsWalkIn { get; set; }
 }
 
 public class ShareCandidateDto
@@ -62,6 +63,16 @@ public class ShareCandidateDto
 public class SelectCandidateDto
 {
     public string CandidateId { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Walk-in self-registration DTO
+/// </summary>
+public class WalkInRegisterDto
+{
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
 }
 
 public class SelectCandidateResponseDto

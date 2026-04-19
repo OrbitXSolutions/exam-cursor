@@ -399,7 +399,7 @@ export default function EditExamPage() {
                   type="number"
                   min="0"
                   value={formData.maxAttempts}
-                  onChange={(e) => updateField("maxAttempts", Number.parseInt(e.target.value) || 1)}
+                  onChange={(e) => { const v = Number.parseInt(e.target.value); updateField("maxAttempts", isNaN(v) ? 0 : Math.max(0, v)); }}
                   className="w-full h-11"
                 />
                 <p className="text-xs text-muted-foreground">{t("exams.maxAttemptsHint")}</p>

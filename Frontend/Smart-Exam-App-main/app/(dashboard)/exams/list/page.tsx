@@ -52,6 +52,7 @@ import {
   PartyPopper,
   Globe,
   Users,
+  UserPlus,
   Info,
   Mail,
   Loader2,
@@ -346,7 +347,12 @@ export default function ExamsListPage() {
 
                         {/* Access Policy */}
                         <TableCell className="text-center">
-                          {exam.accessPolicyStatus === "Assigned" ? (
+                          {exam.accessPolicyStatus === "WalkIn" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                              <UserPlus className="h-3 w-3" />
+                              {language === "ar" ? "تسجيل ذاتي" : "Walk-in"}
+                            </span>
+                          ) : exam.accessPolicyStatus === "Assigned" ? (
                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                               <Users className="h-3 w-3" />
                               {language === "ar" ? "مُعيّن" : "Assigned"}

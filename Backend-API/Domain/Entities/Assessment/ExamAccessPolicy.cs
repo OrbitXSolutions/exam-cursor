@@ -16,6 +16,9 @@ public class ExamAccessPolicy : BaseEntity
     // Optional: allow only specific users/groups later
     public bool RestrictToAssignedCandidates { get; set; }
 
+    // Walk-in: anyone can self-register and take the exam via the share link
+    public bool IsWalkIn { get; set; } = false;
+
     // Navigation Property
     public virtual Exam Exam { get; set; } = null!;
 }

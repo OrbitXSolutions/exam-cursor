@@ -98,12 +98,14 @@ export function Header() {
                   {t("nav.settings")}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/tutorials" className="cursor-pointer">
-                  <HelpCircle className="h-4 w-4" />
-                  {t("nav.userGuide") || t("nav.helpSupport")}
-                </Link>
-              </DropdownMenuItem>
+              {user.role !== "Candidate" && (
+                <DropdownMenuItem asChild>
+                  <Link href="/tutorials" className="cursor-pointer">
+                    <HelpCircle className="h-4 w-4" />
+                    {t("nav.userGuide") || t("nav.helpSupport")}
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
                 <LogOut className="h-4 w-4" />

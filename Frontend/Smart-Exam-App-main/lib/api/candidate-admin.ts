@@ -10,6 +10,7 @@ export interface CandidateDto {
   mobile: string | null;
   status: string;
   isBlocked: boolean;
+  isWalkIn: boolean;
   createdDate: string;
   createdBy: string | null;
   createdByName: string | null;

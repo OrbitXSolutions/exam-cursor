@@ -11,6 +11,7 @@ public class CandidateListDto
     public string? Mobile { get; set; }
     public string Status { get; set; } = "Active";
     public bool IsBlocked { get; set; }
+    public bool IsWalkIn { get; set; }
     public DateTime CreatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }

@@ -87,15 +87,31 @@ public class CandidateService : ICandidateService
             // - If RestrictToAssignedCandidates = true, only show to candidates with ExamAssignment
             if (isCandidate)
             {
-                var assignedExamIds = await _context.Set<Domain.Entities.ExamAssignment.ExamAssignment>()
-                    .Where(a => a.CandidateId == candidateId && a.IsActive && !a.IsDeleted)
-                    .Select(a => a.ExamId)
-                    .ToListAsync();
+                if (user.IsWalkIn)
+                {
+                    // Walk-in candidates only see exams they have an attempt record for.
+                    // They have no account before arriving via share link, so showing all
+                    // public exams is confusing and incorrect.
+                    var attemptedExamIds = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                        .Where(a => a.CandidateId == candidateId && !a.IsDeleted)
+                        .Select(a => a.ExamId)
+                        .Distinct()
+                        .ToListAsync();
 
-                query = query.Where(e =>
-                    e.AccessPolicy!.IsPublic ||
-                    (!e.AccessPolicy.RestrictToAssignedCandidates) ||
-                    assignedExamIds.Contains(e.Id));
+                    query = query.Where(e => attemptedExamIds.Contains(e.Id));
+                }
+                else
+                {
+                    var assignedExamIds = await _context.Set<Domain.Entities.ExamAssignment.ExamAssignment>()
+                        .Where(a => a.CandidateId == candidateId && a.IsActive && !a.IsDeleted)
+                        .Select(a => a.ExamId)
+                        .ToListAsync();
+
+                    query = query.Where(e =>
+                        e.AccessPolicy!.IsPublic ||
+                        (!e.AccessPolicy.IsWalkIn && !e.AccessPolicy.RestrictToAssignedCandidates) ||
+                        assignedExamIds.Contains(e.Id));
+                }
             }
 
             // Department filtering logic:

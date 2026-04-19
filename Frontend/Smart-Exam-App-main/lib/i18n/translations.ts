@@ -470,6 +470,9 @@ export const translations = {
       accessCodePlaceholder: "e.g. EXAM2026",
       restrictToAssigned: "Restrict to Assigned",
       restrictToAssignedDesc: "Only assigned candidates can access this exam",
+      walkIn: "Walk-in Registration",
+      walkInDesc:
+        "Anyone can self-register via QR/share link and take the exam — no prior registration needed",
       addInstruction: "Add Instruction",
       editInstruction: "Edit Instruction",
       instructionDialogDesc: "Enter instruction content in both languages",
@@ -1377,6 +1380,65 @@ export const translations = {
       adminOverride: "Admin Override",
       resumeTab: "Resume",
     },
+
+    // Candidate: Verify Identity Page
+    verifyIdentity: {
+      pageTitle: "Identity Verification",
+      pageSubtitle:
+        "Please verify your identity by taking a selfie and uploading your Emirates ID. This is required before you can take any exam.",
+      step1: "Selfie",
+      step2: "Emirates ID",
+      step3: "ID Info",
+      // Status cards
+      identityVerified: "Identity Verified",
+      identityVerifiedDesc:
+        "Your identity has been verified successfully. You can now proceed to your exams.",
+      verificationPending: "Verification Pending",
+      verificationPendingDesc:
+        "Your identity verification is being reviewed. You will be notified once it is processed.",
+      verificationRejected: "Verification Rejected",
+      verificationFlagged: "Verification Flagged",
+      submittedAt: "Submitted",
+      reviewedAt: "Reviewed",
+      resubmit: "Re-submit",
+      goToMyExams: "Go to My Exams",
+      previousRejected: "Previous submission was {status}. Reason: {reason}",
+      // Selfie section
+      selfieTitle: "Take a Selfie",
+      selfieDesc: "Position your face clearly in the camera frame.",
+      openCamera: "Open Camera",
+      capturePhoto: "Capture Photo",
+      captured: "Captured",
+      retake: "Retake",
+      cameraError:
+        "Camera access denied. Please allow camera access and try again.",
+      // ID section
+      idTitle: "Emirates ID Photo",
+      idDesc: "Upload a clear photo of your Emirates ID (front side).",
+      idFileHint: "JPEG, PNG, or WebP (max 10MB)",
+      uploadIdPhoto: "Upload ID Photo",
+      uploaded: "Uploaded",
+      change: "Change",
+      // ID info
+      idInfoTitle: "ID Information",
+      documentType: "Document Type",
+      idNumber: "ID Number",
+      idNumberPlaceholder: "Enter your ID number",
+      emiratesId: "Emirates ID",
+      nationalId: "National ID",
+      passport: "Passport",
+      drivingLicense: "Driving License",
+      // Submit
+      submitVerification: "Submit Verification",
+      submitting: "Submitting...",
+      // Validation
+      validationSelfieId:
+        "Please capture your selfie and upload your ID photo.",
+      validationIdNumber: "Please enter your ID number.",
+      // File validation
+      invalidFileType: "Please upload a JPEG, PNG, or WebP image.",
+      fileTooLarge: "File size must be less than 10MB.",
+    },
   },
 
   ar: {
@@ -1905,6 +1967,9 @@ export const translations = {
       restrictToAssigned: "تقييد المعينين",
       restrictToAssignedDesc:
         "فقط المرشحون المعينون يمكنهم الوصول إلى هذا الاختبار",
+      walkIn: "تسجيل ذاتي (Walk-in)",
+      walkInDesc:
+        "يمكن لأي شخص التسجيل الذاتي عبر رابط/رمز QR وبدء الاختبار بدون تسجيل مسبق",
       notFound: "الاختبار غير موجود",
     },
 
@@ -2783,6 +2848,64 @@ export const translations = {
       status: "الحالة",
       adminOverride: "تجاوز إداري",
       resumeTab: "استئناف",
+    },
+
+    // Candidate: Verify Identity Page
+    verifyIdentity: {
+      pageTitle: "التحقق من الهوية",
+      pageSubtitle:
+        "يرجى التحقق من هويتك عن طريق التقاط صورة سيلفي وتحميل بطاقة الهوية الإماراتية. هذا الإجراء مطلوب قبل الشروع في أي اختبار.",
+      step1: "سيلفي",
+      step2: "الهوية الإماراتية",
+      step3: "بيانات الهوية",
+      // Status cards
+      identityVerified: "تم التحقق من الهوية",
+      identityVerifiedDesc:
+        "تم التحقق من هويتك بنجاح. يمكنك الآن المتابعة إلى اختباراتك.",
+      verificationPending: "التحقق قيد الانتظار",
+      verificationPendingDesc:
+        "جارٍ مراجعة طلب التحقق من هويتك. سيتم إشعارك فور الانتهاء.",
+      verificationRejected: "تم رفض التحقق",
+      verificationFlagged: "تم تعليم التحقق",
+      submittedAt: "تاريخ التقديم",
+      reviewedAt: "تاريخ المراجعة",
+      resubmit: "إعادة التقديم",
+      goToMyExams: "الذهاب إلى اختباراتي",
+      previousRejected: "تم {status} الطلب السابق. السبب: {reason}",
+      // Selfie section
+      selfieTitle: "التقاط صورة سيلفي",
+      selfieDesc: "ضع وجهك بوضوح أمام الكاميرا.",
+      openCamera: "فتح الكاميرا",
+      capturePhoto: "التقاط الصورة",
+      captured: "تم الالتقاط",
+      retake: "إعادة الالتقاط",
+      cameraError:
+        "تم رفض الوصول إلى الكاميرا. يرجى السماح بالوصول والمحاولة مجدداً.",
+      // ID section
+      idTitle: "صورة الهوية الإماراتية",
+      idDesc: "حمّل صورة واضحة للوجه الأمامي لبطاقة الهوية الإماراتية.",
+      idFileHint: "JPEG أو PNG أو WebP (الحجم الأقصى 10 ميغابايت)",
+      uploadIdPhoto: "تحميل صورة الهوية",
+      uploaded: "تم التحميل",
+      change: "تغيير",
+      // ID info
+      idInfoTitle: "بيانات الهوية",
+      documentType: "نوع المستند",
+      idNumber: "رقم الهوية",
+      idNumberPlaceholder: "أدخل رقم هويتك",
+      emiratesId: "هوية إماراتية",
+      nationalId: "هوية وطنية",
+      passport: "جواز سفر",
+      drivingLicense: "رخصة قيادة",
+      // Submit
+      submitVerification: "تقديم طلب التحقق",
+      submitting: "جارٍ التقديم...",
+      // Validation
+      validationSelfieId: "يرجى التقاط صورة السيلفي وتحميل صورة الهوية.",
+      validationIdNumber: "يرجى إدخال رقم الهوية.",
+      // File validation
+      invalidFileType: "يرجى تحميل صورة بصيغة JPEG أو PNG أو WebP.",
+      fileTooLarge: "يجب أن لا يتجاوز حجم الملف 10 ميغابايت.",
     },
   },
 };

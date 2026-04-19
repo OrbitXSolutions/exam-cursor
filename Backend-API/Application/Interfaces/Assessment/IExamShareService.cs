@@ -14,4 +14,5 @@ public interface IExamShareService
     Task<ApiResponse<PublicExamInfoDto>> GetExamByShareTokenAsync(string shareToken);
     Task<ApiResponse<List<ShareCandidateDto>>> GetCandidatesByShareTokenAsync(string shareToken, string? search);
     Task<ApiResponse<SelectCandidateResponseDto>> SelectCandidateAsync(string shareToken, SelectCandidateDto dto);
+    Task<ApiResponse<SelectCandidateResponseDto>> WalkInRegisterAsync(string shareToken, WalkInRegisterDto dto);
 }

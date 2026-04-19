@@ -12,6 +12,7 @@ public class ExamAccessPolicyDto
     public bool IsPublic { get; set; }
     public string? AccessCode { get; set; }
     public bool RestrictToAssignedCandidates { get; set; }
+    public bool IsWalkIn { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }
@@ -24,6 +25,7 @@ public class SaveExamAccessPolicyDto
     public bool IsPublic { get; set; }
     public string? AccessCode { get; set; }
     public bool RestrictToAssignedCandidates { get; set; }
+    public bool IsWalkIn { get; set; }
 }
 
 #endregion

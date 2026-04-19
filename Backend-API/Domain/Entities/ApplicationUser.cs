@@ -24,6 +24,9 @@ public class ApplicationUser : IdentityUser
   public string? DeletedBy { get; set; }
   public bool IsDeleted { get; set; } = false;
 
+  // Walk-in candidate flag (self-registered via share link)
+  public bool IsWalkIn { get; set; } = false;
+
   // Encrypted password (AES-256) for notification emails
   public string? EncryptedPassword { get; set; }
 

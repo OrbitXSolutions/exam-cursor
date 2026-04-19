@@ -905,6 +905,7 @@ export interface SaveAccessPolicyParams {
   isPublic: boolean;
   accessCode?: string;
   restrictToAssignedCandidates?: boolean;
+  isWalkIn?: boolean;
 }
 
 export async function saveAccessPolicy(
@@ -927,6 +928,7 @@ export async function saveAccessPolicy(
     isPublic: data.isPublic,
     accessCode: data.accessCode || null,
     restrictToAssignedCandidates: data.restrictToAssignedCandidates ?? false,
+    isWalkIn: data.isWalkIn ?? false,
     createdDate: new Date().toISOString(),
     updatedDate: null,
   };
