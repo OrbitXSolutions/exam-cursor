@@ -128,6 +128,7 @@ const examsNavGroup: NavGroup = {
     { icon: Copy, labelKey: "nav.createFromTemplate", href: "/exams/create-from-template" },
     { icon: List, labelKey: "nav.examsList", href: "/exams/list" },
     { icon: Calendar, labelKey: "nav.examScheduler", href: "/exams/scheduler", hidden: true },
+    { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign", roles: [UserRole.Admin, UserRole.Instructor] },
   ],
 }
 
@@ -151,7 +152,6 @@ const proctorNavGroup: NavGroup = {
   roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer, UserRole.Proctor],
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
-    { icon: UserCheck, labelKey: "nav.assignToProctor", href: "/proctor/assign", hidden: true },
     { icon: Users, labelKey: "nav.userIdentification", href: "/proctor/user-identification" },
   ],
 }
@@ -474,8 +474,10 @@ export function Sidebar() {
                       <ShieldCheck className="h-5 w-5 shrink-0 text-green-600" />
                     ) : verifiedStatus === "Pending" ? (
                       <Clock className="h-5 w-5 shrink-0 text-amber-500" />
-                    ) : (
+                    ) : (verifiedStatus === "Rejected" || verifiedStatus === "Flagged") ? (
                       <ShieldCheck className="h-5 w-5 shrink-0 text-red-500" />
+                    ) : (
+                      <ShieldCheck className="h-5 w-5 shrink-0 text-muted-foreground" />
                     )}
                     {!isCollapsed && (
                       <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
@@ -485,10 +487,13 @@ export function Sidebar() {
                           verifiedStatus === "Approved" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                           verifiedStatus === "Pending" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
                           (verifiedStatus === "Rejected" || verifiedStatus === "Flagged") && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+                          (!verifiedStatus || verifiedStatus === "None") && "bg-muted text-muted-foreground",
                         )}>
                           {verifiedStatus === "Approved" ? (language === "ar" ? "تم التحقق" : "Verified") :
                            verifiedStatus === "Pending" ? (language === "ar" ? "قيد المراجعة" : "Pending") :
-                           (language === "ar" ? "مرفوض" : verifiedStatus)}
+                           verifiedStatus === "Rejected" ? (language === "ar" ? "مرفوض" : "Rejected") :
+                           verifiedStatus === "Flagged" ? (language === "ar" ? "مُعلَّم" : "Flagged") :
+                           (language === "ar" ? "غير موثق" : "Not Verified")}
                         </span>
                       </span>
                     )}

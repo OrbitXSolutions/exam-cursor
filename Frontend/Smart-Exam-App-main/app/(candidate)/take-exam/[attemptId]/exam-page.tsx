@@ -1583,19 +1583,30 @@ export default function ExamPage() {
       )}
 
       {/* Header with timer and submit button */}
-      <div className="border-b bg-card px-6 py-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">{examTitle}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t("exam.progress")}: {answeredCount}/{totalQuestions} - {Math.round(progress)}%
-            </p>
-          </div>
+      <div className="border-b bg-card px-3 sm:px-6 py-2 sm:py-3">
 
-          <div className="flex items-center gap-3">
+        {/* Mobile: title + progress centered on one line */}
+        <div className="flex sm:hidden items-center justify-between gap-2 mb-2">
+          <h1 className="text-sm font-bold truncate flex-1 text-center">{examTitle}</h1>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {answeredCount}/{totalQuestions} · {Math.round(progress)}%
+          </span>
+        </div>
+
+        {/* Desktop: original title block */}
+        <div className="hidden sm:block mb-1">
+          <h1 className="text-xl font-bold">{examTitle}</h1>
+          <p className="text-xs text-muted-foreground">
+            {t("exam.progress")}: {answeredCount}/{totalQuestions} - {Math.round(progress)}%
+          </p>
+        </div>
+
+        {/* Controls row */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap min-w-0">
             {/* Section Timer */}
             {sectionTimeRemaining !== undefined && sectionTimeRemaining !== null && (
-              <div className="flex items-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 dark:border-orange-900 dark:bg-orange-950">
+              <div className="flex items-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-2 py-1 sm:px-3 sm:py-1.5 dark:border-orange-900 dark:bg-orange-950">
                 <p className="text-xs font-medium text-orange-600 dark:text-orange-400">
                   {t("exam.sectionTime")}: {formatTime(sectionTimeRemaining)}
                 </p>
@@ -1604,7 +1615,7 @@ export default function ExamPage() {
 
             {/* Exam Timer */}
             <div className={cn(
-              "flex items-center gap-2 rounded-md border px-3 py-1.5",
+              "flex items-center gap-2 rounded-md border px-2 py-1 sm:px-3 sm:py-1.5",
               examTimeRemaining < 300
                 ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950"
                 : "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950"
@@ -1730,12 +1741,22 @@ export default function ExamPage() {
             <Button
               onClick={() => setSubmitDialogOpen(true)}
               size="sm"
-              className="gap-2"
+              className="gap-2 sm:hidden"
             >
               <Send className="h-4 w-4" />
               {t("common.submit")}
             </Button>
           </div>
+
+          {/* Submit Button — desktop (right side) */}
+          <Button
+            onClick={() => setSubmitDialogOpen(true)}
+            size="sm"
+            className="gap-2 hidden sm:flex shrink-0"
+          >
+            <Send className="h-4 w-4" />
+            {t("common.submit")}
+          </Button>
         </div>
 
         {/* Progress bar */}

@@ -292,6 +292,7 @@ export interface ExamAccessPolicy {
   isPublic: boolean;
   accessCode: string | null;
   restrictToAssignedCandidates: boolean;
+  isWalkIn: boolean;
   createdDate: string;
   updatedDate: string | null;
 }

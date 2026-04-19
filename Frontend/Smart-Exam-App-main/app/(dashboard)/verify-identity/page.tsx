@@ -41,7 +41,7 @@ type Step = "check" | "capture" | "review" | "submitted"
 
 export default function VerifyIdentityPage() {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, language, isRTL, dir } = useI18n()
   const router = useRouter()
 
   const [step, setStep] = useState<Step>("check")
@@ -155,11 +155,11 @@ export default function VerifyIdentityPage() {
     const file = e.target.files?.[0]
     if (file) {
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        toast.error("Please upload a JPEG, PNG, or WebP image.")
+        toast.error(t("verifyIdentity.invalidFileType"))
         return
       }
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File size must be less than 10MB.")
+        toast.error(t("verifyIdentity.fileTooLarge"))
         return
       }
       setIdFile(file)
@@ -169,11 +169,11 @@ export default function VerifyIdentityPage() {
 
   const handleSubmit = useCallback(async () => {
     if (!selfieFile || !idFile) {
-      toast.error("Please capture your selfie and upload your ID photo.")
+      toast.error(t("verifyIdentity.validationSelfieId"))
       return
     }
     if (!idNumber.trim()) {
-      toast.error("Please enter your ID number.")
+      toast.error(t("verifyIdentity.validationIdNumber"))
       return
     }
 
@@ -227,7 +227,7 @@ export default function VerifyIdentityPage() {
     const isFlagged = status === "Flagged"
 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir={dir}>
         <Card className="max-w-lg w-full">
           <CardHeader className="text-center">
             {isApproved && (
@@ -235,9 +235,9 @@ export default function VerifyIdentityPage() {
                 <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
                   <CheckCircle2 className="h-8 w-8 text-green-600" />
                 </div>
-                <CardTitle className="text-green-600">Identity Verified</CardTitle>
+                <CardTitle className="text-green-600">{t("verifyIdentity.identityVerified")}</CardTitle>
                 <CardDescription>
-                  Your identity has been verified successfully. You can now proceed to your exams.
+                  {t("verifyIdentity.identityVerifiedDesc")}
                 </CardDescription>
               </>
             )}
@@ -246,9 +246,9 @@ export default function VerifyIdentityPage() {
                 <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
                   <Clock className="h-8 w-8 text-yellow-600" />
                 </div>
-                <CardTitle className="text-yellow-600">Verification Pending</CardTitle>
+                <CardTitle className="text-yellow-600">{t("verifyIdentity.verificationPending")}</CardTitle>
                 <CardDescription>
-                  Your identity verification is being reviewed. You will be notified once it is processed.
+                  {t("verifyIdentity.verificationPendingDesc")}
                 </CardDescription>
               </>
             )}
@@ -258,10 +258,10 @@ export default function VerifyIdentityPage() {
                   {isRejected ? <XCircle className="h-8 w-8 text-red-600" /> : <AlertTriangle className="h-8 w-8 text-orange-600" />}
                 </div>
                 <CardTitle className={isRejected ? "text-red-600" : "text-orange-600"}>
-                  {isRejected ? "Verification Rejected" : "Verification Flagged"}
+                  {isRejected ? t("verifyIdentity.verificationRejected") : t("verifyIdentity.verificationFlagged")}
                 </CardTitle>
                 <CardDescription>
-                  {verificationStatus?.reviewNotes || "Your verification requires attention. Please re-submit."}
+                  {verificationStatus?.reviewNotes || t("verifyIdentity.verificationPendingDesc")}
                 </CardDescription>
               </>
             )}
@@ -269,24 +269,32 @@ export default function VerifyIdentityPage() {
           <CardContent className="space-y-4">
             {verificationStatus?.submittedAt && (
               <div className="text-sm text-muted-foreground text-center">
-                Submitted: {new Date(verificationStatus.submittedAt).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}
+                {t("verifyIdentity.submittedAt")}:{" "}
+                {new Date(verificationStatus.submittedAt).toLocaleString(
+                  language === "ar" ? "ar-SA" : "en-US",
+                  { timeZone: "Asia/Dubai" },
+                )}
               </div>
             )}
             {verificationStatus?.reviewedAt && (
               <div className="text-sm text-muted-foreground text-center">
-                Reviewed: {new Date(verificationStatus.reviewedAt).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}
+                {t("verifyIdentity.reviewedAt")}:{" "}
+                {new Date(verificationStatus.reviewedAt).toLocaleString(
+                  language === "ar" ? "ar-SA" : "en-US",
+                  { timeZone: "Asia/Dubai" },
+                )}
               </div>
             )}
             <div className="flex gap-3 justify-center">
               {(isRejected || isFlagged) && (
                 <Button onClick={resetForm} variant="outline">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Re-submit
+                  <RefreshCw className="h-4 w-4 me-2" />
+                  {t("verifyIdentity.resubmit")}
                 </Button>
               )}
               <Button onClick={() => router.push("/my-exams")}>
-                <ArrowRight className="h-4 w-4 mr-2" />
-                Go to My Exams
+                <ArrowRight className="h-4 w-4 me-2" />
+                {t("verifyIdentity.goToMyExams")}
               </Button>
             </div>
           </CardContent>
@@ -299,24 +307,25 @@ export default function VerifyIdentityPage() {
   const canProceedToReview = selfieFile && idFile && idNumber.trim()
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={dir}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">Identity Verification</h1>
+          <h1 className="text-2xl font-bold">{t("verifyIdentity.pageTitle")}</h1>
           <p className="text-muted-foreground mt-2">
-            Please verify your identity by taking a selfie and uploading your Emirates ID.
-            This is required before you can take any exam.
+            {t("verifyIdentity.pageSubtitle")}
           </p>
           {(verificationStatus?.status === "Rejected" || verificationStatus?.status === "Flagged") && (
             <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm">
-              <AlertTriangle className="h-4 w-4 inline mr-1 text-red-600" />
+              <AlertTriangle className="h-4 w-4 inline me-1 text-red-600" />
               <span className="text-red-700 dark:text-red-400">
-                Previous submission was {verificationStatus.status.toLowerCase()}.
-                {verificationStatus.reviewNotes && ` Reason: ${verificationStatus.reviewNotes}`}
+                {verificationStatus.status === "Rejected"
+                  ? t("verifyIdentity.verificationRejected")
+                  : t("verifyIdentity.verificationFlagged")}
+                {verificationStatus.reviewNotes && ` — ${verificationStatus.reviewNotes}`}
               </span>
             </div>
           )}
@@ -325,15 +334,15 @@ export default function VerifyIdentityPage() {
         {/* Steps indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Badge variant={selfieFile ? "default" : "outline"} className="px-4 py-1.5">
-            1. Selfie
+            1. {t("verifyIdentity.step1")}
           </Badge>
           <div className="w-8 h-px bg-muted-foreground/30" />
           <Badge variant={idFile ? "default" : "outline"} className="px-4 py-1.5">
-            2. Emirates ID
+            2. {t("verifyIdentity.step2")}
           </Badge>
           <div className="w-8 h-px bg-muted-foreground/30" />
           <Badge variant={idNumber ? "default" : "outline"} className="px-4 py-1.5">
-            3. ID Info
+            3. {t("verifyIdentity.step3")}
           </Badge>
         </div>
 
@@ -343,10 +352,10 @@ export default function VerifyIdentityPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Camera className="h-5 w-5" />
-                Take a Selfie
+                {t("verifyIdentity.selfieTitle")}
               </CardTitle>
               <CardDescription>
-                Position your face clearly in the camera frame.
+                {t("verifyIdentity.selfieDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -364,8 +373,8 @@ export default function VerifyIdentityPage() {
                       <canvas ref={canvasRef} className="hidden" />
                       <div className="flex gap-2 mt-3">
                         <Button onClick={capturePhoto} className="flex-1">
-                          <Camera className="h-4 w-4 mr-2" />
-                          Capture Photo
+                          <Camera className="h-4 w-4 me-2" />
+                          {t("verifyIdentity.capturePhoto")}
                         </Button>
                         <Button onClick={stopCamera} variant="outline" size="icon">
                           <XCircle className="h-4 w-4" />
@@ -378,11 +387,11 @@ export default function VerifyIdentityPage() {
                         <User className="h-8 w-8 text-muted-foreground" />
                       </div>
                       {cameraError && (
-                        <p className="text-sm text-destructive text-center">{cameraError}</p>
+                        <p className="text-sm text-destructive text-center">{t("verifyIdentity.cameraError")}</p>
                       )}
                       <Button onClick={startCamera}>
-                        <Camera className="h-4 w-4 mr-2" />
-                        Open Camera
+                        <Camera className="h-4 w-4 me-2" />
+                        {t("verifyIdentity.openCamera")}
                       </Button>
                     </div>
                   )}
@@ -391,12 +400,12 @@ export default function VerifyIdentityPage() {
                 <div className="space-y-3">
                   <img
                     src={selfiePreview}
-                    alt="Selfie preview"
+                    alt={t("verifyIdentity.selfieTitle")}
                     className="w-full rounded-lg border aspect-[4/3] object-cover"
                   />
                   <div className="flex items-center justify-between">
                     <Badge variant="default" className="gap-1">
-                      <CheckCircle2 className="h-3 w-3" /> Captured
+                      <CheckCircle2 className="h-3 w-3" /> {t("verifyIdentity.captured")}
                     </Badge>
                     <Button
                       size="sm"
@@ -406,8 +415,8 @@ export default function VerifyIdentityPage() {
                         setSelfiePreview(null)
                       }}
                     >
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                      Retake
+                      <RefreshCw className="h-3 w-3 me-1" />
+                      {t("verifyIdentity.retake")}
                     </Button>
                   </div>
                 </div>
@@ -420,10 +429,10 @@ export default function VerifyIdentityPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <CreditCard className="h-5 w-5" />
-                Emirates ID Photo
+                {t("verifyIdentity.idTitle")}
               </CardTitle>
               <CardDescription>
-                Upload a clear photo of your Emirates ID (front side).
+                {t("verifyIdentity.idDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -433,13 +442,13 @@ export default function VerifyIdentityPage() {
                     <CreditCard className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <p className="text-sm text-muted-foreground text-center">
-                    JPEG, PNG, or WebP (max 10MB)
+                    {t("verifyIdentity.idFileHint")}
                   </p>
                   <label className="cursor-pointer">
                     <Button asChild>
                       <span>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload ID Photo
+                        <Upload className="h-4 w-4 me-2" />
+                        {t("verifyIdentity.uploadIdPhoto")}
                       </span>
                     </Button>
                     <input
@@ -454,12 +463,12 @@ export default function VerifyIdentityPage() {
                 <div className="space-y-3">
                   <img
                     src={idPreview}
-                    alt="ID preview"
+                    alt={t("verifyIdentity.idTitle")}
                     className="w-full rounded-lg border aspect-[16/10] object-cover"
                   />
                   <div className="flex items-center justify-between">
                     <Badge variant="default" className="gap-1">
-                      <CheckCircle2 className="h-3 w-3" /> Uploaded
+                      <CheckCircle2 className="h-3 w-3" /> {t("verifyIdentity.uploaded")}
                     </Badge>
                     <Button
                       size="sm"
@@ -469,8 +478,8 @@ export default function VerifyIdentityPage() {
                         setIdPreview(null)
                       }}
                     >
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                      Change
+                      <RefreshCw className="h-3 w-3 me-1" />
+                      {t("verifyIdentity.change")}
                     </Button>
                   </div>
                 </div>
@@ -484,29 +493,29 @@ export default function VerifyIdentityPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <CreditCard className="h-5 w-5" />
-              ID Information
+              {t("verifyIdentity.idInfoTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Document Type</Label>
+                <Label>{t("verifyIdentity.documentType")}</Label>
                 <Select value={idDocumentType} onValueChange={setIdDocumentType}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Emirates ID">Emirates ID</SelectItem>
-                    <SelectItem value="National ID">National ID</SelectItem>
-                    <SelectItem value="Passport">Passport</SelectItem>
-                    <SelectItem value="Driving License">Driving License</SelectItem>
+                    <SelectItem value="Emirates ID">{t("verifyIdentity.emiratesId")}</SelectItem>
+                    <SelectItem value="National ID">{t("verifyIdentity.nationalId")}</SelectItem>
+                    <SelectItem value="Passport">{t("verifyIdentity.passport")}</SelectItem>
+                    <SelectItem value="Driving License">{t("verifyIdentity.drivingLicense")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>ID Number</Label>
+                <Label>{t("verifyIdentity.idNumber")}</Label>
                 <Input
-                  placeholder="Enter your ID number"
+                  placeholder={t("verifyIdentity.idNumberPlaceholder")}
                   value={idNumber}
                   onChange={e => setIdNumber(e.target.value)}
                 />
@@ -525,13 +534,13 @@ export default function VerifyIdentityPage() {
           >
             {submitting ? (
               <>
-                <LoadingSpinner size="sm" className="mr-2" />
-                Submitting...
+                <LoadingSpinner size="sm" className="me-2" />
+                {t("verifyIdentity.submitting")}
               </>
             ) : (
               <>
-                <Shield className="h-5 w-5 mr-2" />
-                Submit Verification
+                <Shield className="h-5 w-5 me-2" />
+                {t("verifyIdentity.submitVerification")}
               </>
             )}
           </Button>

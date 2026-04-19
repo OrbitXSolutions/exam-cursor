@@ -1191,9 +1191,9 @@ export const examManagementTutorial: TutorialModule = {
           titleEn: "Tab 4: Access Policy",
           titleAr: "تبويب 4: سياسة الوصول",
           descriptionEn:
-            'Control who can access and take the exam.\n\n**Default:** The exam is set to **"Public"** — meaning all candidates in the system can see and start the exam without any restrictions.\n\nIf you change the policy to **"Restrict to Assigned"**, only candidates you explicitly assign will be able to take the exam. You must then go to **Candidates → Assign to Exam** to assign candidates before they can access it.',
+            "Control who can access and take the exam. There are **4 mutually exclusive access modes**:\n\n**1. Public (Default):** All registered candidates see and can start the exam with no restrictions.\n\n**2. Restrict to Assigned:** Only candidates explicitly assigned via Candidates → Assign to Exam can take the exam.\n\n**3. Access Code:** Candidates must enter a secret code before starting.\n\n**4. Walk-in Registration (NEW):** The exam is accessible via a shareable link. Anyone with the link can self-register — no prior account needed. They fill in name, email, and phone, get auto-registered and logged in, then are taken straight to the exam instructions.",
           descriptionAr:
-            'تحكم في من يمكنه الوصول للاختبار وتقديمه.\n\n**الافتراضي:** الاختبار مُعيّن على **"عام"** — يعني أن جميع المرشحين في النظام يمكنهم رؤية الاختبار والبدء فيه بدون أي قيود.\n\nإذا غيّرت السياسة إلى **"تقييد للمعينين"**، فقط المرشحون الذين تعيّنهم صراحة سيتمكنون من تقديم الاختبار. يجب عليك الذهاب إلى **المرشحون ← تعيين للاختبار** لتعيين المرشحين قبل أن يتمكنوا من الوصول إليه.',
+            "تحكم في من يمكنه الوصول للاختبار وتقديمه. هناك **4 أوضاع وصول حصرية**:\n\n**1. عام (الافتراضي):** جميع المرشحين المسجلين يرون الاختبار ويمكنهم البدء فيه بدون قيود.\n\n**2. تقييد للمعيّنين:** فقط المرشحون المعيّنون صراحة عبر المرشحون ← تعيين للاختبار يمكنهم أداء الاختبار.\n\n**3. رمز الوصول:** يجب على المرشحين إدخال رمز سري قبل البدء.\n\n**4. التسجيل المفتوح (جديد):** الاختبار متاح عبر رابط قابل للمشاركة. أي شخص يملك الرابط يمكنه التسجيل ذاتياً — دون حساب مسبق. يملأ اسمه وبريده ورقم هاتفه، يتم تسجيله تلقائياً وتسجيل دخوله، ثم ينتقل مباشرة إلى تعليمات الاختبار.",
           imagePlaceholder: "/tutorials/config-access.png",
           fields: [
             {
@@ -1216,18 +1216,27 @@ export const examManagementTutorial: TutorialModule = {
             },
             {
               nameEn: "Restrict to Assigned",
-              nameAr: "تقييد للمعينين",
+              nameAr: "تقييد للمعيّنين",
               required: false,
               descriptionEn:
-                "Only assigned candidates can take the exam. You must assign candidates via Candidates → Assign to Exam.",
+                "Only assigned candidates can take the exam. Enabling this disables Public and Walk-in. You must assign candidates via Candidates → Assign to Exam.",
               descriptionAr:
-                "فقط المرشحون المعينون يمكنهم تقديم الاختبار. يجب تعيين المرشحين عبر المرشحون ← تعيين للاختبار.",
+                "فقط المرشحون المعيّنون يمكنهم تقديم الاختبار. تفعيل هذا يعطّل الوضع العام والتسجيل المفتوح. يجب تعيين المرشحين عبر المرشحون ← تعيين للاختبار.",
+            },
+            {
+              nameEn: "Walk-in Registration",
+              nameAr: "التسجيل المفتوح",
+              required: false,
+              descriptionEn:
+                "Enables self-registration via a shareable link. Enabling this disables Public, Restrict to Assigned, and Access Code. After enabling, go to the exam's Share Links section to generate and copy the registration URL.",
+              descriptionAr:
+                "يتيح التسجيل الذاتي عبر رابط قابل للمشاركة. تفعيل هذا يعطّل الوضع العام وتقييد المعيّنين ورمز الوصول. بعد التفعيل، اذهب إلى قسم روابط المشاركة للاختبار لإنشاء ونسخ رابط التسجيل.",
             },
           ],
           tipEn:
-            'If you set "Restrict to Assigned" but forget to assign candidates, no one will be able to access the exam — even after publishing.',
+            "The 4 access modes are mutually exclusive — enabling Walk-in automatically clears Public, Restrict to Assigned, and Access Code. After enabling Walk-in, generate a Share Link from the exam Share Links section and distribute it to your candidates.",
           tipAr:
-            'إذا اخترت "تقييد للمعينين" ولكن نسيت تعيين المرشحين، لن يتمكن أحد من الوصول للاختبار — حتى بعد النشر.',
+            "أوضاع الوصول الأربعة حصرية — تفعيل التسجيل المفتوح يمسح تلقائياً إعدادات العام والتقييد للمعيّنين ورمز الوصول. بعد تفعيل التسجيل المفتوح، أنشئ رابط مشاركة من قسم روابط مشاركة الاختبار ووزّعه على مرشحيك.",
         },
       ],
     },
@@ -1407,11 +1416,69 @@ export const examManagementTutorial: TutorialModule = {
       ],
     },
 
-    // ─── Section 6: Create from Template ────
+    // ─── Section 6: Share Links ────
+    {
+      id: "share-links-walkin",
+      titleEn: "6. Share Links",
+      titleAr: "6. روابط المشاركة",
+      descriptionEn:
+        "Share Links let you generate a unique, secure URL for any published exam — regardless of its access policy. You can share this link with candidates directly. What happens when a candidate opens the link depends on the exam's access policy.",
+      descriptionAr:
+        "روابط المشاركة تتيح لك إنشاء رابط آمن وفريد لأي اختبار منشور — بغض النظر عن سياسة وصوله. يمكنك مشاركة هذا الرابط مع المرشحين مباشرة. ما يحدث عندما يفتح المرشح الرابط يعتمد على سياسة وصول الاختبار.",
+      steps: [
+        {
+          id: "sharelink-generate",
+          titleEn: "Generate a Share Link",
+          titleAr: "إنشاء رابط مشاركة",
+          descriptionEn:
+            'From the **Exam Overview page** or the exam\'s action menu, go to **Share Links**.\n\nClick **"Generate New Link"** and set an expiry date (how long the link remains active). The system creates a unique, cryptographically secure token URL:\n\n`/share/{secure-token}`\n\n**Link details shown:**\n- Created date\n- Expiry date\n- Status (Active / Expired)\n- Full shareable URL\n\nClick **Copy Link** to copy the URL to clipboard. Share it via email, WhatsApp, QR code, or any channel.\n\nYou can generate **multiple links** for the same exam — each has its own expiry.',
+          descriptionAr:
+            'من **صفحة نظرة عامة الاختبار** أو قائمة إجراءات الاختبار، اذهب إلى **روابط المشاركة**.\n\nانقر **"إنشاء رابط جديد"** وحدد تاريخ انتهاء الصلاحية. ينشئ النظام رابطاً آمناً فريداً بالصيغة:\n\n`/share/{رمز-آمن}`\n\n**تفاصيل الرابط المعروضة:**\n- تاريخ الإنشاء\n- تاريخ الانتهاء\n- الحالة (نشط / منتهي الصلاحية)\n- الرابط الكامل القابل للمشاركة\n\nانقر **نسخ الرابط** ومشاركته عبر البريد الإلكتروني أو واتساب أو رمز QR أو أي قناة.\n\nيمكنك إنشاء **روابط متعددة** لنفس الاختبار — كل رابط بتاريخ انتهاء مستقل.',
+          imagePlaceholder: "/tutorials/sharelink-generate.png",
+          tipEn:
+            "The exam must be Published before the share link works for candidates. You can generate the link while the exam is still in Draft, but it only becomes functional after publishing.",
+          tipAr:
+            "يجب نشر الاختبار قبل أن يعمل رابط المشاركة للمرشحين. يمكنك إنشاء الرابط بينما الاختبار لا يزال في مسودة، لكنه لا يصبح فعّالاً إلا بعد النشر.",
+        },
+        {
+          id: "sharelink-behavior",
+          titleEn: "What Happens When a Candidate Opens the Link",
+          titleAr: "ماذا يحدث عندما يفتح المرشح الرابط",
+          descriptionEn:
+            "The behavior depends on the exam's **Access Policy**:\n\n**Case 1 — Walk-in Registration exam:**\nThe candidate sees a **self-registration form** (no account needed):\n- Fills in: Full Name, Email, Phone Number → clicks Register\n- If new email → a Walk-in candidate account is created automatically\n- If same email used before → re-authenticated silently (no duplicate)\n- Automatically logged in and redirected straight to the **Exam Instructions page**\n\n**Case 2 — Any other policy (Public, Assigned, Access Code):**\nThe candidate is redirected to the **Candidate Login page** with the exam instructions URL saved as a `returnUrl`. After logging in with their existing credentials, they land directly on the **Exam Instructions page** — no extra navigation needed.\n\n**In both cases**, the share link acts as a direct entry point into the exam.",
+          descriptionAr:
+            "يعتمد السلوك على **سياسة وصول** الاختبار:\n\n**الحالة 1 — اختبار بسياسة التسجيل المفتوح:**\nيرى المرشح **نموذج تسجيل ذاتي** (لا حاجة لحساب مسبق):\n- يملأ: الاسم الكامل، البريد الإلكتروني، رقم الهاتف → ينقر تسجيل\n- إذا كان البريد جديداً → يُنشأ حساب مرشح مفتوح تلقائياً\n- إذا استُخدم نفس البريد من قبل → تتم المصادقة بصمت (لا يتم إنشاء تكرار)\n- تسجيل الدخول تلقائياً والتوجيه مباشرة إلى **صفحة تعليمات الاختبار**\n\n**الحالة 2 — أي سياسة أخرى (عام، معيّن، رمز وصول):**\nيتم توجيه المرشح إلى **صفحة تسجيل دخول المرشح** مع حفظ رابط تعليمات الاختبار كـ `returnUrl`. بعد تسجيل الدخول ببيانات اعتماده الموجودة، ينتقل مباشرة إلى **صفحة تعليمات الاختبار** — دون أي تنقل إضافي.\n\n**في كلتا الحالتين**، يعمل رابط المشاركة كنقطة دخول مباشرة إلى الاختبار.",
+          imagePlaceholder: "/tutorials/sharelink-behavior.png",
+        },
+        {
+          id: "sharelink-manage",
+          titleEn: "Managing Share Links",
+          titleAr: "إدارة روابط المشاركة",
+          descriptionEn:
+            'From the Share Links section you can:\n\n- **Copy** any active link to clipboard\n- **Delete** a link to immediately deactivate it — candidates who visit a deleted link see an error\n- **View expiry status** — expired links show an "Expired" badge and no longer work\n\n**Security notes:**\n- Each token is cryptographically random and not guessable\n- Setting a short expiry limits the access window\n- Deleting a link instantly revokes it — existing candidate accounts are not affected',
+          descriptionAr:
+            'من قسم روابط المشاركة يمكنك:\n\n- **نسخ** أي رابط نشط إلى الحافظة\n- **حذف** رابط لتعطيله فوراً — المرشحون الذين يزورون رابطاً محذوفاً يرون خطأ\n- **عرض حالة الانتهاء** — الروابط المنتهية تعرض شارة "منتهية الصلاحية" ولا تعمل بعد الآن\n\n**ملاحظات الأمان:**\n- كل رمز عشوائي مشفراً ولا يمكن تخمينه\n- تحديد تاريخ انتهاء قصير يحدّ من نافذة الوصول\n- حذف الرابط يُلغيه فوراً — حسابات المرشحين الموجودة غير متأثرة',
+          imagePlaceholder: "/tutorials/sharelink-manage.png",
+        },
+      ],
+      examples: [
+        {
+          titleEn: "Share Link Behavior by Access Policy",
+          titleAr: "سلوك رابط المشاركة حسب سياسة الوصول",
+          contentEn:
+            "| Access Policy | Candidate opens link | Result |\n|---|---|---|\n| Walk-in Registration | Registration form shown | Auto-registered + auto-logged in → Exam Instructions |\n| Public | Redirect to Candidate Login | Login → Exam Instructions |\n| Restrict to Assigned | Redirect to Candidate Login | Login → Exam Instructions (must already be assigned) |\n| Access Code | Redirect to Candidate Login | Login → Exam Instructions (must enter code on instructions page) |\n\n**The share link always leads to the exam — the only difference is how the candidate authenticates.**",
+          contentAr:
+            "| سياسة الوصول | المرشح يفتح الرابط | النتيجة |\n|---|---|---|\n| التسجيل المفتوح | يظهر نموذج التسجيل | تسجيل تلقائي + دخول تلقائي → تعليمات الاختبار |\n| عام | توجيه إلى تسجيل دخول المرشح | تسجيل الدخول → تعليمات الاختبار |\n| تقييد للمعيّنين | توجيه إلى تسجيل دخول المرشح | تسجيل الدخول → تعليمات الاختبار (يجب أن يكون معيّناً مسبقاً) |\n| رمز الوصول | توجيه إلى تسجيل دخول المرشح | تسجيل الدخول → تعليمات الاختبار (يجب إدخال الرمز في صفحة التعليمات) |\n\n**رابط المشاركة يؤدي دائماً إلى الاختبار — الفرق الوحيد هو كيف يتم مصادقة المرشح.**",
+        },
+      ],
+    },
+
+    // ─── Section 7: Create from Template ────
+    // ─── Section 7: Create from Template ────
     {
       id: "create-from-template",
-      titleEn: "6. Create from Template",
-      titleAr: "6. إنشاء من قالب",
+      titleEn: "7. Create from Template",
+      titleAr: "7. إنشاء من قالب",
       descriptionEn:
         "Clone an existing exam to create a new one. All settings and questions are copied — you just provide a new title and schedule.",
       descriptionAr:
@@ -1513,11 +1580,11 @@ export const examManagementTutorial: TutorialModule = {
       ],
     },
 
-    // ─── Section 7: Exam List ────
+    // ─── Section 8: Exam List ────
     {
       id: "exam-list",
-      titleEn: "7. Exam List",
-      titleAr: "7. قائمة الاختبارات",
+      titleEn: "8. Exam List",
+      titleAr: "8. قائمة الاختبارات",
       descriptionEn:
         "View all exams with their status, configuration, and available actions. Filter by status and search by title.",
       descriptionAr:
@@ -1579,11 +1646,11 @@ export const examManagementTutorial: TutorialModule = {
         },
       ],
     },
-    // ─── Section 8: Violation Events & Auto-Termination ────
+    // ─── Section 9: Violation Events & Auto-Termination ────
     {
       id: "violation-events",
-      titleEn: "8. Violation Events & Auto-Termination",
-      titleAr: "8. أحداث المخالفات والإنهاء التلقائي",
+      titleEn: "9. Violation Events & Auto-Termination",
+      titleAr: "9. أحداث المخالفات والإنهاء التلقائي",
       descriptionEn:
         "All monitored events during exams, which ones count toward auto-termination, and how the warning system works.",
       descriptionAr:
@@ -3367,9 +3434,9 @@ export const candidateTutorial: TutorialModule = {
   titleEn: "Candidate Management",
   titleAr: "إدارة المرشحين",
   descriptionEn:
-    "Learn how to manage candidates — batch organization, candidate data (shared across all departments), exam assignment, exam operations, and detailed exam attempt review.",
+    "Learn how to manage candidates — batch organization, candidate data (shared across all departments), exam assignment, and detailed exam attempt review.",
   descriptionAr:
-    "تعلّم كيفية إدارة المرشحين — تنظيم الدفعات، بيانات المرشحين (مشتركة بين جميع الأقسام)، تعيين الاختبارات، عمليات الاختبار، ومراجعة تفاصيل محاولات الاختبار.",
+    "تعلّم كيفية إدارة المرشحين — تنظيم الدفعات، بيانات المرشحين (مشتركة بين جميع الأقسام)، تعيين الاختبارات، ومراجعة تفاصيل محاولات الاختبار.",
   iconName: "Users",
   videoPlaceholder: "/tutorials/candidates-overview.mp4",
   sections: [
@@ -3379,18 +3446,18 @@ export const candidateTutorial: TutorialModule = {
       titleEn: "1. Overview & Key Concepts",
       titleAr: "1. نظرة عامة والمفاهيم الأساسية",
       descriptionEn:
-        "Understand the Candidate Management module, its 5 sub-pages, and the important concept of shared candidate data across departments.",
+        "Understand the Candidate Management module, its 4 sub-pages, and the important concept of shared candidate data across departments.",
       descriptionAr:
-        "فهم وحدة إدارة المرشحين وصفحاتها الفرعية الخمس والمفهوم المهم لبيانات المرشحين المشتركة بين الأقسام.",
+        "فهم وحدة إدارة المرشحين وصفحاتها الفرعية الأربع والمفهوم المهم لبيانات المرشحين المشتركة بين الأقسام.",
       steps: [
         {
           id: "what-is-candidate-module",
           titleEn: "What Is Candidate Management?",
           titleAr: "ما هي إدارة المرشحين؟",
           descriptionEn:
-            "The **Candidate Management** module is the central hub for managing all exam candidates. It provides **5 dedicated sub-pages** accessible from the sidebar:\n\n1. **Batch** — organize candidates into logical groups\n2. **Candidates Data** — register, import, and manage individual candidates\n3. **Assign to Exam** — bulk-assign candidates to published exams with scheduling\n4. **Exam Operations** — admin interventions (new attempts, add time, terminate)\n5. **Candidate Exam Details** — forensic review of any exam attempt",
+            "The **Candidate Management** module is the central hub for managing all exam candidates. It provides **4 dedicated sub-pages** accessible from the sidebar:\n\n1. **Batch** — organize candidates into logical groups\n2. **Candidates Data** — register, import, and manage individual candidates\n3. **Assign to Exam** — bulk-assign candidates to published exams with scheduling\n4. **Candidate Exam Details** — forensic review of any exam attempt",
           descriptionAr:
-            "وحدة **إدارة المرشحين** هي المحور المركزي لإدارة جميع المرشحين للاختبار. توفر **5 صفحات فرعية مخصصة** يمكن الوصول إليها من القائمة الجانبية:\n\n1. **الدفعات** — تنظيم المرشحين في مجموعات منطقية\n2. **بيانات المرشحين** — تسجيل واستيراد وإدارة المرشحين الأفراد\n3. **تعيين اختبار** — تعيين المرشحين بشكل جماعي للاختبارات المنشورة مع الجدولة\n4. **عمليات الاختبار** — تدخلات إدارية (محاولات جديدة، إضافة وقت، إنهاء)\n5. **تفاصيل اختبار المرشح** — مراجعة شاملة لأي محاولة اختبار",
+            "وحدة **إدارة المرشحين** هي المحور المركزي لإدارة جميع المرشحين للاختبار. توفر **4 صفحات فرعية مخصصة** يمكن الوصول إليها من القائمة الجانبية:\n\n1. **الدفعات** — تنظيم المرشحين في مجموعات منطقية\n2. **بيانات المرشحين** — تسجيل واستيراد وإدارة المرشحين الأفراد\n3. **تعيين اختبار** — تعيين المرشحين بشكل جماعي للاختبارات المنشورة مع الجدولة\n4. **تفاصيل اختبار المرشح** — مراجعة شاملة لأي محاولة اختبار",
           imagePlaceholder: "/tutorials/candidates-overview.png",
           tipEn:
             "Access roles: **Admin** and **Instructor** can access all Candidate Management pages. Other roles do not have access.",
@@ -3830,95 +3897,11 @@ export const candidateTutorial: TutorialModule = {
         },
       ],
     },
-    // ── Section 5: Exam Operations ──
-    {
-      id: "exam-operations",
-      titleEn: "5. Exam Operations",
-      titleAr: "5. عمليات الاختبار",
-      descriptionEn:
-        "Administrative intervention tools for exam attempts — grant new attempts, add extra time, or terminate active attempts. These are powerful overrides that should be used carefully.",
-      descriptionAr:
-        "أدوات تدخل إداري لمحاولات الاختبار — منح محاولات جديدة وإضافة وقت إضافي أو إنهاء محاولات نشطة. هذه تجاوزات قوية يجب استخدامها بعناية.",
-      steps: [
-        {
-          id: "exam-ops-overview",
-          titleEn: "Exam Operations Page",
-          titleAr: "صفحة عمليات الاختبار",
-          descriptionEn:
-            "Navigate to **Candidates** → **Exam Operations** from the sidebar.\n\n**Exam Selection (Required):**\n- Select an exam from the dropdown to load its candidates\n- Only exams with candidate data are shown\n\n**Search:**\n- Search by candidate **name** or **email** (debounced input)\n\n**Candidates Table (20 per page):**\n- **Candidate** — name and email (bilingual display)\n- **Roll No** — candidate identifier\n- **Attempts** — current attempt count / max attempts allowed\n- **Latest Status** — color-coded badge showing the latest attempt status\n- **Pending Overrides** — number of pending admin overrides\n- **Actions** — dropdown with available operations (conditional)",
-          descriptionAr:
-            "انتقل إلى **المرشحون** ← **عمليات الاختبار** من القائمة الجانبية.\n\n**اختيار الاختبار (مطلوب):**\n- اختر اختباراً من القائمة المنسدلة لتحميل مرشحيه\n- تُعرض فقط الاختبارات التي تحتوي على بيانات مرشحين\n\n**البحث:**\n- البحث باسم المرشح أو البريد (إدخال مؤجل)\n\n**جدول المرشحين (20 لكل صفحة):**\n- **المرشح** — الاسم والبريد (عرض ثنائي اللغة)\n- **الرقم** — معرّف المرشح\n- **المحاولات** — عدد المحاولات الحالي / أقصى محاولات مسموحة\n- **آخر حالة** — شارة ملونة تعرض حالة آخر محاولة\n- **التجاوزات المعلّقة** — عدد تجاوزات المدير المعلّقة\n- **الإجراءات** — قائمة منسدلة بالعمليات المتاحة (مشروطة)",
-          imagePlaceholder: "/tutorials/candidates-examops-page.png",
-        },
-        {
-          id: "exam-ops-status-badges",
-          titleEn: "Understanding Attempt Status Badges",
-          titleAr: "فهم شارات حالة المحاولة",
-          descriptionEn:
-            "The **Latest Status** column uses color-coded badges to indicate the current state of a candidate's exam attempt:\n\n✓ **Started / InProgress** — sky blue — candidate is actively taking the exam\n✓ **Submitted / Paused** — amber — exam is submitted or temporarily paused\n✗ **ForceSubmitted** — red — exam was force-submitted by a proctor or admin\n✗ **Terminated** — red — attempt was terminated by admin action\n✗ **Expired** — red — exam time ran out before submission\n✗ **Cancelled** — gray — attempt was cancelled",
-          descriptionAr:
-            "يستخدم عمود **آخر حالة** شارات ملونة لتوضيح الحالة الحالية لمحاولة اختبار المرشح:\n\n✓ **بدأ / جارٍ** — أزرق سماوي — المرشح يؤدي الاختبار بنشاط\n✓ **مقدّم / متوقف** — عنبري — تم تقديم الاختبار أو إيقافه مؤقتاً\n✗ **تقديم إجباري** — أحمر — تم تقديم الاختبار إجبارياً بواسطة مراقب أو مدير\n✗ **مُنهى** — أحمر — تم إنهاء المحاولة بإجراء إداري\n✗ **منتهي الصلاحية** — أحمر — انتهى وقت الاختبار قبل التقديم\n✗ **ملغى** — رمادي — تم إلغاء المحاولة",
-          imagePlaceholder: "/tutorials/candidates-examops-statuses.png",
-        },
-        {
-          id: "allow-new-attempt",
-          titleEn: "Allow New Attempt",
-          titleAr: "السماح بمحاولة جديدة",
-          descriptionEn:
-            "When a candidate has used all their allowed attempts, you can grant them an additional one:\n\n1. Find the candidate in the table\n2. Click the **Actions** dropdown → **Allow New Attempt** (only visible when eligible)\n3. A dialog opens showing:\n   - Candidate info card with **name** and **current attempts / max**\n   - **Reason** textarea (required) — explain why the override is needed\n4. Click **Confirm** to create the override\n5. The candidate can now take one additional attempt beyond the original limit",
-          descriptionAr:
-            "عندما يستنفد المرشح جميع محاولاته المسموحة، يمكنك منحه محاولة إضافية:\n\n1. ابحث عن المرشح في الجدول\n2. انقر القائمة المنسدلة **الإجراءات** ← **السماح بمحاولة جديدة** (مرئي فقط عند الأهلية)\n3. تفتح نافذة تعرض:\n   - بطاقة معلومات المرشح مع **الاسم** و**المحاولات الحالية / الأقصى**\n   - **السبب** مربع نص (مطلوب) — اشرح لماذا التجاوز مطلوب\n4. انقر **تأكيد** لإنشاء التجاوز\n5. يمكن للمرشح الآن أداء محاولة إضافية واحدة تتجاوز الحد الأصلي",
-          imagePlaceholder: "/tutorials/candidates-examops-new-attempt.png",
-          tipEn:
-            "The reason you provide is **logged permanently** in the system audit trail. Always provide a clear, documented reason for the override.",
-          tipAr:
-            "السبب الذي تقدمه يتم **تسجيله بشكل دائم** في سجل تدقيق النظام. قدّم دائماً سبباً واضحاً وموثقاً للتجاوز.",
-        },
-        {
-          id: "add-time-to-attempt",
-          titleEn: "Add Extra Time",
-          titleAr: "إضافة وقت إضافي",
-          descriptionEn:
-            "Add extra minutes to a candidate's **active** exam attempt:\n\n1. Find the candidate with an active attempt (status: **Started** or **InProgress**)\n2. Click **Actions** → **Add Time** (only visible when eligible)\n3. A dialog opens showing:\n   - Candidate info card with **name** and **attempt ID**\n   - **Extra Minutes** input — range: **1 to 480 minutes** (default: 10)\n   - **Reason** textarea (required)\n4. Click **Confirm** to add the extra time\n5. The candidate's exam timer is extended immediately",
-          descriptionAr:
-            "إضافة دقائق إضافية لمحاولة اختبار **نشطة** للمرشح:\n\n1. ابحث عن المرشح بمحاولة نشطة (الحالة: **بدأ** أو **جارٍ**)\n2. انقر **الإجراءات** ← **إضافة وقت** (مرئي فقط عند الأهلية)\n3. تفتح نافذة تعرض:\n   - بطاقة معلومات المرشح مع **الاسم** و**رقم المحاولة**\n   - **الدقائق الإضافية** — المدى: **1 إلى 480 دقيقة** (الافتراضي: 10)\n   - **السبب** مربع نص (مطلوب)\n4. انقر **تأكيد** لإضافة الوقت الإضافي\n5. يتم تمديد مؤقت اختبار المرشح فوراً",
-          imagePlaceholder: "/tutorials/candidates-examops-add-time.png",
-          noteEn:
-            "Common reasons for adding time: technical issues (internet disconnection, system error), accessibility accommodations, or emergency interruptions during the exam.",
-          noteAr:
-            "أسباب شائعة لإضافة الوقت: مشاكل تقنية (انقطاع الإنترنت، خطأ نظامي)، تسهيلات الوصول، أو انقطاعات طارئة أثناء الاختبار.",
-        },
-        {
-          id: "terminate-attempt",
-          titleEn: "Terminate an Attempt",
-          titleAr: "إنهاء محاولة",
-          descriptionEn:
-            "Force-end a candidate's active exam attempt:\n\n1. Find the candidate with an active attempt\n2. Click **Actions** → **Terminate** (only visible when eligible)\n3. A dialog opens showing:\n   - Candidate info card\n   - **Reason** textarea (required) — must explain the termination reason\n4. Click **Confirm** to terminate the attempt\n5. The candidate's exam is immediately ended and their current answers are saved\n6. The attempt status changes to **Terminated** (red badge)",
-          descriptionAr:
-            "إنهاء محاولة اختبار نشطة للمرشح إجبارياً:\n\n1. ابحث عن المرشح بمحاولة نشطة\n2. انقر **الإجراءات** ← **إنهاء** (مرئي فقط عند الأهلية)\n3. تفتح نافذة تعرض:\n   - بطاقة معلومات المرشح\n   - **السبب** مربع نص (مطلوب) — يجب شرح سبب الإنهاء\n4. انقر **تأكيد** لإنهاء المحاولة\n5. يتم إنهاء اختبار المرشح فوراً وحفظ إجاباته الحالية\n6. تتغير حالة المحاولة إلى **مُنهى** (شارة حمراء)",
-          imagePlaceholder: "/tutorials/candidates-examops-terminate.png",
-          tipEn:
-            "Termination is a serious action. The candidate's answers up to the point of termination are saved and can be graded. Use this when there's confirmed cheating or a severe policy violation.",
-          tipAr:
-            "الإنهاء إجراء خطير. يتم حفظ إجابات المرشح حتى نقطة الإنهاء ويمكن تقييمها. استخدم هذا عند التأكد من الغش أو مخالفة جسيمة للسياسة.",
-        },
-      ],
-      examples: [
-        {
-          titleEn: "Operations Decision Guide",
-          titleAr: "دليل قرارات العمليات",
-          contentEn:
-            "**When to use each operation:**\n\n✓ **Allow New Attempt** — candidate had technical issues that prevented fair completion, or institutional policy allows retake\n✓ **Add Time** — internet outage during exam, system error caused delay, or accessibility accommodation\n✗ **Terminate** — confirmed cheating detected by proctor, severe policy violation, or candidate requested exam cancellation\n\n**All operations are:**\n- Logged with the admin's identity and timestamp\n- Require a mandatory reason text\n- Tracked in the system audit trail\n- Visible in the Candidate Exam Details page",
-          contentAr:
-            "**متى تستخدم كل عملية:**\n\n✓ **السماح بمحاولة جديدة** — واجه المرشح مشاكل تقنية منعت الإكمال العادل، أو سياسة المؤسسة تسمح بالإعادة\n✓ **إضافة وقت** — انقطاع إنترنت أثناء الاختبار، خطأ نظامي سبب تأخير، أو تسهيلات وصول\n✗ **إنهاء** — تأكد من الغش بواسطة المراقب، مخالفة جسيمة للسياسة، أو طلب المرشح إلغاء الاختبار\n\n**جميع العمليات:**\n- مسجلة بهوية المدير والطابع الزمني\n- تتطلب نص سبب إلزامي\n- متتبعة في سجل تدقيق النظام\n- مرئية في صفحة تفاصيل اختبار المرشح",
-        },
-      ],
-    },
-    // ── Section 6: Candidate Exam Details ──
+    // ── Section 5: Candidate Exam Details ──
     {
       id: "candidate-exam-details",
-      titleEn: "6. Candidate Exam Details",
-      titleAr: "6. تفاصيل اختبار المرشح",
+      titleEn: "5. Candidate Exam Details",
+      titleAr: "5. تفاصيل اختبار المرشح",
       descriptionEn:
         "Comprehensive forensic view of any candidate's exam attempt — timing, performance, activity, assignment info, proctor evidence, and complete event timeline.",
       descriptionAr:
@@ -4027,9 +4010,9 @@ export const administrationTutorial: TutorialModule = {
   titleEn: "Settings & Administration",
   titleAr: "الإعدادات والإدارة",
   descriptionEn:
-    "Learn how to manage users, roles, permissions, departments, organization branding, system settings, notification configuration, and system logs. Covers department isolation, the shared candidate model, and role-based access.",
+    "Learn how to manage users, roles, permissions, departments, organization branding, notification configuration, and system logs. Covers department isolation, the shared candidate model, and role-based access.",
   descriptionAr:
-    "تعلّم كيفية إدارة المستخدمين والأدوار والصلاحيات والأقسام وعلامة المنظمة وإعدادات النظام وتكوين الإشعارات وسجلات النظام. يغطي عزل الأقسام ونموذج المرشح المشترك والوصول القائم على الأدوار.",
+    "تعلّم كيفية إدارة المستخدمين والأدوار والصلاحيات والأقسام وعلامة المنظمة وتكوين الإشعارات وسجلات النظام. يغطي عزل الأقسام ونموذج المرشح المشترك والوصول القائم على الأدوار.",
   iconName: "Settings",
   videoPlaceholder: "/tutorials/administration-overview.mp4",
   sections: [
@@ -4048,9 +4031,9 @@ export const administrationTutorial: TutorialModule = {
           titleEn: "What Is the Administration Module?",
           titleAr: "ما هي وحدة الإدارة؟",
           descriptionEn:
-            "The **Administration** module is where **SuperAdmin** users manage the entire SmartExam platform. It covers three main sidebar groups:\n\n**Administration:**\n- **Users** — manage admin, instructor, examiner, and proctor accounts\n- **Permissions** — assign roles and departments to users\n- **Departments** — create and manage organizational departments\n- **Organization** — branding, logo, colors, and contact details\n- **Settings** — system-wide configuration (security, proctoring, general)\n\n**Notifications:**\n- **Notification Settings** — SMTP email and SMS provider configuration\n- **Notification Templates** — customize email/SMS content per event\n- **Notification Logs** — track all sent notifications with retry capability\n\n**System Logs:**\n- **Audit Logs** — immutable compliance trail of all system actions\n- **User Logs** — admin and instructor activity tracking\n- **Candidate Logs** — candidate login and exam activity\n- **Proctor Logs** — proctoring session and incident logs\n- **Developer Logs** — system errors and exceptions with stack traces",
+            "The **Administration** module is where **SuperAdmin** users manage the entire SmartExam platform. It covers three main sidebar groups:\n\n**Administration:**\n- **Users** — manage admin, instructor, examiner, and proctor accounts\n- **Permissions** — assign roles and departments to users\n- **Departments** — create and manage organizational departments\n- **Organization** — branding, logo, colors, and contact details\n\n**Notifications:**\n- **Notification Settings** — SMTP email and SMS provider configuration\n- **Notification Templates** — customize email/SMS content per event\n- **Notification Logs** — track all sent notifications with retry capability\n\n**System Logs:**\n- **Audit Logs** — immutable compliance trail of all system actions\n- **User Logs** — admin and instructor activity tracking\n- **Candidate Logs** — candidate login and exam activity\n- **Proctor Logs** — proctoring session and incident logs\n- **Developer Logs** — system errors and exceptions with stack traces",
           descriptionAr:
-            "وحدة **الإدارة** هي المكان الذي يُدير فيه مستخدمو **المسؤول الأعلى** منصة SmartExam بأكملها. تغطي ثلاث مجموعات رئيسية في القائمة الجانبية:\n\n**الإدارة:**\n- **المستخدمون** — إدارة حسابات المديرين والمدرّسين والممتحنين والمراقبين\n- **الصلاحيات** — تعيين الأدوار والأقسام للمستخدمين\n- **الأقسام** — إنشاء وإدارة أقسام المنظمة\n- **المنظمة** — العلامة التجارية والشعار والألوان وتفاصيل الاتصال\n- **الإعدادات** — تكوين على مستوى النظام (الأمان، المراقبة، عام)\n\n**الإشعارات:**\n- **إعدادات الإشعارات** — تكوين بريد SMTP ومزود SMS\n- **قوالب الإشعارات** — تخصيص محتوى البريد/SMS لكل حدث\n- **سجلات الإشعارات** — تتبع جميع الإشعارات المُرسلة مع إمكانية إعادة المحاولة\n\n**سجلات النظام:**\n- **سجلات التدقيق** — سجل امتثال غير قابل للتغيير لجميع إجراءات النظام\n- **سجلات المستخدمين** — تتبع نشاط المديرين والمدرّسين\n- **سجلات المرشحين** — تسجيل دخول المرشحين ونشاط الاختبار\n- **سجلات المراقبة** — جلسات المراقبة وسجلات الحوادث\n- **سجلات المطورين** — أخطاء النظام والاستثناءات مع تتبع المكدس",
+            "وحدة **الإدارة** هي المكان الذي يُدير فيه مستخدمو **المسؤول الأعلى** منصة SmartExam بأكملها. تغطي ثلاث مجموعات رئيسية في القائمة الجانبية:\n\n**الإدارة:**\n- **المستخدمون** — إدارة حسابات المديرين والمدرّسين والممتحنين والمراقبين\n- **الصلاحيات** — تعيين الأدوار والأقسام للمستخدمين\n- **الأقسام** — إنشاء وإدارة أقسام المنظمة\n- **المنظمة** — العلامة التجارية والشعار والألوان وتفاصيل الاتصال\n\n**الإشعارات:**\n- **إعدادات الإشعارات** — تكوين بريد SMTP ومزود SMS\n- **قوالب الإشعارات** — تخصيص محتوى البريد/SMS لكل حدث\n- **سجلات الإشعارات** — تتبع جميع الإشعارات المُرسلة مع إمكانية إعادة المحاولة\n\n**سجلات النظام:**\n- **سجلات التدقيق** — سجل امتثال غير قابل للتغيير لجميع إجراءات النظام\n- **سجلات المستخدمين** — تتبع نشاط المديرين والمدرّسين\n- **سجلات المرشحين** — تسجيل دخول المرشحين ونشاط الاختبار\n- **سجلات المراقبة** — جلسات المراقبة وسجلات الحوادث\n- **سجلات المطورين** — أخطاء النظام والاستثناءات مع تتبع المكدس",
           imagePlaceholder: "/tutorials/admin-overview.png",
         },
         {
@@ -4466,217 +4449,11 @@ export const administrationTutorial: TutorialModule = {
         },
       ],
     },
-    // ── Section 6: System Settings ──
-    {
-      id: "system-settings",
-      titleEn: "6. System Settings",
-      titleAr: "6. إعدادات النظام",
-      descriptionEn:
-        "Configure system-wide settings — general behavior, security policies, proctoring defaults, and brand information across four organized tabs.",
-      descriptionAr:
-        "تكوين إعدادات على مستوى النظام — السلوك العام وسياسات الأمان وإعدادات المراقبة الافتراضية ومعلومات العلامة التجارية عبر أربع تبويبات منظمة.",
-      steps: [
-        {
-          id: "settings-general-tab",
-          titleEn: "General Settings Tab",
-          titleAr: "تبويب الإعدادات العامة",
-          descriptionEn:
-            "Navigate to **Administration** → **Settings** from the sidebar.\n\nThe **General** tab controls platform-wide behavior:",
-          descriptionAr:
-            "انتقل إلى **الإدارة** ← **الإعدادات** من القائمة الجانبية.\n\nتبويب **العام** يتحكم في السلوك على مستوى المنصة:",
-          imagePlaceholder: "/tutorials/admin-settings-general.png",
-          fields: [
-            {
-              nameEn: "Maintenance Mode",
-              nameAr: "وضع الصيانة",
-              required: false,
-              descriptionEn:
-                "Toggle to put the system in maintenance mode. When enabled, only SuperAdmin users can access the platform.",
-              descriptionAr:
-                "مفتاح لوضع النظام في وضع الصيانة. عند التفعيل، فقط مستخدمو المسؤول الأعلى يمكنهم الوصول للمنصة.",
-            },
-            {
-              nameEn: "Allow Registration",
-              nameAr: "السماح بالتسجيل",
-              required: false,
-              descriptionEn: "Toggle to allow or block new user registrations",
-              descriptionAr: "مفتاح للسماح أو منع تسجيلات المستخدمين الجدد",
-            },
-            {
-              nameEn: "Max File Upload (MB)",
-              nameAr: "أقصى حجم رفع (ميجابايت)",
-              required: false,
-              descriptionEn:
-                "Maximum file size allowed for uploads in megabytes",
-              descriptionAr: "أقصى حجم ملف مسموح للرفع بالميجابايت",
-            },
-            {
-              nameEn: "Session Timeout (minutes)",
-              nameAr: "مهلة الجلسة (دقائق)",
-              required: false,
-              descriptionEn:
-                "How long an inactive session stays alive before automatic logout",
-              descriptionAr:
-                "كم تبقى الجلسة غير النشطة حية قبل تسجيل الخروج التلقائي",
-            },
-          ],
-        },
-        {
-          id: "settings-security-tab",
-          titleEn: "Security Settings Tab",
-          titleAr: "تبويب إعدادات الأمان",
-          descriptionEn:
-            "The **Security** tab configures password policies enforced when creating or changing passwords:",
-          descriptionAr:
-            "تبويب **الأمان** يُعدّ سياسات كلمات المرور المفروضة عند إنشاء أو تغيير كلمات المرور:",
-          imagePlaceholder: "/tutorials/admin-settings-security.png",
-          fields: [
-            {
-              nameEn: "Minimum Length",
-              nameAr: "الحد الأدنى للطول",
-              required: false,
-              descriptionEn:
-                "Minimum number of characters required for passwords",
-              descriptionAr: "الحد الأدنى لعدد الأحرف المطلوبة لكلمات المرور",
-            },
-            {
-              nameEn: "Require Uppercase",
-              nameAr: "تتطلب أحرف كبيرة",
-              required: false,
-              descriptionEn: "Toggle to require at least one uppercase letter",
-              descriptionAr: "مفتاح لطلب حرف كبير واحد على الأقل",
-            },
-            {
-              nameEn: "Require Numbers",
-              nameAr: "تتطلب أرقام",
-              required: false,
-              descriptionEn: "Toggle to require at least one numeric digit",
-              descriptionAr: "مفتاح لطلب رقم واحد على الأقل",
-            },
-            {
-              nameEn: "Require Special Characters",
-              nameAr: "تتطلب أحرف خاصة",
-              required: false,
-              descriptionEn:
-                "Toggle to require at least one special character (e.g., @, #, $)",
-              descriptionAr: "مفتاح لطلب حرف خاص واحد على الأقل (مثل: @، #، $)",
-            },
-          ],
-          tipEn:
-            "Stronger password policies improve security but may increase support requests for password resets. Balance security with usability based on your organization's needs.",
-          tipAr:
-            "سياسات كلمات المرور الأقوى تحسّن الأمان لكن قد تزيد طلبات دعم إعادة تعيين كلمات المرور. وازن بين الأمان وسهولة الاستخدام بناءً على احتياجات منظمتك.",
-        },
-        {
-          id: "settings-proctoring-tab",
-          titleEn: "Proctoring Settings Tab",
-          titleAr: "تبويب إعدادات المراقبة",
-          descriptionEn:
-            "The **Proctoring** tab configures the default proctoring behavior for new exams:",
-          descriptionAr:
-            "تبويب **المراقبة** يُعدّ سلوك المراقبة الافتراضي للاختبارات الجديدة:",
-          imagePlaceholder: "/tutorials/admin-settings-proctoring.png",
-          fields: [
-            {
-              nameEn: "Enable Live Video",
-              nameAr: "تفعيل الفيديو المباشر",
-              required: false,
-              descriptionEn:
-                "Toggle to enable WebRTC live video streaming from candidate webcams during proctored exams",
-              descriptionAr:
-                "مفتاح لتفعيل بث الفيديو المباشر WebRTC من كاميرات المرشحين أثناء الاختبارات المراقبة",
-            },
-            {
-              nameEn: "Enable Video Recording",
-              nameAr: "تفعيل تسجيل الفيديو",
-              required: false,
-              descriptionEn:
-                "Toggle to record exam sessions for post-exam review and evidence",
-              descriptionAr:
-                "مفتاح لتسجيل جلسات الاختبار للمراجعة بعد الاختبار والأدلة",
-            },
-            {
-              nameEn: "Enable Smart Monitoring",
-              nameAr: "تفعيل المراقبة الذكية",
-              required: false,
-              descriptionEn:
-                "Toggle to enable AI-powered behavioral analysis during proctored exams",
-              descriptionAr:
-                "مفتاح لتفعيل التحليل السلوكي المدعوم بالذكاء الاصطناعي أثناء الاختبارات المراقبة",
-            },
-            {
-              nameEn: "Default Proctor Mode",
-              nameAr: "وضع المراقبة الافتراضي",
-              required: false,
-              descriptionEn:
-                "Select the default proctoring mode for new exams (e.g., AI Proctoring, Live, or Hybrid)",
-              descriptionAr:
-                "اختر وضع المراقبة الافتراضي للاختبارات الجديدة (مثل: مراقبة AI، مباشر، أو هجين)",
-            },
-          ],
-        },
-        {
-          id: "settings-brand-tab",
-          titleEn: "Brand Info Tab",
-          titleAr: "تبويب معلومات العلامة التجارية",
-          descriptionEn:
-            "The **Brand Info** tab configures branding details used in system communications:",
-          descriptionAr:
-            "تبويب **معلومات العلامة التجارية** يُعدّ تفاصيل العلامة التجارية المستخدمة في اتصالات النظام:",
-          imagePlaceholder: "/tutorials/admin-settings-brand.png",
-          fields: [
-            {
-              nameEn: "Brand Name",
-              nameAr: "اسم العلامة التجارية",
-              required: false,
-              descriptionEn:
-                "Your brand name — used in emails via {{BrandName}} placeholder",
-              descriptionAr:
-                "اسم علامتك التجارية — يُستخدم في الرسائل عبر عنصر {{BrandName}}",
-            },
-            {
-              nameEn: "Logo URL",
-              nameAr: "رابط الشعار",
-              required: false,
-              descriptionEn: "Direct URL to the organization logo image",
-              descriptionAr: "الرابط المباشر لصورة شعار المنظمة",
-            },
-            {
-              nameEn: "Footer Text",
-              nameAr: "نص التذييل",
-              required: false,
-              descriptionEn: "Footer text for emails and platform pages",
-              descriptionAr: "نص التذييل للرسائل وصفحات المنصة",
-            },
-            {
-              nameEn: "Support Email / URL",
-              nameAr: "بريد / رابط الدعم",
-              required: false,
-              descriptionEn:
-                "Support contact details for notifications and templates",
-              descriptionAr: "تفاصيل اتصال الدعم للإشعارات والقوالب",
-            },
-            {
-              nameEn: "Primary Color",
-              nameAr: "اللون الأساسي",
-              required: false,
-              descriptionEn: "Brand color in hex format (e.g., **#0d9488**)",
-              descriptionAr:
-                "لون العلامة التجارية بتنسيق hex (مثل: **#0d9488**)",
-            },
-          ],
-          noteEn:
-            "All settings across the four tabs are saved as a **single configuration object**. Click **Save Settings** at the top-right to persist all changes at once.",
-          noteAr:
-            "جميع الإعدادات عبر التبويبات الأربعة تُحفظ ككائن **تكوين واحد**. انقر **حفظ الإعدادات** في الأعلى الأيمن لحفظ جميع التغييرات دفعة واحدة.",
-        },
-      ],
-    },
-    // ── Section 7: Notifications ──
+    // ── Section 6: Notifications ──
     {
       id: "notifications",
-      titleEn: "7. Notifications",
-      titleAr: "7. الإشعارات",
+      titleEn: "6. Notifications",
+      titleAr: "6. الإشعارات",
       descriptionEn:
         "Configure email (SMTP) and SMS providers, customize notification templates per event type, and track all sent notifications with retry capability for failed deliveries.",
       descriptionAr:
@@ -4857,11 +4634,11 @@ export const administrationTutorial: TutorialModule = {
         },
       ],
     },
-    // ── Section 8: System Logs ──
+    // ── Section 7: System Logs ──
     {
       id: "system-logs",
-      titleEn: "8. System Logs",
-      titleAr: "8. سجلات النظام",
+      titleEn: "7. System Logs",
+      titleAr: "7. سجلات النظام",
       descriptionEn:
         "Monitor all system activity through the comprehensive logging system — audit trail for compliance, specialized logs by user type, and developer error tracking.",
       descriptionAr:
@@ -5313,6 +5090,93 @@ export const candidatePortalTutorial: TutorialModule = {
           descriptionAr:
             "**وضع ملء الشاشة:**\n- يعمل الاختبار في **وضع ملء الشاشة الإلزامي**\n- يتم طلب ملء الشاشة تلقائيًا عند بدء الاختبار\n- إذا خرجت من ملء الشاشة (ضغطت Escape أو Alt+Tab):\n  - يتم **تسجيل مخالفة** (تبديل تبويب / الخروج من ملء الشاشة)\n  - يزداد عداد المخالفات\n  - يظهر إشعار تحذيري منبثق\n  - يطلب النظام ملء الشاشة مرة أخرى\n- دعم عبر المتصفحات: يعمل على Chrome و Firefox و Safari و Edge\n\n**منع النسخ/اللصق:**\n- **النسخ (Ctrl+C):** محظور بـ `preventDefault()` — لا يتم نسخ شيء إلى الحافظة\n- **اللصق (Ctrl+V):** محظور بـ `preventDefault()` — لا يتم لصق شيء\n- **قائمة السياق (النقر اليمين):** قد تكون معطلة على محتوى الاختبار\n- كل محاولة تطلق:\n  - **صوت تحذيري** عبر AudioContext\n  - **إشعار منبثق** يوضح أن الإجراء تم حظره\n  - تسجيل حدث إلى الخادم\n\n**تتبع الجهاز:**\nعند بدء الاختبار، يسجل النظام:\n- **اسم وإصدار المتصفح** (Chrome، Edge، Firefox، Safari)\n- **نظام التشغيل** (Windows، macOS، Linux، iOS، Android)\n- **دقة الشاشة** (مثلاً 1920×1080)\n- يتم تخزين هذه المعلومات مع محاولة الاختبار لأغراض التدقيق",
           imagePlaceholder: "/tutorials/candidate-portal-fullscreen.png",
+        },
+      ],
+    },
+
+    // ── Section 6b: Walk-in Registration ──────────────────
+    {
+      id: "walkin-candidate",
+      titleEn: "Walk-in Registration",
+      titleAr: "التسجيل المفتوح",
+      descriptionEn:
+        "How to access and take an exam as a Walk-in candidate — no pre-existing account required. You only need the share link provided by the exam organizer.",
+      descriptionAr:
+        "كيفية الوصول وأداء الاختبار كمرشح مفتوح — لا حاجة لحساب مسبق. تحتاج فقط إلى رابط المشاركة المقدَّم من منظّم الاختبار.",
+      steps: [
+        {
+          id: "walkin-open-link",
+          titleEn: "Open the Share Link",
+          titleAr: "فتح رابط المشاركة",
+          descriptionEn:
+            "The exam organizer will share a registration link with you (via email, WhatsApp, QR code, etc.). Open the link in any modern browser.\n\nYou will see the **Walk-in Registration page** which displays:\n- The exam title\n- A brief description of the exam\n- A registration form\n\nNo account or prior login is needed — just fill in the form and you are registered instantly.",
+          descriptionAr:
+            "سيشارك منظّم الاختبار رابط التسجيل معك (عبر البريد الإلكتروني أو واتساب أو رمز QR، إلخ). افتح الرابط في أي متصفح حديث.\n\nسترى **صفحة التسجيل المفتوح** التي تعرض:\n- عنوان الاختبار\n- وصف موجز للاختبار\n- نموذج التسجيل\n\nلا حاجة لحساب أو تسجيل دخول مسبق — فقط امل النموذج وستُسجَّل فوراً.",
+          imagePlaceholder: "/tutorials/walkin-candidate-link.png",
+        },
+        {
+          id: "walkin-fill-form",
+          titleEn: "Fill the Registration Form",
+          titleAr: "ملء نموذج التسجيل",
+          descriptionEn:
+            "Enter your details in the registration form:\n\n**Required fields:**\n- **Full Name** — your complete name as it will appear on results and certificates\n- **Email Address** — used as your login identifier; must be a valid email\n- **Phone Number** — your contact number\n\nThen click **Register**.\n\n**What happens next:**\n- If this is your first time → a new Walk-in candidate account is created for you\n- If you registered before with the same email → you are logged back in (no duplicate created)\n- You are **automatically logged in** — no separate password needed\n- You are redirected straight to the **Exam Instructions page**",
+          descriptionAr:
+            "أدخل بياناتك في نموذج التسجيل:\n\n**الحقول المطلوبة:**\n- **الاسم الكامل** — اسمك الكامل كما سيظهر في النتائج والشهادات\n- **البريد الإلكتروني** — يُستخدم كمعرّف تسجيل الدخول؛ يجب أن يكون بريداً إلكترونياً صالحاً\n- **رقم الهاتف** — رقم اتصالك\n\nثم انقر **تسجيل**.\n\n**ماذا يحدث بعدها:**\n- إذا كانت المرة الأولى → يُنشأ حساب مرشح مفتوح جديد لك\n- إذا سجّلت من قبل بنفس البريد → يتم تسجيل دخولك مرة أخرى (لا يتم إنشاء تكرار)\n- يتم **تسجيل دخولك تلقائياً** — لا حاجة لكلمة مرور منفصلة\n- يتم توجيهك مباشرة إلى **صفحة تعليمات الاختبار**",
+          imagePlaceholder: "/tutorials/walkin-candidate-form.png",
+          fields: [
+            {
+              nameEn: "Full Name",
+              nameAr: "الاسم الكامل",
+              required: true,
+              descriptionEn:
+                "Your full name as it will appear on results and certificates",
+              descriptionAr: "اسمك الكامل كما سيظهر في النتائج والشهادات",
+            },
+            {
+              nameEn: "Email Address",
+              nameAr: "البريد الإلكتروني",
+              required: true,
+              descriptionEn:
+                "Your email — used as your login identifier for this exam",
+              descriptionAr:
+                "بريدك الإلكتروني — يُستخدم كمعرّف تسجيل الدخول لهذا الاختبار",
+            },
+            {
+              nameEn: "Phone Number",
+              nameAr: "رقم الهاتف",
+              required: true,
+              descriptionEn: "Your contact phone number",
+              descriptionAr: "رقم هاتف الاتصال بك",
+            },
+          ],
+          tipEn:
+            "Use a real email address you have access to — you may need it to re-register if you revisit the link later.",
+          tipAr:
+            "استخدم بريداً إلكترونياً حقيقياً يمكنك الوصول إليه — قد تحتاجه لإعادة التسجيل إذا زرت الرابط لاحقاً.",
+        },
+        {
+          id: "walkin-my-exams",
+          titleEn: "My Exams as a Walk-in Candidate",
+          titleAr: "اختباراتي كمرشح مفتوح",
+          descriptionEn:
+            "After registering, you land on the Exam Instructions page to start right away.\n\nIf you navigate to **My Exams** later, you will only see exams that you specifically registered for via walk-in links. You will **not** see all public exams in the system — your dashboard is limited to your registered exams.\n\n**Exam card actions available to Walk-in candidates:**\n- **Start Exam** — begin an available attempt\n- **Continue** — resume an in-progress attempt\n- **View Results** — view results of a completed attempt\n\nAll standard exam rules apply: timers, proctoring, max attempts, etc.",
+          descriptionAr:
+            "بعد التسجيل، تصل إلى صفحة تعليمات الاختبار للبدء فوراً.\n\nإذا انتقلت إلى **اختباراتي** لاحقاً، ستجد فقط الاختبارات التي سجّلت فيها تحديداً عبر روابط مفتوحة. **لن ترى** جميع الاختبارات العامة في النظام — لوحتك محدودة باختباراتك المسجّلة.\n\n**إجراءات بطاقة الاختبار المتاحة للمرشحين المفتوحين:**\n- **بدء الاختبار** — بدء محاولة متاحة\n- **متابعة** — استئناف محاولة قيد التقدم\n- **عرض النتائج** — عرض نتائج محاولة مكتملة\n\nتنطبق جميع قواعد الاختبار القياسية: المؤقتات، المراقبة، الحد الأقصى للمحاولات، إلخ.",
+          imagePlaceholder: "/tutorials/walkin-my-exams.png",
+          noteEn:
+            "Walk-in accounts are real candidate accounts in the system. Your results, certificates, and attempt history are stored just like any other candidate.",
+          noteAr:
+            "حسابات التسجيل المفتوح هي حسابات مرشحين حقيقية في النظام. نتائجك وشهاداتك وسجل محاولاتك محفوظة تماماً مثل أي مرشح آخر.",
+        },
+      ],
+      examples: [
+        {
+          titleEn: "Walk-in Candidate Journey",
+          titleAr: "رحلة المرشح المفتوح",
+          contentEn:
+            "1. Receive share link from organizer (email / WhatsApp / QR)\n2. Open link → see Walk-in Registration page with exam title\n3. Fill in: Full Name, Email, Phone → click Register\n4. Auto-logged in → redirected to Exam Instructions page\n5. Review rules → click Start Exam\n6. Take exam (same as any other candidate)\n7. Submit → view results → download certificate if passed\n8. Later: visit /candidate-login to sign in again with the same email if needed",
+          contentAr:
+            "1. استلام رابط المشاركة من المنظّم (بريد / واتساب / رمز QR)\n2. فتح الرابط → رؤية صفحة التسجيل المفتوح مع عنوان الاختبار\n3. ملء: الاسم الكامل، البريد، الهاتف → النقر على تسجيل\n4. تسجيل الدخول تلقائياً → التوجيه إلى صفحة تعليمات الاختبار\n5. مراجعة القواعد → النقر على بدء الاختبار\n6. أداء الاختبار (مثل أي مرشح آخر)\n7. التقديم → عرض النتائج → تنزيل الشهادة عند النجاح\n8. لاحقاً: زيارة /candidate-login لتسجيل الدخول مرة أخرى بنفس البريد الإلكتروني عند الحاجة",
         },
       ],
     },

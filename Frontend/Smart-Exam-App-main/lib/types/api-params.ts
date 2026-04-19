@@ -117,6 +117,7 @@ export interface SaveAccessPolicyRequest {
   isPublic: boolean;
   accessCode?: string | null;
   restrictToAssignedCandidates: boolean;
+  isWalkIn?: boolean;
 }
 
 // ============ ATTEMPT ============

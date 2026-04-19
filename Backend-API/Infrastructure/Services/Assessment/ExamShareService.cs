@@ -18,17 +18,20 @@ public class ExamShareService : IExamShareService
     private readonly ApplicationDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly ICacheService _cache;
 
     public ExamShareService(
         ApplicationDbContext context,
         ITokenService tokenService,
         UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager,
         ICacheService cache)
     {
         _context = context;
         _tokenService = tokenService;
         _userManager = userManager;
+        _roleManager = roleManager;
         _cache = cache;
     }
 
@@ -147,6 +150,9 @@ public class ExamShareService : IExamShareService
         var org = await _context.OrganizationSettings
             .FirstOrDefaultAsync(o => o.IsActive);
 
+        var accessPolicy = await _context.ExamAccessPolicies
+            .FirstOrDefaultAsync(ap => ap.ExamId == exam.Id);
+
         var examInfo = new PublicExamInfoDto
         {
             ExamId = exam.Id,
@@ -158,7 +164,8 @@ public class ExamShareService : IExamShareService
             MaxAttempts = exam.MaxAttempts,
             ExpiresAt = link.ExpiresAt,
             OrganizationName = org?.Name,
-            OrganizationLogoUrl = org?.LogoPath
+            OrganizationLogoUrl = org?.LogoPath,
+            IsWalkIn = accessPolicy?.IsWalkIn ?? false
         };
         _cache.Set(cacheKey, examInfo, CacheKeys.Thirty);
         return ApiResponse<PublicExamInfoDto>.SuccessResponse(examInfo);
@@ -324,6 +331,115 @@ public class ExamShareService : IExamShareService
             ExamId = exam.Id,
             CandidateId = candidate.Id,
             CandidateName = candidate.FullName ?? candidate.DisplayName ?? candidate.Email
+        });
+    }
+
+    public async Task<ApiResponse<SelectCandidateResponseDto>> WalkInRegisterAsync(
+        string shareToken, WalkInRegisterDto dto)
+    {
+        var link = await ValidateShareTokenAsync(shareToken);
+        if (link == null)
+            return ApiResponse<SelectCandidateResponseDto>.FailureResponse("Invalid or expired share link");
+
+        var exam = link.Exam;
+
+        // Verify this exam is configured for walk-in
+        var accessPolicy = await _context.ExamAccessPolicies
+            .FirstOrDefaultAsync(ap => ap.ExamId == exam.Id);
+
+        if (accessPolicy == null || !accessPolicy.IsWalkIn)
+            return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This exam does not allow walk-in registration");
+
+        // Normalize email
+        var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
+        // Check if a user with this email already exists
+        var existingUser = await _userManager.FindByEmailAsync(normalizedEmail);
+
+        if (existingUser != null)
+        {
+            // Reject if blocked or deleted
+            if (existingUser.IsBlocked || existingUser.IsDeleted)
+                return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This account has been blocked. Please contact support.");
+
+            // Check they have the Candidate role
+            var existingRoles = await _userManager.GetRolesAsync(existingUser);
+            if (!existingRoles.Contains(AppRoles.Candidate))
+                return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This email is already registered with a different account type. Please contact support.");
+
+            // Check attempt limits
+            var attemptCount = await _context.Attempts
+                .CountAsync(a => a.ExamId == exam.Id && a.CandidateId == existingUser.Id && !a.IsDeleted);
+            if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
+                return ApiResponse<SelectCandidateResponseDto>.FailureResponse("You have already used all available attempts for this exam.");
+
+            // Re-issue JWT
+            var accessToken = _tokenService.GenerateAccessToken(existingUser, existingRoles.ToList());
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            existingUser.RefreshToken = refreshToken;
+            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _userManager.UpdateAsync(existingUser);
+
+            return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                Expiration = DateTime.UtcNow.AddHours(1),
+                ExamId = exam.Id,
+                CandidateId = existingUser.Id,
+                CandidateName = existingUser.FullName ?? existingUser.DisplayName ?? existingUser.Email
+            });
+        }
+
+        // --- New walk-in candidate ---
+        // All walk-in candidates share a fixed default password.
+        // They authenticate via the share link each time — no password login flow.
+        const string password = "Candidate@3376Exam";
+
+        var newUser = new ApplicationUser
+        {
+            UserName = normalizedEmail,
+            Email = normalizedEmail,
+            NormalizedEmail = normalizedEmail.ToUpperInvariant(),
+            NormalizedUserName = normalizedEmail.ToUpperInvariant(),
+            FullName = dto.FullName.Trim(),
+            DisplayName = dto.FullName.Trim(),
+            PhoneNumber = dto.PhoneNumber.Trim(),
+            IsWalkIn = true,
+            EmailConfirmed = true, // no email verification flow for walk-in
+            CreatedDate = DateTime.UtcNow,
+            Status = UserStatus.Active
+        };
+
+        var createResult = await _userManager.CreateAsync(newUser, password);
+        if (!createResult.Succeeded)
+        {
+            var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
+            return ApiResponse<SelectCandidateResponseDto>.FailureResponse($"Registration failed: {errors}");
+        }
+
+        // Ensure Candidate role exists and assign it
+        if (!await _roleManager.RoleExistsAsync(AppRoles.Candidate))
+            await _roleManager.CreateAsync(new ApplicationRole { Name = AppRoles.Candidate });
+
+        await _userManager.AddToRoleAsync(newUser, AppRoles.Candidate);
+
+        // Issue JWT
+        var roles = new List<string> { AppRoles.Candidate };
+        var token = _tokenService.GenerateAccessToken(newUser, roles);
+        var refresh = _tokenService.GenerateRefreshToken();
+        newUser.RefreshToken = refresh;
+        newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        await _userManager.UpdateAsync(newUser);
+
+        return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
+        {
+            AccessToken = token,
+            RefreshToken = refresh,
+            Expiration = DateTime.UtcNow.AddHours(1),
+            ExamId = exam.Id,
+            CandidateId = newUser.Id,
+            CandidateName = newUser.FullName
         });
     }
 

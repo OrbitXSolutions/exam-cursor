@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
@@ -20,6 +20,8 @@ import { Eye, EyeOff, Shield, Lock, Mail, ArrowLeft } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnUrl = searchParams.get("returnUrl")
   const { login, isLoading } = useAuth()
   const { t, isRTL } = useI18n()
 
@@ -41,6 +43,11 @@ export default function LoginPage() {
         const user = JSON.parse(storedUser)
         // Redirect candidates: if already verified go to My Exams, otherwise verify-identity
         if (user.role === UserRole.Candidate) {
+          // If coming from a share link, go directly there
+          if (returnUrl) {
+            router.push(returnUrl)
+            return
+          }
           try {
             const { getCandidateVerificationStatus } = await import("@/lib/api/proctoring")
             const vs = await getCandidateVerificationStatus()

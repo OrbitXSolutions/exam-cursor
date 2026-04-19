@@ -47,4 +47,14 @@ public class PublicExamController : ControllerBase
         var result = await _examShareService.SelectCandidateAsync(shareToken, dto);
         return result.Success ? Ok(result) : BadRequest(result);
     }
+
+    /// <summary>
+    /// Walk-in self-registration: create or re-auth candidate and get JWT (public, no auth)
+    /// </summary>
+    [HttpPost("{shareToken}/register")]
+    public async Task<IActionResult> WalkInRegister(string shareToken, [FromBody] WalkInRegisterDto dto)
+    {
+        var result = await _examShareService.WalkInRegisterAsync(shareToken, dto);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 }
