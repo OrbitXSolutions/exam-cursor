@@ -69,6 +69,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<Certificate> Certificates { get; set; } = null!;
 
     // Proctor
+    public DbSet<ExamProctor> ExamProctors { get; set; } = null!;
     public DbSet<ProctorSession> ProctorSessions { get; set; } = null!;
     public DbSet<ProctorEvent> ProctorEvents { get; set; } = null!;
     public DbSet<ProctorRiskRule> ProctorRiskRules { get; set; } = null!;

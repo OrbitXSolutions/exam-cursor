@@ -87,6 +87,10 @@ public static class CacheKeys
     public static string GradingIsComplete(int attemptId) => $"grading:complete:{attemptId}";
     public static string GradingCandidateResult(int attemptId) => $"grading:candidate-result:{attemptId}";
 
+    // ── ExamProctors ──────────────────────────────────────────
+    public const string ExamProctorsPrefix = "exam-proctors:";
+    public static string ExamProctors(int examId) => $"exam-proctors:{examId}";
+
     // ── ExamAssignment ────────────────────────────────────────
     public const string ExamAssignmentPrefix = "exam-assignments:";
     public static string ExamAssignmentCandidates(int examId, string filterJson) => $"exam-assignments:{examId}:{filterJson}";

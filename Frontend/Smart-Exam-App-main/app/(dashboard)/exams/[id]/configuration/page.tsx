@@ -58,6 +58,7 @@ export default function ExamConfigurationPage() {
     isPublic: false,
     accessCode: "",
     restrictToAssignedCandidates: false,
+    isWalkIn: false,
   })
   const [savingAccessPolicy, setSavingAccessPolicy] = useState(false)
   
@@ -137,6 +138,7 @@ export default function ExamConfigurationPage() {
           isPublic: policyData.isPublic || false,
           accessCode: policyData.accessCode || "",
           restrictToAssignedCandidates: policyData.restrictToAssignedCandidates || false,
+          isWalkIn: policyData.isWalkIn || false,
         })
       }
     } catch (error) {
@@ -837,7 +839,11 @@ export default function ExamConfigurationPage() {
                   </div>
                   <Switch
                     checked={accessPolicyForm.isPublic}
-                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({ ...prev, isPublic: checked }))}
+                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({
+                      ...prev,
+                      isPublic: checked,
+                      ...(checked ? { isWalkIn: false } : {}),
+                    }))}
                   />
                 </div>
                 
@@ -867,7 +873,29 @@ export default function ExamConfigurationPage() {
                   </div>
                   <Switch
                     checked={accessPolicyForm.restrictToAssignedCandidates}
-                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({ ...prev, restrictToAssignedCandidates: checked }))}
+                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({
+                      ...prev,
+                      restrictToAssignedCandidates: checked,
+                      ...(checked ? { isWalkIn: false } : {}),
+                    }))}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-base font-medium">{t("exams.walkIn")}</Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{t("exams.walkInDesc")}</p>
+                  </div>
+                  <Switch
+                    checked={accessPolicyForm.isWalkIn}
+                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({
+                      ...prev,
+                      isWalkIn: checked,
+                      ...(checked ? { isPublic: false, restrictToAssignedCandidates: false, accessCode: "" } : {}),
+                    }))}
                   />
                 </div>
               </div>

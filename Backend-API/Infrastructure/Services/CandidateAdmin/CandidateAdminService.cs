@@ -117,6 +117,7 @@ public class CandidateAdminService : ICandidateAdminService
                 Mobile = u.PhoneNumber,
                 Status = u.IsBlocked ? "Blocked" : "Active",
                 IsBlocked = u.IsBlocked,
+                IsWalkIn = u.IsWalkIn,
                 CreatedDate = u.CreatedDate,
                 CreatedBy = u.CreatedBy,
                 CreatedByName = u.CreatedBy != null && creators.TryGetValue(u.CreatedBy, out var c)
@@ -534,6 +535,7 @@ public class CandidateAdminService : ICandidateAdminService
         Mobile = u.PhoneNumber,
         Status = u.IsBlocked ? "Blocked" : "Active",
         IsBlocked = u.IsBlocked,
+        IsWalkIn = u.IsWalkIn,
         CreatedDate = u.CreatedDate,
         CreatedBy = u.CreatedBy
     };

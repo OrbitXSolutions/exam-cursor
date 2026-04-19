@@ -398,11 +398,18 @@ export default function CandidatesDataPage() {
                         <TableCell className="font-mono text-sm">{c.rollNo || "—"}</TableCell>
                         <TableCell className="text-sm">{c.mobile || "—"}</TableCell>
                         <TableCell>
-                          <Badge variant={c.isBlocked ? "destructive" : "default"} className={!c.isBlocked ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}>
-                            {c.isBlocked
-                              ? (isAr ? "محظور" : "Blocked")
-                              : (isAr ? "نشط" : "Active")}
-                          </Badge>
+                          <div className="flex flex-wrap gap-1">
+                            <Badge variant={c.isBlocked ? "destructive" : "default"} className={!c.isBlocked ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}>
+                              {c.isBlocked
+                                ? (isAr ? "محظور" : "Blocked")
+                                : (isAr ? "نشط" : "Active")}
+                            </Badge>
+                            {c.isWalkIn && (
+                              <Badge variant="outline" className="border-blue-400 text-blue-600 bg-blue-50">
+                                {isAr ? "تسجيل ذاتي" : "Walk-in"}
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {new Date(c.createdDate).toLocaleDateString(isAr ? "ar-SA" : "en-US", {

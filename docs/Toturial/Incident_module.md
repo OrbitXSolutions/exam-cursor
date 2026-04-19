@@ -91,7 +91,7 @@ This is a critical flow change. Let me analyze the full impact before touching a
 Perfect. Let me consolidate everything into final confirmed points.
 
 Currently, when a candidate enters an exam and leaves without submitting (for example by closing the tab or browser), the system keeps the attempt in an “In Progress” state and allows the candidate to resume it later. However, based on the business requirement for the production version, this behavior must be removed. There should be no “In Progress” or automatic resume option.
-If a candidate exits the exam without submitting, the attempt must be permanently closed (e.g., marked as Abandoned or Not Submitted) and cannot be reused. If the candidate needs to take the exam again, only the Admin or Proctor can grant a new attempt from the Exam Operations screen, which will appear under a separate “Resume” section for the candidate.
+If a candidate exits the exam without submitting, the attempt must be permanently closed (e.g., marked as Abandoned or Not Submitted) and cannot be reused. If the candidate needs to take the exam again, only the Admin or Proctor can grant a new attempt.
 All such actions must be recorded in the Audit log.
 
 Note 1: What happens with the timer when candidate disconnects and returns?

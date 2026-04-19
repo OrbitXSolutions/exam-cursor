@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
@@ -21,6 +21,8 @@ import { Eye, EyeOff, Lock, Mail, ArrowLeft, Shield, Phone, Globe, MailIcon } fr
 
 export default function CandidateLoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnUrl = searchParams.get("returnUrl")
   const { login, isLoading } = useAuth()
   const { t, isRTL, language } = useI18n()
   const { branding, loading: brandingLoading, hasOrgBranding, logoSrc, orgName } = useBranding()
@@ -44,6 +46,10 @@ export default function CandidateLoginPage() {
       if (storedUser) {
         const user = JSON.parse(storedUser)
         if (user.role === UserRole.Candidate) {
+          if (returnUrl) {
+            router.push(returnUrl)
+            return
+          }
           try {
             const { getCandidateVerificationStatus } = await import("@/lib/api/proctoring")
             const vs = await getCandidateVerificationStatus()

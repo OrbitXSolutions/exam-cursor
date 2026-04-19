@@ -179,17 +179,117 @@ When creating or editing an **MCQ Multi** question, you can assign **individual 
 Exams are available to candidates based on:
 
 1. **Department** — Candidates must be in the same department as the exam.
-2. **Access Policy** — Configure under **Configuration** (or `/exams/{id}/configuration`):
-   - **Access Code** — Optional; candidates must enter it to start.
-   - **Restrict to assigned candidates** — If enabled, only explicitly assigned users can access (assignment UI: _Not fully implemented in current version_).
-   - **Is Public** — If true, any eligible candidate in the department can see the exam.
+2. **Access Policy** — Configure under **Configuration** (or `/exams/{id}/configuration`). The system supports **four mutually exclusive policies**:
+
+   | Policy                           | Description                                                                                                         |
+   | -------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+   | **Public**                       | Any candidate in the department can see and start the exam — no restrictions.                                       |
+   | **Access Code**                  | Candidate must enter a secret code on the Instructions page to start.                                               |
+   | **Restrict to Assigned**         | Only explicitly assigned candidates can access the exam.                                                            |
+   | **Walk-in Registration** _(new)_ | Anyone can self-register via a QR code or share link — no prior account needed. Full details: see **Section 3.13**. |
+
+   > Selecting one policy automatically disables the others in the Configuration UI.
 
 3. **Publish status** — Exam must be **Published** for candidates to see it.
 4. **Schedule** — For Fixed exams, the start/end window controls when candidates can start.
 
-**Current implementation:** Published exams in the candidate’s department appear under **My Exams** → **Active** or **Upcoming**.
+**Current implementation:** Published exams in the candidate's department appear under **My Exams** → **Active** or **Upcoming**. Walk-in exams are **excluded** from this list — they are only accessible via the share link.
 
 [Screenshot: Exam Configuration — Access Policy tab]
+
+---
+
+---
+
+### 3.13 Walk-in Registration — QR / Share Link Exam
+
+The **Walk-in Registration** policy is designed for scenarios where you want to run an exam at the end of a live session, meeting, or event — and anyone physically present can scan a QR code or click a link to immediately self-register and start the exam. No account is needed in advance.
+
+**Typical use-case:** You host a training session in a meeting room. At the end, you project a QR code on the screen. Attendees scan it, enter their name, email, and phone number, and start the exam.
+
+---
+
+#### 3.13.1 Set Up a Walk-in Exam (Admin Steps)
+
+**Step 1 — Create and publish the exam**
+
+1. Go to **Exams** → **Create Exam**.
+2. Fill in the title, description, department, duration, and max attempts as usual.
+3. Build the exam in the **Builder** (add sections and questions).
+4. Click **Publish** to make the exam available.
+
+**Step 2 — Set Access Policy to Walk-in**
+
+1. Open the exam and go to **Configuration** (`/exams/{id}/configuration`).
+2. Under **Access Policy**, find the **Walk-in Registration** toggle.
+3. Turn it **ON**.
+   - The Public, Access Code, and Restrict to Assigned toggles automatically turn off.
+4. Click **Save Configuration**.
+
+[Screenshot: Configuration page — Walk-in Registration toggle ON]
+
+**Step 3 — Generate the Share Link / QR Code**
+
+1. On the exam list or exam detail page, click **Share Exam** (or the share/link icon).
+2. The system generates a secure share link (e.g. `https://your-domain.com/share/{token}`).
+3. Use the **Copy Link** button to copy the URL.
+4. Use the **QR Code** display to project or print the QR code for attendees to scan.
+5. The share link has an expiry date matching the exam's end date. You can regenerate it if needed.
+
+[Screenshot: Share Link dialog with QR code and copy button]
+
+**Step 4 — Display the QR Code to attendees**
+
+- Project the QR code on a screen or whiteboard at the end of the session.
+- Attendees scan the QR code with their phone or click the link on their device.
+- They are taken directly to the Walk-in Registration form — no login page.
+
+---
+
+#### 3.13.2 What Attendees See (Walk-in Flow)
+
+1. Attendee opens the share link or scans the QR code.
+2. The **Walk-in Registration form** appears (not the usual candidate picker):
+   - **Full Name** _(required)_
+   - **Email** _(required)_
+   - **Phone Number** _(required)_
+   - **Password** _(optional — leave blank for auto-generated)_
+3. Attendee clicks **Start Exam**.
+4. The system creates an account, issues a session token, and redirects to the **Exam Instructions** page.
+5. The attendee reads the instructions and clicks **Start Exam** to begin.
+
+[Screenshot: Walk-in Registration form on share page]
+
+---
+
+#### 3.13.3 Behavior Rules & Edge Cases
+
+| Scenario                          | System Behavior                                                                                                      |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| New email (first time)            | Account created with `IsWalkIn=true`, Candidate role assigned, JWT issued — exam starts.                             |
+| Same email re-submits             | Account already exists → JWT re-issued. No duplicate account created. MaxAttempts still enforced.                    |
+| Email belongs to Admin/Instructor | Rejected with error: _"This email is already registered with a different account type."_                             |
+| Email is blocked/deleted          | Rejected with error.                                                                                                 |
+| No password provided              | System auto-generates a secure 16-character password (stored on the account).                                        |
+| Max attempts exceeded             | Walk-in candidate is allowed to re-authenticate but cannot start a new attempt (MaxAttempts enforced at exam start). |
+
+---
+
+#### 3.13.4 Walk-in Candidates in Admin Lists
+
+- Walk-in candidates appear in the **Candidates** list with an **"Is Walk-in"** indicator.
+- They appear in **Reports** and **Grading** for the exam like any other candidate.
+- Walk-in exams are **not visible** in the regular candidate exam list (`/my-exams`) — they are accessible only through the share link.
+- Proctoring (webcam snapshots, event logging) applies to walk-in candidates exactly the same as pre-registered candidates, based on the exam's proctoring settings.
+
+---
+
+#### 3.13.5 Regenerate or Revoke the Share Link
+
+- **Regenerate:** Click **Share Exam** → **Generate New Link**. The old link is immediately invalidated and a new token is created.
+- **Revoke:** Click **Revoke Link**. The link is deactivated. Walk-in registration is no longer possible until a new link is generated.
+
+> **Security tip:** Revoke the share link after the exam session ends to prevent late walk-in registrations.
 
 ---
 
@@ -376,6 +476,66 @@ If you switch tabs or exit fullscreen, you may see a warning. These events are r
 
 ---
 
+---
+
+### 4.9 Walk-in Candidates — Taking an Exam via QR Code or Link
+
+If you are attending a live session or event and the instructor displays a QR code or share link at the end, you can take the exam **without a pre-existing account**.
+
+---
+
+#### 4.9.1 How to Register and Start
+
+1. **Scan the QR code** with your phone camera, or **click the share link** shared by the instructor.
+2. You are taken directly to the **Walk-in Registration** form — no login required.
+3. Fill in the form:
+   - **Full Name** _(required)_ — your real name as it will appear on results and certificates.
+   - **Email** _(required)_ — used to identify you; keep it accurate so you can retrieve results later.
+   - **Phone Number** _(required)_
+   - **Password** _(optional)_ — leave blank if you just want to take the exam now. A password will be auto-generated for your account.
+4. Click **Start Exam**.
+5. You are redirected to the **Exam Instructions** page.
+6. Read the instructions and click **Start Exam** to begin.
+
+[Screenshot: Walk-in Registration form]
+
+---
+
+#### 4.9.2 Returning to Your Results Later
+
+After completing the exam, your account remains active. To view your results later:
+
+1. Go to the application login page (`/login`).
+2. Enter the **email** you used during walk-in registration.
+3. Enter your password:
+   - If you set a password during registration, use that.
+   - If you left it blank, contact the exam administrator to retrieve or reset your password.
+4. After login, go to **My Results** (`/my-results`) to see your score.
+
+---
+
+#### 4.9.3 Re-taking the Exam (If Multiple Attempts Allowed)
+
+If the exam allows more than one attempt:
+
+1. Scan the QR code or open the share link again.
+2. Enter the **same email** as before.
+3. You will be re-authenticated automatically (no new account created).
+4. Click **Start Exam** on the Instructions page to begin a new attempt.
+
+> The instructor sets the maximum number of attempts. If the limit is reached, you will see an error and cannot start a new attempt.
+
+---
+
+#### 4.9.4 Important Notes for Walk-in Candidates
+
+- Your account is a **real account** — you can log in later and view results.
+- Walk-in exams do **not** appear in the regular **My Exams** list after logging in — they are only accessible via the share link.
+- Proctoring rules apply to walk-in candidates exactly the same as regular candidates — allow camera and keep fullscreen if the exam requires it.
+- If you used an email that already belongs to an Admin or Instructor account, registration will be **rejected**. Use a personal email.
+
+---
+
 ## 5. Troubleshooting & FAQ
 
 ### 5.1 Common Issues & Fixes
@@ -428,15 +588,20 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ## 7. Glossary
 
-| Term            | Definition                                                                                                             |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Exam**        | A configured assessment with questions, duration, and settings.                                                        |
-| **Attempt**     | A single instance of a candidate taking an exam. A candidate may have multiple attempts per exam (up to max attempts). |
-| **Proctoring**  | Monitoring during the exam (e.g. webcam snapshots, tab-switch and fullscreen events).                                  |
-| **Violation**   | A logged event such as tab switch, fullscreen exit, or copy/paste attempt during a proctored exam.                     |
-| **Reviewer**    | Admin or Instructor who grades manual questions (e.g. essays) and finalizes results.                                   |
-| **Result**      | The final score and pass/fail status for an attempt, created after grading is complete.                                |
-| **Certificate** | A document issued to candidates who pass an exam, with a unique verification code.                                     |
+| Term                     | Definition                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Exam**                 | A configured assessment with questions, duration, and settings.                                                                                          |
+| **Attempt**              | A single instance of a candidate taking an exam. A candidate may have multiple attempts per exam (up to max attempts).                                   |
+| **Proctoring**           | Monitoring during the exam (e.g. webcam snapshots, tab-switch and fullscreen events).                                                                    |
+| **Violation**            | A logged event such as tab switch, fullscreen exit, or copy/paste attempt during a proctored exam.                                                       |
+| **Reviewer**             | Admin or Instructor who grades manual questions (e.g. essays) and finalizes results.                                                                     |
+| **Result**               | The final score and pass/fail status for an attempt, created after grading is complete.                                                                  |
+| **Certificate**          | A document issued to candidates who pass an exam, with a unique verification code.                                                                       |
+| **Access Policy**        | The rule that controls who can access an exam. One of: Public, Access Code, Restrict to Assigned, or Walk-in Registration.                               |
+| **Share Link**           | A unique, secure URL generated for an exam that allows candidates (or walk-in attendees) to access the exam without logging in first.                    |
+| **QR Code**              | A scannable code that opens the share link on a mobile device. Generated automatically with the share link.                                              |
+| **Walk-in Registration** | An access policy where anyone can self-register via QR/share link — no prior account needed. The system creates a Candidate account on the spot.         |
+| **Walk-in Candidate**    | A candidate who registered through the Walk-in Registration flow. Flagged as `IsWalkIn=true` in the system. Appears in reports with a walk-in indicator. |
 
 ---
 
@@ -606,18 +771,119 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 يتوفر الاختبار للمرشحين بناءً على:
 
 ١. **القسم** — يجب أن يكون المرشح في نفس قسم الاختبار.  
-٢. **سياسة الوصول** — من **الإعدادات** (أو `/exams/{id}/configuration`):
+٢. **سياسة الوصول** — من **الإعدادات** (أو `/exams/{id}/configuration`). يدعم النظام **أربع سياسات متعارضة**:
 
-- **رمز الوصول** — اختياري؛ يجب على المرشح إدخاله للبدء.
-- **تقييد على المرشحين المعينين** — إن وُجد؛ واجهة التعيين غير مكتملة في النسخة الحالية.
-- **عام** — إن كان نعم، أي مرشح مخوّل في القسم يمكنه رؤية الاختبار.
+| السياسة                                | الوصف                                                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **عام**                                | أي مرشح في القسم يمكنه رؤية الاختبار والبدء دون قيود.                                                        |
+| **رمز الوصول**                         | يجب على المرشح إدخال رمز سري في صفحة التعليمات للبدء.                                                        |
+| **تقييد على المعينين**                 | فقط المرشحون المعينون صراحةً يمكنهم الوصول للاختبار.                                                         |
+| **التسجيل الحضوري (Walk-in)** _(جديد)_ | يتسجّل أي شخص مباشرةً عبر رمز QR أو رابط مشاركة — لا حاجة لحساب مسبق. التفاصيل الكاملة: انظر **القسم ٣.١٣**. |
+
+> تفعيل أي سياسة يُلغي تلقائياً بقية السياسات في واجهة الإعدادات.
 
 ٣. **حالة النشر** — يجب أن يكون الاختبار **منشوراً** ليراه المرشحون.  
 ٤. **الجدولة** — للاختبارات الثابتة، نافذة البداية/النهاية تحدد متى يمكن البدء.
 
-**النسخة الحالية:** الاختبارات المنشورة في قسم المرشح تظهر في **اختباراتي** → **نشط** أو **قادم**.
+**النسخة الحالية:** الاختبارات المنشورة في قسم المرشح تظهر في **اختباراتي** → **نشط** أو **قادم**. اختبارات Walk-in **لا تظهر** في هذه القائمة — يمكن الوصول إليها فقط عبر رابط المشاركة.
 
 [لقطة شاشة: إعدادات الاختبار — تبويب سياسة الوصول]
+
+---
+
+---
+
+### ٣.١٣ التسجيل الحضوري — اختبار QR / رابط المشاركة
+
+سياسة **التسجيل الحضوري (Walk-in)** مصممة للسيناريوهات التي تريد فيها إجراء اختبار في نهاية جلسة حية أو اجتماع أو فعالية — وأي حاضر يمكنه مسح رمز QR أو الضغط على الرابط للتسجيل الفوري وبدء الاختبار. لا حاجة لحساب مسبق.
+
+**حالة الاستخدام النموذجية:** تعقد جلسة تدريب في قاعة اجتماعات. في النهاية تعرض رمز QR على الشاشة. يمسح الحاضرون الرمز، يُدخلون اسمهم وبريدهم الإلكتروني ورقم هاتفهم، ويبدأون الاختبار.
+
+---
+
+#### ٣.١٣.١ إعداد اختبار Walk-in (خطوات المسؤول)
+
+**الخطوة الأولى — إنشاء الاختبار ونشره**
+
+١. اذهب إلى **الاختبارات** → **إنشاء اختبار**.  
+٢. أدخل العنوان والوصف والقسم والمدة والحد الأقصى للمحاولات.  
+٣. أنشئ الاختبار في **المنشئ** (أضف أقساماً وأسئلة).  
+٤. اضغط **نشر** لإتاحة الاختبار.
+
+**الخطوة الثانية — تعيين سياسة الوصول إلى Walk-in**
+
+١. افتح الاختبار واذهب إلى **الإعدادات** (`/exams/{id}/configuration`).  
+٢. ضمن **سياسة الوصول**، ابحث عن مفتاح **التسجيل الحضوري**.  
+٣. شغّله **تشغيل**.
+
+- تُلغى تلقائياً سياسات العام ورمز الوصول والتقييد.  
+  ٤. اضغط **حفظ الإعدادات**.
+
+[لقطة شاشة: صفحة الإعدادات — مفتاح التسجيل الحضوري مشغّل]
+
+**الخطوة الثالثة — توليد رابط المشاركة / رمز QR**
+
+١. في قائمة الاختبارات أو صفحة تفاصيل الاختبار، اضغط **مشاركة الاختبار** (أو أيقونة المشاركة).  
+٢. يولّد النظام رابطاً آمناً للمشاركة (مثل `https://your-domain.com/share/{token}`).  
+٣. استخدم زر **نسخ الرابط** لنسخ العنوان.  
+٤. استخدم عرض **رمز QR** لعرضه أو طباعته للحاضرين.  
+٥. للرابط تاريخ انتهاء مرتبط بتاريخ نهاية الاختبار. يمكن إعادة توليده عند الحاجة.
+
+[لقطة شاشة: نافذة رابط المشاركة مع رمز QR وزر النسخ]
+
+**الخطوة الرابعة — عرض رمز QR للحاضرين**
+
+- اعرض رمز QR على شاشة أو لوح أبيض في نهاية الجلسة.
+- يمسح الحاضرون الرمز بهواتفهم أو يضغطون على الرابط.
+- يُنقلون مباشرة إلى نموذج التسجيل الحضوري — دون صفحة تسجيل دخول.
+
+---
+
+#### ٣.١٣.٢ ما يراه الحاضرون (مسار Walk-in)
+
+١. يفتح الحاضر رابط المشاركة أو يمسح رمز QR.  
+٢. يظهر **نموذج التسجيل الحضوري** (وليس منتقي المرشح المعتاد):
+
+- **الاسم الكامل** _(مطلوب)_
+- **البريد الإلكتروني** _(مطلوب)_
+- **رقم الهاتف** _(مطلوب)_
+- **كلمة المرور** _(اختيارية — اتركها فارغة للتوليد التلقائي)_  
+  ٣. يضغط الحاضر **بدء الاختبار**.  
+  ٤. يُنشئ النظام حساباً، ويُصدر رمز جلسة، ويُنقل إلى صفحة **تعليمات الاختبار**.  
+  ٥. يقرأ الحاضر التعليمات ويضغط **بدء الاختبار** للشروع.
+
+[لقطة شاشة: نموذج التسجيل الحضوري في صفحة المشاركة]
+
+---
+
+#### ٣.١٣.٣ قواعد السلوك والحالات الاستثنائية
+
+| السيناريو                    | سلوك النظام                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| بريد إلكتروني جديد (أول مرة) | يُنشأ حساب بعلامة Walk-in، تُعيَّن صلاحية مرشح، يُصدر JWT — يبدأ الاختبار.         |
+| نفس البريد مرة أخرى          | الحساب موجود → يُعاد إصدار JWT. لا يُنشأ حساب مكرر. يُطبَّق الحد الأقصى للمحاولات. |
+| البريد لمسؤول أو مدرّب       | يُرفض مع خطأ: _«هذا البريد مسجّل لنوع حساب آخر. تواصل مع الدعم.»_                  |
+| البريد لحساب محظور/محذوف     | يُرفض مع خطأ.                                                                      |
+| بدون كلمة مرور               | يُولّد النظام كلمة مرور آمنة من 16 حرفاً تلقائياً.                                 |
+| تجاوز الحد الأقصى للمحاولات  | يُسمح بإعادة المصادقة لكن لا يمكن بدء محاولة جديدة.                                |
+
+---
+
+#### ٣.١٣.٤ مرشحو Walk-in في القوائم الإدارية
+
+- يظهر مرشحو Walk-in في قائمة **المرشحين** بمؤشر **«Walk-in»**.
+- يظهرون في **التقارير** و**التصحيح** للاختبار مثل أي مرشح عادي.
+- لا تظهر اختبارات Walk-in في قائمة **اختباراتي** العادية — تُتاح فقط عبر رابط المشاركة.
+- تُطبَّق إعدادات المراقبة (لقطات الكاميرا، تسجيل الأحداث) على مرشحي Walk-in تماماً كالمرشحين العاديين.
+
+---
+
+#### ٣.١٣.٥ إعادة توليد رابط المشاركة أو إلغاؤه
+
+- **إعادة التوليد:** اضغط **مشاركة الاختبار** → **توليد رابط جديد**. يُلغى الرابط القديم فوراً ويُنشأ رمز جديد.
+- **الإلغاء:** اضغط **إلغاء الرابط**. يُعطَّل الرابط ولا يمكن التسجيل الحضوري حتى توليد رابط جديد.
+
+> **تنبيه أمني:** ألغِ رابط المشاركة بعد انتهاء جلسة الاختبار لمنع التسجيلات المتأخرة.
 
 ---
 
@@ -799,6 +1065,68 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ---
 
+---
+
+### ٤.٩ مرشحو Walk-in — أداء الاختبار عبر رمز QR أو رابط
+
+إن كنت تحضر جلسة أو فعالية حية وعرض المدرّب رمز QR أو رابطاً في النهاية، يمكنك أداء الاختبار **دون حساب مسبق**.
+
+---
+
+#### ٤.٩.١ كيف تسجّل وتبدأ
+
+١. **امسح رمز QR** بكاميرا هاتفك، أو **اضغط على رابط المشاركة** الذي شاركه المدرّب.  
+٢. تُنقل مباشرةً إلى **نموذج التسجيل الحضوري** — لا تسجيل دخول مطلوب.  
+٣. أكمل النموذج:
+
+- **الاسم الكامل** _(مطلوب)_ — اسمك الحقيقي كما سيظهر في النتائج والشهادات.
+- **البريد الإلكتروني** _(مطلوب)_ — استخدم بريدك الصحيح لتتمكن من استرداد النتائج لاحقاً.
+- **رقم الهاتف** _(مطلوب)_
+- **كلمة المرور** _(اختيارية)_ — اتركها فارغة إن أردت البدء فوراً. ستُولَّد كلمة مرور تلقائياً.  
+  ٤. اضغط **بدء الاختبار**.  
+  ٥. تُنقل إلى صفحة **تعليمات الاختبار**.  
+  ٦. اقرأ التعليمات واضغط **بدء الاختبار** للشروع.
+
+[لقطة شاشة: نموذج التسجيل الحضوري]
+
+---
+
+#### ٤.٩.٢ العودة لنتائجك لاحقاً
+
+بعد إنهاء الاختبار، حسابك يبقى نشطاً. لعرض نتائجك لاحقاً:
+
+١. اذهب إلى صفحة تسجيل الدخول (`/login`).  
+٢. أدخل **البريد الإلكتروني** الذي استخدمته عند التسجيل.  
+٣. أدخل كلمة مرورك:
+
+- إن ضبطت كلمة مرور عند التسجيل، استخدمها.
+- إن تركتها فارغة، تواصل مع مسؤول الاختبار لاسترداد أو إعادة تعيين كلمة المرور.  
+  ٤. بعد الدخول، اذهب إلى **نتائجي** (`/my-results`) لعرض درجتك.
+
+---
+
+#### ٤.٩.٣ إعادة الاختبار (إن سُمح بمحاولات متعددة)
+
+إن سمح الاختبار بأكثر من محاولة:
+
+١. امسح رمز QR أو افتح رابط المشاركة مرة أخرى.  
+٢. أدخل **نفس البريد الإلكتروني** المستخدم سابقاً.  
+٣. ستُعاد مصادقتك تلقائياً (لا يُنشأ حساب جديد).  
+٤. اضغط **بدء الاختبار** في صفحة التعليمات لبدء محاولة جديدة.
+
+> يحدد المدرّب الحد الأقصى للمحاولات. عند الوصول للحد، تظهر رسالة خطأ ولا يمكن بدء محاولة جديدة.
+
+---
+
+#### ٤.٩.٤ ملاحظات مهمة لمرشحي Walk-in
+
+- حسابك **حساب حقيقي** — يمكنك تسجيل الدخول لاحقاً وعرض النتائج.
+- اختبارات Walk-in **لا تظهر** في قائمة **اختباراتي** العادية بعد تسجيل الدخول — تُتاح فقط عبر رابط المشاركة.
+- قواعد المراقبة تُطبَّق على مرشحي Walk-in مثل المرشحين العاديين تماماً — اسمح بالكاميرا وأبقِ ملء الشاشة إن طلب ذلك.
+- إن كان البريد المستخدم ينتمي لحساب مسؤول أو مدرّب، سيُرفض التسجيل. استخدم بريداً شخصياً.
+
+---
+
 ## ٥. استكشاف الأخطاء والأسئلة الشائعة
 
 ### ٥.١ المشكلات والحلول الشائعة
@@ -851,15 +1179,20 @@ A: Go to `/verify-certificate` and enter your certificate code (e.g. `CERT-20260
 
 ## ٧. مسرد المصطلحات
 
-| المصطلح             | التعريف                                                                      |
-| ------------------- | ---------------------------------------------------------------------------- |
-| **اختبار**          | تقييم مُكوّن من أسئلة ومدة وإعدادات.                                         |
-| **محاولة**          | تنفيذ واحد لمرشح لأداء الاختبار. قد يكون للمرشح عدة محاولات لكل اختبار.      |
-| **مراقبة الاختبار** | المراقبة أثناء الاختبار (لقطات كاميرا، أحداث تغيير التبويب وملء الشاشة).     |
-| **مخالفة**          | حدث مُسجّل مثل تغيير التبويب أو الخروج من ملء الشاشة أو محاولة النسخ واللصق. |
-| **مصحّح**           | مسؤول أو مدرّب يصحح الأسئلة اليدوية وينهي النتائج.                           |
-| **نتيجة**           | الدرجة النهائية وحالة النجاح/الرسوب للمحاولة، بعد انتهاء التصحيح.            |
-| **شهادة**           | وثيقة تُصدر للمرشحين الناجحين، برمز تحقق فريد.                               |
+| المصطلح                       | التعريف                                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **اختبار**                    | تقييم مُكوّن من أسئلة ومدة وإعدادات.                                                                             |
+| **محاولة**                    | تنفيذ واحد لمرشح لأداء الاختبار. قد يكون للمرشح عدة محاولات لكل اختبار.                                          |
+| **مراقبة الاختبار**           | المراقبة أثناء الاختبار (لقطات كاميرا، أحداث تغيير التبويب وملء الشاشة).                                         |
+| **مخالفة**                    | حدث مُسجّل مثل تغيير التبويب أو الخروج من ملء الشاشة أو محاولة النسخ واللصق.                                     |
+| **مصحّح**                     | مسؤول أو مدرّب يصحح الأسئلة اليدوية وينهي النتائج.                                                               |
+| **نتيجة**                     | الدرجة النهائية وحالة النجاح/الرسوب للمحاولة، بعد انتهاء التصحيح.                                                |
+| **شهادة**                     | وثيقة تُصدر للمرشحين الناجحين، برمز تحقق فريد.                                                                   |
+| **سياسة الوصول**              | القاعدة التي تتحكم بمن يمكنه الوصول للاختبار. واحدة من: عام، رمز الوصول، تقييد على المعينين، أو التسجيل الحضوري. |
+| **رابط المشاركة**             | رابط URL آمن وفريد يُولَّد للاختبار ويُتيح للمرشحين (أو الحاضرين) الوصول للاختبار دون تسجيل دخول مسبق.           |
+| **رمز QR**                    | رمز قابل للمسح يفتح رابط المشاركة على الأجهزة المحمولة. يُولَّد تلقائياً مع رابط المشاركة.                       |
+| **التسجيل الحضوري (Walk-in)** | سياسة وصول يتسجّل بموجبها أي شخص عبر QR/رابط المشاركة دون حساب مسبق. يُنشئ النظام حساب مرشح فوراً.               |
+| **مرشح Walk-in**              | مرشح سجّل عبر مسار التسجيل الحضوري. مُعلَّم بـ `IsWalkIn=true` في النظام. يظهر في التقارير بمؤشر Walk-in.        |
 
 ---
 

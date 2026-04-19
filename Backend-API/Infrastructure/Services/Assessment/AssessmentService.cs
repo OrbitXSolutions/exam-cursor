@@ -174,9 +174,11 @@ public class AssessmentService : IAssessmentService
           QuestionsCount = x.Sections.Sum(s => s.Questions.Any() ? s.Questions.Count() : s.PickCount),
           TopicsCount = x.Sections.SelectMany(s => s.Topics).Count(),
           TotalPoints = x.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
-          AccessPolicyStatus = x.AccessPolicy != null && x.AccessPolicy.RestrictToAssignedCandidates
-              ? "Assigned"
-              : "Public"
+          AccessPolicyStatus = x.AccessPolicy != null && x.AccessPolicy.IsWalkIn
+              ? "WalkIn"
+              : x.AccessPolicy != null && x.AccessPolicy.RestrictToAssignedCandidates
+                  ? "Assigned"
+                  : "Public"
         })
         .ToListAsync();
 
@@ -1247,6 +1249,7 @@ warningMessage ?? "Exam question updated successfully");
         IsPublic = dto.IsPublic,
         AccessCode = dto.AccessCode,
         RestrictToAssignedCandidates = dto.RestrictToAssignedCandidates,
+        IsWalkIn = dto.IsWalkIn,
         CreatedDate = DateTime.UtcNow,
         CreatedBy = userId
       };
@@ -1265,6 +1268,7 @@ warningMessage ?? "Exam question updated successfully");
       existingPolicy.IsPublic = dto.IsPublic;
       existingPolicy.AccessCode = dto.AccessCode;
       existingPolicy.RestrictToAssignedCandidates = dto.RestrictToAssignedCandidates;
+      existingPolicy.IsWalkIn = dto.IsWalkIn;
       existingPolicy.UpdatedDate = DateTime.UtcNow;
       existingPolicy.UpdatedBy = userId;
 
@@ -1673,9 +1677,11 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       SectionsCount = exam.Sections?.Count ?? 0,
       QuestionsCount = allQuestions.Count(),
       TotalPoints = allQuestions.Sum(q => q.Points),
-      AccessPolicyStatus = exam.AccessPolicy?.RestrictToAssignedCandidates == true
-          ? "Assigned"
-          : "Public"
+      AccessPolicyStatus = exam.AccessPolicy?.IsWalkIn == true
+          ? "WalkIn"
+          : exam.AccessPolicy?.RestrictToAssignedCandidates == true
+              ? "Assigned"
+              : "Public"
     };
   }
 
@@ -3014,6 +3020,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         IsPublic = source.AccessPolicy.IsPublic,
         AccessCode = source.AccessPolicy.AccessCode,
         RestrictToAssignedCandidates = source.AccessPolicy.RestrictToAssignedCandidates,
+        IsWalkIn = source.AccessPolicy.IsWalkIn,
         CreatedDate = DateTime.UtcNow,
         CreatedBy = createdBy
       });
