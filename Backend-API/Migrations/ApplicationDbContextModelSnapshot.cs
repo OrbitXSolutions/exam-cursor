@@ -953,7 +953,7 @@ namespace Smart_Core.Migrations
 
                     b.HasIndex("UsedAttemptId");
 
-                    b.ToTable("AdminAttemptOverrides");
+                    b.ToTable("AdminAttemptOverrides", (string)null);
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Attempt.Attempt", b =>
@@ -3872,7 +3872,7 @@ namespace Smart_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrganizationSettings");
+                    b.ToTable("OrganizationSettings", (string)null);
                 });
 
             modelBuilder.Entity("Smart_Core.Domain.Entities.Proctor.ExamProctor", b =>

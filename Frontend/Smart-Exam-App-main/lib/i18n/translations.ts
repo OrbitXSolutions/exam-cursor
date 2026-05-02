@@ -1742,11 +1742,11 @@ export const translations = {
       // Bilingual titles
       titleEn: "العنوان (بالإنجليزية)",
       titleAr: "العنوان (بالعربية)",
-      titleEnPlaceholder: "Enter exam title in English",
+      titleEnPlaceholder: "أدخل عنوان الاختبار بالإنجليزية",
       titleArPlaceholder: "أدخل عنوان الاختبار بالعربية",
       descriptionEn: "الوصف (بالإنجليزية)",
       descriptionAr: "الوصف (بالعربية)",
-      descriptionEnPlaceholder: "Enter description in English",
+      descriptionEnPlaceholder: "أدخل الوصف بالإنجليزية",
       descriptionArPlaceholder: "أدخل الوصف بالعربية",
       // Timing fields
       startAt: "تاريخ ووقت البدء",
@@ -1786,7 +1786,7 @@ export const translations = {
       emptyStateStep4Desc: "جعل الاختبار متاحاً للمرشحين",
       watchTutorial: "شاهد الدرس التعليمي",
       // Builder
-      builder: "منشئ الاختبار",
+      builder: "تصميم الاختبار",
       builderSubtitle: "أضف الأقسام والمواضيع والأسئلة إلى اختبارك",
       securityConfiguredLater:
         "يمكن تكوين إعدادات الأمان بعد إنشاء الاختبار في منشئ الاختبار",
@@ -1895,7 +1895,7 @@ export const translations = {
       lateEntryMinutes: "نافذة الدخول المتأخر (دقائق)",
       lateEntryMinutesDesc: "كم دقيقة بعد وقت البدء يمكن للمرشحين الانضمام",
       // Exam Configuration
-      configuration: "التكوين",
+      configuration: "الإعدادات",
       configurationDesc: "إدارة إعدادات الاختبار والأمان والتعليمات",
       examSettings: "إعدادات الاختبار",
       examSettingsDesc: "تكوين معلمات الاختبار الأساسية",
