@@ -34,12 +34,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ArrowLeft, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera, Monitor } from "lucide-react"
+import { ArrowLeft, ArrowRight, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera, Monitor } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
-  const { t, language } = useI18n()
+  const { t, language, dir, isRTL } = useI18n()
   const router = useRouter()
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
@@ -350,11 +350,11 @@ export default function ExamConfigurationPage() {
   }
 
   return (
-    <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-10">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-10" dir={dir}>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
           <Link href="/exams/list">
-            <ArrowLeft className="h-4 w-4" />
+            {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
           </Link>
         </Button>
         <div>
@@ -380,8 +380,8 @@ export default function ExamConfigurationPage() {
         )}
       </div>
 
-      <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="settings" className="space-y-6" dir={dir}>
+        <TabsList className="grid w-full grid-cols-4" dir={dir}>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">{t("exams.examSettings")}</span>
@@ -913,7 +913,7 @@ export default function ExamConfigurationPage() {
 
       {/* Instruction Dialog */}
       <Dialog open={instructionDialogOpen} onOpenChange={setInstructionDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg" dir={dir}>
           <DialogHeader>
             <DialogTitle>
               {editingInstruction ? t("exams.editInstruction") : t("exams.addInstruction")}

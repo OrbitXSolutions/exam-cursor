@@ -37,7 +37,7 @@ import {
 import Link from "next/link"
 
 export default function CreateFromTemplatePage() {
-  const { t, language } = useI18n()
+  const { t, language, dir } = useI18n()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [examsLoading, setExamsLoading] = useState(true)
@@ -389,7 +389,7 @@ export default function CreateFromTemplatePage() {
                   id="titleEn"
                   value={formData.titleEn}
                   onChange={(e) => updateField("titleEn", e.target.value)}
-                  placeholder="Enter exam title in English"
+                  placeholder={language === "ar" ? "أدخل عنوان الاختبار بالإنجليزية" : "Enter exam title in English"}
                 />
               </div>
               <div className="space-y-2">
@@ -411,7 +411,7 @@ export default function CreateFromTemplatePage() {
                   id="descriptionEn"
                   value={formData.descriptionEn}
                   onChange={(e) => updateField("descriptionEn", e.target.value)}
-                  placeholder="Enter exam description in English"
+                  placeholder={language === "ar" ? "أدخل وصف الاختبار بالإنجليزية" : "Enter exam description in English"}
                   rows={3}
                 />
               </div>
@@ -447,6 +447,7 @@ export default function CreateFromTemplatePage() {
                 value={formData.examType.toString()}
                 onValueChange={(val) => updateField("examType", Number(val))}
                 className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                dir={dir}
               >
                 <Label
                   htmlFor="type-flex"

@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,7 +27,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import {
   UserPlus, UserMinus, Search, ChevronLeft, ChevronRight, Loader2,
-  Users, CheckCircle2, XCircle, AlertTriangle, ClipboardList,
+  Users, CheckCircle2, XCircle, AlertTriangle, ClipboardList, ChevronDown,
 } from "lucide-react"
 import {
   getAssignmentCandidates, assignExam, unassignExam,
@@ -39,6 +40,7 @@ export default function AssignToExamPage() {
   const { language } = useI18n()
   const { user } = useAuth()
   const isAr = language === "ar"
+  const searchParams = useSearchParams()
 
   // ── Top controls ───────────────────────────────────────────
   const [exams, setExams] = useState<ExamDropdownItem[]>([])
@@ -75,11 +77,44 @@ export default function AssignToExamPage() {
     return !!selectedExamId && !!scheduleFrom && !!scheduleTo && scheduleFrom < scheduleTo
   }, [selectedExamId, scheduleFrom, scheduleTo])
 
+  // ── Exam searchable dropdown ───────────────────────────────
+  const [examSearch, setExamSearch] = useState("")
+  const [examDropdownOpen, setExamDropdownOpen] = useState(false)
+  const examDropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (examDropdownRef.current && !examDropdownRef.current.contains(e.target as Node)) {
+        setExamDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const filteredExamOptions = useMemo(() => {
+    if (!examSearch) return exams
+    const s = examSearch.toLowerCase()
+    return exams.filter(e =>
+      (e.titleEn || "").toLowerCase().includes(s) ||
+      (e.titleAr || "").toLowerCase().includes(s)
+    )
+  }, [exams, examSearch])
+
+  const selectedExamLabel = useMemo(
+    () => exams.find(e => String(e.id) === selectedExamId),
+    [exams, selectedExamId]
+  )
+
   // ── Load dropdowns ─────────────────────────────────────────
   useEffect(() => {
-    getExamListForDropdown().then(setExams).catch(() => setExams([]))
+    getExamListForDropdown().then((list) => {
+      setExams(list)
+      const paramId = searchParams.get("examId")
+      if (paramId) setSelectedExamId(paramId)
+    }).catch(() => setExams([]))
     getBatches({ pageSize: 200 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load candidates ────────────────────────────────────────
   const loadCandidates = useCallback(async () => {
@@ -220,22 +255,68 @@ export default function AssignToExamPage() {
       {/* Controls */}
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Exam */}
-            <div>
+            <div className="lg:col-span-2" ref={examDropdownRef}>
               <Label className="mb-1.5 block">{isAr ? "الاختبار" : "Exam"} *</Label>
-              <Select value={selectedExamId} onValueChange={(v) => { setSelectedExamId(v); setPage(1) }}>
-                <SelectTrigger>
-                  <SelectValue placeholder={isAr ? "اختر اختبار..." : "Select exam..."} />
-                </SelectTrigger>
-                <SelectContent>
-                  {exams.map((e) => (
-                    <SelectItem key={e.id} value={String(e.id)}>
-                      {isAr ? e.titleAr : e.titleEn}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setExamDropdownOpen(!examDropdownOpen)}
+                  className="w-full flex items-center justify-between px-3 py-2 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
+                >
+                  <span className={selectedExamLabel ? "text-foreground" : "text-muted-foreground"}>
+                    {selectedExamLabel
+                      ? (isAr ? selectedExamLabel.titleAr : selectedExamLabel.titleEn)
+                      : (isAr ? "اختر اختبار..." : "Select exam...")}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${examDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+                {examDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-1 rounded-md border bg-popover shadow-lg">
+                    <div className="p-2 border-b">
+                      <div className="relative">
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder={isAr ? "ابحث عن اختبار..." : "Search exams..."}
+                          value={examSearch}
+                          onChange={(e) => setExamSearch(e.target.value)}
+                          className="ps-9 h-9"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto divide-y">
+                      {filteredExamOptions.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-muted-foreground">
+                          {isAr ? "لم يتم العثور على اختبارات" : "No exams found"}
+                        </div>
+                      ) : (
+                        filteredExamOptions.map((e) => (
+                          <button
+                            key={e.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedExamId(String(e.id))
+                              setPage(1)
+                              setExamDropdownOpen(false)
+                              setExamSearch("")
+                            }}
+                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
+                              selectedExamId === String(e.id) ? "bg-primary/10 text-primary font-medium" : ""
+                            }`}
+                          >
+                            {selectedExamId === String(e.id) && (
+                              <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                            )}
+                            <span className="truncate">{isAr ? e.titleAr : e.titleEn}</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Schedule From */}

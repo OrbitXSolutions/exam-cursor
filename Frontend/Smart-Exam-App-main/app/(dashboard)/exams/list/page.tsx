@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import type { Exam } from "@/lib/types"
 import { getExams, deleteExam, publishExam, unpublishExam } from "@/lib/api/exams"
-import { queueExamEmails } from "@/lib/api/notifications"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -26,10 +27,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -49,14 +46,12 @@ import {
   Hammer,
   Copy,
   AlertCircle,
-  PartyPopper,
   Globe,
   Users,
   UserPlus,
-  Info,
-  Mail,
-  Loader2,
   Share2,
+  ExternalLink,
+  Rocket,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
@@ -74,6 +69,7 @@ function getExamStatus(exam: Exam): string {
 
 export default function ExamsListPage() {
   const { t, dir, language } = useI18n()
+  const router = useRouter()
   const [exams, setExams] = useState<Exam[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
@@ -88,12 +84,8 @@ export default function ExamsListPage() {
   const [errorDialogTitle, setErrorDialogTitle] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [actionLoading, setActionLoading] = useState<number | null>(null)
-  const [publishDialogOpen, setPublishDialogOpen] = useState(false)
-  const [publishedExam, setPublishedExam] = useState<Exam | null>(null)
   const [assignFirstDialogOpen, setAssignFirstDialogOpen] = useState(false)
   const [assignFirstExam, setAssignFirstExam] = useState<Exam | null>(null)
-  const [sendingEmail, setSendingEmail] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [shareExam, setShareExam] = useState<Exam | null>(null)
 
@@ -149,15 +141,12 @@ export default function ExamsListPage() {
     try {
       setActionLoading(exam.id)
       await publishExam(exam.id)
-      // Exam published. Now the backend already queued notifications.
-      // Show the celebration dialog with Send Email NOW button
-      setPublishedExam(exam)
-      setEmailSent(false)
-      setPublishDialogOpen(true)
       fetchExams()
+      // Pass exam data via sessionStorage to avoid extra API call on the next page
+      sessionStorage.setItem("publishedExam", JSON.stringify({ ...exam, isPublished: true }))
+      router.push(`/exams/${exam.id}/published`)
     } catch (error: any) {
       const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
-      // Check if the error is about no candidates assigned
       if (exam.accessPolicyStatus === "Assigned") {
         setAssignFirstExam(exam)
         setAssignFirstDialogOpen(true)
@@ -168,19 +157,6 @@ export default function ExamsListPage() {
       }
     } finally {
       setActionLoading(null)
-    }
-  }
-
-  async function handleSendEmailNow(examId: number) {
-    setSendingEmail(true)
-    try {
-      await queueExamEmails(examId)
-      setEmailSent(true)
-      toast.success(language === "ar" ? "تم جدولة إرسال البريد الإلكتروني" : "Email notifications queued successfully")
-    } catch {
-      toast.error(language === "ar" ? "فشل إرسال البريد الإلكتروني" : "Failed to queue email notifications")
-    } finally {
-      setSendingEmail(false)
     }
   }
 
@@ -263,6 +239,7 @@ export default function ExamsListPage() {
             <div className="relative flex-1">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+                className="ps-9"
                 placeholder={t("common.search") || "Search..."}
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
@@ -311,7 +288,7 @@ export default function ExamsListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t("exams.title") || "Title"}</TableHead>
+                    <TableHead>{language === "ar" ? "عنوان الاختبار" : "Exam Title"}</TableHead>
                     <TableHead>{t("common.status") || "Status"}</TableHead>
                     <TableHead className="text-center">
                       {language === "ar" ? "سياسة الوصول" : "Access"}
@@ -320,7 +297,7 @@ export default function ExamsListPage() {
                       {language === "ar" ? "الإعدادات" : "Configuration"}
                     </TableHead>
                     <TableHead className="text-center">
-                      {language === "ar" ? "البناء" : "Builder"}
+                      {language === "ar" ? "تصميم الاختبار" : "Builder"}
                     </TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
@@ -342,7 +319,15 @@ export default function ExamsListPage() {
 
                         {/* Status */}
                         <TableCell>
-                          <StatusBadge status={status} />
+                          <StatusBadge
+                            status={status}
+                            label={language === "ar"
+                              ? status === "Published" ? "منشور"
+                              : status === "Draft" ? "مسودة"
+                              : status === "Archived" ? "مؤرشف"
+                              : status
+                            : undefined}
+                          />
                         </TableCell>
 
                         {/* Access Policy */}
@@ -380,7 +365,7 @@ export default function ExamsListPage() {
                           <Button variant="outline" size="sm" asChild>
                             <Link href={`/exams/setup/${exam.id}?tab=builder`}>
                               <Hammer className="h-4 w-4 me-1" />
-                              {language === "ar" ? "البناء" : "Builder"}
+                              {language === "ar" ? "تصميم الاختبار" : "Builder"}
                             </Link>
                           </Button>
                         </TableCell>
@@ -449,6 +434,16 @@ export default function ExamsListPage() {
                                 >
                                   <Share2 className="h-4 w-4 me-2" />
                                   {language === "ar" ? "مشاركة" : "Share"}
+                                </DropdownMenuItem>
+                              )}
+
+                              {/* Launch Checklist (only if Published) */}
+                              {status === "Published" && (
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/exams/${exam.id}/published`}>
+                                    <Rocket className="h-4 w-4 me-2" />
+                                    {language === "ar" ? "قائمة الإطلاق" : "Launch Checklist"}
+                                  </Link>
                                 </DropdownMenuItem>
                               )}
 
@@ -603,86 +598,6 @@ export default function ExamsListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Publish Celebration Dialog */}
-      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <div className="flex flex-col items-center text-center py-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 mb-4">
-              <PartyPopper className="h-8 w-8 text-green-600 dark:text-green-400" />
-            </div>
-            <h2 className="text-xl font-bold mb-2">
-              {language === "ar" ? "تم نشر الاختبار!" : "Exam Published!"}
-            </h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              {language === "ar"
-                ? "الاختبار متاح الآن للمرشحين لأدائه."
-                : "The exam is now available for candidates to take."}
-            </p>
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-4">
-              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                {publishedExam?.accessPolicyStatus === "Assigned"
-                  ? (language === "ar"
-                    ? "سياسة الوصول: مُعيّن — يمكن فقط للمرشحين المعينين الوصول إلى هذا الاختبار."
-                    : "Access policy: Assigned — only assigned candidates can access this exam.")
-                  : (language === "ar"
-                    ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
-                    : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
-              </p>
-            </div>
-
-            {/* Send Email NOW button */}
-            {publishedExam && !emailSent && (
-              <Button
-                className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => handleSendEmailNow(publishedExam.id)}
-                disabled={sendingEmail}
-              >
-                {sendingEmail ? (
-                  <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                ) : (
-                  <Mail className="h-4 w-4 me-2" />
-                )}
-                {language === "ar" ? "إرسال البريد الإلكتروني الآن" : "Send Email NOW"}
-              </Button>
-            )}
-
-            {emailSent && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-start mb-2 w-full">
-                <Mail className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                <p className="text-xs text-green-700 dark:text-green-300">
-                  {language === "ar"
-                    ? "تمت جدولة إرسال البريد الإلكتروني بنجاح! ستتم معالجة الرسائل في الخلفية."
-                    : "Email notifications queued successfully! Messages will be processed in background."}
-                </p>
-              </div>
-            )}
-
-            {/* Assign candidates button if Assigned policy */}
-            {publishedExam?.accessPolicyStatus === "Assigned" && (
-              <Button
-                variant="outline"
-                className="w-full mb-2"
-                asChild
-              >
-                <Link href={`/candidates/assign-to-exam?examId=${publishedExam.id}`}>
-                  <Users className="h-4 w-4 me-2" />
-                  {language === "ar" ? "تعيين المرشحين" : "Assign Candidates"}
-                </Link>
-              </Button>
-            )}
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setPublishDialogOpen(false)}
-            >
-              {language === "ar" ? "إغلاق" : "Close"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Assign First Dialog - shown when Assigned policy has no candidates */}
       <AlertDialog open={assignFirstDialogOpen} onOpenChange={setAssignFirstDialogOpen}>
