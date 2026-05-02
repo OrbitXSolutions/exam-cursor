@@ -10,10 +10,6 @@ import { queueExamEmails } from "@/lib/api/notifications"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
@@ -36,12 +32,8 @@ import {
   Clock,
   Users,
   Hash,
-  PartyPopper,
   AlertCircle,
-  Info,
   Share2,
-  Mail,
-  Loader2,
 } from "lucide-react"
 import { ExamShareDialog } from "@/components/exam/exam-share-dialog"
 
@@ -64,12 +56,9 @@ export default function ExamOverviewPage() {
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
-  const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
-  const [sendingEmail, setSendingEmail] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
 
   useEffect(() => {
     if (examId) {
@@ -94,29 +83,15 @@ export default function ExamOverviewPage() {
     try {
       setActionLoading(true)
       await publishExam(exam.id)
-      setEmailSent(false)
-      setPublishDialogOpen(true)
-      fetchExam()
+      const updatedExam = { ...exam, isPublished: true }
+      sessionStorage.setItem("publishedExam", JSON.stringify(updatedExam))
+      router.push(`/exams/${exam.id}/published`)
     } catch (error: any) {
       const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
       setErrorMessage(msg)
       setErrorDialogOpen(true)
     } finally {
       setActionLoading(false)
-    }
-  }
-
-  async function handleSendEmailNow() {
-    if (!exam) return
-    setSendingEmail(true)
-    try {
-      await queueExamEmails(exam.id)
-      setEmailSent(true)
-      toast.success(language === "ar" ? "تم جدولة إرسال البريد الإلكتروني" : "Email notifications queued successfully")
-    } catch {
-      toast.error(language === "ar" ? "فشل إرسال البريد الإلكتروني" : "Failed to queue email notifications")
-    } finally {
-      setSendingEmail(false)
     }
   }
 
@@ -136,7 +111,7 @@ export default function ExamOverviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -144,7 +119,7 @@ export default function ExamOverviewPage() {
 
   if (!exam) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <div className="flex flex-col items-center justify-center min-h-100 gap-4">
         <FileText className="h-16 w-16 text-muted-foreground" />
         <p className="text-muted-foreground">
           {language === "ar" ? "الاختبار غير موجود" : "Exam not found"}
@@ -167,7 +142,7 @@ export default function ExamOverviewPage() {
     <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] p-6">
       <Card className="w-full max-w-2xl">
         {/* Success Header */}
-        <div className="rounded-t-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-b border-green-200 dark:border-green-900 px-6 py-5">
+        <div className="rounded-t-xl bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-b border-green-200 dark:border-green-900 px-6 py-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
               <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -290,85 +265,6 @@ export default function ExamOverviewPage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Publish Celebration Dialog */}
-      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <div className="flex flex-col items-center text-center py-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 mb-4">
-              <PartyPopper className="h-8 w-8 text-green-600 dark:text-green-400" />
-            </div>
-            <h2 className="text-xl font-bold mb-2">
-              {language === "ar" ? "تم نشر الاختبار!" : "Exam Published!"}
-            </h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              {language === "ar"
-                ? "الاختبار متاح الآن للمرشحين لأدائه."
-                : "The exam is now available for candidates to take."}
-            </p>
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-start mb-6 w-full">
-              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                {exam?.accessPolicyStatus === "Assigned"
-                  ? (language === "ar"
-                    ? "سياسة الوصول: مُعيّن — يمكن فقط للمرشحين المعينين الوصول إلى هذا الاختبار."
-                    : "Access policy: Assigned — only assigned candidates can access this exam.")
-                  : (language === "ar"
-                    ? "سياسة الوصول الافتراضية: عام — يمكن لجميع المرشحين رؤية هذا الاختبار. يمكنك تغيير هذا من الإعدادات المتقدمة ← سياسة الوصول."
-                    : "Default access policy: Public — all candidates can see this exam. You can change this in Advanced Configuration → Access Policy.")}
-              </p>
-            </div>
-
-            {/* Send Email NOW button */}
-            {exam && !emailSent && (
-              <Button
-                className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={handleSendEmailNow}
-                disabled={sendingEmail}
-              >
-                {sendingEmail ? (
-                  <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                ) : (
-                  <Mail className="h-4 w-4 me-2" />
-                )}
-                {language === "ar" ? "إرسال البريد الإلكتروني الآن" : "Send Email NOW"}
-              </Button>
-            )}
-
-            {emailSent && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-start mb-2 w-full">
-                <Mail className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                <p className="text-xs text-green-700 dark:text-green-300">
-                  {language === "ar"
-                    ? "تمت جدولة إرسال البريد الإلكتروني بنجاح! ستتم معالجة الرسائل في الخلفية."
-                    : "Email notifications queued successfully! Messages will be processed in background."}
-                </p>
-              </div>
-            )}
-
-            <div className="flex gap-2 w-full">
-              <Button
-                className="flex-1"
-                variant="outline"
-                onClick={() => {
-                  setPublishDialogOpen(false)
-                  setShareDialogOpen(true)
-                }}
-              >
-                <Share2 className="h-4 w-4 me-2" />
-                {language === "ar" ? "مشاركة عبر رابط / QR" : "Share via URL / QR"}
-              </Button>
-              <Button
-                className="flex-1"
-                variant="outline"
-                onClick={() => setPublishDialogOpen(false)}
-              >
-                {language === "ar" ? "إغلاق" : "Close"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Publish Error Dialog */}
       <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>

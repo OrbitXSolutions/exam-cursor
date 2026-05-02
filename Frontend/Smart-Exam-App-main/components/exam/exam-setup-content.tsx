@@ -53,7 +53,7 @@ interface ExamSetupContentProps {
 }
 
 export function ExamSetupContent({ examId }: ExamSetupContentProps) {
-  const { t, language } = useI18n()
+  const { t, language, dir, isRTL } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -551,7 +551,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   }
 
   return (
-    <div className="space-y-6 p-6 max-w-4xl mx-auto">
+    <div className="space-y-6 p-6 max-w-4xl mx-auto" dir={dir}>
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
@@ -580,8 +580,8 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       )}
 
       {/* Tabs */}
-      <Tabs value={currentTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs value={currentTab} onValueChange={handleTabChange} className="space-y-6" dir={dir}>
+        <TabsList className="grid w-full grid-cols-2" dir={dir}>
           <TabsTrigger value="config" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             {t("exams.configuration") || "Configuration"}
@@ -684,6 +684,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                   value={String(formData.examType)}
                   onValueChange={(value) => updateField("examType", Number(value))}
                   className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                  dir={dir}
                 >
                   <Label
                     htmlFor="exam-type-flex"
@@ -936,6 +937,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                     value={String(sourceType)}
                     onValueChange={handleSourceTypeChange}
                     className="flex gap-6"
+                    dir={dir}
                   >
                     <div className="flex items-center gap-2">
                       <RadioGroupItem value={String(SectionSourceType.Subject)} id="bySubject" />

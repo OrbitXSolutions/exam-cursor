@@ -1962,6 +1962,89 @@ export const examManagementTutorial: TutorialModule = {
         },
       ],
     },
+
+    // ─── Section 10: Assign Proctor to Exam ────
+    {
+      id: "assign-proctor",
+      titleEn: "10. Assign Proctor to Exam",
+      titleAr: "10. تعيين مراقب للاختبار",
+      descriptionEn:
+        "Assign or remove proctors for any exam. Each exam can have multiple proctors. A proctor can be assigned to multiple exams simultaneously.",
+      descriptionAr:
+        "تعيين أو إزالة المراقبين لأي اختبار. يمكن أن يكون لكل اختبار عدة مراقبين. يمكن تعيين المراقب لعدة اختبارات في آن واحد.",
+      steps: [
+        {
+          id: "proctor-assign-navigate",
+          titleEn: "Navigate to Assign Proctor Page",
+          titleAr: "الانتقال إلى صفحة تعيين المراقب",
+          descriptionEn:
+            'From the sidebar: expand "Exam Management" → click "Assign Proctor to Exam". You can also navigate directly to /proctor/assign or deep-link to a specific exam via /proctor/assign?examId=123.',
+          descriptionAr:
+            'من القائمة الجانبية: وسّع "إدارة الاختبارات" → انقر "تعيين مراقب للاختبار". يمكنك أيضاً الانتقال مباشرة إلى /proctor/assign أو الربط العميق لاختبار محدد عبر /proctor/assign?examId=123.',
+          imagePlaceholder: "/tutorials/proctor-assign-nav.png",
+          tipEn:
+            "You can deep-link to a specific exam by appending ?examId= to the URL. The page will auto-select that exam and load its proctors immediately.",
+          tipAr:
+            "يمكنك الربط العميق لاختبار محدد عبر إضافة ?examId= إلى الرابط. ستقوم الصفحة باختيار ذلك الاختبار تلقائياً وتحميل مراقبيه فوراً.",
+        },
+        {
+          id: "proctor-assign-select-exam",
+          titleEn: "Select an Exam",
+          titleAr: "اختيار الاختبار",
+          descriptionEn:
+            "Use the searchable exam dropdown to find and select the exam you want to manage proctors for. You can type in the search box to filter by English or Arabic title.\n\nOnce you select an exam, the system loads two panels side-by-side:\n• **Assigned Proctors** (left) — proctors currently assigned to this exam\n• **Available Proctors** (right) — proctors from the same department not yet assigned to this exam",
+          descriptionAr:
+            "استخدم القائمة المنسدلة القابلة للبحث للعثور على الاختبار الذي تريد إدارة مراقبيه. يمكنك الكتابة في مربع البحث للتصفية بالعنوان الإنجليزي أو العربي.\n\nعند اختيار اختبار، يحمّل النظام لوحتين جنباً إلى جنب:\n• **المراقبون المعيّنون** (يسار) — المراقبون المعيّنون حالياً لهذا الاختبار\n• **المراقبون المتاحون** (يمين) — المراقبون من نفس القسم غير المعيّنين لهذا الاختبار بعد",
+          imagePlaceholder: "/tutorials/proctor-assign-select.png",
+          noteEn:
+            "Available Proctors shows only proctors from the same department who are not yet assigned to this exam. A proctor can be assigned to multiple exams at the same time.",
+          noteAr:
+            "يعرض المراقبون المتاحون فقط المراقبين من نفس القسم غير المعيّنين لهذا الاختبار بعد. يمكن تعيين المراقب لعدة اختبارات في الوقت ذاته.",
+        },
+        {
+          id: "proctor-assign-action",
+          titleEn: "Assign Proctors",
+          titleAr: "تعيين المراقبين",
+          descriptionEn:
+            "To assign proctors to the exam:\n1. In the **Available Proctors** panel, check one or more proctors using the row checkboxes\n2. Use the header checkbox to **Select All** available proctors at once\n3. An **Assign (N)** button appears in the panel header showing the count of selected proctors\n4. Click **Assign (N)** → a confirmation dialog appears: \"Assign N proctor(s) to this exam?\"\n5. Click **Assign** to confirm\n\nOn success, the proctors move from Available to Assigned and a success toast is shown.",
+          descriptionAr:
+            "لتعيين مراقبين للاختبار:\n1. في لوحة **المراقبون المتاحون**، حدد مراقباً أو أكثر باستخدام مربعات الاختيار\n2. استخدم مربع اختيار الرأس لـ **تحديد الكل** دفعة واحدة\n3. يظهر زر **تعيين (N)** في رأس اللوحة يعرض عدد المراقبين المحددين\n4. انقر **تعيين (N)** → تظهر نافذة تأكيد: \"تعيين N مراقب(ين) لهذا الاختبار؟\"\n5. انقر **تعيين** للتأكيد\n\nعند النجاح، ينتقل المراقبون من المتاحين إلى المعيّنين ويظهر إشعار نجاح.",
+          imagePlaceholder: "/tutorials/proctor-assign-action.png",
+        },
+        {
+          id: "proctor-remove-action",
+          titleEn: "Remove Proctors",
+          titleAr: "إزالة المراقبين",
+          descriptionEn:
+            "To remove assigned proctors from the exam:\n1. In the **Assigned Proctors** panel, check one or more proctors\n2. Use the header checkbox to **Select All** assigned proctors\n3. A **Remove (N)** button appears in the panel header (red/destructive)\n4. Click **Remove (N)** → a confirmation dialog appears: \"Remove N proctor(s) from this exam?\"\n5. Click **Remove** to confirm\n\nThe Assigned Proctors panel also shows the **Assigned At** date for each proctor.",
+          descriptionAr:
+            "لإزالة المراقبين المعيّنين من الاختبار:\n1. في لوحة **المراقبون المعيّنون**، حدد مراقباً أو أكثر\n2. استخدم مربع اختيار الرأس لـ **تحديد الكل**\n3. يظهر زر **إزالة (N)** في رأس اللوحة (باللون الأحمر)\n4. انقر **إزالة (N)** → تظهر نافذة تأكيد: \"إزالة N مراقب(ين) من هذا الاختبار؟\"\n5. انقر **إزالة** للتأكيد\n\nتعرض لوحة المراقبين المعيّنين أيضاً تاريخ **التعيين** لكل مراقب.",
+          imagePlaceholder: "/tutorials/proctor-remove-action.png",
+          tipEn:
+            "Removing a proctor from an exam does not delete the proctor's account — it only removes their assignment to that specific exam.",
+          tipAr:
+            "إزالة المراقب من الاختبار لا تحذف حسابه — تزيل تعيينه لذلك الاختبار المحدد فقط.",
+        },
+      ],
+      examples: [
+        {
+          titleEn: "Typical Proctor Assignment Workflow",
+          titleAr: "سير عمل تعيين المراقب النموذجي",
+          contentEn:
+            "1. Create exam and enable \"Require Proctoring\" in Security settings\n2. Publish the exam\n3. Go to Exam Management → Assign Proctor to Exam\n4. Select the exam from the dropdown\n5. In Available Proctors: select one or more proctors → click Assign\n6. Proctors now appear in the Assigned Proctors panel\n7. Assigned proctors can monitor the exam live from the Proctor Dashboard",
+          contentAr:
+            "1. إنشاء الاختبار وتفعيل \"طلب المراقبة\" في إعدادات الأمان\n2. نشر الاختبار\n3. الذهاب إلى إدارة الاختبارات → تعيين مراقب للاختبار\n4. اختيار الاختبار من القائمة المنسدلة\n5. في المراقبون المتاحون: اختر مراقباً أو أكثر → انقر تعيين\n6. يظهر المراقبون الآن في لوحة المراقبين المعيّنين\n7. يمكن للمراقبين المعيّنين مراقبة الاختبار مباشرة من لوحة تحكم المراقب",
+        },
+        {
+          titleEn: "Proctor Panel Summary",
+          titleAr: "ملخص لوحة المراقب",
+          contentEn:
+            "| Panel | Shows | Action |\n|---|---|---|\n| Assigned Proctors | Currently assigned + Assigned At date | Select → Remove |\n| Available Proctors | Same-dept proctors not yet assigned | Select → Assign |\n\n**Note:** If all proctors are already assigned, the Available panel shows \"All proctors are already assigned\". If no proctors are assigned yet, the Assigned panel shows \"No proctors assigned yet\".",
+          contentAr:
+            "| اللوحة | تعرض | الإجراء |\n|---|---|---|\n| المراقبون المعيّنون | المعيّنون حالياً + تاريخ التعيين | تحديد → إزالة |\n| المراقبون المتاحون | مراقبو نفس القسم غير المعيّنين | تحديد → تعيين |\n\n**ملاحظة:** إذا تم تعيين جميع المراقبين، تعرض لوحة المتاحين \"جميع المراقبون معيّنون بالفعل\". إذا لم يكن هناك مراقبون معيّنون بعد، تعرض لوحة المعيّنين \"لا يوجد مراقبون معيّنون\".",
+        },
+      ],
+    },
   ],
 };
 

@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
 import { getCandidateResultList, type CandidateResultListItem } from "@/lib/api/results"
+import { getGradingSessionByAttempt } from "@/lib/api/grading"
+import { exportCandidateReportExcel, exportCandidateReportPdf, exportCandidateReportPdfAr } from "@/lib/export/candidate-report"
 import { apiClient } from "@/lib/api-client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -38,6 +40,8 @@ import {
   Send,
   ClipboardCheck,
   Bot,
+  FileSpreadsheet,
+  Download,
 } from "lucide-react"
 
 const ALL_EXAMS_VALUE = "__all__"
@@ -68,6 +72,7 @@ export default function CandidateResultPage() {
   const [loadingCandidates, setLoadingCandidates] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [publishingIds, setPublishingIds] = useState<Set<string>>(new Set())
+  const [exportingIds, setExportingIds] = useState<Map<string, "excel" | "pdf" | "pdf-ar">>(new Map())
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const retryRef = useRef(false)
@@ -253,6 +258,50 @@ export default function CandidateResultPage() {
       row.gradingStatusCode === GRADING_STATUS_AUTO_GRADED ||
       row.gradingStatusCode === GRADING_STATUS_COMPLETED
     return gradingCompleted && row.isPassed === true
+  }
+
+  const canExport = (row: EnrichedCandidate) => {
+    return (
+      !!row.attemptId &&
+      (row.gradingStatusCode === GRADING_STATUS_AUTO_GRADED ||
+        row.gradingStatusCode === GRADING_STATUS_COMPLETED)
+    )
+  }
+
+  const handleExport = async (row: EnrichedCandidate, format: "excel" | "pdf" | "pdf-ar") => {
+    if (!row.attemptId) {
+      toast.error(language === "ar" ? "لا توجد محاولة" : "No attempt found")
+      return
+    }
+    const key = `${row.candidateId}-${row.examId}-${format}`
+    setExportingIds((prev) => new Map(prev).set(key, format))
+    try {
+      const session = await getGradingSessionByAttempt(row.attemptId)
+      if (!session) {
+        toast.error(
+          language === "ar"
+            ? "لم يتم العثور على بيانات التصحيح"
+            : "Grading data not found. Please ensure grading is completed.",
+        )
+        return
+      }
+      if (format === "excel") {
+        await exportCandidateReportExcel(session)
+      } else if (format === "pdf-ar") {
+        await exportCandidateReportPdfAr(session)
+      } else {
+        await exportCandidateReportPdf(session)
+      }
+    } catch (err) {
+      console.error(`[Export ${format}] Failed:`, err)
+      toast.error(language === "ar" ? "فشل تصدير التقرير" : "Failed to export report")
+    } finally {
+      setExportingIds((prev) => {
+        const next = new Map(prev)
+        next.delete(key)
+        return next
+      })
+    }
   }
 
   if (loading) {
@@ -484,6 +533,44 @@ export default function CandidateResultPage() {
                                   <Video className="h-4 w-4 me-2" />{language === "ar" ? "وسائط المحاولة" : "Attempt Media"}
                                 </Link>
                               </DropdownMenuItem>
+                              {canExport(row) && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => handleExport(row, "excel")}
+                                    disabled={exportingIds.has(`${row.candidateId}-${row.examId}-excel`)}
+                                  >
+                                    {exportingIds.has(`${row.candidateId}-${row.examId}-excel`) ? (
+                                      <LoadingSpinner size="sm" className="me-2" />
+                                    ) : (
+                                      <FileSpreadsheet className="h-4 w-4 me-2" />
+                                    )}
+                                    {language === "ar" ? "تصدير Excel" : "Export Excel"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleExport(row, "pdf")}
+                                    disabled={exportingIds.has(`${row.candidateId}-${row.examId}-pdf`)}
+                                  >
+                                    {exportingIds.has(`${row.candidateId}-${row.examId}-pdf`) ? (
+                                      <LoadingSpinner size="sm" className="me-2" />
+                                    ) : (
+                                      <Download className="h-4 w-4 me-2" />
+                                    )}
+                                    {language === "ar" ? "تصدير PDF" : "Export PDF (EN)"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleExport(row, "pdf-ar")}
+                                    disabled={exportingIds.has(`${row.candidateId}-${row.examId}-pdf-ar`)}
+                                  >
+                                    {exportingIds.has(`${row.candidateId}-${row.examId}-pdf-ar`) ? (
+                                      <LoadingSpinner size="sm" className="me-2" />
+                                    ) : (
+                                      <Download className="h-4 w-4 me-2" />
+                                    )}
+                                    {language === "ar" ? "تصدير PDF عربي" : "Export PDF (AR)"}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

@@ -5,6 +5,7 @@ type StatusVariant = "default" | "success" | "warning" | "destructive" | "second
 
 interface StatusBadgeProps {
   status: string
+  label?: string
   variant?: StatusVariant
   className?: string
   showDot?: boolean
@@ -80,7 +81,7 @@ const statusVariantMap: Record<string, StatusVariant> = {
   "صعب": "destructive",
 }
 
-export function StatusBadge({ status, variant, className, showDot = true }: StatusBadgeProps) {
+export function StatusBadge({ status, label, variant, className, showDot = true }: StatusBadgeProps) {
   // Handle null/undefined status gracefully
   if (!status) {
     return (
@@ -106,7 +107,7 @@ export function StatusBadge({ status, variant, className, showDot = true }: Stat
   return (
     <Badge variant={resolvedVariant} className={cn("gap-1.5 font-medium", className)}>
       {showDot && <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[resolvedVariant])} />}
-      {status}
+      {label ?? status}
     </Badge>
   )
 }

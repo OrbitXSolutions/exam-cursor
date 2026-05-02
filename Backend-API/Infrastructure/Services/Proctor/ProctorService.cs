@@ -306,6 +306,31 @@ public class ProctorService : IProctorService
             }
         }
 
+        // Assignment isolation: Proctor role can only see sessions for exams they are assigned to.
+        // Admin, Instructor, SuperDev, and ProctorReviewer see all sessions within their department.
+        var userId = _currentUserService.UserId;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var isProctorOnly = await _userManager.IsInRoleAsync(user, AppRoles.Proctor)
+                    && !await _userManager.IsInRoleAsync(user, AppRoles.Admin)
+                    && !await _userManager.IsInRoleAsync(user, AppRoles.Instructor)
+                    && !await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+
+                if (isProctorOnly)
+                {
+                    var assignedExamIds = await _context.ExamProctors
+                        .Where(ep => ep.ProctorId == userId && !ep.IsDeleted)
+                        .Select(ep => ep.ExamId)
+                        .ToListAsync();
+
+                    query = query.Where(s => assignedExamIds.Contains(s.ExamId));
+                }
+            }
+        }
+
         query = ApplySessionFilters(query, searchDto);
         query = query.OrderByDescending(s => s.StartedAt);
 
