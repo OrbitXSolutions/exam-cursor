@@ -49,7 +49,7 @@ public class TerminateAttemptResultDto
 {
     public int AttemptId { get; set; }
     public string Status { get; set; } = string.Empty;
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 }
 
 public class ResumeAttemptOperationResultDto
@@ -75,7 +75,7 @@ public class ExamOperationsCandidateDto
     public int MaxAttempts { get; set; }
     public string? LatestAttemptStatus { get; set; }
     public int? LatestAttemptId { get; set; }
-    public DateTime? LatestAttemptStartedAt { get; set; }
+    public DateTimeOffset? LatestAttemptStartedAt { get; set; }
     public bool HasActiveAttempt { get; set; }
     public int PendingOverrides { get; set; }
     // Action flags
@@ -107,6 +107,6 @@ public class AdminOperationLogDto
     public int? OldAttemptId { get; set; }
     public int? NewAttemptId { get; set; }
     public string Reason { get; set; } = string.Empty;
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
     public string? TraceId { get; set; }
 }

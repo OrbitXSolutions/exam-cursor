@@ -9,7 +9,7 @@ public static class ExamDefaults
     /// Grace period (in minutes) after the scheduled start time for Fixed exams.
     /// Candidates can start within [StartAt, StartAt + GraceMinutes].
     /// </summary>
-    public const int FixedStartGraceMinutes = 10;
+    public const int FixedStartGraceMinutes = 15;
 
     /// <summary>
     /// Maximum cumulative disconnect time (in seconds) before an attempt is auto-expired.

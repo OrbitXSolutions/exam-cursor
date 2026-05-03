@@ -33,7 +33,7 @@ public class ProctorRiskSnapshot : BaseEntity
   // e.g., [{ "ruleId": 1, "points": 10 }, { "ruleId": 3, "points": 30 }]
   public string? TriggeredRulesJson { get; set; }
 
-  public DateTime CalculatedAt { get; set; }
+  public DateTimeOffset CalculatedAt { get; set; }
   public string CalculatedBy { get; set; } = null!;
 
   // Navigation Properties

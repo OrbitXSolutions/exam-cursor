@@ -24,8 +24,8 @@ namespace Smart_Core.Application.DTOs.ExamResult
         public bool IsResultFinalized { get; set; }
         public GradingStatus GradingStatusCode { get; set; }
         public string GradingStatus { get; set; } = string.Empty;
-        public DateTime? GradedAt { get; set; }
-        public DateTime? LastAttemptAt { get; set; }
+        public DateTimeOffset? GradedAt { get; set; }
+        public DateTimeOffset? LastAttemptAt { get; set; }
         public string? AttemptStatusName { get; set; }
         public string? ExpiryReasonName { get; set; }
     }

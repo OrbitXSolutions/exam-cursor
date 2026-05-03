@@ -29,7 +29,7 @@ public class Certificate : BaseEntity
     public string? CandidateNameAr { get; set; }
 
     // Issued date
-    public DateTime IssuedAt { get; set; }
+    public DateTimeOffset IssuedAt { get; set; }
 
     // Optional: stored PDF path (when generated)
     public string? FilePath { get; set; }
@@ -37,7 +37,7 @@ public class Certificate : BaseEntity
 
     // Revocation
     public bool IsRevoked { get; set; }
-    public DateTime? RevokedAt { get; set; }
+    public DateTimeOffset? RevokedAt { get; set; }
     public string? RevokedBy { get; set; }
     public string? RevokeReason { get; set; }
 

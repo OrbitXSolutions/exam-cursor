@@ -1,3 +1,5 @@
+using Smart_Core.Domain.Common;
+
 namespace Smart_Core.Domain.Entities;
 
 /// <summary>
@@ -21,8 +23,8 @@ public class SystemSettings
     public string SupportEmail { get; set; } = "";
     public string SupportUrl { get; set; } = "";
     public string PrimaryColor { get; set; } = "#0d9488";
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; } = UaeTimeHelper.NowUae;
+    public DateTimeOffset? UpdatedDate { get; set; }
 
     // Video Recording Retention
     public int VideoRetentionDays { get; set; } = 30;

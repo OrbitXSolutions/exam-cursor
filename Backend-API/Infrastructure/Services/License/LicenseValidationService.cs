@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.License;
 using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Domain.Models;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.License;
 
@@ -16,7 +17,7 @@ public class LicenseValidationService : ILicenseValidationService
     private readonly object _lock = new();
 
     private LicenseStatusResult _cachedStatus;
-    private DateTime _lastChecked = DateTime.MinValue;
+    private DateTimeOffset _lastChecked = DateTimeOffset.MinValue;
 
     private const int WarningDaysBeforeExpiry = 40;
 
@@ -29,7 +30,7 @@ public class LicenseValidationService : ILicenseValidationService
 
         // Initial validation on startup
         _cachedStatus = Validate();
-        _lastChecked = DateTime.UtcNow;
+        _lastChecked = UaeTimeHelper.NowUae;
         _logger.LogInformation("License validation on startup: State={State}, Message={Message}",
             _cachedStatus.State, _cachedStatus.Message);
     }
@@ -60,7 +61,7 @@ public class LicenseValidationService : ILicenseValidationService
         lock (_lock)
         {
             _cachedStatus = newStatus;
-            _lastChecked = DateTime.UtcNow;
+            _lastChecked = UaeTimeHelper.NowUae;
         }
 
         if (previousState != newStatus.State)
@@ -97,7 +98,7 @@ public class LicenseValidationService : ILicenseValidationService
     private void RefreshIfStale()
     {
         // Auto-refresh cache if older than 24 hours
-        if ((DateTime.UtcNow - _lastChecked).TotalHours >= 24)
+        if ((UaeTimeHelper.NowUae - _lastChecked).TotalHours >= 24)
         {
             ReloadLicense();
         }
@@ -155,10 +156,10 @@ public class LicenseValidationService : ILicenseValidationService
             }
 
             // 5. Clock rollback check
-            if (DateTime.UtcNow < license.IssuedAt.ToUniversalTime().AddHours(-1))
+            if (UaeTimeHelper.NowUae < license.IssuedAt.ToUniversalTime().AddHours(-1))
             {
                 _logger.LogWarning("Clock rollback detected. Current UTC={Now}, IssuedAt={IssuedAt}",
-                    DateTime.UtcNow, license.IssuedAt);
+                    UaeTimeHelper.NowUae, license.IssuedAt);
                 return new LicenseStatusResult
                 {
                     State = LicenseState.Invalid,
@@ -167,7 +168,7 @@ public class LicenseValidationService : ILicenseValidationService
             }
 
             // 6. Calculate expiry state
-            var now = DateTime.UtcNow;
+            var now = UaeTimeHelper.NowUae;
             var expiresAt = license.ExpiresAt.ToUniversalTime();
             var daysUntilExpiry = (expiresAt - now).TotalDays;
             var gracePeriodDays = license.GracePeriodDays > 0 ? license.GracePeriodDays : 30;

@@ -12,7 +12,7 @@ public class CandidateListDto
     public string Status { get; set; } = "Active";
     public bool IsBlocked { get; set; }
     public bool IsWalkIn { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
 }
@@ -24,7 +24,7 @@ public class CreateCandidateDto
     public string? FullNameAr { get; set; }
     public string Email { get; set; } = string.Empty;
     public string? Password { get; set; }
-    public string RollNo { get; set; } = string.Empty;
+    public string? RollNo { get; set; }
     public string? Mobile { get; set; }
 }
 

@@ -6,6 +6,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Entities.Notification;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Notification;
 
@@ -113,7 +114,7 @@ public class NotificationBackgroundService : BackgroundService
             {
                 log.Status = NotificationStatus.Failed;
                 log.ErrorMessage = "No active template configured for this event type.";
-                log.UpdatedDate = DateTime.UtcNow;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
             }
             await db.SaveChangesAsync(stoppingToken);
             return;
@@ -177,14 +178,14 @@ public class NotificationBackgroundService : BackgroundService
                 log.Subject = subject;
                 log.Status = success ? NotificationStatus.Sent : NotificationStatus.Failed;
                 log.ErrorMessage = success ? null : "SMTP delivery failed.";
-                log.SentAt = success ? DateTime.UtcNow : null;
-                log.UpdatedDate = DateTime.UtcNow;
+                log.SentAt = success ? UaeTimeHelper.NowUae : null;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
             }
             catch (Exception ex)
             {
                 log.Status = NotificationStatus.Failed;
                 log.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
-                log.UpdatedDate = DateTime.UtcNow;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
                 _logger.LogError(ex, "Failed to process email notification {LogId}.", log.Id);
             }
         }
@@ -209,7 +210,7 @@ public class NotificationBackgroundService : BackgroundService
             {
                 log.Status = NotificationStatus.Failed;
                 log.ErrorMessage = "No active template configured for this event type.";
-                log.UpdatedDate = DateTime.UtcNow;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
             }
             await db.SaveChangesAsync(stoppingToken);
             return;
@@ -228,7 +229,7 @@ public class NotificationBackgroundService : BackgroundService
                 {
                     log.Status = NotificationStatus.Failed;
                     log.ErrorMessage = "No phone number available.";
-                    log.UpdatedDate = DateTime.UtcNow;
+                    log.UpdatedDate = UaeTimeHelper.NowUae;
                     continue;
                 }
 
@@ -243,14 +244,14 @@ public class NotificationBackgroundService : BackgroundService
                 log.Subject = "SMS Notification";
                 log.Status = success ? NotificationStatus.Sent : NotificationStatus.Failed;
                 log.ErrorMessage = success ? null : "SMS delivery failed.";
-                log.SentAt = success ? DateTime.UtcNow : null;
-                log.UpdatedDate = DateTime.UtcNow;
+                log.SentAt = success ? UaeTimeHelper.NowUae : null;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
             }
             catch (Exception ex)
             {
                 log.Status = NotificationStatus.Failed;
                 log.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
-                log.UpdatedDate = DateTime.UtcNow;
+                log.UpdatedDate = UaeTimeHelper.NowUae;
                 _logger.LogError(ex, "Failed to process SMS notification {LogId}.", log.Id);
             }
         }
@@ -311,7 +312,7 @@ public class NotificationBackgroundService : BackgroundService
   </td></tr>
   <!-- Footer -->
   <tr><td style=""background-color:#f8f9fa;padding:16px 32px;text-align:center;color:#888888;font-size:12px;border-top:1px solid #eeeeee;"">
-    &copy; {DateTime.UtcNow.Year} {brandName}. All rights reserved.
+    &copy; {UaeTimeHelper.NowUae.Year} {brandName}. All rights reserved.
   </td></tr>
 </table>
 </td></tr>

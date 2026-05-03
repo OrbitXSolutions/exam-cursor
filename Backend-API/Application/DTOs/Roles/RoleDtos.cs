@@ -5,7 +5,7 @@ public class RoleDto
   public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int UserCount { get; set; }
 }
 

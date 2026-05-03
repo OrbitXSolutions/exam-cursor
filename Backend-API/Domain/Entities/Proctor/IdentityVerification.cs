@@ -35,7 +35,7 @@ public class IdentityVerification : BaseEntity
     // Status & review
     public IdentityVerificationStatus Status { get; set; } = IdentityVerificationStatus.Pending;
     public string? ReviewedBy { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
     public string? ReviewNotes { get; set; }
 
     // Assigned proctor (optional)
@@ -46,7 +46,7 @@ public class IdentityVerification : BaseEntity
     public string? IpAddress { get; set; }
 
     // SLA
-    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset SubmittedAt { get; set; } = UaeTimeHelper.NowUae;
 
     // Navigation Properties
     public virtual ProctorSession? ProctorSession { get; set; }

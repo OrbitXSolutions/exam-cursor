@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces.CandidateAdmin;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Candidate;
 
@@ -91,7 +92,7 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> ExportCandidates([FromQuery] CandidateFilterDto filter)
     {
         var bytes = await _service.ExportCandidatesAsync(filter);
-        var fileName = $"candidates_{DateTime.UtcNow:yyyy-MM-dd}.xlsx";
+        var fileName = $"candidates_{UaeTimeHelper.NowUae:yyyy-MM-dd}.xlsx";
         return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 

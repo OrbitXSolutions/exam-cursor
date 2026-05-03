@@ -18,7 +18,7 @@ public class IncidentComment : BaseEntity
     public string Body { get; set; } = null!;
 
     /// <summary>
-/// Whether this comment is visible to the candidate
+    /// Whether this comment is visible to the candidate
     /// </summary>
     public bool IsVisibleToCandidate { get; set; }
 
@@ -26,7 +26,7 @@ public class IncidentComment : BaseEntity
     /// Whether this comment has been edited
     /// </summary>
     public bool IsEdited { get; set; }
-    public DateTime? EditedAt { get; set; }
+    public DateTimeOffset? EditedAt { get; set; }
 
     // Navigation Properties
     public virtual IncidentCase IncidentCase { get; set; } = null!;

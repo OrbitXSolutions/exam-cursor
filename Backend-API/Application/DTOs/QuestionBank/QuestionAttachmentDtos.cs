@@ -11,7 +11,7 @@ public class QuestionAttachmentDto
     public string FileType { get; set; } = string.Empty;
     public long FileSize { get; set; }
   public bool IsPrimary { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
 
 public class CreateQuestionAttachmentDto

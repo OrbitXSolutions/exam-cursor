@@ -14,6 +14,7 @@ using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Domain.Entities.Grading;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Grading;
 
@@ -45,7 +46,14 @@ public class GradingService : IGradingService
         _cache = cache;
     }
 
-    private void InvalidateGradingCache() => _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+    private void InvalidateGradingCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
+        _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
+    }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
     {
@@ -97,7 +105,7 @@ public class GradingService : IGradingService
                "Grading session already exists for this attempt. Use re-grade functionality if needed.");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // 3. Create grading session
         var gradingSession = new GradingSession
@@ -320,7 +328,7 @@ public class GradingService : IGradingService
                 $"{pendingManualGrades.Count} question(s) still require manual grading before completion.");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Calculate total score
         var totalScore = session.Answers.Sum(a => a.Score);
@@ -405,7 +413,7 @@ public class GradingService : IGradingService
          $"Score ({dto.Score}) cannot exceed maximum points ({attemptQuestion.Points})");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Update graded answer
         gradedAnswer.Score = dto.Score;
@@ -539,7 +547,7 @@ public class GradingService : IGradingService
         }
 
         var previousScore = gradedAnswer.Score;
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Update graded answer
         gradedAnswer.Score = dto.NewScore;

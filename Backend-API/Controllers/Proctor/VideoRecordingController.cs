@@ -8,6 +8,7 @@ using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -229,7 +230,7 @@ public class VideoRecordingController : ControllerBase
     /// Background method: creates evidence record from chunks (no FFmpeg needed).
     /// The frontend uses MediaSource Extensions (MSE) to stitch WebM chunks in-browser.
     /// </summary>
-    private async Task ProcessVideoFinalization(int attemptId, string candidateId, DateTime startedAt, string mediaBasePath, string contentRootPath)
+    private async Task ProcessVideoFinalization(int attemptId, string candidateId, DateTimeOffset startedAt, string mediaBasePath, string contentRootPath)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -267,10 +268,10 @@ public class VideoRecordingController : ControllerBase
             FileSize = totalSize,
             ContentType = "video/webm",
             StartAt = startedAt,
-            EndAt = DateTime.UtcNow,
-            DurationSeconds = (int)(DateTime.UtcNow - startedAt).TotalSeconds,
+            EndAt = UaeTimeHelper.NowUae,
+            DurationSeconds = (int)(UaeTimeHelper.NowUae - startedAt).TotalSeconds,
             IsUploaded = true,
-            UploadedAt = DateTime.UtcNow,
+            UploadedAt = UaeTimeHelper.NowUae,
             UploadAttempts = 1,
             MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
             {
@@ -285,7 +286,7 @@ public class VideoRecordingController : ControllerBase
         if (settings != null)
         {
             var retentionDays = settings.VideoRetentionDays > 0 ? settings.VideoRetentionDays : 30;
-            evidence.ExpiresAt = DateTime.UtcNow.AddDays(retentionDays);
+            evidence.ExpiresAt = UaeTimeHelper.NowUae.AddDays(retentionDays);
         }
 
         db.ProctorEvidence.Add(evidence);

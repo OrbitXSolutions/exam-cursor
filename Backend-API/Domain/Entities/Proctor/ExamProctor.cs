@@ -17,6 +17,6 @@ public class ExamProctor : BaseEntity
     public string ProctorId { get; set; } = null!;
     public virtual ApplicationUser Proctor { get; set; } = null!;
 
-    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset AssignedAt { get; set; } = UaeTimeHelper.NowUae;
     public string? AssignedBy { get; set; }
 }

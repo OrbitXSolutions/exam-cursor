@@ -11,6 +11,8 @@ using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Domain.Entities.Grading;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.ExamResult;
 
@@ -23,6 +25,7 @@ public class ExamResultService : IExamResultService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly INotificationService _notificationService;
     private readonly ICacheService _cache;
+    private readonly ResourceAuthorizationService _resourceAuthorization;
 
     public ExamResultService(
         ApplicationDbContext context,
@@ -31,7 +34,8 @@ public class ExamResultService : IExamResultService
         ICurrentUserService currentUserService,
         UserManager<ApplicationUser> userManager,
         INotificationService notificationService,
-        ICacheService cache)
+        ICacheService cache,
+        ResourceAuthorizationService resourceAuthorization)
     {
         _context = context;
         _certificateService = certificateService;
@@ -40,9 +44,17 @@ public class ExamResultService : IExamResultService
         _userManager = userManager;
         _notificationService = notificationService;
         _cache = cache;
+        _resourceAuthorization = resourceAuthorization;
     }
 
-    private void InvalidateResultCache() => _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
+    private void InvalidateResultCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
+        _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
+    }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
     {
@@ -72,6 +84,11 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Grading session not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessAttemptForUserAsync(gradingSession.AttemptId, userId))
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Grading session not found");
+        }
+
         // Validate grading is complete
         if (gradingSession.Status != GradingStatus.Completed && gradingSession.Status != GradingStatus.AutoGraded)
         {
@@ -89,7 +106,7 @@ public class ExamResultService : IExamResultService
           "Result already exists for this attempt. Use update if re-grading was performed.");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var attempt = gradingSession.Attempt;
         var exam = attempt.Exam;
         var maxPossibleScore = attempt.Questions.Sum(q => q.Points);
@@ -119,17 +136,35 @@ public class ExamResultService : IExamResultService
         attempt.TotalScore = totalScore;
         attempt.IsPassed = isPassed;
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex, "IX_Results_AttemptId_Unique"))
+        {
+            _context.ChangeTracker.Clear();
+            var existing = await _context.Set<Result>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.AttemptId == gradingSession.AttemptId);
+
+            if (existing != null)
+                return await GetResultByIdForActorAsync(existing.Id, userId);
+
+            throw;
+        }
 
         // Refresh candidate summary
         await RefreshCandidateExamSummaryInternalAsync(exam.Id, attempt.CandidateId, userId);
         InvalidateResultCache();
 
-        return await GetResultByIdAsync(result.Id);
+        return await GetResultByIdForActorAsync(result.Id, userId);
     }
 
     public async Task<ApiResponse<ResultDto>> GetResultByIdAsync(int resultId)
     {
+        if (!await _resourceAuthorization.CanAccessResultAsync(resultId))
+            return ApiResponse<ResultDto>.FailureResponse("Result not found");
+
         var cacheKey = CacheKeys.ResultById(resultId);
         if (_cache.TryGet<ResultDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<ResultDto>.SuccessResponse(cached);
@@ -150,6 +185,9 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<ResultDto>> GetResultByAttemptAsync(int attemptId)
     {
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(attemptId))
+            return ApiResponse<ResultDto>.FailureResponse("Result not found for this attempt");
+
         var cacheKey = CacheKeys.ResultByAttempt(attemptId);
         if (_cache.TryGet<ResultDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<ResultDto>.SuccessResponse(cached);
@@ -170,11 +208,8 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<PaginatedResponse<ResultListDto>>> GetResultsAsync(ResultSearchDto searchDto)
     {
-        // Pre-resolve dept scope for cache key and query
-        bool isSuperDev = await IsCurrentUserSuperDevAsync();
-        int? deptId = isSuperDev ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
-        var deptScope = isSuperDev ? "all" : (deptId?.ToString() ?? "none");
-        var cacheKey = CacheKeys.ResultsList(deptScope, JsonSerializer.Serialize(searchDto));
+        var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+        var cacheKey = CacheKeys.ResultsList(scopeKey, JsonSerializer.Serialize(searchDto));
         if (_cache.TryGet<PaginatedResponse<ResultListDto>>(cacheKey, out var cachedPage) && cachedPage != null)
             return ApiResponse<PaginatedResponse<ResultListDto>>.SuccessResponse(cachedPage);
 
@@ -184,9 +219,7 @@ public class ExamResultService : IExamResultService
             .Include(r => r.Candidate)
  .AsQueryable();
 
-        // Department isolation (uses pre-resolved isSuperDev / deptId)
-        if (!isSuperDev && deptId.HasValue)
-            query = query.Where(r => r.Exam.DepartmentId == deptId.Value);
+        query = await _resourceAuthorization.ScopeResultsAsync(query);
 
         // Apply filters
         query = ApplyResultFilters(query, searchDto);
@@ -230,6 +263,11 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Grading session not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessAttemptForUserAsync(gradingSession.AttemptId, userId))
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Grading session not found");
+        }
+
         var result = await _context.Set<Result>()
             .FirstOrDefaultAsync(r => r.AttemptId == gradingSession.AttemptId);
 
@@ -239,7 +277,7 @@ public class ExamResultService : IExamResultService
             return await FinalizeResultAsync(gradingSessionId, userId);
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var exam = gradingSession.Attempt.Exam;
         var maxPossibleScore = gradingSession.Attempt.Questions.Sum(q => q.Points);
         var totalScore = gradingSession.TotalScore ?? 0;
@@ -264,7 +302,7 @@ public class ExamResultService : IExamResultService
         // Refresh candidate summary
         await RefreshCandidateExamSummaryInternalAsync(exam.Id, gradingSession.Attempt.CandidateId, userId);
 
-        return await GetResultByIdAsync(result.Id);
+        return await GetResultByIdForActorAsync(result.Id, userId);
     }
 
     #endregion
@@ -273,7 +311,13 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<ResultDto>> PublishResultAsync(int resultId, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessResultForUserAsync(resultId, userId))
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Result not found");
+        }
+
         var result = await _context.Set<Result>()
+            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == resultId);
 
         if (result == null)
@@ -286,20 +330,27 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Result is already published");
         }
 
-        var now = DateTime.UtcNow;
-        result.IsPublishedToCandidate = true;
-        result.PublishedAt = now;
-        result.PublishedBy = userId;
+        var now = UaeTimeHelper.NowUae;
+        var publishedRows = await _context.Set<Result>()
+            .Where(r => r.Id == resultId && !r.IsPublishedToCandidate)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(r => r.IsPublishedToCandidate, true)
+                .SetProperty(r => r.PublishedAt, now)
+                .SetProperty(r => r.PublishedBy, userId)
+                .SetProperty(r => r.UpdatedDate, now)
+                .SetProperty(r => r.UpdatedBy, userId));
+
+        if (publishedRows == 0)
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Result is already published");
+        }
 
         // Auto-create certificate for passed results
         if (result.IsPassed)
         {
             await _certificateService.CreateForResultAsync(result.Id, userId);
         }
-        result.UpdatedDate = now;
-        result.UpdatedBy = userId;
 
-        await _context.SaveChangesAsync();
         InvalidateResultCache();
 
         // Queue result published notification
@@ -312,12 +363,18 @@ public class ExamResultService : IExamResultService
             // Don't fail publish if notification queueing fails
         }
 
-        return await GetResultByIdAsync(resultId);
+        return await GetResultByIdForActorAsync(resultId, userId);
     }
 
     public async Task<ApiResponse<ResultDto>> UnpublishResultAsync(int resultId, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessResultForUserAsync(resultId, userId))
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Result not found");
+        }
+
         var result = await _context.Set<Result>()
+            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == resultId);
 
         if (result == null)
@@ -330,24 +387,33 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Result is not published");
         }
 
-        var now = DateTime.UtcNow;
-        result.IsPublishedToCandidate = false;
-        result.UpdatedDate = now;
-        result.UpdatedBy = userId;
+        var now = UaeTimeHelper.NowUae;
+        var unpublishedRows = await _context.Set<Result>()
+            .Where(r => r.Id == resultId && r.IsPublishedToCandidate)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(r => r.IsPublishedToCandidate, false)
+                .SetProperty(r => r.UpdatedDate, now)
+                .SetProperty(r => r.UpdatedBy, userId));
 
-        await _context.SaveChangesAsync();
+        if (unpublishedRows == 0)
+        {
+            return ApiResponse<ResultDto>.FailureResponse("Result is not published");
+        }
+
         InvalidateResultCache();
 
-        return await GetResultByIdAsync(resultId);
+        return await GetResultByIdForActorAsync(resultId, userId);
     }
 
     public async Task<ApiResponse<int>> BulkPublishResultsAsync(BulkPublishResultsDto dto, string userId)
     {
-        var results = await _context.Set<Result>()
+        var query = _context.Set<Result>()
             .Where(r => dto.ResultIds.Contains(r.Id) && !r.IsPublishedToCandidate)
-      .ToListAsync();
+            .AsQueryable();
+        query = await _resourceAuthorization.ScopeResultsForUserAsync(query, userId);
+        var results = await query.ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         foreach (var result in results)
         {
             result.IsPublishedToCandidate = true;
@@ -376,6 +442,11 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<int>> PublishExamResultsAsync(PublishExamResultsDto dto, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(dto.ExamId, userId))
+        {
+            return ApiResponse<int>.FailureResponse("Exam not found");
+        }
+
         var query = _context.Set<Result>()
                 .Where(r => r.ExamId == dto.ExamId && !r.IsPublishedToCandidate);
 
@@ -386,7 +457,7 @@ public class ExamResultService : IExamResultService
 
         var results = await query.ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         foreach (var result in results)
         {
             result.IsPublishedToCandidate = true;
@@ -415,6 +486,12 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<CandidateResultDto>> GetCandidateResultAsync(int attemptId, string candidateId)
     {
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(attemptId) ||
+            !await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
+        {
+            return ApiResponse<CandidateResultDto>.FailureResponse("Result not found");
+        }
+
         var cacheKey = CacheKeys.CandidateResultByAttempt(candidateId, attemptId);
         if (_cache.TryGet<CandidateResultDto>(cacheKey, out var cachedDto) && cachedDto != null)
             return ApiResponse<CandidateResultDto>.SuccessResponse(cachedDto);
@@ -460,6 +537,9 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<List<CandidateResultDto>>> GetCandidateAllResultsAsync(string candidateId)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
+            return ApiResponse<List<CandidateResultDto>>.FailureResponse("Result not found");
+
         var cacheKey = CacheKeys.CandidateResultAll(candidateId);
         if (_cache.TryGet<List<CandidateResultDto>>(cacheKey, out var cachedList) && cachedList != null)
             return ApiResponse<List<CandidateResultDto>>.SuccessResponse(cachedList);
@@ -502,6 +582,12 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<CandidateExamSummaryDto>> GetCandidateExamSummaryAsync(int examId, string candidateId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId) ||
+            !await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
+        {
+            return ApiResponse<CandidateExamSummaryDto>.FailureResponse("No attempts found for this exam");
+        }
+
         var summary = await _context.Set<CandidateExamSummary>()
       .Include(s => s.Exam)
             .Include(s => s.Candidate)
@@ -562,17 +648,10 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ExamReportDto>.FailureResponse("Exam not found");
         }
 
-        // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
-        {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
-            {
-                return ApiResponse<ExamReportDto>.FailureResponse("You do not have access to this exam's reports");
-            }
-        }
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(dto.ExamId, userId))
+            return ApiResponse<ExamReportDto>.FailureResponse("Exam not found");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Query attempts
         var attemptsQuery = _context.Attempts.Where(a => a.ExamId == dto.ExamId);
@@ -623,6 +702,9 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<ExamReportDto>> GetExamReportAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId))
+            return ApiResponse<ExamReportDto>.FailureResponse("No report found. Generate a report first.");
+
         var cacheKey = CacheKeys.ResultsReport(examId);
         if (_cache.TryGet<ExamReportDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<ExamReportDto>.SuccessResponse(cached);
@@ -656,17 +738,10 @@ public class ExamResultService : IExamResultService
             return ApiResponse<List<QuestionPerformanceDto>>.FailureResponse("Exam not found");
         }
 
-        // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
-        {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
-            {
-                return ApiResponse<List<QuestionPerformanceDto>>.FailureResponse("You do not have access to this exam's reports");
-            }
-        }
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(dto.ExamId, userId))
+            return ApiResponse<List<QuestionPerformanceDto>>.FailureResponse("Exam not found");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Get all graded answers for this exam
         var gradedAnswers = await _context.GradedAnswers
@@ -723,6 +798,9 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<List<QuestionPerformanceDto>>> GetQuestionPerformanceAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId))
+            return ApiResponse<List<QuestionPerformanceDto>>.FailureResponse("Exam not found");
+
         var cacheKey = CacheKeys.ResultsQuestionPerf(examId);
         if (_cache.TryGet<List<QuestionPerformanceDto>>(cacheKey, out var cached) && cached != null)
             return ApiResponse<List<QuestionPerformanceDto>>.SuccessResponse(cached);
@@ -760,6 +838,9 @@ public class ExamResultService : IExamResultService
 
     public async Task<ApiResponse<ResultDashboardDto>> GetResultDashboardAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId))
+            return ApiResponse<ResultDashboardDto>.FailureResponse("Exam not found");
+
         var cacheKey = CacheKeys.ResultsDashboard(examId);
         if (_cache.TryGet<ResultDashboardDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<ResultDashboardDto>.SuccessResponse(cached);
@@ -767,14 +848,6 @@ public class ExamResultService : IExamResultService
         var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
         if (exam == null)
             return ApiResponse<ResultDashboardDto>.FailureResponse("Exam not found");
-
-        // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
-        {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
-                return ApiResponse<ResultDashboardDto>.FailureResponse("You do not have access to this exam's dashboard");
-        }
 
         var attempts = await _context.Attempts
             .Where(a => a.ExamId == examId)
@@ -821,6 +894,12 @@ public class ExamResultService : IExamResultService
     public async Task<ApiResponse<CandidateExamSummaryDto>> RefreshCandidateExamSummaryAsync(
         int examId, string candidateId, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(examId, userId) ||
+            !await _resourceAuthorization.CanAccessCandidateForUserAsync(candidateId, userId))
+        {
+            return ApiResponse<CandidateExamSummaryDto>.FailureResponse("No attempts found for this candidate");
+        }
+
         var summary = await RefreshCandidateExamSummaryInternalAsync(examId, candidateId, userId);
         InvalidateResultCache();
         if (summary == null)
@@ -835,7 +914,8 @@ public class ExamResultService : IExamResultService
         int? examId, int pageNumber, int pageSize)
     {
         var examScope = examId.HasValue && examId.Value > 0 ? examId.Value.ToString() : "all";
-        var cacheKey = CacheKeys.ResultsSummaries(examScope, pageNumber, pageSize);
+        var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+        var cacheKey = CacheKeys.ResultsSummaries($"{scopeKey}:{examScope}", pageNumber, pageSize);
         if (_cache.TryGet<PaginatedResponse<CandidateExamSummaryListDto>>(cacheKey, out var cachedPage) && cachedPage != null)
             return ApiResponse<PaginatedResponse<CandidateExamSummaryListDto>>.SuccessResponse(cachedPage);
 
@@ -849,6 +929,9 @@ public class ExamResultService : IExamResultService
             .Include(s => s.BestResult)
             .Include(s => s.Exam)
             .AsQueryable();
+
+        var accessibleExamIds = await _resourceAuthorization.GetAccessibleExamIdsAsync();
+        query = query.Where(s => accessibleExamIds.Contains(s.ExamId));
 
         if (examId.HasValue && examId.Value > 0)
             query = query.Where(s => s.ExamId == examId.Value);
@@ -865,6 +948,8 @@ public class ExamResultService : IExamResultService
                 .Include(s => s.BestResult)
                 .Include(s => s.Exam)
                 .AsQueryable();
+            accessibleExamIds = await _resourceAuthorization.GetAccessibleExamIdsAsync();
+            query = query.Where(s => accessibleExamIds.Contains(s.ExamId));
             if (examId.HasValue && examId.Value > 0)
                 query = query.Where(s => s.ExamId == examId.Value);
             query = query.OrderByDescending(s => s.LastAttemptAt).ThenByDescending(s => s.BestScore);
@@ -910,13 +995,10 @@ public class ExamResultService : IExamResultService
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 100;
 
-        // Pre-resolve dept scope for cache key
-        bool isSuperDevCrl = await IsCurrentUserSuperDevAsync();
-        int? deptIdCrl = isSuperDevCrl ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
-        var deptScopeCrl = isSuperDevCrl ? "all" : (deptIdCrl?.ToString() ?? "none");
+        var scopeKeyCrl = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
         var examScopeCrl = examId.HasValue && examId.Value > 0 ? examId.Value.ToString() : "all";
         var statusKeyCrl = $"{excludeTerminated}:{onlyTerminated}:{statusFilter ?? "all"}";
-        var cacheKeyCrl = CacheKeys.ResultsCandidateList(examScopeCrl, deptScopeCrl, pageNumber, pageSize, statusKeyCrl);
+        var cacheKeyCrl = CacheKeys.ResultsCandidateList(examScopeCrl, scopeKeyCrl, pageNumber, pageSize, statusKeyCrl);
         if (_cache.TryGet<CandidateResultListResponseDto>(cacheKeyCrl, out var cachedCrl) && cachedCrl != null)
             return ApiResponse<CandidateResultListResponseDto>.SuccessResponse(cachedCrl);
 
@@ -935,9 +1017,7 @@ public class ExamResultService : IExamResultService
                         || a.Status == AttemptStatus.ForceSubmitted || a.Status == AttemptStatus.Terminated))
             .AsQueryable();
 
-        // Department isolation (uses pre-resolved values)
-        if (!isSuperDevCrl && deptIdCrl.HasValue)
-            attemptsQuery = attemptsQuery.Where(a => a.Exam.DepartmentId == deptIdCrl.Value);
+        attemptsQuery = await _resourceAuthorization.ScopeAttemptsAsync(attemptsQuery);
 
         if (examId.HasValue && examId.Value > 0)
         {
@@ -1108,7 +1188,10 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultExportJobDto>.FailureResponse("Exam not found");
         }
 
-        var now = DateTime.UtcNow;
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(dto.ExamId, userId))
+            return ApiResponse<ResultExportJobDto>.FailureResponse("Exam not found");
+
+        var now = UaeTimeHelper.NowUae;
 
         var job = new ResultExportJob
         {
@@ -1142,6 +1225,9 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultExportJobDto>.FailureResponse("Export job not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessExamAsync(job.ExamId))
+            return ApiResponse<ResultExportJobDto>.FailureResponse("Export job not found");
+
         return ApiResponse<ResultExportJobDto>.SuccessResponse(MapToExportJobDto(job));
     }
 
@@ -1150,6 +1236,8 @@ public class ExamResultService : IExamResultService
         var query = _context.Set<ResultExportJob>()
        .Include(j => j.Exam)
             .AsQueryable();
+        var accessibleExamIds = await _resourceAuthorization.GetAccessibleExamIdsAsync();
+        query = query.Where(j => accessibleExamIds.Contains(j.ExamId));
 
         if (searchDto.ExamId.HasValue)
             query = query.Where(j => j.ExamId == searchDto.ExamId.Value);
@@ -1203,6 +1291,9 @@ public class ExamResultService : IExamResultService
             return ApiResponse<bool>.FailureResponse("Export job not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessExamForUserAsync(job.ExamId, userId))
+            return ApiResponse<bool>.FailureResponse("Export job not found");
+
         if (job.Status != ExportStatus.Pending)
         {
             return ApiResponse<bool>.FailureResponse("Only pending jobs can be cancelled");
@@ -1210,7 +1301,7 @@ public class ExamResultService : IExamResultService
 
         job.Status = ExportStatus.Failed;
         job.ErrorMessage = "Cancelled by user";
-        job.UpdatedDate = DateTime.UtcNow;
+        job.UpdatedDate = UaeTimeHelper.NowUae;
         job.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -1236,9 +1327,9 @@ public class ExamResultService : IExamResultService
                 // TODO: Implement actual export logic based on format
                 // For now, mark as completed with placeholder
                 job.Status = ExportStatus.Completed;
-                job.FileName = $"exam_{job.ExamId}_results_{DateTime.UtcNow:yyyyMMddHHmmss}.{job.Format.ToString().ToLower()}";
+                job.FileName = $"exam_{job.ExamId}_results_{UaeTimeHelper.NowUae:yyyyMMddHHmmss}.{job.Format.ToString().ToLower()}";
                 job.FilePath = $"/exports/{job.FileName}";
-                job.CompletedAt = DateTime.UtcNow;
+                job.CompletedAt = UaeTimeHelper.NowUae;
 
                 processedCount++;
             }
@@ -1258,6 +1349,37 @@ public class ExamResultService : IExamResultService
     #endregion
 
     #region Private Helper Methods
+
+    private async Task<ApiResponse<ResultDto>> GetResultByIdForActorAsync(int resultId, string? actorUserId)
+    {
+        if (!await _resourceAuthorization.CanAccessResultForUserAsync(resultId, actorUserId))
+            return ApiResponse<ResultDto>.FailureResponse("Result not found");
+
+        var cacheKey = CacheKeys.ResultById(resultId);
+        if (_cache.TryGet<ResultDto>(cacheKey, out var cached) && cached != null)
+            return ApiResponse<ResultDto>.SuccessResponse(cached);
+
+        var result = await _context.Set<Result>()
+            .Include(r => r.Exam)
+            .Include(r => r.Attempt)
+            .Include(r => r.Candidate)
+            .FirstOrDefaultAsync(r => r.Id == resultId);
+
+        if (result == null)
+            return ApiResponse<ResultDto>.FailureResponse("Result not found");
+
+        var dto = MapToResultDto(result);
+        _cache.Set(cacheKey, dto, CacheKeys.Thirty);
+        return ApiResponse<ResultDto>.SuccessResponse(dto);
+    }
+
+    private static bool IsUniqueConstraintViolation(DbUpdateException ex, string indexName)
+    {
+        var message = ex.InnerException?.Message ?? ex.Message;
+        return message.Contains(indexName, StringComparison.OrdinalIgnoreCase)
+            || message.Contains("UNIQUE", StringComparison.OrdinalIgnoreCase)
+            || message.Contains("duplicate", StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <summary>
     /// Creates CandidateExamSummary records for any Result that does not yet have one (e.g. missed by an older flow).
@@ -1289,7 +1411,7 @@ public class ExamResultService : IExamResultService
             return null;
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var bestResult = results.First();
         var latestResult = results.OrderByDescending(r => r.FinalizedAt).First();
 

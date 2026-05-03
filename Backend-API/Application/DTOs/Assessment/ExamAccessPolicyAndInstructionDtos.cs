@@ -13,8 +13,8 @@ public class ExamAccessPolicyDto
     public string? AccessCode { get; set; }
     public bool RestrictToAssignedCandidates { get; set; }
     public bool IsWalkIn { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
 }
 
 /// <summary>
@@ -42,7 +42,7 @@ public class ExamInstructionDto
     public string ContentEn { get; set; } = string.Empty;
     public string ContentAr { get; set; } = string.Empty;
     public int Order { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
 
 /// <summary>

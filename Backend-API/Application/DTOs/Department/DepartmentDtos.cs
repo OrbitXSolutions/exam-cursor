@@ -36,7 +36,7 @@ public record DepartmentResponse(
     string? Code,
     bool IsActive,
     int UserCount,
-    DateTime CreatedDate,
+    DateTimeOffset CreatedDate,
     string? CreatedBy
 );
 

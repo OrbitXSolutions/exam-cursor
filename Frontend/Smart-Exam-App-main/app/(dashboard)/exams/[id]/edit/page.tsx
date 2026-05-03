@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { ExamType, type Exam } from "@/lib/types"
 import { getExam, updateExam } from "@/lib/api/exams"
+import { utcToUaeInput, uaeInputToIso } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -81,13 +82,7 @@ export default function EditExamPage() {
   }
 
   function formatDateTimeLocal(dateString: string): string {
-    const date = new Date(dateString)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    const hours = String(date.getHours()).padStart(2, "0")
-    const minutes = String(date.getMinutes()).padStart(2, "0")
-    return `${year}-${month}-${day}T${hours}:${minutes}`
+    return utcToUaeInput(dateString)
   }
 
   function updateField(field: string, value: string | number | boolean) {
@@ -133,8 +128,8 @@ export default function EditExamPage() {
         titleAr: formData.titleAr || formData.titleEn,
         descriptionEn: formData.descriptionEn || null,
         descriptionAr: formData.descriptionAr || null,
-        startAt: formData.startAt ? new Date(formData.startAt).toISOString() : null,
-        endAt: formData.endAt ? new Date(formData.endAt).toISOString() : null,
+        startAt: formData.startAt ? uaeInputToIso(formData.startAt) : null,
+        endAt: formData.endAt ? uaeInputToIso(formData.endAt) : null,
         durationMinutes: formData.durationMinutes,
         maxAttempts: formData.maxAttempts,
         shuffleQuestions: formData.shuffleQuestions,

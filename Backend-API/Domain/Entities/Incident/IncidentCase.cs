@@ -25,7 +25,7 @@ public class IncidentCase : BaseEntity
     public IncidentSeverity Severity { get; set; }
     public IncidentSource Source { get; set; }
 
-public string TitleEn { get; set; } = null!;
+    public string TitleEn { get; set; } = null!;
     public string TitleAr { get; set; } = null!;
 
     public string? SummaryEn { get; set; }
@@ -37,18 +37,18 @@ public string TitleEn { get; set; } = null!;
 
     // Assignment
     public string? AssignedTo { get; set; }
-    public DateTime? AssignedAt { get; set; }
+    public DateTimeOffset? AssignedAt { get; set; }
 
     // Resolution
     public IncidentOutcome? Outcome { get; set; }
     public string? ResolutionNoteEn { get; set; }
- public string? ResolutionNoteAr { get; set; }
+    public string? ResolutionNoteAr { get; set; }
     public string? ResolvedBy { get; set; }
-    public DateTime? ResolvedAt { get; set; }
+    public DateTimeOffset? ResolvedAt { get; set; }
 
     // Closure
-  public string? ClosedBy { get; set; }
-    public DateTime? ClosedAt { get; set; }
+    public string? ClosedBy { get; set; }
+    public DateTimeOffset? ClosedAt { get; set; }
 
     // Navigation Properties
     public virtual Exam Exam { get; set; } = null!;

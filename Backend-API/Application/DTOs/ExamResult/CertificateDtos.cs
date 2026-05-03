@@ -14,7 +14,7 @@ public class CertificateDto
     public decimal Score { get; set; }
     public decimal MaxScore { get; set; }
     public decimal PassScore { get; set; }
-    public DateTime IssuedAt { get; set; }
+    public DateTimeOffset IssuedAt { get; set; }
     public bool IsRevoked { get; set; }
     public string? DownloadUrl { get; set; }
 }
@@ -28,5 +28,5 @@ public class CertificateVerificationDto
     public string? CandidateName { get; set; }
     public decimal? Score { get; set; }
     public decimal? MaxScore { get; set; }
-    public DateTime? IssuedAt { get; set; }
+    public DateTimeOffset? IssuedAt { get; set; }
 }

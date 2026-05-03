@@ -19,20 +19,20 @@ public class ResultExportJob : BaseEntity
     public ExportStatus Status { get; set; }
 
     // Filter options (optional)
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public bool? PassedOnly { get; set; }
   public bool? FailedOnly { get; set; }
 
     // Request info
     public string RequestedBy { get; set; } = null!;
-    public DateTime RequestedAt { get; set; }
+    public DateTimeOffset RequestedAt { get; set; }
 
     // Output
     public string? FileName { get; set; }
     public string? FilePath { get; set; }
     public long? FileSizeBytes { get; set; }
- public DateTime? CompletedAt { get; set; }
+ public DateTimeOffset? CompletedAt { get; set; }
 
     // Error handling
     public string? ErrorMessage { get; set; }

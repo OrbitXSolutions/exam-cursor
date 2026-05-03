@@ -218,6 +218,7 @@ builder.Services.AddScoped<IExamOperationsService, ExamOperationsService>();
 builder.Services.AddScoped<ICandidateExamDetailsService, CandidateExamDetailsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
+builder.Services.AddScoped<Smart_Core.Infrastructure.Services.Authorization.ResourceAuthorizationService>();
 builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<INotificationService, Smart_Core.Infrastructure.Services.Notification.NotificationService>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
@@ -268,13 +269,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Controllers — serialize all DateTime values in Dubai timezone (UTC+4)
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new Smart_Core.Infrastructure.Json.DubaiDateTimeConverter());
-        options.JsonSerializerOptions.Converters.Add(new Smart_Core.Infrastructure.Json.DubaiNullableDateTimeConverter());
-    });
+// Controllers
+builder.Services.AddControllers();
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();

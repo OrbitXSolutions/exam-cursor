@@ -7,6 +7,7 @@ using Smart_Core.Application.Interfaces.CandidateExamDetails;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.CandidateExamDetails;
 
@@ -174,7 +175,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
         // Refine CanResume with schedule window
         if (dto.CanResume && assignment != null)
         {
-            var now = DateTime.UtcNow;
+            var now = UaeTimeHelper.NowUae;
             if (assignment.ScheduleFrom.HasValue && now < assignment.ScheduleFrom.Value)
                 dto.CanResume = false;
             if (assignment.ScheduleTo.HasValue && now > assignment.ScheduleTo.Value)
@@ -416,7 +417,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
         if (attempt.ExpiresAt == null)
             return 0;
 
-        var remaining = (attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds;
+        var remaining = (attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds;
         return Math.Max(0, (int)remaining);
     }
 

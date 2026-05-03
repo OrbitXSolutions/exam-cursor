@@ -8,7 +8,7 @@ public class ExamProctorItemDto
     public string? FullName { get; set; }
     public string Email { get; set; } = string.Empty;
     public bool IsAssigned { get; set; }
-    public DateTime? AssignedAt { get; set; }
+    public DateTimeOffset? AssignedAt { get; set; }
 }
 
 // ── Combined page response (single GET) ───────────────────────

@@ -11,6 +11,8 @@ using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.ExamOperations;
 
@@ -19,25 +21,39 @@ public class ExamOperationsService : IExamOperationsService
     private readonly ApplicationDbContext _db;
     private readonly ILogger<ExamOperationsService> _logger;
     private readonly ICacheService _cache;
+    private readonly ResourceAuthorizationService _resourceAuthorization;
 
-    public ExamOperationsService(ApplicationDbContext db, ILogger<ExamOperationsService> logger, ICacheService cache)
+    public ExamOperationsService(
+        ApplicationDbContext db,
+        ILogger<ExamOperationsService> logger,
+        ICacheService cache,
+        ResourceAuthorizationService resourceAuthorization)
     {
         _db = db;
         _logger = logger;
         _cache = cache;
+        _resourceAuthorization = resourceAuthorization;
     }
 
     // ── List candidates for exam operations ────────────────────
     public async Task<ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>> GetCandidatesAsync(
         ExamOperationsFilterDto filter)
     {
-        var cacheKey = CacheKeys.ExamOpsCandidates(filter.ExamId, JsonSerializer.Serialize(filter));
+        if (filter.ExamId.HasValue && filter.ExamId > 0 &&
+            !await _resourceAuthorization.CanAccessExamAsync(filter.ExamId.Value))
+        {
+            return ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>.FailureResponse("Exam not found.");
+        }
+
+        var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+        var cacheKey = CacheKeys.ExamOpsCandidates(filter.ExamId, $"{scopeKey}:{JsonSerializer.Serialize(filter)}");
         if (_cache.TryGet<PaginatedResponse<ExamOperationsCandidateDto>>(cacheKey, out var cached) && cached != null)
             return ApiResponse<PaginatedResponse<ExamOperationsCandidateDto>>.SuccessResponse(cached);
 
         // Base: candidates who have been assigned OR have attempts for the exam
         var query = _db.Users
             .Where(u => !u.IsBlocked && !u.IsDeleted);
+        query = await _resourceAuthorization.ScopeUsersAsync(query);
 
         if (filter.ExamId.HasValue && filter.ExamId > 0)
         {
@@ -118,7 +134,7 @@ public class ExamOperationsService : IExamOperationsService
             .Select(g => new { CandidateId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(g => g.CandidateId, g => g.Count);
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var items = candidates.Select(c =>
         {
             attemptsByCandidate.TryGetValue(c.Id, out var candidateAttempts);
@@ -179,11 +195,17 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("Reason is required.");
 
         // Validate candidate exists
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(dto.CandidateId))
+            return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("Candidate not found.");
+
         var candidate = await _db.Users.FindAsync(dto.CandidateId);
         if (candidate == null)
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("Candidate not found.");
 
         // Validate exam exists
+        if (!await _resourceAuthorization.CanAccessExamAsync(dto.ExamId))
+            return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("Exam not found.");
+
         var exam = await _db.Exams.FindAsync(dto.ExamId);
         if (exam == null)
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("Exam not found.");
@@ -210,7 +232,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse(
                 "An unused override already exists for this candidate and exam.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Create the override record
         var overrideRecord = new AdminAttemptOverride
@@ -284,6 +306,9 @@ public class ExamOperationsService : IExamOperationsService
         if (string.IsNullOrWhiteSpace(dto.Reason))
             return ApiResponse<OperationAddTimeResultDto>.FailureResponse("Reason is required.");
 
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(dto.AttemptId))
+            return ApiResponse<OperationAddTimeResultDto>.FailureResponse("Attempt not found.");
+
         var attempt = await _db.Attempts.FirstOrDefaultAsync(a => a.Id == dto.AttemptId && !a.IsDeleted);
         if (attempt == null)
             return ApiResponse<OperationAddTimeResultDto>.FailureResponse("Attempt not found.");
@@ -292,7 +317,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<OperationAddTimeResultDto>.FailureResponse(
                 $"Cannot add time — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var extraSeconds = dto.ExtraMinutes * 60;
 
         if (attempt.ExpiresAt.HasValue)
@@ -374,6 +399,9 @@ public class ExamOperationsService : IExamOperationsService
         if (string.IsNullOrWhiteSpace(dto.Reason))
             return ApiResponse<TerminateAttemptResultDto>.FailureResponse("Reason is required.");
 
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(dto.AttemptId))
+            return ApiResponse<TerminateAttemptResultDto>.FailureResponse("Attempt not found.");
+
         var attempt = await _db.Attempts.FirstOrDefaultAsync(a => a.Id == dto.AttemptId && !a.IsDeleted);
         if (attempt == null)
             return ApiResponse<TerminateAttemptResultDto>.FailureResponse("Attempt not found.");
@@ -384,7 +412,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<TerminateAttemptResultDto>.FailureResponse(
                 $"Cannot terminate — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         attempt.Status = AttemptStatus.ForceSubmitted;
         attempt.SubmittedAt = now;
         attempt.ForceSubmittedBy = adminUserId;
@@ -466,6 +494,9 @@ public class ExamOperationsService : IExamOperationsService
         if (dto.AttemptId <= 0)
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse("AttemptId is required.");
 
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(dto.AttemptId))
+            return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse("Attempt not found.");
+
         var attempt = await _db.Attempts
             .Include(a => a.Exam)
             .FirstOrDefaultAsync(a => a.Id == dto.AttemptId && !a.IsDeleted);
@@ -476,7 +507,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse(
                 $"Cannot resume — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         if (attempt.ExpiresAt.HasValue && attempt.ExpiresAt.Value < now)
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse(
                 "Cannot resume — attempt time has expired.");
@@ -522,6 +553,12 @@ public class ExamOperationsService : IExamOperationsService
     public async Task<ApiResponse<List<AdminOperationLogDto>>> GetOperationLogsAsync(
         string candidateId, int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId) ||
+            !await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
+        {
+            return ApiResponse<List<AdminOperationLogDto>>.SuccessResponse(new List<AdminOperationLogDto>());
+        }
+
         var logs = await _db.AuditLogs
             .Where(a => a.Action == "AllowNewAttemptOverride"
                      || a.Action == "AddTime"

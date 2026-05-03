@@ -17,7 +17,7 @@ public class ExamShareLink : BaseEntity
     /// <summary>
     /// Auto-expires when the exam EndAt passes (if set)
     /// </summary>
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
 
     public bool IsActive { get; set; } = true;
 }

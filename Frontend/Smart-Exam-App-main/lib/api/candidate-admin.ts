@@ -21,7 +21,7 @@ export interface CreateCandidatePayload {
   fullNameAr?: string;
   email: string;
   password?: string;
-  rollNo: string;
+  rollNo?: string;
   mobile?: string;
 }
 

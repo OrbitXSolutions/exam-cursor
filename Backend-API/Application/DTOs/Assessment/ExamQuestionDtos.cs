@@ -15,7 +15,7 @@ public class ExamQuestionDto
     public int Order { get; set; }
     public decimal Points { get; set; }
     public bool IsRequired { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     
     // Question Bank details - Bilingual
     public string QuestionBodyEn { get; set; } = string.Empty;

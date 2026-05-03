@@ -19,7 +19,7 @@ public class AdminAttemptOverride : BaseEntity
     /// <summary>Mandatory reason for audit trail</summary>
     public string Reason { get; set; } = null!;
 
-    public DateTime GrantedAt { get; set; }
+    public DateTimeOffset GrantedAt { get; set; }
 
     /// <summary>Whether the candidate has used this override to start a new attempt</summary>
     public bool IsUsed { get; set; }
@@ -27,7 +27,7 @@ public class AdminAttemptOverride : BaseEntity
     /// <summary>The attempt ID created when the candidate used this override</summary>
     public int? UsedAttemptId { get; set; }
 
-    public DateTime? UsedAt { get; set; }
+    public DateTimeOffset? UsedAt { get; set; }
 
     // Navigation
     public virtual ApplicationUser Candidate { get; set; } = null!;

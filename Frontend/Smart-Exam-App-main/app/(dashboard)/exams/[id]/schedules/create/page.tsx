@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { getExam, createExamSchedule } from "@/lib/api/exams"
 import type { Exam } from "@/lib/types"
+import { uaeInputToIso } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -66,8 +67,8 @@ export default function CreateSchedulePage() {
       setSaving(true)
       await createExamSchedule(id, {
         ...formData,
-        startTime: new Date(formData.startTime).toISOString(),
-        endTime: new Date(formData.endTime).toISOString(),
+        startTime: uaeInputToIso(formData.startTime),
+        endTime: uaeInputToIso(formData.endTime),
       })
       toast.success(language === "ar" ? "تم إنشاء الجدول بنجاح" : "Schedule created successfully")
       router.push(`/exams/${id}/overview`)

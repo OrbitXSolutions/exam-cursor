@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n/context"
 import { ExamType } from "@/lib/types"
 import type { Exam } from "@/lib/types"
 import { getExams, cloneExam } from "@/lib/api/exams"
+import { uaeInputToIso } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -156,8 +157,8 @@ export default function CreateFromTemplatePage() {
         descriptionEn: formData.descriptionEn || undefined,
         descriptionAr: formData.descriptionAr || undefined,
         examType: formData.examType,
-        startAt: formData.startAt ? new Date(formData.startAt).toISOString() : undefined,
-        endAt: formData.endAt ? new Date(formData.endAt).toISOString() : undefined,
+        startAt: formData.startAt ? uaeInputToIso(formData.startAt) : undefined,
+        endAt: formData.endAt ? uaeInputToIso(formData.endAt) : undefined,
         durationMinutes: formData.durationMinutes,
       })
 

@@ -11,6 +11,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Assessment;
 
@@ -353,7 +354,7 @@ public class AssessmentService : IAssessmentService
       EnableScreenMonitoring = dto.EnableScreenMonitoring,
       ScreenMonitoringMode = dto.ScreenMonitoringMode,
       ScreenShareGracePeriod = dto.ScreenShareGracePeriod,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -368,7 +369,7 @@ public class AssessmentService : IAssessmentService
       IsPublic = true,
       RestrictToAssignedCandidates = false,
       AccessCode = null,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
     _context.Set<ExamAccessPolicy>().Add(defaultAccessPolicy);
@@ -467,7 +468,7 @@ public class AssessmentService : IAssessmentService
     entity.EnableScreenMonitoring = dto.EnableScreenMonitoring;
     entity.ScreenMonitoringMode = dto.ScreenMonitoringMode;
     entity.ScreenShareGracePeriod = dto.ScreenShareGracePeriod;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -497,7 +498,7 @@ public class AssessmentService : IAssessmentService
 
     // Soft delete
     entity.IsDeleted = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
@@ -523,7 +524,7 @@ public class AssessmentService : IAssessmentService
     }
 
     entity.IsPublished = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -553,7 +554,7 @@ public class AssessmentService : IAssessmentService
     }
 
     entity.IsPublished = false;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -572,7 +573,7 @@ public class AssessmentService : IAssessmentService
     }
 
     entity.IsActive = !entity.IsActive;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -628,7 +629,7 @@ public class AssessmentService : IAssessmentService
     entity.ScreenMonitoringMode = dto.ScreenMonitoringMode;
     entity.ScreenShareGracePeriod = dto.ScreenShareGracePeriod;
 
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -725,7 +726,7 @@ public class AssessmentService : IAssessmentService
       Order = assignedOrder,
       DurationMinutes = dto.DurationMinutes,
       TotalPointsOverride = dto.TotalPointsOverride,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -785,7 +786,7 @@ x.Order == dto.Order &&
     entity.Order = assignedOrder;
     entity.DurationMinutes = dto.DurationMinutes;
     entity.TotalPointsOverride = dto.TotalPointsOverride;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -821,7 +822,7 @@ x.Order == dto.Order &&
 
     // Soft delete
     entity.IsDeleted = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
@@ -863,7 +864,7 @@ x.Order == dto.Order &&
     {
       var section = sections.First(x => x.Id == reorder.SectionId);
       section.Order = reorder.NewOrder;
-      section.UpdatedDate = DateTime.UtcNow;
+      section.UpdatedDate = UaeTimeHelper.NowUae;
       section.UpdatedBy = updatedBy;
     }
 
@@ -962,7 +963,7 @@ x.Order == dto.Order &&
       Order = assignedOrder,
       Points = dto.PointsOverride ?? question.Points,
       IsRequired = dto.IsRequired,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -1050,7 +1051,7 @@ x.Order == dto.Order &&
         Order = maxOrder,
         Points = dto.UseOriginalPoints ? question.Points : 0,
         IsRequired = dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -1110,7 +1111,7 @@ x.Order == dto.Order &&
     entity.Order = assignedOrder;
     entity.Points = dto.Points;
     entity.IsRequired = dto.IsRequired;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -1141,7 +1142,7 @@ warningMessage ?? "Exam question updated successfully");
 
     // Soft delete
     entity.IsDeleted = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
@@ -1183,7 +1184,7 @@ warningMessage ?? "Exam question updated successfully");
     {
       var question = questions.First(x => x.Id == reorder.ExamQuestionId);
       question.Order = reorder.NewOrder;
-      question.UpdatedDate = DateTime.UtcNow;
+      question.UpdatedDate = UaeTimeHelper.NowUae;
       question.UpdatedBy = updatedBy;
     }
 
@@ -1250,7 +1251,7 @@ warningMessage ?? "Exam question updated successfully");
         AccessCode = dto.AccessCode,
         RestrictToAssignedCandidates = dto.RestrictToAssignedCandidates,
         IsWalkIn = dto.IsWalkIn,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = userId
       };
 
@@ -1269,7 +1270,7 @@ warningMessage ?? "Exam question updated successfully");
       existingPolicy.AccessCode = dto.AccessCode;
       existingPolicy.RestrictToAssignedCandidates = dto.RestrictToAssignedCandidates;
       existingPolicy.IsWalkIn = dto.IsWalkIn;
-      existingPolicy.UpdatedDate = DateTime.UtcNow;
+      existingPolicy.UpdatedDate = UaeTimeHelper.NowUae;
       existingPolicy.UpdatedBy = userId;
 
       await _context.SaveChangesAsync();
@@ -1336,7 +1337,7 @@ warningMessage ?? "Exam question updated successfully");
       ContentEn = dto.ContentEn,
       ContentAr = dto.ContentAr,
       Order = assignedOrder,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -1384,7 +1385,7 @@ x.Order == dto.Order &&
     entity.ContentEn = dto.ContentEn;
     entity.ContentAr = dto.ContentAr;
     entity.Order = assignedOrder;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -1408,7 +1409,7 @@ entity.Adapt<ExamInstructionDto>(),
 
     // Soft delete
     entity.IsDeleted = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
@@ -1450,7 +1451,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     {
       var instruction = instructions.First(x => x.Id == reorder.InstructionId);
       instruction.Order = reorder.NewOrder;
-      instruction.UpdatedDate = DateTime.UtcNow;
+      instruction.UpdatedDate = UaeTimeHelper.NowUae;
       instruction.UpdatedBy = updatedBy;
     }
 
@@ -1637,12 +1638,12 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       result.Warnings.Add("Exam is marked as inactive. It will not be available to candidates even after publishing.");
     }
 
-    if (exam.StartAt.HasValue && exam.StartAt < DateTime.UtcNow)
+    if (exam.StartAt.HasValue && exam.StartAt < UaeTimeHelper.NowUae)
     {
       result.Warnings.Add("Exam start date is in the past.");
     }
 
-    if (exam.EndAt.HasValue && exam.EndAt < DateTime.UtcNow)
+    if (exam.EndAt.HasValue && exam.EndAt < UaeTimeHelper.NowUae)
     {
       result.Warnings.Add("Exam end date is in the past. Candidates will not be able to take this exam.");
     }
@@ -1915,7 +1916,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       DescriptionEn = dto.DescriptionEn,
       DescriptionAr = dto.DescriptionAr,
       Order = assignedOrder,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -1966,7 +1967,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     entity.DescriptionEn = dto.DescriptionEn;
     entity.DescriptionAr = dto.DescriptionAr;
     entity.Order = assignedOrder;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
     entity.UpdatedBy = updatedBy;
 
     await _context.SaveChangesAsync();
@@ -1990,7 +1991,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     }
 
     entity.IsDeleted = true;
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
@@ -2030,7 +2031,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     {
       var topic = topics.First(x => x.Id == reorder.TopicId);
       topic.Order = reorder.NewOrder;
-      topic.UpdatedDate = DateTime.UtcNow;
+      topic.UpdatedDate = UaeTimeHelper.NowUae;
       topic.UpdatedBy = updatedBy;
     }
 
@@ -2124,7 +2125,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       Order = assignedOrder,
       Points = dto.PointsOverride ?? question.Points,
       IsRequired = dto.IsRequired,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -2211,7 +2212,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         Order = maxOrder,
         Points = dto.UseOriginalPoints ? question.Points : 0,
         IsRequired = dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -2299,7 +2300,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         Order = order,
         Points = item.PointsOverride ?? questionBank.Points,
         IsRequired = item.IsRequired ?? dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -2389,7 +2390,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         Order = order,
         Points = item.PointsOverride ?? questionBank.Points,
         IsRequired = item.IsRequired ?? dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -2485,7 +2486,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         Order = maxOrder,
         Points = dto.UseOriginalPoints ? question.Points : 0,
         IsRequired = dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -2577,7 +2578,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         Order = maxOrder,
         Points = dto.UseOriginalPoints ? question.Points : 0,
         IsRequired = dto.MarkAsRequired,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
     }
@@ -2794,7 +2795,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         QuestionSubjectId = sectionDto.QuestionSubjectId > 0 ? sectionDto.QuestionSubjectId : null,
         QuestionTopicId = sectionDto.QuestionTopicId > 0 ? sectionDto.QuestionTopicId : null,
         PickCount = sectionDto.PickCount,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = userId
       };
 
@@ -2890,7 +2891,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
       PreventScreenCapture = source.PreventScreenCapture,
       RequireFullscreen = source.RequireFullscreen,
       BrowserLockdown = source.BrowserLockdown,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -2916,7 +2917,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
           QuestionSubjectId = srcSection.QuestionSubjectId,
           QuestionTopicId = srcSection.QuestionTopicId,
           PickCount = srcSection.PickCount,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = createdBy
         };
 
@@ -2936,7 +2937,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
               DescriptionEn = srcTopic.DescriptionEn,
               DescriptionAr = srcTopic.DescriptionAr,
               Order = srcTopic.Order,
-              CreatedDate = DateTime.UtcNow,
+              CreatedDate = UaeTimeHelper.NowUae,
               CreatedBy = createdBy
             };
 
@@ -2957,7 +2958,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
                   Order = srcQ.Order,
                   Points = srcQ.Points,
                   IsRequired = srcQ.IsRequired,
-                  CreatedDate = DateTime.UtcNow,
+                  CreatedDate = UaeTimeHelper.NowUae,
                   CreatedBy = createdBy
                 });
               }
@@ -2983,7 +2984,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
               Order = srcQ.Order,
               Points = srcQ.Points,
               IsRequired = srcQ.IsRequired,
-              CreatedDate = DateTime.UtcNow,
+              CreatedDate = UaeTimeHelper.NowUae,
               CreatedBy = createdBy
             });
           }
@@ -3004,7 +3005,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
           ContentEn = srcInst.ContentEn,
           ContentAr = srcInst.ContentAr,
           Order = srcInst.Order,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = createdBy
         });
       }
@@ -3021,7 +3022,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
         AccessCode = source.AccessPolicy.AccessCode,
         RestrictToAssignedCandidates = source.AccessPolicy.RestrictToAssignedCandidates,
         IsWalkIn = source.AccessPolicy.IsWalkIn,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = createdBy
       });
       await _context.SaveChangesAsync();

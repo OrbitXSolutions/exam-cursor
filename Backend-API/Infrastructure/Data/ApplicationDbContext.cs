@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Smart_Core.Domain.Common;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
 using Smart_Core.Domain.Entities.Attempt;
@@ -128,10 +129,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedDate = DateTime.UtcNow;
+                    entry.Entity.CreatedDate = UaeTimeHelper.NowUae;
                     break;
                 case EntityState.Modified:
-                    entry.Entity.UpdatedDate = DateTime.UtcNow;
+                    entry.Entity.UpdatedDate = UaeTimeHelper.NowUae;
                     break;
             }
         }

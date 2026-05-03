@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Smart_Core.Domain.Common;
 using Smart_Core.Domain.Entities.Logs;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Services.Logs;
@@ -158,7 +159,7 @@ public class RequestResponseLoggingMiddleware
 
                 var log = new SystemLog
                 {
-                    Timestamp = DateTime.UtcNow,
+                    Timestamp = UaeTimeHelper.NowUae,
                     Level = isError
                         ? (statusCode >= 500 || statusCode == 400
                             ? SystemLogLevel.Error

@@ -14,7 +14,7 @@ public class AuditRetentionPolicy : BaseEntity
     public string NameAr { get; set; } = null!;
 
     public string? DescriptionEn { get; set; }
- public string? DescriptionAr { get; set; }
+    public string? DescriptionAr { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -48,7 +48,7 @@ public class AuditRetentionPolicy : BaseEntity
     /// <summary>
     /// Apply to specific channel
     /// </summary>
-  public string? Channel { get; set; }
+    public string? Channel { get; set; }
 
     /// <summary>
     /// Apply to specific actor type
@@ -58,13 +58,13 @@ public class AuditRetentionPolicy : BaseEntity
     // Archiving behavior
     /// <summary>
     /// Whether to archive logs before deletion
-/// </summary>
+    /// </summary>
     public bool ArchiveBeforeDelete { get; set; }
 
-/// <summary>
+    /// <summary>
     /// Archive target: S3, Blob, FileShare
-/// </summary>
- public string? ArchiveTarget { get; set; }
+    /// </summary>
+    public string? ArchiveTarget { get; set; }
 
     /// <summary>
     /// Archive path template
@@ -74,7 +74,7 @@ public class AuditRetentionPolicy : BaseEntity
     /// <summary>
     /// When this policy was last executed
     /// </summary>
-    public DateTime? LastExecutedAt { get; set; }
+    public DateTimeOffset? LastExecutedAt { get; set; }
 
     /// <summary>
     /// Number of logs processed in last execution

@@ -24,8 +24,8 @@ public class GradingSessionDto
     public decimal MaxPossibleScore { get; set; }
     public decimal PassScore { get; set; }
     public bool? IsPassed { get; set; }
-    public DateTime? GradedAt { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset? GradedAt { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int TotalQuestions { get; set; }
     public int GradedQuestions { get; set; }
     public int ManualGradingRequired { get; set; }
@@ -50,7 +50,7 @@ public class GradingSessionListDto
     public decimal? TotalScore { get; set; }
     public decimal MaxPossibleScore { get; set; }
     public bool? IsPassed { get; set; }
-    public DateTime? GradedAt { get; set; }
+    public DateTimeOffset? GradedAt { get; set; }
     public int ManualGradingRequired { get; set; }
     /// <summary>
     /// Whether the exam result has been finalized (GradedAnswers copied to ExamResultAnswers, Result published)
@@ -68,8 +68,8 @@ public class GradingSearchDto
     public GradingStatus? Status { get; set; }
     public bool? IsPassed { get; set; }
     public bool? RequiresManualGrading { get; set; }
-    public DateTime? GradedFrom { get; set; }
-    public DateTime? GradedTo { get; set; }
+    public DateTimeOffset? GradedFrom { get; set; }
+    public DateTimeOffset? GradedTo { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -230,7 +230,7 @@ public class GradingCompletedDto
     public decimal MaxPossibleScore { get; set; }
     public decimal PassScore { get; set; }
     public bool IsPassed { get; set; }
-    public DateTime GradedAt { get; set; }
+    public DateTimeOffset GradedAt { get; set; }
     public GradingStatus Status { get; set; }
     public string Message { get; set; } = string.Empty;
 }
@@ -326,7 +326,7 @@ public class CandidateGradingResultDto
     public decimal PassScore { get; set; }
     public bool IsPassed { get; set; }
     public decimal Percentage { get; set; }
-    public DateTime? GradedAt { get; set; }
+    public DateTimeOffset? GradedAt { get; set; }
     public GradingStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public bool IsGradingComplete { get; set; }

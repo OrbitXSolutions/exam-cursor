@@ -8,6 +8,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Background;
 
@@ -58,7 +59,7 @@ public class AttemptExpiryBackgroundService : BackgroundService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // ── 1) Timer-expired attempts (ExpiresAt < now) ────────────────────
         var timerExpired = await db.Attempts

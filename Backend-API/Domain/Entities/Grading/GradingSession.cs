@@ -9,25 +9,25 @@ namespace Smart_Core.Domain.Entities.Grading;
 /// </summary>
 public class GradingSession : BaseEntity
 {
-    public int Id { get; set; }
+  public int Id { get; set; }
 
-    // Relations
-    public int AttemptId { get; set; }
-    public string? GradedBy { get; set; }   // UserId (Instructor/Admin/System)
+  // Relations
+  public int AttemptId { get; set; }
+  public string? GradedBy { get; set; }   // UserId (Instructor/Admin/System)
 
-    // Status
-    public GradingStatus Status { get; set; }
+  // Status
+  public GradingStatus Status { get; set; }
 
-    // Summary
- public decimal? TotalScore { get; set; }
-    public bool? IsPassed { get; set; }
+  // Summary
+  public decimal? TotalScore { get; set; }
+  public bool? IsPassed { get; set; }
 
-    public DateTime? GradedAt { get; set; }
+  public DateTimeOffset? GradedAt { get; set; }
 
-    // Navigation Properties
-    public virtual Attempt.Attempt Attempt { get; set; } = null!;
-    public virtual ApplicationUser? Grader { get; set; }
+  // Navigation Properties
+  public virtual Attempt.Attempt Attempt { get; set; } = null!;
+  public virtual ApplicationUser? Grader { get; set; }
 
-    public virtual ICollection<GradedAnswer> Answers { get; set; }
-  = new List<GradedAnswer>();
+  public virtual ICollection<GradedAnswer> Answers { get; set; }
+= new List<GradedAnswer>();
 }
