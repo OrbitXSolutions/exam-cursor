@@ -11,12 +11,12 @@ public class AttemptControlItemDto
     public int ExamId { get; set; }
     public string? ExamTitleEn { get; set; }
     public string? ExamTitleAr { get; set; }
-    public DateTime StartedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
     public int RemainingSeconds { get; set; }
     public string Status { get; set; } = string.Empty;
     public string? ExpiryReason { get; set; }
     public int? ResumedFromAttemptId { get; set; }
-    public DateTime? LastActivityAt { get; set; }
+    public DateTimeOffset? LastActivityAt { get; set; }
     public int ExtraTimeSeconds { get; set; }
     public int ResumeCount { get; set; }
     public string? IPAddress { get; set; }
@@ -50,7 +50,7 @@ public class ForceEndResultDto
 {
     public int AttemptId { get; set; }
     public string Status { get; set; } = string.Empty;
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 }
 
 // ── Resume ───────────────────────────────────────────────────

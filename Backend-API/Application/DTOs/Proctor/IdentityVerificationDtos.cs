@@ -25,7 +25,7 @@ public class IdentityVerificationListDto
     public string StatusName => Status.ToString();
     public string? AssignedProctorId { get; set; }
     public string? AssignedProctorName { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
 }
 
 /// <summary>
@@ -58,7 +58,7 @@ public class IdentityVerificationDetailDto
     public string StatusName => Status.ToString();
     public string? ReviewedBy { get; set; }
     public string? ReviewedByName { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
     public string? ReviewNotes { get; set; }
 
     // Assignment
@@ -70,7 +70,7 @@ public class IdentityVerificationDetailDto
     public string? IpAddress { get; set; }
 
     // Timing
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
 
     // Audit logs (flattened from ProctorEvents)
     public List<IdentityAuditLogDto> AuditLogs { get; set; } = new();
@@ -81,7 +81,7 @@ public class IdentityVerificationDetailDto
 /// </summary>
 public class IdentityAuditLogDto
 {
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
     public string Action { get; set; } = string.Empty;
     public string? PerformedBy { get; set; }
     public string? Details { get; set; }
@@ -95,8 +95,8 @@ public class IdentityVerificationSearchDto
     public IdentityVerificationStatus? Status { get; set; }
     public int? ExamId { get; set; }
     public string? RiskLevel { get; set; }           // "Low", "Medium", "High", "Critical"
-    public DateTime? DateFrom { get; set; }
-    public DateTime? DateTo { get; set; }
+    public DateTimeOffset? DateFrom { get; set; }
+    public DateTimeOffset? DateTo { get; set; }
     public string? AssignedProctorId { get; set; }
     public string? Search { get; set; }              // candidate name search
     public int PageNumber { get; set; } = 1;
@@ -153,8 +153,8 @@ public class CandidateVerificationStatusDto
     public bool HasSubmitted { get; set; }
     public string Status { get; set; } = "None";  // None, Pending, Approved, Rejected, Flagged
     public string? ReviewNotes { get; set; }
-    public DateTime? SubmittedAt { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
 }
 
 #endregion

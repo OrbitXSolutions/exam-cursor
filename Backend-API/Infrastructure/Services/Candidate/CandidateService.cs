@@ -16,6 +16,7 @@ using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Candidate;
 
@@ -61,7 +62,7 @@ public class CandidateService : ICandidateService
     {
         return await _cache.GetOrCreateAsync(CacheKeys.CandidateAvailableExams(candidateId), async () =>
         {
-            var now = DateTime.UtcNow;
+            var now = UaeTimeHelper.NowUae;
 
             // Get user and check role
             var user = await _userManager.FindByIdAsync(candidateId);
@@ -238,7 +239,7 @@ public class CandidateService : ICandidateService
                        // Get published result for this exam (only published results are visible to candidates)
                        publishedByExam.TryGetValue(e.Id, out var publishedResult);
 
-                       var now = DateTime.UtcNow;
+                       var now = UaeTimeHelper.NowUae;
                        var hasAttemptsLeft = e.MaxAttempts == 0 || myAttemptCount < e.MaxAttempts;
                        var inWindow = (!e.StartAt.HasValue || now >= e.StartAt.Value)
                                    && (!e.EndAt.HasValue || now <= e.EndAt.Value);
@@ -450,7 +451,7 @@ public class CandidateService : ICandidateService
         }
 
         // Validate schedule (Flexible vs Fixed)
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
 
         if (!exam.StartAt.HasValue && !exam.EndAt.HasValue)
@@ -466,7 +467,7 @@ public class CandidateService : ICandidateService
             var graceMinutes = ExamDefaults.FixedStartGraceMinutes;
             var windowEnd = exam.StartAt.HasValue
                 ? exam.StartAt.Value.AddMinutes(graceMinutes)
-                : (DateTime?)null;
+                : (DateTimeOffset?)null;
 
             // Clamp grace window to EndAt
             if (windowEnd.HasValue && exam.EndAt.HasValue && windowEnd.Value > exam.EndAt.Value)
@@ -478,7 +479,7 @@ public class CandidateService : ICandidateService
                     "[StartExam] BLOCKED — Fixed exam expired | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Fixed TraceId={TraceId} Reason=PastEndAt",
                     examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
 
             if (exam.StartAt.HasValue && now < exam.StartAt.Value)
@@ -487,7 +488,7 @@ public class CandidateService : ICandidateService
                     "[StartExam] BLOCKED — Fixed exam not started yet | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Fixed TraceId={TraceId} Reason=BeforeStartAt",
                     examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                    $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+                    $"Exam has not started yet. Start time: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
 
             if (windowEnd.HasValue && now > windowEnd.Value)
@@ -496,7 +497,7 @@ public class CandidateService : ICandidateService
                     "[StartExam] BLOCKED — Fixed exam grace window passed | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} GraceEnd={GraceEnd} EndAt={EndAt} ExamType=Fixed GraceMinutes={GraceMinutes} TraceId={TraceId} Reason=PastGraceWindow",
                     examId, candidateId, now, exam.StartAt, windowEnd, exam.EndAt, graceMinutes, traceId);
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                    $"The allowed start window has passed. You must start within {graceMinutes} minutes of the scheduled time ({exam.StartAt!.Value:yyyy-MM-dd HH:mm} UTC).");
+                    $"The allowed start window has passed. You must start within {graceMinutes} minutes of the scheduled time ({exam.StartAt!.Value:yyyy-MM-dd HH:mm} UAE).");
             }
         }
         else
@@ -508,7 +509,7 @@ public class CandidateService : ICandidateService
                     "[StartExam] BLOCKED — Flexible exam not available yet | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Flex TraceId={TraceId} Reason=BeforeStartAt",
                     examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                    $"Exam is not available yet. Available from: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+                    $"Exam is not available yet. Available from: {exam.StartAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
 
             if (exam.EndAt.HasValue && now > exam.EndAt.Value)
@@ -517,7 +518,7 @@ public class CandidateService : ICandidateService
                     "[StartExam] BLOCKED — Flexible exam expired | ExamId={ExamId} CandidateId={CandidateId} Now={Now} StartAt={StartAt} EndAt={EndAt} ExamType=Flex TraceId={TraceId} Reason=PastEndAt",
                     examId, candidateId, now, exam.StartAt, exam.EndAt, traceId);
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
-                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+                    $"Exam has ended. End time: {exam.EndAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
         }
 
@@ -731,7 +732,7 @@ public class CandidateService : ICandidateService
         }
 
         // Check if expired
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value &&
             (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress || attempt.Status == AttemptStatus.Resumed))
         {
@@ -776,7 +777,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             return ApiResponse<bool>.FailureResponse("Access denied");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Validate attempt status
         if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
@@ -865,7 +866,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Access denied");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // If already submitted, return success (idempotent) — do NOT return 400
         if (attempt.Status == AttemptStatus.Submitted)
@@ -1106,7 +1107,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             ExamTitleEn = result.Exam.TitleEn,
             ExamTitleAr = result.Exam.TitleAr,
             AttemptNumber = result.Attempt.AttemptNumber,
-            SubmittedAt = result.Attempt.SubmittedAt ?? DateTime.UtcNow,
+            SubmittedAt = result.Attempt.SubmittedAt ?? UaeTimeHelper.NowUae,
             AllowReview = result.Exam.AllowReview,
             ShowCorrectAnswers = result.Exam.ShowCorrectAnswers
         };
@@ -1183,7 +1184,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             ExamTitleEn = result.Exam.TitleEn,
             ExamTitleAr = result.Exam.TitleAr,
             AttemptNumber = attempt.AttemptNumber,
-            SubmittedAt = attempt.SubmittedAt ?? DateTime.UtcNow
+            SubmittedAt = attempt.SubmittedAt ?? UaeTimeHelper.NowUae
         };
 
         // Respect ShowResults
@@ -1256,7 +1257,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
     {
         return await _cache.GetOrCreateAsync(CacheKeys.CandidateDashboard(candidateId), async () =>
         {
-            var now = DateTime.UtcNow;
+            var now = UaeTimeHelper.NowUae;
 
             // Get user info
             var user = await _userManager.FindByIdAsync(candidateId);
@@ -1450,7 +1451,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                     ExamTitleEn = exam?.TitleEn ?? "Exam",
                     ExamTitleAr = exam?.TitleAr ?? "??????",
                     AttemptId = result.AttemptId,
-                    ActivityDate = result.PublishedAt ?? DateTime.UtcNow,
+                    ActivityDate = result.PublishedAt ?? UaeTimeHelper.NowUae,
                     Description = result.IsPassed ? "Passed" : "Not Passed",
                     Score = result.TotalScore,
                     IsPassed = result.IsPassed
@@ -1492,7 +1493,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             Reasons = new List<string>()
         };
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Check schedule (Flexible vs Fixed)
         if (exam.ExamType == ExamType.Fixed)
@@ -1500,7 +1501,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             var graceMinutes = ExamDefaults.FixedStartGraceMinutes;
             var windowEnd = exam.StartAt.HasValue
                 ? exam.StartAt.Value.AddMinutes(graceMinutes)
-                : (DateTime?)null;
+                : (DateTimeOffset?)null;
 
             if (windowEnd.HasValue && exam.EndAt.HasValue && windowEnd.Value > exam.EndAt.Value)
                 windowEnd = exam.EndAt.Value;
@@ -1508,17 +1509,17 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             if (exam.EndAt.HasValue && now > exam.EndAt.Value)
             {
                 eligibility.CanStartNow = false;
-                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
             else if (exam.StartAt.HasValue && now < exam.StartAt.Value)
             {
                 eligibility.CanStartNow = false;
-                eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+                eligibility.Reasons.Add($"Exam starts at {exam.StartAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
             else if (windowEnd.HasValue && now > windowEnd.Value)
             {
                 eligibility.CanStartNow = false;
-                eligibility.Reasons.Add($"Start window has passed. Must start within {graceMinutes} minutes of {exam.StartAt!.Value:yyyy-MM-dd HH:mm} UTC");
+                eligibility.Reasons.Add($"Start window has passed. Must start within {graceMinutes} minutes of {exam.StartAt!.Value:yyyy-MM-dd HH:mm} UAE");
             }
         }
         else
@@ -1527,13 +1528,13 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             if (exam.StartAt.HasValue && now < exam.StartAt.Value)
             {
                 eligibility.CanStartNow = false;
-                eligibility.Reasons.Add($"Exam is available from {exam.StartAt.Value:yyyy-MM-dd HH:mm} UTC");
+                eligibility.Reasons.Add($"Exam is available from {exam.StartAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
 
             if (exam.EndAt.HasValue && now > exam.EndAt.Value)
             {
                 eligibility.CanStartNow = false;
-                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
+                eligibility.Reasons.Add($"Exam ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UAE");
             }
         }
 
@@ -1576,7 +1577,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         return eligibility;
     }
 
-    private DateTime CalculateExpiresAt(DateTime startedAt, int durationMinutes, DateTime? examEndAt)
+    private DateTimeOffset CalculateExpiresAt(DateTimeOffset startedAt, int durationMinutes, DateTimeOffset? examEndAt)
     {
         var durationExpiry = startedAt.AddMinutes(durationMinutes);
 
@@ -1597,7 +1598,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             return 0;
         }
 
-        var remaining = (int)(attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds;
+        var remaining = (int)(attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds;
         return Math.Max(0, remaining);
     }
 
@@ -1605,7 +1606,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         Domain.Entities.Attempt.Attempt attempt,
         Domain.Entities.Assessment.Exam exam)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Get all attempt questions with their answers, including Subject/Topic for Builder sections
         var attemptQuestions = await _context.Set<AttemptQuestion>()
@@ -1952,7 +1953,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
     public async Task<ApiResponse<ExamJourneyDto>> GetExamJourneyAsync(string candidateId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Get user info
         var user = await _userManager.FindByIdAsync(candidateId);
@@ -2204,7 +2205,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
     /// <summary>
     /// Check eligibility for starting an exam
     /// </summary>
-    private (bool CanStartNow, List<string> Reasons) CheckEligibility(Domain.Entities.Assessment.Exam exam, int attemptsUsed, DateTime now)
+    private (bool CanStartNow, List<string> Reasons) CheckEligibility(Domain.Entities.Assessment.Exam exam, int attemptsUsed, DateTimeOffset now)
     {
         var reasons = new List<string>();
 

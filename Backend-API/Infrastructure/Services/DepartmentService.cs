@@ -7,6 +7,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -69,7 +70,7 @@ public class DepartmentService : IDepartmentService
                 DescriptionAr = request.DescriptionAr,
                 Code = request.Code,
                 IsActive = request.IsActive,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = UaeTimeHelper.NowUae,
                 CreatedBy = _currentUserService.UserId
             };
 
@@ -177,7 +178,7 @@ public class DepartmentService : IDepartmentService
             department.DescriptionAr = request.DescriptionAr;
             department.Code = request.Code;
             department.IsActive = request.IsActive;
-            department.UpdatedDate = DateTime.UtcNow;
+            department.UpdatedDate = UaeTimeHelper.NowUae;
             department.UpdatedBy = _currentUserService.UserId;
 
             await _context.SaveChangesAsync();
@@ -214,7 +215,7 @@ public class DepartmentService : IDepartmentService
             // Soft delete
             department.IsDeleted = true;
             department.DeletedBy = _currentUserService.UserId;
-            department.UpdatedDate = DateTime.UtcNow;
+            department.UpdatedDate = UaeTimeHelper.NowUae;
 
             await _context.SaveChangesAsync();
 
@@ -237,7 +238,7 @@ public class DepartmentService : IDepartmentService
             return ApiResponse<bool>.FailureResponse("Department not found.");
 
         department.IsActive = true;
-        department.UpdatedDate = DateTime.UtcNow;
+        department.UpdatedDate = UaeTimeHelper.NowUae;
         department.UpdatedBy = _currentUserService.UserId;
 
         await _context.SaveChangesAsync();
@@ -253,7 +254,7 @@ public class DepartmentService : IDepartmentService
             return ApiResponse<bool>.FailureResponse("Department not found.");
 
         department.IsActive = false;
-        department.UpdatedDate = DateTime.UtcNow;
+        department.UpdatedDate = UaeTimeHelper.NowUae;
         department.UpdatedBy = _currentUserService.UserId;
 
         await _context.SaveChangesAsync();
@@ -278,7 +279,7 @@ public class DepartmentService : IDepartmentService
                 return ApiResponse<bool>.FailureResponse("Cannot assign user to an inactive department.");
 
             user.DepartmentId = departmentId;
-            user.UpdatedDate = DateTime.UtcNow;
+            user.UpdatedDate = UaeTimeHelper.NowUae;
             user.UpdatedBy = _currentUserService.UserId;
 
             await _userManager.UpdateAsync(user);
@@ -305,7 +306,7 @@ public class DepartmentService : IDepartmentService
                 return ApiResponse<bool>.FailureResponse("User not found.");
 
             user.DepartmentId = null;
-            user.UpdatedDate = DateTime.UtcNow;
+            user.UpdatedDate = UaeTimeHelper.NowUae;
             user.UpdatedBy = _currentUserService.UserId;
 
             await _userManager.UpdateAsync(user);

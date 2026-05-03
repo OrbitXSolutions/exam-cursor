@@ -24,6 +24,6 @@ public class NotificationLog : BaseEntity
     public string? Subject { get; set; }
     public string? ErrorMessage { get; set; }
 
-    public DateTime? SentAt { get; set; }
+    public DateTimeOffset? SentAt { get; set; }
     public int RetryCount { get; set; } = 0;
 }

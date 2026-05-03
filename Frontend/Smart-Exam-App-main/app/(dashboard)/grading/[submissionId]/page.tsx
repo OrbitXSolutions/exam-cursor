@@ -94,7 +94,7 @@ export default function GradeSubmissionPage() {
         setGrades(initialGrades)
       }
     } catch (error) {
-      toast.error("Failed to load submission")
+      toast.error(t("grading.failedToLoad"))
       setSession(null)
     } finally {
       setLoading(false)
@@ -131,7 +131,7 @@ export default function GradeSubmissionPage() {
       setGrades((prev) => new Map(prev).set(currentQuestion.questionId, { ...currentGrade, saved: true }))
       toast.success(t("grading.gradeSaved"))
     } catch (error) {
-      toast.error("Failed to save grade")
+      toast.error(t("grading.failedToSaveGrade"))
     } finally {
       setSaving(false)
     }
@@ -151,7 +151,7 @@ export default function GradeSubmissionPage() {
       })
       router.push("/grading")
     } catch (error) {
-      toast.error("Failed to finalize grading")
+      toast.error(t("grading.failedToFinalize"))
     } finally {
       setFinalizing(false)
       setFinalizeDialogOpen(false)
@@ -226,7 +226,7 @@ export default function GradeSubmissionPage() {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">
-            {session.totalScore != null ? Math.round((session.totalScore / session.maxPossibleScore) * 100) : 0}% auto
+            {session.totalScore != null ? Math.round((session.totalScore / session.maxPossibleScore) * 100) : 0}% {t("grading.autoLabel")}
           </Badge>
           <Button onClick={() => setFinalizeDialogOpen(true)} disabled={!allGraded || finalizing}>
             {finalizing ? (
@@ -254,9 +254,9 @@ export default function GradeSubmissionPage() {
           <CardContent className="py-12">
             <div className="text-center text-muted-foreground">
               <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-500" />
-              <p>All questions are auto-graded. No manual grading required.</p>
+              <p>{t("grading.allAutoGraded")}</p>
               <Button asChild className="mt-4">
-                <Link href="/grading">Back to Grading</Link>
+                <Link href="/grading">{t("grading.backToGrading")}</Link>
               </Button>
             </div>
           </CardContent>
@@ -267,7 +267,7 @@ export default function GradeSubmissionPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Question {currentQuestionIndex + 1} of {manualQuestions.length}
+                {t("grading.questionXofY", { current: currentQuestionIndex + 1, total: manualQuestions.length })}
               </CardTitle>
               <CardDescription className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{t("grading.manualGrading")}</Badge>

@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   AlertTriangle,
+  AlertCircle,
   Upload,
   Globe,
   Calendar,
@@ -22,6 +23,8 @@ import {
   Clock,
   FileKey,
   RefreshCw,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react"
 import { PageHeader } from "@/components/layout/page-header"
 
@@ -99,6 +102,143 @@ export default function LicensePage() {
     return language === "ar" ? l.labelAr : l.label
   }
 
+  function getStateAlert(s: LicenseStatusResult) {
+    const { state, graceDaysRemaining, gracePeriodDays, daysRemaining } = s
+
+    if (state === "GracePeriod") {
+      return {
+        wrapperClass: "bg-orange-50 border-orange-200",
+        titleClass: "text-orange-800",
+        bodyClass: "text-orange-700",
+        dotClass: "bg-orange-500",
+        icon: <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-orange-500" />,
+        title: language === "ar"
+          ? `تحذير: فترة السماح — ${graceDaysRemaining ?? 0} يوم متبقي من أصل ${gracePeriodDays ?? 0}`
+          : `Warning: Grace Period Active — ${graceDaysRemaining ?? 0} of ${gracePeriodDays ?? 0} day(s) remaining`,
+        body: language === "ar"
+          ? "انتهت صلاحية الرخصة. النظام في وضع فترة السماح المؤقتة. بعد انتهاء فترة السماح:"
+          : "Your license has expired. The system is currently in temporary grace mode. When grace period ends:",
+        items: language === "ar" ? [
+          "ستُحظر جميع عمليات الإنشاء والتعديل والحذف تلقائياً.",
+          "لن يتمكن المرشحون من تقديم إجابات الاختبارات.",
+          "لن يمكن إنشاء اختبارات جديدة أو إضافة مرشحين أو تعديل البيانات.",
+          "ستبقى عمليات القراءة وتسجيل الدخول متاحة بالكامل.",
+          "يرجى رفع ملف رخصة جديد الآن لتجنب انقطاع الخدمة.",
+        ] : [
+          "All create, edit, and delete operations will be automatically blocked.",
+          "Candidates will not be able to submit exam answers.",
+          "New exams, candidates, and data modifications will be disabled.",
+          "Login and read-only access will remain fully available.",
+          "Upload a new license file now to avoid service disruption.",
+        ],
+      }
+    }
+
+    if (state === "Expired") {
+      return {
+        wrapperClass: "bg-red-50 border-red-200",
+        titleClass: "text-red-800",
+        bodyClass: "text-red-700",
+        dotClass: "bg-red-500",
+        icon: <XCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-500" />,
+        title: language === "ar"
+          ? "منتهي الصلاحية — وضع القراءة فقط مُفعَّل الآن"
+          : "Expired — Read-Only Mode is Now Active",
+        body: language === "ar"
+          ? "انتهت فترة السماح. النظام يعمل حالياً بوضع القراءة فقط:"
+          : "The grace period has ended. The system is currently operating in Read-Only mode:",
+        items: language === "ar" ? [
+          "جميع عمليات الكتابة (POST / PUT / DELETE) محظورة ويُعاد الرد بخطأ 403.",
+          "لا يمكن إنشاء اختبارات أو إضافة مرشحين أو تعديل أي بيانات.",
+          "لا يمكن للمرشحين تقديم إجابات الاختبارات.",
+          "تسجيل الدخول وعرض البيانات لا يزالان يعملان بشكل طبيعي.",
+          "يرجى رفع ملف رخصة جديد فوراً لاستعادة الوظائف الكاملة.",
+        ] : [
+          "All write operations (POST / PUT / DELETE) are blocked and return HTTP 403.",
+          "Exams cannot be created, candidates cannot be added, and no data can be modified.",
+          "Candidates cannot submit exam answers.",
+          "Login and data viewing remain fully operational.",
+          "Upload a new license file immediately to restore full functionality.",
+        ],
+      }
+    }
+
+    if (state === "Warning") {
+      return {
+        wrapperClass: "bg-yellow-50 border-yellow-200",
+        titleClass: "text-yellow-800",
+        bodyClass: "text-yellow-700",
+        dotClass: "bg-yellow-500",
+        icon: <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-yellow-500" />,
+        title: language === "ar"
+          ? `تنبيه: الرخصة تنتهي خلال ${daysRemaining} يوم`
+          : `Notice: License expires in ${daysRemaining} day(s)`,
+        body: language === "ar"
+          ? "يقترب موعد انتهاء الرخصة. يرجى التجديد قبل الانتهاء لتجنب الانقطاع. عند انتهاء الصلاحية:"
+          : "Your license is approaching its expiry date. Renew before it expires to avoid disruption. When it expires:",
+        items: language === "ar" ? [
+          "ستبدأ فترة السماح تلقائياً عند انتهاء الرخصة.",
+          "بعد انتهاء فترة السماح، يدخل النظام وضع القراءة فقط.",
+          "ستُحظر جميع عمليات الإنشاء والتعديل والحذف.",
+          "يُنصح بالتجديد المبكر لضمان استمرارية الخدمة.",
+        ] : [
+          "A grace period will automatically begin when the license expires.",
+          "After the grace period ends, the system will enter Read-Only mode.",
+          "All write operations will be blocked.",
+          "Early renewal is strongly recommended to ensure service continuity.",
+        ],
+      }
+    }
+
+    if (state === "Invalid" || state === "Missing") {
+      return {
+        wrapperClass: "bg-red-50 border-red-200",
+        titleClass: "text-red-800",
+        bodyClass: "text-red-700",
+        dotClass: "bg-red-500",
+        icon: <XCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-500" />,
+        title: language === "ar"
+          ? (state === "Invalid" ? "رخصة غير صالحة" : "لا توجد رخصة")
+          : (state === "Invalid" ? "Invalid License Detected" : "No License Found"),
+        body: language === "ar"
+          ? "النظام يعمل بدون رخصة صالحة:"
+          : "The system is operating without a valid license:",
+        items: language === "ar" ? [
+          "جميع عمليات الكتابة محظورة.",
+          "يرجى رفع ملف رخصة صالح لاستعادة الوظائف الكاملة.",
+        ] : [
+          "All write operations are blocked.",
+          "Please upload a valid license file to restore full functionality.",
+        ],
+      }
+    }
+
+    if (state === "Active") {
+      return {
+        wrapperClass: "bg-green-50 border-green-200",
+        titleClass: "text-green-800",
+        bodyClass: "text-green-700",
+        dotClass: "bg-green-500",
+        icon: <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-green-500" />,
+        title: language === "ar" ? "الرخصة نشطة — النظام يعمل بشكل كامل" : "License Active — System Fully Operational",
+        body: language === "ar"
+          ? "جميع الميزات متاحة بالكامل:"
+          : "All features are fully available:",
+        items: language === "ar" ? [
+          "إنشاء الاختبارات وإدارة المرشحين والنتائج متاح.",
+          "تسجيل الدخول وجميع عمليات القراءة والكتابة تعمل.",
+          "النظام يعمل ضمن نطاق الرخصة المحددة.",
+        ] : [
+          "Exam creation, candidate management, and results are fully available.",
+          "All read and write operations are operational.",
+          "System is running within the licensed domain.",
+        ],
+      }
+    }
+
+    return null
+  }
+
   function getStateIcon(state: string) {
     switch (state) {
       case "Active": return <ShieldCheck className="h-8 w-8 text-green-500" />
@@ -162,6 +302,29 @@ export default function LicensePage() {
               </div>
             </CardHeader>
             <CardContent>
+              {status && (() => {
+                const alert = getStateAlert(status)
+                if (!alert) return null
+                return (
+                  <div className={`rounded-lg border p-4 mb-5 ${alert.wrapperClass}`}>
+                    <div className="flex items-start gap-3">
+                      {alert.icon}
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-semibold text-sm ${alert.titleClass}`}>{alert.title}</p>
+                        <p className={`text-sm mt-1 ${alert.bodyClass}`}>{alert.body}</p>
+                        <ul className="mt-2 space-y-1">
+                          {alert.items.map((item, i) => (
+                            <li key={i} className={`text-sm flex items-start gap-2 ${alert.bodyClass}`}>
+                              <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${alert.dotClass}`} />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()}
               {status && status.state !== "Missing" && status.state !== "Invalid" ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="flex items-center gap-3">

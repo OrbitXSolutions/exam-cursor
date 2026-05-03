@@ -9,6 +9,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -146,7 +147,7 @@ public class ExamProctorService : IExamProctorService
             {
                 ExamId = dto.ExamId,
                 ProctorId = proctorId,
-                AssignedAt = DateTime.UtcNow,
+                AssignedAt = UaeTimeHelper.NowUae,
                 AssignedBy = assignedBy
             });
             success++;
@@ -192,7 +193,7 @@ public class ExamProctorService : IExamProctorService
         foreach (var r in records)
         {
             r.IsDeleted = true;
-            r.UpdatedDate = DateTime.UtcNow;
+            r.UpdatedDate = UaeTimeHelper.NowUae;
         }
 
         if (success > 0)

@@ -12,6 +12,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Attempt;
 
@@ -101,7 +102,7 @@ public class AttemptService : IAttemptService
     }
 
     // 3. Validate exam schedule
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     if (exam.StartAt.HasValue && now < exam.StartAt.Value)
     {
@@ -308,7 +309,7 @@ public class AttemptService : IAttemptService
     }
 
     // Check if expired
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
     if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value &&
 (attempt.Status == AttemptStatus.Started || attempt.Status == AttemptStatus.InProgress))
     {
@@ -355,7 +356,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptSubmittedDto>.FailureResponse("You do not have access to this attempt");
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     // Check if already submitted or in final state
     if (attempt.Status == AttemptStatus.Submitted)
@@ -460,14 +461,14 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptTimerDto>.SuccessResponse(new AttemptTimerDto
       {
         AttemptId = attemptId,
-        ServerTime = DateTime.UtcNow,
-        ExpiresAt = attempt.ExpiresAt ?? DateTime.UtcNow,
+        ServerTime = UaeTimeHelper.NowUae,
+        ExpiresAt = attempt.ExpiresAt ?? UaeTimeHelper.NowUae,
         RemainingSeconds = 0,
         Status = AttemptStatus.Expired
       });
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
     var remainingSeconds = 0;
 
     if (attempt.ExpiresAt.HasValue)
@@ -506,7 +507,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
   public async Task<int> ExpireOverdueAttemptsAsync()
   {
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     var overdueAttempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
 .Where(a =>
@@ -596,7 +597,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
           "Attempt expired: disconnect time exceeded allowed limit. Cannot save answers.");
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     // Validate attempt status
     if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
@@ -704,7 +705,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       {
         QuestionId = answer.QuestionId,
         AttemptAnswerId = result.Data?.AttemptAnswerId ?? 0,
-        AnsweredAt = result.Data?.AnsweredAt ?? DateTime.UtcNow,
+        AnsweredAt = result.Data?.AnsweredAt ?? UaeTimeHelper.NowUae,
         Success = result.Success,
         Message = result.Success ? "Saved" : result.Message
       });
@@ -775,7 +776,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<bool>.FailureResponse("Cannot log events for inactive attempt");
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     var attemptEvent = new AttemptEvent
     {
@@ -1263,7 +1264,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<bool>.FailureResponse($"Cannot cancel. Attempt is already {attempt.Status}.");
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     attempt.Status = AttemptStatus.Cancelled;
     attempt.UpdatedDate = now;
@@ -1308,7 +1309,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptSubmittedDto>.FailureResponse("Cannot submit cancelled attempt");
     }
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     attempt.Status = AttemptStatus.Submitted;
     attempt.SubmittedAt = now;
@@ -1357,7 +1358,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
         attempt.Status != AttemptStatus.Resumed)
       return false;
 
-    var now = DateTime.UtcNow;
+    var now = UaeTimeHelper.NowUae;
 
     // Check ProctorSession heartbeat to detect current disconnect gap
     var proctorSession = await _context.Set<ProctorSession>()
@@ -1420,7 +1421,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     return false;
   }
 
-  private DateTime CalculateExpiresAt(DateTime startedAt, int durationMinutes, DateTime? examEndAt)
+  private DateTimeOffset CalculateExpiresAt(DateTimeOffset startedAt, int durationMinutes, DateTimeOffset? examEndAt)
   {
     var durationExpiry = startedAt.AddMinutes(durationMinutes);
 
@@ -1441,7 +1442,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       return 0;
     }
 
-    var remaining = (int)(attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds;
+    var remaining = (int)(attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds;
     return Math.Max(0, remaining);
   }
 
@@ -1614,7 +1615,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       ExamDescriptionEn = exam.DescriptionEn,
       ExamDescriptionAr = exam.DescriptionAr,
       StartedAt = attempt.StartedAt,
-      ExpiresAt = attempt.ExpiresAt ?? DateTime.UtcNow,
+      ExpiresAt = attempt.ExpiresAt ?? UaeTimeHelper.NowUae,
       RemainingSeconds = CalculateRemainingSeconds(attempt),
       TotalQuestions = questions.Count,
       AnsweredQuestions = questions.Count(q => q.CurrentAnswer != null),

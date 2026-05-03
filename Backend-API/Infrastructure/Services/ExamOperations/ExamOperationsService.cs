@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.ExamOperations;
 
@@ -118,7 +119,7 @@ public class ExamOperationsService : IExamOperationsService
             .Select(g => new { CandidateId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(g => g.CandidateId, g => g.Count);
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var items = candidates.Select(c =>
         {
             attemptsByCandidate.TryGetValue(c.Id, out var candidateAttempts);
@@ -210,7 +211,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse(
                 "An unused override already exists for this candidate and exam.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Create the override record
         var overrideRecord = new AdminAttemptOverride
@@ -292,7 +293,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<OperationAddTimeResultDto>.FailureResponse(
                 $"Cannot add time — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var extraSeconds = dto.ExtraMinutes * 60;
 
         if (attempt.ExpiresAt.HasValue)
@@ -384,7 +385,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<TerminateAttemptResultDto>.FailureResponse(
                 $"Cannot terminate — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         attempt.Status = AttemptStatus.ForceSubmitted;
         attempt.SubmittedAt = now;
         attempt.ForceSubmittedBy = adminUserId;
@@ -476,7 +477,7 @@ public class ExamOperationsService : IExamOperationsService
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse(
                 $"Cannot resume — attempt status is '{attempt.Status}'.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         if (attempt.ExpiresAt.HasValue && attempt.ExpiresAt.Value < now)
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse(
                 "Cannot resume — attempt time has expired.");

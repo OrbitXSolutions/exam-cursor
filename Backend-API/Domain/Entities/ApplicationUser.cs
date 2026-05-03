@@ -17,8 +17,8 @@ public class ApplicationUser : IdentityUser
   public virtual Department? Department { get; set; }
 
   // BaseEntity properties
-  public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-  public DateTime? UpdatedDate { get; set; }
+  public DateTimeOffset CreatedDate { get; set; } = UaeTimeHelper.NowUae;
+  public DateTimeOffset? UpdatedDate { get; set; }
   public string? CreatedBy { get; set; }
   public string? UpdatedBy { get; set; }
   public string? DeletedBy { get; set; }
@@ -32,7 +32,7 @@ public class ApplicationUser : IdentityUser
 
   // Refresh Token
   public string? RefreshToken { get; set; }
-  public DateTime? RefreshTokenExpiryTime { get; set; }
+  public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
 }
 
 public enum UserStatus

@@ -10,6 +10,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.CandidateAdmin;
 
@@ -173,14 +174,14 @@ public class CandidateAdminService : ICandidateAdminService
             Email = dto.Email,
             FullName = dto.FullName,
             FullNameAr = dto.FullNameAr,
-            RollNo = dto.RollNo,
+            RollNo = string.IsNullOrWhiteSpace(dto.RollNo) ? null : dto.RollNo,
             PhoneNumber = dto.Mobile,
             DisplayName = dto.FullName,
             Status = UserStatus.Active,
             IsBlocked = false,
             EmailConfirmed = true,
             CreatedBy = createdBy,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             EncryptedPassword = _encryption.Encrypt(password)
         };
 
@@ -231,7 +232,7 @@ public class CandidateAdminService : ICandidateAdminService
         if (dto.FullName != null) { user.FullName = dto.FullName; user.DisplayName = dto.FullName; }
         if (dto.FullNameAr != null) user.FullNameAr = dto.FullNameAr;
         if (dto.Mobile != null) user.PhoneNumber = dto.Mobile;
-        user.UpdatedDate = DateTime.UtcNow;
+        user.UpdatedDate = UaeTimeHelper.NowUae;
         user.UpdatedBy = updatedBy;
 
         var result = await _userManager.UpdateAsync(user);
@@ -261,7 +262,7 @@ public class CandidateAdminService : ICandidateAdminService
             return ApiResponse<bool>.FailureResponse("Candidate not found.");
 
         user.IsBlocked = true;
-        user.UpdatedDate = DateTime.UtcNow;
+        user.UpdatedDate = UaeTimeHelper.NowUae;
         user.UpdatedBy = blockedBy;
         user.RefreshToken = null;
         user.RefreshTokenExpiryTime = null;
@@ -278,7 +279,7 @@ public class CandidateAdminService : ICandidateAdminService
             return ApiResponse<bool>.FailureResponse("Candidate not found.");
 
         user.IsBlocked = false;
-        user.UpdatedDate = DateTime.UtcNow;
+        user.UpdatedDate = UaeTimeHelper.NowUae;
         user.UpdatedBy = updatedBy;
         await _userManager.UpdateAsync(user);
 
@@ -303,7 +304,7 @@ public class CandidateAdminService : ICandidateAdminService
         // Soft delete
         user.IsDeleted = true;
         user.DeletedBy = deletedBy;
-        user.UpdatedDate = DateTime.UtcNow;
+        user.UpdatedDate = UaeTimeHelper.NowUae;
         user.RefreshToken = null;
         user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
@@ -488,7 +489,7 @@ public class CandidateAdminService : ICandidateAdminService
                 IsBlocked = false,
                 EmailConfirmed = true,
                 CreatedBy = createdBy,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = UaeTimeHelper.NowUae,
                 EncryptedPassword = _encryption.Encrypt(finalPassword)
             };
 

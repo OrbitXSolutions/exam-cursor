@@ -9,17 +9,17 @@ namespace Smart_Core.Domain.Entities.Attempt;
 /// </summary>
 public class AttemptEvent : BaseEntity
 {
-public int Id { get; set; }
+  public int Id { get; set; }
 
- public int AttemptId { get; set; }
+  public int AttemptId { get; set; }
 
-    public AttemptEventType EventType { get; set; }
+  public AttemptEventType EventType { get; set; }
 
-    // Extra data (browser info, question id, timestamps, etc.)
-    public string? MetadataJson { get; set; }
+  // Extra data (browser info, question id, timestamps, etc.)
+  public string? MetadataJson { get; set; }
 
-    public DateTime OccurredAt { get; set; }
+  public DateTimeOffset OccurredAt { get; set; }
 
   // Navigation Property
-    public virtual Attempt Attempt { get; set; } = null!;
+  public virtual Attempt Attempt { get; set; } = null!;
 }

@@ -25,8 +25,8 @@ public class Exam : BaseEntity
     // Scheduling
     // For Fixed: StartAt is the exact start time, EndAt is calculated as StartAt + DurationMinutes
     // For Flex: StartAt/EndAt define the availability window when candidates can start the exam
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
 
     // Duration (in minutes) - how long the candidate has once they start
     public int DurationMinutes { get; set; }

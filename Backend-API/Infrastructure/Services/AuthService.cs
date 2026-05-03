@@ -8,6 +8,7 @@ using Smart_Core.Application.DTOs.Users;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -47,7 +48,7 @@ public class AuthService : IAuthService
           Email = dto.Email,
            DisplayName = dto.DisplayName,
  FullName = dto.FullName,
-      CreatedDate = DateTime.UtcNow
+      CreatedDate = UaeTimeHelper.NowUae
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
@@ -72,7 +73,7 @@ public class AuthService : IAuthService
       var refreshToken = _tokenService.GenerateRefreshToken();
 
 user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(
+        user.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddHours(
      double.Parse(_configuration["JwtSettings:RefreshTokenExpirationHours"] ?? "20"));
  await _userManager.UpdateAsync(user);
 
@@ -80,7 +81,7 @@ user.RefreshToken = refreshToken;
         {
          AccessToken = accessToken,
      RefreshToken = refreshToken,
-     Expiration = DateTime.UtcNow.AddHours(
+     Expiration = UaeTimeHelper.NowUae.AddHours(
        double.Parse(_configuration["JwtSettings:AccessTokenExpirationHours"] ?? "1")),
             User = user.Adapt<UserDto>()
         }, "Registration successful. Please check your email to confirm your account.");
@@ -119,7 +120,7 @@ user.RefreshToken = refreshToken;
         var refreshToken = _tokenService.GenerateRefreshToken();
 
       user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(
+        user.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddHours(
             double.Parse(_configuration["JwtSettings:RefreshTokenExpirationHours"] ?? "20"));
         await _userManager.UpdateAsync(user);
 
@@ -130,7 +131,7 @@ var userDto = user.Adapt<UserDto>();
         {
        AccessToken = accessToken,
         RefreshToken = refreshToken,
-     Expiration = DateTime.UtcNow.AddHours(
+     Expiration = UaeTimeHelper.NowUae.AddHours(
            double.Parse(_configuration["JwtSettings:AccessTokenExpirationHours"] ?? "1")),
        User = userDto
         }, "Login successful.");
@@ -224,7 +225,7 @@ return ApiResponse<bool>.FailureResponse(
         }
 
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= UaeTimeHelper.NowUae)
    {
             return ApiResponse<TokenResponseDto>.FailureResponse("Invalid or expired refresh token.");
         }
@@ -234,7 +235,7 @@ return ApiResponse<bool>.FailureResponse(
     var newRefreshToken = _tokenService.GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(
+        user.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddHours(
         double.Parse(_configuration["JwtSettings:RefreshTokenExpirationHours"] ?? "20"));
  await _userManager.UpdateAsync(user);
 
@@ -245,7 +246,7 @@ return ApiResponse<bool>.FailureResponse(
     {
             AccessToken = newAccessToken,
      RefreshToken = newRefreshToken,
-     Expiration = DateTime.UtcNow.AddHours(
+     Expiration = UaeTimeHelper.NowUae.AddHours(
    double.Parse(_configuration["JwtSettings:AccessTokenExpirationHours"] ?? "1")),
      User = userDto
         }, "Token refreshed successfully.");

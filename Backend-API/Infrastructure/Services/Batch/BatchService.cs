@@ -9,6 +9,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Batch;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Batch;
 
@@ -183,7 +184,7 @@ public class BatchService : IBatchService
             Description = dto.Description,
             IsActive = dto.IsActive,
             CreatedBy = createdBy,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = UaeTimeHelper.NowUae
         };
 
         _db.Batches.Add(batch);
@@ -225,7 +226,7 @@ public class BatchService : IBatchService
         if (dto.IsActive.HasValue) batch.IsActive = dto.IsActive.Value;
 
         batch.UpdatedBy = updatedBy;
-        batch.UpdatedDate = DateTime.UtcNow;
+        batch.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
 
@@ -251,7 +252,7 @@ public class BatchService : IBatchService
 
         batch.IsDeleted = true;
         batch.DeletedBy = deletedBy;
-        batch.UpdatedDate = DateTime.UtcNow;
+        batch.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         InvalidateBatchCache();
@@ -267,7 +268,7 @@ public class BatchService : IBatchService
 
         batch.IsActive = !batch.IsActive;
         batch.UpdatedBy = updatedBy;
-        batch.UpdatedDate = DateTime.UtcNow;
+        batch.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         InvalidateBatchCache();
@@ -323,7 +324,7 @@ public class BatchService : IBatchService
             {
                 BatchId = batchId,
                 CandidateId = candidateId,
-                AddedAt = DateTime.UtcNow,
+                AddedAt = UaeTimeHelper.NowUae,
                 AddedBy = addedBy
             });
             result.AffectedCount++;

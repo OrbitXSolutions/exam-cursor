@@ -14,6 +14,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -101,7 +102,7 @@ public class ProctorService : IProctorService
            $"A {dto.Mode} proctor session already exists for this attempt");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var session = new ProctorSession
         {
@@ -250,7 +251,7 @@ public class ProctorService : IProctorService
             return ApiResponse<ProctorSessionDto>.FailureResponse("Session is not active");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         session.Status = ProctorSessionStatus.Completed;
         session.EndedAt = now;
         session.UpdatedDate = now;
@@ -274,7 +275,7 @@ public class ProctorService : IProctorService
             return ApiResponse<bool>.FailureResponse("Session not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         session.Status = ProctorSessionStatus.Cancelled;
         session.EndedAt = now;
         session.UpdatedDate = now;
@@ -392,7 +393,7 @@ public class ProctorService : IProctorService
             return ApiResponse<ProctorEventDto>.FailureResponse("Unauthorized");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var isViolation = IsViolationEvent(dto.EventType, dto.Severity);
 
         var proctorEvent = new ProctorEvent
@@ -444,7 +445,7 @@ public class ProctorService : IProctorService
             return ApiResponse<int>.FailureResponse("Unauthorized");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var events = new List<ProctorEvent>();
         var sequenceNumber = session.TotalEvents;
 
@@ -497,7 +498,7 @@ public class ProctorService : IProctorService
             return ApiResponse<HeartbeatResponseDto>.FailureResponse("Unauthorized");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // --- Disconnect budget check ---
         // If previous heartbeat was stale (gap > threshold), candidate was disconnected
@@ -656,7 +657,7 @@ public class ProctorService : IProctorService
             .OrderBy(r => r.Priority)
             .ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         // BUG FIX: anchor to session end time so time-window rules stay correct on recalculation
         var anchor = session.EndedAt ?? session.UpdatedDate ?? now;
 
@@ -683,7 +684,7 @@ public class ProctorService : IProctorService
 
             if (rule.WindowSeconds > 0)
             {
-                // BUG FIX: use anchor (session end time) not DateTime.UtcNow
+                // BUG FIX: use anchor (session end time) not UaeTimeHelper.NowUae
                 var windowStart = anchor.AddSeconds(-rule.WindowSeconds);
                 relevantEvents = relevantEvents.Where(e => e.OccurredAt >= windowStart);
             }
@@ -811,7 +812,7 @@ public class ProctorService : IProctorService
     /// Persisting these eliminates recalculation on every report page load and ensures consistency.
     /// </summary>
     private static (decimal FaceScore, decimal EyeScore, decimal BehaviorScore, decimal EnvironmentScore)
-        ComputeSubScores(List<AttemptEvent> events, ProctorSession session, DateTime now)
+        ComputeSubScores(List<AttemptEvent> events, ProctorSession session, DateTimeOffset now)
     {
         int c(AttemptEventType t) => events.Count(e => e.EventType == t);
 
@@ -871,7 +872,7 @@ public class ProctorService : IProctorService
     public async Task<ApiResponse<ProctorRiskRuleDto>> CreateRiskRuleAsync(
     SaveProctorRiskRuleDto dto, string userId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var rule = new ProctorRiskRule
         {
@@ -908,7 +909,7 @@ public class ProctorService : IProctorService
             return ApiResponse<ProctorRiskRuleDto>.FailureResponse("Rule not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         rule.NameEn = dto.NameEn;
         rule.NameAr = dto.NameAr;
@@ -942,7 +943,7 @@ public class ProctorService : IProctorService
 
         rule.IsDeleted = true;
         rule.DeletedBy = userId;
-        rule.UpdatedDate = DateTime.UtcNow;
+        rule.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _context.SaveChangesAsync();
 
@@ -960,7 +961,7 @@ public class ProctorService : IProctorService
         }
 
         rule.IsActive = !rule.IsActive;
-        rule.UpdatedDate = DateTime.UtcNow;
+        rule.UpdatedDate = UaeTimeHelper.NowUae;
         rule.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -1003,11 +1004,11 @@ public class ProctorService : IProctorService
                 ExamId = attempt.ExamId,
                 CandidateId = candidateId,
                 Mode = ProctorMode.Soft,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = UaeTimeHelper.NowUae,
                 Status = ProctorSessionStatus.Active,
                 IpAddress = ipAddress,
                 UserAgent = userAgent,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = UaeTimeHelper.NowUae,
                 CreatedBy = candidateId
             };
             _context.Set<ProctorSession>().Add(session);
@@ -1018,7 +1019,7 @@ public class ProctorService : IProctorService
         if (!uploadResult.Success || uploadResult.File == null)
             return ApiResponse<ProctorEvidenceDto>.FailureResponse(uploadResult.Message ?? "Upload failed");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var evidence = new ProctorEvidence
         {
             ProctorSessionId = session.Id,
@@ -1061,7 +1062,7 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<EvidenceUploadResultDto>.FailureResponse("Unauthorized");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var fileName = $"{session.AttemptId}/{dto.Type}/{now:yyyyMMddHHmmss}_{dto.FileName}";
         var filePath = $"/evidence/{fileName}";
 
@@ -1111,7 +1112,7 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<ProctorEvidenceDto>.FailureResponse("Evidence not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         evidence.IsUploaded = true;
         evidence.UploadedAt = now;
@@ -1182,7 +1183,7 @@ UploadEvidenceDto dto, string candidateId)
                    "Decisions can only be made after attempt is submitted or expired");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         if (session.Decision != null)
         {
@@ -1240,7 +1241,7 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<ProctorDecisionDto>.FailureResponse("Decision not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         decision.PreviousStatus = decision.Status;
         decision.Status = dto.NewStatus;
@@ -1339,7 +1340,7 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<List<LiveMonitoringDto>>> GetLiveMonitoringAsync(int examId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var offlineThreshold = now.AddSeconds(-HeartbeatMissedThresholdSeconds);
 
         var activeSessions = await _context.Set<ProctorSession>()
@@ -1366,7 +1367,7 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<int> CheckMissedHeartbeatsAsync(int thresholdSeconds)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var threshold = now.AddSeconds(-thresholdSeconds);
 
         var missedSessions = await _context.Set<ProctorSession>()
@@ -1411,7 +1412,7 @@ UploadEvidenceDto dto, string candidateId)
     /// <inheritdoc />
     public async Task<ApiResponse<List<TriageRecommendationDto>>> GetTriageRecommendationsAsync(int top = 5, bool includeSample = true)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var windowStart = now.AddMinutes(-5); // recent events window
 
         // Get active sessions ordered by risk score descending
@@ -1568,7 +1569,7 @@ UploadEvidenceDto dto, string candidateId)
         if (session == null)
             return ApiResponse<bool>.FailureResponse("Session not found");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         session.IsFlagged = flagged;
         session.UpdatedDate = now;
         session.UpdatedBy = proctorUserId;
@@ -1615,7 +1616,7 @@ UploadEvidenceDto dto, string candidateId)
         if (string.IsNullOrWhiteSpace(message))
             return ApiResponse<bool>.FailureResponse("Warning message is required");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         session.PendingWarningMessage = message;
         session.UpdatedDate = now;
         session.UpdatedBy = proctorUserId;
@@ -1656,7 +1657,7 @@ UploadEvidenceDto dto, string candidateId)
         if (session == null)
             return ApiResponse<bool>.FailureResponse("Session not found");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Mark session as cancelled/terminated
         session.Status = ProctorSessionStatus.Cancelled;
@@ -1776,7 +1777,7 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<int> CleanupExpiredEvidenceAsync()
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var expiredEvidence = await _context.Set<ProctorEvidence>()
       .Where(e => e.ExpiresAt < now && !e.IsExpired)
@@ -1873,7 +1874,7 @@ UploadEvidenceDto dto, string candidateId)
     /// </summary>
     private static ProctorSessionDto? GetSampleSessionDto(int sessionId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var samples = new Dictionary<int, ProctorSessionDto>
         {
             [-1] = new()
@@ -1939,7 +1940,7 @@ UploadEvidenceDto dto, string candidateId)
 
     private static List<ProctorSessionListDto> GenerateSampleSessions()
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         return new List<ProctorSessionListDto>
         {
             new()
@@ -2030,7 +2031,7 @@ UploadEvidenceDto dto, string candidateId)
     {
         // Calculate remaining seconds from the linked Attempt
         int? remainingSeconds = null;
-        DateTime? expiresAt = null;
+        DateTimeOffset? expiresAt = null;
         string? attemptStatus = null;
         if (session.Attempt != null)
         {
@@ -2038,7 +2039,7 @@ UploadEvidenceDto dto, string candidateId)
             attemptStatus = session.Attempt.Status.ToString();
             if (session.Attempt.ExpiresAt.HasValue && session.Attempt.Status == AttemptStatus.InProgress)
             {
-                remainingSeconds = Math.Max(0, (int)(session.Attempt.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds);
+                remainingSeconds = Math.Max(0, (int)(session.Attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds);
             }
             else if (session.Attempt.Status == AttemptStatus.Submitted ||
                      session.Attempt.Status == AttemptStatus.Terminated ||
@@ -2051,7 +2052,7 @@ UploadEvidenceDto dto, string candidateId)
         // Calculate session duration
         var duration = session.EndedAt.HasValue
             ? session.EndedAt.Value - session.StartedAt
-            : DateTime.UtcNow - session.StartedAt;
+            : UaeTimeHelper.NowUae - session.StartedAt;
         var durationStr = duration.TotalHours >= 1
             ? $"{(int)duration.TotalHours}h {duration.Minutes}m {duration.Seconds}s"
             : duration.TotalMinutes >= 1

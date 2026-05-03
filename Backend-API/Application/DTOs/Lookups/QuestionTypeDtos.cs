@@ -5,8 +5,8 @@ public class QuestionTypeDto
     public int Id { get; set; }
     public string NameEn { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     public bool IsDeleted { get; set; }
 }
 

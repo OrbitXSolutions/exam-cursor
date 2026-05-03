@@ -32,7 +32,7 @@ public class IncidentEvidenceLink : BaseEntity
     /// Who linked this evidence
     /// </summary>
     public string? LinkedBy { get; set; }
-    public DateTime? LinkedAt { get; set; }
+    public DateTimeOffset? LinkedAt { get; set; }
 
     // Navigation Properties
     public virtual IncidentCase IncidentCase { get; set; } = null!;

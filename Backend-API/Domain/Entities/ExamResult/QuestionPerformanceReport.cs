@@ -18,7 +18,7 @@ public class QuestionPerformanceReport : BaseEntity
     // Aggregates
     public int TotalAnswers { get; set; }
     public int CorrectAnswers { get; set; }
-public int IncorrectAnswers { get; set; }
+    public int IncorrectAnswers { get; set; }
     public int UnansweredCount { get; set; }
 
     public decimal CorrectRate { get; set; }   // 0..1
@@ -28,7 +28,7 @@ public int IncorrectAnswers { get; set; }
     // Difficulty index (CorrectRate - lower = harder)
     public decimal DifficultyIndex { get; set; }
 
-    public DateTime GeneratedAt { get; set; }
+    public DateTimeOffset GeneratedAt { get; set; }
     public string GeneratedBy { get; set; } = null!;
 
     // Navigation Properties

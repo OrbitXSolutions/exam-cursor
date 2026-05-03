@@ -10,6 +10,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.ExamAssignment;
 
@@ -212,7 +213,7 @@ public class ExamAssignmentService : IExamAssignmentService
                     // Update schedule
                     existing.ScheduleFrom = dto.ScheduleFrom;
                     existing.ScheduleTo = dto.ScheduleTo;
-                    existing.UpdatedDate = DateTime.UtcNow;
+                    existing.UpdatedDate = UaeTimeHelper.NowUae;
                     existing.UpdatedBy = assignedBy;
                     result.SuccessCount++;
                 }
@@ -227,10 +228,10 @@ public class ExamAssignmentService : IExamAssignmentService
                 ScheduleFrom = dto.ScheduleFrom,
                 ScheduleTo = dto.ScheduleTo,
                 IsActive = true,
-                AssignedAt = DateTime.UtcNow,
+                AssignedAt = UaeTimeHelper.NowUae,
                 AssignedBy = assignedBy,
                 CreatedBy = assignedBy,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = UaeTimeHelper.NowUae
             });
             result.SuccessCount++;
             newlyAssignedIds.Add(candidateId);
@@ -308,7 +309,7 @@ public class ExamAssignmentService : IExamAssignmentService
 
             // Soft-deactivate
             assignment.IsActive = false;
-            assignment.UpdatedDate = DateTime.UtcNow;
+            assignment.UpdatedDate = UaeTimeHelper.NowUae;
             result.SuccessCount++;
         }
 

@@ -19,8 +19,8 @@ public class AssignmentCandidateDto
 public class AssignmentCandidateFilterDto
 {
     public int ExamId { get; set; }
-    public DateTime ScheduleFrom { get; set; }
-    public DateTime ScheduleTo { get; set; }
+    public DateTimeOffset ScheduleFrom { get; set; }
+    public DateTimeOffset ScheduleTo { get; set; }
     public int? BatchId { get; set; }
     public string? Search { get; set; }
     public string? Status { get; set; }       // "Active" | "Blocked"
@@ -32,8 +32,8 @@ public class AssignmentCandidateFilterDto
 public class AssignExamDto
 {
     public int ExamId { get; set; }
-    public DateTime ScheduleFrom { get; set; }
-    public DateTime ScheduleTo { get; set; }
+    public DateTimeOffset ScheduleFrom { get; set; }
+    public DateTimeOffset ScheduleTo { get; set; }
     public List<string>? CandidateIds { get; set; }
     public int? BatchId { get; set; }
     public bool ApplyToAllMatchingFilters { get; set; }

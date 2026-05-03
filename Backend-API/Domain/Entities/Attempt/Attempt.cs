@@ -16,9 +16,9 @@ public class Attempt : BaseEntity
     public string CandidateId { get; set; } = null!;
 
     // Timing
-    public DateTime StartedAt { get; set; }
-    public DateTime? SubmittedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
 
     // Status
     public AttemptStatus Status { get; set; }
@@ -36,16 +36,16 @@ public class Attempt : BaseEntity
 
     // Admin control fields
     public string? ForceSubmittedBy { get; set; }
-    public DateTime? ForceSubmittedAt { get; set; }
+    public DateTimeOffset? ForceSubmittedAt { get; set; }
     public int ExtraTimeSeconds { get; set; }
     public int ResumeCount { get; set; }
-    public DateTime? LastActivityAt { get; set; }
+    public DateTimeOffset? LastActivityAt { get; set; }
     public string? IPAddress { get; set; }
     public string? DeviceInfo { get; set; }
 
     // Disconnect tracking
     public int TotalDisconnectSeconds { get; set; }
-    public DateTime? DisconnectDetectedAt { get; set; }
+    public DateTimeOffset? DisconnectDetectedAt { get; set; }
 
     // Navigation Properties
     public virtual Exam Exam { get; set; } = null!;

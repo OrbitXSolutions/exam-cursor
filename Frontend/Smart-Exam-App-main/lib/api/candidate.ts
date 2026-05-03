@@ -52,6 +52,16 @@ export enum AttemptEventType {
   FaceOutOfFrame = 20,
   CameraBlocked = 21,
   HeadTurnDetected = 22,
+  ScreenshotAttempt = 24,
+  // Screen monitoring events (aligned with backend ProctorEventType values)
+  ScreenShareStarted = 57,
+  ScreenShareEnded = 58,
+  ScreenShareRequested = 70,
+  ScreenShareDenied = 71,
+  ScreenShareLost = 72,
+  ScreenShareResumed = 73,
+  ScreenSharePermissionRevoked = 74,
+  ScreenShareTrackEnded = 75,
 }
 
 // Journey Stage - mapped from internal statuses

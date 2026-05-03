@@ -5,6 +5,7 @@ using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -129,10 +130,10 @@ public class IdentityVerificationService : IIdentityVerificationService
 
         entity.Status = status.Value;
         entity.ReviewedBy = reviewerId;
-        entity.ReviewedAt = DateTime.UtcNow;
+        entity.ReviewedAt = UaeTimeHelper.NowUae;
         entity.ReviewNotes = dto.Reason;
         entity.UpdatedBy = reviewerId;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _context.SaveChangesAsync();
 
@@ -165,10 +166,10 @@ public class IdentityVerificationService : IIdentityVerificationService
                 {
                     entity.Status = status.Value;
                     entity.ReviewedBy = reviewerId;
-                    entity.ReviewedAt = DateTime.UtcNow;
+                    entity.ReviewedAt = UaeTimeHelper.NowUae;
                     entity.ReviewNotes = dto.Reason;
                     entity.UpdatedBy = reviewerId;
-                    entity.UpdatedDate = DateTime.UtcNow;
+                    entity.UpdatedDate = UaeTimeHelper.NowUae;
                     result.Succeeded++;
                 }
                 catch (Exception ex)
@@ -206,7 +207,7 @@ public class IdentityVerificationService : IIdentityVerificationService
         string candidateId, string? idDocumentType, string? idNumber,
         string selfiePath, string idDocumentPath, string? deviceInfo, string? ipAddress)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Check if candidate already has a pending/approved verification
         var existing = await _context.IdentityVerifications
@@ -394,7 +395,7 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     private static List<IdentityVerificationListDto> GenerateSampleVerifications()
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         return new List<IdentityVerificationListDto>
         {
             new()
@@ -432,7 +433,7 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     private static IdentityVerificationDetailDto? GenerateSampleDetail(int id)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         return id switch
         {
             -1 => new IdentityVerificationDetailDto

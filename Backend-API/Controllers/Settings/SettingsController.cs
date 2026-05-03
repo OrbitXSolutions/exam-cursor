@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Settings;
 
@@ -59,7 +60,7 @@ public class SettingsController : ControllerBase
             entity.SupportUrl = dto.Brand.SupportUrl ?? "";
             entity.PrimaryColor = dto.Brand.PrimaryColor ?? "#0d9488";
         }
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.EnableLiveVideo = dto.EnableLiveVideo;
         entity.EnableVideoRecording = dto.EnableVideoRecording;
         entity.EnableSmartMonitoring = dto.EnableSmartMonitoring;

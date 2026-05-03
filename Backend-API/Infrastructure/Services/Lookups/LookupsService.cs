@@ -9,6 +9,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Lookups;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Lookups;
 
@@ -130,7 +131,7 @@ public class LookupsService : ILookupsService
         {
             NameEn = dto.NameEn,
             NameAr = dto.NameAr,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -174,7 +175,7 @@ public class LookupsService : ILookupsService
 
         entity.NameEn = dto.NameEn;
         entity.NameAr = dto.NameAr;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -290,7 +291,7 @@ public class LookupsService : ILookupsService
         {
             NameEn = dto.NameEn,
             NameAr = dto.NameAr,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -334,7 +335,7 @@ public class LookupsService : ILookupsService
 
         entity.NameEn = dto.NameEn;
         entity.NameAr = dto.NameAr;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -520,7 +521,7 @@ public class LookupsService : ILookupsService
             NameEn = dto.NameEn,
             NameAr = dto.NameAr,
             DepartmentId = departmentId,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -589,7 +590,7 @@ public class LookupsService : ILookupsService
 
         entity.NameEn = dto.NameEn;
         entity.NameAr = dto.NameAr;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -808,7 +809,7 @@ public class LookupsService : ILookupsService
             NameEn = dto.NameEn,
             NameAr = dto.NameAr,
             SubjectId = dto.SubjectId,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -897,7 +898,7 @@ public class LookupsService : ILookupsService
         entity.NameEn = dto.NameEn;
         entity.NameAr = dto.NameAr;
         entity.SubjectId = dto.SubjectId;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();

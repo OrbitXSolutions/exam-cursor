@@ -6,6 +6,7 @@ using Smart_Core.Application.DTOs.Roles;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -91,7 +92,7 @@ public class RoleService : IRoleService
     {
       Name = dto.Name,
       Description = dto.Description,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -130,7 +131,7 @@ public class RoleService : IRoleService
 
     role.Name = dto.Name;
     role.Description = dto.Description;
-    role.UpdatedDate = DateTime.UtcNow;
+    role.UpdatedDate = UaeTimeHelper.NowUae;
     role.UpdatedBy = updatedBy;
 
     var result = await _roleManager.UpdateAsync(role);

@@ -202,5 +202,51 @@ public enum AttemptEventType : byte
     /// <summary>
     /// Attempt expired due to exceeding disconnect time budget
     /// </summary>
-    DisconnectExpired = 23
+    DisconnectExpired = 23,
+
+    /// <summary>
+    /// Screenshot attempt detected on mobile device
+    /// </summary>
+    ScreenshotAttempt = 24,
+
+    // Screen monitoring events (57-75, aligned with ProctorEventType)
+    /// <summary>
+    /// Screen share started
+    /// </summary>
+    ScreenShareStarted = 57,
+
+    /// <summary>
+    /// Screen share ended
+    /// </summary>
+    ScreenShareEnded = 58,
+
+    /// <summary>
+    /// Screen share permission requested from candidate
+    /// </summary>
+    ScreenShareRequested = 70,
+
+    /// <summary>
+    /// Candidate denied screen share permission
+    /// </summary>
+    ScreenShareDenied = 71,
+
+    /// <summary>
+    /// Screen share stream lost unexpectedly
+    /// </summary>
+    ScreenShareLost = 72,
+
+    /// <summary>
+    /// Screen share resumed after loss
+    /// </summary>
+    ScreenShareResumed = 73,
+
+    /// <summary>
+    /// Candidate revoked screen share permission
+    /// </summary>
+    ScreenSharePermissionRevoked = 74,
+
+    /// <summary>
+    /// Screen share track ended (browser stop sharing)
+    /// </summary>
+    ScreenShareTrackEnded = 75
 }

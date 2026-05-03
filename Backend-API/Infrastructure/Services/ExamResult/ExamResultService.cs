@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Domain.Entities.Grading;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.ExamResult;
 
@@ -89,7 +90,7 @@ public class ExamResultService : IExamResultService
           "Result already exists for this attempt. Use update if re-grading was performed.");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var attempt = gradingSession.Attempt;
         var exam = attempt.Exam;
         var maxPossibleScore = attempt.Questions.Sum(q => q.Points);
@@ -239,7 +240,7 @@ public class ExamResultService : IExamResultService
             return await FinalizeResultAsync(gradingSessionId, userId);
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var exam = gradingSession.Attempt.Exam;
         var maxPossibleScore = gradingSession.Attempt.Questions.Sum(q => q.Points);
         var totalScore = gradingSession.TotalScore ?? 0;
@@ -286,7 +287,7 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Result is already published");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         result.IsPublishedToCandidate = true;
         result.PublishedAt = now;
         result.PublishedBy = userId;
@@ -330,7 +331,7 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultDto>.FailureResponse("Result is not published");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         result.IsPublishedToCandidate = false;
         result.UpdatedDate = now;
         result.UpdatedBy = userId;
@@ -347,7 +348,7 @@ public class ExamResultService : IExamResultService
             .Where(r => dto.ResultIds.Contains(r.Id) && !r.IsPublishedToCandidate)
       .ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         foreach (var result in results)
         {
             result.IsPublishedToCandidate = true;
@@ -386,7 +387,7 @@ public class ExamResultService : IExamResultService
 
         var results = await query.ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         foreach (var result in results)
         {
             result.IsPublishedToCandidate = true;
@@ -572,7 +573,7 @@ public class ExamResultService : IExamResultService
             }
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Query attempts
         var attemptsQuery = _context.Attempts.Where(a => a.ExamId == dto.ExamId);
@@ -666,7 +667,7 @@ public class ExamResultService : IExamResultService
             }
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Get all graded answers for this exam
         var gradedAnswers = await _context.GradedAnswers
@@ -1108,7 +1109,7 @@ public class ExamResultService : IExamResultService
             return ApiResponse<ResultExportJobDto>.FailureResponse("Exam not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var job = new ResultExportJob
         {
@@ -1210,7 +1211,7 @@ public class ExamResultService : IExamResultService
 
         job.Status = ExportStatus.Failed;
         job.ErrorMessage = "Cancelled by user";
-        job.UpdatedDate = DateTime.UtcNow;
+        job.UpdatedDate = UaeTimeHelper.NowUae;
         job.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -1236,9 +1237,9 @@ public class ExamResultService : IExamResultService
                 // TODO: Implement actual export logic based on format
                 // For now, mark as completed with placeholder
                 job.Status = ExportStatus.Completed;
-                job.FileName = $"exam_{job.ExamId}_results_{DateTime.UtcNow:yyyyMMddHHmmss}.{job.Format.ToString().ToLower()}";
+                job.FileName = $"exam_{job.ExamId}_results_{UaeTimeHelper.NowUae:yyyyMMddHHmmss}.{job.Format.ToString().ToLower()}";
                 job.FilePath = $"/exports/{job.FileName}";
-                job.CompletedAt = DateTime.UtcNow;
+                job.CompletedAt = UaeTimeHelper.NowUae;
 
                 processedCount++;
             }
@@ -1289,7 +1290,7 @@ public class ExamResultService : IExamResultService
             return null;
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var bestResult = results.First();
         var latestResult = results.OrderByDescending(r => r.FinalizedAt).First();
 

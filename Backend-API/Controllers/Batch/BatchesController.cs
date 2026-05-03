@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Batch;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Batch;
 
@@ -100,7 +101,7 @@ public class BatchesController : ControllerBase
     public async Task<IActionResult> ExportBatchCandidates(int id)
     {
         var bytes = await _service.ExportBatchCandidatesAsync(id);
-        var fileName = $"batch_{id}_candidates_{DateTime.UtcNow:yyyy-MM-dd}.xlsx";
+        var fileName = $"batch_{id}_candidates_{UaeTimeHelper.NowUae:yyyy-MM-dd}.xlsx";
         return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 }

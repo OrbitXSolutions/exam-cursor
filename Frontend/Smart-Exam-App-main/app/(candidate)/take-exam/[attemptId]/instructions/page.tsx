@@ -591,7 +591,7 @@ export default function ExamInstructionsPage() {
                   <Award className="h-5 w-5 text-primary" />
                   <div>
                     <p className="text-sm text-muted-foreground">{t("exams.passScore")}</p>
-                    <p className="font-medium">{examPreview.passScore} / {examPreview.totalPoints}</p>
+                    <p className="font-medium">{Number(examPreview.passScore).toFixed(2).replace(/\.?0+$/, "")} / {Number(examPreview.totalPoints).toFixed(2).replace(/\.?0+$/, "")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">

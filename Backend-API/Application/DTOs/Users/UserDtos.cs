@@ -12,7 +12,7 @@ public class UserDto
     public string Status { get; set; } = string.Empty;
     public bool EmailConfirmed { get; set; }
     public List<string> Roles { get; set; } = new();
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int? DepartmentId { get; set; }
     public string? DepartmentNameEn { get; set; }
     public string? DepartmentNameAr { get; set; }
@@ -22,7 +22,7 @@ public class UserDetailDto : UserDto
 {
     public string? PhoneNumber { get; set; }
     public bool PhoneNumberConfirmed { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
 }

@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities.Incident;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Incident;
 
@@ -53,7 +54,7 @@ public class IncidentService : IIncidentService
            $"An active incident case already exists for this attempt (Case #{existingCase.CaseNumber})");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var caseNumber = await GenerateCaseNumberAsync();
 
         // Get risk info from proctor session if available
@@ -201,7 +202,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCaseDto>.FailureResponse("Cannot update a closed case");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var changes = new List<string>();
 
         if (dto.Severity.HasValue && dto.Severity.Value != incidentCase.Severity)
@@ -310,7 +311,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCaseDto>.FailureResponse("Assignee not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var previousAssignee = incidentCase.AssignedTo;
 
         incidentCase.AssignedTo = dto.AssigneeId;
@@ -359,7 +360,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
                $"Invalid status transition from {oldStatus} to {dto.NewStatus}");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         incidentCase.Status = dto.NewStatus;
         incidentCase.UpdatedDate = now;
         incidentCase.UpdatedBy = userId;
@@ -405,7 +406,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCaseDto>.FailureResponse("Only closed or resolved cases can be reopened");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var oldStatus = incidentCase.Status;
 
         incidentCase.Status = IncidentStatus.InReview;
@@ -442,7 +443,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentEvidenceLinkDto>.FailureResponse("Cannot add evidence to a closed case");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Get the next order number
         var maxOrder = await _context.Set<IncidentEvidenceLink>()
@@ -511,7 +512,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         link.IsDeleted = true;
         link.DeletedBy = userId;
-        link.UpdatedDate = DateTime.UtcNow;
+        link.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _context.SaveChangesAsync();
 
@@ -548,7 +549,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             currentRiskScore = proctorSession?.RiskScore;
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var decision = new IncidentDecisionHistory
         {
@@ -654,7 +655,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
         }
 
         var author = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var comment = new IncidentComment
         {
@@ -694,7 +695,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCommentDto>.FailureResponse("You can only edit your own comments");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         comment.Body = dto.Body;
         comment.IsEdited = true;
         comment.EditedAt = now;
@@ -719,7 +720,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         comment.IsDeleted = true;
         comment.DeletedBy = userId;
-        comment.UpdatedDate = DateTime.UtcNow;
+        comment.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _context.SaveChangesAsync();
 
@@ -801,7 +802,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<AppealRequestDto>.FailureResponse("An appeal is already pending for this case");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var appealNumber = await GenerateAppealNumberAsync();
 
         var appeal = new AppealRequest
@@ -920,7 +921,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<AppealRequestDto>.FailureResponse("Appeal has already been reviewed");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         appeal.Status = dto.Decision;
         appeal.ReviewedBy = reviewerId;
@@ -1117,7 +1118,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<int> ProcessProctorIncidentsAsync(decimal riskThreshold, int violationThreshold)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var createdCount = 0;
 
         // Find completed proctor sessions that exceed thresholds and don't have incidents
@@ -1211,7 +1212,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     private async Task<string> GenerateCaseNumberAsync()
     {
-        var today = DateTime.UtcNow;
+        var today = UaeTimeHelper.NowUae;
         var prefix = $"INC-{today:yyyyMMdd}";
         var count = await _context.Set<IncidentCase>()
            .CountAsync(c => c.CaseNumber.StartsWith(prefix));
@@ -1220,7 +1221,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     private async Task<string> GenerateAppealNumberAsync()
     {
-        var today = DateTime.UtcNow;
+        var today = UaeTimeHelper.NowUae;
         var prefix = $"APL-{today:yyyyMMdd}";
         var count = await _context.Set<AppealRequest>()
   .CountAsync(a => a.AppealNumber.StartsWith(prefix));
@@ -1231,7 +1232,7 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
      string actorId, string descriptionEn, string descriptionAr, object? metadata = null)
     {
         var actor = await _context.Users.FirstOrDefaultAsync(u => u.Id == actorId);
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var timelineEvent = new IncidentTimelineEvent
         {

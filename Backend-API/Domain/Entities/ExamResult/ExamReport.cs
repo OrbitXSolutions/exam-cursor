@@ -14,8 +14,8 @@ public class ExamReport : BaseEntity
     public int ExamId { get; set; }
 
     // Reporting window (optional)
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
 
     // Attempt aggregates
     public int TotalAttempts { get; set; }
@@ -29,14 +29,14 @@ public class ExamReport : BaseEntity
     // Score aggregates
     public decimal AverageScore { get; set; }
     public decimal HighestScore { get; set; }
- public decimal LowestScore { get; set; }
+    public decimal LowestScore { get; set; }
     public decimal PassRate { get; set; }
 
     // Optional: integrity/proctoring aggregates
     public int? TotalFlaggedAttempts { get; set; }
     public decimal? AverageRiskScore { get; set; }
 
-    public DateTime GeneratedAt { get; set; }
+    public DateTimeOffset GeneratedAt { get; set; }
     public string GeneratedBy { get; set; } = null!;
 
     // Navigation Properties

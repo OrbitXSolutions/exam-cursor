@@ -18,8 +18,8 @@ public class ExamDto
     public string TitleAr { get; set; } = string.Empty;
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public int MaxAttempts { get; set; }
     public bool ShuffleQuestions { get; set; }
@@ -110,8 +110,8 @@ public class ExamDto
 
     #endregion
 
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     public int SectionsCount { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
@@ -132,13 +132,13 @@ public class ExamListDto
     public ExamType ExamType { get; set; }
     public string TitleEn { get; set; } = string.Empty;
     public string TitleAr { get; set; } = string.Empty;
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public decimal PassScore { get; set; }
     public bool IsPublished { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int SectionsCount { get; set; }
     public int QuestionsCount { get; set; }
     public int TopicsCount { get; set; }
@@ -175,8 +175,8 @@ public class SaveExamDto
     public string TitleAr { get; set; } = string.Empty;
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public int MaxAttempts { get; set; } = 1;
     public bool ShuffleQuestions { get; set; }
@@ -365,8 +365,8 @@ public class CloneExamDto
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public ExamType ExamType { get; set; } = ExamType.Flex;
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
 }
 
@@ -380,8 +380,8 @@ public class ExamSearchDto
     public ExamType? ExamType { get; set; }
     public bool? IsPublished { get; set; }
     public bool? IsActive { get; set; }
-    public DateTime? StartDateFrom { get; set; }
-    public DateTime? StartDateTo { get; set; }
+    public DateTimeOffset? StartDateFrom { get; set; }
+    public DateTimeOffset? StartDateTo { get; set; }
     public bool IncludeDeleted { get; set; } = false;
     /// <summary>
     /// If true, returns only exams from the current user's department.

@@ -33,14 +33,14 @@ public class IncidentCaseDto
     public int? TotalViolationsAtCreate { get; set; }
     public string? AssignedTo { get; set; }
     public string? AssigneeName { get; set; }
-    public DateTime? AssignedAt { get; set; }
+    public DateTimeOffset? AssignedAt { get; set; }
     public IncidentOutcome? Outcome { get; set; }
   public string? OutcomeName => Outcome?.ToString();
     public string? ResolutionNoteEn { get; set; }
     public string? ResolvedBy { get; set; }
     public string? ResolverName { get; set; }
-    public DateTime? ResolvedAt { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset? ResolvedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 public List<IncidentTimelineEventDto> Timeline { get; set; } = new();
     public List<IncidentEvidenceLinkDto> EvidenceLinks { get; set; } = new();
     public List<IncidentDecisionHistoryDto> Decisions { get; set; } = new();
@@ -67,7 +67,7 @@ public class IncidentCaseListDto
     public decimal? RiskScoreAtCreate { get; set; }
     public string? AssigneeName { get; set; }
     public IncidentOutcome? Outcome { get; set; }
- public DateTime CreatedAt { get; set; }
+ public DateTimeOffset CreatedAt { get; set; }
     public bool HasPendingAppeal { get; set; }
 }
 
@@ -112,8 +112,8 @@ public class IncidentCaseSearchDto
  public IncidentOutcome? Outcome { get; set; }
     public string? AssignedTo { get; set; }
     public bool? Unassigned { get; set; }
-    public DateTime? CreatedFrom { get; set; }
-    public DateTime? CreatedTo { get; set; }
+    public DateTimeOffset? CreatedFrom { get; set; }
+    public DateTimeOffset? CreatedTo { get; set; }
     public string? Search { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -155,7 +155,7 @@ public class IncidentTimelineEventDto
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public string? MetadataJson { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
 }
 
 #endregion
@@ -177,7 +177,7 @@ public class IncidentEvidenceLinkDto
     public string? NoteAr { get; set; }
     public int Order { get; set; }
     public string? LinkedBy { get; set; }
-    public DateTime? LinkedAt { get; set; }
+    public DateTimeOffset? LinkedAt { get; set; }
 }
 
 /// <summary>
@@ -208,7 +208,7 @@ public class IncidentDecisionHistoryDto
     public string? ReasonAr { get; set; }
     public string DecidedBy { get; set; } = string.Empty;
     public string? DeciderName { get; set; }
-    public DateTime DecidedAt { get; set; }
+    public DateTimeOffset DecidedAt { get; set; }
     public decimal? RiskScoreAtDecision { get; set; }
     public bool IsAppealDecision { get; set; }
 }
@@ -241,8 +241,8 @@ public class IncidentCommentDto
     public string Body { get; set; } = string.Empty;
     public bool IsVisibleToCandidate { get; set; }
     public bool IsEdited { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? EditedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? EditedAt { get; set; }
 }
 
 /// <summary>
@@ -286,10 +286,10 @@ public class AppealRequestDto
     public string StatusName => Status.ToString();
     public string Message { get; set; } = string.Empty;
     public string? SupportingInfo { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public string? ReviewedBy { get; set; }
     public string? ReviewerName { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
     public string? DecisionNoteEn { get; set; }
     public string? DecisionNoteAr { get; set; }
     public IncidentOutcome? OriginalOutcome { get; set; }
@@ -307,9 +307,9 @@ public class AppealRequestListDto
     public string CandidateName { get; set; } = string.Empty;
   public AppealStatus Status { get; set; }
   public string StatusName => Status.ToString();
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public string? ReviewerName { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
 }
 
 /// <summary>
@@ -343,8 +343,8 @@ public class AppealSearchDto
     public int? ExamId { get; set; }
     public string? CandidateId { get; set; }
     public AppealStatus? Status { get; set; }
-  public DateTime? SubmittedFrom { get; set; }
-    public DateTime? SubmittedTo { get; set; }
+  public DateTimeOffset? SubmittedFrom { get; set; }
+    public DateTimeOffset? SubmittedTo { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -412,8 +412,8 @@ public class CandidateIncidentStatusDto
     public string StatusName => Status.ToString();
     public IncidentOutcome? Outcome { get; set; }
     public string? OutcomeName => Outcome?.ToString();
-    public DateTime CreatedAt { get; set; }
-    public DateTime? ResolvedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? ResolvedAt { get; set; }
     public bool CanAppeal { get; set; }
     public AppealRequestDto? ActiveAppeal { get; set; }
 }

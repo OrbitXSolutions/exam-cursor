@@ -28,7 +28,7 @@ public class AiProctorAnalysisResponseDto
     public string Model { get; set; } = string.Empty;
 
     /// <summary>When the analysis was generated</summary>
-    public DateTime GeneratedAt { get; set; }
+    public DateTimeOffset GeneratedAt { get; set; }
 
     // ── Enhanced Report Sections (backward-compatible, all nullable) ──
 

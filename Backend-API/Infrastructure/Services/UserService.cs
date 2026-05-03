@@ -9,6 +9,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -53,7 +54,7 @@ public class UserService : IUserService
       DepartmentId = dto.DepartmentId,
       EmailConfirmed = true,
       Status = UserStatus.Active,
-      CreatedDate = DateTime.UtcNow,
+      CreatedDate = UaeTimeHelper.NowUae,
       CreatedBy = createdBy
     };
 
@@ -321,7 +322,7 @@ public class UserService : IUserService
       user.DepartmentId = null;
     else if (dto.DepartmentId.HasValue)
       user.DepartmentId = dto.DepartmentId.Value;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = updatedBy;
 
     var result = await _userManager.UpdateAsync(user);
@@ -356,7 +357,7 @@ public class UserService : IUserService
     }
 
     user.IsBlocked = true;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = blockedBy;
 
     await _userManager.UpdateAsync(user);
@@ -379,7 +380,7 @@ public class UserService : IUserService
     }
 
     user.IsBlocked = false;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = unblockedBy;
 
     await _userManager.UpdateAsync(user);
@@ -397,7 +398,7 @@ public class UserService : IUserService
     }
 
     user.Status = UserStatus.Active;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = activatedBy;
 
     await _userManager.UpdateAsync(user);
@@ -421,7 +422,7 @@ public class UserService : IUserService
     }
 
     user.Status = UserStatus.Inactive;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = deactivatedBy;
 
     await _userManager.UpdateAsync(user);
@@ -447,7 +448,7 @@ public class UserService : IUserService
     // Soft delete
     user.IsDeleted = true;
     user.DeletedBy = deletedBy;
-    user.UpdatedDate = DateTime.UtcNow;
+    user.UpdatedDate = UaeTimeHelper.NowUae;
 
     await _userManager.UpdateAsync(user);
 

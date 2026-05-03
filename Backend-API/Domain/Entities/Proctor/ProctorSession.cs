@@ -21,8 +21,8 @@ public class ProctorSession : BaseEntity
     public ProctorMode Mode { get; set; }
 
     // Timing
-    public DateTime StartedAt { get; set; }
-    public DateTime? EndedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? EndedAt { get; set; }
 
     // Status
     public ProctorSessionStatus Status { get; set; }
@@ -58,7 +58,7 @@ public class ProctorSession : BaseEntity
     public decimal? EnvironmentScore { get; set; }
 
     // Last heartbeat tracking
-    public DateTime? LastHeartbeatAt { get; set; }
+    public DateTimeOffset? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
 
     // Proctor flags & warnings

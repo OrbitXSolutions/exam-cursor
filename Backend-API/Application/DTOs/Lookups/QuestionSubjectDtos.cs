@@ -9,8 +9,8 @@ public class QuestionSubjectDto
     public string DepartmentNameEn { get; set; } = string.Empty;
     public string DepartmentNameAr { get; set; } = string.Empty;
     public int TopicsCount { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     public bool IsDeleted { get; set; }
 }
 

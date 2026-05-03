@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Smart_Core.Domain.Common;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Lookups;
@@ -35,7 +36,7 @@ public class DatabaseSeeder
         {
           Name = roleName,
           Description = $"{roleName} role",
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "System"
         };
 
@@ -69,7 +70,7 @@ public class DatabaseSeeder
         DisplayName = "Rowyda",
         FullName = "Rowyda Super Developer",
         Status = UserStatus.Active,
-        CreatedDate = DateTime.UtcNow,
+        CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = "System"
       };
 
@@ -164,7 +165,7 @@ public class DatabaseSeeder
         {
           Name = roleInfo.Name,
           Description = roleInfo.Description,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 
@@ -211,7 +212,7 @@ public class DatabaseSeeder
           DescriptionEn = deptInfo.DescriptionEn,
           DescriptionAr = deptInfo.DescriptionAr,
           IsActive = true,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 
@@ -283,7 +284,7 @@ public class DatabaseSeeder
           FullName = userInfo.FullName,
           DepartmentId = departmentId,
           Status = UserStatus.Active,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 
@@ -365,7 +366,7 @@ new { NameEn = "Taxation", NameAr = "???????" },
         {
           NameEn = catInfo.NameEn,
           NameAr = catInfo.NameAr,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 
@@ -405,7 +406,7 @@ new { NameEn = "Taxation", NameAr = "???????" },
         {
           NameEn = subjectInfo.NameEn,
           NameAr = subjectInfo.NameAr,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 
@@ -444,7 +445,7 @@ new { NameEn = "Taxation", NameAr = "???????" },
         {
           NameEn = typeInfo.NameEn,
           NameAr = typeInfo.NameAr,
-          CreatedDate = DateTime.UtcNow,
+          CreatedDate = UaeTimeHelper.NowUae,
           CreatedBy = "DemoSeeder"
         };
 

@@ -15,9 +15,9 @@ public class AttemptDto
     public string ExamTitleAr { get; set; } = string.Empty;
     public string CandidateId { get; set; } = string.Empty;
     public string CandidateName { get; set; } = string.Empty;
-    public DateTime StartedAt { get; set; }
-    public DateTime? SubmittedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public ExpiryReason ExpiryReason { get; set; }
@@ -29,7 +29,7 @@ public class AttemptDto
     public int TotalQuestions { get; set; }
     public int AnsweredQuestions { get; set; }
     public int RemainingSeconds { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
 
 /// <summary>
@@ -43,8 +43,8 @@ public class AttemptListDto
     public string ExamTitleAr { get; set; } = string.Empty;
     public string CandidateId { get; set; } = string.Empty;
     public string CandidateName { get; set; } = string.Empty;
-    public DateTime StartedAt { get; set; }
-    public DateTime? SubmittedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public ExpiryReason ExpiryReason { get; set; }
@@ -75,8 +75,8 @@ public class AttemptSessionDto
     public string ExamTitleAr { get; set; } = string.Empty;
     public string? ExamDescriptionEn { get; set; }
     public string? ExamDescriptionAr { get; set; }
-    public DateTime StartedAt { get; set; }
-    public DateTime ExpiresAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
     public int RemainingSeconds { get; set; }
     public int TotalQuestions { get; set; }
     public int AnsweredQuestions { get; set; }
@@ -105,8 +105,8 @@ public class AttemptSearchDto
     public int? ExamId { get; set; }
     public string? CandidateId { get; set; }
     public AttemptStatus? Status { get; set; }
-    public DateTime? StartedFrom { get; set; }
-    public DateTime? StartedTo { get; set; }
+    public DateTimeOffset? StartedFrom { get; set; }
+    public DateTimeOffset? StartedTo { get; set; }
     public bool? IsPassed { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -177,7 +177,7 @@ public class AttemptAnswerDto
     public int QuestionId { get; set; }
     public List<int>? SelectedOptionIds { get; set; }
     public string? TextAnswer { get; set; }
-    public DateTime? AnsweredAt { get; set; }
+    public DateTimeOffset? AnsweredAt { get; set; }
 }
 
 /// <summary>
@@ -205,7 +205,7 @@ public class AnswerSavedDto
 {
     public int AttemptAnswerId { get; set; }
     public int QuestionId { get; set; }
-    public DateTime AnsweredAt { get; set; }
+    public DateTimeOffset AnsweredAt { get; set; }
     public bool Success { get; set; }
     public string? Message { get; set; }
 }
@@ -233,7 +233,7 @@ public class AttemptEventDto
     public AttemptEventType EventType { get; set; }
     public string EventTypeName => EventType.ToString();
     public string? MetadataJson { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
 
     // Enrichment fields for AnswerSaved events
     public string? QuestionTextEn { get; set; }
@@ -259,7 +259,7 @@ public class SubmitAttemptDto
 public class AttemptSubmittedDto
 {
     public int AttemptId { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public int TotalQuestions { get; set; }
@@ -277,8 +277,8 @@ public class AttemptSubmittedDto
 public class AttemptTimerDto
 {
     public int AttemptId { get; set; }
-    public DateTime ServerTime { get; set; }
-    public DateTime ExpiresAt { get; set; }
+    public DateTimeOffset ServerTime { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
     public int RemainingSeconds { get; set; }
     public AttemptStatus Status { get; set; }
     public bool IsExpired => RemainingSeconds <= 0 || Status == AttemptStatus.Expired;
@@ -315,7 +315,7 @@ public class AttemptAnswerDetailDto
     public string? TextAnswer { get; set; }
     public bool? IsCorrect { get; set; }
     public decimal? Score { get; set; }
-    public DateTime? AnsweredAt { get; set; }
+    public DateTimeOffset? AnsweredAt { get; set; }
 }
 
 /// <summary>
