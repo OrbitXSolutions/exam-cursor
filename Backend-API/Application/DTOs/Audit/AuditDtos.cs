@@ -1,4 +1,5 @@
 using Smart_Core.Domain.Enums;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Application.DTOs.Audit;
 
@@ -31,7 +32,7 @@ public class AuditLogDto
     public AuditOutcome Outcome { get; set; }
     public string OutcomeName => Outcome.ToString();
     public string? ErrorMessage { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
     public int? DurationMs { get; set; }
 }
 
@@ -50,7 +51,7 @@ public class AuditLogListDto
     public string OutcomeName => Outcome.ToString();
     public AuditSource? Source { get; set; }
     public AuditChannel? Channel { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
     public bool HasSnapshot => !string.IsNullOrEmpty(BeforeJson) || !string.IsNullOrEmpty(AfterJson);
     public string? BeforeJson { get; set; }
     public string? AfterJson { get; set; }
@@ -98,8 +99,8 @@ public class AuditLogSearchDto
     public AuditSource? Source { get; set; }
     public AuditChannel? Channel { get; set; }
     public AuditOutcome? Outcome { get; set; }
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public string? Search { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 50;
@@ -122,8 +123,8 @@ public class EntityHistoryRequestDto
 public class UserActivityRequestDto
 {
     public string UserId { get; set; } = string.Empty;
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 50;
 }
@@ -153,9 +154,9 @@ public class AuditRetentionPolicyDto
     public bool ArchiveBeforeDelete { get; set; }
     public string? ArchiveTarget { get; set; }
     public string? ArchivePathTemplate { get; set; }
-    public DateTime? LastExecutedAt { get; set; }
+    public DateTimeOffset? LastExecutedAt { get; set; }
     public int? LastExecutionCount { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }
 
 /// <summary>
@@ -211,8 +212,8 @@ public class UpdateRetentionPolicyDto
 public class AuditExportJobDto
 {
     public int Id { get; set; }
-    public DateTime FromDate { get; set; }
-    public DateTime ToDate { get; set; }
+    public DateTimeOffset FromDate { get; set; }
+    public DateTimeOffset ToDate { get; set; }
     public string? TenantId { get; set; }
     public string? EntityName { get; set; }
     public string? ActionPrefix { get; set; }
@@ -226,13 +227,13 @@ public class AuditExportJobDto
     public string StatusName => Status.ToString();
     public string RequestedBy { get; set; } = string.Empty;
     public string? RequesterName { get; set; }
-    public DateTime RequestedAt { get; set; }
-    public DateTime? StartedAt { get; set; }
+    public DateTimeOffset RequestedAt { get; set; }
+    public DateTimeOffset? StartedAt { get; set; }
     public string? FileName { get; set; }
     public long? FileSize { get; set; }
     public int? TotalRecords { get; set; }
-    public DateTime? CompletedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public string? ErrorMessage { get; set; }
     public string? DownloadUrl { get; set; }
 }
@@ -243,18 +244,18 @@ public class AuditExportJobDto
 public class AuditExportJobListDto
 {
     public int Id { get; set; }
-    public DateTime FromDate { get; set; }
-    public DateTime ToDate { get; set; }
+    public DateTimeOffset FromDate { get; set; }
+    public DateTimeOffset ToDate { get; set; }
     public ExportFormat Format { get; set; }
     public string FormatName => Format.ToString();
     public ExportStatus Status { get; set; }
     public string StatusName => Status.ToString();
     public string? RequesterName { get; set; }
-    public DateTime RequestedAt { get; set; }
+    public DateTimeOffset RequestedAt { get; set; }
     public int? TotalRecords { get; set; }
-    public DateTime? CompletedAt { get; set; }
-    public bool IsExpired => ExpiresAt.HasValue && ExpiresAt.Value < DateTime.UtcNow;
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; set; }
+    public bool IsExpired => ExpiresAt.HasValue && ExpiresAt.Value < UaeTimeHelper.NowUae;
+    public DateTimeOffset? ExpiresAt { get; set; }
 }
 
 /// <summary>
@@ -262,8 +263,8 @@ public class AuditExportJobListDto
 /// </summary>
 public class CreateExportJobDto
 {
-    public DateTime FromDate { get; set; }
-    public DateTime ToDate { get; set; }
+    public DateTimeOffset FromDate { get; set; }
+    public DateTimeOffset ToDate { get; set; }
     public string? TenantId { get; set; }
     public string? EntityName { get; set; }
     public string? ActionPrefix { get; set; }
@@ -279,8 +280,8 @@ public class ExportJobSearchDto
 {
     public ExportStatus? Status { get; set; }
     public string? RequestedBy { get; set; }
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 20;
 }
@@ -357,7 +358,7 @@ public class AuditChannelSummaryDto
 /// </summary>
 public class AuditTimeSeriesDto
 {
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
     public long Count { get; set; }
     public long SuccessCount { get; set; }
     public long FailureCount { get; set; }
@@ -373,7 +374,7 @@ public class RetentionExecutionResultDto
     public int LogsProcessed { get; set; }
     public int LogsArchived { get; set; }
     public int LogsDeleted { get; set; }
-    public DateTime ExecutedAt { get; set; }
+    public DateTimeOffset ExecutedAt { get; set; }
     public bool Success { get; set; }
     public string? ErrorMessage { get; set; }
 }

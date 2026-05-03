@@ -13,11 +13,11 @@ public class ExamAssignment : BaseEntity
     public string CandidateId { get; set; } = null!;
     public virtual ApplicationUser Candidate { get; set; } = null!;
 
-    public DateTime ScheduleFrom { get; set; }
-    public DateTime ScheduleTo { get; set; }
+    public DateTimeOffset ScheduleFrom { get; set; }
+    public DateTimeOffset ScheduleTo { get; set; }
 
     public bool IsActive { get; set; } = true;
 
-    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset AssignedAt { get; set; } = UaeTimeHelper.NowUae;
     public string? AssignedBy { get; set; }
 }

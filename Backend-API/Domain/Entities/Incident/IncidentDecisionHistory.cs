@@ -11,11 +11,11 @@ public class IncidentDecisionHistory : BaseEntity
 {
     public int Id { get; set; }
 
-  public int IncidentCaseId { get; set; }
+    public int IncidentCaseId { get; set; }
 
     public IncidentOutcome Outcome { get; set; }
 
-public string? ReasonEn { get; set; }
+    public string? ReasonEn { get; set; }
     public string? ReasonAr { get; set; }
 
     /// <summary>
@@ -24,7 +24,7 @@ public string? ReasonEn { get; set; }
     public string? InternalNotes { get; set; }
 
     public string DecidedBy { get; set; } = null!;
-    public DateTime DecidedAt { get; set; }
+    public DateTimeOffset DecidedAt { get; set; }
 
     /// <summary>
     /// Snapshot of risk score at time of decision

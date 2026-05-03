@@ -15,8 +15,8 @@ public class CandidateExamListDto
     public string TitleAr { get; set; } = string.Empty;
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public int MaxAttempts { get; set; }
     public decimal PassScore { get; set; }
@@ -26,7 +26,7 @@ public class CandidateExamListDto
     public bool? MyBestIsPassed { get; set; }
     public int? LatestAttemptId { get; set; }
     public AttemptStatus? LatestAttemptStatus { get; set; }
-    public DateTime? LatestAttemptSubmittedAt { get; set; }
+    public DateTimeOffset? LatestAttemptSubmittedAt { get; set; }
     public bool? LatestAttemptIsResultPublished { get; set; }
     /// <summary>
     /// Server-driven flag: true when candidate is eligible to retake (has attempts left,
@@ -51,8 +51,8 @@ public class CandidateExamPreviewDto
     public string TitleAr { get; set; } = string.Empty;
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public int MaxAttempts { get; set; }
     public int TotalQuestions { get; set; }
@@ -126,8 +126,8 @@ public class CandidateAttemptSessionDto
     public int ExamId { get; set; }
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
-    public DateTime StartedAtUtc { get; set; }
-    public DateTime ExpiresAtUtc { get; set; }
+    public DateTimeOffset StartedAtUtc { get; set; }
+    public DateTimeOffset ExpiresAtUtc { get; set; }
     public int RemainingSeconds { get; set; }
     public AttemptStatus Status { get; set; }
     public int AttemptNumber { get; set; }
@@ -259,12 +259,12 @@ public class CandidateSectionDto
     /// <summary>
     /// When this section's timer started (for section-level timing)
     /// </summary>
-    public DateTime? SectionStartedAtUtc { get; set; }
+    public DateTimeOffset? SectionStartedAtUtc { get; set; }
 
     /// <summary>
     /// When this section's timer expires (for section-level timing)
     /// </summary>
-    public DateTime? SectionExpiresAtUtc { get; set; }
+    public DateTimeOffset? SectionExpiresAtUtc { get; set; }
 
     /// <summary>
     /// Total points for this section
@@ -390,7 +390,7 @@ public class CandidateAnswerDto
     public int QuestionId { get; set; }
     public List<int>? SelectedOptionIds { get; set; }
     public string? TextAnswer { get; set; }
-    public DateTime? AnsweredAt { get; set; }
+    public DateTimeOffset? AnsweredAt { get; set; }
 }
 
 #endregion
@@ -429,7 +429,7 @@ public class CandidateResultSummaryDto
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
     public int AttemptNumber { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
 
     // Only if ShowResults = true
     public decimal? TotalScore { get; set; }
@@ -453,7 +453,7 @@ public class CandidateResultReviewDto
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
     public int AttemptNumber { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public decimal? TotalScore { get; set; }
     public decimal? MaxPossibleScore { get; set; }
     public decimal? Percentage { get; set; }
@@ -513,7 +513,7 @@ public class CandidateDashboardDto
     // Welcome section
     public string CandidateName { get; set; } = string.Empty;
     public string CandidateEmail { get; set; } = string.Empty;
-    public DateTime CurrentDateUtc { get; set; }
+    public DateTimeOffset CurrentDateUtc { get; set; }
 
     // Statistics Cards
     public DashboardStatsDto Stats { get; set; } = new();
@@ -567,7 +567,7 @@ public class QuickActionDto
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
     public string ActionType { get; set; } = string.Empty; // "Resume" or "Start"
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public int? RemainingMinutes { get; set; }
 }
 
@@ -580,8 +580,8 @@ public class UpcomingExamDto
     public string TitleEn { get; set; } = string.Empty;
     public string TitleAr { get; set; } = string.Empty;
     public ExamType ExamType { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int DurationMinutes { get; set; }
     public int TotalQuestions { get; set; }
     public decimal TotalPoints { get; set; }
@@ -599,7 +599,7 @@ public class RecentActivityDto
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
     public int? AttemptId { get; set; }
-    public DateTime ActivityDate { get; set; }
+    public DateTimeOffset ActivityDate { get; set; }
     public string? Description { get; set; }
     public decimal? Score { get; set; }
     public bool? IsPassed { get; set; }
@@ -640,7 +640,7 @@ public class ExamJourneyDto
     /// <summary>
     /// Current date/time (server UTC)
     /// </summary>
-    public DateTime CurrentDateUtc { get; set; }
+    public DateTimeOffset CurrentDateUtc { get; set; }
 
     /// <summary>
     /// Candidate display name
@@ -765,8 +765,8 @@ public class JourneyExamCardDto
     /// <summary>
     /// Exam window
     /// </summary>
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public ExamType ExamType { get; set; }
 }
 

@@ -164,7 +164,7 @@ export default function CandidatesDataPage() {
           fullNameAr: formData.fullNameAr || undefined,
           email: formData.email,
           password: formData.password || undefined,
-          rollNo: formData.rollNo,
+          rollNo: formData.rollNo || undefined,
           mobile: formData.mobile || undefined,
         })
         toast.success(isAr ? "تم إنشاء المرشح بنجاح" : "Candidate created successfully")

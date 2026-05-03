@@ -9,6 +9,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.AttemptControl;
 
@@ -112,7 +113,7 @@ public class AttemptControlService : IAttemptControlService
             })
             .ToListAsync();
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var items = attempts.Select(a =>
         {
@@ -173,7 +174,7 @@ public class AttemptControlService : IAttemptControlService
             return ApiResponse<ForceEndResultDto>.FailureResponse(
                 $"Cannot force-end an attempt with status '{attempt.Status}'. Only InProgress, Paused, or Resumed attempts can be force-ended.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         attempt.Status = AttemptStatus.ForceSubmitted;
         attempt.SubmittedAt = now;
@@ -214,17 +215,17 @@ public class AttemptControlService : IAttemptControlService
         // Notify proctor/candidate via SignalR (server-side, reliable)
         _ = Task.Run(async () =>
         {
-          try
-          {
-            var group = $"attempt_{attempt.Id}";
-            await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
+            try
             {
-              attemptId = attempt.Id,
-              reason = $"Force-ended by administrator: {dto.Reason}",
-              status = "ForceSubmitted"
-            });
-          }
-          catch { /* fire-and-forget */ }
+                var group = $"attempt_{attempt.Id}";
+                await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
+                {
+                    attemptId = attempt.Id,
+                    reason = $"Force-ended by administrator: {dto.Reason}",
+                    status = "ForceSubmitted"
+                });
+            }
+            catch { /* fire-and-forget */ }
         });
 
         // Audit log (fire-and-forget)
@@ -266,7 +267,7 @@ public class AttemptControlService : IAttemptControlService
             return ApiResponse<ResumeResultDto>.FailureResponse(
                 $"Cannot resume an attempt with status '{attempt.Status}'. Only Paused attempts can be resumed.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         // Check schedule window
         if (attempt.Exam.EndAt.HasValue && attempt.Exam.EndAt.Value < now)
@@ -329,7 +330,7 @@ public class AttemptControlService : IAttemptControlService
             return ApiResponse<AddTimeResultDto>.FailureResponse(
                 $"Cannot add time to an attempt with status '{attempt.Status}'. Only InProgress or Resumed attempts can receive extra time.");
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var extraSeconds = dto.ExtraMinutes * 60;
 
         // Extend expiry
@@ -404,7 +405,7 @@ public class AttemptControlService : IAttemptControlService
 
     // ── Helper ─────────────────────────────────────────────────
     private static int CalculateRemainingSeconds(
-        AttemptStatus status, DateTime? expiresAt, DateTime? submittedAt, DateTime now)
+        AttemptStatus status, DateTimeOffset? expiresAt, DateTimeOffset? submittedAt, DateTimeOffset now)
     {
         if (status == AttemptStatus.Submitted || status == AttemptStatus.ForceSubmitted
             || status == AttemptStatus.Expired || status == AttemptStatus.Cancelled

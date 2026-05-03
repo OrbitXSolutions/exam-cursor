@@ -10,6 +10,7 @@ using Smart_Core.Application.Settings;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -161,7 +162,7 @@ _logger.LogInformation("File uploaded successfully: {Id} - {OriginalName}", medi
 // Soft delete in database
   mediaFile.IsDeleted = true;
           mediaFile.DeletedBy = deletedBy;
-            mediaFile.UpdatedDate = DateTime.UtcNow;
+            mediaFile.UpdatedDate = UaeTimeHelper.NowUae;
     
    await _dbContext.SaveChangesAsync();
 

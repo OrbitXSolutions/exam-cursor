@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Settings;
 
@@ -50,7 +51,7 @@ public class OrganizationController : ControllerBase
         org.FooterText = dto.FooterText;
         org.PrimaryColor = dto.PrimaryColor;
         org.IsActive = dto.IsActive;
-        org.UpdatedDate = DateTime.UtcNow;
+        org.UpdatedDate = UaeTimeHelper.NowUae;
         org.UpdatedBy = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         await _db.SaveChangesAsync();
@@ -111,7 +112,7 @@ public class OrganizationController : ControllerBase
         else
             org.FaviconPath = relativePath;
 
-        org.UpdatedDate = DateTime.UtcNow;
+        org.UpdatedDate = UaeTimeHelper.NowUae;
         org.UpdatedBy = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         await _db.SaveChangesAsync();
 
@@ -206,8 +207,8 @@ public class OrganizationSettingsDto
     public string? FooterText { get; set; }
     public string? PrimaryColor { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
 }
 
 public class UpdateOrganizationDto

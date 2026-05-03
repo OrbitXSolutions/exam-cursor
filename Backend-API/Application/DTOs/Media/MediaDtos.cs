@@ -22,7 +22,7 @@ public class MediaFileDto
     public string Path { get; set; } = string.Empty;
     public string? Url { get; set; }
     public string? Folder { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
 
 public class MediaUploadResultDto

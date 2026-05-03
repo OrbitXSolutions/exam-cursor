@@ -10,9 +10,9 @@ public class ExamShareLinkDto
     public int ExamId { get; set; }
     public string ShareToken { get; set; } = string.Empty;
     public string ShareUrl { get; set; } = string.Empty;
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
 
 public class GenerateShareLinkDto
@@ -20,7 +20,7 @@ public class GenerateShareLinkDto
     /// <summary>
     /// Optional: custom expiration. If null, uses exam EndAt or no expiry.
     /// </summary>
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
 }
 
 // ========== Public DTOs (no sensitive data) ==========
@@ -34,7 +34,7 @@ public class PublicExamInfoDto
     public string? DescriptionAr { get; set; }
     public int DurationMinutes { get; set; }
     public int MaxAttempts { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
 
     // Organization branding
     public string? OrganizationName { get; set; }
@@ -79,7 +79,7 @@ public class SelectCandidateResponseDto
 {
     public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
-    public DateTime Expiration { get; set; }
+    public DateTimeOffset Expiration { get; set; }
     public int ExamId { get; set; }
     public string CandidateId { get; set; } = string.Empty;
     public string? CandidateName { get; set; }

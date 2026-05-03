@@ -1,4 +1,4 @@
-"use client"
+import { utcToUaeInput, uaeInputToIso } from "@/lib/utils"
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
@@ -64,6 +64,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   const [loading, setLoading] = useState(false)
   const [loadingExam, setLoadingExam] = useState(isEditMode)
   const [error, setError] = useState<string | null>(null)
+  const [loadedExam, setLoadedExam] = useState<Exam | null>(null)
 
   // Form data matching API spec
   const [formData, setFormData] = useState({
@@ -124,13 +125,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setLoadingExam(true)
       const exam = await getExam(examId!)
 
-      // Format dates for datetime-local input
-      const formatDate = (dateStr: string | null) => {
-        if (!dateStr) return ""
-        const date = new Date(dateStr)
-        return date.toISOString().slice(0, 16)
-      }
+      // Format dates for datetime-local input (UAE time)
+      const formatDate = (dateStr: string | null) => utcToUaeInput(dateStr)
 
+      setLoadedExam(exam)
       setFormData({
         examType: exam.examType,
         titleEn: exam.titleEn,
@@ -495,14 +493,14 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     try {
       setLoading(true)
 
-      const requestBody = {
+      const baseBody = {
         examType: formData.examType,
         titleEn: formData.titleEn,
         titleAr: formData.titleAr || formData.titleEn,
         descriptionEn: formData.descriptionEn || undefined,
         descriptionAr: formData.descriptionAr || undefined,
-        startAt: formData.startAt ? new Date(formData.startAt).toISOString() : undefined,
-        endAt: formData.endAt ? new Date(formData.endAt).toISOString() : undefined,
+        startAt: formData.startAt ? uaeInputToIso(formData.startAt) : undefined,
+        endAt: formData.endAt ? uaeInputToIso(formData.endAt) : undefined,
         durationMinutes: formData.durationMinutes,
         maxAttempts: formData.maxAttempts,
         shuffleQuestions: formData.shuffleQuestions,
@@ -512,12 +510,30 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       }
 
       if (isEditMode) {
+        // Preserve all security/proctoring fields from the loaded exam to avoid resetting them
+        const requestBody = {
+          ...baseBody,
+          showResults: loadedExam?.showResults ?? true,
+          allowReview: loadedExam?.allowReview ?? false,
+          showCorrectAnswers: loadedExam?.showCorrectAnswers ?? false,
+          requireProctoring: loadedExam?.requireProctoring ?? false,
+          requireIdVerification: loadedExam?.requireIdVerification ?? false,
+          requireWebcam: loadedExam?.requireWebcam ?? false,
+          preventCopyPaste: loadedExam?.preventCopyPaste ?? false,
+          preventScreenCapture: loadedExam?.preventScreenCapture ?? false,
+          requireFullscreen: loadedExam?.requireFullscreen ?? false,
+          browserLockdown: loadedExam?.browserLockdown ?? false,
+          maxViolationWarnings: loadedExam?.maxViolationWarnings ?? 0,
+          enableScreenMonitoring: loadedExam?.enableScreenMonitoring ?? false,
+          screenMonitoringMode: loadedExam?.screenMonitoringMode ?? 0,
+          screenShareGracePeriod: loadedExam?.screenShareGracePeriod ?? 20,
+        }
         // Update existing exam
         await updateExam(examId!, requestBody)
         toast.success(t("exams.updateSuccess") || "Exam updated successfully")
       } else {
         // Create new exam
-        const response = await apiClient.post("/Assessment/exams", requestBody) as any
+        const response = await apiClient.post("/Assessment/exams", baseBody) as any
 
         if (response?.success === false) {
           setError(response.message || localizeText("Failed to create exam", "فشل إنشاء الاختبار", language))

@@ -12,10 +12,6 @@ import {
   closeIncidentCase,
   reopenIncidentCase,
   changeIncidentStatus,
-  INCIDENT_STATUS_LABELS,
-  INCIDENT_SEVERITY_LABELS,
-  INCIDENT_OUTCOME_LABELS,
-  INCIDENT_SOURCE_LABELS,
   type IncidentCaseDetailDto,
   type IncidentCommentDto,
 } from "@/lib/api/proctoring"
@@ -103,7 +99,7 @@ export default function IncidentDetailPage() {
       setCaseDetail(detail)
       setComments(cmts)
     } catch (error) {
-      toast.error("Failed to load incident case")
+      toast.error(t("proctor.failedToLoadCase"))
     } finally {
       setLoading(false)
     }
@@ -119,12 +115,12 @@ export default function IncidentDetailPage() {
         reasonEn: decisionReason || undefined,
         closeCase: decisionCloseCase,
       })
-      toast.success("Decision recorded")
+      toast.success(t("proctor.decisionRecorded"))
       setDecisionDialogOpen(false)
       setDecisionReason("")
       loadCase()
     } catch (error: any) {
-      toast.error(error?.message || "Failed to record decision")
+      toast.error(error?.message || t("proctor.failedToRecordDecision"))
     } finally {
       setDecisionLoading(false)
     }
@@ -134,10 +130,10 @@ export default function IncidentDetailPage() {
     if (!caseDetail) return
     try {
       await closeIncidentCase(caseDetail.id)
-      toast.success("Case closed")
+      toast.success(t("proctor.caseClosed"))
       loadCase()
     } catch (error: any) {
-      toast.error(error?.message || "Failed to close case")
+      toast.error(error?.message || t("proctor.failedToCloseCase"))
     }
   }
 
@@ -145,12 +141,12 @@ export default function IncidentDetailPage() {
     if (!caseDetail || !reopenReason.trim()) return
     try {
       await reopenIncidentCase(caseDetail.id, reopenReason.trim())
-      toast.success("Case reopened")
+      toast.success(t("proctor.caseReopened"))
       setReopenDialogOpen(false)
       setReopenReason("")
       loadCase()
     } catch (error: any) {
-      toast.error(error?.message || "Failed to reopen case")
+      toast.error(error?.message || t("proctor.failedToReopenCase"))
     }
   }
 
@@ -158,12 +154,12 @@ export default function IncidentDetailPage() {
     if (!caseDetail) return
     try {
       await changeIncidentStatus(caseDetail.id, parseInt(newStatus), statusReason || undefined)
-      toast.success("Status updated")
+      toast.success(t("proctor.statusUpdated"))
       setStatusDialogOpen(false)
       setStatusReason("")
       loadCase()
     } catch (error: any) {
-      toast.error(error?.message || "Failed to change status")
+      toast.error(error?.message || t("proctor.failedToChangeStatus"))
     }
   }
 
@@ -172,12 +168,12 @@ export default function IncidentDetailPage() {
     try {
       setCommentLoading(true)
       await addIncidentComment({ caseId: caseDetail.id, body: commentBody.trim() })
-      toast.success("Comment added")
+      toast.success(t("proctor.commentAdded"))
       setCommentBody("")
       const cmts = await getIncidentComments(caseDetail.id)
       setComments(cmts)
     } catch (error: any) {
-      toast.error(error?.message || "Failed to add comment")
+      toast.error(error?.message || t("proctor.failedToAddComment"))
     } finally {
       setCommentLoading(false)
     }
@@ -193,7 +189,13 @@ export default function IncidentDetailPage() {
   }
 
   function getSeverityBadge(severity: number) {
-    const label = INCIDENT_SEVERITY_LABELS[severity] ?? "Unknown"
+    const labels: Record<number, string> = {
+      1: t("proctor.severityLow"),
+      2: t("proctor.severityMedium"),
+      3: t("proctor.severityHigh"),
+      4: t("proctor.severityCritical"),
+    }
+    const label = labels[severity] ?? t("common.unknown")
     switch (severity) {
       case 1:
         return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">{label}</Badge>
@@ -209,7 +211,14 @@ export default function IncidentDetailPage() {
   }
 
   function getStatusBadge(status: number) {
-    const label = INCIDENT_STATUS_LABELS[status] ?? "Unknown"
+    const labels: Record<number, string> = {
+      1: t("proctor.statusOpen"),
+      2: t("proctor.statusInReview"),
+      3: t("proctor.statusResolved"),
+      4: t("proctor.statusClosed"),
+      5: t("proctor.statusEscalated"),
+    }
+    const label = labels[status] ?? t("common.unknown")
     switch (status) {
       case 1:
         return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">{label}</Badge>
@@ -227,8 +236,14 @@ export default function IncidentDetailPage() {
   }
 
   function getOutcomeBadge(outcome: number | undefined) {
-    if (outcome === undefined || outcome === null) return <span className="text-muted-foreground">Pending</span>
-    const label = INCIDENT_OUTCOME_LABELS[outcome] ?? "Unknown"
+    if (outcome === undefined || outcome === null) return <span className="text-muted-foreground">{t("proctor.pendingOutcome")}</span>
+    const labels: Record<number, string> = {
+      1: t("proctor.cleared"),
+      2: t("proctor.suspicious"),
+      3: t("proctor.invalidated"),
+      4: t("proctor.statusEscalated"),
+    }
+    const label = labels[outcome] ?? t("common.unknown")
     switch (outcome) {
       case 1:
         return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">{label}</Badge>
@@ -261,8 +276,8 @@ export default function IncidentDetailPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Incident Not Found</h1>
-            <p className="text-muted-foreground mt-1">This incident case does not exist or you don&apos;t have access.</p>
+            <h1 className="text-2xl font-bold text-foreground">{t("proctor.incidentNotFound")}</h1>
+            <p className="text-muted-foreground mt-1">{t("proctor.incidentNotFoundDesc")}</p>
           </div>
         </div>
       </div>
@@ -296,16 +311,16 @@ export default function IncidentDetailPage() {
             <>
               <Button variant="outline" size="sm" onClick={() => setStatusDialogOpen(true)}>
                 <Activity className="h-4 w-4 me-2" />
-                Change Status
+                {t("proctor.changeStatus")}
               </Button>
               <Button variant="outline" size="sm" onClick={() => setDecisionDialogOpen(true)}>
                 <Scale className="h-4 w-4 me-2" />
-                Record Decision
+                {t("proctor.recordDecision")}
               </Button>
               {isResolved && (
                 <Button variant="outline" size="sm" onClick={handleCloseCase}>
                   <Lock className="h-4 w-4 me-2" />
-                  Close Case
+                  {t("proctor.closeCase")}
                 </Button>
               )}
             </>
@@ -313,7 +328,7 @@ export default function IncidentDetailPage() {
           {isClosed && (
             <Button variant="outline" size="sm" onClick={() => setReopenDialogOpen(true)}>
               <RotateCcw className="h-4 w-4 me-2" />
-              Reopen Case
+              {t("proctor.reopenCase")}
             </Button>
           )}
         </div>
@@ -326,43 +341,49 @@ export default function IncidentDetailPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Case Details
+              {t("proctor.caseDetailsCard")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Source</span>
-              <span>{INCIDENT_SOURCE_LABELS[caseDetail.source] ?? "Unknown"}</span>
+              <span className="text-muted-foreground">{t("proctor.sourceLabel")}</span>
+              <span>{(() => {
+                const src = caseDetail.source
+                if (src === 1) return t("proctor.sourceProctor")
+                if (src === 2) return t("proctor.sourceSystem")
+                if (src === 3) return t("proctor.sourceManual")
+                return t("common.unknown")
+              })()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Created</span>
+              <span className="text-muted-foreground">{t("proctor.createdLabel")}</span>
               <span>{formatDateTime(caseDetail.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Outcome</span>
+              <span className="text-muted-foreground">{t("proctor.outcomeLabel")}</span>
               {getOutcomeBadge(caseDetail.outcome)}
             </div>
             {caseDetail.riskScoreAtCreate != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Risk Score</span>
+                <span className="text-muted-foreground">{t("proctor.riskScoreLabel")}</span>
                 <span className="font-mono">{caseDetail.riskScoreAtCreate}</span>
               </div>
             )}
             {caseDetail.assigneeName && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Assigned To</span>
+                <span className="text-muted-foreground">{t("proctor.assignedToLabel")}</span>
                 <span>{caseDetail.assigneeName}</span>
               </div>
             )}
             {caseDetail.resolverName && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Resolved By</span>
+                <span className="text-muted-foreground">{t("proctor.resolvedByLabel")}</span>
                 <span>{caseDetail.resolverName}</span>
               </div>
             )}
             {caseDetail.resolvedAt && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Resolved At</span>
+                <span className="text-muted-foreground">{t("proctor.resolvedAtLabel")}</span>
                 <span>{formatDateTime(caseDetail.resolvedAt)}</span>
               </div>
             )}
@@ -374,29 +395,29 @@ export default function IncidentDetailPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <User className="h-4 w-4" />
-              Candidate
+              {t("proctor.candidateCard")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Name</span>
+              <span className="text-muted-foreground">{t("proctor.nameLabel")}</span>
               <span className="font-medium">{caseDetail.candidateName}</span>
             </div>
             {caseDetail.candidateEmail && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Email</span>
+                <span className="text-muted-foreground">{t("proctor.emailLabel")}</span>
                 <span className="text-xs">{caseDetail.candidateEmail}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Attempt</span>
+              <span className="text-muted-foreground">{t("proctor.attemptLabel")}</span>
               <span>#{caseDetail.attemptNumber} (ID: {caseDetail.attemptId})</span>
             </div>
             {caseDetail.proctorSessionId && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Session</span>
+                <span className="text-muted-foreground">{t("proctor.sessionLabel")}</span>
                 <Link href={`/proctor-center/${caseDetail.proctorSessionId}`} className="text-primary hover:underline">
-                  View Session
+                  {t("proctor.viewSession")}
                 </Link>
               </div>
             )}
@@ -408,23 +429,23 @@ export default function IncidentDetailPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Exam
+              {t("proctor.examCard")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Exam</span>
+              <span className="text-muted-foreground">{t("proctor.examLabel")}</span>
               <span className="font-medium text-end max-w-[180px] truncate" title={caseDetail.examTitleEn}>
                 {caseDetail.examTitleEn}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Exam ID</span>
+              <span className="text-muted-foreground">{t("proctor.examIdLabel")}</span>
               <span>{caseDetail.examId}</span>
             </div>
             {caseDetail.totalViolationsAtCreate != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Violations at Create</span>
+                <span className="text-muted-foreground">{t("proctor.violationsAtCreate")}</span>
                 <span>{caseDetail.totalViolationsAtCreate}</span>
               </div>
             )}
@@ -450,10 +471,10 @@ export default function IncidentDetailPage() {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {tab === "timeline" && "Timeline"}
-            {tab === "evidence" && `Evidence (${caseDetail.evidenceLinks?.length ?? 0})`}
-            {tab === "decisions" && `Decisions (${caseDetail.decisions?.length ?? 0})`}
-            {tab === "comments" && `Comments (${comments.length})`}
+            {tab === "timeline" && t("proctor.tabTimeline")}
+            {tab === "evidence" && `${t("proctor.tabEvidence")} (${caseDetail.evidenceLinks?.length ?? 0})`}
+            {tab === "decisions" && `${t("proctor.tabDecisions")} (${caseDetail.decisions?.length ?? 0})`}
+            {tab === "comments" && `${t("proctor.tabComments")} (${comments.length})`}
           </button>
         ))}
       </div>
@@ -463,7 +484,7 @@ export default function IncidentDetailPage() {
         <Card>
           <CardContent className="p-6">
             {caseDetail.timeline?.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No timeline events yet</p>
+              <p className="text-muted-foreground text-center py-8">{t("proctor.noTimelineEvents")}</p>
             ) : (
               <div className="space-y-4">
                 {caseDetail.timeline?.map((event) => (
@@ -480,7 +501,7 @@ export default function IncidentDetailPage() {
                         <span className="text-xs text-muted-foreground">{formatDateTime(event.occurredAt)}</span>
                       </div>
                       {event.actorName && (
-                        <p className="text-xs text-muted-foreground mt-0.5">by {event.actorName}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{t("proctor.byActorLabel", { name: event.actorName })}</p>
                       )}
                       {event.descriptionEn && (
                         <p className="text-sm text-muted-foreground mt-1">{event.descriptionEn}</p>
@@ -498,7 +519,7 @@ export default function IncidentDetailPage() {
         <Card>
           <CardContent className="p-6">
             {caseDetail.evidenceLinks?.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No evidence linked yet</p>
+              <p className="text-muted-foreground text-center py-8">{t("proctor.noEvidenceLinked")}</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {caseDetail.evidenceLinks?.map((evidence) => (
@@ -522,13 +543,13 @@ export default function IncidentDetailPage() {
                             className="text-primary hover:underline text-sm flex items-center gap-1"
                           >
                             <Eye className="h-3 w-3" />
-                            View
+                            {t("proctor.viewEvidence")}
                           </a>
                         )}
                       </div>
                       {evidence.linkedAt && (
                         <p className="text-xs text-muted-foreground mt-2">
-                          Linked {formatDateTime(evidence.linkedAt)}
+                            {t("proctor.linkedAt", { date: formatDateTime(evidence.linkedAt) })}
                         </p>
                       )}
                     </CardContent>
@@ -544,7 +565,7 @@ export default function IncidentDetailPage() {
         <Card>
           <CardContent className="p-6">
             {caseDetail.decisions?.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No decisions recorded yet</p>
+              <p className="text-muted-foreground text-center py-8">{t("proctor.noDecisionsRecorded")}</p>
             ) : (
               <div className="space-y-4">
                 {caseDetail.decisions?.map((decision) => (
@@ -558,7 +579,7 @@ export default function IncidentDetailPage() {
                     </div>
                     {decision.deciderName && (
                       <p className="text-sm text-muted-foreground mt-2">
-                        Decided by: {decision.deciderName}
+                        {t("proctor.decidedByLabel", { name: decision.deciderName })}
                       </p>
                     )}
                     {decision.reasonEn && (
@@ -566,7 +587,7 @@ export default function IncidentDetailPage() {
                     )}
                     {decision.riskScoreAtDecision != null && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Risk score at decision: {decision.riskScoreAtDecision}
+                        {t("proctor.riskAtDecision", { score: decision.riskScoreAtDecision })}
                       </p>
                     )}
                   </div>
@@ -583,7 +604,7 @@ export default function IncidentDetailPage() {
             {/* Add comment */}
             <div className="flex gap-3">
               <Textarea
-                placeholder="Add a comment..."
+                placeholder={t("proctor.addCommentPlaceholder")}
                 value={commentBody}
                 onChange={(e) => setCommentBody(e.target.value)}
                 rows={2}
@@ -602,7 +623,7 @@ export default function IncidentDetailPage() {
             <Separator />
 
             {comments.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">No comments yet</p>
+              <p className="text-muted-foreground text-center py-4">{t("proctor.noCommentsYet")}</p>
             ) : (
               <div className="space-y-4">
                 {comments.map((comment) => (
@@ -612,7 +633,7 @@ export default function IncidentDetailPage() {
                         <User className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium text-sm">{comment.authorName ?? "Unknown"}</span>
                         {comment.isEdited && (
-                          <span className="text-xs text-muted-foreground">(edited)</span>
+                          <span className="text-xs text-muted-foreground">{t("proctor.editedLabel")}</span>
                         )}
                       </div>
                       <span className="text-xs text-muted-foreground">{formatDateTime(comment.createdAt)}</span>
@@ -630,30 +651,30 @@ export default function IncidentDetailPage() {
       <Dialog open={decisionDialogOpen} onOpenChange={setDecisionDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
-            <DialogTitle>Record Decision</DialogTitle>
+            <DialogTitle>{t("proctor.recordDecisionTitle")}</DialogTitle>
             <DialogDescription>
-              Record a formal decision on case {caseDetail.caseNumber}
+              {t("proctor.recordDecisionDesc", { caseNumber: caseDetail.caseNumber })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Outcome</Label>
+              <Label>{t("proctor.outcomeField")}</Label>
               <Select value={decisionOutcome} onValueChange={setDecisionOutcome}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Cleared — No wrongdoing found</SelectItem>
-                  <SelectItem value="2">Suspicious — Flagged for monitoring</SelectItem>
-                  <SelectItem value="3">Invalidated — Exam result voided</SelectItem>
-                  <SelectItem value="4">Escalated — Referred to higher authority</SelectItem>
+                  <SelectItem value="1">{t("proctor.outcomeCleared")}</SelectItem>
+                  <SelectItem value="2">{t("proctor.outcomeSuspicious")}</SelectItem>
+                  <SelectItem value="3">{t("proctor.outcomeInvalidated")}</SelectItem>
+                  <SelectItem value="4">{t("proctor.outcomeEscalated")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Reason / Notes</Label>
+              <Label>{t("proctor.reasonNotes")}</Label>
               <Textarea
-                placeholder="Explain your decision..."
+                placeholder={t("proctor.explainDecision")}
                 value={decisionReason}
                 onChange={(e) => setDecisionReason(e.target.value)}
                 rows={3}
@@ -668,15 +689,15 @@ export default function IncidentDetailPage() {
                 className="rounded"
               />
               <Label htmlFor="closeCase" className="cursor-pointer text-sm">
-                Also close this case after recording the decision
+                {t("proctor.closeCaseAfterDecision")}
               </Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDecisionDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDecisionDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleRecordDecision} disabled={decisionLoading}>
               {decisionLoading ? <LoadingSpinner size="sm" className="me-2" /> : null}
-              Record Decision
+              {t("proctor.recordDecision")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -686,38 +707,38 @@ export default function IncidentDetailPage() {
       <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Change Status</DialogTitle>
+            <DialogTitle>{t("proctor.changeStatusTitle")}</DialogTitle>
             <DialogDescription>
-              Update the status of case {caseDetail.caseNumber}
+              {t("proctor.changeStatusDesc", { caseNumber: caseDetail.caseNumber })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>New Status</Label>
+              <Label>{t("proctor.newStatusLabel")}</Label>
               <Select value={newStatus} onValueChange={setNewStatus}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Open</SelectItem>
-                  <SelectItem value="2">In Review</SelectItem>
-                  <SelectItem value="3">Resolved</SelectItem>
-                  <SelectItem value="5">Escalated</SelectItem>
+                  <SelectItem value="1">{t("proctor.statusOpen")}</SelectItem>
+                  <SelectItem value="2">{t("proctor.statusInReview")}</SelectItem>
+                  <SelectItem value="3">{t("proctor.statusResolved")}</SelectItem>
+                  <SelectItem value="5">{t("proctor.statusEscalated")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Reason (optional)</Label>
+              <Label>{t("proctor.reasonOptionalField")}</Label>
               <Input
-                placeholder="Why are you changing the status?"
+                placeholder={t("proctor.whyChangingStatus")}
                 value={statusReason}
                 onChange={(e) => setStatusReason(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleChangeStatus}>Update Status</Button>
+            <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleChangeStatus}>{t("proctor.updateStatus")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -726,16 +747,16 @@ export default function IncidentDetailPage() {
       <Dialog open={reopenDialogOpen} onOpenChange={setReopenDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Reopen Case</DialogTitle>
+            <DialogTitle>{t("proctor.reopenCaseTitle")}</DialogTitle>
             <DialogDescription>
-              Provide a reason for reopening case {caseDetail.caseNumber}
+              {t("proctor.reopenCaseDesc", { caseNumber: caseDetail.caseNumber })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Reason *</Label>
+              <Label>{t("proctor.reasonRequired")}</Label>
               <Textarea
-                placeholder="Why are you reopening this case?"
+                placeholder={t("proctor.whyReopening")}
                 value={reopenReason}
                 onChange={(e) => setReopenReason(e.target.value)}
                 rows={3}
@@ -743,8 +764,8 @@ export default function IncidentDetailPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setReopenDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleReopenCase} disabled={!reopenReason.trim()}>Reopen Case</Button>
+            <Button variant="outline" onClick={() => setReopenDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleReopenCase} disabled={!reopenReason.trim()}>{t("proctor.reopenCase")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

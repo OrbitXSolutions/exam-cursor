@@ -15,7 +15,7 @@ public class QuestionOptionDto
   public decimal? Points { get; set; }
   public int Order { get; set; }
   public string? AttachmentPath { get; set; }
-  public DateTime CreatedDate { get; set; }
+  public DateTimeOffset CreatedDate { get; set; }
 }
 
 public class CreateQuestionOptionDto

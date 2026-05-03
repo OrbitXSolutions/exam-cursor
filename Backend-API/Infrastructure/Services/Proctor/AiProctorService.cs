@@ -13,6 +13,7 @@ using Smart_Core.Domain.Entities.Attempt;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -101,7 +102,7 @@ public class AiProctorService : IAiProctorService
                     Confidence = 100,
                     DetailedAnalysis = "The session has no recorded events or violations. This may indicate the session just started or the monitoring system has not captured any activity yet.",
                     Model = _openAiSettings.Model,
-                    GeneratedAt = DateTime.UtcNow,
+                    GeneratedAt = UaeTimeHelper.NowUae,
                     ExecutiveSummary = "Clean session with no recorded events or violations.",
                     RiskScore = 0,
                     IntegrityVerdict = "No concerns — session has no activity to analyze.",
@@ -123,7 +124,7 @@ public class AiProctorService : IAiProctorService
                     errorMessage ?? "AI service is temporarily unavailable. Please review the session manually.");
 
             aiResult.Model = _openAiSettings.Model;
-            aiResult.GeneratedAt = DateTime.UtcNow;
+            aiResult.GeneratedAt = UaeTimeHelper.NowUae;
 
             _logger.LogInformation(
                 "AI proctor analysis for Session {SessionId}: RiskLevel={RiskLevel}, Confidence={Confidence}%",
@@ -179,7 +180,7 @@ public class AiProctorService : IAiProctorService
         // Calculate session duration
         var sessionDuration = session.EndedAt.HasValue
             ? session.EndedAt.Value - session.StartedAt
-            : DateTime.UtcNow - session.StartedAt;
+            : UaeTimeHelper.NowUae - session.StartedAt;
 
         // --- Answer Behavior Analysis from AttemptEvents ---
         var answerEvents = attemptEvents
@@ -187,7 +188,7 @@ public class AiProctorService : IAiProctorService
             .OrderBy(e => e.OccurredAt)
             .ToList();
 
-        var questionTimestamps = new Dictionary<string, List<DateTime>>();
+        var questionTimestamps = new Dictionary<string, List<DateTimeOffset>>();
         foreach (var ae in answerEvents)
         {
             var questionId = "unknown";
@@ -202,7 +203,7 @@ public class AiProctorService : IAiProctorService
                 catch { /* ignore malformed metadata */ }
             }
             if (!questionTimestamps.ContainsKey(questionId))
-                questionTimestamps[questionId] = new List<DateTime>();
+                questionTimestamps[questionId] = new List<DateTimeOffset>();
             questionTimestamps[questionId].Add(ae.OccurredAt);
         }
 
@@ -273,7 +274,7 @@ public class AiProctorService : IAiProctorService
 
         int disconnectCount = 0;
         double totalDisconnectSeconds = 0;
-        DateTime? lastDisconnect = null;
+        DateTimeOffset? lastDisconnect = null;
         foreach (var de in disconnectEvents)
         {
             if (de.EventType == ProctorEventType.NetworkDisconnected)
@@ -1097,9 +1098,9 @@ public class AiProctorService : IAiProctorService
         public string? AttemptStatus { get; set; }
         public int? CurrentQuestionNumber { get; set; }
         // Attempt details
-        public DateTime? AttemptStartedAt { get; set; }
-        public DateTime? AttemptSubmittedAt { get; set; }
-        public DateTime? AttemptExpiresAt { get; set; }
+        public DateTimeOffset? AttemptStartedAt { get; set; }
+        public DateTimeOffset? AttemptSubmittedAt { get; set; }
+        public DateTimeOffset? AttemptExpiresAt { get; set; }
         public decimal? AttemptTotalScore { get; set; }
         public bool? AttemptIsPassed { get; set; }
         public int AttemptNumber { get; set; }
@@ -1131,8 +1132,8 @@ public class AiProctorService : IAiProctorService
         public int SuspiciousReconnectCount { get; set; }
         public int LatePhaseViolationCount { get; set; }
         // Session timing
-        public DateTime SessionStartedAt { get; set; }
-        public DateTime? SessionEndedAt { get; set; }
+        public DateTimeOffset SessionStartedAt { get; set; }
+        public DateTimeOffset? SessionEndedAt { get; set; }
     }
 
     private class OpenAiChatResponse

@@ -10,6 +10,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.QuestionBank;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.QuestionBank;
 
@@ -311,7 +312,7 @@ public class QuestionBankService : IQuestionBankService
             DifficultyLevel = dto.DifficultyLevel,
             IsActive = dto.IsActive,
             IsCalculatorAllowed = dto.IsCalculatorAllowed,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
         };
 
         // Add options if provided
@@ -327,7 +328,7 @@ public class QuestionBankService : IQuestionBankService
                     Points = optionDto.Points,
                     Order = optionDto.Order,
                     AttachmentPath = optionDto.AttachmentPath,
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = UaeTimeHelper.NowUae,
                     CreatedBy = createdBy
                 });
             }
@@ -347,7 +348,7 @@ public class QuestionBankService : IQuestionBankService
                 RubricTextAr = dto.AnswerKey.RubricTextAr,
                 NumericAnswer = dto.AnswerKey.NumericAnswer,
                 Tolerance = dto.AnswerKey.Tolerance,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = UaeTimeHelper.NowUae,
                 CreatedBy = createdBy
             };
         }
@@ -417,7 +418,7 @@ public class QuestionBankService : IQuestionBankService
         entity.DifficultyLevel = dto.DifficultyLevel;
         entity.IsActive = dto.IsActive;
         entity.IsCalculatorAllowed = dto.IsCalculatorAllowed;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
 
         // Upsert answer key if provided
         if (dto.AnswerKey != null)
@@ -434,7 +435,7 @@ public class QuestionBankService : IQuestionBankService
                 entity.AnswerKey.RubricTextAr = dto.AnswerKey.RubricTextAr;
                 entity.AnswerKey.NumericAnswer = dto.AnswerKey.NumericAnswer;
                 entity.AnswerKey.Tolerance = dto.AnswerKey.Tolerance;
-                entity.AnswerKey.UpdatedDate = DateTime.UtcNow;
+                entity.AnswerKey.UpdatedDate = UaeTimeHelper.NowUae;
                 entity.AnswerKey.UpdatedBy = updatedBy;
             }
             else
@@ -451,7 +452,7 @@ public class QuestionBankService : IQuestionBankService
                     RubricTextAr = dto.AnswerKey.RubricTextAr,
                     NumericAnswer = dto.AnswerKey.NumericAnswer,
                     Tolerance = dto.AnswerKey.Tolerance,
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = UaeTimeHelper.NowUae,
                     CreatedBy = updatedBy
                 };
             }
@@ -495,7 +496,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         entity.IsActive = !entity.IsActive;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -593,7 +594,7 @@ public class QuestionBankService : IQuestionBankService
             Points = dto.Points,
             Order = dto.Order,
             AttachmentPath = dto.AttachmentPath,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -632,7 +633,7 @@ public class QuestionBankService : IQuestionBankService
         entity.Points = dto.Points;
         entity.Order = dto.Order;
         entity.AttachmentPath = dto.AttachmentPath;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -698,7 +699,7 @@ public class QuestionBankService : IQuestionBankService
                 existingOption.Points = optionDto.Points;
                 existingOption.Order = optionDto.Order;
                 existingOption.AttachmentPath = optionDto.AttachmentPath;
-                existingOption.UpdatedDate = DateTime.UtcNow;
+                existingOption.UpdatedDate = UaeTimeHelper.NowUae;
                 existingOption.UpdatedBy = updatedBy;
             }
             else if (optionDto.Id == 0)
@@ -713,7 +714,7 @@ public class QuestionBankService : IQuestionBankService
                     Points = optionDto.Points,
                     Order = optionDto.Order,
                     AttachmentPath = optionDto.AttachmentPath,
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = UaeTimeHelper.NowUae,
                     CreatedBy = updatedBy
                 });
             }
@@ -775,7 +776,7 @@ public class QuestionBankService : IQuestionBankService
             FileType = dto.FileType,
             FileSize = dto.FileSize,
             IsPrimary = dto.IsPrimary,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -815,7 +816,7 @@ public class QuestionBankService : IQuestionBankService
         entity.FileType = dto.FileType;
         entity.FileSize = dto.FileSize;
         entity.IsPrimary = dto.IsPrimary;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -861,12 +862,12 @@ public class QuestionBankService : IQuestionBankService
         foreach (var attachment in existingPrimary)
         {
             attachment.IsPrimary = false;
-            attachment.UpdatedDate = DateTime.UtcNow;
+            attachment.UpdatedDate = UaeTimeHelper.NowUae;
             attachment.UpdatedBy = updatedBy;
         }
 
         entity.IsPrimary = true;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();

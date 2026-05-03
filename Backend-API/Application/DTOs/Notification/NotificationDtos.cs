@@ -73,8 +73,8 @@ public class NotificationLogDto
     public string? RecipientPhone { get; set; }
     public string? Subject { get; set; }
     public string? ErrorMessage { get; set; }
-    public DateTime? SentAt { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset? SentAt { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int RetryCount { get; set; }
 }
 
@@ -84,8 +84,8 @@ public class NotificationLogFilterDto
     public NotificationChannel? Channel { get; set; }
     public NotificationEventType? EventType { get; set; }
     public int? ExamId { get; set; }
-    public DateTime? DateFrom { get; set; }
-    public DateTime? DateTo { get; set; }
+    public DateTimeOffset? DateFrom { get; set; }
+    public DateTimeOffset? DateTo { get; set; }
     public string? Search { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 50;

@@ -18,7 +18,7 @@ public class ExamSectionDto
     public int Order { get; set; }
     public int? DurationMinutes { get; set; }
     public decimal? TotalPointsOverride { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int TopicsCount { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
@@ -76,7 +76,7 @@ public class ExamTopicDto
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public int Order { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int QuestionsCount { get; set; }
     public decimal TotalPoints { get; set; }
     public List<ExamQuestionDto> Questions { get; set; } = new();

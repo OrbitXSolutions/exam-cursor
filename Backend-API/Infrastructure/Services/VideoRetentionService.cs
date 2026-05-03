@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -60,12 +61,12 @@ public class VideoRetentionService : BackgroundService
             return;
         }
 
-        var cutoff = DateTime.UtcNow.AddDays(-retentionDays);
+        var cutoff = UaeTimeHelper.NowUae.AddDays(-retentionDays);
 
         // Find expired video evidence
         var expiredRecordings = await db.ProctorEvidence
             .Where(e => e.Type == EvidenceType.Video && !e.IsExpired)
-            .Where(e => (e.ExpiresAt != null && e.ExpiresAt <= DateTime.UtcNow) ||
+            .Where(e => (e.ExpiresAt != null && e.ExpiresAt <= UaeTimeHelper.NowUae) ||
                         (e.ExpiresAt == null && e.UploadedAt != null && e.UploadedAt <= cutoff))
             .ToListAsync(ct);
 

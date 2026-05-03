@@ -89,18 +89,18 @@ public class ExamDetailsAttemptDto
     public int AttemptNumber { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime StartedAt { get; set; }
-    public DateTime? SubmittedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public int TotalDurationSeconds { get; set; }
     public int RemainingSeconds { get; set; }
     public int ExtraTimeSeconds { get; set; }
     public int ResumeCount { get; set; }
-    public DateTime? LastActivityAt { get; set; }
+    public DateTimeOffset? LastActivityAt { get; set; }
     public decimal? TotalScore { get; set; }
     public bool? IsPassed { get; set; }
     public string? ForceSubmittedBy { get; set; }
-    public DateTime? ForceSubmittedAt { get; set; }
+    public DateTimeOffset? ForceSubmittedAt { get; set; }
     public string? IPAddress { get; set; }
     public string? DeviceInfo { get; set; }
     public int TotalQuestions { get; set; }
@@ -111,9 +111,9 @@ public class ExamDetailsAttemptDto
 
 public class ExamDetailsAssignmentDto
 {
-    public DateTime? ScheduleFrom { get; set; }
-    public DateTime? ScheduleTo { get; set; }
-    public DateTime AssignedAt { get; set; }
+    public DateTimeOffset? ScheduleFrom { get; set; }
+    public DateTimeOffset? ScheduleTo { get; set; }
+    public DateTimeOffset AssignedAt { get; set; }
     public string? AssignedBy { get; set; }
     public bool IsActive { get; set; }
 }
@@ -127,7 +127,7 @@ public class ExamDetailsProctorDto
     public int TotalViolations { get; set; }
     public decimal? RiskScore { get; set; }
     public string RiskLevel { get; set; } = string.Empty;
-    public DateTime? LastHeartbeatAt { get; set; }
+    public DateTimeOffset? LastHeartbeatAt { get; set; }
     public string? DecisionStatus { get; set; }
     public string? DecisionNotes { get; set; }
 
@@ -146,7 +146,7 @@ public class ExamDetailsEvidenceItemDto
     public string FileName { get; set; } = string.Empty;
     public string? ContentType { get; set; }
     public long FileSize { get; set; }
-    public DateTime? CapturedAt { get; set; }
+    public DateTimeOffset? CapturedAt { get; set; }
     public int? DurationSeconds { get; set; }
     public bool IsUploaded { get; set; }
     public string? PreviewUrl { get; set; }
@@ -162,7 +162,7 @@ public class ExamDetailsEventDto
     public int EventType { get; set; }
     public string EventTypeName { get; set; } = string.Empty;
     public string? MetadataJson { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
 
     // Enrichment fields for AnswerSaved events
     public string? QuestionTextEn { get; set; }
@@ -176,8 +176,8 @@ public class ExamDetailsAttemptBriefDto
     public int AttemptNumber { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime StartedAt { get; set; }
-    public DateTime? SubmittedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? SubmittedAt { get; set; }
     public decimal? TotalScore { get; set; }
     public bool? IsPassed { get; set; }
 }
@@ -202,5 +202,5 @@ public class CandidateExamBriefDto
     public string TitleEn { get; set; } = string.Empty;
     public string? TitleAr { get; set; }
     public int TotalAttempts { get; set; }
-    public DateTime LastAttemptAt { get; set; }
+    public DateTimeOffset LastAttemptAt { get; set; }
 }

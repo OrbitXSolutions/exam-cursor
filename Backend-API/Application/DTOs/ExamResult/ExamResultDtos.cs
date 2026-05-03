@@ -25,10 +25,10 @@ public string ExamTitleAr { get; set; } = string.Empty;
     public bool IsPassed { get; set; }
     public string? GradeLabel { get; set; }
     public bool IsPublishedToCandidate { get; set; }
-    public DateTime? PublishedAt { get; set; }
-    public DateTime FinalizedAt { get; set; }
-    public DateTime? AttemptStartedAt { get; set; }
-    public DateTime? AttemptSubmittedAt { get; set; }
+    public DateTimeOffset? PublishedAt { get; set; }
+    public DateTimeOffset FinalizedAt { get; set; }
+    public DateTimeOffset? AttemptStartedAt { get; set; }
+    public DateTimeOffset? AttemptSubmittedAt { get; set; }
 }
 
 /// <summary>
@@ -49,7 +49,7 @@ public class ResultListDto
     public bool IsPassed { get; set; }
     public string? GradeLabel { get; set; }
     public bool IsPublishedToCandidate { get; set; }
-    public DateTime FinalizedAt { get; set; }
+    public DateTimeOffset FinalizedAt { get; set; }
 }
 
 /// <summary>
@@ -61,8 +61,8 @@ public class ResultSearchDto
     public string? CandidateId { get; set; }
     public bool? IsPassed { get; set; }
     public bool? IsPublished { get; set; }
-    public DateTime? FinalizedFrom { get; set; }
-    public DateTime? FinalizedTo { get; set; }
+    public DateTimeOffset? FinalizedFrom { get; set; }
+    public DateTimeOffset? FinalizedTo { get; set; }
     public string? Search { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -84,9 +84,9 @@ public class CandidateResultDto
   public decimal Percentage { get; set; }
     public bool IsPassed { get; set; }
     public string? GradeLabel { get; set; }
-    public DateTime FinalizedAt { get; set; }
-    public DateTime? AttemptStartedAt { get; set; }
-    public DateTime? AttemptSubmittedAt { get; set; }
+    public DateTimeOffset FinalizedAt { get; set; }
+    public DateTimeOffset? AttemptStartedAt { get; set; }
+    public DateTimeOffset? AttemptSubmittedAt { get; set; }
     public List<CandidateQuestionResultDto>? QuestionResults { get; set; }
 }
 
@@ -145,8 +145,8 @@ public class ExamReportDto
     public int ExamId { get; set; }
     public string ExamTitleEn { get; set; } = string.Empty;
     public string ExamTitleAr { get; set; } = string.Empty;
- public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+ public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public int TotalAttempts { get; set; }
     public int TotalSubmitted { get; set; }
     public int TotalExpired { get; set; }
@@ -158,7 +158,7 @@ public class ExamReportDto
     public decimal PassRate { get; set; }
     public int? TotalFlaggedAttempts { get; set; }
     public decimal? AverageRiskScore { get; set; }
-    public DateTime GeneratedAt { get; set; }
+    public DateTimeOffset GeneratedAt { get; set; }
     public string GeneratedBy { get; set; } = string.Empty;
 }
 
@@ -168,8 +168,8 @@ public class ExamReportDto
 public class GenerateExamReportDto
 {
     public int ExamId { get; set; }
-    public DateTime? FromDate { get; set; }
- public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+ public DateTimeOffset? ToDate { get; set; }
 }
 
 #endregion
@@ -199,7 +199,7 @@ public class QuestionPerformanceDto
     public decimal MaxPoints { get; set; }
     public decimal DifficultyIndex { get; set; }
     public string DifficultyLabel { get; set; } = string.Empty; // Easy, Medium, Hard
-    public DateTime GeneratedAt { get; set; }
+    public DateTimeOffset GeneratedAt { get; set; }
 }
 
 /// <summary>
@@ -234,7 +234,7 @@ public int? BestAttemptId { get; set; }
     public bool? BestIsPassed { get; set; }
     public decimal? LatestScore { get; set; }
     public bool? LatestIsPassed { get; set; }
-    public DateTime? LastAttemptAt { get; set; }
+    public DateTimeOffset? LastAttemptAt { get; set; }
 }
 
 /// <summary>
@@ -249,7 +249,7 @@ public class CandidateExamSummaryListDto
     public decimal? BestScore { get; set; }
     public decimal? BestPercentage { get; set; }
     public bool? BestIsPassed { get; set; }
-    public DateTime? LastAttemptAt { get; set; }
+    public DateTimeOffset? LastAttemptAt { get; set; }
     /// <summary>Present when returning all candidates across exams</summary>
     public int? ExamId { get; set; }
     public string? ExamTitleEn { get; set; }
@@ -272,17 +272,17 @@ public class ResultExportJobDto
     public string FormatName => Format.ToString();
     public ExportStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public bool? PassedOnly { get; set; }
     public bool? FailedOnly { get; set; }
     public string RequestedBy { get; set; } = string.Empty;
-    public DateTime RequestedAt { get; set; }
+    public DateTimeOffset RequestedAt { get; set; }
     public string? FileName { get; set; }
     public string? FilePath { get; set; }
     public string? DownloadUrl { get; set; }
     public long? FileSizeBytes { get; set; }
- public DateTime? CompletedAt { get; set; }
+ public DateTimeOffset? CompletedAt { get; set; }
     public string? ErrorMessage { get; set; }
 }
 
@@ -293,8 +293,8 @@ public class RequestExportDto
 {
     public int ExamId { get; set; }
     public ExportFormat Format { get; set; }
-  public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+  public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
     public bool? PassedOnly { get; set; }
     public bool? FailedOnly { get; set; }
 }
@@ -311,8 +311,8 @@ public class ResultExportJobListDto
     public string FormatName => Format.ToString();
     public ExportStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime RequestedAt { get; set; }
-    public DateTime? CompletedAt { get; set; }
+    public DateTimeOffset RequestedAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; set; }
     public string? DownloadUrl { get; set; }
 }
 
@@ -323,8 +323,8 @@ public class ExportJobSearchDto
 {
     public int? ExamId { get; set; }
     public ExportStatus? Status { get; set; }
-    public DateTime? RequestedFrom { get; set; }
-    public DateTime? RequestedTo { get; set; }
+    public DateTimeOffset? RequestedFrom { get; set; }
+    public DateTimeOffset? RequestedTo { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

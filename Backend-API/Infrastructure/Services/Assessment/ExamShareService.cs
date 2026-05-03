@@ -10,6 +10,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Assessment;
 
@@ -60,7 +61,7 @@ public class ExamShareService : IExamShareService
         if (existingLink != null)
         {
             existingLink.IsActive = false;
-            existingLink.UpdatedDate = DateTime.UtcNow;
+            existingLink.UpdatedDate = UaeTimeHelper.NowUae;
             existingLink.UpdatedBy = createdBy;
         }
 
@@ -84,7 +85,7 @@ public class ExamShareService : IExamShareService
             ShareToken = shareToken,
             ExpiresAt = expiresAt,
             IsActive = true,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = createdBy
         };
 
@@ -123,7 +124,7 @@ public class ExamShareService : IExamShareService
             return ApiResponse<bool>.FailureResponse("No active share link found for this exam");
 
         link.IsActive = false;
-        link.UpdatedDate = DateTime.UtcNow;
+        link.UpdatedDate = UaeTimeHelper.NowUae;
         link.UpdatedBy = updatedBy;
 
         await _context.SaveChangesAsync();
@@ -320,14 +321,14 @@ public class ExamShareService : IExamShareService
 
         // Store refresh token
         candidate.RefreshToken = refreshToken;
-        candidate.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        candidate.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddDays(7);
         await _userManager.UpdateAsync(candidate);
 
         return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            Expiration = DateTime.UtcNow.AddHours(1),
+            Expiration = UaeTimeHelper.NowUae.AddHours(1),
             ExamId = exam.Id,
             CandidateId = candidate.Id,
             CandidateName = candidate.FullName ?? candidate.DisplayName ?? candidate.Email
@@ -377,14 +378,14 @@ public class ExamShareService : IExamShareService
             var accessToken = _tokenService.GenerateAccessToken(existingUser, existingRoles.ToList());
             var refreshToken = _tokenService.GenerateRefreshToken();
             existingUser.RefreshToken = refreshToken;
-            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            existingUser.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddDays(7);
             await _userManager.UpdateAsync(existingUser);
 
             return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                Expiration = DateTime.UtcNow.AddHours(1),
+                Expiration = UaeTimeHelper.NowUae.AddHours(1),
                 ExamId = exam.Id,
                 CandidateId = existingUser.Id,
                 CandidateName = existingUser.FullName ?? existingUser.DisplayName ?? existingUser.Email
@@ -407,7 +408,7 @@ public class ExamShareService : IExamShareService
             PhoneNumber = dto.PhoneNumber.Trim(),
             IsWalkIn = true,
             EmailConfirmed = true, // no email verification flow for walk-in
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = UaeTimeHelper.NowUae,
             Status = UserStatus.Active
         };
 
@@ -429,14 +430,14 @@ public class ExamShareService : IExamShareService
         var token = _tokenService.GenerateAccessToken(newUser, roles);
         var refresh = _tokenService.GenerateRefreshToken();
         newUser.RefreshToken = refresh;
-        newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        newUser.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddDays(7);
         await _userManager.UpdateAsync(newUser);
 
         return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
         {
             AccessToken = token,
             RefreshToken = refresh,
-            Expiration = DateTime.UtcNow.AddHours(1),
+            Expiration = UaeTimeHelper.NowUae.AddHours(1),
             ExamId = exam.Id,
             CandidateId = newUser.Id,
             CandidateName = newUser.FullName
@@ -458,7 +459,7 @@ public class ExamShareService : IExamShareService
             return null;
 
         // Check expiry
-        if (link.ExpiresAt.HasValue && link.ExpiresAt.Value < DateTime.UtcNow)
+        if (link.ExpiresAt.HasValue && link.ExpiresAt.Value < UaeTimeHelper.NowUae)
             return null;
 
         // Verify exam is still published and active

@@ -37,8 +37,8 @@ public class QuestionDto
     public string DifficultyLevelName => DifficultyLevel.ToString();
     public bool IsActive { get; set; }
     public bool IsCalculatorAllowed { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     public bool IsDeleted { get; set; }
 
     public List<QuestionOptionDto> Options { get; set; } = new();
@@ -73,7 +73,7 @@ public class QuestionListDto
     public string DifficultyLevelName => DifficultyLevel.ToString();
     public bool IsActive { get; set; }
     public bool IsCalculatorAllowed { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public int OptionsCount { get; set; }
     public int AttachmentsCount { get; set; }
 }

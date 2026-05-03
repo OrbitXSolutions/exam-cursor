@@ -84,7 +84,7 @@ export default function IncidentsPage() {
       setReviewNotes("")
       loadIncidents()
     } catch (error) {
-      toast.error("Failed to review incident")
+      toast.error(t("proctor.failedToReviewIncident"))
     }
   }
 
@@ -102,12 +102,12 @@ export default function IncidentsPage() {
         titleEn: newIncident.titleEn.trim(),
         summaryEn: newIncident.summaryEn.trim() || undefined,
       })
-      toast.success(`Incident ${result.caseNumber} created`)
+      toast.success(t("proctor.incidentCreatedNum", { num: result.caseNumber }))
       setCreateDialogOpen(false)
       setNewIncident({ attemptId: "", severity: "2", titleEn: "", summaryEn: "" })
       loadIncidents()
     } catch (error: any) {
-      toast.error(error?.message || "Failed to create incident")
+      toast.error(error?.message || t("proctor.failedToCreateIncident"))
     } finally {
       setCreateLoading(false)
     }
@@ -122,29 +122,38 @@ export default function IncidentsPage() {
   }
 
   function getSeverityBadge(severity: string) {
+    const label = (() => {
+      switch (severity) {
+        case "Low": return t("proctor.severityLow")
+        case "Medium": return t("proctor.severityMedium")
+        case "High": return t("proctor.severityHigh")
+        case "Critical": return t("proctor.severityCritical")
+        default: return severity
+      }
+    })()
     switch (severity) {
       case "Low":
         return (
           <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-            Low
+            {label}
           </Badge>
         )
       case "Medium":
         return (
           <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-            Medium
+            {label}
           </Badge>
         )
       case "High":
         return (
           <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/30">
-            High
+            {label}
           </Badge>
         )
       case "Critical":
-        return <Badge variant="destructive">Critical</Badge>
+        return <Badge variant="destructive">{label}</Badge>
       default:
-        return <Badge variant="secondary">{severity}</Badge>
+        return <Badge variant="secondary">{label}</Badge>
     }
   }
 
@@ -302,10 +311,10 @@ export default function IncidentsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("common.all")}</SelectItem>
-                <SelectItem value="Low">Low</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
+                <SelectItem value="Low">{t("proctor.severityLow")}</SelectItem>
+                <SelectItem value="Medium">{t("proctor.severityMedium")}</SelectItem>
+                <SelectItem value="High">{t("proctor.severityHigh")}</SelectItem>
+                <SelectItem value="Critical">{t("proctor.severityCritical")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={reviewedFilter} onValueChange={setReviewedFilter}>

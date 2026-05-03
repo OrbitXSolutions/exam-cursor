@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.Proctor;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -111,7 +112,7 @@ public class IdentityVerificationController : ControllerBase
         var candidateDir = Path.Combine(_env.ContentRootPath, "wwwroot", "candidateIDs", candidateId);
         Directory.CreateDirectory(candidateDir);
 
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+        var timestamp = UaeTimeHelper.NowUae.ToString("yyyyMMdd_HHmmss");
         var selfieExt = Path.GetExtension(selfiePhoto.FileName);
         var idExt = Path.GetExtension(idPhoto.FileName);
 

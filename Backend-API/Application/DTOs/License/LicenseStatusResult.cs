@@ -11,8 +11,8 @@ public class LicenseStatusResult
     public int? GraceDaysRemaining { get; set; }
     public string? CustomerName { get; set; }
     public string? LicenseType { get; set; }
-    public DateTime? IssuedAt { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? IssuedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public int? MaxUsers { get; set; }
     public string? LicensedDomain { get; set; }
     public string Message { get; set; } = string.Empty;

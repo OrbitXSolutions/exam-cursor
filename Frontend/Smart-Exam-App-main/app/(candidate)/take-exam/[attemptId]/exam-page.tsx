@@ -381,7 +381,13 @@ export default function ExamPage() {
         }
       }
 
+      // Mobile detection (used for both tab switch and screenshot handlers below)
+      const isMobileUA =
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints > 1 && !/Macintosh/.test(navigator.userAgent))
+
       // Monitor fullscreen changes only if fullscreen is required
+      // (Fullscreen API not supported on iOS/mobile, so no point registering it there)
       const handleFullscreenChange = settings?.requireFullscreen ? () => {
         if (suppressFullscreenExitRef.current) return // Skip during screen share start
         if (!document.fullscreenElement) {
@@ -394,12 +400,15 @@ export default function ExamPage() {
         }
       } : null
 
-      // Tab visibility detection only if fullscreen is required
-      const handleVisibilityChange = settings?.requireFullscreen ? () => {
+      // Tab visibility / app-switch detection:
+      // - Desktop: only when requireFullscreen is enabled (existing behaviour)
+      // - Mobile: always active — visibilitychange fires reliably on app-switch/home button
+      //   and the Fullscreen API doesn't work on iOS/mobile anyway
+      const handleVisibilityChange = (settings?.requireFullscreen || isMobileUA) ? () => {
         if (document.hidden) {
           logAttemptEvent(session.attemptId, {
             eventType: AttemptEventType.TabSwitched,
-            metadataJson: JSON.stringify({ timestamp: new Date().toISOString() }),
+            metadataJson: JSON.stringify({ timestamp: new Date().toISOString(), isMobile: isMobileUA }),
           }).catch(() => { })
           playWarningBeep()
           toast.warning(t("exam.tabSwitchWarning"))
@@ -427,16 +436,47 @@ export default function ExamPage() {
         toast.warning(t("exam.copyPasteBlocked"))
       } : null
 
+      // Mobile screenshot detection
+      // True screenshot prevention is not possible via web APIs (OS-level).
+      // We detect rapid visibility changes (< 3s hidden then visible) on mobile
+      // as a strong signal of a screenshot or screen-recording attempt.
+      let mobileHiddenAt: number | null = null
+      const handleMobileScreenshot = isMobileUA ? () => {
+        if (document.hidden) {
+          mobileHiddenAt = Date.now()
+        } else if (mobileHiddenAt !== null) {
+          const elapsed = Date.now() - mobileHiddenAt
+          mobileHiddenAt = null
+          // Rapid hide→show (< 3s) on mobile = suspected screenshot / screen recording
+          if (elapsed < 3000) {
+            logAttemptEvent(session.attemptId, {
+              eventType: AttemptEventType.ScreenshotAttempt,
+              metadataJson: JSON.stringify({
+                timestamp: new Date().toISOString(),
+                hiddenDurationMs: elapsed,
+                userAgent: navigator.userAgent,
+                screenResolution: `${screen.width}x${screen.height}`,
+                isMobile: true,
+              }),
+            }).catch(() => { })
+            playWarningBeep()
+            toast.warning(t("exam.screenshotAttemptWarning"))
+          }
+        }
+      } : null
+
       if (handleFullscreenChange) document.addEventListener("fullscreenchange", handleFullscreenChange)
       if (handleVisibilityChange) document.addEventListener("visibilitychange", handleVisibilityChange)
       if (handleCopy) document.addEventListener("copy", handleCopy)
       if (handlePaste) document.addEventListener("paste", handlePaste)
+      if (handleMobileScreenshot) document.addEventListener("visibilitychange", handleMobileScreenshot)
 
       return () => {
         if (handleFullscreenChange) document.removeEventListener("fullscreenchange", handleFullscreenChange)
         if (handleVisibilityChange) document.removeEventListener("visibilitychange", handleVisibilityChange)
         if (handleCopy) document.removeEventListener("copy", handleCopy)
         if (handlePaste) document.removeEventListener("paste", handlePaste)
+        if (handleMobileScreenshot) document.removeEventListener("visibilitychange", handleMobileScreenshot)
 
         if (settings?.requireFullscreen && document.fullscreenElement) {
           document.exitFullscreen().catch(() => { })
@@ -936,10 +976,6 @@ export default function ExamPage() {
       // Note: Continuous polling is managed by the smart-poll useEffect below,
       // which only polls when SignalR is disconnected (signalRConnected === false).
 
-      // Log exam started event
-      await logAttemptEvent(sessionData.attemptId, {
-        eventType: AttemptEventType.Started,
-      }).catch(() => { })
     } catch (error: unknown) {
       console.error("[v0] Failed to start exam:", error)
       // Extract error message from API response
@@ -1012,10 +1048,6 @@ export default function ExamPage() {
           if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
           saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
 
-          await logAttemptEvent(session.attemptId, {
-            eventType: AttemptEventType.AnswerSaved,
-            metadataJson: JSON.stringify({ questionId }),
-          }).catch(() => { })
         } catch (error) {
           console.error("[v0] Failed to save answer:", error)
           setSaveStatus("error")
@@ -1102,19 +1134,19 @@ export default function ExamPage() {
 
         // Log events for key status changes
         if (status === "active") {
-          logAttemptEvent(session.attemptId, { eventType: "ScreenShareStarted" }).catch(() => {})
+          logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareStarted }).catch(() => {})
         } else if (status === "stopped" || status === "failed") {
-          logAttemptEvent(session.attemptId, { eventType: "ScreenShareEnded" }).catch(() => {})
+          logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareEnded }).catch(() => {})
           handleScreenShareStopped()
         } else if (status === "lost") {
-          logAttemptEvent(session.attemptId, { eventType: "ScreenShareLost" }).catch(() => {})
+          logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareLost }).catch(() => {})
           handleScreenShareStopped()
         } else if (status === "denied") {
-          logAttemptEvent(session.attemptId, { eventType: "ScreenShareDenied" }).catch(() => {})
+          logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareDenied }).catch(() => {})
         }
       },
       onTrackEnded: () => {
-        logAttemptEvent(session.attemptId, { eventType: "ScreenShareTrackEnded" }).catch(() => {})
+        logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareTrackEnded }).catch(() => {})
       },
       onError: (error) => {
         console.warn("[ExamPage] Screen share error:", error.message)
@@ -1132,7 +1164,7 @@ export default function ExamPage() {
   async function autoStartScreenShare() {
     if (!session) return
     suppressFullscreenExitRef.current = true
-    logAttemptEvent(session.attemptId, { eventType: "ScreenShareRequested" }).catch(() => {})
+    logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareRequested }).catch(() => {})
     if (screenShareGraceTimerRef.current) { clearTimeout(screenShareGraceTimerRef.current); screenShareGraceTimerRef.current = undefined }
     try {
       const started = await startScreenSharePublisher()
@@ -1197,7 +1229,7 @@ export default function ExamPage() {
         if (screenSharePublisherRef.current?.currentStatus === "active") return
         // Grace period expired — log violation (counts toward MaxViolationWarnings)
         logAttemptEvent(session.attemptId, {
-          eventType: "ScreenSharePermissionRevoked",
+          eventType: AttemptEventType.ScreenSharePermissionRevoked,
           metadataJson: JSON.stringify({ reason: "grace_period_expired", gracePeriodSeconds: gracePeriod }),
         }).catch(() => {})
         // Auto-restart screen share
@@ -1214,7 +1246,7 @@ export default function ExamPage() {
 
   function handleScreenShareSkip() {
     setScreenShareConsentOpen(false)
-    logAttemptEvent(session!.attemptId, { eventType: "ScreenShareDenied", metadataJson: JSON.stringify({ reason: "user_skipped" }) }).catch(() => {})
+    logAttemptEvent(session!.attemptId, { eventType: AttemptEventType.ScreenShareDenied, metadataJson: JSON.stringify({ reason: "user_skipped" }) }).catch(() => {})
   }
 
   // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
@@ -1342,10 +1374,6 @@ export default function ExamPage() {
 
       // Stop all background calls BEFORE submit to prevent race conditions
       stopAllBackgroundActivity()
-
-      await logAttemptEvent(session.attemptId, {
-        eventType: AttemptEventType.Submitted,
-      }).catch(() => { })
 
       // Finalize video recording in background (fire-and-forget â€” never delays submit)
       // Backend returns 202 Accepted and processes FFmpeg in background

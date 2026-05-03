@@ -24,6 +24,6 @@ public class BatchCandidate
     public string CandidateId { get; set; } = null!;
     public virtual ApplicationUser Candidate { get; set; } = null!;
 
-    public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset AddedAt { get; set; } = UaeTimeHelper.NowUae;
     public string? AddedBy { get; set; }
 }

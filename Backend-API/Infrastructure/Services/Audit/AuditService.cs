@@ -9,6 +9,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Audit;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Audit;
 
@@ -295,7 +296,7 @@ public class AuditService : IAuditService
     public async Task<ApiResponse<AuditRetentionPolicyDto>> CreateRetentionPolicyAsync(
         CreateRetentionPolicyDto dto, string userId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var policy = new AuditRetentionPolicy
         {
@@ -338,7 +339,7 @@ public class AuditService : IAuditService
             return ApiResponse<AuditRetentionPolicyDto>.FailureResponse("Policy not found");
         }
 
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         if (!string.IsNullOrEmpty(dto.NameEn)) policy.NameEn = dto.NameEn;
         if (!string.IsNullOrEmpty(dto.NameAr)) policy.NameAr = dto.NameAr;
@@ -381,7 +382,7 @@ public class AuditService : IAuditService
 
         policy.IsDeleted = true;
         policy.DeletedBy = userId;
-        policy.UpdatedDate = DateTime.UtcNow;
+        policy.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _context.SaveChangesAsync();
 
@@ -407,12 +408,12 @@ public class AuditService : IAuditService
         foreach (var p in currentDefault)
         {
             p.IsDefault = false;
-            p.UpdatedDate = DateTime.UtcNow;
+            p.UpdatedDate = UaeTimeHelper.NowUae;
             p.UpdatedBy = userId;
         }
 
         policy.IsDefault = true;
-        policy.UpdatedDate = DateTime.UtcNow;
+        policy.UpdatedDate = UaeTimeHelper.NowUae;
         policy.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -451,7 +452,7 @@ public class AuditService : IAuditService
             return ApiResponse<int>.FailureResponse("Policy not found");
         }
 
-        var cutoffDate = DateTime.UtcNow.AddDays(-policy.RetentionDays);
+        var cutoffDate = UaeTimeHelper.NowUae.AddDays(-policy.RetentionDays);
         var query = _context.Set<AuditLog>()
        .Where(x => x.OccurredAt < cutoffDate);
 
@@ -467,12 +468,12 @@ public class AuditService : IAuditService
         {
             PolicyId = policy.Id,
             PolicyName = policy.NameEn,
-            ExecutedAt = DateTime.UtcNow
+            ExecutedAt = UaeTimeHelper.NowUae
         };
 
         try
         {
-            var cutoffDate = DateTime.UtcNow.AddDays(-policy.RetentionDays);
+            var cutoffDate = UaeTimeHelper.NowUae.AddDays(-policy.RetentionDays);
             var query = _context.Set<AuditLog>()
            .Where(x => x.OccurredAt < cutoffDate);
 
@@ -501,7 +502,7 @@ public class AuditService : IAuditService
             result.LogsDeleted = logsToProcess.Count;
 
             // Update policy execution stats
-            policy.LastExecutedAt = DateTime.UtcNow;
+            policy.LastExecutedAt = UaeTimeHelper.NowUae;
             policy.LastExecutionCount = logsToProcess.Count;
             await _context.SaveChangesAsync();
 
@@ -540,7 +541,7 @@ public class AuditService : IAuditService
 
     public async Task<ApiResponse<AuditExportJobDto>> CreateExportJobAsync(CreateExportJobDto dto, string userId)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var job = new AuditExportJob
         {
@@ -648,7 +649,7 @@ public class AuditService : IAuditService
 
         job.Status = ExportStatus.Failed;
         job.ErrorMessage = "Cancelled by user";
-        job.UpdatedDate = DateTime.UtcNow;
+        job.UpdatedDate = UaeTimeHelper.NowUae;
         job.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -676,7 +677,7 @@ public class AuditService : IAuditService
             return ApiResponse<string>.FailureResponse("Export file not available");
         }
 
-        if (job.ExpiresAt.HasValue && job.ExpiresAt.Value < DateTime.UtcNow)
+        if (job.ExpiresAt.HasValue && job.ExpiresAt.Value < UaeTimeHelper.NowUae)
         {
             return ApiResponse<string>.FailureResponse("Export file has expired");
         }
@@ -705,7 +706,7 @@ public class AuditService : IAuditService
         try
         {
             job.Status = ExportStatus.Processing;
-            job.StartedAt = DateTime.UtcNow;
+            job.StartedAt = UaeTimeHelper.NowUae;
             await _context.SaveChangesAsync();
 
             // Build query
@@ -727,7 +728,7 @@ public class AuditService : IAuditService
             var logs = await query.OrderBy(x => x.OccurredAt).ToListAsync();
 
             // Generate file
-            var fileName = $"audit_export_{job.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}";
+            var fileName = $"audit_export_{job.Id}_{UaeTimeHelper.NowUae:yyyyMMddHHmmss}";
             string filePath;
             long fileSize;
 
@@ -748,8 +749,8 @@ public class AuditService : IAuditService
             job.FileName = Path.GetFileName(filePath);
             job.FileSize = fileSize;
             job.TotalRecords = logs.Count;
-            job.CompletedAt = DateTime.UtcNow;
-            job.ExpiresAt = DateTime.UtcNow.AddDays(7); // Files expire after 7 days
+            job.CompletedAt = UaeTimeHelper.NowUae;
+            job.ExpiresAt = UaeTimeHelper.NowUae.AddDays(7); // Files expire after 7 days
 
             await _context.SaveChangesAsync();
 
@@ -760,7 +761,7 @@ public class AuditService : IAuditService
         {
             job.Status = ExportStatus.Failed;
             job.ErrorMessage = ex.Message;
-            job.CompletedAt = DateTime.UtcNow;
+            job.CompletedAt = UaeTimeHelper.NowUae;
             await _context.SaveChangesAsync();
 
             _logger.LogError(ex, "Failed to process export job {JobId}", job.Id);
@@ -831,7 +832,7 @@ public class AuditService : IAuditService
 
     public async Task<ApiResponse<AuditDashboardDto>> GetDashboardAsync(DateTime? fromDate = null, DateTime? toDate = null)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var from = fromDate ?? now.AddDays(-30);
         var to = toDate ?? now;
 
@@ -914,7 +915,7 @@ public class AuditService : IAuditService
 
     public async Task<ApiResponse<AuditDashboardDto>> GetEntityDashboardAsync(string entityName)
     {
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
         var from = now.AddDays(-30);
 
         var query = _context.Set<AuditLog>()
@@ -1027,8 +1028,8 @@ public class AuditService : IAuditService
             Outcome = dto.Outcome,
             ErrorMessage = dto.ErrorMessage,
             DurationMs = dto.DurationMs,
-            OccurredAt = DateTime.UtcNow,
-            CreatedDate = DateTime.UtcNow,
+            OccurredAt = UaeTimeHelper.NowUae,
+            CreatedDate = UaeTimeHelper.NowUae,
             CreatedBy = dto.ActorId
         };
     }

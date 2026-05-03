@@ -6,6 +6,7 @@ using Smart_Core.Application.Interfaces.ExamResult;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.ExamResult;
 
@@ -45,7 +46,7 @@ public class CertificateService : ICertificateService
             return ApiResponse<CertificateDto>.FailureResponse("Certificate already exists for this result");
 
         var code = GenerateCertificateCode();
-        var now = DateTime.UtcNow;
+        var now = UaeTimeHelper.NowUae;
 
         var cert = new Certificate
         {
@@ -215,10 +216,10 @@ public class CertificateService : ICertificateService
             return ApiResponse<bool>.FailureResponse("Certificate not found");
 
         cert.IsRevoked = true;
-        cert.RevokedAt = DateTime.UtcNow;
+        cert.RevokedAt = UaeTimeHelper.NowUae;
         cert.RevokedBy = userId;
         cert.RevokeReason = reason;
-        cert.UpdatedDate = DateTime.UtcNow;
+        cert.UpdatedDate = UaeTimeHelper.NowUae;
         cert.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -239,7 +240,7 @@ public class CertificateService : ICertificateService
         cert.IsRevoked = false;
         cert.FilePath = null;
         cert.FileUrl = null;
-        cert.UpdatedDate = DateTime.UtcNow;
+        cert.UpdatedDate = UaeTimeHelper.NowUae;
         cert.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
@@ -250,7 +251,7 @@ public class CertificateService : ICertificateService
     private static string GenerateCertificateCode()
     {
         var guid = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
-        var date = DateTime.UtcNow.ToString("yyyyMMdd");
+        var date = UaeTimeHelper.NowUae.ToString("yyyyMMdd");
         return $"CERT-{date}-{guid}";
     }
 

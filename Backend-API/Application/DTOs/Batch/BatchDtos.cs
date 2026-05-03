@@ -8,7 +8,7 @@ public class BatchListDto
     public string? Description { get; set; }
     public bool IsActive { get; set; }
     public int CandidateCount { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
 }
@@ -21,7 +21,7 @@ public class BatchDetailDto
     public string? Description { get; set; }
     public bool IsActive { get; set; }
     public int CandidateCount { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
     public List<BatchCandidateDto> Candidates { get; set; } = new();
@@ -37,7 +37,7 @@ public class BatchCandidateDto
     public string? RollNo { get; set; }
     public string? Mobile { get; set; }
     public bool IsBlocked { get; set; }
-    public DateTime AddedAt { get; set; }
+    public DateTimeOffset AddedAt { get; set; }
     public string? AddedBy { get; set; }
     public string? AddedByName { get; set; }
 }

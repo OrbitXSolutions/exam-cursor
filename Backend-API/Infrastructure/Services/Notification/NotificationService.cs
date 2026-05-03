@@ -8,6 +8,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Notification;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Domain.Common;
 
 namespace Smart_Core.Infrastructure.Services.Notification;
 
@@ -74,7 +75,7 @@ public class NotificationService : INotificationService
         entity.LoginUrl = dto.LoginUrl;
 
         entity.UpdatedBy = updatedBy;
-        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         return ApiResponse<NotificationSettingsDto>.SuccessResponse(MapSettingsToDto(entity), "Notification settings updated.");
@@ -124,7 +125,7 @@ public class NotificationService : INotificationService
         template.BodyAr = dto.BodyAr;
         template.IsActive = dto.IsActive;
         template.UpdatedBy = updatedBy;
-        template.UpdatedDate = DateTime.UtcNow;
+        template.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         return ApiResponse<NotificationTemplateDto>.SuccessResponse(
@@ -199,7 +200,7 @@ public class NotificationService : INotificationService
         log.Status = NotificationStatus.Pending;
         log.ErrorMessage = null;
         log.RetryCount++;
-        log.UpdatedDate = DateTime.UtcNow;
+        log.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         return ApiResponse<bool>.SuccessResponse(true, "Notification queued for retry.");
@@ -217,7 +218,7 @@ public class NotificationService : INotificationService
         log.Status = NotificationStatus.Pending;
         log.ErrorMessage = null;
         log.RetryCount++;
-        log.UpdatedDate = DateTime.UtcNow;
+        log.UpdatedDate = UaeTimeHelper.NowUae;
 
         await _db.SaveChangesAsync();
         return ApiResponse<bool>.SuccessResponse(true, "Notification queued for immediate sending.");
@@ -321,7 +322,7 @@ public class NotificationService : INotificationService
                     Status = NotificationStatus.Pending,
                     RecipientEmail = candidate.Email,
                     RecipientPhone = candidate.PhoneNumber,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = UaeTimeHelper.NowUae
                 });
             }
 
@@ -336,7 +337,7 @@ public class NotificationService : INotificationService
                     Status = NotificationStatus.Pending,
                     RecipientEmail = candidate.Email ?? string.Empty,
                     RecipientPhone = candidate.PhoneNumber,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = UaeTimeHelper.NowUae
                 });
             }
         }
@@ -403,7 +404,7 @@ public class NotificationService : INotificationService
                     Status = NotificationStatus.Pending,
                     RecipientEmail = candidate.Email,
                     RecipientPhone = candidate.PhoneNumber,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = UaeTimeHelper.NowUae
                 });
             }
 
@@ -418,7 +419,7 @@ public class NotificationService : INotificationService
                     Status = NotificationStatus.Pending,
                     RecipientEmail = candidate.Email ?? string.Empty,
                     RecipientPhone = candidate.PhoneNumber,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = UaeTimeHelper.NowUae
                 });
             }
         }
@@ -483,7 +484,7 @@ public class NotificationService : INotificationService
                 Status = NotificationStatus.Pending,
                 RecipientEmail = candidate.Email,
                 RecipientPhone = candidate.PhoneNumber,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = UaeTimeHelper.NowUae
             });
         }
 
@@ -559,7 +560,7 @@ Good luck!",
 
 بالتوفيق!",
                 IsActive = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = UaeTimeHelper.NowUae
             },
             new()
             {
@@ -583,7 +584,7 @@ Best regards,
 مع أطيب التحيات،
 فريق {{BrandName}}",
                 IsActive = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = UaeTimeHelper.NowUae
             },
             new()
             {
@@ -607,7 +608,7 @@ Best regards,
 مع أطيب التحيات،
 فريق {{BrandName}}",
                 IsActive = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = UaeTimeHelper.NowUae
             }
         };
 

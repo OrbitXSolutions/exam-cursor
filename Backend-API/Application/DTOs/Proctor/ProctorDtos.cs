@@ -19,8 +19,8 @@ public class ProctorSessionDto
     public string ModeName => Mode.ToString();
     public ProctorSessionStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime StartedAt { get; set; }
-    public DateTime? EndedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? EndedAt { get; set; }
     public string? DeviceFingerprint { get; set; }
     public string? UserAgent { get; set; }
     public string? IpAddress { get; set; }
@@ -41,12 +41,12 @@ public class ProctorSessionDto
     public decimal? BehaviorScore { get; set; }
     public decimal? EnvironmentScore { get; set; }
     public string RiskLevel => GetRiskLevel(RiskScore);
-    public DateTime? LastHeartbeatAt { get; set; }
+    public DateTimeOffset? LastHeartbeatAt { get; set; }
     public int HeartbeatMissedCount { get; set; }
     public bool IsFlagged { get; set; }
     // Attempt-level fields
     public int? RemainingSeconds { get; set; }
-    public DateTime? ExpiresAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
     public string? AttemptStatus { get; set; }
     public string? AttemptIpAddress { get; set; }
     public string? AttemptDeviceInfo { get; set; }
@@ -77,8 +77,8 @@ public class ProctorSessionDto
     public int AttemptNumber { get; set; }
     public decimal? AttemptTotalScore { get; set; }
     public bool? AttemptIsPassed { get; set; }
-    public DateTime? AttemptSubmittedAt { get; set; }
-    public DateTime? AttemptStartedAt { get; set; }
+    public DateTimeOffset? AttemptSubmittedAt { get; set; }
+    public DateTimeOffset? AttemptStartedAt { get; set; }
     public int AttemptExtraTimeSeconds { get; set; }
     public int AttemptTotalAnswered { get; set; }
     public int AttemptTotalQuestions { get; set; }
@@ -112,9 +112,9 @@ public class SessionIdentityVerificationDto
     public decimal? FaceMatchScore { get; set; }
     public string? LivenessResult { get; set; }
     public decimal? RiskScore { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public string? ReviewedBy { get; set; }
-    public DateTime? ReviewedAt { get; set; }
+    public DateTimeOffset? ReviewedAt { get; set; }
     public string? ReviewNotes { get; set; }
     public string? IdDocumentType { get; set; }
     public bool IdDocumentUploaded { get; set; }
@@ -145,8 +145,8 @@ public class ProctorSessionListDto
     public string ModeName => Mode.ToString();
     public ProctorSessionStatus Status { get; set; }
     public string StatusName => Status.ToString();
-    public DateTime StartedAt { get; set; }
-    public DateTime? EndedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
+    public DateTimeOffset? EndedAt { get; set; }
     public int TotalViolations { get; set; }
     public int CountableViolationCount { get; set; }
     public int MaxViolationWarnings { get; set; }
@@ -159,7 +159,7 @@ public class ProctorSessionListDto
     public string? TerminationReason { get; set; }
     public string? LatestSnapshotUrl { get; set; }
     public int SnapshotCount { get; set; }
-    public DateTime? LastSnapshotAt { get; set; }
+    public DateTimeOffset? LastSnapshotAt { get; set; }
     // Device & Environment
     public string? IpAddress { get; set; }
     public string? UserAgent { get; set; }
@@ -214,7 +214,7 @@ public class ProctorSessionCreatedDto
     public int ProctorSessionId { get; set; }
     public int AttemptId { get; set; }
     public ProctorMode Mode { get; set; }
-    public DateTime StartedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; }
     public int HeartbeatIntervalSeconds { get; set; }
     public string Message { get; set; } = string.Empty;
 }
@@ -231,8 +231,8 @@ public class ProctorSessionSearchDto
     public ProctorDecisionStatus? DecisionStatus { get; set; }
     public bool? RequiresReview { get; set; }
     public decimal? MinRiskScore { get; set; }
-    public DateTime? StartedFrom { get; set; }
-    public DateTime? StartedTo { get; set; }
+    public DateTimeOffset? StartedFrom { get; set; }
+    public DateTimeOffset? StartedTo { get; set; }
     public bool IncludeSamples { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -255,7 +255,7 @@ public class ProctorEventDto
     public string SeverityLabel => GetSeverityLabel(Severity);
     public bool IsViolation { get; set; }
     public string? MetadataJson { get; set; }
-    public DateTime OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; set; }
     public int SequenceNumber { get; set; }
 
     private static string GetSeverityLabel(byte severity) => severity switch
@@ -279,7 +279,7 @@ public class LogProctorEventDto
     public ProctorEventType EventType { get; set; }
     public byte Severity { get; set; }
     public string? MetadataJson { get; set; }
-    public DateTime? ClientTimestamp { get; set; }
+    public DateTimeOffset? ClientTimestamp { get; set; }
 }
 
 /// <summary>
@@ -299,7 +299,7 @@ public class LogProctorEventItemDto
     public ProctorEventType EventType { get; set; }
     public byte Severity { get; set; }
     public string? MetadataJson { get; set; }
-    public DateTime? ClientTimestamp { get; set; }
+    public DateTimeOffset? ClientTimestamp { get; set; }
 }
 
 /// <summary>
@@ -308,7 +308,7 @@ public class LogProctorEventItemDto
 public class HeartbeatDto
 {
     public int ProctorSessionId { get; set; }
-    public DateTime? ClientTimestamp { get; set; }
+    public DateTimeOffset? ClientTimestamp { get; set; }
     public string? MetadataJson { get; set; }
 }
 
@@ -318,7 +318,7 @@ public class HeartbeatDto
 public class HeartbeatResponseDto
 {
     public bool Success { get; set; }
-    public DateTime ServerTime { get; set; }
+    public DateTimeOffset ServerTime { get; set; }
     public decimal? CurrentRiskScore { get; set; }
     public int TotalViolations { get; set; }
     public bool HasWarning { get; set; }
@@ -388,11 +388,11 @@ public class ProctorEvidenceDto
     public long FileSize { get; set; }
     public string FileSizeFormatted => FormatFileSize(FileSize);
     public string? ContentType { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int? DurationSeconds { get; set; }
     public bool IsUploaded { get; set; }
-    public DateTime? UploadedAt { get; set; }
+    public DateTimeOffset? UploadedAt { get; set; }
     public string? PreviewUrl { get; set; }
     public string? DownloadUrl { get; set; }
 
@@ -419,8 +419,8 @@ public class UploadEvidenceDto
     public EvidenceType Type { get; set; }
     public string FileName { get; set; } = string.Empty;
     public string? ContentType { get; set; }
-    public DateTime? StartAt { get; set; }
-    public DateTime? EndAt { get; set; }
+    public DateTimeOffset? StartAt { get; set; }
+    public DateTimeOffset? EndAt { get; set; }
     public int? DurationSeconds { get; set; }
     public string? MetadataJson { get; set; }
 }
@@ -432,7 +432,7 @@ public class EvidenceUploadResultDto
 {
     public int EvidenceId { get; set; }
     public string UploadUrl { get; set; } = string.Empty;
-    public DateTime ExpiresAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
 }
 
 #endregion
@@ -453,7 +453,7 @@ public class ProctorDecisionDto
     public string? DecisionReasonAr { get; set; }
     public string? DecidedBy { get; set; }
     public string? DeciderName { get; set; }
-    public DateTime? DecidedAt { get; set; }
+    public DateTimeOffset? DecidedAt { get; set; }
     public bool IsFinalized { get; set; }
     public ProctorDecisionStatus? PreviousStatus { get; set; }
     public bool WasOverridden => PreviousStatus.HasValue;
@@ -505,7 +505,7 @@ public class RiskCalculationResultDto
     public int TotalViolations { get; set; }
     public List<TriggeredRuleDto> TriggeredRules { get; set; } = new();
     public Dictionary<string, int> EventBreakdown { get; set; } = new();
-    public DateTime CalculatedAt { get; set; }
+    public DateTimeOffset CalculatedAt { get; set; }
 }
 
 /// <summary>
@@ -573,7 +573,7 @@ public class LiveMonitoringDto
     public ProctorSessionStatus Status { get; set; }
     public decimal? RiskScore { get; set; }
     public int TotalViolations { get; set; }
-    public DateTime? LastHeartbeatAt { get; set; }
+    public DateTimeOffset? LastHeartbeatAt { get; set; }
     public bool IsOnline { get; set; }
     public ProctorEventDto? LastEvent { get; set; }
 }
