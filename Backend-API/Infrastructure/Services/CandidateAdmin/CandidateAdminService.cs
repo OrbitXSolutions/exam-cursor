@@ -11,6 +11,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.CandidateAdmin;
 
@@ -21,19 +22,22 @@ public class CandidateAdminService : ICandidateAdminService
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IEncryptionService _encryption;
     private readonly ICacheService _cache;
+    private readonly ResourceAuthorizationService _resourceAuthorization;
 
     public CandidateAdminService(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
         IEncryptionService encryption,
-        ICacheService cache)
+        ICacheService cache,
+        ResourceAuthorizationService resourceAuthorization)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
         _encryption = encryption;
         _cache = cache;
+        _resourceAuthorization = resourceAuthorization;
     }
 
     private void InvalidateCandidateCache()
@@ -44,7 +48,8 @@ public class CandidateAdminService : ICandidateAdminService
     // ── List ───────────────────────────────────────────────────
     public async Task<ApiResponse<PaginatedResponse<CandidateListDto>>> GetCandidatesAsync(CandidateFilterDto filter)
     {
-        var cacheKey = $"{CacheKeys.CandidatesPrefix}admin:{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+        var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+        var cacheKey = $"{CacheKeys.CandidatesPrefix}admin:{scopeKey}:{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
         return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
             // Get all candidate user IDs
@@ -60,6 +65,7 @@ public class CandidateAdminService : ICandidateAdminService
 
             var query = _db.Users
                 .Where(u => candidateUserIds.Contains(u.Id) && !u.IsDeleted);
+            query = await _resourceAuthorization.ScopeUsersAsync(query);
 
             // Search
             if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -139,6 +145,9 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Get by ID ──────────────────────────────────────────────
     public async Task<ApiResponse<CandidateListDto>> GetCandidateByIdAsync(string id)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(id))
+            return ApiResponse<CandidateListDto>.FailureResponse("Candidate not found.");
+
         var user = await _userManager.FindByIdAsync(id);
         if (user == null || user.IsDeleted)
             return ApiResponse<CandidateListDto>.FailureResponse("Candidate not found.");
@@ -153,6 +162,10 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Create ─────────────────────────────────────────────────
     public async Task<ApiResponse<CandidateListDto>> CreateCandidateAsync(CreateCandidateDto dto, string createdBy)
     {
+        var departmentId = await _resourceAuthorization.IsCurrentUserSuperDevAsync()
+            ? null
+            : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
+
         // Validate email uniqueness
         var existing = await _userManager.FindByEmailAsync(dto.Email);
         if (existing != null)
@@ -180,6 +193,7 @@ public class CandidateAdminService : ICandidateAdminService
             Status = UserStatus.Active,
             IsBlocked = false,
             EmailConfirmed = true,
+            DepartmentId = departmentId,
             CreatedBy = createdBy,
             CreatedDate = UaeTimeHelper.NowUae,
             EncryptedPassword = _encryption.Encrypt(password)
@@ -204,6 +218,9 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Update ─────────────────────────────────────────────────
     public async Task<ApiResponse<CandidateListDto>> UpdateCandidateAsync(string id, UpdateCandidateDto dto, string updatedBy)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(id))
+            return ApiResponse<CandidateListDto>.FailureResponse("Candidate not found.");
+
         var user = await _userManager.FindByIdAsync(id);
         if (user == null || user.IsDeleted)
             return ApiResponse<CandidateListDto>.FailureResponse("Candidate not found.");
@@ -257,6 +274,9 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Block / Unblock ────────────────────────────────────────
     public async Task<ApiResponse<bool>> BlockCandidateAsync(string id, string blockedBy)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(id))
+            return ApiResponse<bool>.FailureResponse("Candidate not found.");
+
         var user = await _userManager.FindByIdAsync(id);
         if (user == null || user.IsDeleted)
             return ApiResponse<bool>.FailureResponse("Candidate not found.");
@@ -274,6 +294,9 @@ public class CandidateAdminService : ICandidateAdminService
 
     public async Task<ApiResponse<bool>> UnblockCandidateAsync(string id, string updatedBy)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(id))
+            return ApiResponse<bool>.FailureResponse("Candidate not found.");
+
         var user = await _userManager.FindByIdAsync(id);
         if (user == null || user.IsDeleted)
             return ApiResponse<bool>.FailureResponse("Candidate not found.");
@@ -290,6 +313,9 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Delete (safe) ──────────────────────────────────────────
     public async Task<ApiResponse<bool>> DeleteCandidateAsync(string id, string deletedBy)
     {
+        if (!await _resourceAuthorization.CanAccessCandidateAsync(id))
+            return ApiResponse<bool>.FailureResponse("Candidate not found.");
+
         var user = await _userManager.FindByIdAsync(id);
         if (user == null || user.IsDeleted)
             return ApiResponse<bool>.FailureResponse("Candidate not found.");
@@ -388,6 +414,9 @@ public class CandidateAdminService : ICandidateAdminService
     public async Task<ApiResponse<CandidateImportResultDto>> ImportCandidatesAsync(Stream fileStream, string createdBy)
     {
         var result = new CandidateImportResultDto();
+        var departmentId = await _resourceAuthorization.IsCurrentUserSuperDevAsync()
+            ? null
+            : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
 
         using var workbook = new XLWorkbook(fileStream);
         var ws = workbook.Worksheets.First();
@@ -488,6 +517,7 @@ public class CandidateAdminService : ICandidateAdminService
                 Status = UserStatus.Active,
                 IsBlocked = false,
                 EmailConfirmed = true,
+                DepartmentId = departmentId,
                 CreatedBy = createdBy,
                 CreatedDate = UaeTimeHelper.NowUae,
                 EncryptedPassword = _encryption.Encrypt(finalPassword)

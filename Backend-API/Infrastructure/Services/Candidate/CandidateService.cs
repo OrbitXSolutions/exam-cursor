@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
@@ -51,9 +52,20 @@ public class CandidateService : ICandidateService
         _proctorHub = proctorHub;
     }
 
-    private void InvalidateCandidateCache()
+    private void InvalidateAttemptProgressCaches()
     {
         _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
+        _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
+    }
+
+    private void InvalidateAttemptCompletionCaches()
+    {
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
+        _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
     }
 
     #region Exam Discovery & Preview
@@ -532,6 +544,8 @@ public class CandidateService : ICandidateService
             }
         }
 
+        await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
         // Check for existing active attempt
         var existingActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
                  .Include(a => a.Questions.OrderBy(q => q.Order))
@@ -549,11 +563,12 @@ public class CandidateService : ICandidateService
                 existingActive.Status = AttemptStatus.Expired;
                 existingActive.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
                 await _context.SaveChangesAsync();
-                InvalidateCandidateCache();
+                InvalidateAttemptCompletionCaches();
             }
             else
             {
                 // Resume existing
+                await startTransaction.CommitAsync();
                 return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
                      await BuildCandidateSessionDto(existingActive, exam),
                    "Resuming existing attempt");
@@ -577,6 +592,7 @@ public class CandidateService : ICandidateService
 
             if (adminOverride == null)
             {
+                await startTransaction.CommitAsync();
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
                      $"Maximum attempts ({exam.MaxAttempts}) reached");
             }
@@ -609,7 +625,7 @@ public class CandidateService : ICandidateService
 
         _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
-        InvalidateCandidateCache();
+        InvalidateAttemptProgressCaches();
 
         // Mark admin override as used (if applicable)
         if (adminOverride != null)
@@ -620,7 +636,7 @@ public class CandidateService : ICandidateService
             adminOverride.UpdatedDate = now;
             adminOverride.UpdatedBy = candidateId;
             await _context.SaveChangesAsync();
-            InvalidateCandidateCache();
+            InvalidateAttemptProgressCaches();
         }
 
         // Generate attempt questions
@@ -696,7 +712,8 @@ public class CandidateService : ICandidateService
         _context.Set<AttemptEvent>().Add(startEvent);
 
         await _context.SaveChangesAsync();
-        InvalidateCandidateCache();
+        InvalidateAttemptProgressCaches();
+        await startTransaction.CommitAsync();
 
         // Reload with questions
         var createdAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -739,7 +756,7 @@ public class CandidateService : ICandidateService
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
-            InvalidateCandidateCache();
+            InvalidateAttemptCompletionCaches();
         }
 
         if (attempt.Status == AttemptStatus.Submitted || attempt.Status == AttemptStatus.Expired ||
@@ -757,14 +774,6 @@ $"Attempt is {attempt.Status}. Cannot resume.");
      int attemptId, BulkSaveAnswersRequest request, string candidateId)
     {
         var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
-            .Include(a => a.Questions)
- .ThenInclude(aq => aq.Question)
-             .ThenInclude(q => q.QuestionType)
-     .Include(a => a.Questions)
-       .ThenInclude(aq => aq.Question)
-        .ThenInclude(q => q.Options)
-.Include(a => a.Questions)
-.ThenInclude(aq => aq.Answers)
             .FirstOrDefaultAsync(a => a.Id == attemptId);
 
         if (attempt == null)
@@ -791,7 +800,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
-            InvalidateCandidateCache();
+            InvalidateAttemptCompletionCaches();
             return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
 
@@ -801,13 +810,26 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             attempt.Status = AttemptStatus.InProgress;
         }
 
+        var questionIds = request.Answers.Select(a => a.QuestionId).Distinct().ToList();
+        var attemptQuestions = await _context.Set<AttemptQuestion>()
+            .Where(aq => aq.AttemptId == attemptId && questionIds.Contains(aq.QuestionId))
+            .ToListAsync();
+        var attemptQuestionLookup = attemptQuestions.ToDictionary(aq => aq.QuestionId);
+
+        var existingAnswers = await _context.Set<AttemptAnswer>()
+            .Where(a => a.AttemptId == attemptId && questionIds.Contains(a.QuestionId))
+            .ToListAsync();
+        var answerLookup = existingAnswers.ToDictionary(a => a.QuestionId);
+
         // Process each answer (idempotent)
         foreach (var answerRequest in request.Answers)
         {
-            var attemptQuestion = attempt.Questions.FirstOrDefault(q => q.QuestionId == answerRequest.QuestionId);
-            if (attemptQuestion == null) continue;
+            if (!attemptQuestionLookup.TryGetValue(answerRequest.QuestionId, out var attemptQuestion))
+            {
+                continue;
+            }
 
-            var existingAnswer = attemptQuestion.Answers.FirstOrDefault();
+            answerLookup.TryGetValue(answerRequest.QuestionId, out var existingAnswer);
 
             if (existingAnswer != null)
             {
@@ -837,11 +859,22 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                     CreatedBy = candidateId
                 };
                 _context.Set<AttemptAnswer>().Add(newAnswer);
+                answerLookup[answerRequest.QuestionId] = newAnswer;
             }
+
+            _context.Set<AttemptEvent>().Add(new AttemptEvent
+            {
+                AttemptId = attemptId,
+                EventType = AttemptEventType.AnswerSaved,
+                OccurredAt = now,
+                MetadataJson = JsonSerializer.Serialize(new { questionId = answerRequest.QuestionId }),
+                CreatedDate = now,
+                CreatedBy = candidateId
+            });
         }
 
         await _context.SaveChangesAsync();
-        InvalidateCandidateCache();
+        InvalidateAttemptProgressCaches();
 
         return ApiResponse<bool>.SuccessResponse(true, "Answers saved successfully");
     }
@@ -898,12 +931,61 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         if (attempt.ExpiresAt.HasValue && now > attempt.ExpiresAt.Value)
         {
             _logger.LogInformation("Submit on expired attempt: Attempt {AttemptId} expired but submitting anyway | CandidateId={CandidateId}", attemptId, candidateId);
-            attempt.Status = AttemptStatus.Submitted;
-            attempt.SubmittedAt = now;
-            attempt.UpdatedDate = now;
-            attempt.UpdatedBy = candidateId;
+            var expiredSubmitRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                .Where(a => a.Id == attemptId
+                    && a.CandidateId == candidateId
+                    && a.Status != AttemptStatus.Submitted
+                    && a.Status != AttemptStatus.Expired
+                    && a.Status != AttemptStatus.Cancelled
+                    && a.ExpiresAt.HasValue
+                    && a.ExpiresAt.Value < now)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(a => a.Status, AttemptStatus.Submitted)
+                    .SetProperty(a => a.SubmittedAt, now)
+                    .SetProperty(a => a.UpdatedDate, now)
+                    .SetProperty(a => a.UpdatedBy, candidateId));
+
+            if (expiredSubmitRows == 0)
+            {
+                var latestAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                    .Include(a => a.Exam)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.Id == attemptId && a.CandidateId == candidateId);
+
+                if (latestAttempt?.Status == AttemptStatus.Submitted)
+                {
+                    _logger.LogInformation("Submit idempotent: Attempt {AttemptId} already submitted during expired submit | CandidateId={CandidateId}", attemptId, candidateId);
+                    return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(
+                        new CandidateResultSummaryDto
+                        {
+                            ResultId = 0,
+                            ExamId = latestAttempt.ExamId,
+                            ExamTitleEn = latestAttempt.Exam.TitleEn,
+                            ExamTitleAr = latestAttempt.Exam.TitleAr,
+                            AttemptNumber = latestAttempt.AttemptNumber,
+                            SubmittedAt = latestAttempt.SubmittedAt ?? now,
+                            AllowReview = latestAttempt.Exam.AllowReview,
+                            ShowCorrectAnswers = latestAttempt.Exam.ShowCorrectAnswers
+                        },
+                        "Attempt already submitted successfully.");
+                }
+
+                if (latestAttempt?.Status == AttemptStatus.Expired || latestAttempt?.Status == AttemptStatus.Cancelled)
+                    return ApiResponse<CandidateResultSummaryDto>.FailureResponse($"Attempt is {latestAttempt.Status}");
+
+                return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt could not be submitted. Please retry.");
+            }
+
+            _context.Set<AttemptEvent>().Add(new AttemptEvent
+            {
+                AttemptId = attemptId,
+                EventType = AttemptEventType.Submitted,
+                OccurredAt = now,
+                CreatedDate = now,
+                CreatedBy = candidateId
+            });
             await _context.SaveChangesAsync();
-            InvalidateCandidateCache();
+            InvalidateAttemptCompletionCaches();
 
             // Notify proctor via SignalR (server-side, reliable)
             _ = Task.Run(async () =>
@@ -942,10 +1024,49 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
         // ===== PRIMARY SUBMIT PATH =====
         // Step 1: Persist submission state (this is the critical save)
-        attempt.Status = AttemptStatus.Submitted;
-        attempt.SubmittedAt = now;
-        attempt.UpdatedDate = now;
-        attempt.UpdatedBy = candidateId;
+        var submittedRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .Where(a => a.Id == attemptId
+                && a.CandidateId == candidateId
+                && a.Status != AttemptStatus.Submitted
+                && a.Status != AttemptStatus.Expired
+                && a.Status != AttemptStatus.Cancelled
+                && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(a => a.Status, AttemptStatus.Submitted)
+                .SetProperty(a => a.SubmittedAt, now)
+                .SetProperty(a => a.UpdatedDate, now)
+                .SetProperty(a => a.UpdatedBy, candidateId));
+
+        if (submittedRows == 0)
+        {
+            var latestAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+                .Include(a => a.Exam)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id == attemptId && a.CandidateId == candidateId);
+
+            if (latestAttempt?.Status == AttemptStatus.Submitted)
+            {
+                _logger.LogInformation("Submit idempotent: Attempt {AttemptId} was submitted by a parallel request | CandidateId={CandidateId}", attemptId, candidateId);
+                return ApiResponse<CandidateResultSummaryDto>.SuccessResponse(
+                    new CandidateResultSummaryDto
+                    {
+                        ResultId = 0,
+                        ExamId = latestAttempt.ExamId,
+                        ExamTitleEn = latestAttempt.Exam.TitleEn,
+                        ExamTitleAr = latestAttempt.Exam.TitleAr,
+                        AttemptNumber = latestAttempt.AttemptNumber,
+                        SubmittedAt = latestAttempt.SubmittedAt ?? now,
+                        AllowReview = latestAttempt.Exam.AllowReview,
+                        ShowCorrectAnswers = latestAttempt.Exam.ShowCorrectAnswers
+                    },
+                    "Attempt already submitted successfully.");
+            }
+
+            if (latestAttempt?.Status == AttemptStatus.Expired || latestAttempt?.Status == AttemptStatus.Cancelled)
+                return ApiResponse<CandidateResultSummaryDto>.FailureResponse($"Attempt is {latestAttempt.Status}");
+
+            return ApiResponse<CandidateResultSummaryDto>.FailureResponse("Attempt could not be submitted. Please retry.");
+        }
 
         // Log event
         var submitEvent = new AttemptEvent
@@ -971,7 +1092,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         }
 
         await _context.SaveChangesAsync();
-        InvalidateCandidateCache();
+        InvalidateAttemptCompletionCaches();
 
         _logger.LogInformation("Submit succeeded: Attempt {AttemptId} submitted | CandidateId={CandidateId} | ExamId={ExamId}",
             attemptId, candidateId, attempt.ExamId);

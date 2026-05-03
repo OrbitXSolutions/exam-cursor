@@ -10,6 +10,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -18,12 +19,18 @@ public class UserService : IUserService
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly ICacheService _cache;
   private readonly ApplicationDbContext _context;
+  private readonly ResourceAuthorizationService _resourceAuthorization;
 
-  public UserService(UserManager<ApplicationUser> userManager, ICacheService cache, ApplicationDbContext context)
+  public UserService(
+    UserManager<ApplicationUser> userManager,
+    ICacheService cache,
+    ApplicationDbContext context,
+    ResourceAuthorizationService resourceAuthorization)
   {
     _userManager = userManager;
     _cache = cache;
     _context = context;
+    _resourceAuthorization = resourceAuthorization;
   }
 
   private void InvalidateUserCache()
@@ -35,6 +42,19 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<UserDetailDto>> CreateUserAsync(CreateUserDto dto, string createdBy)
   {
+    var departmentId = dto.DepartmentId;
+    if (!await _resourceAuthorization.IsCurrentUserSuperDevAsync())
+    {
+      var currentDepartmentId = await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
+      if (!currentDepartmentId.HasValue)
+        return ApiResponse<UserDetailDto>.FailureResponse("Department not found.");
+
+      if (departmentId.HasValue && departmentId.Value != currentDepartmentId.Value)
+        return ApiResponse<UserDetailDto>.FailureResponse("Department not found.");
+
+      departmentId = currentDepartmentId.Value;
+    }
+
     // Check if email already exists
     var existingUser = await _userManager.FindByEmailAsync(dto.Email);
     if (existingUser != null)
@@ -51,7 +71,7 @@ public class UserService : IUserService
       FullName = dto.FullName,
       FullNameAr = dto.FullNameAr,
       DisplayName = dto.FullName,
-      DepartmentId = dto.DepartmentId,
+      DepartmentId = departmentId,
       EmailConfirmed = true,
       Status = UserStatus.Active,
       CreatedDate = UaeTimeHelper.NowUae,
@@ -84,13 +104,15 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetUsersAsync(UserFilterDto filter)
   {
+    var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
     var excludeKey = filter.ExcludeRoles != null && filter.ExcludeRoles.Count > 0
       ? string.Join(",", filter.ExcludeRoles.OrderBy(r => r).Select(r => r.ToLower()))
       : "";
-    var cacheKey = $"{CacheKeys.UsersPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.IsBlocked}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{excludeKey}:{filter.PageNumber}:{filter.PageSize}";
+    var cacheKey = $"{CacheKeys.UsersPrefix}{scopeKey}:{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.IsBlocked}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{excludeKey}:{filter.PageNumber}:{filter.PageSize}";
     return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
       var query = _userManager.Users.Include(u => u.Department).AsQueryable();
+      query = await _resourceAuthorization.ScopeUsersAsync(query);
 
       if (!string.IsNullOrWhiteSpace(filter.Search))
       {
@@ -176,7 +198,8 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<PaginatedResponse<UserDto>>> GetStaffUsersAsync(StaffUserFilterDto filter)
   {
-    var cacheKey = $"{CacheKeys.UsersPrefix}staff:{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+    var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+    var cacheKey = $"{CacheKeys.UsersPrefix}staff:{scopeKey}:{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
     return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
       // Excluded roles resolved via SQL subquery — no memory loading
@@ -189,6 +212,7 @@ public class UserService : IUserService
       var query = _context.Users
         .Include(u => u.Department)
         .Where(u => !excludedUserIds.Contains(u.Id));
+      query = await _resourceAuthorization.ScopeUsersAsync(query);
 
       if (!string.IsNullOrWhiteSpace(filter.Search))
       {
@@ -248,6 +272,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<UserDetailDto>> GetUserByIdAsync(string userId)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<UserDetailDto>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.Users.Include(u => u.Department).FirstOrDefaultAsync(u => u.Id == userId);
     if (user == null)
     {
@@ -273,6 +302,11 @@ public class UserService : IUserService
       return ApiResponse<UserDetailDto>.FailureResponse("User not found.");
     }
 
+    if (!await _resourceAuthorization.CanAccessUserAsync(user.Id))
+    {
+      return ApiResponse<UserDetailDto>.FailureResponse("User not found.");
+    }
+
     var roles = await _userManager.GetRolesAsync(user);
     var userDto = user.Adapt<UserDetailDto>();
     userDto.Roles = roles.ToList();
@@ -283,10 +317,17 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<List<UserDto>>> GetUsersByRoleAsync(string roleName)
   {
-    var cacheKey = $"{CacheKeys.UsersPrefix}byrole:{roleName.ToLower()}";
+    var scopeKey = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
+    var cacheKey = $"{CacheKeys.UsersPrefix}byrole:{scopeKey}:{roleName.ToLower()}";
     return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
-      var users = await _userManager.GetUsersInRoleAsync(roleName);
+      var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+      var userIdsInRole = usersInRole.Select(u => u.Id).ToHashSet();
+      var query = _userManager.Users
+        .Where(u => userIdsInRole.Contains(u.Id))
+        .AsQueryable();
+      query = await _resourceAuthorization.ScopeUsersAsync(query);
+      var users = await query.ToListAsync();
       var userDtos = users.Adapt<List<UserDto>>();
 
       foreach (var userDto in userDtos)
@@ -303,6 +344,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<UserDetailDto>> UpdateUserAsync(string userId, UpdateUserDto dto, string updatedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<UserDetailDto>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
@@ -318,6 +364,16 @@ public class UserService : IUserService
     user.DisplayName = dto.DisplayName ?? user.DisplayName;
     user.FullName = dto.FullName ?? user.FullName;
     user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+    if (!await _resourceAuthorization.IsCurrentUserSuperDevAsync())
+    {
+      var currentDepartmentId = await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
+      if (!currentDepartmentId.HasValue)
+        return ApiResponse<UserDetailDto>.FailureResponse("Department not found.");
+
+      if (dto.ClearDepartment || (dto.DepartmentId.HasValue && dto.DepartmentId.Value != currentDepartmentId.Value))
+        return ApiResponse<UserDetailDto>.FailureResponse("Department not found.");
+    }
+
     if (dto.ClearDepartment)
       user.DepartmentId = null;
     else if (dto.DepartmentId.HasValue)
@@ -344,6 +400,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<bool>> BlockUserAsync(string userId, string blockedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<bool>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
@@ -373,6 +434,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<bool>> UnblockUserAsync(string userId, string unblockedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<bool>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
@@ -391,6 +457,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<bool>> ActivateUserAsync(string userId, string activatedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<bool>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
@@ -409,6 +480,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<bool>> DeactivateUserAsync(string userId, string deactivatedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<bool>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
@@ -433,6 +509,11 @@ public class UserService : IUserService
 
   public async Task<ApiResponse<bool>> DeleteUserAsync(string userId, string deletedBy)
   {
+    if (!await _resourceAuthorization.CanAccessUserAsync(userId))
+    {
+      return ApiResponse<bool>.FailureResponse("User not found.");
+    }
+
     var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {

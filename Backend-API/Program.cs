@@ -218,6 +218,7 @@ builder.Services.AddScoped<IExamOperationsService, ExamOperationsService>();
 builder.Services.AddScoped<ICandidateExamDetailsService, CandidateExamDetailsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISmsService, SmsService>();
+builder.Services.AddScoped<Smart_Core.Infrastructure.Services.Authorization.ResourceAuthorizationService>();
 builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<INotificationService, Smart_Core.Infrastructure.Services.Notification.NotificationService>();
 builder.Services.AddSingleton<ICacheService, CacheService>();

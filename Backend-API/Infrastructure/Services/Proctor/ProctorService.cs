@@ -15,6 +15,7 @@ using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -26,6 +27,7 @@ public class ProctorService : IProctorService
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHubContext<ProctorHub> _proctorHub;
+    private readonly ResourceAuthorizationService _resourceAuthorization;
     private const int DefaultHeartbeatIntervalSeconds = 15;
     private const int HeartbeatMissedThresholdSeconds = 45;
 
@@ -35,7 +37,8 @@ public class ProctorService : IProctorService
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
         UserManager<ApplicationUser> userManager,
-        IHubContext<ProctorHub> proctorHub)
+        IHubContext<ProctorHub> proctorHub,
+        ResourceAuthorizationService resourceAuthorization)
     {
         _context = context;
         _mediaStorage = mediaStorage;
@@ -43,6 +46,7 @@ public class ProctorService : IProctorService
         _currentUserService = currentUserService;
         _userManager = userManager;
         _proctorHub = proctorHub;
+        _resourceAuthorization = resourceAuthorization;
     }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
@@ -177,6 +181,11 @@ public class ProctorService : IProctorService
             return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessProctorSessionAsync(sessionId))
+        {
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+        }
+
         var dto = MapToSessionDto(session);
 
         // Enriched: load exam total questions count (separate query to avoid heavy include)
@@ -221,6 +230,9 @@ public class ProctorService : IProctorService
 
     public async Task<ApiResponse<ProctorSessionDto>> GetSessionByAttemptAsync(int attemptId, ProctorMode mode)
     {
+        if (!await _resourceAuthorization.CanAccessAttemptAsync(attemptId))
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+
         var session = await _context.Set<ProctorSession>()
         .Include(s => s.Exam)
    .Include(s => s.Candidate)
@@ -238,6 +250,9 @@ public class ProctorService : IProctorService
 
     public async Task<ApiResponse<ProctorSessionDto>> EndSessionAsync(int sessionId, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, userId))
+            return ApiResponse<ProctorSessionDto>.FailureResponse("Session not found");
+
         var session = await _context.Set<ProctorSession>()
           .FirstOrDefaultAsync(s => s.Id == sessionId);
 
@@ -267,6 +282,9 @@ public class ProctorService : IProctorService
 
     public async Task<ApiResponse<bool>> CancelSessionAsync(int sessionId, string adminUserId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, adminUserId))
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
         var session = await _context.Set<ProctorSession>()
          .FirstOrDefaultAsync(s => s.Id == sessionId);
 
@@ -296,41 +314,7 @@ public class ProctorService : IProctorService
                   .Include(s => s.EvidenceItems)
                   .Include(s => s.Attempt)
                   .AsQueryable();
-
-        // Department isolation: filter proctor sessions via Exam.DepartmentId (SuperDev sees all)
-        if (!await IsCurrentUserSuperDevAsync())
-        {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
-            {
-                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
-            }
-        }
-
-        // Assignment isolation: Proctor role can only see sessions for exams they are assigned to.
-        // Admin, Instructor, SuperDev, and ProctorReviewer see all sessions within their department.
-        var userId = _currentUserService.UserId;
-        if (!string.IsNullOrEmpty(userId))
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                var isProctorOnly = await _userManager.IsInRoleAsync(user, AppRoles.Proctor)
-                    && !await _userManager.IsInRoleAsync(user, AppRoles.Admin)
-                    && !await _userManager.IsInRoleAsync(user, AppRoles.Instructor)
-                    && !await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
-
-                if (isProctorOnly)
-                {
-                    var assignedExamIds = await _context.ExamProctors
-                        .Where(ep => ep.ProctorId == userId && !ep.IsDeleted)
-                        .Select(ep => ep.ExamId)
-                        .ToListAsync();
-
-                    query = query.Where(s => assignedExamIds.Contains(s.ExamId));
-                }
-            }
-        }
+        query = await _resourceAuthorization.ScopeProctorSessionsAsync(query);
 
         query = ApplySessionFilters(query, searchDto);
         query = query.OrderByDescending(s => s.StartedAt);
@@ -609,6 +593,9 @@ public class ProctorService : IProctorService
 
     public async Task<ApiResponse<List<ProctorEventDto>>> GetSessionEventsAsync(int sessionId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionAsync(sessionId))
+            return ApiResponse<List<ProctorEventDto>>.FailureResponse("Session not found");
+
         var events = await _context.Set<ProctorEvent>()
      .Where(e => e.ProctorSessionId == sessionId)
             .OrderByDescending(e => e.OccurredAt)
@@ -621,6 +608,9 @@ public class ProctorService : IProctorService
     public async Task<ApiResponse<List<ProctorEventDto>>> GetEventsByTypeAsync(
     int sessionId, ProctorEventType eventType)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionAsync(sessionId))
+            return ApiResponse<List<ProctorEventDto>>.FailureResponse("Session not found");
+
         var events = await _context.Set<ProctorEvent>()
      .Where(e => e.ProctorSessionId == sessionId && e.EventType == eventType)
           .OrderByDescending(e => e.OccurredAt)
@@ -637,6 +627,9 @@ public class ProctorService : IProctorService
     public async Task<ApiResponse<RiskCalculationResultDto>> CalculateRiskScoreAsync(
         int sessionId, string calculatedBy)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, calculatedBy))
+            return ApiResponse<RiskCalculationResultDto>.FailureResponse("Session not found");
+
         return await CalculateRiskScoreInternalAsync(sessionId, calculatedBy);
     }
 
@@ -1128,6 +1121,9 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<List<ProctorEvidenceDto>>> GetSessionEvidenceAsync(int sessionId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionAsync(sessionId))
+            return ApiResponse<List<ProctorEvidenceDto>>.FailureResponse("Session not found");
+
         var evidence = await _context.Set<ProctorEvidence>()
  .Where(e => e.ProctorSessionId == sessionId && e.IsUploaded)
             .OrderBy(e => e.StartAt ?? e.CreatedDate)
@@ -1139,6 +1135,9 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<string>> GetEvidenceDownloadUrlAsync(int evidenceId, string userId)
     {
+        if (!await _resourceAuthorization.CanAccessEvidenceAsync(evidenceId, userId))
+            return ApiResponse<string>.FailureResponse("Evidence not found");
+
         var evidence = await _context.Set<ProctorEvidence>()
               .FirstOrDefaultAsync(e => e.Id == evidenceId);
 
@@ -1165,6 +1164,9 @@ UploadEvidenceDto dto, string candidateId)
     public async Task<ApiResponse<ProctorDecisionDto>> MakeDecisionAsync(
       MakeDecisionDto dto, string reviewerId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(dto.ProctorSessionId, reviewerId))
+            return ApiResponse<ProctorDecisionDto>.FailureResponse("Session not found");
+
         var session = await _context.Set<ProctorSession>()
    .Include(s => s.Attempt)
             .Include(s => s.Decision)
@@ -1241,6 +1243,9 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<ProctorDecisionDto>.FailureResponse("Decision not found");
         }
 
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(decision.ProctorSessionId, adminUserId))
+            return ApiResponse<ProctorDecisionDto>.FailureResponse("Decision not found");
+
         var now = UaeTimeHelper.NowUae;
 
         decision.PreviousStatus = decision.Status;
@@ -1268,6 +1273,9 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<ProctorDecisionDto>> GetDecisionAsync(int sessionId)
     {
+        if (!await _resourceAuthorization.CanAccessProctorSessionAsync(sessionId))
+            return ApiResponse<ProctorDecisionDto>.FailureResponse("No decision found");
+
         var decision = await _context.Set<ProctorDecision>()
        .FirstOrDefaultAsync(d => d.ProctorSessionId == sessionId);
 
@@ -1292,6 +1300,9 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<ProctorDashboardDto>> GetDashboardAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId))
+            return ApiResponse<ProctorDashboardDto>.FailureResponse("Exam not found");
+
         var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
         if (exam == null)
         {
@@ -1340,6 +1351,9 @@ UploadEvidenceDto dto, string candidateId)
 
     public async Task<ApiResponse<List<LiveMonitoringDto>>> GetLiveMonitoringAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId))
+            return ApiResponse<List<LiveMonitoringDto>>.FailureResponse("Exam not found");
+
         var now = UaeTimeHelper.NowUae;
         var offlineThreshold = now.AddSeconds(-HeartbeatMissedThresholdSeconds);
 
@@ -1418,16 +1432,7 @@ UploadEvidenceDto dto, string candidateId)
         // Get active sessions ordered by risk score descending
         var query = _context.Set<ProctorSession>()
             .Where(s => s.Status == ProctorSessionStatus.Active && s.RiskScore > 0);
-
-        // Department isolation
-        if (!await IsCurrentUserSuperDevAsync())
-        {
-            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
-            {
-                query = query.Where(s => s.Exam.DepartmentId == userDepartmentId.Value);
-            }
-        }
+        query = await _resourceAuthorization.ScopeProctorSessionsAsync(query);
 
         var sessions = await query
             .OrderByDescending(s => s.RiskScore)
@@ -1563,6 +1568,9 @@ UploadEvidenceDto dto, string candidateId)
         if (sessionId < 0)
             return ApiResponse<bool>.SuccessResponse(true, flagged ? "Session flagged" : "Session unflagged");
 
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, proctorUserId))
+            return ApiResponse<bool>.FailureResponse("Session not found");
+
         var session = await _context.Set<ProctorSession>()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
@@ -1602,6 +1610,9 @@ UploadEvidenceDto dto, string candidateId)
         // Handle sample/demo sessions
         if (sessionId < 0)
             return ApiResponse<bool>.SuccessResponse(true, "Warning sent to candidate");
+
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, proctorUserId))
+            return ApiResponse<bool>.FailureResponse("Session not found");
 
         var session = await _context.Set<ProctorSession>()
             .FirstOrDefaultAsync(s => s.Id == sessionId);
@@ -1649,6 +1660,9 @@ UploadEvidenceDto dto, string candidateId)
         // Handle sample/demo sessions
         if (sessionId < 0)
             return ApiResponse<bool>.SuccessResponse(true, "Session terminated");
+
+        if (!await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId, proctorUserId))
+            return ApiResponse<bool>.FailureResponse("Session not found");
 
         var session = await _context.Set<ProctorSession>()
             .Include(s => s.Attempt)

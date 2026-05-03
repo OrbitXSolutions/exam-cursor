@@ -46,7 +46,14 @@ public class GradingService : IGradingService
         _cache = cache;
     }
 
-    private void InvalidateGradingCache() => _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+    private void InvalidateGradingCache()
+    {
+        _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.CandidatesPrefix);
+        _cache.RemoveByPrefix(CacheKeys.AttemptsPrefix);
+        _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
+    }
 
     private async Task<bool> IsCurrentUserSuperDevAsync()
     {

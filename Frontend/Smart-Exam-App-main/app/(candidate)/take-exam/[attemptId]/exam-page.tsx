@@ -976,10 +976,6 @@ export default function ExamPage() {
       // Note: Continuous polling is managed by the smart-poll useEffect below,
       // which only polls when SignalR is disconnected (signalRConnected === false).
 
-      // Log exam started event
-      await logAttemptEvent(sessionData.attemptId, {
-        eventType: AttemptEventType.Started,
-      }).catch(() => { })
     } catch (error: unknown) {
       console.error("[v0] Failed to start exam:", error)
       // Extract error message from API response
@@ -1052,10 +1048,6 @@ export default function ExamPage() {
           if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
           saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
 
-          await logAttemptEvent(session.attemptId, {
-            eventType: AttemptEventType.AnswerSaved,
-            metadataJson: JSON.stringify({ questionId }),
-          }).catch(() => { })
         } catch (error) {
           console.error("[v0] Failed to save answer:", error)
           setSaveStatus("error")
@@ -1382,10 +1374,6 @@ export default function ExamPage() {
 
       // Stop all background calls BEFORE submit to prevent race conditions
       stopAllBackgroundActivity()
-
-      await logAttemptEvent(session.attemptId, {
-        eventType: AttemptEventType.Submitted,
-      }).catch(() => { })
 
       // Finalize video recording in background (fire-and-forget â€” never delays submit)
       // Backend returns 202 Accepted and processes FFmpeg in background
