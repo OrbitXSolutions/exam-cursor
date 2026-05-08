@@ -25,6 +25,7 @@ import {
   RefreshCw,
   CheckCircle2,
   XCircle,
+  Lock,
 } from "lucide-react"
 import { PageHeader } from "@/components/layout/page-header"
 
@@ -103,7 +104,7 @@ export default function LicensePage() {
   }
 
   function getStateAlert(s: LicenseStatusResult) {
-    const { state, graceDaysRemaining, gracePeriodDays, daysRemaining } = s
+    const { stateText: state, graceDaysRemaining, gracePeriodDays, daysRemaining } = s
 
     if (state === "GracePeriod") {
       return {
@@ -259,6 +260,13 @@ export default function LicensePage() {
     })
   }
 
+  function getGracePeriodEndDate(expiresAt: string | null, gracePeriodDays: number | null) {
+    if (!expiresAt || gracePeriodDays == null) return "—"
+    const d = new Date(expiresAt)
+    d.setDate(d.getDate() + gracePeriodDays)
+    return formatDate(d.toISOString())
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -281,17 +289,17 @@ export default function LicensePage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {status && getStateIcon(status.state)}
+                  {status && getStateIcon(status.stateText)}
                   <div>
-                    <CardTitle className="flex items-center gap-3">
+                    <CardTitle className="flex items-center gap-3 text-xl">
                       {language === "ar" ? "حالة الرخصة" : "License Status"}
                       {status && (
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${getStateColor(status.state)}`}>
-                          {getStateLabel(status.state)}
+                        <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-base font-bold border-2 ${getStateColor(status.stateText)}`}>
+                          {getStateLabel(status.stateText)}
                         </span>
                       )}
                     </CardTitle>
-                    <CardDescription>{status?.message || ""}</CardDescription>
+                    <CardDescription className="text-base font-medium mt-1.5">{status?.message || ""}</CardDescription>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -310,42 +318,44 @@ export default function LicensePage() {
                     <div className="flex items-start gap-3">
                       {alert.icon}
                       <div className="flex-1 min-w-0">
-                        <p className={`font-semibold text-sm ${alert.titleClass}`}>{alert.title}</p>
+                        <p className={`font-bold text-base ${alert.titleClass}`}>{alert.title}</p>
                         <p className={`text-sm mt-1 ${alert.bodyClass}`}>{alert.body}</p>
-                        <ul className="mt-2 space-y-1">
-                          {alert.items.map((item, i) => (
-                            <li key={i} className={`text-sm flex items-start gap-2 ${alert.bodyClass}`}>
-                              <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${alert.dotClass}`} />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
+                        {status?.stateText !== "Expired" && (
+                          <ul className="mt-2 space-y-1">
+                            {alert.items.map((item, i) => (
+                              <li key={i} className={`text-sm flex items-start gap-2 ${alert.bodyClass}`}>
+                                <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${alert.dotClass}`} />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     </div>
                   </div>
                 )
               })()}
-              {status && status.state !== "Missing" && status.state !== "Invalid" ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {status && status.stateText !== "Missing" && status.stateText !== "Invalid" ? (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="flex items-center gap-3">
                     <Building2 className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "العميل" : "Customer"}</p>
-                      <p className="font-medium">{status.customerName || "—"}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "العميل" : "Customer"}</p>
+                      <p className="font-semibold text-base">{status.customerName || "—"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "تاريخ الإصدار → الانتهاء" : "Issued → Expiry"}</p>
-                      <p className="font-medium">{formatDate(status.issuedAt)} — {formatDate(status.expiresAt)}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "تاريخ الإصدار → الانتهاء" : "Issued → Expiry"}</p>
+                      <p className="font-semibold text-base">{formatDate(status.issuedAt)} — {formatDate(status.expiresAt)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "الأيام المتبقية" : "Days Remaining"}</p>
-                      <p className="font-medium">
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "الأيام المتبقية" : "Days Remaining"}</p>
+                      <p className="font-semibold text-base">
                         {status.daysRemaining !== null ? (
                           status.daysRemaining > 0 ? status.daysRemaining : (
                             status.graceDaysRemaining !== null && status.graceDaysRemaining > 0
@@ -359,17 +369,63 @@ export default function LicensePage() {
                   <div className="flex items-center gap-3">
                     <FileKey className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "نوع الرخصة" : "License Type"}</p>
-                      <p className="font-medium">{status.licenseType || "—"}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "نوع الرخصة" : "License Type"}</p>
+                      <p className="font-semibold text-base">{status.licenseType || "—"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Users className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">{language === "ar" ? "الحد الأقصى للمستخدمين" : "Max Users"}</p>
-                      <p className="font-medium">{status.maxUsers === 0 ? (language === "ar" ? "غير محدود" : "Unlimited") : (status.maxUsers || "—")}</p>
+                      <p className="text-sm text-muted-foreground">{language === "ar" ? "الحد الأقصى للمستخدمين" : "Max Users"}</p>
+                      <p className="font-semibold text-base">{status.maxUsers === 0 ? (language === "ar" ? "غير محدود" : "Unlimited") : (status.maxUsers || "—")}</p>
                     </div>
                   </div>
+
+                  {/* Grace Period / Expired details */}
+                  {(status.stateText === "Expired" || status.stateText === "GracePeriod") && (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-red-500" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">{language === "ar" ? "انتهت الصلاحية في" : "Expired At"}</p>
+                          <p className="font-semibold text-base text-red-600">{formatDate(status.expiresAt)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-5 w-5 text-orange-500" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">{language === "ar" ? "مدة فترة السماح" : "Grace Period"}</p>
+                          <p className="font-semibold text-base">
+                            {status.gracePeriodDays != null
+                              ? (language === "ar" ? `${status.gracePeriodDays} يوم` : `${status.gracePeriodDays} day(s)`)
+                              : "—"}
+                          </p>
+                        </div>
+                      </div>
+                      {status.stateText === "Expired" && (
+                        <div className="flex items-center gap-3">
+                          <AlertCircle className="h-5 w-5 text-red-500" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">{language === "ar" ? "انتهت فترة السماح في" : "Grace Period Ended"}</p>
+                            <p className="font-semibold text-base text-red-600">{getGracePeriodEndDate(status.expiresAt, status.gracePeriodDays)}</p>
+                          </div>
+                        </div>
+                      )}
+                      {status.stateText === "GracePeriod" && (
+                        <div className="flex items-center gap-3">
+                          <AlertCircle className="h-5 w-5 text-orange-500" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">{language === "ar" ? "أيام فترة السماح المتبقية" : "Grace Days Remaining"}</p>
+                            <p className="font-semibold text-base text-orange-600">
+                              {status.graceDaysRemaining != null
+                                ? (language === "ar" ? `${status.graceDaysRemaining} يوم` : `${status.graceDaysRemaining} day(s)`)
+                                : "—"}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -377,6 +433,53 @@ export default function LicensePage() {
                     ? "لا توجد رخصة صالحة. يرجى رفع ملف رخصة جديد."
                     : "No valid license found. Please upload a new license file."}
                 </p>
+              )}
+
+              {/* Read-Only Mode Explanation */}
+              {status && status.stateText === "Expired" && (
+                <div className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <Lock className="h-5 w-5 mt-0.5 shrink-0 text-red-500" />
+                    <div className="flex-1">
+                      <p className="font-bold text-red-800 text-base">
+                        {language === "ar" ? "ما هو وضع القراءة فقط؟" : "What is Read-Only Mode?"}
+                      </p>
+                      <p className="text-sm text-red-700 mt-1.5">
+                        {language === "ar"
+                          ? "بعد انتهاء فترة السماح، يدخل النظام تلقائياً في وضع القراءة فقط. لا يمكن إجراء أي تعديلات على البيانات — يُتاح فقط تسجيل الدخول وعرض المعلومات الموجودة، وكذلك رفع رخصة جديدة."
+                          : "After the grace period ends, the system automatically enters Read-Only mode. No data changes can be made — users can only log in, view existing information, and upload a new license to restore service."}
+                      </p>
+                      <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
+                        {(language === "ar" ? [
+                          { blocked: true,  text: "إنشاء أو تعديل أو حذف الاختبارات" },
+                          { blocked: true,  text: "إضافة أو تعديل بيانات المرشحين" },
+                          { blocked: true,  text: "تقديم إجابات الاختبارات" },
+                          { blocked: true,  text: "أي طلبات كتابة (POST / PUT / DELETE)" },
+                          { blocked: false, text: "تسجيل الدخول وعرض البيانات" },
+                          { blocked: false, text: "عرض الاختبارات والنتائج والتقارير" },
+                          { blocked: false, text: "عرض الإحصائيات والسجلات" },
+                          { blocked: false, text: "رفع رخصة جديدة لاستعادة الخدمة" },
+                        ] : [
+                          { blocked: true,  text: "Creating, editing, or deleting exams" },
+                          { blocked: true,  text: "Adding or modifying candidate data" },
+                          { blocked: true,  text: "Submitting exam answers" },
+                          { blocked: true,  text: "Any write request (POST / PUT / DELETE)" },
+                          { blocked: false, text: "Login and viewing existing data" },
+                          { blocked: false, text: "Viewing exams, results, and reports" },
+                          { blocked: false, text: "Viewing statistics and audit logs" },
+                          { blocked: false, text: "Uploading a new license to restore service" },
+                        ]).map((item, i) => (
+                          <div key={i} className={`flex items-center gap-2 text-sm ${item.blocked ? "text-red-700" : "text-green-700"}`}>
+                            {item.blocked
+                              ? <XCircle className="h-4 w-4 shrink-0" />
+                              : <CheckCircle2 className="h-4 w-4 shrink-0" />}
+                            {item.text}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -438,6 +541,24 @@ export default function LicensePage() {
                     <>
                       <Upload className="h-4 w-4 me-2" />
                       {language === "ar" ? "رفع ملف الرخصة" : "Upload License File"}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={loadStatus}
+                  disabled={loading}
+                  className="w-full mt-3"
+                >
+                  {loading ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      <span className="ms-2">{language === "ar" ? "جاري التحديث..." : "Refreshing..."}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 me-2" />
+                      {language === "ar" ? "تحديث حالة الرخصة" : "Refresh License Status"}
                     </>
                   )}
                 </Button>

@@ -11,6 +11,7 @@ import { Header } from "@/components/layout/header"
 import { FullPageLoader } from "@/components/ui/loading-spinner"
 import { useApplyBrandingColor } from "@/lib/hooks/use-branding"
 import { UserRole } from "@/lib/types"
+import { LicenseExpiredDialog } from "@/components/license-expired-dialog"
 
 export default function DashboardLayout({
   children,
@@ -46,6 +47,7 @@ export default function DashboardLayout({
         <Header />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
+      <LicenseExpiredDialog />
     </div>
   )
 }
