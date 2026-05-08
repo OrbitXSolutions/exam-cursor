@@ -64,7 +64,7 @@ public class CertificateController : ControllerBase
     /// Create certificate for a passed result (Admin/Instructor)
     /// </summary>
     [HttpPost("create/{resultId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> Create(int resultId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -76,7 +76,7 @@ public class CertificateController : ControllerBase
     /// Revoke certificate (Admin only)
     /// </summary>
     [HttpPost("{certificateId}/revoke")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> Revoke(int certificateId, [FromBody] RevokeCertificateRequest request)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -88,7 +88,7 @@ public class CertificateController : ControllerBase
     /// Regenerate certificate (new code, Admin only)
     /// </summary>
     [HttpPost("{certificateId}/regenerate")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> Regenerate(int certificateId)
     {
         var userId = _currentUserService.UserId ?? "system";

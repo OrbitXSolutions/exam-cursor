@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Notification;
 using Smart_Core.Application.Interfaces;
@@ -8,7 +8,7 @@ namespace Smart_Core.Controllers.Settings;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.Admin},{AppRoles.SuperDev}")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
 public class NotificationController : ControllerBase
 {
     private readonly INotificationService _notificationService;
@@ -22,7 +22,7 @@ public class NotificationController : ControllerBase
         _currentUserService = currentUserService;
     }
 
-    // ── Settings ────────────────────────────────────────────────
+    // â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("settings")]
     public async Task<IActionResult> GetSettings()
@@ -39,7 +39,7 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Templates ───────────────────────────────────────────────
+    // â”€â”€ Templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("templates")]
     public async Task<IActionResult> GetTemplates()
@@ -63,7 +63,7 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Logs ────────────────────────────────────────────────────
+    // â”€â”€ Logs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("logs")]
     public async Task<IActionResult> GetLogs([FromQuery] NotificationLogFilterDto filter)
@@ -86,7 +86,7 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Test ────────────────────────────────────────────────────
+    // â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("test-email")]
     public async Task<IActionResult> TestEmail([FromBody] TestEmailDto dto)
@@ -102,7 +102,7 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Manual triggers ─────────────────────────────────────────
+    // â”€â”€ Manual triggers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("queue-exam-emails/{examId:int}")]
     public async Task<IActionResult> QueueExamEmails(int examId)

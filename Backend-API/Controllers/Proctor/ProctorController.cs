@@ -64,7 +64,7 @@ public class ProctorController : ControllerBase
     /// Get proctor session by ID
     /// </summary>
     [HttpGet("session/{sessionId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetSession(int sessionId)
     {
         var result = await _proctorService.GetSessionAsync(sessionId);
@@ -96,7 +96,7 @@ public class ProctorController : ControllerBase
     /// Cancel a proctor session (admin only)
     /// </summary>
     [HttpPost("session/{sessionId}/cancel")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CancelSession(int sessionId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -108,7 +108,7 @@ public class ProctorController : ControllerBase
     /// Toggle flag on a proctor session
     /// </summary>
     [HttpPost("session/{sessionId}/flag")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> FlagSession(int sessionId, [FromBody] FlagSessionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -120,7 +120,7 @@ public class ProctorController : ControllerBase
     /// Send a warning to a candidate during an active session
     /// </summary>
     [HttpPost("session/{sessionId}/warning")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> SendWarning(int sessionId, [FromBody] SendWarningDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -132,7 +132,7 @@ public class ProctorController : ControllerBase
     /// Terminate a session and force-end the candidate's attempt
     /// </summary>
     [HttpPost("session/{sessionId}/terminate")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> TerminateSession(int sessionId, [FromBody] TerminateSessionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -158,7 +158,7 @@ public class ProctorController : ControllerBase
     /// Get all proctor sessions with filtering
     /// </summary>
     [HttpGet("sessions")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetSessions([FromQuery] ProctorSessionSearchDto searchDto)
     {
         var result = await _proctorService.GetSessionsAsync(searchDto);
@@ -169,7 +169,7 @@ public class ProctorController : ControllerBase
     /// Get proctor sessions for an exam
     /// </summary>
     [HttpGet("sessions/exam/{examId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetExamSessions(int examId, [FromQuery] ProctorSessionSearchDto searchDto)
     {
         var result = await _proctorService.GetExamSessionsAsync(examId, searchDto);
@@ -232,7 +232,7 @@ public class ProctorController : ControllerBase
     /// Get events for a session
     /// </summary>
     [HttpGet("session/{sessionId}/events")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetSessionEvents(int sessionId)
     {
         var result = await _proctorService.GetSessionEventsAsync(sessionId);
@@ -243,7 +243,7 @@ public class ProctorController : ControllerBase
     /// Get events by type for a session
     /// </summary>
     [HttpGet("session/{sessionId}/events/{eventType}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetEventsByType(int sessionId, ProctorEventType eventType)
     {
         var result = await _proctorService.GetEventsByTypeAsync(sessionId, eventType);
@@ -258,7 +258,7 @@ public class ProctorController : ControllerBase
     /// Calculate risk score for a session
     /// </summary>
     [HttpPost("session/{sessionId}/calculate-risk")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CalculateRiskScore(int sessionId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -270,7 +270,7 @@ public class ProctorController : ControllerBase
     /// Get all risk rules
     /// </summary>
     [HttpGet("rules")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetRiskRules([FromQuery] bool activeOnly = false)
     {
         var result = await _proctorService.GetRiskRulesAsync(activeOnly);
@@ -281,7 +281,7 @@ public class ProctorController : ControllerBase
     /// Create a risk rule
     /// </summary>
     [HttpPost("rules")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CreateRiskRule([FromBody] SaveProctorRiskRuleDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -293,7 +293,7 @@ public class ProctorController : ControllerBase
     /// Update a risk rule
     /// </summary>
     [HttpPut("rules/{ruleId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> UpdateRiskRule(int ruleId, [FromBody] SaveProctorRiskRuleDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -305,7 +305,7 @@ public class ProctorController : ControllerBase
     /// Delete a risk rule
     /// </summary>
     [HttpDelete("rules/{ruleId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> DeleteRiskRule(int ruleId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -317,7 +317,7 @@ public class ProctorController : ControllerBase
     /// Toggle risk rule active status
     /// </summary>
     [HttpPost("rules/{ruleId}/toggle")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> ToggleRiskRule(int ruleId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -381,7 +381,7 @@ public class ProctorController : ControllerBase
     /// Get evidence for a session
     /// </summary>
     [HttpGet("session/{sessionId}/evidence")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetSessionEvidence(int sessionId)
     {
         var result = await _proctorService.GetSessionEvidenceAsync(sessionId);
@@ -392,7 +392,7 @@ public class ProctorController : ControllerBase
     /// Get secure download URL for evidence
     /// </summary>
     [HttpGet("evidence/{evidenceId}/download-url")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetEvidenceDownloadUrl(int evidenceId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -408,7 +408,7 @@ public class ProctorController : ControllerBase
     /// Make a decision on a proctor session
     /// </summary>
     [HttpPost("decision")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> MakeDecision([FromBody] MakeDecisionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -420,7 +420,7 @@ public class ProctorController : ControllerBase
     /// Override a previous decision
     /// </summary>
     [HttpPost("decision/override")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> OverrideDecision([FromBody] OverrideDecisionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -432,7 +432,7 @@ public class ProctorController : ControllerBase
     /// Get decision for a session
     /// </summary>
     [HttpGet("session/{sessionId}/decision")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetDecision(int sessionId)
     {
         var result = await _proctorService.GetDecisionAsync(sessionId);
@@ -443,7 +443,7 @@ public class ProctorController : ControllerBase
     /// Get sessions pending review
     /// </summary>
     [HttpGet("pending-review")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetPendingReview([FromQuery] ProctorSessionSearchDto searchDto)
     {
         var result = await _proctorService.GetPendingReviewAsync(searchDto);
@@ -458,7 +458,7 @@ public class ProctorController : ControllerBase
     /// Get proctor dashboard for an exam
     /// </summary>
     [HttpGet("dashboard/exam/{examId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetDashboard(int examId)
     {
         var result = await _proctorService.GetDashboardAsync(examId);
@@ -469,7 +469,7 @@ public class ProctorController : ControllerBase
     /// Get live monitoring data for active sessions
     /// </summary>
     [HttpGet("live/exam/{examId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetLiveMonitoring(int examId)
     {
         var result = await _proctorService.GetLiveMonitoringAsync(examId);
@@ -481,7 +481,7 @@ public class ProctorController : ControllerBase
     /// Returns active sessions ranked by risk with human-readable reasons.
     /// </summary>
     [HttpGet("triage")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetTriageRecommendations([FromQuery] int top = 5, [FromQuery] bool includeSample = true)
     {
         var result = await _proctorService.GetTriageRecommendationsAsync(top, includeSample);
@@ -495,10 +495,10 @@ public class ProctorController : ControllerBase
     /// <summary>
     /// Generate an AI-powered risk analysis for a proctoring session.
     /// Uses GPT-4o to analyze events, violations, and patterns.
-    /// Advisory only — the proctor always has final authority.
+    /// Advisory only â€” the proctor always has final authority.
     /// </summary>
     [HttpGet("session/{sessionId}/ai-analysis")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetAiRiskAnalysis(int sessionId, [FromQuery] string lang = "en")
     {
         var result = await _aiProctorService.GetAiRiskAnalysisAsync(sessionId, lang);

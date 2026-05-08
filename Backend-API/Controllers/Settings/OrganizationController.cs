@@ -28,7 +28,7 @@ public class OrganizationController : ControllerBase
 
     // ─── Admin: GET organization settings ─────────────────────────────
     [HttpGet]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Get()
     {
         var org = await GetOrCreateAsync();
@@ -38,7 +38,7 @@ public class OrganizationController : ControllerBase
 
     // ─── Admin: PUT organization settings ─────────────────────────────
     [HttpPut]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Update([FromBody] UpdateOrganizationDto dto)
     {
         var org = await GetOrCreateAsync();
@@ -62,7 +62,7 @@ public class OrganizationController : ControllerBase
 
     // ─── Admin: Upload logo or favicon ────────────────────────────────
     [HttpPost("upload/{type}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     [RequestSizeLimit(5 * 1024 * 1024)]
     public async Task<IActionResult> Upload(string type, IFormFile file)
     {

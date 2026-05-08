@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Audit;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Audit;
+using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Controllers.Audit;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,SuperAdmin,Auditor")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
 public class AuditController : ControllerBase
 {
     private readonly IAuditService _auditService;
@@ -17,8 +18,8 @@ public class AuditController : ControllerBase
     public AuditController(
         IAuditService auditService,
     ICurrentUserService currentUserService)
- {
- _auditService = auditService;
+    {
+        _auditService = auditService;
         _currentUserService = currentUserService;
     }
 
@@ -26,7 +27,7 @@ public class AuditController : ControllerBase
 
     /// <summary>
     /// Get audit log by ID
-  /// </summary>
+    /// </summary>
     [HttpGet("log/{logId}")]
     public async Task<IActionResult> GetLog(long logId)
     {
@@ -41,13 +42,13 @@ public class AuditController : ControllerBase
     public async Task<IActionResult> SearchLogs([FromQuery] AuditLogSearchDto searchDto)
     {
         var result = await _auditService.SearchLogsAsync(searchDto);
-    return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Get entity history (all changes to a specific entity)
     /// </summary>
- [HttpGet("entity-history")]
+    [HttpGet("entity-history")]
     public async Task<IActionResult> GetEntityHistory([FromQuery] EntityHistoryRequestDto request)
     {
         var result = await _auditService.GetEntityHistoryAsync(request);
@@ -60,28 +61,28 @@ public class AuditController : ControllerBase
     [HttpGet("user-activity")]
     public async Task<IActionResult> GetUserActivity([FromQuery] UserActivityRequestDto request)
     {
-   var result = await _auditService.GetUserActivityAsync(request);
+        var result = await _auditService.GetUserActivityAsync(request);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
     /// Get logs by correlation ID (request tracing)
     /// </summary>
- [HttpGet("correlation/{correlationId}")]
+    [HttpGet("correlation/{correlationId}")]
     public async Task<IActionResult> GetByCorrelationId(string correlationId)
     {
         var result = await _auditService.GetByCorrelationIdAsync(correlationId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get recent failures
-  /// </summary>
+    /// </summary>
     [HttpGet("failures")]
     public async Task<IActionResult> GetRecentFailures([FromQuery] int count = 50)
     {
         var result = await _auditService.GetRecentFailuresAsync(count);
-    return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -96,7 +97,7 @@ public class AuditController : ControllerBase
     {
         var result = await _auditService.GetRetentionPoliciesAsync();
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get retention policy by ID
@@ -104,7 +105,7 @@ public class AuditController : ControllerBase
     [HttpGet("policy/{policyId}")]
     public async Task<IActionResult> GetRetentionPolicy(int policyId)
     {
-  var result = await _auditService.GetRetentionPolicyAsync(policyId);
+        var result = await _auditService.GetRetentionPolicyAsync(policyId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -112,7 +113,6 @@ public class AuditController : ControllerBase
     /// Create retention policy
     /// </summary>
     [HttpPost("policy")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> CreateRetentionPolicy([FromBody] CreateRetentionPolicyDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -124,7 +124,6 @@ public class AuditController : ControllerBase
     /// Update retention policy
     /// </summary>
     [HttpPut("policy")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> UpdateRetentionPolicy([FromBody] UpdateRetentionPolicyDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -136,7 +135,6 @@ public class AuditController : ControllerBase
     /// Delete retention policy
     /// </summary>
     [HttpDelete("policy/{policyId}")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> DeleteRetentionPolicy(int policyId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -148,7 +146,6 @@ public class AuditController : ControllerBase
     /// Set default retention policy
     /// </summary>
     [HttpPost("policy/{policyId}/set-default")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> SetDefaultPolicy(int policyId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -160,8 +157,7 @@ public class AuditController : ControllerBase
     /// Execute retention policies manually
     /// </summary>
     [HttpPost("policies/execute")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
-public async Task<IActionResult> ExecuteRetention()
+    public async Task<IActionResult> ExecuteRetention()
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _auditService.ExecuteRetentionAsync(userId);
@@ -174,33 +170,33 @@ public async Task<IActionResult> ExecuteRetention()
     [HttpGet("policy/{policyId}/preview")]
     public async Task<IActionResult> PreviewRetention(int policyId)
     {
-    var result = await _auditService.PreviewRetentionAsync(policyId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _auditService.PreviewRetentionAsync(policyId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
 
     #region Export Jobs
 
-  /// <summary>
+    /// <summary>
     /// Create export job
     /// </summary>
     [HttpPost("export")]
     public async Task<IActionResult> CreateExportJob([FromBody] CreateExportJobDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
-    var result = await _auditService.CreateExportJobAsync(dto, userId);
+        var result = await _auditService.CreateExportJobAsync(dto, userId);
         return result.Success ? Ok(result) : BadRequest(result);
-  }
+    }
 
     /// <summary>
     /// Get export job by ID
     /// </summary>
     [HttpGet("export/{jobId}")]
- public async Task<IActionResult> GetExportJob(int jobId)
+    public async Task<IActionResult> GetExportJob(int jobId)
     {
-  var result = await _auditService.GetExportJobAsync(jobId);
-     return result.Success ? Ok(result) : NotFound(result);
+        var result = await _auditService.GetExportJobAsync(jobId);
+        return result.Success ? Ok(result) : NotFound(result);
     }
 
     /// <summary>
@@ -219,17 +215,17 @@ public async Task<IActionResult> ExecuteRetention()
     [HttpGet("exports/my")]
     public async Task<IActionResult> GetMyExportJobs()
     {
-     var userId = _currentUserService.UserId;
+        var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId))
-  {
+        {
             return Unauthorized();
-   }
+        }
         var result = await _auditService.GetMyExportJobsAsync(userId);
         return result.Success ? Ok(result) : BadRequest(result);
- }
+    }
 
     /// <summary>
-  /// Cancel export job
+    /// Cancel export job
     /// </summary>
     [HttpPost("export/{jobId}/cancel")]
     public async Task<IActionResult> CancelExportJob(int jobId)
@@ -247,7 +243,7 @@ public async Task<IActionResult> ExecuteRetention()
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _auditService.GetExportDownloadUrlAsync(jobId, userId);
-   return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -266,11 +262,11 @@ public async Task<IActionResult> ExecuteRetention()
 
     /// <summary>
     /// Get audit statistics for a specific entity type
- /// </summary>
+    /// </summary>
     [HttpGet("dashboard/entity/{entityName}")]
     public async Task<IActionResult> GetEntityDashboard(string entityName)
     {
-    var result = await _auditService.GetEntityDashboardAsync(entityName);
+        var result = await _auditService.GetEntityDashboardAsync(entityName);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

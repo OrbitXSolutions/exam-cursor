@@ -74,9 +74,9 @@ export default function LoginPage() {
     }
   }
 
-  const fillDemoCredentials = (userEmail: string) => {
+  const fillDemoCredentials = (userEmail: string, userPassword = "Demo@123456") => {
     setEmail(userEmail)
-    setPassword("Demo@123456")
+    setPassword(userPassword)
   }
 
   return (
@@ -234,6 +234,17 @@ export default function LoginPage() {
                 <div className="mt-4 rounded-lg bg-muted p-4 text-sm max-h-80 overflow-y-auto">
                   <p className="font-medium mb-3">Demo Credentials (click to fill):</p>
                   <div className="space-y-3">
+                    {/* SuperAdmin */}
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">System</p>
+                      <div className="space-y-1">
+                        <button type="button" onClick={() => fillDemoCredentials("super-admin@smartexam.local", "Smart@26Super5")} className="w-full text-left p-2 rounded hover:bg-background transition-colors border border-primary/20">
+                          <span className="font-medium text-primary">SuperAdmin:</span>{" "}
+                          <span className="text-muted-foreground">super-admin@smartexam.local</span>
+                          <span className="ms-2 text-xs text-muted-foreground">(pw: Smart@26Super5)</span>
+                        </button>
+                      </div>
+                    </div>
                     {/* IT Department */}
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">IT Department</p>

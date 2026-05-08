@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.ExamOperations;
@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.ExamOperations;
 
 [ApiController]
 [Route("api/exam-operations")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class ExamOperationsController : ControllerBase
 {
     private readonly IExamOperationsService _service;

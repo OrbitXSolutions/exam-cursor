@@ -27,8 +27,8 @@ public class ResourceAuthorizationService
 
     public string? CurrentUserId => _currentUserService.UserId;
 
-    public Task<bool> IsCurrentUserSuperDevAsync()
-        => IsUserSuperDevAsync(_currentUserService.UserId);
+    public Task<bool> IsCurrentUserSuperAdminAsync()
+        => IsUserSuperAdminAsync(_currentUserService.UserId);
 
     public async Task<int?> GetCurrentUserDepartmentIdAsync()
     {
@@ -48,7 +48,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return "scope:anonymous";
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return "scope:all";
 
         var roles = await GetUserRolesAsync(userId);
@@ -71,7 +71,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return exams.Where(_ => false).Select(e => e.Id);
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return exams.Select(e => e.Id);
 
         var roles = await GetUserRolesAsync(userId);
@@ -107,7 +107,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return false;
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return true;
 
         var user = await _db.Users
@@ -233,7 +233,7 @@ public class ResourceAuthorizationService
         if (candidateId == userId)
             return true;
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return true;
 
         if (!await UserIsInRoleAsync(candidateId, AppRoles.Candidate))
@@ -286,7 +286,7 @@ public class ResourceAuthorizationService
         if (targetUserId == userId)
             return true;
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return true;
 
         if (await UserIsInRoleAsync(targetUserId, AppRoles.Candidate))
@@ -309,7 +309,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return query.Where(_ => false);
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return query;
 
         var roles = await GetUserRolesAsync(userId);
@@ -336,7 +336,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return query.Where(_ => false);
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return query;
 
         var roles = await GetUserRolesAsync(userId);
@@ -361,7 +361,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return query.Where(_ => false);
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return query;
 
         var roles = await GetUserRolesAsync(userId);
@@ -386,7 +386,7 @@ public class ResourceAuthorizationService
         if (string.IsNullOrWhiteSpace(userId))
             return query.Where(_ => false);
 
-        if (await IsUserSuperDevAsync(userId))
+        if (await IsUserSuperAdminAsync(userId))
             return query;
 
         var roles = await GetUserRolesAsync(userId);
@@ -427,13 +427,13 @@ public class ResourceAuthorizationService
             assignedCandidateIdsFromAssignments.Contains(u.Id));
     }
 
-    private async Task<bool> IsUserSuperDevAsync(string? userId)
+    private async Task<bool> IsUserSuperAdminAsync(string? userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
             return false;
 
         var user = await _userManager.FindByIdAsync(userId);
-        return user != null && await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return user != null && await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     private async Task<IList<string>> GetUserRolesAsync(string userId)
@@ -463,6 +463,6 @@ public class ResourceAuthorizationService
                !roles.Contains(AppRoles.Instructor) &&
                !roles.Contains(AppRoles.Examiner) &&
                !roles.Contains(AppRoles.Proctor) &&
-               !roles.Contains(AppRoles.SuperDev);
+               !roles.Contains(AppRoles.SuperAdmin);
     }
 }

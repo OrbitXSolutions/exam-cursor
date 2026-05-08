@@ -5,6 +5,8 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
+import { useAuth } from "@/lib/auth/context"
+import { UserRole } from "@/lib/types"
 import { createUser, getDepartmentsList } from "@/lib/api/admin"
 import type { DepartmentListItem } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
@@ -71,8 +73,10 @@ type TouchedFields = {
 
 export default function CreateUserPage() {
   const { language } = useI18n()
+  const { hasRole } = useAuth()
   const router = useRouter()
   const ar = language === "ar"
+  const isSuperAdmin = hasRole(UserRole.SuperAdmin)
   const [loading, setLoading] = useState(false)
   const [departments, setDepartments] = useState<DepartmentListItem[]>([])
   const [showPasswordRules, setShowPasswordRules] = useState(false)
@@ -135,9 +139,11 @@ export default function CreateUserPage() {
           ? (ar ? "صيغة البريد الإلكتروني غير صحيحة" : "Invalid email format")
           : null,
     role: !formData.role ? (ar ? "الدور مطلوب" : "Role is required") : null,
-    departmentId: !formData.departmentId || formData.departmentId === "none"
-      ? (ar ? "القسم مطلوب" : "Department is required")
-      : null,
+    departmentId: formData.role === "SuperAdmin"
+      ? null
+      : (!formData.departmentId || formData.departmentId === "none"
+          ? (ar ? "القسم مطلوب" : "Department is required")
+          : null),
     password: !formData.password
       ? (ar ? "كلمة المرور مطلوبة" : "Password is required")
       : !validatePassword(formData.password)
@@ -279,7 +285,11 @@ export default function CreateUserPage() {
                     <SelectValue placeholder={ar ? "اختر الدور" : "Select role"} />
                   </SelectTrigger>
                   <SelectContent>
+                    {isSuperAdmin && (
+                      <SelectItem value="SuperAdmin">{ar ? "مسؤول أعلى" : "Super Admin"}</SelectItem>
+                    )}
                     <SelectItem value="Admin">{ar ? "مسؤول" : "Admin"}</SelectItem>
+                    <SelectItem value="Instructor">{ar ? "مدرس" : "Instructor"}</SelectItem>
                     <SelectItem value="Examiner">{ar ? "ممتحن" : "Examiner"}</SelectItem>
                     <SelectItem value="Proctor">{ar ? "مراقب" : "Proctor"}</SelectItem>
                   </SelectContent>
@@ -288,6 +298,7 @@ export default function CreateUserPage() {
                   <p className="text-xs text-destructive">{errors.role}</p>
                 )}
               </div>
+              {formData.role !== "SuperAdmin" && (
               <div className="space-y-2">
                 <Label htmlFor="departmentId">{ar ? "القسم" : "Department"}{R}</Label>
                 <Select
@@ -315,6 +326,7 @@ export default function CreateUserPage() {
                   <p className="text-xs text-destructive">{errors.departmentId}</p>
                 )}
               </div>
+              )}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

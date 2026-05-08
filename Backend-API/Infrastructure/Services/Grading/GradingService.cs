@@ -55,13 +55,13 @@ public class GradingService : IGradingService
         _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
     }
 
-    private async Task<bool> IsCurrentUserSuperDevAsync()
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId)) return false;
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     #region Grading Lifecycle
@@ -593,9 +593,9 @@ public class GradingService : IGradingService
     public async Task<ApiResponse<PaginatedResponse<GradingSessionListDto>>> GetGradingSessionsAsync(GradingSearchDto searchDto)
     {
         // Pre-resolve dept scope for cache key + query isolation
-        bool isSuperDevGs = await IsCurrentUserSuperDevAsync();
-        int? deptIdGs = isSuperDevGs ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
-        var deptScopeGs = isSuperDevGs ? "all" : (deptIdGs?.ToString() ?? "none");
+        bool isSuperAdminGs = await IsCurrentUserSuperAdminAsync();
+        int? deptIdGs = isSuperAdminGs ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
+        var deptScopeGs = isSuperAdminGs ? "all" : (deptIdGs?.ToString() ?? "none");
 
         var cacheKey = CacheKeys.GradingList(deptScopeGs, JsonSerializer.Serialize(searchDto));
         if (_cache.TryGet<PaginatedResponse<GradingSessionListDto>>(cacheKey, out var cachedGs) && cachedGs != null)
@@ -612,7 +612,7 @@ public class GradingService : IGradingService
  .AsQueryable();
 
         // Department isolation: filter grading sessions via Exam.DepartmentId (SuperDev sees all)
-        if (!isSuperDevGs && deptIdGs.HasValue)
+        if (!isSuperAdminGs && deptIdGs.HasValue)
         {
             query = query.Where(gs => gs.Attempt.Exam.DepartmentId == deptIdGs.Value);
         }
@@ -701,7 +701,7 @@ public class GradingService : IGradingService
         }
 
         // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && exam.DepartmentId != userDepartmentId.Value)
@@ -748,7 +748,7 @@ public class GradingService : IGradingService
             return ApiResponse<List<QuestionGradingStatsDto>>.SuccessResponse(cachedQStats);
 
         // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
             if (exam != null)

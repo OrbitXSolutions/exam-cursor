@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.Lookups;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class LookupsController : ControllerBase
 {
   private readonly ILookupsService _lookupsService;

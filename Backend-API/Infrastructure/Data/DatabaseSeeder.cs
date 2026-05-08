@@ -56,54 +56,55 @@ public class DatabaseSeeder
       }
     }
 
-    // Seed SuperDev User
-    var superDevEmail = ProtectedUsers.SuperDevEmail;
-    var existingUser = await _userManager.FindByEmailAsync(superDevEmail);
+    // Seed SuperAdmin User
+    var superAdminEmail = ProtectedUsers.SuperAdminEmail;
+    var existingUser = await _userManager.FindByEmailAsync(superAdminEmail);
 
     if (existingUser == null)
     {
-      var superDevUser = new ApplicationUser
+      var superAdminUser = new ApplicationUser
       {
-        UserName = superDevEmail,
-        Email = superDevEmail,
+        UserName = superAdminEmail,
+        Email = superAdminEmail,
         EmailConfirmed = true,
-        DisplayName = "Rowyda",
-        FullName = "Rowyda Super Developer",
+        DisplayName = "System Administrator",
+        FullName = "System Administrator",
+        FullNameAr = "مسؤول النظام",
         Status = UserStatus.Active,
         CreatedDate = UaeTimeHelper.NowUae,
         CreatedBy = "System"
       };
 
-      var createResult = await _userManager.CreateAsync(superDevUser, "13579@Rowyda");
+      var createResult = await _userManager.CreateAsync(superAdminUser, "Smart@26Super5");
       if (createResult.Succeeded)
       {
-        messages.Add($"SuperDev user '{superDevEmail}' created successfully.");
+        messages.Add($"SuperAdmin user '{superAdminEmail}' created successfully.");
 
-        var roleResult = await _userManager.AddToRoleAsync(superDevUser, AppRoles.SuperDev);
+        var roleResult = await _userManager.AddToRoleAsync(superAdminUser, AppRoles.SuperAdmin);
         if (roleResult.Succeeded)
         {
-          messages.Add($"SuperDev user assigned to '{AppRoles.SuperDev}' role successfully.");
+          messages.Add($"SuperAdmin user assigned to '{AppRoles.SuperAdmin}' role successfully.");
         }
         else
         {
-          messages.Add($"Failed to assign SuperDev role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+          messages.Add($"Failed to assign SuperAdmin role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
         }
       }
       else
       {
-        messages.Add($"Failed to create SuperDev user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+        messages.Add($"Failed to create SuperAdmin user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
         return (false, messages);
       }
     }
     else
     {
-      messages.Add($"SuperDev user '{superDevEmail}' already exists.");
+      messages.Add($"SuperAdmin user '{superAdminEmail}' already exists.");
 
-      // Ensure user is in SuperDev role
-      if (!await _userManager.IsInRoleAsync(existingUser, AppRoles.SuperDev))
+      // Ensure user is in SuperAdmin role
+      if (!await _userManager.IsInRoleAsync(existingUser, AppRoles.SuperAdmin))
       {
-        await _userManager.AddToRoleAsync(existingUser, AppRoles.SuperDev);
-        messages.Add($"SuperDev user added to '{AppRoles.SuperDev}' role.");
+        await _userManager.AddToRoleAsync(existingUser, AppRoles.SuperAdmin);
+        messages.Add($"SuperAdmin user added to '{AppRoles.SuperAdmin}' role.");
       }
     }
 

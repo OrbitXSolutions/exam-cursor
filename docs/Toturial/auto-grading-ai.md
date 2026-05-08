@@ -18,7 +18,7 @@ Question: "What is your name?" — No model answer/rubric defined.
 
 The AI still:
 
-Evaluated the student's answer "Rowyda"
+Evaluated the student's answer "Admin"
 Gave 5.5/5.5 (full marks) with 100% confidence
 Generated professional feedback: "The student's answer is complete and factually accurate..."
 This is by design. When there's no model answer, the prompt tells GPT-4o:

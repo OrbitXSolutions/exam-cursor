@@ -11,7 +11,7 @@ namespace Smart_Core.Controllers.QuestionBank;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class QuestionBankController : ControllerBase
 {
     private readonly IQuestionBankService _questionBankService;

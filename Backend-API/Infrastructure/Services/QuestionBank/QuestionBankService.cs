@@ -42,13 +42,13 @@ public class QuestionBankService : IQuestionBankService
         _cache.RemoveByPrefix(CacheKeys.ExamsPrefix);
     }
 
-    private async Task<bool> IsCurrentUserSuperDevAsync()
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId)) return false;
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     #region Questions
@@ -56,12 +56,12 @@ public class QuestionBankService : IQuestionBankService
     public async Task<ApiResponse<PaginatedResponse<QuestionListDto>>> GetAllQuestionsAsync(QuestionSearchDto searchDto)
     {
         // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
-        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
         int? resolvedDeptId = null;
-        if (!isSuperDev)
+        if (!isSuperAdmin)
             resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var deptScope = isSuperAdmin ? "all" : (resolvedDeptId?.ToString() ?? "none");
         var cacheKey = $"{CacheKeys.QuestionsPrefix}{deptScope}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.QuestionTypeId}:{searchDto.QuestionCategoryId}:{searchDto.SubjectId}:{searchDto.TopicId}:{searchDto.DifficultyLevel}:{searchDto.IsActive}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
         return await _cache.GetOrCreateAsync(cacheKey, async () =>
@@ -82,7 +82,7 @@ public class QuestionBankService : IQuestionBankService
             }
 
             // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
-            if (!isSuperDev && resolvedDeptId.HasValue)
+            if (!isSuperAdmin && resolvedDeptId.HasValue)
             {
                 query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
             }
@@ -195,7 +195,7 @@ public class QuestionBankService : IQuestionBankService
         }
 
         // Department isolation check via Subject
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && entity.Subject != null && entity.Subject.DepartmentId != userDepartmentId.Value)
@@ -513,7 +513,7 @@ public class QuestionBankService : IQuestionBankService
             .Where(q => q.IsActive && !q.IsDeleted);
 
         // Department isolation
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue)

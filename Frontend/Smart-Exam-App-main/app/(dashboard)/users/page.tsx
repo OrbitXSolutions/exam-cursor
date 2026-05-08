@@ -45,6 +45,7 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  Lock,
 } from "lucide-react"
 import { toast } from "sonner"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -140,7 +141,7 @@ export default function UsersPage() {
     }
   }
 
-  // Backend already excludes Candidate and SuperDev via ExcludeRoles filter
+  // Backend already excludes Candidate and SuperAdmin via ExcludeRoles filter
   const filteredUsers = users
 
   async function handleDeleteUser() {
@@ -174,7 +175,6 @@ export default function UsersPage() {
       case "Instructor":
         return "secondary"
       case "ProctorReviewer":
-        return "outline"
       case "Auditor":
         return "outline"
       default:
@@ -286,8 +286,6 @@ export default function UsersPage() {
                 <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
                 <SelectItem value="Examiner">{language === "ar" ? "ممتحن" : "Examiner"}</SelectItem>
                 <SelectItem value="Proctor">{language === "ar" ? "مراقب" : "Proctor"}</SelectItem>
-                <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
-                <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1) }}>
@@ -362,38 +360,49 @@ export default function UsersPage() {
                         {new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.push(`/users/${user.id}`)}>
-                              <Eye className="me-2 h-4 w-4" />
-                              {language === "ar" ? "عرض" : "View"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push(`/users/${user.id}/edit`)}>
-                              <Pencil className="me-2 h-4 w-4" />
-                              {language === "ar" ? "تعديل" : "Edit"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleResetPassword(user)}>
-                              <KeyRound className="me-2 h-4 w-4" />
-                              {language === "ar" ? "إعادة تعيين كلمة المرور" : "Reset Password"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => {
-                                setUserToDelete(user)
-                                setDeleteDialogOpen(true)
-                              }}
-                            >
-                              <Trash2 className="me-2 h-4 w-4" />
-                              {language === "ar" ? "حذف" : "Delete"}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {user.isProtected === true ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => router.push(`/users/${user.id}`)}
+                            title={language === "ar" ? "عرض فقط — محمي" : "View only — protected"}
+                          >
+                            <Lock className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        ) : (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => router.push(`/users/${user.id}`)}>
+                                <Eye className="me-2 h-4 w-4" />
+                                {language === "ar" ? "عرض" : "View"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => router.push(`/users/${user.id}/edit`)}>
+                                <Pencil className="me-2 h-4 w-4" />
+                                {language === "ar" ? "تعديل" : "Edit"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleResetPassword(user)}>
+                                <KeyRound className="me-2 h-4 w-4" />
+                                {language === "ar" ? "إعادة تعيين كلمة المرور" : "Reset Password"}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => {
+                                  setUserToDelete(user)
+                                  setDeleteDialogOpen(true)
+                                }}
+                              >
+                                <Trash2 className="me-2 h-4 w-4" />
+                                {language === "ar" ? "حذف" : "Delete"}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

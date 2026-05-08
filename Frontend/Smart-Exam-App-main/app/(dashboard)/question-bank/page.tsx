@@ -49,6 +49,7 @@ import {
   X,
   RefreshCw,
   Sparkles,
+  AlertCircle,
 } from "lucide-react"
 
 export default function QuestionBankPage() {
@@ -112,8 +113,11 @@ export default function QuestionBankPage() {
       .catch((err) => {
         console.error("Error fetching questions:", err)
         if (!cancelled) {
-          setError(localizeText("Failed to load data. Please try again.", "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.", language))
-          toast.error(localizeText("Failed to load questions", "فشل تحميل الأسئلة", language))
+          setError(
+            err instanceof Error && err.message
+              ? err.message
+              : localizeText("Failed to load data. Please try again.", "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.", language)
+          )
         }
       })
       .finally(() => {
@@ -211,13 +215,25 @@ export default function QuestionBankPage() {
       <div className="flex flex-col">
         <PageHeader title={t("questionBank.title")} subtitle={t("questionBank.subtitle")} />
         <div className="flex-1 flex items-center justify-center p-12">
-          <div className="text-center space-y-4">
-            <p className="text-destructive">{error}</p>
-            <Button onClick={fetchData} variant="outline">
-              <RefreshCw className="me-2 h-4 w-4" />
-              {t("common.retry")}
-            </Button>
-          </div>
+          <Card className="max-w-md w-full">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <AlertCircle className="h-12 w-12 text-destructive" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold">
+                    {localizeText("Unable to Load Questions", "تعذر تحميل الأسئلة", language)}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
+                <Button onClick={fetchData} variant="outline">
+                  <RefreshCw className="me-2 h-4 w-4" />
+                  {t("common.retry")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )

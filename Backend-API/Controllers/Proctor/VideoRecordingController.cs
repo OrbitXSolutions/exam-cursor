@@ -166,7 +166,7 @@ public class VideoRecordingController : ControllerBase
 
     /// <summary>
     /// Finalize video recording: validates and returns 202 Accepted immediately.
-    /// Actual merge + FFmpeg conversion runs in background — never blocks submit/result flows.
+    /// Actual merge + FFmpeg conversion runs in background â€” never blocks submit/result flows.
     /// POST /api/Proctor/video-finalize/{attemptId}
     /// </summary>
     [HttpPost("video-finalize/{attemptId}")]
@@ -180,7 +180,7 @@ public class VideoRecordingController : ControllerBase
         if (string.IsNullOrEmpty(candidateId))
             return Unauthorized();
 
-        // Quick validation only — no heavy processing
+        // Quick validation only â€” no heavy processing
         var attempt = await _db.Attempts.AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == attemptId && a.CandidateId == candidateId);
         if (attempt == null)
@@ -223,7 +223,7 @@ public class VideoRecordingController : ControllerBase
             attemptId,
             chunkCount,
             status = "processing"
-        }, "Video finalization accepted — processing in background"));
+        }, "Video finalization accepted â€” processing in background"));
     }
 
     /// <summary>
@@ -301,7 +301,7 @@ public class VideoRecordingController : ControllerBase
     /// GET /api/Proctor/video-recording/{attemptId}
     /// </summary>
     [HttpGet("video-recording/{attemptId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetVideoRecording(int attemptId)
     {
         try
@@ -400,7 +400,7 @@ public class VideoRecordingController : ControllerBase
     /// GET /api/Proctor/video-stream/{attemptId}
     /// </summary>
     [HttpGet("video-stream/{attemptId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> StreamVideo(int attemptId)
     {
         var evidence = await _db.ProctorEvidence
@@ -424,7 +424,7 @@ public class VideoRecordingController : ControllerBase
     /// GET /api/Proctor/video-chunks/{attemptId}
     /// </summary>
     [HttpGet("video-chunks/{attemptId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public IActionResult GetVideoChunks(int attemptId)
     {
         try
@@ -488,7 +488,7 @@ public class VideoRecordingController : ControllerBase
     /// GET /api/Proctor/video-chunks/{attemptId}/{filename}
     /// </summary>
     [HttpGet("video-chunks/{attemptId}/{filename}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor},ProctorReviewer,{AppRoles.Proctor}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public IActionResult GetVideoChunkFile(int attemptId, string filename)
     {
         // Validate filename pattern to prevent path traversal
@@ -503,7 +503,7 @@ public class VideoRecordingController : ControllerBase
         return File(stream, "video/webm", enableRangeProcessing: true);
     }
 
-    // ── Helpers ──────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private async Task<bool> IsVideoRecordingEnabled()
     {

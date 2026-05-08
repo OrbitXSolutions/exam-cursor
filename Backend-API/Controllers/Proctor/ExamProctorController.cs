@@ -9,7 +9,7 @@ namespace Smart_Core.Controllers.Proctor;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class ExamProctorController : ControllerBase
 {
     private readonly IExamProctorService _service;

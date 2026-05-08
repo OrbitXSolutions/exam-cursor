@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.CandidateAdmin;
 using Smart_Core.Application.DTOs.Common;
@@ -11,7 +11,7 @@ namespace Smart_Core.Controllers.Candidate;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
 public class CandidatesController : ControllerBase
 {
     private readonly ICandidateAdminService _service;
@@ -77,7 +77,7 @@ public class CandidatesController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    /// <summary>Delete a candidate (safe — blocks if has attempts)</summary>
+    /// <summary>Delete a candidate (safe â€” blocks if has attempts)</summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteCandidate(string id)

@@ -19,16 +19,7 @@ public class SeedController : ControllerBase
         _configuration = configuration;
     }
 
-    /// <summary>
-    /// Seed initial data (roles and SuperDev user)
-    /// </summary>
-    /// <remarks>
-    /// This endpoint seeds:
-    /// - Roles: SuperDev, Admin, Instructor, Candidate
-    /// - SuperDev User: Rowyda15@gmail.com with password 13579@Rowyda
-    /// 
-    /// In production, this should be protected or disabled.
-    /// </remarks>
+
     [HttpPost]
     [AllowAnonymous] // Allow anonymous for initial setup, consider securing in production
     [ProducesResponseType(typeof(ApiResponse<SeedResultDto>), StatusCodes.Status200OK)]
@@ -36,27 +27,27 @@ public class SeedController : ControllerBase
     public async Task<IActionResult> SeedData()
     {
         // Optional: Add a seed key for production security
-       var seedKey = _configuration["AppSettings:SeedKey"];
-var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
-    
-    if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
-      {
-return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
+        var seedKey = _configuration["AppSettings:SeedKey"];
+        var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
+
+        if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
+        {
+            return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
         }
 
         var (success, messages) = await _seeder.SeedAsync();
-      
+
         var result = new SeedResultDto
         {
-     Success = success,
+            Success = success,
             Messages = messages
         };
 
         if (success)
         {
-  return Ok(ApiResponse<SeedResultDto>.SuccessResponse(result, "Database seeded successfully."));
+            return Ok(ApiResponse<SeedResultDto>.SuccessResponse(result, "Database seeded successfully."));
         }
-        
+
         return BadRequest(ApiResponse<SeedResultDto>.FailureResponse("Seeding failed.", messages));
     }
 
@@ -65,7 +56,7 @@ return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key
     /// </summary>
     /// <remarks>
     /// Creates the following demo data:
- /// 
+    /// 
     /// **Roles:** Admin, Instructor, Candidate
     /// 
     /// **Departments:**
@@ -77,7 +68,7 @@ return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key
     /// 
     /// *IT Department:*
     /// - Ahmed Hassan (ahmed.it.admin@examcore.com) - Admin
-  /// - Sara Khaled (sara.it.instructor@examcore.com) - Instructor
+    /// - Sara Khaled (sara.it.instructor@examcore.com) - Instructor
     /// 
     /// *HR Department:*
     /// - Mona Youssef (mona.hr.admin@examcore.com) - Admin
@@ -90,7 +81,7 @@ return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key
     /// *Candidates (No Department):*
     /// - Ali Mahmoud (ali.it.candidate@examcore.com)
     /// - Nour Ahmed (nour.it.candidate@examcore.com)
- /// - Youssef Adel (youssef.finance.candidate@examcore.com)
+    /// - Youssef Adel (youssef.finance.candidate@examcore.com)
     /// - Ahmed Nabil (ahmed.hr.candidate@examcore.com)
     /// - Salma Hussein (salma.hr.candidate@examcore.com)
     /// 
@@ -104,28 +95,28 @@ return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key
     [ProducesResponseType(typeof(ApiResponse<SeedResultDto>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SeedDemoData()
     {
-      // Optional: Add a seed key for production security
-  //   var seedKey = _configuration["AppSettings:SeedKey"];
-  //var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
-        
-  //if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
-  //      {
-  //        return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
-  //      }
+        // Optional: Add a seed key for production security
+        //   var seedKey = _configuration["AppSettings:SeedKey"];
+        //var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
+
+        //if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
+        //      {
+        //        return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
+        //      }
 
         var (success, messages) = await _seeder.SeedDemoDataAsync();
-  
+
         var result = new SeedResultDto
-  {
+        {
             Success = success,
-   Messages = messages
+            Messages = messages
         };
 
         if (success)
         {
             return Ok(ApiResponse<SeedResultDto>.SuccessResponse(result, "Demo data seeded successfully."));
         }
-        
+
         return BadRequest(ApiResponse<SeedResultDto>.FailureResponse("Demo data seeding failed.", messages));
     }
 
@@ -141,47 +132,47 @@ return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key
     [ProducesResponseType(typeof(ApiResponse<SeedResultDto>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SeedAllData()
     {
- // Optional: Add a seed key for production security
-     //var seedKey = _configuration["AppSettings:SeedKey"];
-     //   var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
-        
-     //   if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
-     //   {
-     // return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
-     // }
+        // Optional: Add a seed key for production security
+        //var seedKey = _configuration["AppSettings:SeedKey"];
+        //   var providedKey = Request.Headers["X-Seed-Key"].FirstOrDefault();
 
-var allMessages = new List<string>();
-        
+        //   if (!string.IsNullOrEmpty(seedKey) && seedKey != providedKey)
+        //   {
+        // return Unauthorized(ApiResponse<SeedResultDto>.FailureResponse("Invalid seed key."));
+        // }
+
+        var allMessages = new List<string>();
+
         // Seed initial data first
-  allMessages.Add("=== Seeding Initial Data ===");
+        allMessages.Add("=== Seeding Initial Data ===");
         var (initialSuccess, initialMessages) = await _seeder.SeedAsync();
         allMessages.AddRange(initialMessages);
-      
+
         if (!initialSuccess)
         {
-          var failResult = new SeedResultDto { Success = false, Messages = allMessages };
+            var failResult = new SeedResultDto { Success = false, Messages = allMessages };
             return BadRequest(ApiResponse<SeedResultDto>.FailureResponse("Failed to seed initial data.", allMessages));
         }
 
         // Then seed demo data
         allMessages.Add("");
         allMessages.Add("=== Seeding Demo Data ===");
-  var (demoSuccess, demoMessages) = await _seeder.SeedDemoDataAsync();
+        var (demoSuccess, demoMessages) = await _seeder.SeedDemoDataAsync();
         allMessages.AddRange(demoMessages);
 
         var result = new SeedResultDto
         {
-     Success = demoSuccess,
-  Messages = allMessages
-      };
+            Success = demoSuccess,
+            Messages = allMessages
+        };
 
         if (demoSuccess)
         {
-          return Ok(ApiResponse<SeedResultDto>.SuccessResponse(result, "All data seeded successfully."));
+            return Ok(ApiResponse<SeedResultDto>.SuccessResponse(result, "All data seeded successfully."));
         }
-        
+
         return BadRequest(ApiResponse<SeedResultDto>.FailureResponse("Failed to seed demo data.", allMessages));
-  }
+    }
 }
 
 /// <summary>
