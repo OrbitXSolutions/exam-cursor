@@ -109,12 +109,14 @@ export const GradingStatus = {
 export async function getGradingSessions(params?: {
   status?: number;
   examId?: number;
+  search?: string;
   pageNumber?: number;
   pageSize?: number;
 }): Promise<PaginatedGradingResponse> {
   const query = new URLSearchParams();
   if (params?.status != null) query.set("Status", String(params.status));
   if (params?.examId) query.set("ExamId", String(params.examId));
+  if (params?.search?.trim()) query.set("Search", params.search.trim());
   query.set("PageNumber", String(params?.pageNumber ?? 1));
   query.set("PageSize", String(params?.pageSize ?? 50));
 
@@ -147,11 +149,13 @@ export async function getGradingSessions(params?: {
  */
 export async function getManualGradingRequired(params?: {
   examId?: number;
+  search?: string;
   pageNumber?: number;
   pageSize?: number;
 }): Promise<PaginatedGradingResponse> {
   const query = new URLSearchParams();
   if (params?.examId) query.set("ExamId", String(params.examId));
+  if (params?.search?.trim()) query.set("Search", params.search.trim());
   if (params?.pageNumber) query.set("PageNumber", String(params.pageNumber));
   if (params?.pageSize) query.set("PageSize", String(params.pageSize));
   query.set("RequiresManualGrading", "true");

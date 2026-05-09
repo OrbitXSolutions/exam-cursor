@@ -301,9 +301,11 @@ public class ExamResultController : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] bool excludeTerminated = true,
         [FromQuery] bool onlyTerminated = false,
-        [FromQuery] string? statusFilter = null)
+        [FromQuery] string? statusFilter = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? resultStatus = null)
     {
-        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize, excludeTerminated, onlyTerminated, statusFilter);
+        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize, excludeTerminated, onlyTerminated, statusFilter, search, resultStatus);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

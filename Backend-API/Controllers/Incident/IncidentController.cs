@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Incident;
 using Smart_Core.Application.Interfaces;
@@ -29,7 +29,7 @@ public class IncidentController : ControllerBase
     /// Create a new incident case
     /// </summary>
     [HttpPost("case")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CreateCase([FromBody] CreateIncidentCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -41,7 +41,7 @@ public class IncidentController : ControllerBase
     /// Create case automatically from proctor session
     /// </summary>
     [HttpPost("case/from-proctor/{proctorSessionId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CreateCaseFromProctor(int proctorSessionId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -53,7 +53,7 @@ public class IncidentController : ControllerBase
     /// Get incident case by ID
     /// </summary>
     [HttpGet("case/{caseId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetCase(int caseId)
     {
         var result = await _incidentService.GetCaseAsync(caseId);
@@ -64,7 +64,7 @@ public class IncidentController : ControllerBase
     /// Get incident case by attempt ID
     /// </summary>
     [HttpGet("case/by-attempt/{attemptId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetCaseByAttempt(int attemptId)
     {
         var result = await _incidentService.GetCaseByAttemptAsync(attemptId);
@@ -75,7 +75,7 @@ public class IncidentController : ControllerBase
     /// Update incident case
     /// </summary>
     [HttpPut("case")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> UpdateCase([FromBody] UpdateIncidentCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -87,7 +87,7 @@ public class IncidentController : ControllerBase
     /// Get all incident cases with filtering
     /// </summary>
     [HttpGet("cases")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetCases([FromQuery] IncidentCaseSearchDto searchDto)
     {
         var result = await _incidentService.GetCasesAsync(searchDto);
@@ -98,7 +98,7 @@ public class IncidentController : ControllerBase
     /// Get incident cases for an exam
     /// </summary>
     [HttpGet("cases/exam/{examId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetExamCases(int examId, [FromQuery] IncidentCaseSearchDto searchDto)
     {
         var result = await _incidentService.GetExamCasesAsync(examId, searchDto);
@@ -109,7 +109,7 @@ public class IncidentController : ControllerBase
     /// Get cases assigned to current reviewer
     /// </summary>
     [HttpGet("cases/my-assigned")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetMyAssignedCases([FromQuery] IncidentCaseSearchDto searchDto)
     {
         var userId = _currentUserService.UserId;
@@ -129,7 +129,7 @@ public class IncidentController : ControllerBase
     /// Assign case to a reviewer
     /// </summary>
     [HttpPost("case/assign")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> AssignCase([FromBody] AssignCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -141,7 +141,7 @@ public class IncidentController : ControllerBase
     /// Reassign case to a different reviewer
     /// </summary>
     [HttpPost("case/reassign")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> ReassignCase([FromBody] AssignCaseDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -153,7 +153,7 @@ public class IncidentController : ControllerBase
     /// Change case status
     /// </summary>
     [HttpPost("case/status")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> ChangeStatus([FromBody] ChangeStatusDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -165,7 +165,7 @@ public class IncidentController : ControllerBase
     /// Close a resolved case
     /// </summary>
     [HttpPost("case/{caseId}/close")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> CloseCase(int caseId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -177,7 +177,7 @@ public class IncidentController : ControllerBase
     /// Reopen a case
     /// </summary>
     [HttpPost("case/{caseId}/reopen")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> ReopenCase(int caseId, [FromQuery] string reason)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -193,7 +193,7 @@ public class IncidentController : ControllerBase
     /// Link evidence to a case
     /// </summary>
     [HttpPost("evidence/link")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> LinkEvidence([FromBody] LinkEvidenceDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -205,7 +205,7 @@ public class IncidentController : ControllerBase
     /// Get evidence for a case
     /// </summary>
     [HttpGet("case/{caseId}/evidence")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetCaseEvidence(int caseId)
     {
         var result = await _incidentService.GetCaseEvidenceAsync(caseId);
@@ -216,7 +216,7 @@ public class IncidentController : ControllerBase
     /// Remove evidence link
     /// </summary>
     [HttpDelete("evidence/{linkId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> RemoveEvidenceLink(int linkId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -232,7 +232,7 @@ public class IncidentController : ControllerBase
     /// Record a decision on a case
     /// </summary>
     [HttpPost("decision")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> RecordDecision([FromBody] RecordDecisionDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -244,7 +244,7 @@ public class IncidentController : ControllerBase
     /// Get decision history for a case
     /// </summary>
     [HttpGet("case/{caseId}/decisions")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetDecisionHistory(int caseId)
     {
         var result = await _incidentService.GetDecisionHistoryAsync(caseId);
@@ -255,7 +255,7 @@ public class IncidentController : ControllerBase
     /// Get the latest decision for a case
     /// </summary>
     [HttpGet("case/{caseId}/decision/latest")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetLatestDecision(int caseId)
     {
         var result = await _incidentService.GetLatestDecisionAsync(caseId);
@@ -270,7 +270,7 @@ public class IncidentController : ControllerBase
     /// Add a comment to a case
     /// </summary>
     [HttpPost("comment")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> AddComment([FromBody] AddCommentDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -282,7 +282,7 @@ public class IncidentController : ControllerBase
     /// Edit a comment
     /// </summary>
     [HttpPut("comment")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> EditComment([FromBody] EditCommentDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -294,7 +294,7 @@ public class IncidentController : ControllerBase
     /// Delete a comment
     /// </summary>
     [HttpDelete("comment/{commentId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> DeleteComment(int commentId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -306,7 +306,7 @@ public class IncidentController : ControllerBase
     /// Get comments for a case
     /// </summary>
     [HttpGet("case/{caseId}/comments")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetComments(int caseId)
     {
         var result = await _incidentService.GetCommentsAsync(caseId, true);
@@ -321,7 +321,7 @@ public class IncidentController : ControllerBase
     /// Get timeline for a case
     /// </summary>
     [HttpGet("case/{caseId}/timeline")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetTimeline(int caseId)
     {
         var result = await _incidentService.GetTimelineAsync(caseId);
@@ -339,7 +339,7 @@ public class IncidentController : ControllerBase
     /// Get incident dashboard for an exam
     /// </summary>
     [HttpGet("dashboard/exam/{examId}")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetDashboard(int examId)
     {
         var result = await _incidentService.GetDashboardAsync(examId);
@@ -350,7 +350,7 @@ public class IncidentController : ControllerBase
     /// Get global incident dashboard
     /// </summary>
     [HttpGet("dashboard")]
-    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetGlobalDashboard()
     {
         var result = await _incidentService.GetGlobalDashboardAsync();

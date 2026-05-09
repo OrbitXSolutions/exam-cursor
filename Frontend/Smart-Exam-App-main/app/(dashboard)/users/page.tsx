@@ -174,9 +174,6 @@ export default function UsersPage() {
         return "default"
       case "Instructor":
         return "secondary"
-      case "ProctorReviewer":
-      case "Auditor":
-        return "outline"
       default:
         return "secondary"
     }

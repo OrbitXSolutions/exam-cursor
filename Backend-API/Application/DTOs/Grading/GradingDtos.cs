@@ -70,6 +70,8 @@ public class GradingSearchDto
     public bool? RequiresManualGrading { get; set; }
     public DateTimeOffset? GradedFrom { get; set; }
     public DateTimeOffset? GradedTo { get; set; }
+    /// <summary>Free-text search on candidate name, email, roll no, or exam title</summary>
+    public string? Search { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

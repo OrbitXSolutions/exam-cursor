@@ -80,7 +80,7 @@ export default function QuestionBankPage() {
   // Load reference data (subjects, types) once for dropdowns
   useEffect(() => {
     Promise.all([
-      getQuestionSubjects({ pageSize: 1000 }),
+      getQuestionSubjects({ pageSize: 200 }),
       getQuestionTypes(),
     ])
       .then(([subjectsRes, typesRes]) => {
@@ -137,7 +137,7 @@ export default function QuestionBankPage() {
     }
     const fetchTopicsForSubject = async () => {
       try {
-        const res = await getQuestionTopics({ subjectId: Number(selectedSubject), pageSize: 1000 })
+        const res = await getQuestionTopics({ subjectId: Number(selectedSubject), pageSize: 200 })
         setTopics(res?.items || [])
         setSelectedTopic("all")
       } catch {

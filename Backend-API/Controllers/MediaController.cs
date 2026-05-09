@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.Media;
 using Smart_Core.Application.Interfaces;
+using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Controllers;
 
@@ -105,6 +106,7 @@ public class MediaController : ControllerBase
     /// Delete file by ID
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
     [ProducesResponseType(typeof(MediaDeleteResultDto), StatusCodes.Status200OK)]
  [ProducesResponseType(typeof(MediaDeleteResultDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(Guid id)

@@ -107,15 +107,39 @@ function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
  */
 export async function getIncidents(params?: {
   status?: string;
+  severity?: string;
+  search?: string;
+  reviewed?: "all" | "reviewed" | "pending";
   pageNumber?: number;
   pageSize?: number;
 }): Promise<{ items: Incident[]; totalCount: number }> {
   try {
     const query = new URLSearchParams();
     query.set("PageNumber", String(params?.pageNumber ?? 1));
-    query.set("PageSize", String(params?.pageSize ?? 50));
+    query.set("PageSize", String(params?.pageSize ?? 10));
     if (params?.status && params.status !== "all") {
       query.set("Status", params.status);
+    }
+    if (params?.severity && params.severity !== "all") {
+      // Backend IncidentSeverity: Low=1, Medium=2, High=3, Critical=4
+      const severityMap: Record<string, string> = {
+        Low: "1",
+        Medium: "2",
+        High: "3",
+        Critical: "4",
+      };
+      const severityVal = severityMap[params.severity];
+      if (severityVal) query.set("Severity", severityVal);
+    }
+    if (params?.search?.trim()) {
+      query.set("Search", params.search.trim());
+    }
+    if (params?.reviewed === "reviewed") {
+      // Reviewed = resolved or closed
+      query.set("Status", "3"); // IncidentStatus.Resolved
+    } else if (params?.reviewed === "pending") {
+      // Pending = open or in review
+      query.set("Status", "1"); // IncidentStatus.Open
     }
     const raw = await apiClient.get<{
       items?: IncidentCaseListDto[];
@@ -157,6 +181,7 @@ export async function reviewIncident(
  */
 export async function getLiveSessions(
   includeSamples = false,
+  params?: { search?: string; isFlagged?: boolean },
 ): Promise<LiveSession[]> {
   try {
     const query = new URLSearchParams();
@@ -164,6 +189,8 @@ export async function getLiveSessions(
     query.set("PageSize", "100");
     query.set("Status", "1");
     query.set("IncludeSamples", String(includeSamples));
+    if (params?.search?.trim()) query.set("Search", params.search.trim());
+    if (params?.isFlagged) query.set("IsFlagged", "true");
     const raw = await apiClient.get<{ items?: ProctorSessionListDto[] }>(
       `/Proctor/sessions?${query}`,
     );

@@ -73,7 +73,7 @@ export async function getUsers(params?: {
   }
 }
 
-/// Dedicated staff users endpoint — Candidate and SuperDev always excluded server-side via SQL JOIN
+/// Dedicated staff users endpoint — Candidate and SuperAdmin always excluded server-side via SQL JOIN
 export async function getStaffUsers(params?: {
   search?: string;
   role?: string;

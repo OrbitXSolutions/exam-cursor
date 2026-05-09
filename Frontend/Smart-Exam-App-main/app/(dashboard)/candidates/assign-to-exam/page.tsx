@@ -113,7 +113,7 @@ export default function AssignToExamPage() {
       const paramId = searchParams.get("examId")
       if (paramId) setSelectedExamId(paramId)
     }).catch(() => setExams([]))
-    getBatches({ pageSize: 200 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
+    getBatches({ pageSize: 100 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load candidates ────────────────────────────────────────

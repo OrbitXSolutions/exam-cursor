@@ -28,10 +28,16 @@ const ROUTE_ROLE_MAP: { prefix: string; roles: UserRole[] }[] = [
   { prefix: "/question-bank",   roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
   { prefix: "/lookups",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
   { prefix: "/exams",           roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
-  { prefix: "/candidates",      roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
-  // Admin + Examiner + SuperAdmin
-  { prefix: "/grading",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Examiner] },
-  { prefix: "/results",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Examiner] },
+  // Sub-routes first — find() returns the first match, so specific paths must precede the parent
+  // BatchesController + CandidatesController: SuperAdmin,Admin only
+  { prefix: "/candidates/batch",         roles: [UserRole.SuperAdmin, UserRole.Admin] },
+  { prefix: "/candidates/data",          roles: [UserRole.SuperAdmin, UserRole.Admin] },
+  // AssignmentsController + CandidateExamDetailsController: SuperAdmin,Admin,Instructor
+  { prefix: "/candidates",               roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
+  // GradingController: SuperAdmin,Admin,Instructor,Examiner
+  { prefix: "/grading",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Examiner] },
+  // ExamResultController: SuperAdmin,Admin,Instructor (Examiner has no backend access to results)
+  { prefix: "/results",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor] },
   // Admin + Proctor + SuperAdmin (Instructor included for /proctor/assign)
   { prefix: "/proctor-center",  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Proctor] },
   { prefix: "/proctor",         roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Proctor, UserRole.Instructor] },

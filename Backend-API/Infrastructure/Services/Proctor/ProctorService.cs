@@ -1855,6 +1855,19 @@ UploadEvidenceDto dto, string candidateId)
         if (searchDto.StartedTo.HasValue)
             query = query.Where(s => s.StartedAt <= searchDto.StartedTo.Value);
 
+        if (!string.IsNullOrEmpty(searchDto.Search))
+        {
+            var s = searchDto.Search.Trim();
+            query = query.Where(ps =>
+                ps.Candidate.FullName.Contains(s) ||
+                (ps.Candidate.Email != null && ps.Candidate.Email.Contains(s)) ||
+                ps.Exam.TitleEn.Contains(s) ||
+                ps.Exam.TitleAr.Contains(s));
+        }
+
+        if (searchDto.IsFlagged == true)
+            query = query.Where(s => s.IsFlagged == true);
+
         return query;
     }
 

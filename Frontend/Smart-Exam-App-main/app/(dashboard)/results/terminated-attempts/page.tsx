@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
@@ -84,6 +84,8 @@ export default function TerminatedAttemptsPage() {
   const [pageSize, setPageSize] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [terminationStatus, setTerminationStatus] = useState(STATUS_ALL)
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Allow New Attempt dialog
   const [newAttemptOpen, setNewAttemptOpen] = useState(false)
@@ -120,6 +122,7 @@ export default function TerminatedAttemptsPage() {
       pageSize,
       onlyTerminated: true,
       statusFilter: terminationStatus !== STATUS_ALL ? terminationStatus : undefined,
+      search: debouncedSearch.trim() || undefined,
     })
       .then((res) => {
         if (!cancelled) {
@@ -131,21 +134,14 @@ export default function TerminatedAttemptsPage() {
       .finally(() => { if (!cancelled) setLoadingData(false) })
 
     return () => { cancelled = true }
-  }, [selectedExamId, refreshKey, currentPage, pageSize, terminationStatus])
-
-  // Search filter (status filtering done server-side with onlyTerminated=true)
-  const filteredAttempts = useMemo(() => {
-    if (!searchQuery.trim()) return allCandidates
-    const q = searchQuery.trim().toLowerCase()
-    return allCandidates.filter(
-      (row) =>
-        (row.candidateName ?? "").toLowerCase().includes(q) ||
-        (row.candidateEmail ?? "").toLowerCase().includes(q)
-    )
-  }, [allCandidates, searchQuery])
+  }, [selectedExamId, refreshKey, currentPage, pageSize, terminationStatus, debouncedSearch])
 
   const handleExamChange = (v: string) => { setSelectedExamId(v); setCurrentPage(1) }
-  const handleSearchChange = (v: string) => { setSearchQuery(v); setCurrentPage(1) }
+  const handleSearchChange = (v: string) => {
+    setSearchQuery(v)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => { setDebouncedSearch(v); setCurrentPage(1) }, 400)
+  }
   const handlePageSizeChange = (v: string) => { setPageSize(Number(v)); setCurrentPage(1) }
   const handleStatusFilterChange = (v: string) => { setTerminationStatus(v); setCurrentPage(1) }
 
@@ -376,7 +372,7 @@ export default function TerminatedAttemptsPage() {
             <div className="flex min-h-[200px] items-center justify-center">
               <LoadingSpinner size="lg" />
             </div>
-          ) : filteredAttempts.length === 0 ? (
+          ) : allCandidates.length === 0 ? (
             <EmptyState
               icon={ShieldAlert}
               title={isAr ? "لا توجد محاولات مُنهاة" : "No terminated attempts"}
@@ -397,7 +393,7 @@ export default function TerminatedAttemptsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredAttempts.map((row, idx) => {
+                  {allCandidates.map((row, idx) => {
                     const examId = String(row.examId ?? "")
                     const attemptQuery = row.attemptId ? `?attemptId=${row.attemptId}` : ""
 
@@ -488,7 +484,7 @@ export default function TerminatedAttemptsPage() {
             </div>
           )}
         </CardContent>
-        {filteredAttempts.length > 0 && (
+        {allCandidates.length > 0 && (
           <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{isAr ? "عرض" : "Show"}</span>

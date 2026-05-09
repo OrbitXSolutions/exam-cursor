@@ -50,28 +50,24 @@ export default function ReportsPage() {
   }, [])
 
   useEffect(() => {
-    if (!selectedExamId) {
-      setDashboard(null)
-      setCandidates([])
-      setLoading(false)
-      return
-    }
-    setLoading(true)
-    Promise.all([
-      getResultDashboard(selectedExamId),
-      getExamResults(selectedExamId, { pageSize: 100 }),
-    ]).then(([dash, res]) => {
-      setDashboard(dash || null)
-      setCandidates(res.items)
-      setLoading(false)
-    })
+    if (!selectedExamId) { setDashboard(null); return; }
+    getResultDashboard(selectedExamId).then((dash) => setDashboard(dash || null))
   }, [selectedExamId])
 
-  const filteredCandidates = candidates.filter(
-    (c) =>
-      c.candidateName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.candidateId.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  useEffect(() => {
+    if (!selectedExamId) { setCandidates([]); setLoading(false); return; }
+    setLoading(true)
+    const handler = setTimeout(() => {
+      getExamResults(selectedExamId, {
+        pageSize: 100,
+        search: searchQuery.trim() || undefined,
+      }).then((res) => {
+        setCandidates(res.items)
+        setLoading(false)
+      })
+    }, searchQuery ? 300 : 0)
+    return () => clearTimeout(handler)
+  }, [selectedExamId, searchQuery])
 
   const passFailData = dashboard
     ? [
@@ -83,7 +79,7 @@ export default function ReportsPage() {
   function exportCsv() {
     if (!dashboard || candidates.length === 0) return
     const headers = ["Candidate", "Candidate ID", "Score %", "Status", "Date"]
-    const rows = filteredCandidates.map((c) => [
+    const rows = candidates.map((c) => [
       `"${(c.candidateName || "").replace(/"/g, '""')}"`,
       `"${(c.candidateId || "").replace(/"/g, '""')}"`,
       Math.round(c.percentage),
@@ -262,7 +258,7 @@ export default function ReportsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCandidates.map((candidate) => (
+              {candidates.map((candidate) => (
                 <TableRow key={candidate.id}>
                   <TableCell>
                     <div>
@@ -295,7 +291,7 @@ export default function ReportsPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredCandidates.length === 0 && (
+              {candidates.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                     {t("reports.noCandidates")}

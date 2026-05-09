@@ -234,6 +234,10 @@ public class ProctorSessionSearchDto
     public DateTimeOffset? StartedFrom { get; set; }
     public DateTimeOffset? StartedTo { get; set; }
     public bool IncludeSamples { get; set; }
+    /// <summary>Free-text search on candidate name or exam title</summary>
+    public string? Search { get; set; }
+    /// <summary>When true, only return flagged sessions</summary>
+    public bool? IsFlagged { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

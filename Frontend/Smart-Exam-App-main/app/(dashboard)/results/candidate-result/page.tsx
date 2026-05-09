@@ -75,11 +75,17 @@ export default function CandidateResultPage() {
   const [exportingIds, setExportingIds] = useState<Map<string, "excel" | "pdf" | "pdf-ar">>(new Map())
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const retryRef = useRef(false)
 
   const handleExamChange = (v: string) => { setSelectedExamId(v); setCurrentPage(1) }
   const handleStatusChange = (v: string) => { setResultStatus(v); setCurrentPage(1) }
-  const handleSearchChange = (v: string) => { setSearchQuery(v); setCurrentPage(1) }
+  const handleSearchChange = (v: string) => {
+    setSearchQuery(v)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => { setDebouncedSearch(v); setCurrentPage(1) }, 400)
+  }
   const handlePageSizeChange = (v: string) => { setPageSize(Number(v)); setCurrentPage(1) }
 
   const loadCandidates = useCallback(() => {
@@ -110,7 +116,7 @@ export default function CandidateResultPage() {
 
     const fetchData = async () => {
       try {
-        const res = await getCandidateResultList(examIdParam, { pageNumber: currentPage, pageSize, excludeTerminated: true })
+        const res = await getCandidateResultList(examIdParam, { pageNumber: currentPage, pageSize, excludeTerminated: true, search: debouncedSearch.trim() || undefined, resultStatus: resultStatus !== RESULT_STATUS_ALL ? resultStatus : undefined })
         if (cancelled) return
 
         const list = res?.items ?? []
@@ -131,41 +137,7 @@ export default function CandidateResultPage() {
 
     fetchData()
     return () => { cancelled = true }
-  }, [selectedExamId, refreshKey, fromGrading, currentPage, pageSize])
-
-  // Backend now excludes Terminated/Expired/ForceSubmitted via excludeTerminated=true
-  const statusFilteredCandidates = useMemo(() => {
-    if (resultStatus === RESULT_STATUS_ALL) return candidates
-    
-    return candidates.filter((c) => {
-      switch (resultStatus) {
-        case RESULT_STATUS_PASSED:
-          return c.isPassed === true
-        case RESULT_STATUS_FAILED:
-          return c.isPassed === false
-        case RESULT_STATUS_UNDER_REVIEW:
-          return (
-            c.gradingStatusCode === GRADING_STATUS_MANUAL_REQUIRED ||
-            c.gradingStatusCode === GRADING_STATUS_PENDING ||
-            !c.isResultFinalized
-          )
-        case RESULT_STATUS_NOT_PUBLISHED:
-          return c.isResultFinalized && !c.isPublished
-        default:
-          return true
-      }
-    })
-  }, [candidates, resultStatus])
-
-  const filteredCandidates = useMemo(() => {
-    if (!searchQuery.trim()) return statusFilteredCandidates
-    const q = searchQuery.trim().toLowerCase()
-    return statusFilteredCandidates.filter(
-      (row) =>
-        (row.candidateName ?? "").toLowerCase().includes(q) ||
-        (row.candidateEmail ?? "").toLowerCase().includes(q)
-    )
-  }, [statusFilteredCandidates, searchQuery])
+  }, [selectedExamId, refreshKey, fromGrading, currentPage, pageSize, debouncedSearch, resultStatus])
 
   const getExamTitle = (exam: ExamDropdownItem) => (language === "ar" ? exam.titleAr : exam.titleEn) || ""
 
@@ -407,7 +379,7 @@ export default function CandidateResultPage() {
               <div className="flex min-h-[200px] items-center justify-center">
                 <LoadingSpinner size="lg" />
               </div>
-            ) : filteredCandidates.length === 0 ? (
+            ) : candidates.length === 0 ? (
               <EmptyState
                 icon={BarChart3}
                 title={language === "ar" ? "لا يوجد مرشحون" : "No candidates"}
@@ -430,7 +402,7 @@ export default function CandidateResultPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCandidates.map((row, idx) => {
+                  {candidates.map((row, idx) => {
                     const effectiveExamId = selectedExamId !== ALL_EXAMS_VALUE ? selectedExamId : String(row.examId ?? "")
                     const examTitle = row.examId != null
                       ? (language === "ar" ? row.examTitleAr : row.examTitleEn) ?? ""
@@ -583,7 +555,7 @@ export default function CandidateResultPage() {
             )}
           </CardContent>
           {/* Pagination */}
-          {filteredCandidates.length > 0 && (
+          {candidates.length > 0 && (
           <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4 border-t">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{language === "ar" ? "عرض" : "Show"}</span>

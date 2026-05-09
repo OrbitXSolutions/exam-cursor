@@ -653,6 +653,17 @@ public class GradingService : IGradingService
             query = query.Where(gs => gs.GradedAt <= searchDto.GradedTo.Value);
         }
 
+        if (!string.IsNullOrEmpty(searchDto.Search))
+        {
+            var s = searchDto.Search.Trim();
+            query = query.Where(gs =>
+                gs.Attempt.Candidate.FullName.Contains(s) ||
+                (gs.Attempt.Candidate.Email != null && gs.Attempt.Candidate.Email.Contains(s)) ||
+                (gs.Attempt.Candidate.RollNo != null && gs.Attempt.Candidate.RollNo.Contains(s)) ||
+                gs.Attempt.Exam.TitleEn.Contains(s) ||
+                gs.Attempt.Exam.TitleAr.Contains(s));
+        }
+
         query = query.OrderByDescending(gs => gs.CreatedDate);
 
         var totalCount = await query.CountAsync();

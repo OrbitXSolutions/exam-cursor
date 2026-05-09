@@ -136,9 +136,11 @@ const examsNavGroup: NavGroup = {
 const resultNavGroup: NavGroup = {
   icon: CheckCircle2,
   labelKey: "nav.result",
-  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Examiner],
+  // GradingController: SuperAdmin,Admin,Instructor,Examiner | ExamResultController: SuperAdmin,Admin,Instructor
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Examiner],
   children: [
-    { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
+    // GradingController allows Examiner; explicit roles required so Examiner sees grading inside the group
+    { icon: GraduationCap, labelKey: "nav.grading", href: "/grading", roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Examiner] },
     { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result", roles: [UserRole.SuperAdmin, UserRole.Admin] },
     { icon: ShieldAlert, labelKey: "nav.terminatedAttempts", href: "/results/terminated-attempts", roles: [UserRole.SuperAdmin, UserRole.Admin] },
     { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report", roles: [UserRole.SuperAdmin, UserRole.Admin] },
@@ -162,8 +164,10 @@ const candidatesNavGroup: NavGroup = {
   labelKey: "nav.candidates",
   roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor],
   children: [
-    { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
-    { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
+    // BatchesController + CandidatesController: SuperAdmin,Admin only
+    { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    // AssignmentsController + CandidateExamDetailsController: SuperAdmin,Admin,Instructor
     { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
     // { icon: Wrench, labelKey: "nav.examOperations", href: "/candidates/exam-operations" },
     { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
