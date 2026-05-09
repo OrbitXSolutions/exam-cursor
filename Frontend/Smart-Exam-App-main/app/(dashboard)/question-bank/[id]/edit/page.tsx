@@ -18,13 +18,14 @@ import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LoadingSpinner, PageLoader } from "@/components/ui/loading-spinner"
 import { getQuestionById, updateQuestion } from "@/lib/api/question-bank"
-import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type QuestionType, type QuestionSubject, type QuestionTopic } from "@/lib/api/lookups"
+import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, getQuestionSubjectById, getQuestionTopicById, type QuestionType } from "@/lib/api/lookups"
 import type { Question } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
 import { ArrowLeft, Plus, Trash2, GripVertical, ImageIcon, Upload, X, Calculator } from "lucide-react"
 import type { QuestionAttachment } from "@/lib/types"
 import { addQuestionAttachment, deleteQuestionAttachment } from "@/lib/api/question-bank"
+import { SearchableSelectInput } from "@/components/ui/searchable-select-input"
 
 interface OptionInput {
   id: string
@@ -46,9 +47,9 @@ export default function EditQuestionPage() {
   const { t, language } = useI18n()
 
   const [question, setQuestion] = useState<Question | null>(null)
-  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
-  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [types, setTypes] = useState<QuestionType[]>([])
+  const [initialSubjectLabel, setInitialSubjectLabel] = useState("")
+  const [initialTopicLabel, setInitialTopicLabel] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -164,25 +165,6 @@ export default function EditQuestionPage() {
     }
     setIsLoading(false)
   }
-
-  // Fetch topics when subject changes
-  useEffect(() => {
-    if (!formData.subjectId) {
-      setTopics([])
-      return
-    }
-    const fetchTopics = async () => {
-      try {
-        const res = await getQuestionTopics({ subjectId: Number(formData.subjectId), pageSize: 100 })
-        setTopics(res?.items || [])
-      } catch { setTopics([]) }
-    }
-    // Only fetch if subjectId changed from original (to avoid double-fetch on first load)
-    if (question && String(question.subjectId) !== formData.subjectId) {
-      setFormData((prev) => ({ ...prev, topicId: "" }))
-      fetchTopics()
-    }
-  }, [formData.subjectId])
 
   const addOption = () => {
     setOptions([
@@ -640,21 +622,17 @@ export default function EditQuestionPage() {
                     <Label htmlFor="subject">
                       {language === "ar" ? "المادة" : "Subject"} <span className="text-destructive">*</span>
                     </Label>
-                    <Select
-                      value={formData.subjectId}
-                      onValueChange={(value) => setFormData({ ...formData, subjectId: value })}
-                    >
-                      <SelectTrigger id="subject" className="w-full">
-                        <SelectValue placeholder={language === "ar" ? "اختر المادة" : "Select subject"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map((subj) => (
-                          <SelectItem key={subj.id} value={String(subj.id)}>
-                            {language === "ar" ? subj.nameAr : subj.nameEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelectInput
+                      id="subject"
+                      value={formData.subjectId || null}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, subjectId: val, topicId: "" }))}
+                      fetchFn={(search, page) =>
+                        getQuestionSubjects({ search, pageNumber: page, pageSize: 20 })
+                      }
+                      placeholder={language === "ar" ? "اختر المادة" : "Select subject"}
+                      language={language}
+                      initialLabel={initialSubjectLabel}
+                    />
                   </div>
                 </div>
 
@@ -663,22 +641,24 @@ export default function EditQuestionPage() {
                     <Label htmlFor="topic">
                       {language === "ar" ? "الموضوع" : "Topic"}
                     </Label>
-                    <Select
-                      value={formData.topicId}
-                      onValueChange={(value) => setFormData({ ...formData, topicId: value })}
-                      disabled={!formData.subjectId || topics.length === 0}
-                    >
-                      <SelectTrigger id="topic" className="w-full">
-                        <SelectValue placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {topics.map((topic) => (
-                          <SelectItem key={topic.id} value={String(topic.id)}>
-                            {language === "ar" ? topic.nameAr : topic.nameEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelectInput
+                      id="topic"
+                      value={formData.topicId || null}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, topicId: val }))}
+                      fetchFn={(search, page) =>
+                        getQuestionTopics({
+                          subjectId: Number(formData.subjectId),
+                          search,
+                          pageNumber: page,
+                          pageSize: 20,
+                        })
+                      }
+                      placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"}
+                      disabled={!formData.subjectId}
+                      language={language}
+                      initialLabel={initialTopicLabel}
+                      resetOn={formData.subjectId}
+                    />
                   </div>
                 </div>
 

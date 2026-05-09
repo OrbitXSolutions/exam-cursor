@@ -41,11 +41,14 @@ export default function CreateFromTemplatePage() {
   const { t, language, dir } = useI18n()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [examsLoading, setExamsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Source exams list
-  const [allExams, setAllExams] = useState<Exam[]>([])
+  // Source exams list (server-side searchable)
+  const [examItems, setExamItems] = useState<Exam[]>([])
+  const [examPage, setExamPage] = useState(0)
+  const [examTotalPages, setExamTotalPages] = useState(0)
+  const [examSearchLoading, setExamSearchLoading] = useState(false)
+  const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
   const [examSearch, setExamSearch] = useState("")
   const [selectedExamId, setSelectedExamId] = useState<number | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -63,24 +66,41 @@ export default function CreateFromTemplatePage() {
     durationMinutes: 60,
   })
 
-  // Load published exams
-  useEffect(() => {
-    async function fetchExams() {
-      try {
-        setExamsLoading(true)
-        const response = await getExams({ pageSize: 100 })
-        if (response?.items && Array.isArray(response.items)) {
-          // Show all exams (not just published) so user can pick any as template
-          setAllExams(response.items)
-        }
-      } catch {
-        toast.error(localizeText("Failed to load exams", "فشل في تحميل الاختبارات", language))
-      } finally {
-        setExamsLoading(false)
+  const PAGE_SIZE = 20
+
+  async function loadExamsPage(search: string, page: number, replace: boolean) {
+    setExamSearchLoading(true)
+    try {
+      const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE })
+      const items = response.items ?? []
+      if (replace) {
+        setExamItems(items)
+      } else {
+        setExamItems((prev) => [...prev, ...items])
       }
+      setExamPage(page)
+      setExamTotalPages(response.totalPages ?? 0)
+    } catch {
+      // silent — list stays as-is
+    } finally {
+      setExamSearchLoading(false)
     }
-    fetchExams()
-  }, [])
+  }
+
+  // Load initial list when dropdown opens
+  useEffect(() => {
+    if (!dropdownOpen) return
+    loadExamsPage(examSearch, 1, true)
+  }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced reload on search change while dropdown is open
+  useEffect(() => {
+    if (!dropdownOpen) return
+    const timer = setTimeout(() => {
+      loadExamsPage(examSearch, 1, true)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -93,31 +113,18 @@ export default function CreateFromTemplatePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const selectedExam = allExams.find((e) => e.id === selectedExamId) || null
-
-  // Filter exams by search text
-  const filteredExams = allExams.filter((exam) => {
-    if (!examSearch) return true
-    const s = examSearch.toLowerCase()
-    return (
-      exam.titleEn?.toLowerCase().includes(s) ||
-      exam.titleAr?.toLowerCase().includes(s) ||
-      ((exam as any).code && (exam as any).code.toLowerCase().includes(s))
-    )
-  })
-
   function updateField(field: string, value: string | number | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setError(null)
   }
 
   function handleSelectExam(examId: number) {
+    const exam = examItems.find((e) => e.id === examId)
     setSelectedExamId(examId)
+    setSelectedExam(exam ?? null)
     setExamSearch("")
     setDropdownOpen(false)
-    const exam = allExams.find((e) => e.id === examId)
     if (exam) {
-      // Pre-fill duration from source exam
       setFormData((prev) => ({
         ...prev,
         durationMinutes: exam.durationMinutes || 60,
@@ -221,14 +228,8 @@ export default function CreateFromTemplatePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 overflow-visible min-h-[80px]">
-            {examsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <LoadingSpinner size="md" />
-              </div>
-            ) : (
-              <>
-                {/* Dropdown selector */}
-                <div className="relative" ref={dropdownRef}>
+            {/* Dropdown selector */}
+            <div className="relative" ref={dropdownRef}>
                   <button
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -258,31 +259,47 @@ export default function CreateFromTemplatePage() {
 
                       {/* Options list */}
                       <div className="max-h-80 overflow-y-auto divide-y">
-                        {filteredExams.length === 0 ? (
+                        {examSearchLoading && examItems.length === 0 ? (
+                          <div className="flex items-center justify-center py-6">
+                            <LoadingSpinner size="sm" />
+                          </div>
+                        ) : examItems.length === 0 ? (
                           <div className="p-4 text-center text-sm text-muted-foreground">{language === "ar" ? "لم يتم العثور على اختبارات" : "No exams found"}</div>
                         ) : (
-                          filteredExams.map((exam) => (
-                            <button
-                              key={exam.id}
-                              type="button"
-                              onClick={() => handleSelectExam(exam.id)}
-                              className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
-                                selectedExamId === exam.id ? "bg-primary/10 text-primary font-medium" : ""
-                              }`}
-                            >
-                              {selectedExamId === exam.id && (
-                                <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-                              )}
-                              <span className="truncate">{getExamTitle(exam)}</span>
-                            </button>
-                          ))
+                          <>
+                            {examItems.map((exam) => (
+                              <button
+                                key={exam.id}
+                                type="button"
+                                onClick={() => handleSelectExam(exam.id)}
+                                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                  selectedExamId === exam.id ? "bg-primary/10 text-primary font-medium" : ""
+                                }`}
+                              >
+                                {selectedExamId === exam.id && (
+                                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                                )}
+                                <span className="truncate">{getExamTitle(exam)}</span>
+                              </button>
+                            ))}
+                            {examPage < examTotalPages && (
+                              <button
+                                type="button"
+                                onClick={() => loadExamsPage(examSearch, examPage + 1, false)}
+                                disabled={examSearchLoading}
+                                className="w-full px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors text-center disabled:opacity-50"
+                              >
+                                {examSearchLoading
+                                  ? <LoadingSpinner size="sm" className="mx-auto" />
+                                  : (language === "ar" ? "تحميل المزيد..." : "Load more...")}
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
                   )}
                 </div>
-              </>
-            )}
 
             {/* Source Exam Preview */}
             {selectedExam && (

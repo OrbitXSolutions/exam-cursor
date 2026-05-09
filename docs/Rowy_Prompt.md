@@ -13,6 +13,32 @@ Rules:
 - Do not Change or break any flow
 - Ask me or take permission anytime
   Do not trust documentation or memory as the source of truth. They may be outdated. The current codebase is the only reliable source—inspect it deeply and verify every assumption against the actual implementation.
+  This is a production system. Safety is more important than speed. If you are unsure, stop and explain the risk instead of guessing.
+
+--- Review the task
+Good.
+
+Now perform a final production safety review for this implementation.
+
+Tasks:
+
+1. Re-check for any broken imports, unused imports, type errors, or lint issues.
+2. Verify no existing form behavior changed except the dropdown loading behavior.
+3. Verify subjectId/topicId types remain exactly compatible with existing submit API payloads.
+4. Verify topic selection fully resets when subject changes.
+5. Verify no duplicate API requests or infinite re-render loops exist.
+6. Verify dropdown closes correctly after selection.
+7. Verify Load More appends instead of replacing existing items.
+8. Verify search resets pagination correctly.
+9. Verify no memory leaks from debounce timers or async state updates after unmount.
+10. Verify accessibility/basic keyboard interaction still works.
+
+Then provide:
+
+- Final changed files list
+- Manual QA checklist
+- Any remaining risks or edge cases
+- Whether this is safe to push to production
 
 Requirement: Partial Scoring for Multi-Choice Questions
 
