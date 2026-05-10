@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useI18n } from "@/lib/i18n/context"
 import {
-  getExamsForReports,
   getResultDashboard,
   getExamResults,
-  type ExamListItem,
   type ResultDashboard,
   type ResultListItem,
 } from "@/lib/api/reports"
+import { getExams } from "@/lib/api/exams"
+import type { Exam } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -31,23 +30,88 @@ import {
   Tooltip,
   Legend,
 } from "recharts"
-import { Users, Target, TrendingUp, Award, Search, Download, CheckCircle2, XCircle, Clock } from "lucide-react"
+import { Users, Target, TrendingUp, Award, Search, Download, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react"
 
 export default function ReportsPage() {
   const { t, locale } = useI18n()
-  const [exams, setExams] = useState<ExamListItem[]>([])
+  const [examItems, setExamItems] = useState<Exam[]>([])
+  const [examPage, setExamPage] = useState(0)
+  const [examTotalPages, setExamTotalPages] = useState(0)
+  const [examSearchLoading, setExamSearchLoading] = useState(false)
+  const [examSearch, setExamSearch] = useState("")
+  const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [selectedExamId, setSelectedExamId] = useState<number | null>(null)
   const [dashboard, setDashboard] = useState<ResultDashboard | null>(null)
   const [candidates, setCandidates] = useState<ResultListItem[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
 
+  const PAGE_SIZE_EXAM = 20
+  async function loadExamsPage(search: string, page: number, replace: boolean) {
+    setExamSearchLoading(true)
+    try {
+      const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE_EXAM })
+      const items = response.items ?? []
+      if (replace) {
+        setExamItems(items)
+        // Auto-select first exam on initial load
+        if (page === 1 && items.length > 0 && selectedExamId === null) {
+          setSelectedExamId(items[0].id)
+          setSelectedExam(items[0])
+        }
+      } else {
+        setExamItems((prev) => [...prev, ...items])
+      }
+      setExamPage(page)
+      setExamTotalPages(response.totalPages ?? 0)
+    } catch {
+      // silent
+    } finally {
+      setExamSearchLoading(false)
+    }
+  }
+
+  // Load exams on mount
   useEffect(() => {
-    getExamsForReports().then((list) => {
-      setExams(list)
-      if (list.length > 0 && !selectedExamId) setSelectedExamId(list[0].id)
-    })
+    loadExamsPage("", 1, true)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reload when dropdown opens
+  useEffect(() => {
+    if (!dropdownOpen) return
+    loadExamsPage(examSearch, 1, true)
+  }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced reload on search change
+  useEffect(() => {
+    if (!dropdownOpen) return
+    const timer = setTimeout(() => { loadExamsPage(examSearch, 1, true) }, 300)
+    return () => clearTimeout(timer)
+  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  function handleSelectExam(exam: Exam) {
+    setSelectedExamId(exam.id)
+    setSelectedExam(exam)
+    setExamSearch("")
+    setDropdownOpen(false)
+  }
+
+  function getExamTitle(exam: Exam) {
+    return exam.titleEn || exam.titleAr || ""
+  }
 
   useEffect(() => {
     if (!selectedExamId) { setDashboard(null); return; }
@@ -121,21 +185,69 @@ export default function ReportsPage() {
           <p className="text-muted-foreground mt-1">{t("reports.subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Select
-            value={selectedExamId ? String(selectedExamId) : ""}
-            onValueChange={(v) => setSelectedExamId(Number(v))}
-          >
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder={t("reports.selectExam")} />
-            </SelectTrigger>
-            <SelectContent>
-              {exams.map((exam) => (
-                <SelectItem key={exam.id} value={String(exam.id)}>
-                  {exam.titleEn || exam.titleAr}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-[280px] flex items-center justify-between px-3 py-2.5 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
+            >
+              <span className={selectedExam ? "text-foreground" : "text-muted-foreground"}>
+                {selectedExam ? getExamTitle(selectedExam) : t("reports.selectExam")}
+              </span>
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute z-50 w-[340px] mt-1 rounded-md border bg-popover shadow-lg">
+                <div className="p-2 border-b">
+                  <div className="relative">
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t("common.search")}
+                      value={examSearch}
+                      onChange={(e) => setExamSearch(e.target.value)}
+                      className="ps-9 h-9 border"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-y-auto divide-y">
+                  {examSearchLoading && examItems.length === 0 ? (
+                    <div className="flex items-center justify-center py-6">
+                      <LoadingSpinner size="sm" />
+                    </div>
+                  ) : examItems.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">{locale === "ar" ? "لم يتم العثور على اختبارات" : "No exams found"}</div>
+                  ) : (
+                    <>
+                      {examItems.map((exam) => (
+                        <button
+                          key={exam.id}
+                          type="button"
+                          onClick={() => handleSelectExam(exam)}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${selectedExamId === exam.id ? "bg-primary/10 text-primary font-medium" : ""}`}
+                        >
+                          {selectedExamId === exam.id && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                          <span className="truncate">{getExamTitle(exam)}</span>
+                        </button>
+                      ))}
+                      {examPage < examTotalPages && (
+                        <button
+                          type="button"
+                          onClick={() => loadExamsPage(examSearch, examPage + 1, false)}
+                          disabled={examSearchLoading}
+                          className="w-full px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors text-center disabled:opacity-50"
+                        >
+                          {examSearchLoading
+                            ? <LoadingSpinner size="sm" className="mx-auto" />
+                            : (locale === "ar" ? "تحميل المزيد..." : "Load more...")}
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           <Button variant="outline" onClick={exportCsv} disabled={!dashboard || candidates.length === 0}>
             <Download className="h-4 w-4 me-2" />
             {t("reports.export")}

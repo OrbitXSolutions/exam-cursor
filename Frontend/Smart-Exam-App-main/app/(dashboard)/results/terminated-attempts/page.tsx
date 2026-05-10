@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
-import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
+import { getExams } from "@/lib/api/exams"
+import type { Exam } from "@/lib/types"
 import { getCandidateResultList, type CandidateResultListItem } from "@/lib/api/results"
 import { allowNewAttempt } from "@/lib/api/exam-operations"
 import { apiClient } from "@/lib/api-client"
@@ -46,6 +47,8 @@ import {
   FileText,
   MessageSquareWarning,
   Clock,
+  ChevronDown,
+  CheckCircle2,
 } from "lucide-react"
 
 const ALL_EXAMS_VALUE = "__all__"
@@ -73,11 +76,16 @@ export default function TerminatedAttemptsPage() {
   const isAr = language === "ar"
 
   // ── State ──
-  const [exams, setExams] = useState<ExamDropdownItem[]>([])
+  const [examItems, setExamItems] = useState<Exam[]>([])
+  const [examPage, setExamPage] = useState(0)
+  const [examTotalPages, setExamTotalPages] = useState(0)
+  const [examSearchLoading, setExamSearchLoading] = useState(false)
+  const [examSearch, setExamSearch] = useState("")
+  const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedExamId, setSelectedExamId] = useState<string>(ALL_EXAMS_VALUE)
   const [searchQuery, setSearchQuery] = useState("")
   const [allCandidates, setAllCandidates] = useState<CandidateResultListItem[]>([])
-  const [loading, setLoading] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
@@ -86,6 +94,7 @@ export default function TerminatedAttemptsPage() {
   const [terminationStatus, setTerminationStatus] = useState(STATUS_ALL)
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Allow New Attempt dialog
   const [newAttemptOpen, setNewAttemptOpen] = useState(false)
@@ -101,14 +110,48 @@ export default function TerminatedAttemptsPage() {
 
   const reload = useCallback(() => setRefreshKey((k) => k + 1), [])
 
-  // Load exams
+  const PAGE_SIZE = 20
+  async function loadExamsPage(search: string, page: number, replace: boolean) {
+    setExamSearchLoading(true)
+    try {
+      const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE })
+      const items = response.items ?? []
+      if (replace) {
+        setExamItems(items)
+      } else {
+        setExamItems((prev) => [...prev, ...items])
+      }
+      setExamPage(page)
+      setExamTotalPages(response.totalPages ?? 0)
+    } catch {
+      // silent
+    } finally {
+      setExamSearchLoading(false)
+    }
+  }
+
+  // Load list when dropdown opens
   useEffect(() => {
-    let cancelled = false
-    getExamListForDropdown()
-      .then((list) => { if (!cancelled) setExams(Array.isArray(list) ? list : []) })
-      .catch(() => { if (!cancelled) setExams([]) })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
+    if (!dropdownOpen) return
+    loadExamsPage(examSearch, 1, true)
+  }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced reload on search change
+  useEffect(() => {
+    if (!dropdownOpen) return
+    const timer = setTimeout(() => { loadExamsPage(examSearch, 1, true) }, 300)
+    return () => clearTimeout(timer)
+  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   // Load candidates (server-side filtered: onlyTerminated=true)
@@ -136,7 +179,19 @@ export default function TerminatedAttemptsPage() {
     return () => { cancelled = true }
   }, [selectedExamId, refreshKey, currentPage, pageSize, terminationStatus, debouncedSearch])
 
-  const handleExamChange = (v: string) => { setSelectedExamId(v); setCurrentPage(1) }
+  function handleSelectExam(exam: Exam | null) {
+    if (exam === null) {
+      setSelectedExamId(ALL_EXAMS_VALUE)
+      setSelectedExam(null)
+    } else {
+      setSelectedExamId(String(exam.id))
+      setSelectedExam(exam)
+    }
+    setExamSearch("")
+    setDropdownOpen(false)
+    setCurrentPage(1)
+  }
+
   const handleSearchChange = (v: string) => {
     setSearchQuery(v)
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -145,7 +200,7 @@ export default function TerminatedAttemptsPage() {
   const handlePageSizeChange = (v: string) => { setPageSize(Number(v)); setCurrentPage(1) }
   const handleStatusFilterChange = (v: string) => { setTerminationStatus(v); setCurrentPage(1) }
 
-  const getExamTitle = (exam: ExamDropdownItem) =>
+  const getExamTitle = (exam: Exam) =>
     (isAr ? exam.titleAr : exam.titleEn) || ""
 
   const getRowExamTitle = (row: CandidateResultListItem) =>
@@ -247,14 +302,6 @@ export default function TerminatedAttemptsPage() {
     )
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
-
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
@@ -324,17 +371,81 @@ export default function TerminatedAttemptsPage() {
             <div className="space-y-2">
               <Label className="text-sm font-medium">{isAr ? "الاختبار" : "Exam"}</Label>
               <div className="flex items-center gap-2">
-                <Select value={selectedExamId} onValueChange={(v) => v && handleExamChange(v)}>
-                  <SelectTrigger className="w-[220px]">
-                    <SelectValue placeholder={isAr ? "اختر اختباراً" : "Select exam"} />
-                  </SelectTrigger>
-                  <SelectContent position="popper" sideOffset={4}>
-                    <SelectItem value={ALL_EXAMS_VALUE}>{isAr ? "جميع الاختبارات" : "All exams"}</SelectItem>
-                    {exams.map((exam) => (
-                      <SelectItem key={exam.id} value={String(exam.id)}>{getExamTitle(exam)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="w-[220px] flex items-center justify-between px-3 py-2.5 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
+                  >
+                    <span className={selectedExam ? "text-foreground" : "text-muted-foreground"}>
+                      {selectedExamId === ALL_EXAMS_VALUE
+                        ? (isAr ? "جميع الاختبارات" : "All exams")
+                        : selectedExam ? getExamTitle(selectedExam) : (isAr ? "اختر اختباراً" : "Select exam")}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute z-50 w-[280px] mt-1 rounded-md border bg-popover shadow-lg">
+                      <div className="p-2 border-b">
+                        <div className="relative">
+                          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder={isAr ? "البحث عن اختبارات..." : "Search exams..."}
+                            value={examSearch}
+                            onChange={(e) => setExamSearch(e.target.value)}
+                            className="ps-9 h-9 border"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                      <div className="max-h-72 overflow-y-auto divide-y">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectExam(null)}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${selectedExamId === ALL_EXAMS_VALUE ? "bg-primary/10 text-primary font-medium" : ""}`}
+                        >
+                          {selectedExamId === ALL_EXAMS_VALUE && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                          <span>{isAr ? "جميع الاختبارات" : "All exams"}</span>
+                        </button>
+                        {examSearchLoading && examItems.length === 0 ? (
+                          <div className="flex items-center justify-center py-6">
+                            <LoadingSpinner size="sm" />
+                          </div>
+                        ) : examItems.length === 0 ? (
+                          <div className="p-4 text-center text-sm text-muted-foreground">
+                            {isAr ? "لم يتم العثور على اختبارات" : "No exams found"}
+                          </div>
+                        ) : (
+                          <>
+                            {examItems.map((exam) => (
+                              <button
+                                key={exam.id}
+                                type="button"
+                                onClick={() => handleSelectExam(exam)}
+                                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${selectedExamId === String(exam.id) ? "bg-primary/10 text-primary font-medium" : ""}`}
+                              >
+                                {selectedExamId === String(exam.id) && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                                <span className="truncate">{getExamTitle(exam)}</span>
+                              </button>
+                            ))}
+                            {examPage < examTotalPages && (
+                              <button
+                                type="button"
+                                onClick={() => loadExamsPage(examSearch, examPage + 1, false)}
+                                disabled={examSearchLoading}
+                                className="w-full px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors text-center disabled:opacity-50"
+                              >
+                                {examSearchLoading
+                                  ? <LoadingSpinner size="sm" className="mx-auto" />
+                                  : (isAr ? "تحميل المزيد..." : "Load more...")}
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <Button type="button" variant="outline" size="icon" onClick={reload}>
                   <RefreshCw className="h-4 w-4" />
                 </Button>

@@ -74,7 +74,7 @@ export default function ProctorCenterPage() {
   const searchQueryRef = useRef(searchQuery)
   const filterModeRef = useRef(filterMode)
   searchQueryRef.current = searchQuery
-  filterModeRef.current = filterMode — matches backend GetRiskLevel thresholds
+  filterModeRef.current = filterMode
   function getRiskBadge(score?: number) {
     if (score == null) return null
     if (score <= 20) return { label: localizeText("Low", "منخفض", locale), color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }
