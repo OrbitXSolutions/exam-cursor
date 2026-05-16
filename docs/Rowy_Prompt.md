@@ -13,7 +13,17 @@ Rules:
 - Do not Change or break any flow
 - Ask me or take permission anytime
   Do not trust documentation or memory as the source of truth. They may be outdated. The current codebase is the only reliable source—inspect it deeply and verify every assumption against the actual implementation.
+- After implementation, list changed files and manual QA cases.
+  and make sure build is success
   This is a production system. Safety is more important than speed. If you are unsure, stop and explain the risk instead of guessing.
+
+  tASK :
+  aS aDMIN, Instructor
+  I nned to seed Email Notification logs
+  to confrim Whether the email sent to candidates or not
+
+  Now the Email Menu is only for Superadmin
+  (Allow - Admin also to see the side nav Ema Back and Front)
 
 --- Review the task
 Good.

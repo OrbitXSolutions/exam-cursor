@@ -10,6 +10,7 @@ using Smart_Core.Application.Interfaces.Assessment;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
+using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
 
@@ -175,6 +176,7 @@ public class AssessmentService : IAssessmentService
           QuestionsCount = x.Sections.Sum(s => s.Questions.Any() ? s.Questions.Count() : s.PickCount),
           TopicsCount = x.Sections.SelectMany(s => s.Topics).Count(),
           TotalPoints = x.Sections.SelectMany(s => s.Questions).Sum(q => q.Points),
+          RequireProctoring = x.RequireProctoring,
           AccessPolicyStatus = x.AccessPolicy != null && x.AccessPolicy.IsWalkIn
               ? "WalkIn"
               : x.AccessPolicy != null && x.AccessPolicy.RestrictToAssignedCandidates
@@ -529,6 +531,16 @@ public class AssessmentService : IAssessmentService
 
     await _context.SaveChangesAsync();
     InvalidateExamCache();
+
+    // Auto-assign all active Proctor-role users to this exam (if not already assigned or explicitly unassigned)
+    try
+    {
+      await AutoAssignAllProctorsAsync(id, updatedBy);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Failed to auto-assign proctors for exam {ExamId}. Publish succeeded.", id);
+    }
 
     // Queue notifications for candidates (runs in background)
     try
@@ -1653,6 +1665,50 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   #endregion
 
+  #region Private Helpers
+
+  /// <summary>
+  /// Auto-assigns all active Proctor-role users to the exam.
+  /// Skips proctors who already have an active assignment or were explicitly unassigned (IsDeleted=true).
+  /// </summary>
+  private async Task AutoAssignAllProctorsAsync(int examId, string assignedBy)
+  {
+    var proctorUsers = await _userManager.GetUsersInRoleAsync(AppRoles.Proctor);
+    var activeProctors = proctorUsers.Where(u => !u.IsDeleted).ToList();
+
+    if (activeProctors.Count == 0) return;
+
+    // Get ALL ExamProctor records for this exam (active + soft-deleted) to respect explicit unassignments
+    var existingProctorIds = await _context.ExamProctors
+        .Where(ep => ep.ExamId == examId)
+        .Select(ep => ep.ProctorId)
+        .ToHashSetAsync();
+
+    var newAssignments = activeProctors
+        .Where(p => !existingProctorIds.Contains(p.Id))
+        .Select(p => new ExamProctor
+        {
+          ExamId = examId,
+          ProctorId = p.Id,
+          AssignedAt = UaeTimeHelper.NowUae,
+          AssignedBy = assignedBy
+        })
+        .ToList();
+
+    if (newAssignments.Count == 0) return;
+
+    _context.ExamProctors.AddRange(newAssignments);
+    await _context.SaveChangesAsync();
+
+    // Invalidate proctor cache for this exam
+    _cache.Remove($"exam-proctors:{examId}");
+
+    _logger.LogInformation(
+        "Exam {ExamId}: auto-assigned {Count} proctor(s) on publish.", examId, newAssignments.Count);
+  }
+
+  #endregion
+
   #region Private Mapping Methods
 
   private ExamListDto MapToExamListDto(Exam exam)
@@ -1678,6 +1734,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
       SectionsCount = exam.Sections?.Count ?? 0,
       QuestionsCount = allQuestions.Count(),
       TotalPoints = allQuestions.Sum(q => q.Points),
+      RequireProctoring = exam.RequireProctoring,
       AccessPolicyStatus = exam.AccessPolicy?.IsWalkIn == true
           ? "WalkIn"
           : exam.AccessPolicy?.RestrictToAssignedCandidates == true

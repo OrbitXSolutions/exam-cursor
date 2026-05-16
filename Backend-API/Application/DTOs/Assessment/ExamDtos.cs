@@ -145,6 +145,11 @@ public class ExamListDto
     public decimal TotalPoints { get; set; }
 
     /// <summary>
+    /// Whether proctoring is required for this exam
+    /// </summary>
+    public bool RequireProctoring { get; set; }
+
+    /// <summary>
     /// Access policy status: "Public" or "Assigned"
     /// </summary>
     public string AccessPolicyStatus { get; set; } = "Public";

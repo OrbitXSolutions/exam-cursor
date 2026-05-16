@@ -21,7 +21,7 @@ const ROUTE_ROLE_MAP: { prefix: string; roles: UserRole[] }[] = [
   { prefix: "/departments",     roles: [UserRole.SuperAdmin] },
   { prefix: "/organization",    roles: [UserRole.SuperAdmin] },
   { prefix: "/settings/license",roles: [UserRole.SuperAdmin] },
-  { prefix: "/notifications",   roles: [UserRole.SuperAdmin] },
+  { prefix: "/notifications",   roles: [UserRole.SuperAdmin, UserRole.Admin] },
   { prefix: "/audit",           roles: [UserRole.SuperAdmin] },
   { prefix: "/logs",            roles: [UserRole.SuperAdmin] },
   // Admin + Instructor + SuperAdmin

@@ -8,7 +8,7 @@ namespace Smart_Core.Controllers.Settings;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = AppRoles.SuperAdmin)]
+[Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
 public class NotificationController : ControllerBase
 {
     private readonly INotificationService _notificationService;
@@ -22,7 +22,6 @@ public class NotificationController : ControllerBase
         _currentUserService = currentUserService;
     }
 
-    // â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("settings")]
     public async Task<IActionResult> GetSettings()
@@ -39,7 +38,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // â”€â”€ Templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("templates")]
     public async Task<IActionResult> GetTemplates()
@@ -63,7 +61,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // â”€â”€ Logs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("logs")]
     public async Task<IActionResult> GetLogs([FromQuery] NotificationLogFilterDto filter)
@@ -86,7 +83,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // â”€â”€ Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("test-email")]
     public async Task<IActionResult> TestEmail([FromBody] TestEmailDto dto)
@@ -102,7 +98,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // â”€â”€ Manual triggers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("queue-exam-emails/{examId:int}")]
     public async Task<IActionResult> QueueExamEmails(int examId)

@@ -193,7 +193,7 @@ const administrationNavGroup: NavGroup = {
 const notificationsNavGroup: NavGroup = {
   icon: Bell,
   labelKey: "nav.notifications",
-  roles: [UserRole.SuperAdmin],
+  roles: [UserRole.SuperAdmin, UserRole.Admin],
   children: [
     { icon: Settings, labelKey: "nav.notificationSettings", href: "/notifications/settings" },
     { icon: FileText, labelKey: "nav.notificationTemplates", href: "/notifications/templates" },
