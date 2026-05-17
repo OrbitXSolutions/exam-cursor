@@ -2,7 +2,7 @@
 
 ## ? Overview
 
-The Media Storage feature provides a flexible, production-ready file storage solution that supports both **Local** and **S3-compatible** storage backends. You can switch between storage providers using configuration only—no code changes required.
+The Media Storage feature provides a flexible, production-ready file storage solution that supports both **Local** and **S3-compatible** storage backends. You can switch between storage providers using configuration onlyï¿½no code changes required.
 
 ---
 
@@ -52,10 +52,10 @@ Smart_Core/
 ?               IMediaStorageService          ?
 ?        (MediaStorageService.cs)        ?
 ?                 ?
-?  • Validates files (type, size)            ?
-?  • Generates unique filenames            ?
-?  • Stores metadata in database              ?
-?  • Delegates storage to IStorageProvider            ?
+?  ï¿½ Validates files (type, size)            ?
+?  ï¿½ Generates unique filenames            ?
+?  ï¿½ Stores metadata in database              ?
+?  ï¿½ Delegates storage to IStorageProvider            ?
 ???????????????????????????????????????????????????????????????
       ?
       ?
@@ -65,9 +65,9 @@ Smart_Core/
 ???????????????????????????????????????????????????????????????
 ?   LocalStorageProvider ?  S3StorageProvider    ?
 ?    ?       ?
-?  • Saves to disk       ?  • Uploads to S3/MinIO/Spaces    ?
-?  • Organized by date     ?  • Supports any S3-compatible    ?
-?  • Returns local URL     ?  • Returns object key + URL      ?
+?  ï¿½ Saves to disk       ?  ï¿½ Uploads to S3/MinIO/Spaces    ?
+?  ï¿½ Organized by date     ?  ï¿½ Supports any S3-compatible    ?
+?  ï¿½ Returns local URL     ?  ï¿½ Returns object key + URL      ?
 ???????????????????????????????????????????????????????????????
 ```
 
@@ -89,25 +89,32 @@ Smart_Core/
 ```json
 {
   "MediaStorage": {
-    "Provider": "Local",           // "Local" or "S3"
-    "MaxFileSizeMB": 10,           // Maximum file size in MB
-    "AllowedImageExtensions": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"],
+    "Provider": "Local", // "Local" or "S3"
+    "MaxFileSizeMB": 10, // Maximum file size in MB
+    "AllowedImageExtensions": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".webp",
+      ".bmp"
+    ],
     "AllowedPdfExtensions": [".pdf"],
-    
+
     "Local": {
-      "BasePath": "MediaStorage",  // Folder path (relative or absolute)
-      "BaseUrl": "/media"       // URL path for serving files
+      "BasePath": "MediaStorage", // Folder path (relative or absolute)
+      "BaseUrl": "/media" // URL path for serving files
     },
-    
+
     "S3": {
       "ServiceUrl": "https://s3.amazonaws.com",
       "AccessKey": "your-access-key",
       "SecretKey": "your-secret-key",
- "BucketName": "your-bucket-name",
+      "BucketName": "your-bucket-name",
       "Region": "us-east-1",
-      "UsePathStyle": false,       // true for MinIO
-      "DefaultPrefix": "uploads",  // Optional folder prefix
-      "PublicUrl": ""    // Optional CDN/public URL
+      "UsePathStyle": false, // true for MinIO
+      "DefaultPrefix": "uploads", // Optional folder prefix
+      "PublicUrl": "" // Optional CDN/public URL
     }
   }
 }
@@ -135,10 +142,12 @@ Smart_Core/
 ### File Organization
 
 Files are automatically organized by:
+
 - **Folder** (optional, user-specified)
 - **Year/Month** (automatic)
 
 Example structure:
+
 ```
 MediaStorage/
 ??? profiles/
@@ -158,6 +167,7 @@ MediaStorage/
 ### Accessing Files
 
 Local files can be accessed via:
+
 - **Direct URL**: `/media/profiles/2024/01/filename.jpg`
 - **API Download**: `GET /api/media/{id}/download`
 - **API View**: `GET /api/media/{id}/view`
@@ -197,7 +207,7 @@ Local files can be accessed via:
       "AccessKey": "minioadmin",
       "SecretKey": "minioadmin",
       "BucketName": "media",
-   "Region": "",
+      "Region": "",
       "UsePathStyle": true,
       "DefaultPrefix": "",
       "PublicUrl": "http://localhost:9000/media"
@@ -241,7 +251,7 @@ Local files can be accessed via:
       "UsePathStyle": true,
       "DefaultPrefix": "",
       "PublicUrl": "https://pub-xxx.r2.dev"
-  }
+    }
   }
 }
 ```
@@ -252,17 +262,17 @@ Local files can be accessed via:
 
 ### MediaController (`/api/media`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/upload` | Upload single file | Yes |
-| POST | `/upload-multiple` | Upload multiple files | Yes |
-| GET | `/{id}` | Get file metadata | Yes |
-| GET | `/{id}/download` | Download file | No* |
-| GET | `/{id}/view` | View file inline | No* |
-| DELETE | `/{id}` | Delete file | Yes |
-| GET | `/` | List files (paginated) | Yes |
+| Method | Endpoint           | Description            | Auth |
+| ------ | ------------------ | ---------------------- | ---- |
+| POST   | `/upload`          | Upload single file     | Yes  |
+| POST   | `/upload-multiple` | Upload multiple files  | Yes  |
+| GET    | `/{id}`            | Get file metadata      | Yes  |
+| GET    | `/{id}/download`   | Download file          | No\* |
+| GET    | `/{id}/view`       | View file inline       | No\* |
+| DELETE | `/{id}`            | Delete file            | Yes  |
+| GET    | `/`                | List files (paginated) | Yes  |
 
-*Can be configured to require auth
+\*Can be configured to require auth
 
 ---
 
@@ -279,6 +289,7 @@ file: [binary file data]
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -349,6 +360,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -371,10 +383,10 @@ Authorization: Bearer {token}
 
 ### File Types
 
-| Type | Allowed Extensions | MIME Types |
-|------|-------------------|------------|
+| Type       | Allowed Extensions                   | MIME Types                                              |
+| ---------- | ------------------------------------ | ------------------------------------------------------- |
 | **Images** | .jpg, .jpeg, .png, .gif, .webp, .bmp | image/jpeg, image/png, image/gif, image/webp, image/bmp |
-| **PDFs** | .pdf | application/pdf |
+| **PDFs**   | .pdf                                 | application/pdf                                         |
 
 ### File Size
 
@@ -401,26 +413,26 @@ Authorization: Bearer {token}
 
 ### MediaFiles Table
 
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | uniqueidentifier | Primary key (GUID) |
-| OriginalFileName | nvarchar(500) | Original uploaded filename |
-| StoredFileName | nvarchar(500) | Generated filename (GUID) |
-| Extension | nvarchar(20) | File extension |
-| ContentType | nvarchar(100) | MIME type |
-| SizeInBytes | bigint | File size |
-| MediaType | int | 1=Image, 2=PDF |
-| StorageProvider | int | 1=Local, 2=S3 |
-| Path | nvarchar(1000) | Storage path/key |
-| Url | nvarchar(2000) | Public URL |
-| BucketName | nvarchar(100) | S3 bucket (nullable) |
-| Folder | nvarchar(200) | Logical folder |
-| CreatedDate | datetime2 | Created timestamp |
-| UpdatedDate | datetime2 | Updated timestamp |
-| CreatedBy | nvarchar(450) | User ID |
-| UpdatedBy | nvarchar(450) | User ID |
-| DeletedBy | nvarchar(450) | User ID |
-| IsDeleted | bit | Soft delete flag |
+| Column           | Type             | Description                |
+| ---------------- | ---------------- | -------------------------- |
+| Id               | uniqueidentifier | Primary key (GUID)         |
+| OriginalFileName | nvarchar(500)    | Original uploaded filename |
+| StoredFileName   | nvarchar(500)    | Generated filename (GUID)  |
+| Extension        | nvarchar(20)     | File extension             |
+| ContentType      | nvarchar(100)    | MIME type                  |
+| SizeInBytes      | bigint           | File size                  |
+| MediaType        | int              | 1=Image, 2=PDF             |
+| StorageProvider  | int              | 1=Local, 2=S3              |
+| Path             | nvarchar(1000)   | Storage path/key           |
+| Url              | nvarchar(2000)   | Public URL                 |
+| BucketName       | nvarchar(100)    | S3 bucket (nullable)       |
+| Folder           | nvarchar(200)    | Logical folder             |
+| CreatedDate      | datetime2        | Created timestamp          |
+| UpdatedDate      | datetime2        | Updated timestamp          |
+| CreatedBy        | nvarchar(450)    | User ID                    |
+| UpdatedBy        | nvarchar(450)    | User ID                    |
+| DeletedBy        | nvarchar(450)    | User ID                    |
+| IsDeleted        | bit              | Soft delete flag           |
 
 ---
 
@@ -447,6 +459,7 @@ dotnet ef database update
 ### 2. Create MediaStorage Folder
 
 For local storage, create the folder:
+
 ```bash
 mkdir MediaStorage
 ```
@@ -454,6 +467,7 @@ mkdir MediaStorage
 ### 3. Configure Storage
 
 Edit `appsettings.json`:
+
 ```json
 {
   "MediaStorage": {
@@ -465,10 +479,6 @@ Edit `appsettings.json`:
 ### 4. Test Upload
 
 ```bash
-# Login first to get token
-curl -X POST https://localhost:5001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"Rowyda15@gmail.com","password":"13579@Rowyda"}'
 
 # Upload file
 curl -X POST https://localhost:5001/api/media/upload \
@@ -484,10 +494,11 @@ curl -X POST https://localhost:5001/api/media/upload \
 To switch from Local to S3 (or vice versa):
 
 1. Update `appsettings.json`:
+
    ```json
    {
      "MediaStorage": {
-       "Provider": "S3"  // Change from "Local" to "S3"
+       "Provider": "S3" // Change from "Local" to "S3"
      }
    }
    ```
@@ -501,6 +512,7 @@ To switch from Local to S3 (or vice versa):
 ## ?? NuGet Package
 
 The S3 integration uses:
+
 ```xml
 <PackageReference Include="AWSSDK.S3" Version="3.7.400.2" />
 ```

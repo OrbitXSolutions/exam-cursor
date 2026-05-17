@@ -35,7 +35,7 @@ Migration applied successfully with `dotnet ef database update`.
 
 ## Test Scenarios & Results
 
-**Exam used:** ID `67` — _Test Rowyda_  
+**Exam used:** ID `67`  
 **Share Token:** `htPxPMxEiMc8omiHXpPgRw_2XysZAf3gRnWVDEMcUAHHnDrA1sdJWzfUrldruKLk`
 
 ---
@@ -74,7 +74,7 @@ Migration applied successfully with `dotnet ef database update`.
 | --------------------------------------------------------------------- | ------- |
 | HTTP 200                                                              | ✅ PASS |
 | `isWalkIn = true` returned in response                                | ✅      |
-| `titleEn = "Test Rowyda"`                                             | ✅      |
+| `titleEn = "Test Admin"`                                              | ✅      |
 | Frontend branches to walk-in registration form (not candidate picker) | ✅      |
 
 ---

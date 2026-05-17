@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
@@ -33,7 +33,7 @@ import {
   getAssignmentCandidates, assignExam, unassignExam,
   type AssignmentCandidateDto, type AssignmentResultDto,
 } from "@/lib/api/exam-assignment"
-import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
+import { getExams } from "@/lib/api/exams"
 import { getBatches, type BatchDto } from "@/lib/api/batch"
 
 export default function AssignToExamPage() {
@@ -43,7 +43,11 @@ export default function AssignToExamPage() {
   const searchParams = useSearchParams()
 
   // ── Top controls ───────────────────────────────────────────
-  const [exams, setExams] = useState<ExamDropdownItem[]>([])
+  const [examItems, setExamItems] = useState<Array<{id: number; titleEn: string; titleAr: string}>>([])
+  const [examPage, setExamPage] = useState(0)
+  const [examTotalPages, setExamTotalPages] = useState(0)
+  const [examSearchLoading, setExamSearchLoading] = useState(false)
+  const [selectedExamObj, setSelectedExamObj] = useState<{id: number; titleEn: string; titleAr: string} | null>(null)
   const [batches, setBatches] = useState<BatchDto[]>([])
   const [selectedExamId, setSelectedExamId] = useState<string>("")
   const [selectedBatchId, setSelectedBatchId] = useState<string>("all")
@@ -73,9 +77,7 @@ export default function AssignToExamPage() {
   const [resultOpen, setResultOpen] = useState(false)
   const [result, setResult] = useState<AssignmentResultDto | null>(null)
 
-  const isReady = useMemo(() => {
-    return !!selectedExamId && !!scheduleFrom && !!scheduleTo && scheduleFrom < scheduleTo
-  }, [selectedExamId, scheduleFrom, scheduleTo])
+  const isReady = !!selectedExamId && !!scheduleFrom && !!scheduleTo && scheduleFrom < scheduleTo
 
   // ── Exam searchable dropdown ───────────────────────────────
   const [examSearch, setExamSearch] = useState("")
@@ -92,28 +94,60 @@ export default function AssignToExamPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const filteredExamOptions = useMemo(() => {
-    if (!examSearch) return exams
-    const s = examSearch.toLowerCase()
-    return exams.filter(e =>
-      (e.titleEn || "").toLowerCase().includes(s) ||
-      (e.titleAr || "").toLowerCase().includes(s)
-    )
-  }, [exams, examSearch])
+  const filteredExamOptions = examItems
 
-  const selectedExamLabel = useMemo(
-    () => exams.find(e => String(e.id) === selectedExamId),
-    [exams, selectedExamId]
-  )
+  const PAGE_SIZE_EXAM = 20
+
+  async function loadExamsPage(search: string, page: number, replace: boolean) {
+    setExamSearchLoading(true)
+    try {
+      const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE_EXAM })
+      const items = (response.items ?? []).map(e => ({ id: e.id, titleEn: e.titleEn, titleAr: e.titleAr }))
+      if (replace) {
+        setExamItems(items)
+      } else {
+        setExamItems((prev) => [...prev, ...items])
+      }
+      setExamPage(page)
+      setExamTotalPages(response.totalPages ?? 0)
+    } catch {
+      // silent
+    } finally {
+      setExamSearchLoading(false)
+    }
+  }
+
+  // When examItems loads and selectedExamId is set (URL param), resolve the label
+  useEffect(() => {
+    if (selectedExamId && !selectedExamObj && examItems.length > 0) {
+      const found = examItems.find(e => String(e.id) === selectedExamId)
+      if (found) setSelectedExamObj(found)
+    }
+  }, [examItems, selectedExamId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load first exam page when dropdown opens
+  useEffect(() => {
+    if (!examDropdownOpen) return
+    loadExamsPage(examSearch, 1, true)
+  }, [examDropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced reload on search change while dropdown is open
+  useEffect(() => {
+    if (!examDropdownOpen) return
+    const timer = setTimeout(() => {
+      loadExamsPage(examSearch, 1, true)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load dropdowns ─────────────────────────────────────────
   useEffect(() => {
-    getExamListForDropdown().then((list) => {
-      setExams(list)
-      const paramId = searchParams.get("examId")
-      if (paramId) setSelectedExamId(paramId)
-    }).catch(() => setExams([]))
-    getBatches({ pageSize: 200 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
+    const paramId = searchParams.get("examId")
+    if (paramId) {
+      setSelectedExamId(paramId)
+      loadExamsPage("", 1, true)
+    }
+    getBatches({ pageSize: 100 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load candidates ────────────────────────────────────────
@@ -265,9 +299,9 @@ export default function AssignToExamPage() {
                   onClick={() => setExamDropdownOpen(!examDropdownOpen)}
                   className="w-full flex items-center justify-between px-3 py-2 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
                 >
-                  <span className={selectedExamLabel ? "text-foreground" : "text-muted-foreground"}>
-                    {selectedExamLabel
-                      ? (isAr ? selectedExamLabel.titleAr : selectedExamLabel.titleEn)
+                  <span className={selectedExamObj ? "text-foreground" : "text-muted-foreground"}>
+                    {selectedExamObj
+                      ? (isAr ? selectedExamObj.titleAr : selectedExamObj.titleEn)
                       : (isAr ? "اختر اختبار..." : "Select exam...")}
                   </span>
                   <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${examDropdownOpen ? "rotate-180" : ""}`} />
@@ -287,31 +321,50 @@ export default function AssignToExamPage() {
                       </div>
                     </div>
                     <div className="max-h-60 overflow-y-auto divide-y">
-                      {filteredExamOptions.length === 0 ? (
+                      {examSearchLoading && filteredExamOptions.length === 0 ? (
+                        <div className="flex items-center justify-center py-6">
+                          <LoadingSpinner size="sm" />
+                        </div>
+                      ) : filteredExamOptions.length === 0 ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                           {isAr ? "لم يتم العثور على اختبارات" : "No exams found"}
                         </div>
                       ) : (
-                        filteredExamOptions.map((e) => (
-                          <button
-                            key={e.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedExamId(String(e.id))
-                              setPage(1)
-                              setExamDropdownOpen(false)
-                              setExamSearch("")
-                            }}
-                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
-                              selectedExamId === String(e.id) ? "bg-primary/10 text-primary font-medium" : ""
-                            }`}
-                          >
-                            {selectedExamId === String(e.id) && (
-                              <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-                            )}
-                            <span className="truncate">{isAr ? e.titleAr : e.titleEn}</span>
-                          </button>
-                        ))
+                        <>
+                          {filteredExamOptions.map((e) => (
+                            <button
+                              key={e.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedExamId(String(e.id))
+                                setSelectedExamObj(e)
+                                setPage(1)
+                                setExamDropdownOpen(false)
+                                setExamSearch("")
+                              }}
+                              className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
+                                selectedExamId === String(e.id) ? "bg-primary/10 text-primary font-medium" : ""
+                              }`}
+                            >
+                              {selectedExamId === String(e.id) && (
+                                <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                              )}
+                              <span className="truncate">{isAr ? e.titleAr : e.titleEn}</span>
+                            </button>
+                          ))}
+                          {examPage < examTotalPages && (
+                            <button
+                              type="button"
+                              onClick={() => loadExamsPage(examSearch, examPage + 1, false)}
+                              disabled={examSearchLoading}
+                              className="w-full px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors text-center disabled:opacity-50"
+                            >
+                              {examSearchLoading
+                                ? <LoadingSpinner size="sm" className="mx-auto" />
+                                : (isAr ? "تحميل المزيد..." : "Load more...")}
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

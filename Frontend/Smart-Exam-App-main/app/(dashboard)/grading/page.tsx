@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { getManualGradingRequired, getGradingSessions, finalizeResult, GradingStatus, type GradingSessionListItem } from "@/lib/api/grading"
+import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -30,14 +31,17 @@ export default function GradingPage() {
   const { t, dir, language } = useI18n()
   const router = useRouter()
   const [submissions, setSubmissions] = useState<GradingSessionListItem[]>([])
+  const [exams, setExams] = useState<ExamDropdownItem[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [examFilter, setExamFilter] = useState<string>("all")
   const [listFilter, setListFilter] = useState<ListFilter>("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -45,15 +49,16 @@ export default function GradingPage() {
     async function loadSubmissions() {
       try {
         setLoading(true)
+        const examId = examFilter !== "all" ? Number(examFilter) : undefined
         if (listFilter === "pending") {
-          const response = await getManualGradingRequired({ pageNumber: currentPage, pageSize })
+          const response = await getManualGradingRequired({ pageNumber: currentPage, pageSize, examId, search: debouncedSearch || undefined })
           if (!cancelled) {
             setSubmissions(response.items || [])
             setTotalCount(response.totalCount || 0)
             setTotalPages(response.totalPages || 0)
           }
         } else {
-          const response = await getGradingSessions({ pageNumber: currentPage, pageSize })
+          const response = await getGradingSessions({ pageNumber: currentPage, pageSize, examId, search: debouncedSearch || undefined })
           if (!cancelled) {
             setSubmissions(response.items || [])
             setTotalCount(response.totalCount || 0)
@@ -76,7 +81,24 @@ export default function GradingPage() {
     return () => {
       cancelled = true
     }
-  }, [listFilter, currentPage, pageSize])
+  }, [listFilter, currentPage, pageSize, examFilter, debouncedSearch])
+
+  // Load exam dropdown options once
+  useEffect(() => {
+    getExamListForDropdown()
+      .then((list) => setExams(Array.isArray(list) ? list : []))
+      .catch(() => setExams([]))
+  }, [])
+
+  // Debounce search input (400ms)
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(value)
+      setCurrentPage(1)
+    }, 400)
+  }
 
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value))
@@ -92,18 +114,6 @@ export default function GradingPage() {
     })
   }
 
-  const filteredSubmissions = submissions.filter((sub) => {
-    const matchesSearch =
-      (sub.candidateName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.candidateId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.examTitleEn || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.examTitleAr || "").toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesExam = examFilter === "all" || String(sub.examId) === examFilter
-    return matchesSearch && matchesExam
-  })
-
-  const examOptions = [...new Map(submissions.map((s) => [String(s.examId), getLocalizedField(s, "examTitle", language)])).entries()]
-
   if (loading) {
     return (
       <div className="flex justify-center min-h-[400px] items-center">
@@ -111,6 +121,11 @@ export default function GradingPage() {
       </div>
     )
   }
+
+  const examOptions = exams.map((e) => ({
+    id: String(e.id),
+    title: (language === "ar" ? e.titleAr : e.titleEn) || e.titleEn || e.titleAr || "",
+  }))
 
   return (
     <div className="space-y-6 p-6">
@@ -153,7 +168,7 @@ export default function GradingPage() {
               <Clock className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{examOptions.length}</p>
+              <p className="text-2xl font-bold">{exams.length}</p>
               <p className="text-sm text-muted-foreground">{t("grading.examsWithPending")}</p>
             </div>
           </CardContent>
@@ -178,13 +193,13 @@ export default function GradingPage() {
               <Label className="text-sm font-medium">{language === "ar" ? "تصفية حسب الاختبار" : "Filter by Exam"}</Label>
               <select
                 value={examFilter}
-                onChange={(e) => setExamFilter(e.target.value)}
+                onChange={(e) => { setExamFilter(e.target.value); setCurrentPage(1) }}
                 className="flex h-10 w-full sm:w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="all">{t("common.all")}</option>
-                {examOptions.map(([id, title]) => (
-                  <option key={id} value={id}>
-                    {title}
+                {examOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.title}
                   </option>
                 ))}
               </select>
@@ -195,8 +210,8 @@ export default function GradingPage() {
                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder={t("grading.searchPlaceholder")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  defaultValue={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="ps-9"
                 />
               </div>
@@ -204,7 +219,7 @@ export default function GradingPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {filteredSubmissions.length === 0 ? (
+          {submissions.length === 0 ? (
             <EmptyState
               icon={ClipboardCheck}
               title={t("grading.noSubmissions")}
@@ -227,7 +242,7 @@ export default function GradingPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSubmissions.map((sub) => {
+                  {submissions.map((sub) => {
                     const manualCount = sub.manualGradingRequired ?? 0
                     const isCompleted = sub.status === GradingStatus.Completed || sub.status === GradingStatus.AutoGraded
                     return (

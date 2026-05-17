@@ -19,6 +19,7 @@ import {
   Settings,
   Users,
   X,
+  PlayCircle,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useMemo } from "react"
@@ -171,6 +172,49 @@ export default function TutorialsPage() {
                 {language === "ar" ? "لا توجد نتائج" : "No results found"}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Video Tutorials Section */}
+        {!searchQuery.trim() && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <PlayCircle className="h-5 w-5 text-primary" />
+              {language === "ar" ? "الدروس المرئية" : "Video Tutorials"}
+            </h2>
+            <Link href="/tutorials/videos">
+              <Card className="hover:border-primary/50 hover:shadow-md transition-all cursor-pointer group overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="flex flex-col sm:flex-row items-stretch">
+                    <div className="flex items-center justify-center bg-primary/10 group-hover:bg-primary/15 transition-colors sm:w-40 shrink-0 py-8 sm:py-0">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <PlayCircle className="h-9 w-9" />
+                      </div>
+                    </div>
+                    <div className="flex-1 p-5 flex items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-semibold group-hover:text-primary transition-colors">
+                            {language === "ar" ? "الدروس المرئية" : "Video Tutorials"}
+                          </h3>
+                          <Badge variant="default" className="text-xs shrink-0">7 {language === "ar" ? "فيديو" : "videos"}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "ar"
+                            ? "شاهد فيديوهات تعليمية احترافية تغطي جميع مراحل استخدام نظام SmartExam من الإنشاء حتى النتائج."
+                            : "Watch step-by-step video walkthroughs covering the full SmartExam workflow — from exam creation to results and administration."}
+                        </p>
+                      </div>
+                      {isRTL ? (
+                        <ChevronLeft className="h-5 w-5 text-muted-foreground group-hover:text-primary shrink-0" />
+                      ) : (
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary shrink-0" />
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         )}
 

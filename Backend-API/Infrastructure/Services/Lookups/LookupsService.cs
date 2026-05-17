@@ -35,13 +35,13 @@ public class LookupsService : ILookupsService
         _cache = cache;
     }
 
-    private async Task<bool> IsCurrentUserSuperDevAsync()
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId)) return false;
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     private void InvalidateLookupCache(string prefix)
@@ -372,12 +372,12 @@ public class LookupsService : ILookupsService
     public async Task<ApiResponse<PaginatedResponse<QuestionSubjectDto>>> GetAllQuestionSubjectsAsync(QuestionSubjectSearchDto searchDto)
     {
         // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
-        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
         int? resolvedDeptId = null;
-        if (!isSuperDev)
+        if (!isSuperAdmin)
             resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var deptScope = isSuperAdmin ? "all" : (resolvedDeptId?.ToString() ?? "none");
         var cacheKey = $"{CacheKeys.SubjectsPrefix}{deptScope}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
         return await _cache.GetOrCreateAsync(cacheKey, async () =>
@@ -394,7 +394,7 @@ public class LookupsService : ILookupsService
             }
 
             // Department isolation: filter by user's department (SuperDev sees all)
-            if (!isSuperDev && resolvedDeptId.HasValue)
+            if (!isSuperAdmin && resolvedDeptId.HasValue)
             {
                 query = query.Where(x => x.DepartmentId == resolvedDeptId.Value);
             }
@@ -456,7 +456,7 @@ public class LookupsService : ILookupsService
         }
 
         // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
@@ -559,7 +559,7 @@ public class LookupsService : ILookupsService
         }
 
         // Department isolation check
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
@@ -653,12 +653,12 @@ public class LookupsService : ILookupsService
     public async Task<ApiResponse<PaginatedResponse<QuestionTopicDto>>> GetAllQuestionTopicsAsync(QuestionTopicSearchDto searchDto)
     {
         // Resolve dept isolation BEFORE cache key so key is deterministic per user scope
-        var isSuperDev = await IsCurrentUserSuperDevAsync();
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
         int? resolvedDeptId = null;
-        if (!isSuperDev)
+        if (!isSuperAdmin)
             resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
 
-        var deptScope = isSuperDev ? "all" : (resolvedDeptId?.ToString() ?? "none");
+        var deptScope = isSuperAdmin ? "all" : (resolvedDeptId?.ToString() ?? "none");
         var cacheKey = $"{CacheKeys.TopicsPrefix}{deptScope}:{searchDto.SubjectId}:{searchDto.IncludeDeleted}:{searchDto.Search?.ToLower() ?? ""}:{searchDto.PageNumber}:{searchDto.PageSize}";
 
         return await _cache.GetOrCreateAsync(cacheKey, async () =>
@@ -674,7 +674,7 @@ public class LookupsService : ILookupsService
             }
 
             // Department isolation: filter topics via Subject.DepartmentId (SuperDev sees all)
-            if (!isSuperDev && resolvedDeptId.HasValue)
+            if (!isSuperAdmin && resolvedDeptId.HasValue)
             {
                 query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
             }
@@ -740,7 +740,7 @@ public class LookupsService : ILookupsService
         }
 
         // Department isolation check via Subject
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
@@ -775,7 +775,7 @@ public class LookupsService : ILookupsService
         }
 
         // Department isolation: ensure subject belongs to user's department
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && subject.DepartmentId != userDepartmentId.Value)
@@ -845,7 +845,7 @@ public class LookupsService : ILookupsService
         }
 
         // Department isolation check via Subject
-        if (!await IsCurrentUserSuperDevAsync())
+        if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
             if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
@@ -865,7 +865,7 @@ public class LookupsService : ILookupsService
             }
 
             // Ensure new subject also belongs to user's department
-            if (!await IsCurrentUserSuperDevAsync())
+            if (!await IsCurrentUserSuperAdminAsync())
             {
                 var userDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
                 if (userDeptId.HasValue && subject.DepartmentId != userDeptId.Value)

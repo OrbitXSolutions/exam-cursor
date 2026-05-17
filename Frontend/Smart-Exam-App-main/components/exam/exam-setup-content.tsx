@@ -1,7 +1,7 @@
 import { utcToUaeInput, uaeInputToIso } from "@/lib/utils"
 
 import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { ExamType, SectionSourceType, type Exam, type ExamBuilderDto, type BuilderSectionDto, type SaveBuilderSectionDto, type SaveExamBuilderRequest } from "@/lib/types"
@@ -42,6 +42,7 @@ import {
   Plus,
   FolderTree,
   CheckCircle2,
+  Search,
 } from "lucide-react"
 import Link from "next/link"
 import { apiClient } from "@/lib/api-client"
@@ -93,6 +94,17 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<number[]>([])
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([])
   const [questionsCount, setQuestionsCount] = useState<Map<string, { count: number; totalPoints: number }>>(new Map())
+
+  // Subject pagination
+  const [subjectSearch, setSubjectSearch] = useState("")
+  const [subjectPage, setSubjectPage] = useState(0)
+  const [subjectTotalPages, setSubjectTotalPages] = useState(0)
+  const [subjectsLoading, setSubjectsLoading] = useState(false)
+  const subjectSearchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Topic pagination meta (per subject)
+  const [topicsPageMeta, setTopicsPageMeta] = useState<Map<number, { page: number; totalPages: number; loading: boolean; search: string }>>(new Map())
+  const topicSearchTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map())
   const [builderSections, setBuilderSections] = useState<Array<{
     key: string // unique key for react
     questionSubjectId: number | null
@@ -168,26 +180,79 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   }
 
   // ============ BUILDER FUNCTIONS ============
-  
-  // Load subjects list
-  const loadSubjects = useCallback(async () => {
+
+  // Load subjects page (server-side search + pagination)
+  async function loadSubjectsPage(search: string, page: number, replace: boolean, pageSize = 10) {
+    setSubjectsLoading(true)
     try {
-      const response = await getQuestionSubjects({ pageSize: 500 })
-      setSubjects(response.items || [])
+      const response = await getQuestionSubjects({ pageSize, pageNumber: page, search: search || undefined })
+      const items = response.items || []
+      if (replace) {
+        setSubjects(items)
+      } else {
+        setSubjects(prev => [...prev, ...items])
+      }
+      setSubjectPage(page)
+      setSubjectTotalPages(response.totalPages ?? 0)
     } catch (err) {
       console.error("Failed to load subjects:", err)
+    } finally {
+      setSubjectsLoading(false)
     }
-  }, [])
+  }
 
-  // Load topics for a subject
-  const loadTopicsForSubject = useCallback(async (subjectId: number) => {
+  function handleSubjectSearch(value: string) {
+    setSubjectSearch(value)
+    if (subjectSearchTimerRef.current) clearTimeout(subjectSearchTimerRef.current)
+    subjectSearchTimerRef.current = setTimeout(() => loadSubjectsPage(value, 1, true), 300)
+  }
+
+  // Load topics page for a subject (server-side search + pagination)
+  async function loadTopicsPage(subjectId: number, search: string, page: number, replace: boolean, pageSize = 10) {
+    setTopicsPageMeta(prev => {
+      const next = new Map(prev)
+      const existing = next.get(subjectId) ?? { page: 0, totalPages: 0, loading: false, search: "" }
+      next.set(subjectId, { ...existing, loading: true })
+      return next
+    })
     try {
-      const response = await getQuestionTopics({ subjectId, pageSize: 500 })
-      setTopics(prev => new Map(prev).set(subjectId, response.items || []))
+      const response = await getQuestionTopics({ subjectId, pageSize, pageNumber: page, search: search || undefined })
+      const items = response.items || []
+      if (replace) {
+        setTopics(prev => new Map(prev).set(subjectId, items))
+      } else {
+        setTopics(prev => {
+          const existing = prev.get(subjectId) || []
+          return new Map(prev).set(subjectId, [...existing, ...items])
+        })
+      }
+      setTopicsPageMeta(prev => {
+        const next = new Map(prev)
+        next.set(subjectId, { page, search, loading: false, totalPages: response.totalPages ?? 0 })
+        return next
+      })
     } catch (err) {
       console.error(`Failed to load topics for subject ${subjectId}:`, err)
+      setTopicsPageMeta(prev => {
+        const next = new Map(prev)
+        const existing = next.get(subjectId) ?? { page, search, loading: false, totalPages: 0 }
+        next.set(subjectId, { ...existing, loading: false })
+        return next
+      })
     }
-  }, [])
+  }
+
+  function handleTopicSearch(subjectId: number, value: string) {
+    setTopicsPageMeta(prev => {
+      const next = new Map(prev)
+      const existing = next.get(subjectId) ?? { page: 0, totalPages: 0, loading: false, search: "" }
+      next.set(subjectId, { ...existing, search: value })
+      return next
+    })
+    const existingTimer = topicSearchTimersRef.current.get(subjectId)
+    if (existingTimer) clearTimeout(existingTimer)
+    topicSearchTimersRef.current.set(subjectId, setTimeout(() => loadTopicsPage(subjectId, value, 1, true), 300))
+  }
 
   // Fetch questions count for a subject/topic
   const fetchQuestionsCount = useCallback(async (subjectId: number | null, topicId: number | null): Promise<{ count: number; totalPoints: number }> => {
@@ -254,9 +319,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         if (data.sourceType === SectionSourceType.Topic) {
           const topicIds = data.sections.map(s => s.questionTopicId).filter(Boolean) as number[]
           setSelectedTopicIds(topicIds)
-          // Load topics for each subject
+          // Load topics for each subject (large page to capture all existing selections)
           for (const sid of subjectIds) {
-            await loadTopicsForSubject(sid)
+            await loadTopicsPage(sid, "", 1, true, 100)
           }
         }
       }
@@ -266,15 +331,15 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     } finally {
       setBuilderLoading(false)
     }
-  }, [examId, loadTopicsForSubject])
+  }, [examId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load subjects and builder data when switching to builder tab
   useEffect(() => {
     if (currentTab === "builder" && isEditMode) {
-      loadSubjects()
+      loadSubjectsPage("", 1, true)
       loadBuilderData()
     }
-  }, [currentTab, isEditMode, loadSubjects, loadBuilderData])
+  }, [currentTab, isEditMode, loadBuilderData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Toggle subject selection
   const toggleSubject = async (subjectId: number, checked: boolean) => {
@@ -308,7 +373,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         }])
       } else {
         // Load topics for this subject
-        await loadTopicsForSubject(subjectId)
+        await loadTopicsPage(subjectId, "", 1, true)
       }
     } else {
       setSelectedSubjectIds(prev => prev.filter(id => id !== subjectId))
@@ -366,6 +431,11 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     setBuilderSections([])
     setSelectedSubjectIds([])
     setSelectedTopicIds([])
+    // Reset search/pagination
+    setSubjectSearch("")
+    setSubjectPage(0)
+    setSubjectTotalPages(0)
+    setTopicsPageMeta(new Map())
   }
 
   // Update section field
@@ -997,100 +1067,177 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {subjects.length === 0 ? (
+                  {/* Subject Search */}
+                  <div className="relative mb-4">
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={language === "ar" ? "بحث في المواد..." : "Search subjects..."}
+                      value={subjectSearch}
+                      onChange={(e) => handleSubjectSearch(e.target.value)}
+                      className="ps-9"
+                    />
+                  </div>
+
+                  {subjectsLoading && subjects.length === 0 ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : subjects.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <BookOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p>{language === "ar" ? "لم يتم العثور على مواد في بنك الأسئلة" : "No subjects found in Question Bank"}</p>
-                      <p className="text-sm">{language === "ar" ? "أنشئ المواد في بنك الأسئلة أولاً" : "Create subjects in the Question Bank first"}</p>
+                      {!subjectSearch && <p className="text-sm">{language === "ar" ? "أنشئ المواد في بنك الأسئلة أولاً" : "Create subjects in the Question Bank first"}</p>}
                     </div>
                   ) : sourceType === SectionSourceType.Subject ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {subjects.map(subject => (
-                        <div
-                          key={subject.id}
-                          className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                            selectedSubjectIds.includes(subject.id)
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-muted-foreground/50"
-                          }`}
-                        >
-                          <Checkbox
-                            id={`subject-${subject.id}`}
-                            checked={selectedSubjectIds.includes(subject.id)}
-                            onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
-                          />
-                          <Label htmlFor={`subject-${subject.id}`} className="flex-1 cursor-pointer">
-                            <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
-                            {subject.topicsCount !== undefined && (
-                              <span className="text-xs text-muted-foreground ms-2">
-                                ({subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"})
-                              </span>
-                            )}
-                          </Label>
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {subjects.map(subject => (
+                          <div
+                            key={subject.id}
+                            className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                              selectedSubjectIds.includes(subject.id)
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-muted-foreground/50"
+                            }`}
+                          >
+                            <Checkbox
+                              id={`subject-${subject.id}`}
+                              checked={selectedSubjectIds.includes(subject.id)}
+                              onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
+                            />
+                            <Label htmlFor={`subject-${subject.id}`} className="flex-1 cursor-pointer">
+                              <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
+                              {subject.topicsCount !== undefined && (
+                                <span className="text-xs text-muted-foreground ms-2">
+                                  ({subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"})
+                                </span>
+                              )}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      {subjectPage < subjectTotalPages && (
+                        <div className="mt-4 flex justify-center">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadSubjectsPage(subjectSearch, subjectPage + 1, false)}
+                            disabled={subjectsLoading}
+                          >
+                            {subjectsLoading && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                            {language === "ar" ? "تحميل المزيد" : "Load More"}
+                          </Button>
                         </div>
-                      ))}
-                    </div>
+                      )}
+                    </>
                   ) : (
                     /* Topic mode - show accordion with subjects and topics */
-                    <Accordion type="multiple" className="w-full">
-                      {subjects.map(subject => (
-                        <AccordionItem key={subject.id} value={`subject-${subject.id}`}>
-                          <AccordionTrigger className="hover:no-underline">
-                            <div className="flex flex-1 items-center justify-between pe-2">
-                              <div className="flex items-center gap-3">
-                                <Checkbox
-                                  id={`subject-expand-${subject.id}`}
-                                  checked={selectedSubjectIds.includes(subject.id)}
-                                  onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
-                                {subject.topicsCount !== undefined && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"}
-                                  </Badge>
-                                )}
+                    <>
+                      <Accordion type="multiple" className="w-full">
+                        {subjects.map(subject => (
+                          <AccordionItem key={subject.id} value={`subject-${subject.id}`}>
+                            <AccordionTrigger className="hover:no-underline">
+                              <div className="flex flex-1 items-center justify-between pe-2">
+                                <div className="flex items-center gap-3">
+                                  <Checkbox
+                                    id={`subject-expand-${subject.id}`}
+                                    checked={selectedSubjectIds.includes(subject.id)}
+                                    onCheckedChange={(checked) => toggleSubject(subject.id, checked as boolean)}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <span className="font-medium">{language === "ar" ? (subject.nameAr || subject.nameEn) : subject.nameEn}</span>
+                                  {subject.topicsCount !== undefined && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {subject.topicsCount} {language === "ar" ? "مواضيع" : "topics"}
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            {selectedSubjectIds.includes(subject.id) ? (
-                              <div className="ps-8 space-y-2">
-                                {topics.get(subject.id)?.length ? (
-                                  topics.get(subject.id)!.map(topic => (
-                                    <div
-                                      key={topic.id}
-                                      className={`flex items-center gap-3 p-2 rounded-md border transition-colors ${
-                                        selectedTopicIds.includes(topic.id)
-                                          ? "border-primary bg-primary/5"
-                                          : "border-transparent hover:bg-muted"
-                                      }`}
-                                    >
-                                      <Checkbox
-                                        id={`topic-${topic.id}`}
-                                        checked={selectedTopicIds.includes(topic.id)}
-                                        onCheckedChange={(checked) => toggleTopic(topic, checked as boolean)}
-                                      />
-                                      <Label htmlFor={`topic-${topic.id}`} className="flex-1 cursor-pointer text-sm">
-                                        {language === "ar" ? (topic.nameAr || topic.nameEn) : topic.nameEn}
-                                      </Label>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {selectedSubjectIds.includes(subject.id) ? (
+                                <div className="ps-8 space-y-2">
+                                  {/* Topic search */}
+                                  <div className="relative mb-2">
+                                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                      placeholder={language === "ar" ? "بحث في المواضيع..." : "Search topics..."}
+                                      value={topicsPageMeta.get(subject.id)?.search ?? ""}
+                                      onChange={(e) => handleTopicSearch(subject.id, e.target.value)}
+                                      className="ps-9 h-8 text-sm"
+                                    />
+                                  </div>
+                                  {topicsPageMeta.get(subject.id)?.loading && (topics.get(subject.id)?.length ?? 0) === 0 ? (
+                                    <div className="flex items-center justify-center py-4">
+                                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                                     </div>
-                                  ))
-                                ) : (
-                                  <p className="text-sm text-muted-foreground py-2">
-                                    {language === "ar" ? "جاري تحميل المواضيع..." : "Loading topics..."}
-                                  </p>
-                                )}
-                              </div>
-                            ) : (
-                              <p className="ps-8 text-sm text-muted-foreground py-2">
-                                {language === "ar" ? "اختر هذه المادة لعرض مواضيعها" : "Select this subject to see its topics"}
-                              </p>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
+                                  ) : (topics.get(subject.id)?.length ?? 0) === 0 ? (
+                                    <p className="text-sm text-muted-foreground py-2">
+                                      {language === "ar" ? "لا توجد مواضيع" : "No topics found"}
+                                    </p>
+                                  ) : (
+                                    <>
+                                      {topics.get(subject.id)!.map(topic => (
+                                        <div
+                                          key={topic.id}
+                                          className={`flex items-center gap-3 p-2 rounded-md border transition-colors ${
+                                            selectedTopicIds.includes(topic.id)
+                                              ? "border-primary bg-primary/5"
+                                              : "border-transparent hover:bg-muted"
+                                          }`}
+                                        >
+                                          <Checkbox
+                                            id={`topic-${topic.id}`}
+                                            checked={selectedTopicIds.includes(topic.id)}
+                                            onCheckedChange={(checked) => toggleTopic(topic, checked as boolean)}
+                                          />
+                                          <Label htmlFor={`topic-${topic.id}`} className="flex-1 cursor-pointer text-sm">
+                                            {language === "ar" ? (topic.nameAr || topic.nameEn) : topic.nameEn}
+                                          </Label>
+                                        </div>
+                                      ))}
+                                      {(topicsPageMeta.get(subject.id)?.page ?? 0) < (topicsPageMeta.get(subject.id)?.totalPages ?? 0) && (
+                                        <div className="flex justify-center pt-1">
+                                          <button
+                                            type="button"
+                                            onClick={() => loadTopicsPage(subject.id, topicsPageMeta.get(subject.id)?.search ?? "", (topicsPageMeta.get(subject.id)?.page ?? 0) + 1, false)}
+                                            disabled={topicsPageMeta.get(subject.id)?.loading}
+                                            className="text-sm text-muted-foreground hover:text-foreground py-1 px-3 disabled:opacity-50 transition-colors"
+                                          >
+                                            {topicsPageMeta.get(subject.id)?.loading
+                                              ? <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                                              : (language === "ar" ? "تحميل المزيد..." : "Load more...")}
+                                          </button>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="ps-8 text-sm text-muted-foreground py-2">
+                                  {language === "ar" ? "اختر هذه المادة لعرض مواضيعها" : "Select this subject to see its topics"}
+                                </p>
+                              )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                      {subjectPage < subjectTotalPages && (
+                        <div className="mt-4 flex justify-center">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadSubjectsPage(subjectSearch, subjectPage + 1, false)}
+                            disabled={subjectsLoading}
+                          >
+                            {subjectsLoading && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+                            {language === "ar" ? "تحميل المزيد" : "Load More"}
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>

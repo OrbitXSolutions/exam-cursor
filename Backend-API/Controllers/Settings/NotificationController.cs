@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Notification;
 using Smart_Core.Application.Interfaces;
@@ -8,7 +8,7 @@ namespace Smart_Core.Controllers.Settings;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.Admin},{AppRoles.SuperDev}")]
+[Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
 public class NotificationController : ControllerBase
 {
     private readonly INotificationService _notificationService;
@@ -22,7 +22,6 @@ public class NotificationController : ControllerBase
         _currentUserService = currentUserService;
     }
 
-    // ── Settings ────────────────────────────────────────────────
 
     [HttpGet("settings")]
     public async Task<IActionResult> GetSettings()
@@ -39,7 +38,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Templates ───────────────────────────────────────────────
 
     [HttpGet("templates")]
     public async Task<IActionResult> GetTemplates()
@@ -63,7 +61,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Logs ────────────────────────────────────────────────────
 
     [HttpGet("logs")]
     public async Task<IActionResult> GetLogs([FromQuery] NotificationLogFilterDto filter)
@@ -86,7 +83,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Test ────────────────────────────────────────────────────
 
     [HttpPost("test-email")]
     public async Task<IActionResult> TestEmail([FromBody] TestEmailDto dto)
@@ -102,7 +98,6 @@ public class NotificationController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    // ── Manual triggers ─────────────────────────────────────────
 
     [HttpPost("queue-exam-emails/{examId:int}")]
     public async Task<IActionResult> QueueExamEmails(int examId)

@@ -162,7 +162,7 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Create ─────────────────────────────────────────────────
     public async Task<ApiResponse<CandidateListDto>> CreateCandidateAsync(CreateCandidateDto dto, string createdBy)
     {
-        var departmentId = await _resourceAuthorization.IsCurrentUserSuperDevAsync()
+        var departmentId = await _resourceAuthorization.IsCurrentUserSuperAdminAsync()
             ? null
             : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
 
@@ -414,7 +414,7 @@ public class CandidateAdminService : ICandidateAdminService
     public async Task<ApiResponse<CandidateImportResultDto>> ImportCandidatesAsync(Stream fileStream, string createdBy)
     {
         var result = new CandidateImportResultDto();
-        var departmentId = await _resourceAuthorization.IsCurrentUserSuperDevAsync()
+        var departmentId = await _resourceAuthorization.IsCurrentUserSuperAdminAsync()
             ? null
             : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
 

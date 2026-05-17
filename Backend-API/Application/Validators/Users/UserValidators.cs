@@ -18,3 +18,29 @@ public class UpdateUserDtoValidator : AbstractValidator<UpdateUserDto>
    .WithMessage("Invalid phone number format");
   }
 }
+
+public class UserFilterDtoValidator : AbstractValidator<UserFilterDto>
+{
+    public UserFilterDtoValidator()
+    {
+        RuleFor(x => x.PageNumber)
+            .GreaterThan(0).WithMessage("Page number must be greater than 0");
+
+        RuleFor(x => x.PageSize)
+            .GreaterThan(0).WithMessage("Page size must be greater than 0")
+            .LessThanOrEqualTo(500).WithMessage("Page size cannot exceed 500");
+    }
+}
+
+public class StaffUserFilterDtoValidator : AbstractValidator<StaffUserFilterDto>
+{
+    public StaffUserFilterDtoValidator()
+    {
+        RuleFor(x => x.PageNumber)
+            .GreaterThan(0).WithMessage("Page number must be greater than 0");
+
+        RuleFor(x => x.PageSize)
+            .GreaterThan(0).WithMessage("Page size must be greater than 0")
+            .LessThanOrEqualTo(100).WithMessage("Page size cannot exceed 100");
+    }
+}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
@@ -71,7 +71,10 @@ export default function ProctorCenterPage() {
   const [triageLoading, setTriageLoading] = useState(false)
   const [useSampleData, setUseSampleData] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
-  // Risk level helper — matches backend GetRiskLevel thresholds
+  const searchQueryRef = useRef(searchQuery)
+  const filterModeRef = useRef(filterMode)
+  searchQueryRef.current = searchQuery
+  filterModeRef.current = filterMode
   function getRiskBadge(score?: number) {
     if (score == null) return null
     if (score <= 20) return { label: localizeText("Low", "منخفض", locale), color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }
@@ -83,14 +86,17 @@ export default function ProctorCenterPage() {
   useEffect(() => {
     loadSessions()
     // Auto-refresh every 30 seconds
-    const interval = setInterval(loadSessions, 5000)
+    const interval = setInterval(() => loadSessions(), 5000)
     return () => clearInterval(interval)
-  }, [demoMode])
+  }, [demoMode, searchQuery, filterMode])
 
   async function loadSessions() {
     try {
       if (!loading) setRefreshing(true)
-      const data = await getLiveSessions(demoMode)
+      const data = await getLiveSessions(demoMode, {
+        search: searchQueryRef.current.trim() || undefined,
+        isFlagged: filterModeRef.current === "flagged" ? true : undefined,
+      })
       // Auto-flag sessions with > 5 violations
       const flagged = data.map((s) => {
         if ((s.totalViolations ?? 0) > 5 && !s.flagged) {
@@ -165,18 +171,10 @@ export default function ProctorCenterPage() {
     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`
   }
 
-  const filteredSessions = sessions.filter((s) => {
-    const matchesSearch =
-      s.candidateName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.examTitle.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filterMode === "all" || s.flagged
-    return matchesSearch && matchesFilter
-  })
-
   // Apply user-selected sort (only when explicitly chosen — no auto-reorder)
   const sortedSessions = (() => {
-    if (sortMode === "default") return filteredSessions
-    const sorted = [...filteredSessions]
+    if (sortMode === "default") return sessions
+    const sorted = [...sessions]
     sorted.sort((a, b) => {
       const aScore = a.riskScore ?? 0
       const bScore = b.riskScore ?? 0

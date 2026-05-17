@@ -22,7 +22,7 @@ public class DepartmentsController : ControllerBase
     /// Get all departments
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? search = null,
         [FromQuery] bool includeInactive = false,
@@ -37,7 +37,7 @@ public class DepartmentsController : ControllerBase
     /// Get department by ID
     /// </summary>
     [HttpGet("{id}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _departmentService.GetByIdAsync(id);
@@ -48,7 +48,7 @@ public class DepartmentsController : ControllerBase
     /// Create a new department
     /// </summary>
     [HttpPost]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Create([FromBody] CreateDepartmentRequest request)
     {
         var result = await _departmentService.CreateAsync(request);
@@ -61,7 +61,7 @@ public class DepartmentsController : ControllerBase
     /// Update a department
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateDepartmentRequest request)
     {
         var result = await _departmentService.UpdateAsync(id, request);
@@ -72,7 +72,7 @@ public class DepartmentsController : ControllerBase
     /// Delete a department
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = AppRoles.SuperDev)]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _departmentService.DeleteAsync(id);
@@ -83,7 +83,7 @@ public class DepartmentsController : ControllerBase
     /// Activate a department
     /// </summary>
     [HttpPost("{id}/activate")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Activate(int id)
     {
         var result = await _departmentService.ActivateAsync(id);
@@ -94,7 +94,7 @@ public class DepartmentsController : ControllerBase
     /// Deactivate a department
     /// </summary>
     [HttpPost("{id}/deactivate")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Deactivate(int id)
     {
         var result = await _departmentService.DeactivateAsync(id);
@@ -105,7 +105,7 @@ public class DepartmentsController : ControllerBase
     /// Assign a user to a department
     /// </summary>
     [HttpPost("assign-user")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> AssignUser([FromBody] AssignUserToDepartmentRequest request)
     {
         var result = await _departmentService.AssignUserToDepartmentAsync(request.UserId, request.DepartmentId);
@@ -116,7 +116,7 @@ public class DepartmentsController : ControllerBase
     /// Remove a user from their department
     /// </summary>
     [HttpPost("remove-user/{userId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> RemoveUser(string userId)
     {
         var result = await _departmentService.RemoveUserFromDepartmentAsync(userId);
@@ -127,7 +127,7 @@ public class DepartmentsController : ControllerBase
     /// Get all users in a department
     /// </summary>
     [HttpGet("{id}/users")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> GetDepartmentUsers(int id)
     {
         var result = await _departmentService.GetUsersByDepartmentAsync(id);
@@ -138,7 +138,7 @@ public class DepartmentsController : ControllerBase
     /// Get a user's department info
     /// </summary>
     [HttpGet("user/{userId}")]
-    [Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> GetUserDepartment(string userId)
     {
         var result = await _departmentService.GetUserDepartmentAsync(userId);

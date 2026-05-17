@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.Interfaces.Assessment;
@@ -9,6 +10,7 @@ namespace Smart_Core.Controllers.Assessment;
 /// </summary>
 [ApiController]
 [Route("api/public/exam")]
+[AllowAnonymous]
 public class PublicExamController : ControllerBase
 {
     private readonly IExamShareService _examShareService;

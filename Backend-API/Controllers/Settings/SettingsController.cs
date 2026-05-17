@@ -11,7 +11,7 @@ namespace Smart_Core.Controllers.Settings;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = AppRoles.Admin)]
+[Authorize(Roles = AppRoles.SuperAdmin)]
 public class SettingsController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

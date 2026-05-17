@@ -36,3 +36,16 @@ public class UpdateQuestionTopicDtoValidator : AbstractValidator<UpdateQuestionT
             .GreaterThan(0).WithMessage("Subject is required");
     }
 }
+
+public class QuestionTopicSearchDtoValidator : AbstractValidator<QuestionTopicSearchDto>
+{
+    public QuestionTopicSearchDtoValidator()
+    {
+        RuleFor(x => x.PageNumber)
+            .GreaterThan(0).WithMessage("Page number must be greater than 0");
+
+        RuleFor(x => x.PageSize)
+            .GreaterThan(0).WithMessage("Page size must be greater than 0")
+            .LessThanOrEqualTo(200).WithMessage("Page size cannot exceed 200");
+    }
+}

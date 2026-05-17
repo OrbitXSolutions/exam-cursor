@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.CandidateExamDetails;
 using Smart_Core.Application.DTOs.Common;
@@ -9,7 +9,7 @@ namespace Smart_Core.Controllers.CandidateExamDetails;
 
 [ApiController]
 [Route("api/candidate-exam-details")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class CandidateExamDetailsController : ControllerBase
 {
     private readonly ICandidateExamDetailsService _service;
@@ -21,7 +21,7 @@ public class CandidateExamDetailsController : ControllerBase
 
     /// <summary>
     /// Get full enriched exam details for a candidate.
-    /// Returns candidate info, exam info, attempt summary, proctor data, event logs — all in ONE call.
+    /// Returns candidate info, exam info, attempt summary, proctor data, event logs â€” all in ONE call.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<CandidateExamDetailsDto>), StatusCodes.Status200OK)]

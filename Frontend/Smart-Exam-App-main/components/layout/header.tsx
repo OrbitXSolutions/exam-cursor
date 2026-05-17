@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { LanguageToggle } from "./language-toggle"
@@ -13,12 +14,44 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Bell, User, Settings, LogOut, HelpCircle } from "lucide-react"
 import Link from "next/link"
+import { getLicenseStatus, type LicenseStatusResult } from "@/lib/api/license"
+import { UserRole } from "@/lib/types"
+
+function getLicenseBadgeStyle(stateText: string): string {
+  switch (stateText) {
+    case "Active":   return "bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700"
+    case "Warning":  return "bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700"
+    case "GracePeriod": return "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700"
+    default:         return "bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700"
+  }
+}
+
+function getLicenseBadgeLabel(stateText: string): string {
+  switch (stateText) {
+    case "Active":      return "License: Active"
+    case "Warning":     return "License: Warning"
+    case "GracePeriod": return "License: Grace Period"
+    case "Expired":     return "License: Expired"
+    case "Invalid":     return "License: Invalid"
+    case "Missing":     return "License: Missing"
+    default:            return `License: ${stateText}`
+  }
+}
 
 export function Header() {
   const { t, language } = useI18n()
-  const { user, logout } = useAuth()
+  const { user, logout, hasRole } = useAuth()
+  const [licenseStatus, setLicenseStatus] = useState<LicenseStatusResult | null>(null)
+
+  const isAdmin = hasRole(UserRole.Admin) || hasRole(UserRole.SuperAdmin)
+
+  useEffect(() => {
+    if (!isAdmin) return
+    getLicenseStatus().then(setLicenseStatus).catch(() => null)
+  }, [isAdmin])
 
   // Generate welcome title and date subtitle
   const welcomeTitle = user
@@ -46,6 +79,24 @@ export function Header() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* License Status Badge — Admin only */}
+        {isAdmin && licenseStatus && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href="/settings/license">
+                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80 cursor-pointer ${getLicenseBadgeStyle(licenseStatus.stateText)}`}>
+                    {getLicenseBadgeLabel(licenseStatus.stateText)}
+                  </span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{licenseStatus.message}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />

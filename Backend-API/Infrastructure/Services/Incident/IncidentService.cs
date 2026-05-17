@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Audit;
 using Smart_Core.Application.DTOs.Common;
@@ -7,6 +8,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Audit;
 using Smart_Core.Application.Interfaces.Incident;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Incident;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
@@ -20,12 +22,33 @@ public class IncidentService : IIncidentService
     private readonly ApplicationDbContext _context;
     private readonly IAuditService _auditService;
     private readonly ICacheService _cache;
+    private readonly IDepartmentService _departmentService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public IncidentService(ApplicationDbContext context, IAuditService auditService, ICacheService cache)
+    public IncidentService(
+        ApplicationDbContext context,
+        IAuditService auditService,
+        ICacheService cache,
+        IDepartmentService departmentService,
+        ICurrentUserService currentUserService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _auditService = auditService;
         _cache = cache;
+        _departmentService = departmentService;
+        _currentUserService = currentUserService;
+        _userManager = userManager;
+    }
+
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
+    {
+        var userId = _currentUserService.UserId;
+        if (string.IsNullOrEmpty(userId)) return false;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     private void InvalidateIncidentCache() => _cache.RemoveByPrefix(CacheKeys.IncidentsPrefix);
@@ -240,7 +263,15 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<PaginatedResponse<IncidentCaseListDto>>> GetCasesAsync(IncidentCaseSearchDto searchDto)
     {
-        var cacheKey = CacheKeys.IncidentCasesList(JsonSerializer.Serialize(searchDto));
+        // Resolve department scope before building cache key — ensures isolation per user scope
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
+        int? resolvedDeptId = null;
+        var currentUserId = _currentUserService.UserId;
+        if (!isSuperAdmin)
+            resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+        var deptScope = isSuperAdmin ? "all" : (resolvedDeptId?.ToString() ?? $"user:{currentUserId}");
+
+        var cacheKey = CacheKeys.IncidentCasesList($"{deptScope}:{JsonSerializer.Serialize(searchDto)}");
         if (_cache.TryGet<PaginatedResponse<IncidentCaseListDto>>(cacheKey, out var cachedList) && cachedList != null)
             return ApiResponse<PaginatedResponse<IncidentCaseListDto>>.SuccessResponse(cachedList);
 
@@ -250,6 +281,18 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
                  .Include(c => c.Assignee)
                  .Include(c => c.Appeals)
                  .AsQueryable();
+
+        // Department isolation: non-SuperAdmin with dept sees only their dept's cases;
+        // non-SuperAdmin without dept (e.g. Proctor) sees only cases assigned to them.
+        if (!isSuperAdmin)
+        {
+            if (resolvedDeptId.HasValue)
+                query = query.Where(c => c.Exam.DepartmentId == resolvedDeptId.Value);
+            else if (!string.IsNullOrEmpty(currentUserId))
+                query = query.Where(c => c.AssignedTo == currentUserId);
+            else
+                query = query.Where(c => false);
+        }
 
         query = ApplyCaseFilters(query, searchDto);
         query = query.OrderByDescending(c => c.CreatedDate);
@@ -865,12 +908,31 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<PaginatedResponse<AppealRequestListDto>>> GetAppealsAsync(AppealSearchDto searchDto)
     {
+        // Resolve department scope for appeals list
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
+        int? resolvedDeptId = null;
+        var currentUserId = _currentUserService.UserId;
+        if (!isSuperAdmin)
+            resolvedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+
         var query = _context.Set<AppealRequest>()
 .Include(a => a.IncidentCase)
             .Include(a => a.Exam)
     .Include(a => a.Candidate)
             .Include(a => a.Reviewer)
             .AsQueryable();
+
+        // Department isolation: non-SuperAdmin with dept sees only their dept's appeals;
+        // non-SuperAdmin without dept sees only appeals for cases assigned to them.
+        if (!isSuperAdmin)
+        {
+            if (resolvedDeptId.HasValue)
+                query = query.Where(a => a.Exam.DepartmentId == resolvedDeptId.Value);
+            else if (!string.IsNullOrEmpty(currentUserId))
+                query = query.Where(a => a.IncidentCase.AssignedTo == currentUserId);
+            else
+                query = query.Where(a => false);
+        }
 
         if (searchDto.ExamId.HasValue)
             query = query.Where(a => a.ExamId == searchDto.ExamId.Value);

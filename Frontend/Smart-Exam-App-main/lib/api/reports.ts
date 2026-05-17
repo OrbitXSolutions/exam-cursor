@@ -52,12 +52,13 @@ export async function getResultDashboard(examId: number): Promise<ResultDashboar
 
 export async function getExamResults(
   examId: number,
-  params?: { pageNumber?: number; pageSize?: number }
+  params?: { pageNumber?: number; pageSize?: number; search?: string }
 ): Promise<{ items: ResultListItem[]; totalCount: number }> {
   try {
     const query = new URLSearchParams()
     query.set("PageNumber", String(params?.pageNumber ?? 1))
     query.set("PageSize", String(params?.pageSize ?? 50))
+    if (params?.search?.trim()) query.set("Search", params.search.trim())
     const data = await apiClient.get<{ items: ResultListItem[]; totalCount: number }>(
       `/ExamResult/exam/${examId}?${query}`
     )

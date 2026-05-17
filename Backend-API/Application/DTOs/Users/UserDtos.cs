@@ -16,6 +16,8 @@ public class UserDto
     public int? DepartmentId { get; set; }
     public string? DepartmentNameEn { get; set; }
     public string? DepartmentNameAr { get; set; }
+    /// <summary>True only for the system-seeded SuperAdmin account (super-admin@smartexam.local). Cannot be deleted or modified.</summary>
+    public bool IsProtected { get; set; }
 }
 
 public class UserDetailDto : UserDto

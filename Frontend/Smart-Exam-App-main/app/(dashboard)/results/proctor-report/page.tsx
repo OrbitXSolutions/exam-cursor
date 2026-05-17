@@ -22,25 +22,36 @@ export default function ProctorReportPage() {
   const [selectedExamKey, setSelectedExamKey] = useState<string>("")
   const [searchQuery, setSearchQuery] = useState<string>("")
 
-  // Single API call to load all candidate+exam combinations
+  // Fetch candidate+exam combinations from server, re-fetching when search changes
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    getCandidateResultList(undefined, { pageNumber: 1, pageSize: 500 })
-      .then((res) => {
-        if (!cancelled) setData(res?.items ?? [])
+    const doFetch = () => {
+      setLoading(true)
+      getCandidateResultList(undefined, {
+        pageNumber: 1,
+        pageSize: 50,
+        search: searchQuery.trim() || undefined,
       })
-      .catch((err) => {
-        console.warn("[ProctorReport] Failed to load data:", err)
-        if (!cancelled) setData([])
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+        .then((res) => {
+          if (!cancelled) setData(res?.items ?? [])
+        })
+        .catch((err) => {
+          console.warn("[ProctorReport] Failed to load data:", err)
+          if (!cancelled) setData([])
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+    }
+    if (searchQuery.trim()) {
+      const timer = setTimeout(doFetch, 350)
+      return () => { cancelled = true; clearTimeout(timer) }
+    }
+    doFetch()
     return () => { cancelled = true }
-  }, [])
+  }, [searchQuery])
 
-  // Distinct candidates
+  // Distinct candidates extracted from server results (already search-filtered)
   const candidates = useMemo(() => {
     const map = new Map<string, { id: string; name: string; email?: string; rollNo?: string }>()
     data.forEach((row) => {
@@ -56,18 +67,6 @@ export default function ProctorReportPage() {
     })
     return Array.from(map.values())
   }, [data])
-
-  // Filtered candidates based on search query
-  const filteredCandidates = useMemo(() => {
-    if (!searchQuery.trim()) return candidates
-    const q = searchQuery.trim().toLowerCase()
-    return candidates.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        (c.email ?? "").toLowerCase().includes(q) ||
-        (c.rollNo ?? "").toLowerCase().includes(q)
-    )
-  }, [candidates, searchQuery])
 
   // Exams filtered by selected candidate
   const examsForCandidate = useMemo(() => {
@@ -181,12 +180,12 @@ export default function ProctorReportPage() {
                 />
               </SelectTrigger>
               <SelectContent>
-                {filteredCandidates.length === 0 ? (
+                {candidates.length === 0 ? (
                   <div className="py-4 text-center text-sm text-muted-foreground">
                     {language === "ar" ? "لا توجد نتائج" : "No results found"}
                   </div>
                 ) : (
-                  filteredCandidates.map((c) => (
+                  candidates.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}
                       {c.email ? ` (${c.email})` : ""}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import {
@@ -40,8 +40,13 @@ export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [severityFilter, setSeverityFilter] = useState<string>("all")
   const [reviewedFilter, setReviewedFilter] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(10)
+  const [totalCount, setTotalCount] = useState(0)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
@@ -60,13 +65,29 @@ export default function IncidentsPage() {
 
   useEffect(() => {
     loadIncidents()
-  }, [])
+  }, [currentPage, severityFilter, reviewedFilter, debouncedSearch])
+
+  function handleSearchChange(value: string) {
+    setSearchQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(value)
+      setCurrentPage(1)
+    }, 400)
+  }
 
   async function loadIncidents() {
     try {
       setLoading(true)
-      const data = await getIncidents()
+      const data = await getIncidents({
+        pageNumber: currentPage,
+        pageSize,
+        search: debouncedSearch.trim() || undefined,
+        severity: severityFilter !== "all" ? severityFilter : undefined,
+        reviewed: reviewedFilter !== "all" ? (reviewedFilter as "reviewed" | "pending") : undefined,
+      })
       setIncidents(data.items)
+      setTotalCount(data.totalCount ?? data.items.length)
     } catch (error) {
       toast.error(t("proctor.failedToLoadIncidents"))
     } finally {
@@ -156,19 +177,6 @@ export default function IncidentsPage() {
         return <Badge variant="secondary">{label}</Badge>
     }
   }
-
-  const filteredIncidents = incidents.filter((inc) => {
-    const matchesSearch =
-      inc.candidateName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      inc.examTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      inc.type.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesSeverity = severityFilter === "all" || inc.severity === severityFilter
-    const matchesReviewed =
-      reviewedFilter === "all" ||
-      (reviewedFilter === "reviewed" && inc.reviewed) ||
-      (reviewedFilter === "pending" && !inc.reviewed)
-    return matchesSearch && matchesSeverity && matchesReviewed
-  })
 
   const columns: ColumnDef<Incident>[] = [
     {
@@ -301,11 +309,11 @@ export default function IncidentsPage() {
               <Input
                 placeholder={t("proctor.searchIncidents")}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="ps-9"
               />
             </div>
-            <Select value={severityFilter} onValueChange={setSeverityFilter}>
+            <Select value={severityFilter} onValueChange={(v) => { setSeverityFilter(v); setCurrentPage(1) }}>
               <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder={t("proctor.severity")} />
               </SelectTrigger>
@@ -317,7 +325,7 @@ export default function IncidentsPage() {
                 <SelectItem value="Critical">{t("proctor.severityCritical")}</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={reviewedFilter} onValueChange={setReviewedFilter}>
+            <Select value={reviewedFilter} onValueChange={(v) => { setReviewedFilter(v); setCurrentPage(1) }}>
               <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder={t("common.status")} />
               </SelectTrigger>
@@ -330,14 +338,30 @@ export default function IncidentsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {filteredIncidents.length === 0 ? (
+          {incidents.length === 0 ? (
             <EmptyState
               icon={AlertTriangle}
               title={t("proctor.noIncidentsFound")}
               description={t("proctor.noIncidentsFoundDesc")}
             />
           ) : (
-            <DataTable columns={columns} data={filteredIncidents} />
+            <DataTable columns={columns} data={incidents} />
+          )}
+          {totalCount > pageSize && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                {totalCount} {locale === "ar" ? "إجمالي" : "total"}
+              </p>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
+                  {locale === "ar" ? "السابق" : "Previous"}
+                </Button>
+                <span className="text-sm flex items-center px-2">{currentPage} / {Math.ceil(totalCount / pageSize)}</span>
+                <Button variant="outline" size="sm" disabled={currentPage >= Math.ceil(totalCount / pageSize)} onClick={() => setCurrentPage(p => p + 1)}>
+                  {locale === "ar" ? "التالي" : "Next"}
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
