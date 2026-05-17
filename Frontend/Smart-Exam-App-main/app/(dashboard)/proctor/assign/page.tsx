@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useEffect, useState, useCallback, useRef, useMemo } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,12 +22,12 @@ import { Label } from "@/components/ui/label"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { toast } from "sonner"
-import { UserCheck, UserMinus, UserPlus, Loader2, Search, ChevronDown, CheckCircle2, Info } from "lucide-react"
+import { UserCheck, UserMinus, UserPlus, Loader2, Search, ChevronDown, CheckCircle2, Info, HelpCircle, ChevronUp, ShieldCheck, Zap, X } from "lucide-react"
 import {
   getExamProctors, assignProctors, unassignProctors,
   type ExamProctorItemDto, type ExamProctorPageDto,
 } from "@/lib/api/exam-proctor"
-import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
+import { getExams } from "@/lib/api/exams"
 
 export default function AssignToProctorPage() {
   const { language } = useI18n()
@@ -35,7 +35,11 @@ export default function AssignToProctorPage() {
   const searchParams = useSearchParams()
 
   // ── State ──────────────────────────────────────────────────
-  const [exams, setExams] = useState<ExamDropdownItem[]>([])
+  const [examItems, setExamItems] = useState<Array<{id: number; titleEn: string; titleAr: string}>>([])
+  const [examPage, setExamPage] = useState(0)
+  const [examTotalPages, setExamTotalPages] = useState(0)
+  const [examSearchLoading, setExamSearchLoading] = useState(false)
+  const [selectedExamObj, setSelectedExamObj] = useState<{id: number; titleEn: string; titleAr: string} | null>(null)
   const [selectedExamId, setSelectedExamId] = useState<string>("")
   const [pageData, setPageData] = useState<ExamProctorPageDto | null>(null)
   const [loading, setLoading] = useState(false)
@@ -48,6 +52,9 @@ export default function AssignToProctorPage() {
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmAction, setConfirmAction] = useState<"assign" | "unassign">("assign")
+
+  // How it works panel
+  const [infoOpen, setInfoOpen] = useState(false)
 
   // ── Exam searchable dropdown ───────────────────────────────
   const [examSearch, setExamSearch] = useState("")
@@ -64,33 +71,59 @@ export default function AssignToProctorPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const filteredExamOptions = useMemo(() => {
-    if (!examSearch) return exams
-    const s = examSearch.toLowerCase()
-    return exams.filter(e =>
-      (e.titleEn || "").toLowerCase().includes(s) ||
-      (e.titleAr || "").toLowerCase().includes(s)
-    )
-  }, [exams, examSearch])
+  const PAGE_SIZE = 20
 
-  const selectedExamLabel = useMemo(
-    () => exams.find(e => String(e.id) === selectedExamId),
-    [exams, selectedExamId]
-  )
+  async function loadExamsPage(search: string, page: number, replace: boolean) {
+    setExamSearchLoading(true)
+    try {
+      const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE })
+      const items = (response.items ?? []).map(e => ({ id: e.id, titleEn: e.titleEn, titleAr: e.titleAr }))
+      if (replace) {
+        setExamItems(items)
+      } else {
+        setExamItems((prev) => [...prev, ...items])
+      }
+      setExamPage(page)
+      setExamTotalPages(response.totalPages ?? 0)
+    } catch {
+      // silent
+    } finally {
+      setExamSearchLoading(false)
+    }
+  }
 
-  // ── Load exam dropdown once, then auto-select from ?examId ──
+  // Auto-select from ?examId URL param on mount
   useEffect(() => {
-    getExamListForDropdown()
-      .then((list) => {
-        setExams(list)
-        const paramId = searchParams.get("examId")
-        if (paramId) {
-          setSelectedExamId(paramId)
-          loadPage(Number(paramId))
-        }
-      })
-      .catch(() => setExams([]))
+    const paramId = searchParams.get("examId")
+    if (paramId) {
+      setSelectedExamId(paramId)
+      loadPage(Number(paramId))
+      loadExamsPage("", 1, true)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When examItems loads and a selectedExamId is set (from URL param), resolve the label
+  useEffect(() => {
+    if (selectedExamId && !selectedExamObj && examItems.length > 0) {
+      const found = examItems.find(e => String(e.id) === selectedExamId)
+      if (found) setSelectedExamObj(found)
+    }
+  }, [examItems, selectedExamId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load first page when dropdown opens
+  useEffect(() => {
+    if (!examDropdownOpen) return
+    loadExamsPage(examSearch, 1, true)
+  }, [examDropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced reload on search change while dropdown is open
+  useEffect(() => {
+    if (!examDropdownOpen) return
+    const timer = setTimeout(() => {
+      loadExamsPage(examSearch, 1, true)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load proctor page data when exam changes ───────────────
   const loadPage = useCallback(async (examId: number) => {
@@ -107,8 +140,9 @@ export default function AssignToProctorPage() {
     }
   }, [isAr])
 
-  const handleExamChange = (value: string) => {
+  const handleExamChange = (value: string, obj?: {id: number; titleEn: string; titleAr: string}) => {
     setSelectedExamId(value)
+    setSelectedExamObj(obj ?? null)
     setPageData(null)
     if (value) loadPage(Number(value))
   }
@@ -187,16 +221,29 @@ export default function AssignToProctorPage() {
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <UserCheck className="h-6 w-6 text-primary" />
-          {isAr ? "تعيين مراقبين للاختبار" : "Assign Proctor to Exam"}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {isAr
-            ? "تعيين وإدارة المراقبين لكل اختبار"
-            : "Assign and manage proctors per exam"}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <UserCheck className="h-6 w-6 text-primary" />
+            {isAr ? "تعيين مراقبين للاختبار" : "Assign Proctor to Exam"}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {isAr
+              ? "تعيين وإدارة المراقبين لكل اختبار"
+              : "Assign and manage proctors per exam"}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setInfoOpen(o => !o)}
+          className="flex items-center gap-1.5 shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+        >
+          <HelpCircle className="h-4 w-4" />
+          <span>{isAr ? "كيف تعمل المراقبة؟" : "How Proctoring Works?"}</span>
+          {infoOpen
+            ? <ChevronUp className="h-3.5 w-3.5 opacity-60" />
+            : <ChevronDown className="h-3.5 w-3.5 opacity-60" />}
+        </button>
       </div>
 
       {/* Exam selector */}
@@ -210,9 +257,9 @@ export default function AssignToProctorPage() {
                 onClick={() => setExamDropdownOpen(!examDropdownOpen)}
                 className="w-full flex items-center justify-between px-3 py-2 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
               >
-                <span className={selectedExamLabel ? "text-foreground" : "text-muted-foreground"}>
-                  {selectedExamLabel
-                    ? (isAr ? selectedExamLabel.titleAr : selectedExamLabel.titleEn)
+                <span className={selectedExamObj ? "text-foreground" : "text-muted-foreground"}>
+                  {selectedExamObj
+                    ? (isAr ? selectedExamObj.titleAr : selectedExamObj.titleEn)
                     : (isAr ? "اختر اختبار..." : "Select exam...")}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${examDropdownOpen ? "rotate-180" : ""}`} />
@@ -232,30 +279,48 @@ export default function AssignToProctorPage() {
                     </div>
                   </div>
                   <div className="max-h-60 overflow-y-auto divide-y">
-                    {filteredExamOptions.length === 0 ? (
+                    {examSearchLoading && examItems.length === 0 ? (
+                      <div className="flex items-center justify-center py-6">
+                        <LoadingSpinner size="sm" />
+                      </div>
+                    ) : examItems.length === 0 ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
                         {isAr ? "لم يتم العثور على اختبارات" : "No exams found"}
                       </div>
                     ) : (
-                      filteredExamOptions.map((e) => (
-                        <button
-                          key={e.id}
-                          type="button"
-                          onClick={() => {
-                            handleExamChange(String(e.id))
-                            setExamDropdownOpen(false)
-                            setExamSearch("")
-                          }}
-                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
-                            selectedExamId === String(e.id) ? "bg-primary/10 text-primary font-medium" : ""
-                          }`}
-                        >
-                          {selectedExamId === String(e.id) && (
-                            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-                          )}
-                          <span className="truncate">{isAr ? e.titleAr : e.titleEn}</span>
-                        </button>
-                      ))
+                      <>
+                        {examItems.map((e) => (
+                          <button
+                            key={e.id}
+                            type="button"
+                            onClick={() => {
+                              handleExamChange(String(e.id), e)
+                              setExamDropdownOpen(false)
+                              setExamSearch("")
+                            }}
+                            className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground ${
+                              selectedExamId === String(e.id) ? "bg-primary/10 text-primary font-medium" : ""
+                            }`}
+                          >
+                            {selectedExamId === String(e.id) && (
+                              <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                            )}
+                            <span className="truncate">{isAr ? e.titleAr : e.titleEn}</span>
+                          </button>
+                        ))}
+                        {examPage < examTotalPages && (
+                          <button
+                            type="button"
+                            onClick={() => loadExamsPage(examSearch, examPage + 1, false)}
+                            disabled={examSearchLoading}
+                            className="w-full px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors text-center disabled:opacity-50"
+                          >
+                            {examSearchLoading
+                              ? <LoadingSpinner size="sm" className="mx-auto" />
+                              : (isAr ? "تحميل المزيد..." : "Load more...")}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -431,6 +496,97 @@ export default function AssignToProctorPage() {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* ── How Proctoring Works panel ───────────────────────── */}
+      {infoOpen && (
+        <div className="rounded-xl border bg-muted/40 p-5 space-y-5 relative">
+          <button
+            type="button"
+            onClick={() => setInfoOpen(false)}
+            className="absolute top-3 end-3 rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          {/* Section title */}
+          <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            <span>{isAr ? "كيف تعمل المراقبة البشرية؟" : "How Does Human Proctoring Work?"}</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+
+            {/* Block 1 — Who can proctor */}
+            <div className="rounded-lg border bg-background p-4 space-y-2">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">1</span>
+                {isAr ? "من يستطيع المراقبة؟" : "Who Can Proctor?"}
+              </p>
+              <ul className="space-y-1 text-muted-foreground">
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                  <span>
+                    <strong className="text-foreground">{isAr ? "المشرف العام / المسؤول" : "SuperAdmin / Admin"}</strong>
+                    {isAr ? " — صلاحية كاملة تلقائياً" : " — full access automatically"}
+                  </span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                  <span>
+                    <strong className="text-foreground">{isAr ? "المراقب (Proctor)" : "Proctor role"}</strong>
+                    {isAr ? " — فقط للاختبارات المعيّنة له" : " — only for exams they're assigned to"}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Block 2 — Auto-assign on publish */}
+            <div className="rounded-lg border bg-background p-4 space-y-2">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold dark:bg-emerald-900/40 dark:text-emerald-300">2</span>
+                {isAr ? "التعيين التلقائي" : "Auto-Assignment"}
+              </p>
+              <p className="text-muted-foreground">
+                {isAr
+                  ? <>عند <strong className="text-foreground">نشر الاختبار</strong>، يتم تعيين <strong className="text-foreground">جميع المراقبين النشطين</strong> تلقائياً. المراقبون المُزالون مسبقاً لن يُعادوا.</>
+                  : <>When an exam is <strong className="text-foreground">published</strong>, all <strong className="text-foreground">active Proctor-role users</strong> are automatically assigned. Previously removed proctors are not re-added.</>
+                }
+              </p>
+            </div>
+
+            {/* Block 3 — Unassigning */}
+            <div className="rounded-lg border bg-background p-4 space-y-2">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-bold dark:bg-amber-900/40 dark:text-amber-300">3</span>
+                {isAr ? "إزالة مراقب" : "Removing a Proctor"}
+              </p>
+              <ol className="space-y-1 text-muted-foreground list-none">
+                <li className="flex gap-1.5">
+                  <span className="text-foreground font-medium shrink-0">1.</span>
+                  {isAr ? "اختر المراقب من قائمة \"المعيّنون\"" : "Select proctor from \"Assigned\" list"}
+                </li>
+                <li className="flex gap-1.5">
+                  <span className="text-foreground font-medium shrink-0">2.</span>
+                  {isAr ? "اضغط \"إزالة\" — يسري فوراً" : "Click Remove — takes effect immediately"}
+                </li>
+                <li className="flex gap-1.5">
+                  <span className="text-foreground font-medium shrink-0">3.</span>
+                  <strong className="text-foreground">{isAr ? "لا حاجة لإلغاء نشر الاختبار" : "No unpublish required"}</strong>
+                </li>
+              </ol>
+            </div>
+
+          </div>
+
+          <p className="text-xs text-muted-foreground border-t pt-3">
+            <Zap className="inline h-3 w-3 me-1 text-amber-500" />
+            {isAr
+              ? "ملاحظة: تفعيل خيار \"تتطلب المراقبة\" في إعدادات الاختبار هو المصدر الوحيد للحقيقة — إذا كان مغلقاً، لا يمكن للمراقبين رؤية الجلسات."
+              : "Note: The \"Require Proctoring\" toggle in exam settings is the source of truth — if off, proctors cannot see live sessions even if assigned."}
+          </p>
+        </div>
       )}
 
       {/* Confirm dialog */}

@@ -106,6 +106,20 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     if (attemptId) fetchChunks()
   }, [attemptId])
 
+  // Seed totalDuration from chunk metadata as soon as we have it.
+  // video.duration stays Infinity during MSE sequence-mode buffering, so we
+  // need a baseline value so the seek slider and skip buttons work immediately.
+  useEffect(() => {
+    if (
+      chunkData &&
+      chunkData.chunkDurationMs > 0 &&
+      chunkData.totalChunks > 0
+    ) {
+      const estimated = (chunkData.totalChunks * chunkData.chunkDurationMs) / 1000
+      setTotalDuration((prev) => (prev > 0 ? prev : estimated))
+    }
+  }, [chunkData])
+
   // Set up MSE with codec auto-detect and retry logic.
   // If chunk 0 (the EBML init segment) fails with one codec, we try the next candidate.
   // This handles the common case where the recording codec (e.g. vp9+opus) differs
@@ -296,7 +310,8 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     const handlePause = () => setIsPlaying(false)
     const handleEnded = () => setIsPlaying(false)
     const handleDurationChange = () => {
-      if (video.duration && isFinite(video.duration)) {
+      // Accept the real duration when it becomes finite (fires after endOfStream())
+      if (video.duration && isFinite(video.duration) && video.duration > 0) {
         setTotalDuration(video.duration)
       }
     }
@@ -369,7 +384,9 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
   const skipForward = () => {
     const video = videoRef.current
     if (!video) return
-    video.currentTime = Math.min(video.currentTime + 10, totalDuration)
+    // Use actual video.duration if finite, otherwise fall back to state
+    const dur = isFinite(video.duration) && video.duration > 0 ? video.duration : totalDuration
+    video.currentTime = Math.min(video.currentTime + 10, dur)
   }
 
   const skipBackward = () => {

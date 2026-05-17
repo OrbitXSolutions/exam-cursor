@@ -227,11 +227,11 @@ public class RoleService : IRoleService
       return ApiResponse<bool>.FailureResponse("User not found.");
     }
 
-    // Protect SuperDev user from being removed from SuperDev role
-    if (user.Email?.Equals(ProtectedUsers.SuperDevEmail, StringComparison.OrdinalIgnoreCase) == true
-        && dto.RoleName.Equals(AppRoles.SuperDev, StringComparison.OrdinalIgnoreCase))
+    // Protect SuperAdmin user from being removed from SuperAdmin role
+    if (user.Email?.Equals(ProtectedUsers.SuperAdminEmail, StringComparison.OrdinalIgnoreCase) == true
+        && dto.RoleName.Equals(AppRoles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
     {
-      return ApiResponse<bool>.FailureResponse("Cannot remove SuperDev user from SuperDev role.");
+      return ApiResponse<bool>.FailureResponse("Cannot remove SuperAdmin user from SuperAdmin role.");
     }
 
     var isInRole = await _userManager.IsInRoleAsync(user, dto.RoleName);

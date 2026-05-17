@@ -22,6 +22,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [isProtected, setIsProtected] = useState(false)
   const [formData, setFormData] = useState({
     fullNameEn: "",
     fullNameAr: "",
@@ -36,6 +37,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   async function loadUser() {
     try {
       const user = await getUserById(id)
+      setIsProtected(user.isProtected ?? false)
       setFormData({
         fullNameEn: user.fullNameEn,
         fullNameAr: user.fullNameAr,
@@ -117,18 +119,23 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
 
             <div className="space-y-2">
               <Label htmlFor="role">{language === "ar" ? "الدور" : "Role"}</Label>
+              {isProtected ? (
+                <div className="rounded-md border px-3 py-2 text-sm text-muted-foreground bg-muted">
+                  SuperAdmin — {language === "ar" ? "لا يمكن تغيير الدور" : "Role cannot be changed"}
+                </div>
+              ) : (
               <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Candidate">{language === "ar" ? "مرشح" : "Candidate"}</SelectItem>
-                  <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
-                  <SelectItem value="ProctorReviewer">{language === "ar" ? "مراجع" : "Proctor Reviewer"}</SelectItem>
-                  <SelectItem value="Auditor">{language === "ar" ? "مدقق" : "Auditor"}</SelectItem>
                   <SelectItem value="Admin">{language === "ar" ? "مسؤول" : "Admin"}</SelectItem>
+                  <SelectItem value="Instructor">{language === "ar" ? "مدرس" : "Instructor"}</SelectItem>
+                  <SelectItem value="Examiner">{language === "ar" ? "ممتحن" : "Examiner"}</SelectItem>
+                  <SelectItem value="Proctor">{language === "ar" ? "مراقب" : "Proctor"}</SelectItem>
                 </SelectContent>
               </Select>
+              )}
             </div>
 
             <div className="flex items-center justify-between rounded-lg border p-4">

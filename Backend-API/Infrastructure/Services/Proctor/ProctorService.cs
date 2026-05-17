@@ -49,13 +49,13 @@ public class ProctorService : IProctorService
         _resourceAuthorization = resourceAuthorization;
     }
 
-    private async Task<bool> IsCurrentUserSuperDevAsync()
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId)) return false;
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     #region Session Management
@@ -1854,6 +1854,19 @@ UploadEvidenceDto dto, string candidateId)
 
         if (searchDto.StartedTo.HasValue)
             query = query.Where(s => s.StartedAt <= searchDto.StartedTo.Value);
+
+        if (!string.IsNullOrEmpty(searchDto.Search))
+        {
+            var s = searchDto.Search.Trim();
+            query = query.Where(ps =>
+                ps.Candidate.FullName.Contains(s) ||
+                (ps.Candidate.Email != null && ps.Candidate.Email.Contains(s)) ||
+                ps.Exam.TitleEn.Contains(s) ||
+                ps.Exam.TitleAr.Contains(s));
+        }
+
+        if (searchDto.IsFlagged == true)
+            query = query.Where(s => s.IsFlagged == true);
 
         return query;
     }

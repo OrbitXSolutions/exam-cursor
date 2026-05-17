@@ -69,7 +69,7 @@ export async function getQuestionCategories(params?: {
   if (params?.search) queryParams.append("search", params.search);
   if (params?.includeDeleted) queryParams.append("includeDeleted", "true");
   queryParams.append("pageNumber", String(params?.pageNumber || 1));
-  queryParams.append("pageSize", String(params?.pageSize || 100));
+  queryParams.append("pageSize", String(params?.pageSize || 20));
 
   const result = await apiClient.get<PaginatedResponse<QuestionCategory>>(
     `/Lookups/question-categories?${queryParams.toString()}`,
@@ -125,7 +125,7 @@ export async function getQuestionTypes(params?: {
   if (params?.search) queryParams.append("search", params.search);
   if (params?.includeDeleted) queryParams.append("includeDeleted", "true");
   queryParams.append("pageNumber", String(params?.pageNumber || 1));
-  queryParams.append("pageSize", String(params?.pageSize || 100));
+  queryParams.append("pageSize", String(params?.pageSize || 20));
 
   const result = await apiClient.get<PaginatedResponse<QuestionType>>(
     `/Lookups/question-types?${queryParams.toString()}`,
@@ -180,7 +180,7 @@ export async function getQuestionSubjects(params?: {
   if (params?.search) queryParams.append("search", params.search);
   if (params?.includeDeleted) queryParams.append("includeDeleted", "true");
   queryParams.append("pageNumber", String(params?.pageNumber || 1));
-  queryParams.append("pageSize", String(params?.pageSize || 100));
+  queryParams.append("pageSize", String(params?.pageSize || 20));
 
   const result = await apiClient.get<PaginatedResponse<QuestionSubject>>(
     `/Lookups/question-subjects?${queryParams.toString()}`,
@@ -239,7 +239,7 @@ export async function getQuestionTopics(params?: {
     queryParams.append("subjectId", String(params.subjectId));
   if (params?.includeDeleted) queryParams.append("includeDeleted", "true");
   queryParams.append("pageNumber", String(params?.pageNumber || 1));
-  queryParams.append("pageSize", String(params?.pageSize || 100));
+  queryParams.append("pageSize", String(params?.pageSize || 20));
 
   const result = await apiClient.get<PaginatedResponse<QuestionTopic>>(
     `/Lookups/question-topics?${queryParams.toString()}`,

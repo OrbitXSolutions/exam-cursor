@@ -1,0 +1,932 @@
+version=1
+
+# This file caches language service data to improve the performance of C# Dev Kit.
+# It is not intended for manual editing. It can safely be deleted and will be
+# regenerated automatically. For more information, see https://aka.ms/lscache
+#
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
+
+[project]
+language=C#
+primary
+lastDtbSucceeded
+
+[properties]
+AssemblyName=Smart_Core
+CommandLineArgsForDesignTimeEvaluation=-langversion:13.0 -define:TRACE
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=13.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=Smart_Core
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=*Undefined*
+TargetFrameworkIdentifier=.NETCoreApp
+TargetPath=<PATH>bin/Debug/net9.0/Smart_Core.dll
+TargetRefPath=<PATH>obj/Debug/net9.0/ref/Smart_Core.dll
+TemporaryDependencyNodeTargetIdentifier=net9.0
+
+[commandLineArguments]
+/noconfig
+/unsafe-
+/checked-
+/nowarn:1701,1702,1701,1702
+/fullpaths
+/nostdlib+
+/errorreport:prompt
+/warn:9
+/define:TRACE;DEBUG;NET;NET9_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER
+/highentropyva+
+/nullable:enable
+/debug+
+/debug:portable
+/filealign:512
+/optimize-
+/out:obj\Debug\net9.0\Smart_Core.dll
+/refout:obj\Debug\net9.0\refint\Smart_Core.dll
+/target:exe
+/warnaserror-
+/utf8output
+/deterministic+
+/langversion:13.0
+/warnaserror+:NU1605,SYSLIB0011
+
+[sourceFiles]
+Application/DTOs/Assessment/
+ ExamAccessPolicyAndInstructionDtos.cs
+ ExamBuilderDtos.cs
+ ExamDtos.cs
+ ExamQuestionDtos.cs
+ ExamSectionDtos.cs
+ ExamShareLinkDtos.cs
+Application/DTOs/
+ Attempt/AttemptDtos.cs
+ AttemptControl/AttemptControlDtos.cs
+ Audit/AuditDtos.cs
+ Auth/AuthDtos.cs
+ Batch/BatchDtos.cs
+ Candidate/CandidateDtos.cs
+ CandidateAdmin/CandidateAdminDtos.cs
+ CandidateExamDetails/CandidateExamDetailsDtos.cs
+ Common/ApiResponse.cs
+ Department/DepartmentDtos.cs
+ ExamAssignment/ExamAssignmentDtos.cs
+ ExamOperations/ExamOperationsDtos.cs
+ ExamResult/
+  CandidateResultListDto.cs
+  CertificateDtos.cs
+  ExamResultDtos.cs
+ Grading/
+  AiGradingDtos.cs
+  GradingDtos.cs
+ Incident/IncidentDtos.cs
+ License/LicenseStatusResult.cs
+ Logs/SystemLogDtos.cs
+ Lookups/
+  QuestionCategoryDtos.cs
+  QuestionSubjectDtos.cs
+  QuestionTopicDtos.cs
+  QuestionTypeDtos.cs
+ Media/MediaDtos.cs
+ Notification/NotificationDtos.cs
+ Proctor/
+  AiProctorDtos.cs
+  ExamProctorDtos.cs
+  IdentityVerificationDtos.cs
+  ProctorDtos.cs
+ QuestionBank/
+  AiQuestionGeneratorDtos.cs
+  QuestionAttachmentDtos.cs
+  QuestionDtos.cs
+  QuestionOptionDtos.cs
+ Roles/RoleDtos.cs
+ Users/UserDtos.cs
+Application/Interfaces/Assessment/
+ IAssessmentService.cs
+ IExamShareService.cs
+Application/Interfaces/
+ Attempt/IAttemptService.cs
+ AttemptControl/IAttemptControlService.cs
+ Audit/IAuditService.cs
+ Batch/IBatchService.cs
+ Candidate/ICandidateService.cs
+ CandidateAdmin/ICandidateAdminService.cs
+ CandidateExamDetails/ICandidateExamDetailsService.cs
+ ExamAssignment/IExamAssignmentService.cs
+ ExamOperations/IExamOperationsService.cs
+ ExamResult/
+  ICertificateService.cs
+  IExamResultService.cs
+ Grading/
+  IAiGradingService.cs
+  IGradingService.cs
+ IAuthService.cs
+ ICacheService.cs
+ ICurrentUserService.cs
+ IDepartmentService.cs
+ IEmailService.cs
+ IEncryptionService.cs
+ IMediaStorageService.cs
+ Incident/IIncidentService.cs
+ INotificationService.cs
+ IRoleService.cs
+ ISmsService.cs
+ IStorageProvider.cs
+ ITokenService.cs
+ IUnitOfWork.cs
+ IUserService.cs
+ License/ILicenseValidationService.cs
+ Logs/ISystemLogService.cs
+ Lookups/ILookupsService.cs
+ Proctor/
+  IAiProctorService.cs
+  IExamProctorService.cs
+  IIdentityVerificationService.cs
+  IProctorService.cs
+ QuestionBank/
+  IAiQuestionGeneratorService.cs
+  IQuestionBankService.cs
+Application/Settings/
+ MediaStorageSettings.cs
+ OpenAISettings.cs
+Application/Validators/Assessment/
+ ExamAccessPolicyAndInstructionValidators.cs
+ ExamQuestionValidators.cs
+ ExamSectionValidators.cs
+ ExamValidators.cs
+Application/Validators/
+ Attempt/AttemptValidators.cs
+ Audit/AuditValidators.cs
+ Auth/AuthValidators.cs
+ Batch/BatchFilterDtoValidator.cs
+ Department/DepartmentValidators.cs
+ ExamResult/ExamResultValidators.cs
+ Grading/GradingValidators.cs
+ Incident/IncidentValidators.cs
+ Lookups/
+  QuestionCategoryValidators.cs
+  QuestionSubjectValidators.cs
+  QuestionTopicValidators.cs
+  QuestionTypeValidators.cs
+ Proctor/ProctorValidators.cs
+ QuestionBank/
+  QuestionAttachmentValidators.cs
+  QuestionOptionValidators.cs
+  QuestionValidators.cs
+ Roles/RoleValidators.cs
+ Users/
+  CandidateAdminValidators.cs
+  UserValidators.cs
+Controllers/Assessment/
+ AssessmentController.cs
+ PublicExamController.cs
+Controllers/
+ Attempt/AttemptController.cs
+ AttemptControl/AttemptControlController.cs
+ Audit/AuditController.cs
+ AuthController.cs
+ Batch/BatchesController.cs
+ Candidate/
+  CandidateController.cs
+  CandidatesController.cs
+ CandidateExamDetails/CandidateExamDetailsController.cs
+ DepartmentsController.cs
+ ExamAssignment/AssignmentsController.cs
+ ExamOperations/ExamOperationsController.cs
+ ExamResult/
+  CertificateController.cs
+  ExamResultController.cs
+ Grading/GradingController.cs
+ Incident/IncidentController.cs
+ Logs/SystemLogsController.cs
+ Lookups/LookupsController.cs
+ MediaController.cs
+ Proctor/
+  ExamProctorController.cs
+  IdentityVerificationController.cs
+  ProctorController.cs
+  VideoRecordingController.cs
+ QuestionBank/QuestionBankController.cs
+ RolesController.cs
+ SeedController.cs
+ Settings/
+  LicenseController.cs
+  NotificationController.cs
+  OrganizationController.cs
+  SettingsController.cs
+ UsersController.cs
+Domain/Common/
+ BaseEntity.cs
+ UaeTimeHelper.cs
+Domain/Constants/
+ AppRoles.cs
+ CacheKeys.cs
+ ExamDefaults.cs
+Domain/Entities/
+ ApplicationRole.cs
+ ApplicationUser.cs
+ Assessment/
+  Exam.cs
+  ExamAccessPolicy.cs
+  ExamInstruction.cs
+  ExamQuestion.cs
+  ExamSection.cs
+  ExamShareLink.cs
+  ExamTopic.cs
+ Attempt/
+  AdminAttemptOverride.cs
+  Attempt.cs
+  AttemptAnswer.cs
+  AttemptEvent.cs
+  AttemptQuestion.cs
+ Audit/
+  AuditExportJob.cs
+  AuditLog.cs
+  AuditRetentionPolicy.cs
+ Batch/Batch.cs
+ Department.cs
+ ExamAssignment/ExamAssignment.cs
+ ExamResult/
+  CandidateExamSummary.cs
+  Certificate.cs
+  ExamReport.cs
+  QuestionPerformanceReport.cs
+  Result.cs
+  ResultExportJob.cs
+ Grading/
+  GradedAnswer.cs
+  GradingSession.cs
+ Incident/
+  AppealRequest.cs
+  IncidentCase.cs
+  IncidentComment.cs
+  IncidentDecisionHistory.cs
+  IncidentEvidenceLink.cs
+  IncidentTimelineEvent.cs
+ Logs/SystemLog.cs
+ Lookups/
+  QuestionCategory.cs
+  QuestionSubject.cs
+  QuestionTopic.cs
+  QuestionType.cs
+ MediaFile.cs
+ Notification/
+  NotificationLog.cs
+  NotificationSettings.cs
+  NotificationTemplate.cs
+ OrganizationSettings.cs
+ Proctor/
+  ExamProctor.cs
+  IdentityVerification.cs
+  ProctorDecision.cs
+  ProctorEvent.cs
+  ProctorEvidence.cs
+  ProctorRiskRule.cs
+  ProctorRiskSnapshot.cs
+  ProctorSession.cs
+ QuestionBank/
+  Question.cs
+  QuestionAnswerKey.cs
+  QuestionAttachment.cs
+  QuestionOption.cs
+ SystemSettings.cs
+Domain/Enums/
+ AssessmentEnums.cs
+ AttemptEnums.cs
+ AuditEnums.cs
+ DifficultyLevel.cs
+ ExamResultEnums.cs
+ GradingEnums.cs
+ IdentityVerificationEnums.cs
+ IncidentEnums.cs
+ LicenseState.cs
+ NotificationEnums.cs
+ ProctorEnums.cs
+ StorageEnums.cs
+ SystemLogEnums.cs
+Domain/Models/LicenseData.cs
+Infrastructure/Data/
+ ApplicationDbContext.cs
+ ApplicationDbContextFactory.cs
+ Configurations/
+  ApplicationRoleConfiguration.cs
+  ApplicationUserConfiguration.cs
+  Assessment/
+   ExamAccessPolicyConfiguration.cs
+   ExamConfiguration.cs
+   ExamInstructionConfiguration.cs
+   ExamQuestionConfiguration.cs
+   ExamSectionConfiguration.cs
+   ExamTopicConfiguration.cs
+  Attempt/
+   AttemptAnswerConfiguration.cs
+   AttemptConfiguration.cs
+   AttemptEventConfiguration.cs
+   AttemptQuestionConfiguration.cs
+  Audit/
+   AuditExportJobConfiguration.cs
+   AuditLogConfiguration.cs
+   AuditRetentionPolicyConfiguration.cs
+  BatchConfiguration.cs
+  DepartmentConfiguration.cs
+  ExamAssignmentConfiguration.cs
+  ExamResult/
+   CandidateExamSummaryConfiguration.cs
+   CertificateConfiguration.cs
+   ExamReportConfiguration.cs
+   QuestionPerformanceReportConfiguration.cs
+   ResultConfiguration.cs
+   ResultExportJobConfiguration.cs
+  ExamShareLinkConfiguration.cs
+  Grading/
+   GradedAnswerConfiguration.cs
+   GradingSessionConfiguration.cs
+  Incident/
+   AppealRequestConfiguration.cs
+   IncidentCaseConfiguration.cs
+   IncidentCommentConfiguration.cs
+   IncidentDecisionHistoryConfiguration.cs
+   IncidentEvidenceLinkConfiguration.cs
+   IncidentTimelineEventConfiguration.cs
+  Logs/SystemLogConfiguration.cs
+  Lookups/
+   QuestionCategoryConfiguration.cs
+   QuestionSubjectConfiguration.cs
+   QuestionTopicConfiguration.cs
+   QuestionTypeConfiguration.cs
+  MediaFileConfiguration.cs
+  Notification/
+   NotificationLogConfiguration.cs
+   NotificationSettingsConfiguration.cs
+   NotificationTemplateConfiguration.cs
+  Proctor/
+   ExamProctorConfiguration.cs
+   IdentityVerificationConfiguration.cs
+   ProctorDecisionConfiguration.cs
+   ProctorEventConfiguration.cs
+   ProctorEvidenceConfiguration.cs
+   ProctorRiskRuleConfiguration.cs
+   ProctorRiskSnapshotConfiguration.cs
+   ProctorSessionConfiguration.cs
+  QuestionBank/
+   QuestionAnswerKeyConfiguration.cs
+   QuestionAttachmentConfiguration.cs
+   QuestionConfiguration.cs
+   QuestionOptionConfiguration.cs
+  SystemSettingsConfiguration.cs
+ DatabaseSeeder.cs
+Infrastructure/
+ Hubs/ProctorHub.cs
+ Mapping/MappingConfig.cs
+ Middleware/
+  GlobalExceptionMiddleware.cs
+  LicenseEnforcementMiddleware.cs
+  RequestResponseLoggingMiddleware.cs
+ Persistence/UnitOfWork.cs
+ Services/
+  AesEncryptionService.cs
+  Assessment/
+   AssessmentService.cs
+   ExamShareService.cs
+  Attempt/AttemptService.cs
+  AttemptControl/AttemptControlService.cs
+  Audit/AuditService.cs
+  Authorization/ResourceAuthorizationService.cs
+  AuthService.cs
+  Background/AttemptExpiryBackgroundService.cs
+  Batch/BatchService.cs
+  CacheService.cs
+  Candidate/CandidateService.cs
+  CandidateAdmin/CandidateAdminService.cs
+  CandidateExamDetails/CandidateExamDetailsService.cs
+  CurrentUserService.cs
+  DepartmentService.cs
+  EmailService.cs
+  ExamAssignment/ExamAssignmentService.cs
+  ExamOperations/ExamOperationsService.cs
+  ExamResult/
+   CertificateService.cs
+   ExamResultService.cs
+  Grading/
+   AiGradingService.cs
+   GradingService.cs
+  Incident/IncidentService.cs
+  License/
+   LicenseCanonicalBuilder.cs
+   LicenseCheckBackgroundService.cs
+   LicenseValidationService.cs
+  LogCleanupService.cs
+  Logs/
+   LogPersistenceService.cs
+   SystemLogChannel.cs
+   SystemLogService.cs
+  Lookups/LookupsService.cs
+  MediaStorageService.cs
+  Notification/
+   NotificationBackgroundService.cs
+   NotificationService.cs
+  Proctor/
+   AiProctorService.cs
+   ExamProctorService.cs
+   IdentityVerificationService.cs
+   ProctorService.cs
+  QuestionBank/
+   AiQuestionGeneratorService.cs
+   QuestionBankService.cs
+  RoleService.cs
+  SmsService.cs
+  TokenService.cs
+  UserService.cs
+  VideoRetentionService.cs
+ Storage/
+  LocalStorageProvider.cs
+  S3StorageProvider.cs
+Migrations/
+ 20260111183852_InitialMigration.cs
+ 20260111183852_InitialMigration.Designer.cs
+ 20260117032303_AddDepartmentAndExamStructure.cs
+ 20260117032303_AddDepartmentAndExamStructure.Designer.cs
+ 20260118060705_BilingualQuestionSupport.cs
+ 20260118060705_BilingualQuestionSupport.Designer.cs
+ 20260118082816_AddExamSettings.cs
+ 20260118082816_AddExamSettings.Designer.cs
+ 20260131130202_AddCertificates.cs
+ 20260131130202_AddCertificates.Designer.cs
+ 20260201101047_AddSystemSettings.cs
+ 20260201101047_AddSystemSettings.Designer.cs
+ 20260210040929_AddQuestionSubjectsAndTopics.cs
+ 20260210040929_AddQuestionSubjectsAndTopics.Designer.cs
+ 20260210135423_AddExamSectionBuilderFields.cs
+ 20260210135423_AddExamSectionBuilderFields.Designer.cs
+ 20260212073931_AddCandidateFields.cs
+ 20260212073931_AddCandidateFields.Designer.cs
+ 20260212081531_AddBatches.cs
+ 20260212081531_AddBatches.Designer.cs
+ 20260212083244_AddExamAssignments.cs
+ 20260212083244_AddExamAssignments.Designer.cs
+ 20260212090303_AddAttemptControlFields.cs
+ 20260212090303_AddAttemptControlFields.Designer.cs
+ 20260212113120_AddOrganizationSettings.cs
+ 20260212113120_AddOrganizationSettings.Designer.cs
+ 20260212114749_AddOrganizationPrimaryColor.cs
+ 20260212114749_AddOrganizationPrimaryColor.Designer.cs
+ 20260212132940_AddIdentityVerifications.cs
+ 20260212132940_AddIdentityVerifications.Designer.cs
+ 20260214100032_AddAdminAttemptOverride.cs
+ 20260214100032_AddAdminAttemptOverride.Designer.cs
+ 20260214113458_AddProctorSessionFlags.cs
+ 20260214113458_AddProctorSessionFlags.Designer.cs
+ 20260217001420_MakeVerificationFKsNullable.cs
+ 20260217001420_MakeVerificationFKsNullable.Designer.cs
+ 20260222161938_AddVideoRetentionDays.cs
+ 20260222161938_AddVideoRetentionDays.Designer.cs
+ 20260222165807_AddVideoFeatureFlags.cs
+ 20260222165807_AddVideoFeatureFlags.Designer.cs
+ 20260222192751_FixVideoFlagsDefaultTrue.cs
+ 20260222192751_FixVideoFlagsDefaultTrue.Designer.cs
+ 20260223150612_AddExpiryReasonAndResumedFromAttempt.cs
+ 20260223150612_AddExpiryReasonAndResumedFromAttempt.Designer.cs
+ 20260223174922_CloneExamFeature.cs
+ 20260223174922_CloneExamFeature.Designer.cs
+ 20260224170815_AddSmartMonitoring.cs
+ 20260224170815_AddSmartMonitoring.Designer.cs
+ 20260304180958_UpdateQuestionTypeSeedData.cs
+ 20260304180958_UpdateQuestionTypeSeedData.Designer.cs
+ 20260304201417_AddIsCalculatorAllowed.cs
+ 20260304201417_AddIsCalculatorAllowed.Designer.cs
+ 20260306004712_AddDisconnectBudgetTracking.cs
+ 20260306004712_AddDisconnectBudgetTracking.Designer.cs
+ 20260306021005_AddNotificationSystem.cs
+ 20260306021005_AddNotificationSystem.Designer.cs
+ 20260306031036_AddMaxViolationWarningsAndCountableViolationCount.cs
+ 20260306031036_AddMaxViolationWarningsAndCountableViolationCount.Designer.cs
+ 20260306041325_AddDepartmentIdToQuestionSubject.cs
+ 20260306041325_AddDepartmentIdToQuestionSubject.Designer.cs
+ 20260306132902_AddSystemLogsTable.cs
+ 20260306132902_AddSystemLogsTable.Designer.cs
+ 20260401003847_AddExamShareLinks.cs
+ 20260401003847_AddExamShareLinks.Designer.cs
+ 20260403045255_AddOptionPoints.cs
+ 20260403045255_AddOptionPoints.Designer.cs
+ 20260403155512_AddScreenMonitoringFields.cs
+ 20260403155512_AddScreenMonitoringFields.Designer.cs
+ 20260404093958_AddRiskSubScores.cs
+ 20260404093958_AddRiskSubScores.Designer.cs
+ 20260404094148_SeedBurstRiskRules.cs
+ 20260404094148_SeedBurstRiskRules.Designer.cs
+ 20260419102147_AddWalkInToExamAccessPolicyAndUsers.cs
+ 20260419102147_AddWalkInToExamAccessPolicyAndUsers.Designer.cs
+ 20260419171822_AddExamProctors.cs
+ 20260419171822_AddExamProctors.Designer.cs
+ 20260503115059_UseUaeDateTimeOffset.cs
+ 20260503115059_UseUaeDateTimeOffset.Designer.cs
+ ApplicationDbContextModelSnapshot.cs
+obj/Debug/net9.0/
+ .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+ Smart_Core.AssemblyInfo.cs
+ Smart_Core.GlobalUsings.g.cs
+Program.cs
+
+[metadataReferences]
+<DOTNET>/packs/Microsoft.AspNetCore.App.Ref/9.0.10/ref/net9.0/
+ Microsoft.AspNetCore.Antiforgery.dll
+ Microsoft.AspNetCore.Authentication.Abstractions.dll
+ Microsoft.AspNetCore.Authentication.BearerToken.dll
+ Microsoft.AspNetCore.Authentication.Cookies.dll
+ Microsoft.AspNetCore.Authentication.Core.dll
+ Microsoft.AspNetCore.Authentication.dll
+ Microsoft.AspNetCore.Authentication.OAuth.dll
+ Microsoft.AspNetCore.Authorization.dll
+ Microsoft.AspNetCore.Authorization.Policy.dll
+ Microsoft.AspNetCore.Components.Authorization.dll
+ Microsoft.AspNetCore.Components.dll
+ Microsoft.AspNetCore.Components.Endpoints.dll
+ Microsoft.AspNetCore.Components.Forms.dll
+ Microsoft.AspNetCore.Components.Server.dll
+ Microsoft.AspNetCore.Components.Web.dll
+ Microsoft.AspNetCore.Connections.Abstractions.dll
+ Microsoft.AspNetCore.CookiePolicy.dll
+ Microsoft.AspNetCore.Cors.dll
+ Microsoft.AspNetCore.Cryptography.Internal.dll
+ Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+ Microsoft.AspNetCore.DataProtection.Abstractions.dll
+ Microsoft.AspNetCore.DataProtection.dll
+ Microsoft.AspNetCore.DataProtection.Extensions.dll
+ Microsoft.AspNetCore.Diagnostics.Abstractions.dll
+ Microsoft.AspNetCore.Diagnostics.dll
+ Microsoft.AspNetCore.Diagnostics.HealthChecks.dll
+ Microsoft.AspNetCore.dll
+ Microsoft.AspNetCore.HostFiltering.dll
+ Microsoft.AspNetCore.Hosting.Abstractions.dll
+ Microsoft.AspNetCore.Hosting.dll
+ Microsoft.AspNetCore.Hosting.Server.Abstractions.dll
+ Microsoft.AspNetCore.Html.Abstractions.dll
+ Microsoft.AspNetCore.Http.Abstractions.dll
+ Microsoft.AspNetCore.Http.Connections.Common.dll
+ Microsoft.AspNetCore.Http.Connections.dll
+ Microsoft.AspNetCore.Http.dll
+ Microsoft.AspNetCore.Http.Extensions.dll
+ Microsoft.AspNetCore.Http.Features.dll
+ Microsoft.AspNetCore.Http.Results.dll
+ Microsoft.AspNetCore.HttpLogging.dll
+ Microsoft.AspNetCore.HttpOverrides.dll
+ Microsoft.AspNetCore.HttpsPolicy.dll
+ Microsoft.AspNetCore.Identity.dll
+ Microsoft.AspNetCore.Localization.dll
+ Microsoft.AspNetCore.Localization.Routing.dll
+ Microsoft.AspNetCore.Metadata.dll
+ Microsoft.AspNetCore.Mvc.Abstractions.dll
+ Microsoft.AspNetCore.Mvc.ApiExplorer.dll
+ Microsoft.AspNetCore.Mvc.Core.dll
+ Microsoft.AspNetCore.Mvc.Cors.dll
+ Microsoft.AspNetCore.Mvc.DataAnnotations.dll
+ Microsoft.AspNetCore.Mvc.dll
+ Microsoft.AspNetCore.Mvc.Formatters.Json.dll
+ Microsoft.AspNetCore.Mvc.Formatters.Xml.dll
+ Microsoft.AspNetCore.Mvc.Localization.dll
+ Microsoft.AspNetCore.Mvc.Razor.dll
+ Microsoft.AspNetCore.Mvc.RazorPages.dll
+ Microsoft.AspNetCore.Mvc.TagHelpers.dll
+ Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+ Microsoft.AspNetCore.OutputCaching.dll
+ Microsoft.AspNetCore.RateLimiting.dll
+ Microsoft.AspNetCore.Razor.dll
+ Microsoft.AspNetCore.Razor.Runtime.dll
+ Microsoft.AspNetCore.RequestDecompression.dll
+ Microsoft.AspNetCore.ResponseCaching.Abstractions.dll
+ Microsoft.AspNetCore.ResponseCaching.dll
+ Microsoft.AspNetCore.ResponseCompression.dll
+ Microsoft.AspNetCore.Rewrite.dll
+ Microsoft.AspNetCore.Routing.Abstractions.dll
+ Microsoft.AspNetCore.Routing.dll
+ Microsoft.AspNetCore.Server.HttpSys.dll
+ Microsoft.AspNetCore.Server.IIS.dll
+ Microsoft.AspNetCore.Server.IISIntegration.dll
+ Microsoft.AspNetCore.Server.Kestrel.Core.dll
+ Microsoft.AspNetCore.Server.Kestrel.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll
+ Microsoft.AspNetCore.Session.dll
+ Microsoft.AspNetCore.SignalR.Common.dll
+ Microsoft.AspNetCore.SignalR.Core.dll
+ Microsoft.AspNetCore.SignalR.dll
+ Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+ Microsoft.AspNetCore.StaticAssets.dll
+ Microsoft.AspNetCore.StaticFiles.dll
+ Microsoft.AspNetCore.WebSockets.dll
+ Microsoft.AspNetCore.WebUtilities.dll
+ Microsoft.Extensions.Caching.Abstractions.dll
+ Microsoft.Extensions.Caching.Memory.dll
+ Microsoft.Extensions.Configuration.Abstractions.dll
+ Microsoft.Extensions.Configuration.Binder.dll
+ Microsoft.Extensions.Configuration.CommandLine.dll
+ Microsoft.Extensions.Configuration.dll
+ Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+ Microsoft.Extensions.Configuration.FileExtensions.dll
+ Microsoft.Extensions.Configuration.Ini.dll
+ Microsoft.Extensions.Configuration.Json.dll
+ Microsoft.Extensions.Configuration.KeyPerFile.dll
+ Microsoft.Extensions.Configuration.UserSecrets.dll
+ Microsoft.Extensions.Configuration.Xml.dll
+ Microsoft.Extensions.DependencyInjection.Abstractions.dll
+ Microsoft.Extensions.DependencyInjection.dll
+ Microsoft.Extensions.Diagnostics.Abstractions.dll
+ Microsoft.Extensions.Diagnostics.dll
+ Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+ Microsoft.Extensions.Diagnostics.HealthChecks.dll
+ Microsoft.Extensions.Features.dll
+ Microsoft.Extensions.FileProviders.Abstractions.dll
+ Microsoft.Extensions.FileProviders.Composite.dll
+ Microsoft.Extensions.FileProviders.Embedded.dll
+ Microsoft.Extensions.FileProviders.Physical.dll
+ Microsoft.Extensions.FileSystemGlobbing.dll
+ Microsoft.Extensions.Hosting.Abstractions.dll
+ Microsoft.Extensions.Hosting.dll
+ Microsoft.Extensions.Http.dll
+ Microsoft.Extensions.Identity.Core.dll
+ Microsoft.Extensions.Identity.Stores.dll
+ Microsoft.Extensions.Localization.Abstractions.dll
+ Microsoft.Extensions.Localization.dll
+ Microsoft.Extensions.Logging.Abstractions.dll
+ Microsoft.Extensions.Logging.Configuration.dll
+ Microsoft.Extensions.Logging.Console.dll
+ Microsoft.Extensions.Logging.Debug.dll
+ Microsoft.Extensions.Logging.dll
+ Microsoft.Extensions.Logging.EventLog.dll
+ Microsoft.Extensions.Logging.EventSource.dll
+ Microsoft.Extensions.Logging.TraceSource.dll
+ Microsoft.Extensions.ObjectPool.dll
+ Microsoft.Extensions.Options.ConfigurationExtensions.dll
+ Microsoft.Extensions.Options.DataAnnotations.dll
+ Microsoft.Extensions.Options.dll
+ Microsoft.Extensions.Primitives.dll
+ Microsoft.Extensions.WebEncoders.dll
+ Microsoft.JSInterop.dll
+ Microsoft.Net.Http.Headers.dll
+ System.Diagnostics.EventLog.dll
+ System.Security.Cryptography.Xml.dll
+ System.Threading.RateLimiting.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/9.0.10/ref/net9.0/
+ Microsoft.CSharp.dll
+ Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
+ Microsoft.Win32.Primitives.dll
+ Microsoft.Win32.Registry.dll
+ mscorlib.dll
+ netstandard.dll
+ System.AppContext.dll
+ System.Buffers.dll
+ System.Collections.Concurrent.dll
+ System.Collections.dll
+ System.Collections.Immutable.dll
+ System.Collections.NonGeneric.dll
+ System.Collections.Specialized.dll
+ System.ComponentModel.Annotations.dll
+ System.ComponentModel.DataAnnotations.dll
+ System.ComponentModel.dll
+ System.ComponentModel.EventBasedAsync.dll
+ System.ComponentModel.Primitives.dll
+ System.ComponentModel.TypeConverter.dll
+ System.Configuration.dll
+ System.Console.dll
+ System.Core.dll
+ System.Data.Common.dll
+ System.Data.DataSetExtensions.dll
+ System.Data.dll
+ System.Diagnostics.Contracts.dll
+ System.Diagnostics.Debug.dll
+ System.Diagnostics.DiagnosticSource.dll
+ System.Diagnostics.FileVersionInfo.dll
+ System.Diagnostics.Process.dll
+ System.Diagnostics.StackTrace.dll
+ System.Diagnostics.TextWriterTraceListener.dll
+ System.Diagnostics.Tools.dll
+ System.Diagnostics.TraceSource.dll
+ System.Diagnostics.Tracing.dll
+ System.dll
+ System.Drawing.dll
+ System.Drawing.Primitives.dll
+ System.Dynamic.Runtime.dll
+ System.Formats.Asn1.dll
+ System.Formats.Tar.dll
+ System.Globalization.Calendars.dll
+ System.Globalization.dll
+ System.Globalization.Extensions.dll
+ System.IO.Compression.Brotli.dll
+ System.IO.Compression.dll
+ System.IO.Compression.FileSystem.dll
+ System.IO.Compression.ZipFile.dll
+ System.IO.dll
+ System.IO.FileSystem.AccessControl.dll
+ System.IO.FileSystem.dll
+ System.IO.FileSystem.DriveInfo.dll
+ System.IO.FileSystem.Primitives.dll
+ System.IO.FileSystem.Watcher.dll
+ System.IO.IsolatedStorage.dll
+ System.IO.MemoryMappedFiles.dll
+ System.IO.Pipelines.dll
+ System.IO.Pipes.AccessControl.dll
+ System.IO.Pipes.dll
+ System.IO.UnmanagedMemoryStream.dll
+ System.Linq.dll
+ System.Linq.Expressions.dll
+ System.Linq.Parallel.dll
+ System.Linq.Queryable.dll
+ System.Memory.dll
+ System.Net.dll
+ System.Net.Http.dll
+ System.Net.Http.Json.dll
+ System.Net.HttpListener.dll
+ System.Net.Mail.dll
+ System.Net.NameResolution.dll
+ System.Net.NetworkInformation.dll
+ System.Net.Ping.dll
+ System.Net.Primitives.dll
+ System.Net.Quic.dll
+ System.Net.Requests.dll
+ System.Net.Security.dll
+ System.Net.ServicePoint.dll
+ System.Net.Sockets.dll
+ System.Net.WebClient.dll
+ System.Net.WebHeaderCollection.dll
+ System.Net.WebProxy.dll
+ System.Net.WebSockets.Client.dll
+ System.Net.WebSockets.dll
+ System.Numerics.dll
+ System.Numerics.Vectors.dll
+ System.ObjectModel.dll
+ System.Reflection.DispatchProxy.dll
+ System.Reflection.dll
+ System.Reflection.Emit.dll
+ System.Reflection.Emit.ILGeneration.dll
+ System.Reflection.Emit.Lightweight.dll
+ System.Reflection.Extensions.dll
+ System.Reflection.Metadata.dll
+ System.Reflection.Primitives.dll
+ System.Reflection.TypeExtensions.dll
+ System.Resources.Reader.dll
+ System.Resources.ResourceManager.dll
+ System.Resources.Writer.dll
+ System.Runtime.CompilerServices.Unsafe.dll
+ System.Runtime.CompilerServices.VisualC.dll
+ System.Runtime.dll
+ System.Runtime.Extensions.dll
+ System.Runtime.Handles.dll
+ System.Runtime.InteropServices.dll
+ System.Runtime.InteropServices.JavaScript.dll
+ System.Runtime.InteropServices.RuntimeInformation.dll
+ System.Runtime.Intrinsics.dll
+ System.Runtime.Loader.dll
+ System.Runtime.Numerics.dll
+ System.Runtime.Serialization.dll
+ System.Runtime.Serialization.Formatters.dll
+ System.Runtime.Serialization.Json.dll
+ System.Runtime.Serialization.Primitives.dll
+ System.Runtime.Serialization.Xml.dll
+ System.Security.AccessControl.dll
+ System.Security.Claims.dll
+ System.Security.Cryptography.Algorithms.dll
+ System.Security.Cryptography.Cng.dll
+ System.Security.Cryptography.Csp.dll
+ System.Security.Cryptography.dll
+ System.Security.Cryptography.Encoding.dll
+ System.Security.Cryptography.OpenSsl.dll
+ System.Security.Cryptography.Primitives.dll
+ System.Security.Cryptography.X509Certificates.dll
+ System.Security.dll
+ System.Security.Principal.dll
+ System.Security.Principal.Windows.dll
+ System.Security.SecureString.dll
+ System.ServiceModel.Web.dll
+ System.ServiceProcess.dll
+ System.Text.Encoding.CodePages.dll
+ System.Text.Encoding.dll
+ System.Text.Encoding.Extensions.dll
+ System.Text.Encodings.Web.dll
+ System.Text.Json.dll
+ System.Text.RegularExpressions.dll
+ System.Threading.Channels.dll
+ System.Threading.dll
+ System.Threading.Overlapped.dll
+ System.Threading.Tasks.Dataflow.dll
+ System.Threading.Tasks.dll
+ System.Threading.Tasks.Extensions.dll
+ System.Threading.Tasks.Parallel.dll
+ System.Threading.Thread.dll
+ System.Threading.ThreadPool.dll
+ System.Threading.Timer.dll
+ System.Transactions.dll
+ System.Transactions.Local.dll
+ System.ValueTuple.dll
+ System.Web.dll
+ System.Web.HttpUtility.dll
+ System.Windows.dll
+ System.Xml.dll
+ System.Xml.Linq.dll
+ System.Xml.ReaderWriter.dll
+ System.Xml.Serialization.dll
+ System.Xml.XDocument.dll
+ System.Xml.XmlDocument.dll
+ System.Xml.XmlSerializer.dll
+ System.Xml.XPath.dll
+ System.Xml.XPath.XDocument.dll
+ WindowsBase.dll
+<NUGET>/
+ awssdk.core/3.7.400.2/lib/net8.0/AWSSDK.Core.dll
+ awssdk.s3/3.7.400.2/lib/net8.0/AWSSDK.S3.dll
+ azure.core/1.38.0/lib/net6.0/Azure.Core.dll
+ azure.identity/1.11.4/lib/netstandard2.0/Azure.Identity.dll
+ closedxml.parser/1.2.0/lib/netstandard2.1/ClosedXML.Parser.dll
+ closedxml/0.104.2/lib/netstandard2.1/ClosedXML.dll
+ documentformat.openxml.framework/3.1.1/lib/net8.0/DocumentFormat.OpenXml.Framework.dll
+ documentformat.openxml/3.1.1/lib/net8.0/DocumentFormat.OpenXml.dll
+ excelnumberformat/1.1.0/lib/netstandard2.0/ExcelNumberFormat.dll
+ fluentvalidation.aspnetcore/11.3.0/lib/net6.0/FluentValidation.AspNetCore.dll
+ fluentvalidation.dependencyinjectionextensions/11.11.0/lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll
+ fluentvalidation/11.11.0/lib/net8.0/FluentValidation.dll
+ mapster.core/1.2.1/lib/net7.0/Mapster.Core.dll
+ mapster/7.4.0/lib/net7.0/Mapster.dll
+ microsoft.aspnetcore.authentication.jwtbearer/9.0.0/lib/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+ microsoft.aspnetcore.identity.entityframeworkcore/9.0.0/lib/net9.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+ microsoft.aspnetcore.openapi/9.0.0/lib/net9.0/Microsoft.AspNetCore.OpenApi.dll
+ microsoft.bcl.asyncinterfaces/7.0.0/lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll
+ microsoft.data.sqlclient/5.2.2/ref/net8.0/Microsoft.Data.SqlClient.dll
+ microsoft.entityframeworkcore.abstractions/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+ microsoft.entityframeworkcore.relational/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
+ microsoft.entityframeworkcore.sqlserver/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.SqlServer.dll
+ microsoft.entityframeworkcore/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.dll
+ microsoft.extensions.caching.stackexchangeredis/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+ microsoft.extensions.dependencymodel/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.identity.client.extensions.msal/4.61.3/lib/net6.0/Microsoft.Identity.Client.Extensions.Msal.dll
+ microsoft.identity.client/4.61.3/lib/net6.0/Microsoft.Identity.Client.dll
+ microsoft.identitymodel.abstractions/8.3.1/lib/net9.0/Microsoft.IdentityModel.Abstractions.dll
+ microsoft.identitymodel.jsonwebtokens/8.3.1/lib/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+ microsoft.identitymodel.logging/8.3.1/lib/net9.0/Microsoft.IdentityModel.Logging.dll
+ microsoft.identitymodel.protocols.openidconnect/8.0.1/lib/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+ microsoft.identitymodel.protocols/8.0.1/lib/net9.0/Microsoft.IdentityModel.Protocols.dll
+ microsoft.identitymodel.tokens/8.3.1/lib/net9.0/Microsoft.IdentityModel.Tokens.dll
+ microsoft.openapi/1.6.22/lib/netstandard2.0/Microsoft.OpenApi.dll
+ microsoft.sqlserver.server/1.0.0/lib/netstandard2.0/Microsoft.SqlServer.Server.dll
+ pipelines.sockets.unofficial/2.2.8/lib/net5.0/Pipelines.Sockets.Unofficial.dll
+ rbush/4.0.0/lib/net8.0/RBush.dll
+ serilog.aspnetcore/8.0.3/lib/net8.0/Serilog.AspNetCore.dll
+ serilog.extensions.hosting/8.0.0/lib/net8.0/Serilog.Extensions.Hosting.dll
+ serilog.extensions.logging/8.0.0/lib/net8.0/Serilog.Extensions.Logging.dll
+ serilog.formatting.compact/2.0.0/lib/net7.0/Serilog.Formatting.Compact.dll
+ serilog.settings.configuration/8.0.4/lib/net8.0/Serilog.Settings.Configuration.dll
+ serilog.sinks.console/5.0.0/lib/net7.0/Serilog.Sinks.Console.dll
+ serilog.sinks.debug/2.0.0/lib/netstandard2.1/Serilog.Sinks.Debug.dll
+ serilog.sinks.file/6.0.0/lib/net8.0/Serilog.Sinks.File.dll
+ serilog.sinks.mssqlserver/8.0.0/lib/net8.0/Serilog.Sinks.MSSqlServer.dll
+ serilog/4.2.0/lib/net9.0/Serilog.dll
+ sixlabors.fonts/1.0.0/lib/netcoreapp3.1/SixLabors.Fonts.dll
+ stackexchange.redis/2.8.24/lib/net8.0/StackExchange.Redis.dll
+ swashbuckle.aspnetcore.swagger/7.2.0/lib/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+ swashbuckle.aspnetcore.swaggergen/7.2.0/lib/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+ swashbuckle.aspnetcore.swaggerui/7.2.0/lib/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+ system.clientmodel/1.0.0/lib/net6.0/System.ClientModel.dll
+ system.configuration.configurationmanager/8.0.1/lib/net8.0/System.Configuration.ConfigurationManager.dll
+ system.identitymodel.tokens.jwt/8.3.1/lib/net9.0/System.IdentityModel.Tokens.Jwt.dll
+ system.io.packaging/8.0.1/lib/net8.0/System.IO.Packaging.dll
+ system.memory.data/1.0.2/lib/netstandard2.0/System.Memory.Data.dll
+ system.security.cryptography.protecteddata/8.0.0/lib/net8.0/System.Security.Cryptography.ProtectedData.dll
+
+[analyzerReferences]
+<DOTNET>/packs/Microsoft.AspNetCore.App.Ref/9.0.10/analyzers/dotnet/cs/
+ Microsoft.AspNetCore.App.Analyzers.dll
+ Microsoft.AspNetCore.App.CodeFixes.dll
+ Microsoft.AspNetCore.Components.Analyzers.dll
+<DOTNET>/packs/Microsoft.AspNetCore.App.Ref/9.0.10/analyzers/dotnet/roslyn4.4/cs/
+ Microsoft.Extensions.Logging.Generators.dll
+ Microsoft.Extensions.Options.SourceGeneration.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/9.0.10/analyzers/dotnet/cs/
+ Microsoft.Interop.ComInterfaceGenerator.dll
+ Microsoft.Interop.JavaScript.JSImportGenerator.dll
+ Microsoft.Interop.LibraryImportGenerator.dll
+ Microsoft.Interop.SourceGeneration.dll
+ System.Text.Json.SourceGeneration.dll
+ System.Text.RegularExpressions.Generator.dll
+<DOTNET>/sdk/9.0.306/Sdks/Microsoft.NET.Sdk.Razor/source-generators/
+ Microsoft.AspNetCore.Razor.Utilities.Shared.dll
+ Microsoft.CodeAnalysis.Razor.Compiler.dll
+ Microsoft.Extensions.ObjectPool.dll
+ System.Collections.Immutable.dll
+<DOTNET>/sdk/9.0.306/Sdks/Microsoft.NET.Sdk.Web/analyzers/cs/
+ Microsoft.AspNetCore.Analyzers.dll
+ Microsoft.AspNetCore.Mvc.Analyzers.dll
+<DOTNET>/sdk/9.0.306/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
+<NUGET>/awssdk.s3/3.7.400.2/analyzers/dotnet/cs/
+ AWSSDK.S3.CodeAnalysis.dll
+ SharedAnalysisCode.dll
+<NUGET>/microsoft.codeanalysis.analyzers/3.3.4/analyzers/dotnet/cs/
+ Microsoft.CodeAnalysis.Analyzers.dll
+ Microsoft.CodeAnalysis.CSharp.Analyzers.dll
+<NUGET>/microsoft.entityframeworkcore.analyzers/9.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
+
+[analyzerConfigFiles]
+<DOTNET>/sdk/9.0.306/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_9_default.globalconfig
+obj/Debug/net9.0/Smart_Core.GeneratedMSBuildEditorConfig.editorconfig

@@ -43,7 +43,21 @@ public class UserService : IUserService
   public async Task<ApiResponse<UserDetailDto>> CreateUserAsync(CreateUserDto dto, string createdBy)
   {
     var departmentId = dto.DepartmentId;
-    if (!await _resourceAuthorization.IsCurrentUserSuperDevAsync())
+
+    // SuperAdmin role can only be assigned by another SuperAdmin; max 2 allowed system-wide
+    if (dto.Role == AppRoles.SuperAdmin)
+    {
+      if (!await _resourceAuthorization.IsCurrentUserSuperAdminAsync())
+        return ApiResponse<UserDetailDto>.FailureResponse("Only a SuperAdmin can create another SuperAdmin.");
+
+      var existingSuperAdmins = await _userManager.GetUsersInRoleAsync(AppRoles.SuperAdmin);
+      if (existingSuperAdmins.Count >= 2)
+        return ApiResponse<UserDetailDto>.FailureResponse("System already has the maximum of 2 SuperAdmin accounts.");
+
+      // SuperAdmin is not department-scoped
+      departmentId = null;
+    }
+    else if (!await _resourceAuthorization.IsCurrentUserSuperAdminAsync())
     {
       var currentDepartmentId = await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
       if (!currentDepartmentId.HasValue)
@@ -202,8 +216,8 @@ public class UserService : IUserService
     var cacheKey = $"{CacheKeys.UsersPrefix}staff:{scopeKey}:{filter.Search?.ToLower() ?? ""}:{filter.Status}:{filter.DepartmentId}:{filter.Role?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
     return await _cache.GetOrCreateAsync(cacheKey, async () =>
     {
-      // Excluded roles resolved via SQL subquery — no memory loading
-      var excludedRoleNames = new[] { AppRoles.Candidate, AppRoles.SuperDev };
+      // Excluded roles resolved via SQL subquery — Candidate excluded; SuperAdmin shown as read-only
+      var excludedRoleNames = new[] { AppRoles.Candidate };
       var excludedUserIds = _context.Set<Microsoft.AspNetCore.Identity.IdentityUserRole<string>>()
         .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
         .Where(x => excludedRoleNames.Contains(x.Name))
@@ -257,6 +271,7 @@ public class UserService : IUserService
         userDto.DepartmentId = user.DepartmentId;
         userDto.DepartmentNameEn = user.Department?.NameEn;
         userDto.DepartmentNameAr = user.Department?.NameAr;
+        userDto.IsProtected = user.Email == ProtectedUsers.SuperAdminEmail;
         userDtos.Add(userDto);
       }
 
@@ -355,16 +370,16 @@ public class UserService : IUserService
       return ApiResponse<UserDetailDto>.FailureResponse("User not found.");
     }
 
-    // Protect SuperDev user
-    if (user.Email?.Equals(ProtectedUsers.SuperDevEmail, StringComparison.OrdinalIgnoreCase) == true)
+    // Protect SuperAdmin user
+    if (user.Email?.Equals(ProtectedUsers.SuperAdminEmail, StringComparison.OrdinalIgnoreCase) == true)
     {
-      return ApiResponse<UserDetailDto>.FailureResponse("Cannot modify the SuperDev user.");
+      return ApiResponse<UserDetailDto>.FailureResponse("Cannot modify the SuperAdmin user.");
     }
 
     user.DisplayName = dto.DisplayName ?? user.DisplayName;
     user.FullName = dto.FullName ?? user.FullName;
     user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
-    if (!await _resourceAuthorization.IsCurrentUserSuperDevAsync())
+    if (!await _resourceAuthorization.IsCurrentUserSuperAdminAsync())
     {
       var currentDepartmentId = await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
       if (!currentDepartmentId.HasValue)
@@ -411,10 +426,10 @@ public class UserService : IUserService
       return ApiResponse<bool>.FailureResponse("User not found.");
     }
 
-    // Protect SuperDev user
-    if (user.Email?.Equals(ProtectedUsers.SuperDevEmail, StringComparison.OrdinalIgnoreCase) == true)
+    // Protect SuperAdmin user
+    if (user.Email?.Equals(ProtectedUsers.SuperAdminEmail, StringComparison.OrdinalIgnoreCase) == true)
     {
-      return ApiResponse<bool>.FailureResponse("Cannot block the SuperDev user.");
+      return ApiResponse<bool>.FailureResponse("Cannot block the SuperAdmin user.");
     }
 
     user.IsBlocked = true;
@@ -491,10 +506,10 @@ public class UserService : IUserService
       return ApiResponse<bool>.FailureResponse("User not found.");
     }
 
-    // Protect SuperDev user
-    if (user.Email?.Equals(ProtectedUsers.SuperDevEmail, StringComparison.OrdinalIgnoreCase) == true)
+    // Protect SuperAdmin user
+    if (user.Email?.Equals(ProtectedUsers.SuperAdminEmail, StringComparison.OrdinalIgnoreCase) == true)
     {
-      return ApiResponse<bool>.FailureResponse("Cannot deactivate the SuperDev user.");
+      return ApiResponse<bool>.FailureResponse("Cannot deactivate the SuperAdmin user.");
     }
 
     user.Status = UserStatus.Inactive;
@@ -520,10 +535,10 @@ public class UserService : IUserService
       return ApiResponse<bool>.FailureResponse("User not found.");
     }
 
-    // Protect SuperDev user
-    if (user.Email?.Equals(ProtectedUsers.SuperDevEmail, StringComparison.OrdinalIgnoreCase) == true)
+    // Protect SuperAdmin user
+    if (user.Email?.Equals(ProtectedUsers.SuperAdminEmail, StringComparison.OrdinalIgnoreCase) == true)
     {
-      return ApiResponse<bool>.FailureResponse("Cannot delete the SuperDev user.");
+      return ApiResponse<bool>.FailureResponse("Cannot delete the SuperAdmin user.");
     }
 
     // Soft delete

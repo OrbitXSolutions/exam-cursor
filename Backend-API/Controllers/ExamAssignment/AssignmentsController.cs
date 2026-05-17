@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.ExamAssignment;
@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.ExamAssignment;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class AssignmentsController : ControllerBase
 {
     private readonly IExamAssignmentService _service;
@@ -24,7 +24,7 @@ public class AssignmentsController : ControllerBase
 
     /// <summary>
     /// Get candidate list with ExamAssigned and ExamStarted flags.
-    /// Single unified endpoint — no extra calls needed.
+    /// Single unified endpoint â€” no extra calls needed.
     /// </summary>
     [HttpGet("candidates")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResponse<AssignmentCandidateDto>>), StatusCodes.Status200OK)]

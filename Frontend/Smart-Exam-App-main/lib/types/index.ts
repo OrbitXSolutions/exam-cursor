@@ -6,8 +6,6 @@ export enum UserRole {
   Instructor = "Instructor",
   Admin = "Admin",
   SuperAdmin = "SuperAdmin",
-  ProctorReviewer = "ProctorReviewer",
-  Auditor = "Auditor",
   Examiner = "Examiner",
   Proctor = "Proctor",
 }
@@ -183,6 +181,7 @@ export interface User {
   departmentId?: number | null;
   departmentNameEn?: string;
   departmentNameAr?: string;
+  isProtected?: boolean;
 }
 
 export interface AuthResponse {

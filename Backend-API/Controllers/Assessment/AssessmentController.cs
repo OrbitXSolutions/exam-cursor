@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Assessment;
+using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Controllers.Assessment;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class AssessmentController : ControllerBase
 {
     private readonly IAssessmentService _assessmentService;

@@ -56,13 +56,13 @@ public class ExamResultService : IExamResultService
         _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
     }
 
-    private async Task<bool> IsCurrentUserSuperDevAsync()
+    private async Task<bool> IsCurrentUserSuperAdminAsync()
     {
         var userId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(userId)) return false;
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        return await _userManager.IsInRoleAsync(user, AppRoles.SuperDev);
+        return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
     #region Result Management
@@ -990,14 +990,14 @@ public class ExamResultService : IExamResultService
     }
 
     public async Task<ApiResponse<CandidateResultListResponseDto>> GetCandidateResultListAsync(
-        int? examId, int pageNumber, int pageSize, bool excludeTerminated = true, bool onlyTerminated = false, string? statusFilter = null)
+        int? examId, int pageNumber, int pageSize, bool excludeTerminated = true, bool onlyTerminated = false, string? statusFilter = null, string? search = null, string? resultStatus = null)
     {
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 100;
 
         var scopeKeyCrl = await _resourceAuthorization.GetCurrentScopeCacheKeyAsync();
         var examScopeCrl = examId.HasValue && examId.Value > 0 ? examId.Value.ToString() : "all";
-        var statusKeyCrl = $"{excludeTerminated}:{onlyTerminated}:{statusFilter ?? "all"}";
+        var statusKeyCrl = $"{excludeTerminated}:{onlyTerminated}:{statusFilter ?? "all"}:{search ?? ""}:{resultStatus ?? "all"}";
         var cacheKeyCrl = CacheKeys.ResultsCandidateList(examScopeCrl, scopeKeyCrl, pageNumber, pageSize, statusKeyCrl);
         if (_cache.TryGet<CandidateResultListResponseDto>(cacheKeyCrl, out var cachedCrl) && cachedCrl != null)
             return ApiResponse<CandidateResultListResponseDto>.SuccessResponse(cachedCrl);
@@ -1022,6 +1022,42 @@ public class ExamResultService : IExamResultService
         if (examId.HasValue && examId.Value > 0)
         {
             attemptsQuery = attemptsQuery.Where(a => a.ExamId == examId.Value);
+        }
+
+        // Server-side free-text search on candidate name, email, roll no
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim();
+            attemptsQuery = attemptsQuery.Where(a =>
+                a.Candidate.FullName.Contains(s) ||
+                (a.Candidate.Email != null && a.Candidate.Email.Contains(s)) ||
+                (a.Candidate.RollNo != null && a.Candidate.RollNo.Contains(s)));
+        }
+
+        // Server-side result status filter (operates on the grading/result tables via subquery)
+        if (!string.IsNullOrEmpty(resultStatus) && resultStatus != "all")
+        {
+            switch (resultStatus.ToLowerInvariant())
+            {
+                case "passed":
+                    attemptsQuery = attemptsQuery.Where(a =>
+                        _context.Set<Result>().Any(r => r.AttemptId == a.Id && r.IsPassed == true));
+                    break;
+                case "failed":
+                    attemptsQuery = attemptsQuery.Where(a =>
+                        _context.Set<Result>().Any(r => r.AttemptId == a.Id && r.IsPassed == false));
+                    break;
+                case "under_review":
+                    attemptsQuery = attemptsQuery.Where(a =>
+                        _context.GradingSessions.Any(gs => gs.AttemptId == a.Id &&
+                            (gs.Status == GradingStatus.Pending || gs.Status == GradingStatus.ManualRequired)) ||
+                        !_context.Set<Result>().Any(r => r.AttemptId == a.Id));
+                    break;
+                case "not_published":
+                    attemptsQuery = attemptsQuery.Where(a =>
+                        _context.Set<Result>().Any(r => r.AttemptId == a.Id && !r.IsPublishedToCandidate));
+                    break;
+            }
         }
 
         var groupedAttemptsQuery = attemptsQuery

@@ -28,8 +28,6 @@ import {
   getQuestionSubjects,
   getQuestionTopics,
   type QuestionType,
-  type QuestionSubject,
-  type QuestionTopic,
 } from "@/lib/api/lookups"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
@@ -52,6 +50,7 @@ import {
   Brain,
   Zap,
 } from "lucide-react"
+import { SearchableSelectInput } from "@/components/ui/searchable-select-input"
 
 // Question Type IDs from backend
 const QUESTION_TYPE = {
@@ -81,8 +80,6 @@ export default function AiStudioPage() {
 
   // Lookups
   const [types, setTypes] = useState<QuestionType[]>([])
-  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
-  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [isLoadingLookups, setIsLoadingLookups] = useState(true)
 
   // Form
@@ -110,38 +107,17 @@ export default function AiStudioPage() {
     fetchLookups()
   }, [])
 
-  useEffect(() => {
-    if (formData.subjectId) {
-      fetchTopics(formData.subjectId)
-    } else {
-      setTopics([])
-    }
-  }, [formData.subjectId])
-
   const fetchLookups = async () => {
     try {
-      const [typesRes, subjectsRes] = await Promise.all([
-        getQuestionTypes(),
-        getQuestionSubjects({ pageSize: 100 }),
-      ])
+      const typesRes = await getQuestionTypes()
       const allTypes = typesRes?.items || []
       // Filter to only supported types (MCQ Single, MCQ Multi, True/False)
       setTypes(allTypes.filter((t: QuestionType) => SUPPORTED_TYPES.includes(t.id)))
-      setSubjects(subjectsRes?.items || [])
     } catch (err) {
       console.error("Failed to load lookups:", err)
       toast.error(localizeText("Failed to load form data", "فشل تحميل بيانات النموذج", language))
     } finally {
       setIsLoadingLookups(false)
-    }
-  }
-
-  const fetchTopics = async (subjectId: number) => {
-    try {
-      const res = await getQuestionTopics({ subjectId, pageSize: 100 })
-      setTopics(res?.items || [])
-    } catch {
-      setTopics([])
     }
   }
 
@@ -397,23 +373,17 @@ export default function AiStudioPage() {
                   {language === "ar" ? "المادة" : "Subject"}
                   <span className="text-destructive">*</span>
                 </Label>
-                <Select
-                  value={formData.subjectId ? String(formData.subjectId) : ""}
-                  onValueChange={(val) =>
+                <SearchableSelectInput
+                  value={formData.subjectId || null}
+                  onChange={(val) =>
                     setFormData((prev) => ({ ...prev, subjectId: Number(val), topicId: null }))
                   }
-                >
-                  <SelectTrigger className="border-2 h-11 w-full">
-                    <SelectValue placeholder={language === "ar" ? "اختر المادة" : "Select subject"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subjects.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {language === "ar" ? s.nameAr || s.nameEn : s.nameEn || s.nameAr}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  fetchFn={(search, page) =>
+                    getQuestionSubjects({ search, pageNumber: page, pageSize: 20 })
+                  }
+                  placeholder={language === "ar" ? "اختر المادة" : "Select subject"}
+                  language={language}
+                />
               </div>
 
               {/* Topic */}
@@ -422,24 +392,24 @@ export default function AiStudioPage() {
                   {language === "ar" ? "الموضوع" : "Topic"}
                   <span className="text-destructive">*</span>
                 </Label>
-                <Select
-                  value={formData.topicId ? String(formData.topicId) : ""}
-                  onValueChange={(val) =>
+                <SearchableSelectInput
+                  value={formData.topicId}
+                  onChange={(val) =>
                     setFormData((prev) => ({ ...prev, topicId: Number(val) }))
                   }
-                  disabled={topics.length === 0}
-                >
-                  <SelectTrigger className="border-2 h-11 w-full">
-                    <SelectValue placeholder={language === "ar" ? "اختر الموضوع" : "Select topic"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {topics.map((tp) => (
-                      <SelectItem key={tp.id} value={String(tp.id)}>
-                        {language === "ar" ? tp.nameAr || tp.nameEn : tp.nameEn || tp.nameAr}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  fetchFn={(search, page) =>
+                    getQuestionTopics({
+                      subjectId: formData.subjectId,
+                      search,
+                      pageNumber: page,
+                      pageSize: 20,
+                    })
+                  }
+                  placeholder={language === "ar" ? "اختر الموضوع" : "Select topic"}
+                  disabled={!formData.subjectId}
+                  language={language}
+                  resetOn={formData.subjectId}
+                />
               </div>
 
               {/* Question Type */}

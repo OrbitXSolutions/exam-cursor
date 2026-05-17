@@ -65,8 +65,8 @@ export default function UserPermissionsPage() {
         page: 1,
         pageSize: 200,
       })
-      // Hide Candidate (separate page) and SuperDev from permissions list
-      const hidden = ["Candidate", "SuperDev"]
+      // Hide Candidate (separate page) and SuperAdmin from permissions list
+      const hidden = ["Candidate", "SuperAdmin"]
       setUsers(res.items.filter(u => !hidden.includes(u.role as string)))
     } catch {
       toast.error(language === "ar" ? "فشل تحميل المستخدمين" : "Failed to load users")
@@ -222,7 +222,7 @@ export default function UserPermissionsPage() {
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case "SuperDev":
+      case "SuperAdmin":
       case "Admin":
         return "default" as const
       case "Instructor":
@@ -246,16 +246,13 @@ export default function UserPermissionsPage() {
       Candidate: "مرشح",
       Examiner: "ممتحن",
       Proctor: "مراقب",
-      SuperDev: "مطور",
-      ProctorReviewer: "مراجع المراقبة",
-      Auditor: "مدقق",
       SuperAdmin: "مسؤول أعلى",
     }
     return map[role] || role
   }
 
-  // Filter out SuperDev and Candidate from assignable roles
-  const assignableRoles = roles.filter((r) => r.name !== "SuperDev" && r.name !== "Candidate")
+  // Filter out SuperAdmin and Candidate from assignable roles
+  const assignableRoles = roles.filter((r) => r.name !== "SuperAdmin" && r.name !== "Candidate")
 
   if (loading && users.length === 0) {
     return (

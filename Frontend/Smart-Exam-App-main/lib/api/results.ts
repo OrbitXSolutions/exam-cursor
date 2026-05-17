@@ -122,6 +122,8 @@ export async function getCandidateResultList(
     excludeTerminated?: boolean;
     onlyTerminated?: boolean;
     statusFilter?: string;
+    search?: string;
+    resultStatus?: string;
   },
 ): Promise<CandidateResultListResponse> {
   const query = new URLSearchParams();
@@ -132,8 +134,10 @@ export async function getCandidateResultList(
     query.set("excludeTerminated", String(params.excludeTerminated));
   if (params?.onlyTerminated !== undefined)
     query.set("onlyTerminated", String(params.onlyTerminated));
-  if (params?.statusFilter)
-    query.set("statusFilter", params.statusFilter);
+  if (params?.statusFilter) query.set("statusFilter", params.statusFilter);
+  if (params?.search?.trim()) query.set("search", params.search.trim());
+  if (params?.resultStatus && params.resultStatus !== "all")
+    query.set("resultStatus", params.resultStatus);
 
   const raw = await apiClient.get<unknown>(
     `/ExamResult/candidate-result-list?${query}`,

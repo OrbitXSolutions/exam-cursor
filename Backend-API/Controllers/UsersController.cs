@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Auth;
 using Smart_Core.Application.DTOs.Common;
@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -155,7 +155,7 @@ public class UsersController : ControllerBase
     /// Delete user (soft delete)
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = AppRoles.SuperDev)]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteUser(string id)

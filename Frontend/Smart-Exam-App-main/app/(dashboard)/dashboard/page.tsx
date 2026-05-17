@@ -50,7 +50,7 @@ import {
 import { UserRole } from "@/lib/types"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { getLicenseStatus, type LicenseStatusResult } from "@/lib/api/license"
-import { AlertTriangle as AlertTriangleIcon, ShieldAlert, Info } from "lucide-react"
+import { AlertTriangle as AlertTriangleIcon, ShieldAlert, XCircle, Lock } from "lucide-react"
 
 export default function DashboardPage() {
   const { t, language } = useI18n()
@@ -170,60 +170,132 @@ export default function DashboardPage() {
   const licenseWarningBanner = () => {
     if (!licenseStatus || licenseStatus.stateText === "Active") return null
 
-    let bgClass = ""
-    let borderClass = ""
-    let textClass = ""
-    let icon = <Info className="h-5 w-5" />
-    let message = ""
-
     switch (licenseStatus.stateText) {
+
       case "Warning":
-        bgClass = "bg-yellow-50 dark:bg-yellow-950/30"
-        borderClass = "border-yellow-300 dark:border-yellow-700"
-        textClass = "text-yellow-800 dark:text-yellow-200"
-        icon = <AlertTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-        message = language === "ar"
-          ? `تنتهي صلاحية الرخصة خلال ${licenseStatus.daysRemaining} يوم`
-          : `License expires in ${licenseStatus.daysRemaining} days`
-        break
+        return (
+          <div className="rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-950/30 p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangleIcon className="h-5 w-5 mt-0.5 shrink-0 text-yellow-600 dark:text-yellow-400" />
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base text-yellow-800 dark:text-yellow-200">
+                  {language === "ar"
+                    ? `تنبيه: الرخصة تنتهي خلال ${licenseStatus.daysRemaining} يوم`
+                    : `Notice: License Expires in ${licenseStatus.daysRemaining} Day(s)`}
+                </p>
+                <p className="text-sm mt-0.5 text-yellow-700 dark:text-yellow-300">
+                  {language === "ar"
+                    ? "يقترب موعد انتهاء الرخصة. بعد الانتهاء ستبدأ فترة السماح تلقائياً، ثم يدخل النظام وضع القراءة فقط."
+                    : "Your license is approaching its expiry. After it expires a grace period begins, then the system enters Read-Only mode."}
+                </p>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-sm text-yellow-700 dark:text-yellow-300">
+                    <Clock className="h-3.5 w-3.5" />
+                    {language === "ar"
+                      ? `مدة فترة السماح: ${licenseStatus.gracePeriodDays ?? "—"} يوم بعد الانتهاء`
+                      : `Grace period: ${licenseStatus.gracePeriodDays ?? "—"} day(s) after expiry`}
+                  </div>
+                  <Link href="/settings/license" className="text-sm font-semibold text-yellow-700 dark:text-yellow-300 underline underline-offset-2 hover:text-yellow-900 dark:hover:text-yellow-100 shrink-0">
+                    {language === "ar" ? "عرض الرخصة ←" : "View License →"}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
       case "GracePeriod":
-        bgClass = "bg-orange-50 dark:bg-orange-950/30"
-        borderClass = "border-orange-300 dark:border-orange-700"
-        textClass = "text-orange-800 dark:text-orange-200"
-        icon = <ShieldAlert className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-        message = language === "ar"
-          ? `انتهت صلاحية الرخصة. فترة السماح: ${licenseStatus.graceDaysRemaining} يوم متبقي`
-          : `License expired. Grace period: ${licenseStatus.graceDaysRemaining} days remaining`
-        break
+        return (
+          <div className="rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/30 p-4">
+            <div className="flex items-start gap-3">
+              <ShieldAlert className="h-5 w-5 mt-0.5 shrink-0 text-orange-600 dark:text-orange-400" />
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base text-orange-800 dark:text-orange-200">
+                  {language === "ar"
+                    ? `فترة السماح نشطة — ${licenseStatus.graceDaysRemaining} يوم متبقي من أصل ${licenseStatus.gracePeriodDays}`
+                    : `Grace Period Active — ${licenseStatus.graceDaysRemaining} of ${licenseStatus.gracePeriodDays} Day(s) Remaining`}
+                </p>
+                <p className="text-sm mt-0.5 text-orange-700 dark:text-orange-300">
+                  {language === "ar"
+                    ? "انتهت صلاحية الرخصة. النظام في وضع فترة السماح المؤقتة. جميع الوظائف لا تزال تعمل. بعد انتهاء فترة السماح سيدخل النظام وضع القراءة فقط."
+                    : "Your license has expired. The system is in a temporary grace period — all features are still available. When grace ends, the system will enter Read-Only mode."}
+                </p>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-sm text-orange-700 dark:text-orange-300">
+                    <AlertTriangleIcon className="h-3.5 w-3.5" />
+                    {language === "ar" ? "يُرجى التجديد فوراً لتجنب انقطاع الخدمة" : "Renew immediately to avoid service disruption"}
+                  </div>
+                  <Link href="/settings/license" className="text-sm font-semibold text-orange-700 dark:text-orange-300 underline underline-offset-2 hover:text-orange-900 dark:hover:text-orange-100 shrink-0">
+                    {language === "ar" ? "تجديد الرخصة ←" : "Renew License →"}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
       case "Expired":
-        bgClass = "bg-red-50 dark:bg-red-950/30"
-        borderClass = "border-red-300 dark:border-red-700"
-        textClass = "text-red-800 dark:text-red-200"
-        icon = <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400" />
-        message = language === "ar"
-          ? "انتهت صلاحية الرخصة. النظام في وضع القراءة فقط"
-          : "License expired. System is in read-only mode"
-        break
+        return (
+          <div className="rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/30 p-4">
+            <div className="flex items-start gap-3">
+              <XCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base text-red-800 dark:text-red-200">
+                  {language === "ar" ? "منتهي الصلاحية — وضع القراءة فقط مُفعَّل الآن" : "Expired — Read-Only Mode is Now Active"}
+                </p>
+                <p className="text-sm mt-0.5 text-red-700 dark:text-red-300">
+                  {language === "ar"
+                    ? "انتهت فترة السماح. النظام يعمل حالياً بوضع القراءة فقط. لا يمكن إجراء أي تعديلات — تسجيل الدخول وعرض البيانات متاح فقط."
+                    : "The grace period has ended. The system is currently operating in Read-Only mode. No changes can be made — login and data viewing remain available."}
+                </p>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-sm text-red-700 dark:text-red-300">
+                    <Lock className="h-3.5 w-3.5" />
+                    {language === "ar" ? "جميع عمليات الكتابة محظورة (HTTP 403)" : "All write operations blocked (HTTP 403)"}
+                  </div>
+                  <Link href="/settings/license" className="text-sm font-semibold text-red-700 dark:text-red-300 underline underline-offset-2 hover:text-red-900 dark:hover:text-red-100 shrink-0">
+                    {language === "ar" ? "تجديد الرخصة ←" : "Renew License →"}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
       case "Invalid":
       case "Missing":
-        bgClass = "bg-yellow-50 dark:bg-yellow-950/30"
-        borderClass = "border-yellow-300 dark:border-yellow-700"
-        textClass = "text-yellow-800 dark:text-yellow-200"
-        icon = <AlertTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-        message = language === "ar"
-          ? "لم يتم العثور على رخصة صالحة. يرجى التواصل مع المسؤول"
-          : "No valid license found. Please contact your administrator"
-        break
+        return (
+          <div className="rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/30 p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangleIcon className="h-5 w-5 mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base text-red-800 dark:text-red-200">
+                  {language === "ar"
+                    ? (licenseStatus.stateText === "Invalid" ? "رخصة غير صالحة — النظام محظور" : "لا توجد رخصة — النظام محظور")
+                    : (licenseStatus.stateText === "Invalid" ? "Invalid License — System Blocked" : "No License Found — System Blocked")}
+                </p>
+                <p className="text-sm mt-0.5 text-red-700 dark:text-red-300">
+                  {language === "ar"
+                    ? "النظام يعمل بدون رخصة صالحة. جميع عمليات الكتابة محظورة. يرجى رفع ملف رخصة صالح فوراً لاستعادة الخدمة الكاملة."
+                    : "The system is running without a valid license. All write operations are blocked. Upload a valid license file immediately to restore full service."}
+                </p>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-sm text-red-700 dark:text-red-300">
+                    <Lock className="h-3.5 w-3.5" />
+                    {language === "ar" ? "جميع عمليات الكتابة محظورة" : "All write operations are blocked"}
+                  </div>
+                  <Link href="/settings/license" className="text-sm font-semibold text-red-700 dark:text-red-300 underline underline-offset-2 hover:text-red-900 dark:hover:text-red-100 shrink-0">
+                    {language === "ar" ? "رفع رخصة ←" : "Upload License →"}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
       default:
         return null
     }
-
-    return (
-      <div className={`flex items-center gap-3 rounded-lg border p-4 ${bgClass} ${borderClass} ${textClass}`}>
-        {icon}
-        <span className="text-sm font-medium">{message}</span>
-      </div>
-    )
   }
 
   return (

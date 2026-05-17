@@ -23,9 +23,8 @@ import {
   getQuestionSubjects,
   getQuestionTopics,
   type QuestionType,
-  type QuestionSubject,
-  type QuestionTopic,
 } from "@/lib/api/lookups"
+import { SearchableSelectInput } from "@/components/ui/searchable-select-input"
 import { DifficultyLevel } from "@/lib/types"
 import { toast } from "sonner"
 import {
@@ -55,6 +54,8 @@ const QUESTION_TYPE = {
   SUBJECTIVE: 4,
 }
 
+const PAGE_SIZE = 20
+
 interface OptionInput {
   id: string
   textEn: string
@@ -73,8 +74,6 @@ const CreateQuestionPage = () => {
   const errorRef = useRef<HTMLDivElement>(null)
 
   const [types, setTypes] = useState<QuestionType[]>([])
-  const [subjects, setSubjects] = useState<QuestionSubject[]>([])
-  const [topics, setTopics] = useState<QuestionTopic[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [formErrors, setFormErrors] = useState<string[]>([])
@@ -197,54 +196,22 @@ const CreateQuestionPage = () => {
     }
   }, [formErrors])
 
-  // Fetch topics when subject changes
-  useEffect(() => {
-    if (!formData.subjectId) {
-      setTopics([])
-      setFormData((prev) => ({ ...prev, topicId: "" }))
-      return
-    }
-    const fetchTopics = async () => {
-      try {
-        const res = await getQuestionTopics({ subjectId: Number(formData.subjectId), pageSize: 100 })
-        setTopics(res?.items || [])
-        setFormData((prev) => ({ ...prev, topicId: "" })) // Reset topic when subject changes
-      } catch (error) {
-        console.error("Failed to fetch topics:", error)
-        setTopics([])
-      }
-    }
-    fetchTopics()
-  }, [formData.subjectId])
-
   const fetchLookups = async () => {
     try {
-      const [typesRes, subjectsRes] = await Promise.all([
-        getQuestionTypes(),
-        getQuestionSubjects({ pageSize: 100 }),
-      ])
+      const typesRes = await getQuestionTypes()
 
       // Types - response is PaginatedResponse<QuestionType>
       const typesData = typesRes?.items || []
       setTypes(typesData)
-
-      // Subjects - response is PaginatedResponse<QuestionSubject>
-      const subjectsData = subjectsRes?.items || []
-      setSubjects(subjectsData)
 
       // Default to MCQ Single if available
       if (typesData.length > 0) {
         const mcqType = typesData.find((t) => t.nameEn?.toLowerCase().includes("single") || t.nameEn?.toLowerCase() === "mcq single") || typesData[0]
         setFormData((prev) => ({ ...prev, questionTypeId: String(mcqType.id) }))
       }
-
-      // Default to first subject if available
-      if (subjectsData.length > 0) {
-        setFormData((prev) => ({ ...prev, subjectId: String(subjectsData[0].id) }))
-      }
     } catch (error) {
       console.error("[v0] Failed to fetch lookups:", error)
-      toast.error(localizeText("Failed to load question types and categories", "فشل تحميل أنواع وتصنيفات الأسئلة", language))
+      toast.error(localizeText("Failed to load question types", "فشل تحميل أنواع الأسئلة", language))
     }
     setIsLoading(false)
   }
@@ -650,57 +617,41 @@ const CreateQuestionPage = () => {
                       {language === "ar" ? "المادة" : "Subject"}
                       <span className="text-destructive">*</span>
                     </Label>
-                    <Select
-                      value={formData.subjectId}
-                      onValueChange={(value) => setFormData({ ...formData, subjectId: value })}
-                    >
-                      <SelectTrigger id="subject" className="border-2 h-11 w-full">
-                        <SelectValue placeholder={language === "ar" ? "اختر المادة" : "Select subject"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.length === 0 ? (
-                          <SelectItem value="none" disabled>
-                            {language === "ar" ? "لا توجد مواد" : "No subjects available"}
-                          </SelectItem>
-                        ) : (
-                          subjects.map((subject) => (
-                            <SelectItem key={subject.id} value={String(subject.id)}>
-                              {language === "ar" ? subject.nameAr : subject.nameEn}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelectInput
+                      id="subject"
+                      value={formData.subjectId || null}
+                      onChange={(val) => {
+                        setFormData((prev) => ({ ...prev, subjectId: val, topicId: "" }))
+                      }}
+                      fetchFn={(search, page) =>
+                        getQuestionSubjects({ search, pageNumber: page, pageSize: PAGE_SIZE })
+                      }
+                      placeholder={language === "ar" ? "اختر المادة" : "Select subject"}
+                      language={language}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="topic" className="text-sm font-semibold flex items-center gap-2">
                       {language === "ar" ? "الموضوع" : "Topic"}
                     </Label>
-                    <Select
-                      value={formData.topicId}
-                      onValueChange={(value) => setFormData({ ...formData, topicId: value })}
-                      disabled={!formData.subjectId || topics.length === 0}
-                    >
-                      <SelectTrigger id="topic" className="border-2 h-11 w-full">
-                        <SelectValue placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {topics.length === 0 ? (
-                          <SelectItem value="none" disabled>
-                            {!formData.subjectId
-                              ? (language === "ar" ? "اختر مادة أولاً" : "Select a subject first")
-                              : (language === "ar" ? "لا توجد مواضيع" : "No topics for this subject")}
-                          </SelectItem>
-                        ) : (
-                          topics.map((topic) => (
-                            <SelectItem key={topic.id} value={String(topic.id)}>
-                              {language === "ar" ? topic.nameAr : topic.nameEn}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelectInput
+                      id="topic"
+                      value={formData.topicId || null}
+                      onChange={(val) => setFormData((prev) => ({ ...prev, topicId: val }))}
+                      fetchFn={(search, page) =>
+                        getQuestionTopics({
+                          subjectId: Number(formData.subjectId),
+                          search,
+                          pageNumber: page,
+                          pageSize: PAGE_SIZE,
+                        })
+                      }
+                      placeholder={language === "ar" ? "اختر الموضوع (اختياري)" : "Select topic (optional)"}
+                      disabled={!formData.subjectId}
+                      language={language}
+                      resetOn={formData.subjectId}
+                    />
                   </div>
                 </div>
 

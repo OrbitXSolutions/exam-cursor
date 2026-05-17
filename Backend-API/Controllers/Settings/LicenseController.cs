@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Common;
@@ -43,7 +43,7 @@ public class LicenseController : ControllerBase
     /// Upload a new license.json file. Admin only.
     /// </summary>
     [HttpPost("upload")]
-    [Authorize(Roles = $"{AppRoles.Admin},{AppRoles.SuperDev}")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
     public async Task<IActionResult> Upload(IFormFile file)
     {
         if (file == null || file.Length == 0)

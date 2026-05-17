@@ -74,7 +74,7 @@ function TopicsContent() {
 
   // Load subjects once for dropdown
   useEffect(() => {
-    getQuestionSubjects({ pageSize: 1000 })
+    getQuestionSubjects({ pageSize: 200 })
       .then((res) => setSubjects(res.items || []))
       .catch(() => {})
   }, [])

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Batch;
 using Smart_Core.Application.DTOs.Common;
@@ -11,7 +11,7 @@ namespace Smart_Core.Controllers.Batch;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin}")]
 public class BatchesController : ControllerBase
 {
     private readonly IBatchService _service;

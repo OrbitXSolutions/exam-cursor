@@ -107,7 +107,17 @@ class ApiClient {
         // Handle license enforcement 403
         if (response.status === 403) {
           const licenseState = response.headers.get("X-License-State");
-          if (licenseState === "Expired") {
+          const bodyMsg: string = jsonResponse.message || "";
+          const isLicenseExpired =
+            licenseState === "Expired" ||
+            bodyMsg.toLowerCase().includes("license expired") ||
+            bodyMsg.toLowerCase().includes("read-only mode");
+
+          if (isLicenseExpired) {
+            // Broadcast globally so any mounted dialog can react
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("licenseExpired"));
+            }
             throw new Error(
               language === "ar"
                 ? "انتهت صلاحية الرخصة. النظام في وضع القراءة فقط. يرجى التواصل مع المسؤول لتجديد الرخصة."

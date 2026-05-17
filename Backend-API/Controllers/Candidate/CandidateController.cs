@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.Candidate;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = AppRoles.Candidate)]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Candidate}")]
 public class CandidateController : ControllerBase
 {
     private readonly ICandidateService _candidateService;

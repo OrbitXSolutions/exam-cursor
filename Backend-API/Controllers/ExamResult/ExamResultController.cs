@@ -28,7 +28,7 @@ public class ExamResultController : ControllerBase
     /// Finalize result from completed grading session
     /// </summary>
     [HttpPost("finalize/{gradingSessionId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> FinalizeResult(int gradingSessionId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -40,7 +40,7 @@ public class ExamResultController : ControllerBase
     /// Get result by ID
     /// </summary>
     [HttpGet("{resultId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetResult(int resultId)
     {
         var result = await _examResultService.GetResultByIdAsync(resultId);
@@ -51,7 +51,7 @@ public class ExamResultController : ControllerBase
     /// Get result by attempt ID
     /// </summary>
     [HttpGet("attempt/{attemptId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetResultByAttempt(int attemptId)
     {
         var result = await _examResultService.GetResultByAttemptAsync(attemptId);
@@ -62,7 +62,7 @@ public class ExamResultController : ControllerBase
     /// Get all results with pagination and filtering
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetResults([FromQuery] ResultSearchDto searchDto)
     {
         var result = await _examResultService.GetResultsAsync(searchDto);
@@ -73,7 +73,7 @@ public class ExamResultController : ControllerBase
     /// Get results for a specific exam
     /// </summary>
     [HttpGet("exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetExamResults(int examId, [FromQuery] ResultSearchDto searchDto)
     {
         var result = await _examResultService.GetExamResultsAsync(examId, searchDto);
@@ -84,7 +84,7 @@ public class ExamResultController : ControllerBase
     /// Update result after re-grading
     /// </summary>
     [HttpPut("update-from-regrade/{gradingSessionId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> UpdateResultFromRegrading(int gradingSessionId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -100,7 +100,7 @@ public class ExamResultController : ControllerBase
     /// Publish a single result to candidate
     /// </summary>
     [HttpPost("{resultId}/publish")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> PublishResult(int resultId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -112,7 +112,7 @@ public class ExamResultController : ControllerBase
     /// Unpublish a result (Admin only)
     /// </summary>
     [HttpPost("{resultId}/unpublish")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> UnpublishResult(int resultId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -124,7 +124,7 @@ public class ExamResultController : ControllerBase
     /// Bulk publish results
     /// </summary>
     [HttpPost("publish/bulk")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> BulkPublishResults([FromBody] BulkPublishResultsDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -136,7 +136,7 @@ public class ExamResultController : ControllerBase
     /// Publish all results for an exam
     /// </summary>
     [HttpPost("publish/exam")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> PublishExamResults([FromBody] PublishExamResultsDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -151,6 +151,7 @@ public class ExamResultController : ControllerBase
     /// <summary>
     /// Get candidate's result for an attempt (only if published)
     /// </summary>
+    [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("my-result/{attemptId}")]
     public async Task<IActionResult> GetMyResult(int attemptId)
     {
@@ -167,6 +168,7 @@ public class ExamResultController : ControllerBase
     /// <summary>
     /// Get all published results for the current candidate
     /// </summary>
+    [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("my-results")]
     public async Task<IActionResult> GetMyResults()
     {
@@ -183,6 +185,7 @@ public class ExamResultController : ControllerBase
     /// <summary>
     /// Get candidate's exam summary
     /// </summary>
+    [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("my-summary/exam/{examId}")]
     public async Task<IActionResult> GetMyExamSummary(int examId)
     {
@@ -204,7 +207,7 @@ public class ExamResultController : ControllerBase
     /// Generate/refresh exam report
     /// </summary>
     [HttpPost("report/generate")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GenerateExamReport([FromBody] GenerateExamReportDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -216,7 +219,7 @@ public class ExamResultController : ControllerBase
     /// Get latest exam report
     /// </summary>
     [HttpGet("report/exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetExamReport(int examId)
     {
         var result = await _examResultService.GetExamReportAsync(examId);
@@ -227,7 +230,7 @@ public class ExamResultController : ControllerBase
     /// Generate/refresh question performance reports
     /// </summary>
     [HttpPost("report/question-performance/generate")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GenerateQuestionPerformance([FromBody] GenerateQuestionPerformanceDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -239,7 +242,7 @@ public class ExamResultController : ControllerBase
     /// Get question performance reports for an exam
     /// </summary>
     [HttpGet("report/question-performance/exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetQuestionPerformance(int examId)
     {
         var result = await _examResultService.GetQuestionPerformanceAsync(examId);
@@ -250,7 +253,7 @@ public class ExamResultController : ControllerBase
     /// Get result dashboard for an exam
     /// </summary>
     [HttpGet("dashboard/exam/{examId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetResultDashboard(int examId)
     {
         var result = await _examResultService.GetResultDashboardAsync(examId);
@@ -265,7 +268,7 @@ public class ExamResultController : ControllerBase
     /// Refresh candidate exam summary
     /// </summary>
     [HttpPost("summary/refresh")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> RefreshCandidateSummary([FromQuery] int examId, [FromQuery] string candidateId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -277,7 +280,7 @@ public class ExamResultController : ControllerBase
     /// Get all candidate summaries (optionally filter by exam). Omit examId to load all candidates across exams.
     /// </summary>
     [HttpGet("summary/candidates")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetCandidateSummaries(
         [FromQuery] int? examId,
         [FromQuery] int pageNumber = 1,
@@ -291,16 +294,18 @@ public class ExamResultController : ControllerBase
     /// Get combined candidate result list with grading status and all required fields for result page
     /// </summary>
     [HttpGet("candidate-result-list")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetCandidateResultList(
         [FromQuery] int? examId,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] bool excludeTerminated = true,
         [FromQuery] bool onlyTerminated = false,
-        [FromQuery] string? statusFilter = null)
+        [FromQuery] string? statusFilter = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? resultStatus = null)
     {
-        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize, excludeTerminated, onlyTerminated, statusFilter);
+        var result = await _examResultService.GetCandidateResultListAsync(examId, pageNumber, pageSize, excludeTerminated, onlyTerminated, statusFilter, search, resultStatus);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -308,7 +313,7 @@ public class ExamResultController : ControllerBase
     /// Get all candidate summaries for an exam (path variant for backward compatibility)
     /// </summary>
     [HttpGet("summary/exam/{examId}/candidates")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetExamCandidateSummaries(
       int examId,
   [FromQuery] int pageNumber = 1,
@@ -326,7 +331,7 @@ public class ExamResultController : ControllerBase
     /// Request a result export job
     /// </summary>
     [HttpPost("export/request")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> RequestExport([FromBody] RequestExportDto dto)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -338,7 +343,7 @@ public class ExamResultController : ControllerBase
     /// Get export job by ID
     /// </summary>
     [HttpGet("export/{jobId}")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetExportJob(int jobId)
     {
         var result = await _examResultService.GetExportJobAsync(jobId);
@@ -349,7 +354,7 @@ public class ExamResultController : ControllerBase
     /// Get export jobs with filtering
     /// </summary>
     [HttpGet("export")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetExportJobs([FromQuery] ExportJobSearchDto searchDto)
     {
         var result = await _examResultService.GetExportJobsAsync(searchDto);
@@ -360,7 +365,7 @@ public class ExamResultController : ControllerBase
     /// Cancel a pending export job
     /// </summary>
     [HttpPost("export/{jobId}/cancel")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> CancelExportJob(int jobId)
     {
         var userId = _currentUserService.UserId ?? "system";
@@ -372,7 +377,7 @@ public class ExamResultController : ControllerBase
     /// Download exported file (placeholder - implement actual file serving)
     /// </summary>
     [HttpGet("export/{jobId}/download")]
-    [Authorize(Roles = "Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> DownloadExport(int jobId)
     {
         var jobResult = await _examResultService.GetExportJobAsync(jobId);

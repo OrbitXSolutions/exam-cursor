@@ -108,7 +108,7 @@ const candidateNavItems: NavItem[] = [
 const questionBankNavGroup: NavGroup = {
   icon: Library,
   labelKey: "nav.questionBank",
-  roles: [UserRole.Admin, UserRole.Instructor],
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor],
   children: [
     { icon: BookOpen, labelKey: "nav.subjects", href: "/lookups/subjects" },
     { icon: Hash, labelKey: "nav.topics", href: "/lookups/topics" },
@@ -121,7 +121,7 @@ const questionBankNavGroup: NavGroup = {
 const examsNavGroup: NavGroup = {
   icon: ClipboardList,
   labelKey: "nav.examManagement",
-  roles: [UserRole.Admin, UserRole.Instructor],
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor],
   children: [
     { icon: ClipboardList, labelKey: "nav.exams", href: "/exams/list", hidden: true },
     { icon: PlusSquare, labelKey: "nav.createExam", href: "/exams/setup" },
@@ -136,12 +136,14 @@ const examsNavGroup: NavGroup = {
 const resultNavGroup: NavGroup = {
   icon: CheckCircle2,
   labelKey: "nav.result",
-  roles: [UserRole.Admin, UserRole.Instructor, UserRole.Examiner],
+  // GradingController: SuperAdmin,Admin,Instructor,Examiner | ExamResultController: SuperAdmin,Admin,Instructor
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Examiner],
   children: [
-    { icon: GraduationCap, labelKey: "nav.grading", href: "/grading" },
-    { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result", roles: [UserRole.Admin, UserRole.Instructor] },
-    { icon: ShieldAlert, labelKey: "nav.terminatedAttempts", href: "/results/terminated-attempts", roles: [UserRole.Admin, UserRole.Instructor] },
-    { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report", roles: [UserRole.Admin, UserRole.Instructor] },
+    // GradingController allows Examiner; explicit roles required so Examiner sees grading inside the group
+    { icon: GraduationCap, labelKey: "nav.grading", href: "/grading", roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Examiner] },
+    { icon: BarChart3, labelKey: "nav.candidateResult", href: "/results/candidate-result", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    { icon: ShieldAlert, labelKey: "nav.terminatedAttempts", href: "/results/terminated-attempts", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    { icon: FileText, labelKey: "nav.proctorReport", href: "/results/proctor-report", roles: [UserRole.SuperAdmin, UserRole.Admin] },
   ],
 }
 
@@ -149,7 +151,7 @@ const resultNavGroup: NavGroup = {
 const proctorNavGroup: NavGroup = {
   icon: Monitor,
   labelKey: "nav.proctorCenter",
-  roles: [UserRole.Admin, UserRole.Instructor, UserRole.ProctorReviewer, UserRole.Proctor],
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Proctor],
   children: [
     { icon: LayoutDashboard, labelKey: "nav.proctorDashboard", href: "/proctor-center" },
     { icon: Users, labelKey: "nav.userIdentification", href: "/proctor/user-identification" },
@@ -160,10 +162,12 @@ const proctorNavGroup: NavGroup = {
 const candidatesNavGroup: NavGroup = {
   icon: UsersRound,
   labelKey: "nav.candidates",
-  roles: [UserRole.Admin, UserRole.Instructor],
+  roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor],
   children: [
-    { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch" },
-    { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data" },
+    // BatchesController + CandidatesController: SuperAdmin,Admin only
+    { icon: FolderTree, labelKey: "nav.batch", href: "/candidates/batch", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    { icon: Users, labelKey: "nav.candidatesData", href: "/candidates/data", roles: [UserRole.SuperAdmin, UserRole.Admin] },
+    // AssignmentsController + CandidateExamDetailsController: SuperAdmin,Admin,Instructor
     { icon: UserPlus, labelKey: "nav.assignToExam", href: "/candidates/assign-to-exam" },
     // { icon: Wrench, labelKey: "nav.examOperations", href: "/candidates/exam-operations" },
     { icon: ClipboardCheck, labelKey: "nav.candidateExamDetails", href: "/candidates/exam-details" },
@@ -174,7 +178,7 @@ const candidatesNavGroup: NavGroup = {
 const administrationNavGroup: NavGroup = {
   icon: UserCog,
   labelKey: "nav.administration",
-  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  roles: [UserRole.SuperAdmin],
   children: [
     { icon: Users, labelKey: "nav.users", href: "/users", exact: true },
     { icon: ShieldCheck, labelKey: "nav.permissions", href: "/users/permissions" },
@@ -189,7 +193,7 @@ const administrationNavGroup: NavGroup = {
 const notificationsNavGroup: NavGroup = {
   icon: Bell,
   labelKey: "nav.notifications",
-  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  roles: [UserRole.SuperAdmin, UserRole.Admin],
   children: [
     { icon: Settings, labelKey: "nav.notificationSettings", href: "/notifications/settings" },
     { icon: FileText, labelKey: "nav.notificationTemplates", href: "/notifications/templates" },
@@ -201,7 +205,7 @@ const notificationsNavGroup: NavGroup = {
 const logsNavGroup: NavGroup = {
   icon: Activity,
   labelKey: "nav.logs",
-  roles: [UserRole.Admin, UserRole.SuperAdmin],
+  roles: [UserRole.SuperAdmin],
   children: [
     { icon: FileText, labelKey: "nav.audit", href: "/audit" },
     { icon: Users, labelKey: "nav.candidateLogs", href: "/logs/candidate" },
@@ -216,7 +220,7 @@ const userGuideNavItem: NavItem = {
   icon: HelpCircle,
   labelKey: "nav.userGuide",
   href: "/tutorials",
-  roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor, UserRole.Proctor, UserRole.ProctorReviewer, UserRole.Examiner, UserRole.Auditor],
+  roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor, UserRole.Proctor, UserRole.Examiner],
 }
 
 export function Sidebar() {

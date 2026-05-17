@@ -75,38 +75,36 @@ export default function ExamPublishedPage() {
 
   // ── Load data on mount ────────────────────────────────────────
   useEffect(() => {
-    let examData: Exam | null = null
+    let cachedExamId: number | null = null
 
-    // 1 — Try sessionStorage first (zero API call for exam)
+    // 1 — Try sessionStorage for instant title render (avoids flash)
     try {
       const raw = sessionStorage.getItem("publishedExam")
       if (raw) {
-        examData = JSON.parse(raw) as Exam
+        const cached = JSON.parse(raw) as Exam
         sessionStorage.removeItem("publishedExam")
-        setExam(examData)
+        cachedExamId = cached.id
+        setExam(cached) // show title immediately while API loads
       }
     } catch {
       // ignore parse errors
     }
 
-    async function loadRemoteData(examId: number) {
-      // proctor count only — share link is handled by ExamShareDialog
-      const proctorRes = await getExamProctors(examId).catch(() => null)
-      if (proctorRes) setProctorData(proctorRes)
+    const examId = cachedExamId ?? Number(id)
+
+    async function loadRemoteData(eid: number) {
+      // Always re-fetch the full exam to get authoritative settings (requireProctoring, etc.)
+      // Run exam + proctors in parallel — one round-trip
+      const [examResult, proctorResult] = await Promise.allSettled([
+        getExam(eid),
+        getExamProctors(eid).catch(() => null),
+      ])
+      if (examResult.status === "fulfilled") setExam(examResult.value)
+      if (proctorResult.status === "fulfilled" && proctorResult.value) setProctorData(proctorResult.value)
       setLoadingPage(false)
     }
 
-    if (examData) {
-      loadRemoteData(examData.id)
-    } else {
-      // Fallback: fetch exam then load remote data
-      getExam(id)
-        .then((e) => {
-          setExam(e)
-          return loadRemoteData(e.id)
-        })
-        .catch(() => setLoadingPage(false))
-    }
+    loadRemoteData(examId).catch(() => setLoadingPage(false))
   }, [id])
 
   // ── Actions ────────────────────────────────────────────────────

@@ -171,8 +171,7 @@ public class LicenseValidationService : ILicenseValidationService
             var now = UaeTimeHelper.NowUae;
             var expiresAt = license.ExpiresAt.ToUniversalTime();
             var daysUntilExpiry = (expiresAt - now).TotalDays;
-            var gracePeriodDays = license.GracePeriodDays > 0 ? license.GracePeriodDays : 30;
-
+            var gracePeriodDays = license.GracePeriodDays;
             var baseResult = new LicenseStatusResult
             {
                 CustomerName = license.CustomerName,

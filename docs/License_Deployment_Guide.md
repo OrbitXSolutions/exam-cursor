@@ -329,6 +329,7 @@ dotnet run -- verify-license license_ClientName_20260404.json
 ## Renewing a License
 
 When a license is approaching expiry (40-day warning banner will appear):
+--- Open run this from the LicenseSigner folder:
 
 1. Run `dotnet run -- sign-license` on the vendor machine with a new validity period
 2. Use the **same domain name** as before
@@ -339,5 +340,36 @@ When a license is approaching expiry (40-day warning banner will appear):
 
 The system will pick up the new license automatically.
 
-Command
-"Client1`nStandard`nsmartexam-sable.vercel.app`n0`n30`n2026-01-01`n2026-04-07" | dotnet run -- sign-license
+Command in Powershell is OKAY
+Format: CustomerName \n LicenseType \n Domain \n MaxUsers (0 (unlimited)) \n GraceDays \n
+Issued Date (blank = today 2026-05-08 UTC) \n Expiry Date 2027-05-08 (1 year)
+
+Ex:
+
+> > cd LicenseSigner
+> > "Client1`nStandard`nsmartexam-sable.vercel.app`n0`n30`n`n2027-05-08" | dotnet run -- sign-license
+
+Then verify:
+dotnet run -- verify-license license_Client1_20260508.json
+
+Notes
+Can you change the domain on renewal?
+
+Yes, technically — the signer will accept any domain you type. But:
+
+⚠️ You should NOT change it unless the deployment actually moved to a new domain.
+
+The domain in the license is validated by the backend against the actual request host. If you issue a license with domain newdomain.com but the app is still running on smartexam-sable.vercel.app, the license will be treated as Invalid and all write operations will be blocked immediately.
+
+. Issued date must be before expiry — blank = today (May 8), but expiry is May 5 → issued after expiry is invalid. You must explicitly set an issued date.
+
+Using 0 will never produce Expired because the code forces it to 30 days.
+
+Add it to the Header (top bar) — visible on every page, not just sidebar
+Only shown for Admin/SuperAdmin roles (not candidates)
+
+State Color
+Active Green
+Warning Yellow
+GracePeriod Orange
+Expired / Invalid / Missing Red

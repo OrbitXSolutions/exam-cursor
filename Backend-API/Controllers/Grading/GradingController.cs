@@ -31,7 +31,7 @@ public class GradingController : ControllerBase
     /// Initiate grading for a submitted attempt (triggers auto-grading)
     /// </summary>
     [HttpPost("initiate")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> InitiateGrading([FromBody] InitiateGradingDto dto)
     {
      var graderId = _currentUserService.UserId ?? "system";
@@ -43,7 +43,7 @@ public class GradingController : ControllerBase
     /// Get grading session by ID
     /// </summary>
     [HttpGet("{gradingSessionId}")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSession(int gradingSessionId)
     {
       var result = await _gradingService.GetGradingSessionAsync(gradingSessionId);
@@ -54,7 +54,7 @@ public class GradingController : ControllerBase
     /// Get grading session by attempt ID
     /// </summary>
     [HttpGet("attempt/{attemptId}")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSessionByAttempt(int attemptId)
   {
   var result = await _gradingService.GetGradingSessionByAttemptAsync(attemptId);
@@ -65,7 +65,7 @@ public class GradingController : ControllerBase
     /// Complete grading session (finalize scores)
     /// </summary>
     [HttpPost("complete")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> CompleteGrading([FromBody] CompleteGradingDto dto)
     {
    var graderId = _currentUserService.UserId ?? "system";
@@ -81,7 +81,7 @@ public class GradingController : ControllerBase
     /// Submit manual grade for a single question
 /// </summary>
     [HttpPost("manual-grade")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> SubmitManualGrade([FromBody] ManualGradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -93,7 +93,7 @@ public class GradingController : ControllerBase
     /// Bulk submit manual grades
     /// </summary>
     [HttpPost("manual-grade/bulk")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> BulkSubmitManualGrades([FromBody] BulkManualGradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -105,7 +105,7 @@ public class GradingController : ControllerBase
     /// Get questions requiring manual grading for a session
     /// </summary>
     [HttpGet("{gradingSessionId}/manual-queue")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetManualGradingQueue(int gradingSessionId)
     {
      var result = await _gradingService.GetManualGradingQueueAsync(gradingSessionId);
@@ -120,7 +120,7 @@ public class GradingController : ControllerBase
     /// Re-grade a previously graded answer
     /// </summary>
     [HttpPost("regrade")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> RegradeAnswer([FromBody] RegradeDto dto)
     {
         var graderId = _currentUserService.UserId ?? "system";
@@ -136,7 +136,7 @@ public class GradingController : ControllerBase
     /// Get all grading sessions with pagination and filtering
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetGradingSessions([FromQuery] GradingSearchDto searchDto)
     {
         var result = await _gradingService.GetGradingSessionsAsync(searchDto);
@@ -147,7 +147,7 @@ public class GradingController : ControllerBase
     /// Get grading sessions requiring manual grading
     /// </summary>
     [HttpGet("manual-required")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetManualGradingRequired([FromQuery] GradingSearchDto searchDto)
     {
         var result = await _gradingService.GetManualGradingRequiredAsync(searchDto);
@@ -158,7 +158,7 @@ public class GradingController : ControllerBase
     /// Get grading statistics for an exam
     /// </summary>
   [HttpGet("stats/exam/{examId}")]
- [Authorize(Roles = "Admin,Instructor,Examiner")]
+ [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetExamGradingStats(int examId)
     {
         var result = await _gradingService.GetExamGradingStatsAsync(examId);
@@ -169,7 +169,7 @@ public class GradingController : ControllerBase
     /// Get question-level grading statistics for an exam
     /// </summary>
     [HttpGet("stats/exam/{examId}/questions")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetQuestionGradingStats(int examId)
     {
         var result = await _gradingService.GetQuestionGradingStatsAsync(examId);
@@ -183,6 +183,7 @@ public class GradingController : ControllerBase
     /// <summary>
     /// Get grading result for the current candidate
     /// </summary>
+    [Authorize(Roles = "SuperAdmin,Candidate")]
  [HttpGet("my-result/{attemptId}")]
     public async Task<IActionResult> GetMyResult(int attemptId)
     {
@@ -199,6 +200,7 @@ public class GradingController : ControllerBase
     /// <summary>
     /// Check if grading is complete for an attempt
     /// </summary>
+    [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("is-complete/{attemptId}")]
     public async Task<IActionResult> IsGradingComplete(int attemptId)
     {
@@ -217,7 +219,7 @@ public class GradingController : ControllerBase
     /// The examiner always has the final decision.
     /// </summary>
     [HttpPost("ai-suggest")]
-    [Authorize(Roles = "Admin,Instructor,Examiner")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
     public async Task<IActionResult> GetAiGradeSuggestion([FromBody] AiGradeSuggestRequestDto dto)
     {
         var result = await _aiGradingService.GetAiGradeSuggestionAsync(dto);

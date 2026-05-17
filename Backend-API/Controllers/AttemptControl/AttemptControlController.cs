@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.AttemptControl;
 using Smart_Core.Application.DTOs.Common;
@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.AttemptControl;
 
 [ApiController]
 [Route("api/attempt-control")]
-[Authorize(Roles = $"{AppRoles.SuperDev},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
 public class AttemptControlController : ControllerBase
 {
     private readonly IAttemptControlService _service;
