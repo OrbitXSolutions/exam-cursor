@@ -51,7 +51,7 @@ const videoTutorials: VideoTutorial[] = [
     descriptionEn:
       "Configure advanced exam settings including access policies, instructions, time limits, and proctoring rules.",
     descriptionAr:
-      "ضبط إعدادات الاختبار المتقدمة بما في ذلك سياسات الوصول والتعليمات والحدود الزمنية وقواعد المراقبة.",
+      "ضبط إعدادات الاختبار المتقدمة بما في ذلك سياسات الوصول والتعليمات ,المدة الزمنية وقواعد المراقبة.",
     icon: ClipboardList,
     videoPath: "/tutorials/exam-configuration.mp4",
   },
