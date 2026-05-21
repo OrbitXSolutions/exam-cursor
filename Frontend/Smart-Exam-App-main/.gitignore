@@ -26,7 +26,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Tutorial videos — deploy separately to public/tutorials/ on the server
+# Tutorial videos — served from backend wwwroot/tutorials/, not git
 /public/tutorials/*.mp4
 /public/tutorials/*.webm
 /public/tutorials/*.mov

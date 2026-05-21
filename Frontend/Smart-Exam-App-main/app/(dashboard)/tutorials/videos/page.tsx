@@ -14,9 +14,10 @@ import {
   UserCog,
   Settings,
   Maximize2,
+  Loader2,
 } from "lucide-react"
 import Link from "next/link"
-import { useRef, useCallback } from "react"
+import { useRef, useCallback, useState } from "react"
 import type React from "react"
 
 interface VideoTutorial {
@@ -114,6 +115,11 @@ const videoTutorials: VideoTutorial[] = [
 export default function VideoTutorialsPage() {
   const { language, isRTL } = useI18n()
   const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({})
+  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({})
+
+  const setLoading = useCallback((id: number, value: boolean) => {
+    setLoadingStates(prev => ({ ...prev, [id]: value }))
+  }, [])
 
   const handleFullscreen = useCallback((id: number) => {
     const video = videoRefs.current[id]
@@ -173,17 +179,26 @@ export default function VideoTutorialsPage() {
                 <div className="relative bg-black/5 aspect-video group/video">
                   <video
                     ref={(el) => { videoRefs.current[video.id] = el }}
-                    src={video.videoPath}
+                    src={`/api/backend-files${video.videoPath}`}
                     controls
                     className="w-full h-full rounded-t-xl"
                     preload="metadata"
+                    onLoadStart={() => setLoading(video.id, true)}
+                    onCanPlay={() => setLoading(video.id, false)}
                     onError={(e) => {
+                      setLoading(video.id, false)
                       const target = e.currentTarget
                       target.style.display = "none"
                       const fallback = target.nextElementSibling as HTMLElement
                       if (fallback) fallback.style.display = "flex"
                     }}
                   />
+                  {/* Loading spinner */}
+                  {loadingStates[video.id] && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-xl pointer-events-none">
+                      <Loader2 className="h-10 w-10 text-white animate-spin" />
+                    </div>
+                  )}
                   {/* Fallback — shown only when video fails to load */}
                   <div
                     className="hidden absolute inset-0 flex-col items-center justify-center gap-3 text-muted-foreground bg-muted/30 rounded-t-xl"
@@ -194,8 +209,8 @@ export default function VideoTutorialsPage() {
                     <p className="text-xs font-mono text-muted-foreground/60">{video.videoPath}</p>
                     <p className="text-xs text-muted-foreground">
                       {language === "ar"
-                        ? "ضع الفيديو في مجلد public/tutorials/"
-                        : "Place video in public/tutorials/ folder"}
+                        ? "ضع الفيديو في مجلد wwwroot/tutorials/"
+                        : "Place video in wwwroot/tutorials/ folder"}
                     </p>
                   </div>
                   {/* Number badge */}
