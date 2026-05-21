@@ -17,6 +17,8 @@ Rules:
   and make sure build is success
   This is a production system. Safety is more important than speed. If you are unsure, stop and explain the risk instead of guessing.
 
+  Email: super-admin@smartexam.local
+  Password: Smart@26Super5
   tASK :
   aS aDMIN, Instructor
   I nned to seed Email Notification logs

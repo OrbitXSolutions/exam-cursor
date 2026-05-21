@@ -25,3 +25,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Tutorial videos — deploy separately to public/tutorials/ on the server
+/public/tutorials/*.mp4
+/public/tutorials/*.webm
+/public/tutorials/*.mov
