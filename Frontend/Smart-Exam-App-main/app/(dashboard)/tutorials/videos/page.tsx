@@ -173,7 +173,7 @@ export default function VideoTutorialsPage() {
                 <div className="relative bg-black/5 aspect-video group/video">
                   <video
                     ref={(el) => { videoRefs.current[video.id] = el }}
-                    src={`/api/backend-files${video.videoPath}`}
+                    src={video.videoPath}
                     controls
                     className="w-full h-full rounded-t-xl"
                     preload="metadata"
@@ -194,8 +194,8 @@ export default function VideoTutorialsPage() {
                     <p className="text-xs font-mono text-muted-foreground/60">{video.videoPath}</p>
                     <p className="text-xs text-muted-foreground">
                       {language === "ar"
-                        ? "يمكن تحميل الفيديو في مجلد wwwroot/tutorials"
-                        : "Upload video to wwwroot/tutorials folder"}
+                        ? "ضع الفيديو في مجلد public/tutorials/"
+                        : "Place video in public/tutorials/ folder"}
                     </p>
                   </div>
                   {/* Number badge */}
