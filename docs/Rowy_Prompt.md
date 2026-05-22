@@ -17,15 +17,20 @@ Rules:
   and make sure build is success
   This is a production system. Safety is more important than speed. If you are unsure, stop and explain the risk instead of guessing.
 
-  Email: super-admin@smartexam.local
-  Password: Smart@26Super5
-  tASK :
-  aS aDMIN, Instructor
-  I nned to seed Email Notification logs
-  to confrim Whether the email sent to candidates or not
+The buiness user want a new feature when candidate Walkin-Registration (Self-Registration) (Email - name - Phone)
+he want to add more feild per exam requirement
+(Dynamic Field)
+What is the best, High Performance to do that without break current flow?
 
-  Now the Email Menu is only for Superadmin
-  (Allow - Admin also to see the side nav Ema Back and Front)
+Email: super-admin@smartexam.local
+Password: Smart@26Super5
+tASK :
+aS aDMIN, Instructor
+I nned to seed Email Notification logs
+to confrim Whether the email sent to candidates or not
+
+Now the Email Menu is only for Superadmin
+(Allow - Admin also to see the side nav Ema Back and Front)
 
 --- Review the task
 Good.

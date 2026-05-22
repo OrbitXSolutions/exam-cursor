@@ -406,6 +406,27 @@ public class ProctorService : IProctorService
 
         await _context.SaveChangesAsync();
 
+        // Push violation events to proctor in real time via SignalR.
+        // Awaited directly — IHubContext.SendAsync is non-blocking at the application level.
+        if (isViolation)
+        {
+            try
+            {
+                var group = $"attempt_{session.AttemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("ViolationEventReceived", new
+                {
+                    id = proctorEvent.Id,
+                    attemptId = session.AttemptId,
+                    eventType = dto.EventType.ToString(),
+                    eventTypeId = (int)dto.EventType,
+                    metadataJson = dto.MetadataJson,
+                    occurredAt = now.ToString("o"),
+                    severity = dto.Severity >= 5 ? "Critical" : dto.Severity == 4 ? "High" : dto.Severity == 3 ? "Medium" : "Low",
+                });
+            }
+            catch { /* non-fatal — event already saved to DB; proctor sees it on next refresh */ }
+        }
+
         return ApiResponse<ProctorEventDto>.SuccessResponse(MapToEventDto(proctorEvent));
     }
 
@@ -463,6 +484,27 @@ public class ProctorService : IProctorService
         session.TotalEvents = sequenceNumber;
 
         await _context.SaveChangesAsync();
+
+        // Push violation events to proctor in real time via SignalR.
+        // Bulk events (e.g. focus-loss burst) now appear in the proctor's live log immediately.
+        foreach (var proctorEvent in events.Where(e => e.IsViolation))
+        {
+            try
+            {
+                var group = $"attempt_{session.AttemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("ViolationEventReceived", new
+                {
+                    id = proctorEvent.Id,
+                    attemptId = session.AttemptId,
+                    eventType = proctorEvent.EventType.ToString(),
+                    eventTypeId = (int)proctorEvent.EventType,
+                    metadataJson = proctorEvent.MetadataJson,
+                    occurredAt = now.ToString("o"),
+                    severity = proctorEvent.Severity >= 5 ? "Critical" : proctorEvent.Severity == 4 ? "High" : proctorEvent.Severity == 3 ? "Medium" : "Low",
+                });
+            }
+            catch { /* non-fatal — events already saved to DB; proctor sees them on next refresh */ }
+        }
 
         return ApiResponse<int>.SuccessResponse(events.Count, $"{events.Count} events logged");
     }
@@ -1652,6 +1694,23 @@ UploadEvidenceDto dto, string candidateId)
 
         await _context.SaveChangesAsync();
 
+        // Push warning to candidate via SignalR for immediate delivery.
+        // This covers warnings sent from the list page which has no client-side SignalR connection.
+        // The DB field (PendingWarningMessage) remains as the 15 s fallback for disconnected candidates.
+        try
+        {
+            var group = $"attempt_{session.AttemptId}";
+            await _proctorHub.Clients.Group(group).SendAsync("ReceiveWarning", new
+            {
+                fromConnectionId = "",
+                fromUserId = proctorUserId,
+                message,
+                attemptId = session.AttemptId,
+                isLastWarning = false
+            });
+        }
+        catch { /* non-fatal — warning stored in DB as fallback */ }
+
         return ApiResponse<bool>.SuccessResponse(true, "Warning sent to candidate");
     }
 
@@ -1730,22 +1789,20 @@ UploadEvidenceDto dto, string candidateId)
 
         await _context.SaveChangesAsync();
 
-        // Notify candidate via SignalR (server-side, reliable)
-        _ = Task.Run(async () =>
+        // Notify candidate via SignalR directly — awaited so the push fires before the HTTP
+        // response returns to the proctor, ensuring the candidate receives it immediately.
+        try
         {
-            try
+            var group = $"attempt_{session.AttemptId}";
+            await _proctorHub.Clients.Group(group).SendAsync("SessionTerminated", new
             {
-                var group = $"attempt_{session.AttemptId}";
-                await _proctorHub.Clients.Group(group).SendAsync("SessionTerminated", new
-                {
-                    attemptId = session.AttemptId,
-                    reason,
-                    status = "Terminated",
-                    message = "Your exam has been terminated by the proctor."
-                });
-            }
-            catch { /* fire-and-forget */ }
-        });
+                attemptId = session.AttemptId,
+                reason,
+                status = "Terminated",
+                message = "Your exam has been terminated by the proctor."
+            });
+        }
+        catch { /* non-fatal — candidate detects termination via next status poll */ }
 
         return ApiResponse<bool>.SuccessResponse(true, "Session terminated and attempt force-ended");
     }

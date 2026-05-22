@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Smart_Core.Domain.Enums;
 
 namespace Smart_Core.Application.DTOs.Proctor;
@@ -599,6 +600,7 @@ public class FlagSessionDto
 /// </summary>
 public class SendWarningDto
 {
+    [MaxLength(1000)]
     public string Message { get; set; } = string.Empty;
 }
 
@@ -607,6 +609,7 @@ public class SendWarningDto
 /// </summary>
 public class TerminateSessionDto
 {
+    [MaxLength(500)]
     public string Reason { get; set; } = string.Empty;
 }
 

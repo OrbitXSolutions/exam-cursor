@@ -90,7 +90,7 @@ export class ProctorViewer {
             this.candidateConnectionId = event.connectionId;
             // The candidate joined AFTER the proctor, so it won't receive a
             // PeerJoined(proctor) event. Ask it to send an offer once its
-            // PeerConnection is ready (~2 s grace period).
+            // PeerConnection is ready (~500 ms grace period).
             setTimeout(() => {
               if (!this.disposed && this.signaling?.isConnected && !this.pc) {
                 console.log(
@@ -105,7 +105,7 @@ export class ProctorViewer {
                     ),
                   );
               }
-            }, 2000);
+            }, 500);
           }
         },
         onPeerLeft: (event) => {

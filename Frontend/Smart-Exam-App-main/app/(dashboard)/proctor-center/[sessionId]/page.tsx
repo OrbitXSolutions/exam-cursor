@@ -90,6 +90,10 @@ export default function SessionDetailPage() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const viewerRef = useRef<ProctorViewer | null>(null)
   const sessionPollRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  // Guard: prevents onExamTerminated from firing the error toast + redirect when
+  // the proctor themselves initiated the termination (backend push reaches the
+  // proctor's own SignalR connection because both are in the same group).
+  const terminatingRef = useRef(false)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("offline")
   const [hasRemoteStream, setHasRemoteStream] = useState(false)
@@ -243,7 +247,10 @@ export default function SessionDetailPage() {
           }, 15000)
         },
         onExamTerminated: (termEvent) => {
-          // Auto-termination (max violations) or proctor-initiated termination
+          // If the proctor themselves just triggered this termination, ignore the
+          // SignalR echo — handleTerminate already shows a success toast and redirects.
+          if (terminatingRef.current) return
+          // Auto-termination (max violations) or external system termination
           setSessionEnded({ reason: "Terminated" })
           setHasRemoteStream(false)
           viewerRef.current?.disconnect()
@@ -455,12 +462,8 @@ export default function SessionDetailPage() {
     if (!session || !warningMessage.trim()) return
     try {
       await sendWarning(session.id, warningMessage)
-      // Also send instantly via SignalR (best-effort, won't fail the operation)
-      try {
-        await viewerRef.current?.signalingConnection?.sendWarningToCandidate(warningMessage)
-      } catch (e) {
-        console.warn("[ProctorPage] SignalR instant warning failed (non-fatal):", e)
-      }
+      // Backend now pushes ReceiveWarning via SignalR directly after SaveChangesAsync —
+      // no additional client-side hub call needed (would cause duplicate delivery).
       toast.success(t("proctor.warningSent"))
       setWarningDialogOpen(false)
       setWarningMessage("")
@@ -476,13 +479,11 @@ export default function SessionDetailPage() {
   async function handleTerminate() {
     if (!session || !terminateReason.trim()) return
     try {
+      // Set flag BEFORE the HTTP call so the SignalR echo from the backend push
+      // (which goes to the entire group including the proctor) is ignored by onExamTerminated.
+      terminatingRef.current = true
       await terminateSession(session.id, terminateReason)
-      // Also notify candidate instantly via SignalR (best-effort)
-      try {
-        await viewerRef.current?.signalingConnection?.sendTerminationToCandidate(terminateReason)
-      } catch (e) {
-        console.warn("[ProctorPage] SignalR termination notification failed (non-fatal):", e)
-      }
+      // Backend now pushes SessionTerminated via SignalR directly — no duplicate call needed.
       toast.success(t("proctor.sessionTerminated"))
       setTerminateDialogOpen(false)
       setTerminateReason("")
@@ -493,6 +494,9 @@ export default function SessionDetailPage() {
         router.push("/proctor-center")
       }
     } catch (error) {
+      // Reset the guard — the termination request failed, so future system-level
+      // SessionTerminated pushes (e.g. auto-termination) must still reach onExamTerminated.
+      terminatingRef.current = false
       const errMsg = error instanceof Error ? error.message : t("proctor.failedToCreateIncident")
       toast.error(errMsg, {
         description: t("proctor.sessionMayNotBeActive"),
