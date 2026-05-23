@@ -92,7 +92,7 @@ export default function LoginPage() {
 
         <div className="space-y-6">
           <h1 className="text-4xl font-bold leading-tight text-balance">
-            Enterprise-Grade Online Examination Platform
+            Enterprise-Grade Online Examination Platform - Secure, Scalable, and Compliant
           </h1>
           <p className="text-lg text-primary-foreground/80">
             Secure, scalable, and compliant assessment solutions for educational institutions and enterprises.
@@ -142,7 +142,7 @@ export default function LoginPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Shield className="h-5 w-5" />
               </div>
-              <span className="text-xl font-bold">SmartExam</span>
+              <span className="text-xl font-bold">Smart-Exam</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
