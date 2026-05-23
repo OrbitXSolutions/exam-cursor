@@ -198,6 +198,7 @@ builder.Services.AddScoped<IQuestionBankService, QuestionBankService>();
 builder.Services.AddScoped<IAiQuestionGeneratorService, AiQuestionGeneratorService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<IExamShareService, ExamShareService>();
+builder.Services.AddScoped<IWalkInFieldService, WalkInFieldService>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
 builder.Services.AddScoped<IGradingService, GradingService>();
 builder.Services.AddScoped<IAiGradingService, AiGradingService>();

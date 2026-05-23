@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { apiClient } from "@/lib/api-client"
+import type { WalkInField } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -36,6 +37,7 @@ interface PublicExamInfo {
   organizationName?: string
   organizationLogoUrl?: string
   isWalkIn: boolean
+  walkInFields?: WalkInField[]
 }
 
 interface WalkInResponse {
@@ -61,7 +63,7 @@ async function fetchPublicExamInfo(token: string): Promise<PublicExamInfo | null
 
 async function walkInRegister(
   token: string,
-  data: { fullName: string; email: string; phoneNumber: string },
+  data: { fullName: string; email: string; phoneNumber: string; dynamicFields?: Array<{ fieldId: number; value: string }> },
 ): Promise<{ success: boolean; data?: WalkInResponse; message?: string }> {
   try {
     const res = await fetch(`/api/proxy/public/exam/${token}/register`, {
@@ -98,6 +100,10 @@ export default function ShareExamPage() {
   })
   const [walkInErrors, setWalkInErrors] = useState<Record<string, string>>({})
 
+  // Dynamic registration fields state
+  const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<number, string>>({})
+  const [dynamicFieldErrors, setDynamicFieldErrors] = useState<Record<number, string>>({})
+
   // Load exam info on mount
   useEffect(() => {
     if (!token) return
@@ -126,16 +132,37 @@ export default function ShareExamPage() {
     if (!walkInForm.phoneNumber.trim())
       errors.phoneNumber = isRTL ? "رقم الهاتف مطلوب" : "Phone number is required"
 
+    // Validate dynamic fields
+    const dynErrors: Record<number, string> = {}
+    const fields = examInfo?.walkInFields ?? []
+    for (const field of fields) {
+      const val = (dynamicFieldValues[field.id] ?? "").trim()
+      if (field.isRequired && !val) {
+        dynErrors[field.id] = isRTL ? `حقل "${field.labelAr}" مطلوب` : `"${field.labelEn}" is required`
+      } else if (val && field.fieldType === 2 && isNaN(Number(val))) {
+        dynErrors[field.id] = isRTL ? `يجب أن يكون الحقل "${field.labelAr}" رقمًا` : `"${field.labelEn}" must be a number`
+      }
+    }
+
     setWalkInErrors(errors)
-    if (Object.keys(errors).length > 0) return
+    setDynamicFieldErrors(dynErrors)
+    if (Object.keys(errors).length > 0 || Object.keys(dynErrors).length > 0) return
 
     setSubmitting(true)
     setSubmitError("")
+
+    // Collect dynamic fields for submission
+    const dynamicFields = fields.length > 0
+      ? fields
+          .filter(f => (dynamicFieldValues[f.id] ?? "").trim() !== "")
+          .map(f => ({ fieldId: f.id, value: (dynamicFieldValues[f.id] ?? "").trim() }))
+      : undefined
 
     const result = await walkInRegister(token, {
       fullName: walkInForm.fullName.trim(),
       email: walkInForm.email.trim(),
       phoneNumber: walkInForm.phoneNumber.trim(),
+      dynamicFields,
     })
 
     if (result.success && result.data) {
@@ -322,6 +349,30 @@ export default function ShareExamPage() {
                       <p className="text-xs text-destructive">{walkInErrors.phoneNumber}</p>
                     )}
                   </div>
+
+                  {/* Dynamic registration fields */}
+                  {(examInfo?.walkInFields ?? []).map((field) => (
+                    <div key={field.id} className="space-y-1.5">
+                      <Label htmlFor={`dynamic-field-${field.id}`} className="font-medium">
+                        {isRTL ? field.labelAr : field.labelEn}
+                        {field.isRequired && <span className="text-destructive ms-1">*</span>}
+                      </Label>
+                      <Input
+                        id={`dynamic-field-${field.id}`}
+                        type={field.fieldType === 2 ? "text" : "text"}
+                        inputMode={field.fieldType === 2 ? "numeric" : "text"}
+                        value={dynamicFieldValues[field.id] ?? ""}
+                        onChange={(e) =>
+                          setDynamicFieldValues((prev) => ({ ...prev, [field.id]: e.target.value }))
+                        }
+                        placeholder={isRTL ? field.labelAr : field.labelEn}
+                        className="h-11"
+                      />
+                      {dynamicFieldErrors[field.id] && (
+                        <p className="text-xs text-destructive">{dynamicFieldErrors[field.id]}</p>
+                      )}
+                    </div>
+                  ))}
 
                   {submitError && (
                     <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2.5">

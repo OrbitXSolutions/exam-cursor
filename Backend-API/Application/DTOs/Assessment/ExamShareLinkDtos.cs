@@ -40,6 +40,12 @@ public class PublicExamInfoDto
     public string? OrganizationName { get; set; }
     public string? OrganizationLogoUrl { get; set; }
     public bool IsWalkIn { get; set; }
+
+    /// <summary>
+    /// Dynamic registration fields configured for this walk-in exam.
+    /// Empty list for non-walk-in exams.
+    /// </summary>
+    public List<WalkInFieldDto> WalkInFields { get; set; } = new();
 }
 
 public class ShareCandidateDto
@@ -73,6 +79,11 @@ public class WalkInRegisterDto
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Dynamic field answers. Null/empty is valid for exams with no configured fields.
+    /// </summary>
+    public List<WalkInFieldAnswerInputDto>? DynamicFields { get; set; }
 }
 
 public class SelectCandidateResponseDto
