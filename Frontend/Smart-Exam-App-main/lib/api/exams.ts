@@ -7,6 +7,8 @@ import type {
   ExamInstruction,
   ExamAccessPolicy,
   PagedResult,
+  WalkInField,
+  WalkInAnswer,
 } from "@/lib/types";
 import { ExamType } from "@/lib/types";
 
@@ -932,6 +934,84 @@ export async function saveAccessPolicy(
     createdDate: new Date().toISOString(),
     updatedDate: null,
   };
+}
+
+// ============ WALK-IN DYNAMIC REGISTRATION FIELDS ============
+
+export interface SaveWalkInFieldParams {
+  labelEn: string;
+  labelAr: string;
+  fieldType: 1 | 2; // 1 = Text, 2 = Number
+  isRequired: boolean;
+  displayOrder: number;
+}
+
+export interface ReorderWalkInFieldParams {
+  fieldId: number;
+  displayOrder: number;
+}
+
+export async function getWalkInFields(
+  examId: string | number,
+): Promise<WalkInField[]> {
+  const response = await apiClient.get<any>(
+    `/Assessment/exams/${examId}/walkin-fields`,
+    null,
+  );
+  return response ?? [];
+}
+
+export async function saveWalkInField(
+  examId: string | number,
+  fieldId: number | null,
+  data: SaveWalkInFieldParams,
+): Promise<WalkInField> {
+  let response: any;
+  if (fieldId) {
+    response = await apiClient.put<any>(
+      `/Assessment/exams/${examId}/walkin-fields/${fieldId}`,
+      data,
+      null,
+    );
+  } else {
+    response = await apiClient.post<any>(
+      `/Assessment/exams/${examId}/walkin-fields`,
+      data,
+      null,
+    );
+  }
+  return response;
+}
+
+export async function deleteWalkInField(
+  examId: string | number,
+  fieldId: number,
+): Promise<void> {
+  await apiClient.delete<any>(
+    `/Assessment/exams/${examId}/walkin-fields/${fieldId}`,
+    null,
+  );
+}
+
+export async function reorderWalkInFields(
+  examId: string | number,
+  orders: ReorderWalkInFieldParams[],
+): Promise<void> {
+  await apiClient.put<any>(
+    `/Assessment/exams/${examId}/walkin-fields/reorder`,
+    orders,
+    null,
+  );
+}
+
+export async function getWalkInAnswers(
+  examId: string | number,
+): Promise<WalkInAnswer[]> {
+  const response = await apiClient.get<any>(
+    `/Assessment/exams/${examId}/walkin-answers`,
+    null,
+  );
+  return response ?? [];
 }
 
 // ============ EXAM SCHEDULES (MOCK) ============

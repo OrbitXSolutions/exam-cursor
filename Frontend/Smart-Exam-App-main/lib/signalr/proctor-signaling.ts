@@ -165,9 +165,9 @@ export class ProctorSignaling {
     const hubUrl = `${backendUrl}/hubs/proctor`;
     console.log(`[SignalR] Hub URL: ${hubUrl}`);
 
-    // In production, allow negotiate+fallback transports (ServerSentEvents/LongPolling)
-    // so connection works even if WebSocket module is restricted on host.
-    // Locally, skip negotiation for speed.
+    // On localhost: skip negotiate, pure WebSockets (fastest dev experience, no round-trip).
+    // In production: WebSockets first, SSE as fallback — LongPolling is excluded because it
+    // introduces 1–30 s polling latency which causes the "slow notification" issue.
     const isLocalhost =
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" ||
@@ -181,7 +181,13 @@ export class ProctorSignaling {
               skipNegotiation: true,
               transport: signalR.HttpTransportType.WebSockets,
             }
-          : {}),
+          : {
+              // Production: prefer WebSockets, allow SSE as fallback.
+              // Both are server-push — no polling delay.
+              transport:
+                signalR.HttpTransportType.WebSockets |
+                signalR.HttpTransportType.ServerSentEvents,
+            }),
       })
       .withAutomaticReconnect([0, 1000, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Information)

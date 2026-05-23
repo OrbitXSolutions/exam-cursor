@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Infrastructure.Data;
 
 namespace Smart_Core.Infrastructure.Hubs;
 
@@ -13,10 +15,12 @@ namespace Smart_Core.Infrastructure.Hubs;
 public class ProctorHub : Hub
 {
     private readonly ILogger<ProctorHub> _logger;
+    private readonly ApplicationDbContext _db;
 
-    public ProctorHub(ILogger<ProctorHub> logger)
+    public ProctorHub(ILogger<ProctorHub> logger, ApplicationDbContext db)
     {
         _logger = logger;
+        _db = db;
     }
 
     // ── Connection lifecycle ──────────────────────────────────────────
@@ -39,9 +43,19 @@ public class ProctorHub : Hub
 
     /// <summary>
     /// Candidate or proctor joins the signaling room for an attempt.
+    /// Authorization: caller must be the candidate who owns the attempt,
+    /// or a Proctor / Admin / SuperAdmin.
     /// </summary>
     public async Task JoinAttemptRoom(int attemptId, string role)
     {
+        if (!await IsAuthorizedForAttemptAsync(attemptId))
+        {
+            _logger.LogWarning(
+                "ProctorHub: Unauthorized JoinAttemptRoom by {UserId} for attempt {AttemptId}",
+                Context.UserIdentifier, attemptId);
+            return;
+        }
+
         var group = $"attempt_{attemptId}";
         await Groups.AddToGroupAsync(Context.ConnectionId, group);
 
@@ -183,6 +197,14 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendWarningToCandidate(int attemptId, string message)
     {
+        // Only proctors and admin-level roles may send warnings via the hub.
+        if (!Context.User!.IsInRole(AppRoles.Proctor) &&
+            !Context.User.IsInRole(AppRoles.Admin) &&
+            !Context.User.IsInRole(AppRoles.SuperAdmin))
+        {
+            _logger.LogWarning("ProctorHub: Unauthorized SendWarningToCandidate attempt by {UserId}", Context.UserIdentifier);
+            return;
+        }
         var group = $"attempt_{attemptId}";
         _logger.LogInformation("ProctorHub: SendWarningToCandidate from {ConnId} for attempt {AttemptId}: {Message}",
             Context.ConnectionId, attemptId, message);
@@ -218,6 +240,14 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendTerminationToCandidate(int attemptId, string reason)
     {
+        // Only proctors and admin-level roles may send terminations via the hub.
+        if (!Context.User!.IsInRole(AppRoles.Proctor) &&
+            !Context.User.IsInRole(AppRoles.Admin) &&
+            !Context.User.IsInRole(AppRoles.SuperAdmin))
+        {
+            _logger.LogWarning("ProctorHub: Unauthorized SendTerminationToCandidate attempt by {UserId}", Context.UserIdentifier);
+            return;
+        }
         var group = $"attempt_{attemptId}";
         _logger.LogInformation("ProctorHub: SendTerminationToCandidate from {ConnId} for attempt {AttemptId}: {Reason}",
             Context.ConnectionId, attemptId, reason);
@@ -253,9 +283,18 @@ public class ProctorHub : Hub
     /// <summary>
     /// Candidate or proctor joins the screen share signaling room.
     /// Uses a separate group from webcam to avoid signal collision.
+    /// Authorization: same rules as JoinAttemptRoom.
     /// </summary>
     public async Task JoinScreenRoom(int attemptId, string role)
     {
+        if (!await IsAuthorizedForAttemptAsync(attemptId))
+        {
+            _logger.LogWarning(
+                "ProctorHub: Unauthorized JoinScreenRoom by {UserId} for attempt {AttemptId}",
+                Context.UserIdentifier, attemptId);
+            return;
+        }
+
         var group = $"attempt_{attemptId}_screen";
         await Groups.AddToGroupAsync(Context.ConnectionId, group);
 
@@ -368,5 +407,39 @@ public class ProctorHub : Hub
             status,
             attemptId
         });
+    }
+
+    // ── Authorization helpers ─────────────────────────────────────────
+
+    /// <summary>
+    /// Returns true if the connected user is allowed to participate in the
+    /// SignalR rooms for the given attempt:
+    ///   - The candidate who owns the attempt, OR
+    ///   - A Proctor / Admin / SuperAdmin (monitoring rights).
+    /// Candidates belonging to a different attempt are rejected, preventing
+    /// IDOR attacks where they could receive another candidate's violation
+    /// events or WebRTC signaling (live webcam/screen SDP).
+    /// </summary>
+    private async Task<bool> IsAuthorizedForAttemptAsync(int attemptId)
+    {
+        var userId = Context.UserIdentifier;
+        if (string.IsNullOrEmpty(userId))
+            return false;
+
+        // Proctor-level roles are always permitted — they have legitimate monitoring
+        // rights over all attempts they can access (department scoping is enforced
+        // at the REST API / ProctorService layer before they reach this hub).
+        if (Context.User!.IsInRole(AppRoles.Proctor) ||
+            Context.User.IsInRole(AppRoles.Admin) ||
+            Context.User.IsInRole(AppRoles.SuperAdmin))
+            return true;
+
+        // For candidates: verify they own this specific attempt.
+        var candidateId = await _db.Attempts
+            .Where(a => a.Id == attemptId && !a.IsDeleted)
+            .Select(a => (string?)a.CandidateId)
+            .FirstOrDefaultAsync();
+
+        return candidateId == userId;
     }
 }
