@@ -1030,27 +1030,26 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     _context.Set<AttemptEvent>().Add(attemptEvent);
     await _context.SaveChangesAsync();
 
-    // Push violation events to proctor in real time via SignalR
+    // Push violation events to proctor in real time via SignalR.
+    // Awaited directly — IHubContext.SendAsync is non-blocking at the application level
+    // (it serialises + enqueues the message; actual network I/O is async).
     if (ViolationEventTypes.Contains(dto.EventType))
     {
-      _ = Task.Run(async () =>
+      try
       {
-        try
+        var group = $"attempt_{attemptId}";
+        await _proctorHub.Clients.Group(group).SendAsync("ViolationEventReceived", new
         {
-          var group = $"attempt_{attemptId}";
-          await _proctorHub.Clients.Group(group).SendAsync("ViolationEventReceived", new
-          {
-            id = attemptEvent.Id,
-            attemptId,
-            eventType = dto.EventType.ToString(),
-            eventTypeId = (int)dto.EventType,
-            metadataJson = dto.MetadataJson,
-            occurredAt = now.ToString("o"),
-            severity = GetViolationSeverity(dto.EventType),
-          });
-        }
-        catch { /* fire-and-forget — never block the candidate */ }
-      });
+          id = attemptEvent.Id,
+          attemptId,
+          eventType = dto.EventType.ToString(),
+          eventTypeId = (int)dto.EventType,
+          metadataJson = dto.MetadataJson,
+          occurredAt = now.ToString("o"),
+          severity = GetViolationSeverity(dto.EventType),
+        });
+      }
+      catch { /* non-fatal — event already saved to DB; proctor sees it on next refresh */ }
     }
 
     // ── Auto-termination: count countable violations toward MaxViolationWarnings ──
@@ -1119,21 +1118,19 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
               await _context.SaveChangesAsync();
               InvalidateAttemptCompletionCaches();
 
-              // Notify candidate instantly via SignalR
-              _ = Task.Run(async () =>
+              // Notify candidate instantly via SignalR.
+              // Awaited directly — IHubContext.SendAsync is non-blocking at the application level.
+              try
               {
-                try
+                var group = $"attempt_{attemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
                 {
-                  var group = $"attempt_{attemptId}";
-                  await _proctorHub.Clients.Group(group).SendAsync("ExamTerminated", new
-                  {
-                    reason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})",
-                    countableViolationCount = currentCount,
-                    maxViolationWarnings = maxWarnings
-                  });
-                }
-                catch { /* fire-and-forget */ }
-              });
+                  reason = $"Auto-terminated: exceeded maximum violations ({maxWarnings})",
+                  countableViolationCount = currentCount,
+                  maxViolationWarnings = maxWarnings
+                });
+              }
+              catch { /* non-fatal — candidate detects termination via next status poll */ }
 
               return ApiResponse<bool>.SuccessResponse(true, "Event logged — attempt auto-terminated");
             }
@@ -1146,22 +1143,20 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
               await _context.SaveChangesAsync();
 
-              // Push last warning instantly via SignalR
-              _ = Task.Run(async () =>
+              // Push last warning instantly via SignalR.
+              // Awaited directly — IHubContext.SendAsync is non-blocking at the application level.
+              try
               {
-                try
+                var group = $"attempt_{attemptId}";
+                await _proctorHub.Clients.Group(group).SendAsync("ProctorWarning", new
                 {
-                  var group = $"attempt_{attemptId}";
-                  await _proctorHub.Clients.Group(group).SendAsync("ProctorWarning", new
-                  {
-                    message = proctorSession.PendingWarningMessage,
-                    isLastWarning = true,
-                    currentCount,
-                    maxWarnings
-                  });
-                }
-                catch { /* fire-and-forget */ }
-              });
+                  message = proctorSession.PendingWarningMessage,
+                  isLastWarning = true,
+                  currentCount,
+                  maxWarnings
+                });
+              }
+              catch { /* non-fatal — candidate sees the warning on next status poll */ }
             }
             else
             {

@@ -473,6 +473,31 @@ export const translations = {
       walkIn: "Walk-in Registration",
       walkInDesc:
         "Anyone can self-register via QR/share link and take the exam — no prior registration needed",
+      // Walk-in dynamic registration fields
+      registrationFields: "Registration Fields",
+      registrationFieldsDesc:
+        "Define additional fields candidates must fill when registering for this exam",
+      registrationFieldsNote:
+        "These fields are only available when Walk-in Registration is enabled",
+      addField: "Add Field",
+      editField: "Edit Field",
+      fieldLabelEn: "Label (English)",
+      fieldLabelAr: "Label (Arabic)",
+      fieldType: "Field Type",
+      fieldTypeText: "Text",
+      fieldTypeNumber: "Number",
+      fieldRequired: "Required",
+      fieldDisplayOrder: "Display Order",
+      fieldLabelEnPlaceholder: "e.g. ID Number",
+      fieldLabelArPlaceholder: "e.g. رقم الهوية",
+      noRegistrationFields: "No registration fields configured",
+      noRegistrationFieldsDesc:
+        "Add fields that candidates must fill when they register for this walk-in exam",
+      fieldsLimitHint: "You can add up to 5 registration fields per exam",
+      fieldsLimitReached: "Maximum of 5 fields reached",
+      deleteFieldConfirm: "Delete this registration field?",
+      deleteFieldConfirmDesc:
+        "This will remove the field from the registration form. Existing answers are kept.",
       addInstruction: "Add Instruction",
       editInstruction: "Edit Instruction",
       instructionDialogDesc: "Enter instruction content in both languages",
@@ -723,7 +748,8 @@ export const translations = {
       finalizeConfirmDesc:
         "This will submit all grades and the candidate will see their final result. You cannot change grades after finalizing.",
       // Grading submission detail
-      allAutoGraded: "All questions are auto-graded. No manual grading required.",
+      allAutoGraded:
+        "All questions are auto-graded. No manual grading required.",
       backToGrading: "Back to Grading",
       questionXofY: "Question {current} of {total}",
       autoLabel: "auto",
@@ -1105,7 +1131,8 @@ export const translations = {
       eventSnapshotFailed: "SnapshotFailed",
       // Incident Detail page
       incidentNotFound: "Incident Not Found",
-      incidentNotFoundDesc: "This incident case does not exist or you don't have access.",
+      incidentNotFoundDesc:
+        "This incident case does not exist or you don't have access.",
       changeStatus: "Change Status",
       // Source labels
       sourceProctor: "Proctor",
@@ -1152,7 +1179,8 @@ export const translations = {
       outcomeField: "Outcome",
       reasonNotes: "Reason / Notes",
       explainDecision: "Explain your decision...",
-      closeCaseAfterDecision: "Also close this case after recording the decision",
+      closeCaseAfterDecision:
+        "Also close this case after recording the decision",
       changeStatusTitle: "Change Status",
       changeStatusDesc: "Update the status of case {caseNumber}",
       newStatusLabel: "New Status",
@@ -2061,6 +2089,31 @@ export const translations = {
       walkIn: "تسجيل ذاتي (Walk-in)",
       walkInDesc:
         "يمكن لأي شخص التسجيل الذاتي عبر رابط/رمز QR وبدء الاختبار بدون تسجيل مسبق",
+      // حقول التسجيل الديناميكية للتسجيل المفتوح
+      registrationFields: "حقول التسجيل",
+      registrationFieldsDesc:
+        "حدّد الحقول الإضافية التي يجب على المرشح ملؤها عند التسجيل في هذا الاختبار",
+      registrationFieldsNote:
+        "هذه الحقول متاحة فقط عند تفعيل التسجيل الذاتي (Walk-in)",
+      addField: "إضافة حقل",
+      editField: "تعديل حقل",
+      fieldLabelEn: "التسمية (إنجليزي)",
+      fieldLabelAr: "التسمية (عربي)",
+      fieldType: "نوع الحقل",
+      fieldTypeText: "نص",
+      fieldTypeNumber: "رقم",
+      fieldRequired: "إلزامي",
+      fieldDisplayOrder: "ترتيب العرض",
+      fieldLabelEnPlaceholder: "مثال: رقم الهوية",
+      fieldLabelArPlaceholder: "مثال: رقم الهوية",
+      noRegistrationFields: "لا توجد حقول تسجيل",
+      noRegistrationFieldsDesc:
+        "أضف حقولاً يجب على المرشحين ملؤها عند التسجيل في هذا الاختبار",
+      fieldsLimitHint: "يمكنك إضافة ما يصل إلى 5 حقول تسجيل لكل اختبار",
+      fieldsLimitReached: "تم الوصول إلى الحد الأقصى وهو 5 حقول",
+      deleteFieldConfirm: "حذف هذا الحقل؟",
+      deleteFieldConfirmDesc:
+        "سيتم إزالة الحقل من نموذج التسجيل. الإجابات الموجودة ستُحفظ.",
       notFound: "الاختبار غير موجود",
     },
 
@@ -2307,7 +2360,8 @@ export const translations = {
       timeExpired: "انتهى الوقت! سيتم إرسال اختبارك تلقائياً.",
       tabSwitchWarning: "تحذير: تم اكتشاف تبديل علامة التبويب. سيتم تسجيل ذلك.",
       copyPasteBlocked: "النسخ/اللصق غير مسموح به أثناء هذا الاختبار.",
-      screenshotAttemptWarning: "تحذير: تم اكتشاف لقطة شاشة على جهازك. تم تسجيل هذا كانتهاك أمني.",
+      screenshotAttemptWarning:
+        "تحذير: تم اكتشاف لقطة شاشة على جهازك. تم تسجيل هذا كانتهاك أمني.",
       sectionTimeExpired: "انتهى وقت القسم. الانتقال إلى القسم التالي.",
       sectionTimeWarning: "الوقت ينفد!",
       sectionTimeWarningDesc: "يتبقى فقط {seconds} ثانية في هذا القسم.",
@@ -2770,7 +2824,8 @@ export const translations = {
       eventSnapshotFailed: "فشل اللقطة",
       // Incident Detail page
       incidentNotFound: "الحادثة غير موجودة",
-      incidentNotFoundDesc: "حالة الحادثة هذه غير موجودة أو ليس لديك صلاحية الوصول إليها.",
+      incidentNotFoundDesc:
+        "حالة الحادثة هذه غير موجودة أو ليس لديك صلاحية الوصول إليها.",
       changeStatus: "تغيير الحالة",
       // Source labels
       sourceProctor: "المراقب",

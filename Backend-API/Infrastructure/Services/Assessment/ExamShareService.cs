@@ -168,6 +168,25 @@ public class ExamShareService : IExamShareService
             OrganizationLogoUrl = org?.LogoPath,
             IsWalkIn = accessPolicy?.IsWalkIn ?? false
         };
+
+        // Load dynamic registration fields if this is a walk-in exam
+        if (accessPolicy?.IsWalkIn == true)
+        {
+            examInfo.WalkInFields = await _context.WalkInRegistrationFields
+                .Where(f => f.ExamId == exam.Id)
+                .OrderBy(f => f.DisplayOrder)
+                .Select(f => new WalkInFieldDto
+                {
+                    Id = f.Id,
+                    ExamId = f.ExamId,
+                    LabelEn = f.LabelEn,
+                    LabelAr = f.LabelAr,
+                    FieldType = (WalkInFieldTypeDto)f.FieldType,
+                    IsRequired = f.IsRequired,
+                    DisplayOrder = f.DisplayOrder
+                })
+                .ToListAsync();
+        }
         _cache.Set(cacheKey, examInfo, CacheKeys.Thirty);
         return ApiResponse<PublicExamInfoDto>.SuccessResponse(examInfo);
     }
@@ -381,6 +400,9 @@ public class ExamShareService : IExamShareService
             existingUser.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddDays(7);
             await _userManager.UpdateAsync(existingUser);
 
+            // Upsert dynamic field answers (re-registration always re-collects data)
+            await UpsertDynamicFieldAnswersAsync(exam.Id, existingUser.Id, dto.DynamicFields);
+
             return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
             {
                 AccessToken = accessToken,
@@ -433,6 +455,9 @@ public class ExamShareService : IExamShareService
         newUser.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddDays(7);
         await _userManager.UpdateAsync(newUser);
 
+        // Save dynamic field answers for new candidate
+        await UpsertDynamicFieldAnswersAsync(exam.Id, newUser.Id, dto.DynamicFields);
+
         return ApiResponse<SelectCandidateResponseDto>.SuccessResponse(new SelectCandidateResponseDto
         {
             AccessToken = token,
@@ -442,6 +467,66 @@ public class ExamShareService : IExamShareService
             CandidateId = newUser.Id,
             CandidateName = newUser.FullName
         });
+    }
+
+    /// <summary>
+    /// Upsert dynamic field answers for a candidate on a specific exam.
+    /// Skips gracefully when no dynamic fields are submitted (backward-compatible).
+    /// </summary>
+    private async Task UpsertDynamicFieldAnswersAsync(
+        int examId, string candidateId, List<WalkInFieldAnswerInputDto>? dynamicFields)
+    {
+        if (dynamicFields == null || dynamicFields.Count == 0)
+            return;
+
+        var submittedFieldIds = dynamicFields.Select(f => f.FieldId).Distinct().ToList();
+
+        // Security: only accept fieldIds that actually belong to this exam.
+        // Prevents a malicious candidate from injecting field IDs from other exams.
+        var validFieldIds = await _context.WalkInRegistrationFields
+            .Where(f => f.ExamId == examId && submittedFieldIds.Contains(f.Id))
+            .Select(f => f.Id)
+            .ToListAsync();
+
+        // Filter out any spoofed or invalid field IDs
+        var sanitizedFields = dynamicFields
+            .Where(f => validFieldIds.Contains(f.FieldId))
+            .ToList();
+
+        if (sanitizedFields.Count == 0)
+            return;
+
+        // Load existing answers for this (candidate, exam) pair
+        var existing = await _context.WalkInRegistrationAnswers
+            .Where(a => a.CandidateId == candidateId && a.ExamId == examId && validFieldIds.Contains(a.FieldId))
+            .ToListAsync();
+
+        var now = UaeTimeHelper.NowUae;
+
+        foreach (var input in sanitizedFields)
+        {
+            var answer = existing.FirstOrDefault(a => a.FieldId == input.FieldId);
+            if (answer != null)
+            {
+                // Update existing answer
+                answer.Value = input.Value?.Trim() ?? string.Empty;
+                answer.UpdatedDate = now;
+            }
+            else
+            {
+                // Insert new answer
+                _context.WalkInRegistrationAnswers.Add(new WalkInRegistrationAnswer
+                {
+                    ExamId = examId,
+                    CandidateId = candidateId,
+                    FieldId = input.FieldId,
+                    Value = input.Value?.Trim() ?? string.Empty,
+                    CreatedDate = now
+                });
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     // ========== Helpers ==========

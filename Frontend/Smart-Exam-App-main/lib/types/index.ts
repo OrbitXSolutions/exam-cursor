@@ -296,6 +296,33 @@ export interface ExamAccessPolicy {
   updatedDate: string | null;
 }
 
+// Walk-In Dynamic Registration Fields
+export type WalkInFieldType = 1 | 2; // 1 = Text, 2 = Number
+
+export interface WalkInField {
+  id: number;
+  examId: number;
+  labelEn: string;
+  labelAr: string;
+  fieldType: WalkInFieldType;
+  isRequired: boolean;
+  displayOrder: number;
+}
+
+export interface WalkInAnswerValue {
+  fieldId: number;
+  labelEn: string;
+  labelAr: string;
+  value: string;
+}
+
+export interface WalkInAnswer {
+  candidateId: string;
+  candidateName: string | null;
+  candidateEmail: string | null;
+  answers: WalkInAnswerValue[];
+}
+
 export interface ExamQuestion {
   id: number;
   examId: number;

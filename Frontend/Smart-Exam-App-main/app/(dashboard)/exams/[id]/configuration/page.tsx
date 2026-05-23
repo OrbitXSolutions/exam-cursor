@@ -14,8 +14,12 @@ import {
   deleteInstruction,
   getAccessPolicy,
   saveAccessPolicy,
+  getWalkInFields,
+  saveWalkInField,
+  deleteWalkInField,
+  reorderWalkInFields,
 } from "@/lib/api/exams"
-import type { Exam, ExamInstruction, ExamAccessPolicy } from "@/lib/types"
+import type { Exam, ExamInstruction, ExamAccessPolicy, WalkInField } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,8 +37,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
-import { ArrowLeft, ArrowRight, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera, Monitor } from "lucide-react"
+import { ArrowLeft, ArrowRight, Save, Settings, Shield, FileText, Eye, Lock, Plus, Pencil, Trash2, GripVertical, Key, Globe, Users, CheckCircle2, XCircle, ShieldCheck, AlertTriangle, Camera, Monitor, ListChecks, ChevronUp, ChevronDown } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function ExamConfigurationPage() {
@@ -61,6 +75,22 @@ export default function ExamConfigurationPage() {
     isWalkIn: false,
   })
   const [savingAccessPolicy, setSavingAccessPolicy] = useState(false)
+  const [activeTab, setActiveTab] = useState("settings")
+
+  // Walk-In Registration Fields State
+  const [walkInFields, setWalkInFields] = useState<WalkInField[]>([])
+  const [loadingFields, setLoadingFields] = useState(false)
+  const [walkInFieldDialogOpen, setWalkInFieldDialogOpen] = useState(false)
+  const [editingField, setEditingField] = useState<WalkInField | null>(null)
+  const [fieldForm, setFieldForm] = useState<{
+    labelEn: string
+    labelAr: string
+    fieldType: 1 | 2
+    isRequired: boolean
+    displayOrder: number
+  }>({ labelEn: "", labelAr: "", fieldType: 1, isRequired: false, displayOrder: 0 })
+  const [savingField, setSavingField] = useState(false)
+  const [deleteConfirmFieldId, setDeleteConfirmFieldId] = useState<number | null>(null)
   
   // Exam Settings State
   const [formData, setFormData] = useState({
@@ -140,12 +170,113 @@ export default function ExamConfigurationPage() {
           restrictToAssignedCandidates: policyData.restrictToAssignedCandidates || false,
           isWalkIn: policyData.isWalkIn || false,
         })
+        // Auto-load walk-in fields if walk-in is already enabled
+        if (policyData.isWalkIn) {
+          const fieldsData = await getWalkInFields(id)
+          setWalkInFields(fieldsData)
+        }
       }
     } catch (error) {
       console.log("[v0] Configuration page - error:", error)
       toast.error(error instanceof Error ? error.message : t("common.error"))
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Load walk-in fields on demand (e.g. when user enables walk-in mid-session)
+  async function loadWalkInFields() {
+    try {
+      setLoadingFields(true)
+      const data = await getWalkInFields(id)
+      setWalkInFields(data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.error"))
+    } finally {
+      setLoadingFields(false)
+    }
+  }
+
+  // Walk-In Field CRUD
+  function openAddField() {
+    setEditingField(null)
+    setFieldForm({
+      labelEn: "",
+      labelAr: "",
+      fieldType: 1,
+      isRequired: false,
+      displayOrder: walkInFields.length,
+    })
+    setWalkInFieldDialogOpen(true)
+  }
+
+  function openEditField(field: WalkInField) {
+    setEditingField(field)
+    setFieldForm({
+      labelEn: field.labelEn,
+      labelAr: field.labelAr,
+      fieldType: field.fieldType,
+      isRequired: field.isRequired,
+      displayOrder: field.displayOrder,
+    })
+    setWalkInFieldDialogOpen(true)
+  }
+
+  async function handleSaveField() {
+    if (!fieldForm.labelEn.trim()) {
+      toast.error(language === "ar" ? "التسمية الإنجليزية مطلوبة" : "English label is required")
+      return
+    }
+    if (!fieldForm.labelAr.trim()) {
+      toast.error(language === "ar" ? "التسمية العربية مطلوبة" : "Arabic label is required")
+      return
+    }
+    try {
+      setSavingField(true)
+      await saveWalkInField(id, editingField?.id ?? null, fieldForm)
+      toast.success(t("common.saved"))
+      const updated = await getWalkInFields(id)
+      setWalkInFields(updated)
+      setWalkInFieldDialogOpen(false)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.error"))
+    } finally {
+      setSavingField(false)
+    }
+  }
+
+  async function handleDeleteField(fieldId: number) {
+    try {
+      await deleteWalkInField(id, fieldId)
+      toast.success(t("common.deleteSuccess"))
+      setWalkInFields(prev => prev.filter(f => f.id !== fieldId))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.error"))
+    } finally {
+      setDeleteConfirmFieldId(null)
+    }
+  }
+
+  async function handleMoveField(fieldId: number, direction: "up" | "down") {
+    const idx = walkInFields.findIndex(f => f.id === fieldId)
+    if (idx === -1) return
+    if (direction === "up" && idx === 0) return
+    if (direction === "down" && idx === walkInFields.length - 1) return
+
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1
+    const reordered = [...walkInFields]
+    const tmp = reordered[idx].displayOrder
+    reordered[idx] = { ...reordered[idx], displayOrder: reordered[swapIdx].displayOrder }
+    reordered[swapIdx] = { ...reordered[swapIdx], displayOrder: tmp }
+    ;[reordered[idx], reordered[swapIdx]] = [reordered[swapIdx], reordered[idx]]
+    setWalkInFields(reordered)
+
+    try {
+      await reorderWalkInFields(id, reordered.map((f, i) => ({ fieldId: f.id, displayOrder: i })))
+      const updated = await getWalkInFields(id)
+      setWalkInFields(updated)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
 
@@ -380,8 +511,8 @@ export default function ExamConfigurationPage() {
         )}
       </div>
 
-      <Tabs defaultValue="settings" className="space-y-6" dir={dir}>
-        <TabsList className="grid w-full grid-cols-4" dir={dir}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir={dir}>
+        <TabsList className={`grid w-full ${accessPolicyForm.isWalkIn ? "grid-cols-5" : "grid-cols-4"}`} dir={dir}>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">{t("exams.examSettings")}</span>
@@ -398,6 +529,16 @@ export default function ExamConfigurationPage() {
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">{t("exams.accessPolicy")}</span>
           </TabsTrigger>
+          {accessPolicyForm.isWalkIn && (
+            <TabsTrigger
+              value="registration-fields"
+              className="flex items-center gap-2"
+              onClick={() => { if (walkInFields.length === 0 && !loadingFields) loadWalkInFields() }}
+            >
+              <ListChecks className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("exams.registrationFields")}</span>
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Exam Settings Tab */}
@@ -881,22 +1022,43 @@ export default function ExamConfigurationPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-base font-medium">{t("exams.walkIn")}</Label>
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-base font-medium">{t("exams.walkIn")}</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{t("exams.walkInDesc")}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{t("exams.walkInDesc")}</p>
+                    <Switch
+                      checked={accessPolicyForm.isWalkIn}
+                      onCheckedChange={(checked) => setAccessPolicyForm(prev => ({
+                        ...prev,
+                        isWalkIn: checked,
+                        ...(checked ? { isPublic: false, restrictToAssignedCandidates: false, accessCode: "" } : {}),
+                      }))}
+                    />
                   </div>
-                  <Switch
-                    checked={accessPolicyForm.isWalkIn}
-                    onCheckedChange={(checked) => setAccessPolicyForm(prev => ({
-                      ...prev,
-                      isWalkIn: checked,
-                      ...(checked ? { isPublic: false, restrictToAssignedCandidates: false, accessCode: "" } : {}),
-                    }))}
-                  />
+                  {accessPolicyForm.isWalkIn && (
+                    <div className="px-4 py-3 bg-primary/5 border-t flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <ListChecks className="h-4 w-4 text-primary" />
+                        {language === "ar" ? "يمكنك إضافة حقول إضافية يجب على المرشحين ملؤها عند التسجيل" : "You can add extra fields candidates must fill when registering"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab("registration-fields")
+                          if (walkInFields.length === 0 && !loadingFields) loadWalkInFields()
+                        }}
+                        className="text-sm font-semibold text-primary hover:underline flex items-center gap-1.5 shrink-0 ms-4"
+                      >
+                        {language === "ar" ? "إدارة الحقول" : "Manage Fields"}
+                        {isRTL ? <ArrowLeft className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -909,7 +1071,208 @@ export default function ExamConfigurationPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Registration Fields Tab — Walk-In only */}
+        {accessPolicyForm.isWalkIn && (
+          <TabsContent value="registration-fields" className="space-y-6">
+            <Card>
+              <CardHeader className="border-b bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <ListChecks className="h-5 w-5" />
+                      {t("exams.registrationFields")}
+                    </CardTitle>
+                    <CardDescription className="mt-1">{t("exams.registrationFieldsDesc")}</CardDescription>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {walkInFields.length >= 5
+                        ? t("exams.fieldsLimitReached")
+                        : t("exams.fieldsLimitHint")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-medium tabular-nums ${walkInFields.length >= 5 ? "text-destructive" : "text-muted-foreground"}`}>
+                      {walkInFields.length} / 5
+                    </span>
+                    <Button onClick={openAddField} size="sm" disabled={loadingFields || walkInFields.length >= 5}>
+                      <Plus className="h-4 w-4 me-2" />
+                      {t("exams.addField")}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {loadingFields ? (
+                  <div className="flex items-center justify-center py-12">
+                    <LoadingSpinner size="md" />
+                  </div>
+                ) : walkInFields.length === 0 ? (
+                  <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                    <ListChecks className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-1">{t("exams.noRegistrationFields")}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{t("exams.noRegistrationFieldsDesc")}</p>
+                    <Button onClick={openAddField} disabled={walkInFields.length >= 5}>
+                      <Plus className="h-4 w-4 me-2" />
+                      {t("exams.addField")}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {walkInFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className="flex items-center gap-3 p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex flex-col gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            disabled={index === 0}
+                            onClick={() => handleMoveField(field.id, "up")}
+                          >
+                            <ChevronUp className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            disabled={index === walkInFields.length - 1}
+                            onClick={() => handleMoveField(field.id, "down")}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm">{field.labelEn}</span>
+                            <span className="text-muted-foreground text-sm" dir="rtl">{field.labelAr}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                              {field.fieldType === 2 ? t("exams.fieldTypeNumber") : t("exams.fieldTypeText")}
+                            </span>
+                            {field.isRequired && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                                {t("exams.fieldRequired")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditField(field)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeleteConfirmFieldId(field.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+
+                  <AlertDialog open={deleteConfirmFieldId !== null} onOpenChange={(open) => { if (!open) setDeleteConfirmFieldId(null) }}>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("exams.deleteFieldConfirm")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("exams.deleteFieldConfirmDesc")}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-white hover:bg-destructive/90"
+                          onClick={() => deleteConfirmFieldId !== null && handleDeleteField(deleteConfirmFieldId)}
+                        >
+                          {t("common.delete")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
+
+      {/* Walk-In Field Dialog */}
+      <Dialog open={walkInFieldDialogOpen} onOpenChange={setWalkInFieldDialogOpen}>
+        <DialogContent className="sm:max-w-lg" dir={dir}>
+          <DialogHeader>
+            <DialogTitle>
+              {editingField ? t("exams.editField") : t("exams.addField")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="fieldLabelEn">
+                {t("exams.fieldLabelEn")} <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="fieldLabelEn"
+                value={fieldForm.labelEn}
+                onChange={(e) => setFieldForm(prev => ({ ...prev, labelEn: e.target.value }))}
+                placeholder={t("exams.fieldLabelEnPlaceholder")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fieldLabelAr">
+                {t("exams.fieldLabelAr")} <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="fieldLabelAr"
+                value={fieldForm.labelAr}
+                onChange={(e) => setFieldForm(prev => ({ ...prev, labelAr: e.target.value }))}
+                placeholder={t("exams.fieldLabelArPlaceholder")}
+                dir="rtl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t("exams.fieldType")}</Label>
+              <Select
+                value={String(fieldForm.fieldType)}
+                onValueChange={(v) => setFieldForm(prev => ({ ...prev, fieldType: Number(v) as 1 | 2 }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">{t("exams.fieldTypeText")}</SelectItem>
+                  <SelectItem value="2">{t("exams.fieldTypeNumber")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <Label htmlFor="fieldRequired" className="cursor-pointer">
+                {t("exams.fieldRequired")}
+              </Label>
+              <Switch
+                id="fieldRequired"
+                checked={fieldForm.isRequired}
+                onCheckedChange={(checked) => setFieldForm(prev => ({ ...prev, isRequired: checked }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWalkInFieldDialogOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={handleSaveField} disabled={savingField}>
+              {savingField ? t("common.saving") : t("common.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Instruction Dialog */}
       <Dialog open={instructionDialogOpen} onOpenChange={setInstructionDialogOpen}>

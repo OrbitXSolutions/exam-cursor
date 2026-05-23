@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -1303,9 +1303,9 @@ export default function ExamPage() {
         }
       }).catch(() => {})
     } else {
-      // SignalR is disconnected â€” start 15s fallback polling
+      // SignalR is disconnected — start 10s fallback polling
       if (!proctorPollRef.current) {
-        console.log("[SmartPoll] SignalR disconnected â€” starting 15s fallback polling")
+        console.log("[SmartPoll] SignalR disconnected — starting 10s fallback polling")
         proctorPollRef.current = setInterval(async () => {
           try {
             const status = await getCandidateSessionStatus(session.attemptId)
@@ -1324,7 +1324,7 @@ export default function ExamPage() {
           } catch {
             // Silent fail â€” don't disrupt exam
           }
-        }, 15000)
+        }, 10000)
       }
     }
 
