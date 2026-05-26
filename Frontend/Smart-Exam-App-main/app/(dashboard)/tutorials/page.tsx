@@ -197,7 +197,7 @@ export default function TutorialsPage() {
                           <h3 className="text-base font-semibold group-hover:text-primary transition-colors">
                             {language === "ar" ? "الدروس المرئية" : "Video Tutorials"}
                           </h3>
-                          <Badge variant="default" className="text-xs shrink-0">7 {language === "ar" ? "فيديو" : "videos"}</Badge>
+                          <Badge variant="default" className="text-xs shrink-0">8 {language === "ar" ? "فيديو" : "videos"}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {language === "ar"
