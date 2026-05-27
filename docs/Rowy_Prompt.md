@@ -121,3 +121,29 @@ This is inefficient — pagination needs to be server-side.
 Default page size = 10.
 Preserve all existing functionality: Allow New Attempt dialog, Show Reason dialog, action dropdowns.
 Do NOT change the bilingual (Arabic/English) labels.
+
+Storage in DB:
+
+Column Value Purpose
+PasswordHash AQAAAAIAAYagAAAAE... ASP.NET Identity hash — login only
+EncryptedPassword Base64(IV + AES ciphertext) Recoverable for email delivery
+Is it sent via email?
+Yes — NotificationService calls \_encryption.Decrypt(user.EncryptedPassword) and includes the plain password in the welcome email to the candidate. This is by design so admins can send login credentials.
+
+Is this secure?
+The EncryptedPassword field is AES-256 encrypted — not plain text. The decryption key comes from EncryptionSettings:Key in appsettings.json. As long as that key is protected (environment variable / secrets manager in production), the stored data is safe even if the DB is compromised.
+
+Summary: Password field on the "Create Candidate" form is optional — leave it blank to auto-generate one. Either way, the candidate receives it via email and can log in with it.
+
+Summary
+Changed file: CandidateService.cs:154
+
+What was done: After candidateAttempts is fetched (already in memory), added a 5-line in-memory filter for regular non-walk-in candidates:
+
+EndAt = null → always visible
+EndAt >= now → still open or upcoming → visible
+Candidate has an attempt for it → keep (result review access preserved)
+Everything else (expired, never attempted) → removed from the list
+Zero extra DB queries — reuses candidateAttempts already fetched on that path.
+
+Walk-in candidates → untouched (their branch was already correct).

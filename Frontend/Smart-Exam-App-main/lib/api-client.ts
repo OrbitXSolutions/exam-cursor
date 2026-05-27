@@ -124,6 +124,13 @@ class ApiClient {
                 : "License expired. System is in read-only mode. Please contact your administrator to renew the license.",
             );
           }
+
+          // Permission-denied 403 (not license-related)
+          throw new Error(
+            language === "ar"
+              ? "ليس لديك صلاحية للقيام بهذا الإجراء."
+              : "You do not have permission to perform this action.",
+          );
         }
 
         const errors = jsonResponse.errors;

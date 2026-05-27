@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 using FluentValidation;
+using Serilog.Context;
 using Smart_Core.Application.DTOs.Common;
 
 namespace Smart_Core.Infrastructure.Middleware;
@@ -32,6 +34,17 @@ public class GlobalExceptionMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        using var _1 = LogContext.PushProperty("ExceptionMessage", exception.Message);
+        using var _2 = LogContext.PushProperty("ExceptionType", exception.GetType().FullName ?? "Unknown");
+        using var _3 = LogContext.PushProperty("InnerException", exception.InnerException?.Message ?? (object?)null);
+        using var _4 = LogContext.PushProperty("Endpoint", $"{context.Request.Method} {context.Request.Path}");
+        using var _5 = LogContext.PushProperty("RequestId", traceId);
+        using var _6 = LogContext.PushProperty("UserId", userId ?? (object?)null);
+
+        // Share exception with RequestResponseLoggingMiddleware (outer) so it appears in Developer log
+        context.Items["UnhandledException"] = exception;
 
         _logger.LogError(exception,
             "Unhandled exception | TraceId={TraceId} | Path={Path} | Method={Method} | Message={Message}",
