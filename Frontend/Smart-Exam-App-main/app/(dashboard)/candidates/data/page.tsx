@@ -475,6 +475,7 @@ export default function CandidatesDataPage() {
                       <TableHead>{isAr ? "الجوال" : "Mobile"}</TableHead>
                       <TableHead>{isAr ? "الحالة" : "Status"}</TableHead>
                       <TableHead>{isAr ? "تاريخ الإنشاء" : "Created"}</TableHead>
+                      <TableHead>{isAr ? "آخر تسجيل دخول" : "Last Login"}</TableHead>
                       <TableHead>{isAr ? "أنشأ بواسطة" : "Created By"}</TableHead>
                       <TableHead className="w-10"></TableHead>
                     </TableRow>
@@ -510,6 +511,14 @@ export default function CandidatesDataPage() {
                             timeZone: "Asia/Dubai",
                             year: "numeric", month: "short", day: "numeric",
                           })}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {c.lastLoginDate
+                            ? new Date(c.lastLoginDate).toLocaleDateString(isAr ? "ar-SA" : "en-US", {
+                                timeZone: "Asia/Dubai",
+                                year: "numeric", month: "short", day: "numeric",
+                              })
+                            : "—"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{c.createdByName || "—"}</TableCell>
                         <TableCell>

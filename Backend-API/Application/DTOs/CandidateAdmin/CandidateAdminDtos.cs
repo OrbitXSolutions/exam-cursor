@@ -13,6 +13,7 @@ public class CandidateListDto
     public bool IsBlocked { get; set; }
     public bool IsWalkIn { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
     public string? DeletedBy { get; set; }

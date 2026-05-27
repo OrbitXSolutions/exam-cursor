@@ -13,6 +13,7 @@ public class UserDto
     public bool EmailConfirmed { get; set; }
     public List<string> Roles { get; set; } = new();
     public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
     public int? DepartmentId { get; set; }
     public string? DepartmentNameEn { get; set; }
     public string? DepartmentNameAr { get; set; }

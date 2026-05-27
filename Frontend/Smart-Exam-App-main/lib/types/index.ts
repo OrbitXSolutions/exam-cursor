@@ -177,6 +177,7 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   createdDate: string;
+  lastLoginDate?: string | null;
   avatarUrl?: string;
   departmentId?: number | null;
   departmentNameEn?: string;

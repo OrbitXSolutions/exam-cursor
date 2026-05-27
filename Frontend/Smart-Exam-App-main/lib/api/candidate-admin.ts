@@ -12,6 +12,7 @@ export interface CandidateDto {
   isBlocked: boolean;
   isWalkIn: boolean;
   createdDate: string;
+  lastLoginDate: string | null;
   createdBy: string | null;
   createdByName: string | null;
   deletedBy: string | null;

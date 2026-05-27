@@ -129,6 +129,7 @@ public class CandidateAdminService : ICandidateAdminService
                 IsBlocked = u.IsBlocked,
                 IsWalkIn = u.IsWalkIn,
                 CreatedDate = u.CreatedDate,
+                LastLoginDate = u.LastLoginDate,
                 CreatedBy = u.CreatedBy,
                 CreatedByName = u.CreatedBy != null && creators.TryGetValue(u.CreatedBy, out var c)
                     ? (c.FullName ?? c.Email) : null
@@ -764,6 +765,7 @@ public class CandidateAdminService : ICandidateAdminService
         IsBlocked = u.IsBlocked,
         IsWalkIn = u.IsWalkIn,
         CreatedDate = u.CreatedDate,
+        LastLoginDate = u.LastLoginDate,
         CreatedBy = u.CreatedBy,
         DeletedBy = u.DeletedBy,
         DeletedDate = u.IsDeleted ? u.UpdatedDate : null,
