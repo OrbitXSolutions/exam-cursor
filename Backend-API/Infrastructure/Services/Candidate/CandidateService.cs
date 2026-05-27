@@ -151,6 +151,20 @@ public class CandidateService : ICandidateService
                 })
                 .ToListAsync();
 
+            // Exclude expired exams unless the candidate has an attempt for them.
+            // Keeps result-review access for completed exams; hides irrelevant past exams
+            // from new/walk-in-registered candidates. Walk-in branch already limits to
+            // attempted exams, so this guard only applies to regular candidates.
+            if (isCandidate && !user.IsWalkIn)
+            {
+                var attemptedExamIdSet = candidateAttempts.Select(a => a.ExamId).ToHashSet();
+                exams = exams.Where(e =>
+                    !e.EndAt.HasValue ||              // no expiry → always visible
+                    e.EndAt.Value >= now ||            // still open / upcoming → visible
+                    attemptedExamIdSet.Contains(e.Id)  // has attempt → keep for results
+                ).ToList();
+            }
+
             var attemptCounts = candidateAttempts
                 .GroupBy(a => a.ExamId)
                 .ToDictionary(g => g.Key, g => g.Count());
