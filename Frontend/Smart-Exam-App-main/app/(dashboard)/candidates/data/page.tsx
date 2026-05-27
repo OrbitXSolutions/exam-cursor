@@ -149,8 +149,6 @@ export default function CandidatesDataPage() {
     if (!formData.email.trim()) err.email = isAr ? "البريد مطلوب" : "Email is required"
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       err.email = isAr ? "بريد غير صالح" : "Invalid email format"
-    if (formMode === "create" && !formData.password.trim())
-      err.password = isAr ? "كلمة المرور مطلوبة" : "Password is required"
     if (formData.password) {
       if (formData.password.length < 8)
         err.password = isAr ? "8 أحرف على الأقل" : "At least 8 characters"
@@ -632,20 +630,24 @@ export default function CandidatesDataPage() {
             <div className="grid gap-2">
               <Label>
                 {isAr ? "كلمة المرور" : "Password"}
-                {formMode === "create" ? " *" : ` (${isAr ? "اختياري" : "optional"})`}
+                {` (${isAr ? "اختياري" : "optional"})`}
               </Label>
               <Input
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData(d => ({ ...d, password: e.target.value }))}
-                placeholder={formMode === "edit" ? (isAr ? "اتركه فارغاً للإبقاء" : "Leave empty to keep current") : ""}
+                placeholder={isAr ? "اتركه فارغاً للتوليد التلقائي" : "Leave blank to auto-generate"}
               />
               {formErrors.password
                 ? <p className="text-xs text-destructive">{formErrors.password}</p>
                 : <p className="text-xs text-muted-foreground">
-                    {isAr
-                      ? "8 أحرف على الأقل، حرف كبير، حرف صغير، ورمز خاص (!@#$...)"
-                      : "Min 8 chars, uppercase, lowercase & special character (!@#$...)"}
+                    {formMode === "create"
+                      ? (isAr
+                          ? "اختياري — اتركه فارغاً ليتم توليد كلمة مرور تلقائياً. إذا حددتها: 8 أحرف على الأقل، حرف كبير، حرف صغير، ورمز خاص"
+                          : "Optional — leave blank to auto-generate one. If set: min 8 chars, uppercase, lowercase & special character")
+                      : (isAr
+                          ? "اتركه فارغاً للإبقاء على كلمة المرور الحالية"
+                          : "Leave blank to keep the current password")}
                   </p>
               }
             </div>
