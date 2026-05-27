@@ -9,6 +9,9 @@ using Smart_Core.Application.Interfaces.CandidateAdmin;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
+using Smart_Core.Domain.Entities.Batch;
+using Smart_Core.Domain.Entities.ExamAssignment;
+using Smart_Core.Domain.Entities.ExamResult;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
 using Smart_Core.Infrastructure.Services.Authorization;
@@ -166,17 +169,37 @@ public class CandidateAdminService : ICandidateAdminService
             ? null
             : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
 
-        // Validate email uniqueness
-        var existing = await _userManager.FindByEmailAsync(dto.Email);
-        if (existing != null)
-            return ApiResponse<CandidateListDto>.FailureResponse("A user with this email already exists.");
+        // Validate email uniqueness — IgnoreQueryFilters to include soft-deleted rows
+        // (HasQueryFilter on ApplicationUser hides them from FindByEmailAsync, which would
+        //  cause CreateAsync to crash with a unique-constraint violation on NormalizedEmail)
+        var existingByEmail = await _db.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.NormalizedEmail == dto.Email.ToUpperInvariant());
+        if (existingByEmail != null)
+        {
+            // Reactivate path: restore the soft-deleted record with new data
+            if (existingByEmail.IsDeleted && dto.ForceReactivate)
+                return await ReactivateCandidateAsync(existingByEmail, dto, departmentId, createdBy);
 
-        // Validate RollNo uniqueness
+            var msg = existingByEmail.IsDeleted
+                ? "This email belongs to a previously deleted account. Please use a different email."
+                : "A user with this email already exists.";
+            return ApiResponse<CandidateListDto>.FailureResponse(msg);
+        }
+
+        // Validate RollNo uniqueness — IgnoreQueryFilters for same reason
         if (!string.IsNullOrWhiteSpace(dto.RollNo))
         {
-            var rollExists = await _db.Users.AnyAsync(u => u.RollNo == dto.RollNo && !u.IsDeleted);
-            if (rollExists)
-                return ApiResponse<CandidateListDto>.FailureResponse("A candidate with this Roll No already exists.");
+            var existingByRoll = await _db.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.RollNo == dto.RollNo);
+            if (existingByRoll != null)
+            {
+                var msg = existingByRoll.IsDeleted
+                    ? "This Roll No belongs to a previously deleted candidate. Please use a different Roll No."
+                    : "A candidate with this Roll No already exists.";
+                return ApiResponse<CandidateListDto>.FailureResponse(msg);
+            }
         }
 
         var password = string.IsNullOrWhiteSpace(dto.Password) ? GeneratePassword() : dto.Password;
@@ -225,24 +248,38 @@ public class CandidateAdminService : ICandidateAdminService
         if (user == null || user.IsDeleted)
             return ApiResponse<CandidateListDto>.FailureResponse("Candidate not found.");
 
-        // Email change → check uniqueness
+        // Email change → check uniqueness (IgnoreQueryFilters to catch soft-deleted conflicts)
         if (!string.IsNullOrWhiteSpace(dto.Email) && !dto.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase))
         {
-            var exists = await _userManager.FindByEmailAsync(dto.Email);
-            if (exists != null)
-                return ApiResponse<CandidateListDto>.FailureResponse("A user with this email already exists.");
+            var existingByEmail = await _db.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.NormalizedEmail == dto.Email.ToUpperInvariant() && u.Id != id);
+            if (existingByEmail != null)
+            {
+                var msg = existingByEmail.IsDeleted
+                    ? "This email belongs to a previously deleted account. Please use a different email."
+                    : "A user with this email already exists.";
+                return ApiResponse<CandidateListDto>.FailureResponse(msg);
+            }
             user.Email = dto.Email;
             user.UserName = dto.Email;
             user.NormalizedEmail = dto.Email.ToUpperInvariant();
             user.NormalizedUserName = dto.Email.ToUpperInvariant();
         }
 
-        // RollNo change → check uniqueness
+        // RollNo change → check uniqueness (IgnoreQueryFilters to catch soft-deleted conflicts)
         if (dto.RollNo != null && dto.RollNo != user.RollNo)
         {
-            var rollExists = await _db.Users.AnyAsync(u => u.RollNo == dto.RollNo && u.Id != id && !u.IsDeleted);
-            if (rollExists)
-                return ApiResponse<CandidateListDto>.FailureResponse("A candidate with this Roll No already exists.");
+            var existingByRoll = await _db.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.RollNo == dto.RollNo && u.Id != id);
+            if (existingByRoll != null)
+            {
+                var msg = existingByRoll.IsDeleted
+                    ? "This Roll No belongs to a previously deleted candidate. Please use a different Roll No."
+                    : "A candidate with this Roll No already exists.";
+                return ApiResponse<CandidateListDto>.FailureResponse(msg);
+            }
             user.RollNo = dto.RollNo;
         }
 
@@ -339,13 +376,144 @@ public class CandidateAdminService : ICandidateAdminService
         return ApiResponse<bool>.SuccessResponse(true, "Candidate deleted successfully.");
     }
 
-    // ── Export Excel ───────────────────────────────────────────
-    public async Task<byte[]> ExportCandidatesAsync(CandidateFilterDto filter)
+    // ── Find soft-deleted candidate by email ───────────────────
+    public async Task<ApiResponse<CandidateListDto?>> FindDeletedByEmailAsync(string email)
     {
-        // Remove pagination for export
-        filter.PageNumber = 1;
-        filter.PageSize = 100_000;
-        var response = await GetCandidatesAsync(filter);
+        var user = await _db.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.NormalizedEmail == email.ToUpperInvariant() && u.IsDeleted);
+
+        if (user == null)
+            return ApiResponse<CandidateListDto?>.FailureResponse("No deleted candidate found with this email.");
+
+        var dto = MapToDto(user);
+
+        // Resolve DeletedBy ID → display name or email
+        if (!string.IsNullOrWhiteSpace(user.DeletedBy))
+        {
+            var deletedByUser = await _db.Users
+                .IgnoreQueryFilters()
+                .Where(u => u.Id == user.DeletedBy)
+                .Select(u => new { u.DisplayName, u.Email })
+                .FirstOrDefaultAsync();
+
+            if (deletedByUser != null)
+                dto.DeletedBy = !string.IsNullOrWhiteSpace(deletedByUser.DisplayName)
+                    ? deletedByUser.DisplayName
+                    : deletedByUser.Email;
+        }
+
+        return ApiResponse<CandidateListDto?>.SuccessResponse(dto);
+    }
+
+    // ── Reactivate (private helper) ────────────────────────────
+    private async Task<ApiResponse<CandidateListDto>> ReactivateCandidateAsync(
+        ApplicationUser user, CreateCandidateDto dto, int? departmentId, string updatedBy)
+    {
+        // Validate new RollNo won't conflict with another ACTIVE candidate
+        if (!string.IsNullOrWhiteSpace(dto.RollNo) && dto.RollNo != user.RollNo)
+        {
+            var rollConflict = await _db.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.RollNo == dto.RollNo && u.Id != user.Id);
+            if (rollConflict != null)
+            {
+                var msg = rollConflict.IsDeleted
+                    ? "This Roll No belongs to another deleted candidate. Please use a different Roll No."
+                    : "A candidate with this Roll No already exists.";
+                return ApiResponse<CandidateListDto>.FailureResponse(msg);
+            }
+        }
+
+        user.IsDeleted = false;
+        user.DeletedBy = null;
+        user.FullName = dto.FullName;
+        user.FullNameAr = dto.FullNameAr;
+        user.RollNo = string.IsNullOrWhiteSpace(dto.RollNo) ? null : dto.RollNo;
+        user.PhoneNumber = dto.Mobile;
+        user.DisplayName = dto.FullName;
+        user.Status = UserStatus.Active;
+        user.IsBlocked = false;
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+        user.UpdatedDate = UaeTimeHelper.NowUae;
+        user.UpdatedBy = updatedBy;
+        user.DepartmentId = departmentId;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+            return ApiResponse<CandidateListDto>.FailureResponse(
+                "Failed to reactivate candidate.",
+                updateResult.Errors.Select(e => e.Description).ToList());
+
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            await _userManager.ResetPasswordAsync(user, token, dto.Password);
+            user.EncryptedPassword = _encryption.Encrypt(dto.Password);
+            await _userManager.UpdateAsync(user);
+        }
+
+        // Ensure Candidate role exists
+        if (!await _roleManager.RoleExistsAsync(AppRoles.Candidate))
+            await _roleManager.CreateAsync(new ApplicationRole { Name = AppRoles.Candidate });
+        if (!await _userManager.IsInRoleAsync(user, AppRoles.Candidate))
+            await _userManager.AddToRoleAsync(user, AppRoles.Candidate);
+
+        InvalidateCandidateCache();
+        return ApiResponse<CandidateListDto>.SuccessResponse(MapToDto(user), "Candidate reactivated successfully.");
+    }
+
+    // ── Permanent Delete (SuperAdmin only) ─────────────────────
+    public async Task<ApiResponse<bool>> PermanentDeleteCandidateAsync(string id, string requestedBy)
+    {
+        var user = await _db.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+            return ApiResponse<bool>.FailureResponse("Candidate not found.");
+
+        if (!user.IsDeleted)
+            return ApiResponse<bool>.FailureResponse(
+                "Only soft-deleted candidates can be permanently deleted. Please soft-delete first.");
+
+        // Block permanent deletion if any linked records exist
+        var hasAttempts = await _db.Set<Domain.Entities.Attempt.Attempt>()
+            .IgnoreQueryFilters().AnyAsync(a => a.CandidateId == id);
+        var hasResults = await _db.Set<Result>()
+            .IgnoreQueryFilters().AnyAsync(r => r.CandidateId == id);
+        var hasBatch = await _db.Set<BatchCandidate>()
+            .IgnoreQueryFilters().AnyAsync(bc => bc.CandidateId == id);
+        var hasAssignments = await _db.Set<Smart_Core.Domain.Entities.ExamAssignment.ExamAssignment>()
+            .IgnoreQueryFilters().AnyAsync(ea => ea.CandidateId == id);
+
+        if (hasAttempts || hasResults || hasBatch || hasAssignments)
+            return ApiResponse<bool>.FailureResponse(
+                "Cannot permanently delete: this candidate has linked records (attempts, results, batch memberships, or exam assignments). The account will remain as deleted.");
+
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+            return ApiResponse<bool>.FailureResponse(
+                "Failed to permanently delete candidate.",
+                result.Errors.Select(e => e.Description).ToList());
+
+        InvalidateCandidateCache();
+        return ApiResponse<bool>.SuccessResponse(true, "Candidate permanently deleted. The email is now available for reuse.");
+    }
+
+    // ── Export Excel ───────────────────────────────────────────
+    public async Task<byte[]> ExportCandidatesAsync(CandidateExportFilterDto filter)
+    {
+        // Export always fetches all records — bypass pagination completely
+        var internalFilter = new CandidateFilterDto
+        {
+            Search = filter.Search,
+            Status = filter.Status,
+            PageNumber = 1,
+            PageSize = 100_000,
+        };
+        var response = await GetCandidatesAsync(internalFilter);
         var candidates = response.Data?.Items ?? new List<CandidateListDto>();
 
         using var workbook = new XLWorkbook();
@@ -413,146 +581,174 @@ public class CandidateAdminService : ICandidateAdminService
     // ── Import Excel ───────────────────────────────────────────
     public async Task<ApiResponse<CandidateImportResultDto>> ImportCandidatesAsync(Stream fileStream, string createdBy)
     {
-        var result = new CandidateImportResultDto();
-        var departmentId = await _resourceAuthorization.IsCurrentUserSuperAdminAsync()
-            ? null
-            : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
-
-        using var workbook = new XLWorkbook(fileStream);
-        var ws = workbook.Worksheets.First();
-        var lastRow = ws.LastRowUsed()?.RowNumber() ?? 1;
-
-        // Read header row to map columns
-        var headerRow = ws.Row(1);
-        var colMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        for (int c = 1; c <= ws.LastColumnUsed()?.ColumnNumber(); c++)
+        try
         {
-            var val = headerRow.Cell(c).GetString().Trim();
-            if (!string.IsNullOrWhiteSpace(val))
-                colMap[val] = c;
-        }
+            var result = new CandidateImportResultDto();
+            var departmentId = await _resourceAuthorization.IsCurrentUserSuperAdminAsync()
+                ? null
+                : await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
 
-        // Pre-load existing emails and roll numbers for uniqueness
-        var existingEmails = await _db.Users.Where(u => !u.IsDeleted)
-            .Select(u => u.NormalizedEmail).ToListAsync();
-        var emailSet = new HashSet<string>(existingEmails.Where(e => e != null)!, StringComparer.OrdinalIgnoreCase);
+            using var workbook = new XLWorkbook(fileStream);
+            var ws = workbook.Worksheets.First();
+            var lastRow = ws.LastRowUsed()?.RowNumber() ?? 1;
 
-        var existingRolls = await _db.Users.Where(u => !u.IsDeleted && u.RollNo != null)
-            .Select(u => u.RollNo!).ToListAsync();
-        var rollSet = new HashSet<string>(existingRolls, StringComparer.OrdinalIgnoreCase);
-
-        // Track duplicates within the file
-        var fileEmailSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var fileRollSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // Ensure Candidate role exists
-        if (!await _roleManager.RoleExistsAsync(AppRoles.Candidate))
-            await _roleManager.CreateAsync(new ApplicationRole { Name = AppRoles.Candidate });
-
-        for (int row = 2; row <= lastRow; row++)
-        {
-            result.TotalRows++;
-            var errors = new List<string>();
-
-            string GetCell(string col) => colMap.TryGetValue(col, out var idx)
-                ? ws.Row(row).Cell(idx).GetString().Trim() : "";
-
-            var fullName = GetCell("FullName");
-            var fullNameAr = GetCell("FullNameAr");
-            var email = GetCell("Email");
-            var password = GetCell("Password");
-            var rollNo = GetCell("RollNo");
-            var mobile = GetCell("Mobile");
-
-            // Skip completely empty rows
-            if (string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(email))
-                continue;
-
-            // Validate required
-            if (string.IsNullOrWhiteSpace(fullName)) errors.Add("FullName is required.");
-            if (string.IsNullOrWhiteSpace(email)) errors.Add("Email is required.");
-            else if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$")) errors.Add("Invalid email format.");
-            if (string.IsNullOrWhiteSpace(rollNo)) errors.Add("RollNo is required.");
-
-            // Uniqueness
-            if (!string.IsNullOrWhiteSpace(email))
+            // Read header row to map columns
+            var headerRow = ws.Row(1);
+            var colMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int c = 1; c <= ws.LastColumnUsed()?.ColumnNumber(); c++)
             {
-                if (emailSet.Contains(email) || fileEmailSet.Contains(email))
-                    errors.Add("Email already exists.");
-                else
-                    fileEmailSet.Add(email);
-            }
-            if (!string.IsNullOrWhiteSpace(rollNo))
-            {
-                if (rollSet.Contains(rollNo) || fileRollSet.Contains(rollNo))
-                    errors.Add("RollNo already exists.");
-                else
-                    fileRollSet.Add(rollNo);
+                var val = headerRow.Cell(c).GetString().Trim();
+                if (!string.IsNullOrWhiteSpace(val))
+                    colMap[val] = c;
             }
 
-            if (errors.Count > 0)
+            // Pre-load existing emails and roll numbers for uniqueness
+            // Must use IgnoreQueryFilters so soft-deleted users are included —
+            // the DB unique indexes cover ALL rows, not just active ones.
+            var existingEmails = await _db.Users.IgnoreQueryFilters()
+                .Select(u => u.NormalizedEmail).ToListAsync();
+            var emailSet = new HashSet<string>(existingEmails.Where(e => e != null)!, StringComparer.OrdinalIgnoreCase);
+
+            var existingRolls = await _db.Users.IgnoreQueryFilters()
+                .Where(u => u.RollNo != null)
+                .Select(u => u.RollNo!).ToListAsync();
+            var rollSet = new HashSet<string>(existingRolls, StringComparer.OrdinalIgnoreCase);
+
+            // Track duplicates within the file
+            var fileEmailSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var fileRollSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // Ensure Candidate role exists
+            if (!await _roleManager.RoleExistsAsync(AppRoles.Candidate))
+                await _roleManager.CreateAsync(new ApplicationRole { Name = AppRoles.Candidate });
+
+            for (int row = 2; row <= lastRow; row++)
             {
-                result.SkippedCount++;
-                result.Errors.Add(new CandidateImportErrorDto
+                result.TotalRows++;
+                var errors = new List<string>();
+
+                string GetCell(string col) => colMap.TryGetValue(col, out var idx)
+                    ? ws.Row(row).Cell(idx).GetString().Trim() : "";
+
+                var fullName = GetCell("FullName");
+                var fullNameAr = GetCell("FullNameAr");
+                var email = GetCell("Email");
+                var password = GetCell("Password");
+                var rollNo = GetCell("RollNo");
+                var mobile = GetCell("Mobile");
+
+                // Skip completely empty rows
+                if (string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(email))
+                    continue;
+
+                // Validate required
+                if (string.IsNullOrWhiteSpace(fullName)) errors.Add("FullName is required.");
+                if (string.IsNullOrWhiteSpace(email)) errors.Add("Email is required.");
+                else if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$")) errors.Add("Invalid email format.");
+                if (string.IsNullOrWhiteSpace(rollNo)) errors.Add("RollNo is required.");
+
+                // Uniqueness
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    if (emailSet.Contains(email) || fileEmailSet.Contains(email))
+                        errors.Add("Email already exists.");
+                    else
+                        fileEmailSet.Add(email);
+                }
+                if (!string.IsNullOrWhiteSpace(rollNo))
+                {
+                    if (rollSet.Contains(rollNo) || fileRollSet.Contains(rollNo))
+                        errors.Add("RollNo already exists.");
+                    else
+                        fileRollSet.Add(rollNo);
+                }
+
+                if (errors.Count > 0)
+                {
+                    result.SkippedCount++;
+                    result.Errors.Add(new CandidateImportErrorDto
+                    {
+                        Row = row,
+                        Email = email,
+                        Reasons = errors
+                    });
+                    continue;
+                }
+
+                // Generate password if not provided
+                var finalPassword = string.IsNullOrWhiteSpace(password) ? GeneratePassword() : password;
+
+                var user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = fullName,
+                    FullNameAr = string.IsNullOrWhiteSpace(fullNameAr) ? null : fullNameAr,
+                    RollNo = rollNo,
+                    PhoneNumber = string.IsNullOrWhiteSpace(mobile) ? null : mobile,
+                    DisplayName = fullName,
+                    Status = UserStatus.Active,
+                    IsBlocked = false,
+                    EmailConfirmed = true,
+                    DepartmentId = departmentId,
+                    CreatedBy = createdBy,
+                    CreatedDate = UaeTimeHelper.NowUae,
+                    EncryptedPassword = _encryption.Encrypt(finalPassword)
+                };
+
+                IdentityResult createResult;
+                try
+                {
+                    createResult = await _userManager.CreateAsync(user, finalPassword);
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    var dbMsg = dbEx.InnerException?.Message ?? dbEx.Message;
+                    result.SkippedCount++;
+                    result.Errors.Add(new CandidateImportErrorDto
+                    {
+                        Row = row,
+                        Email = email,
+                        Reasons = new List<string> { $"Database constraint violation: {dbMsg}" }
+                    });
+                    continue;
+                }
+                if (!createResult.Succeeded)
+                {
+                    result.SkippedCount++;
+                    result.Errors.Add(new CandidateImportErrorDto
+                    {
+                        Row = row,
+                        Email = email,
+                        Reasons = createResult.Errors.Select(e => e.Description).ToList()
+                    });
+                    continue;
+                }
+
+                await _userManager.AddToRoleAsync(user, AppRoles.Candidate);
+                emailSet.Add(email);
+                rollSet.Add(rollNo);
+
+                result.InsertedCount++;
+                result.CreatedAccounts.Add(new CandidateImportedAccountDto
                 {
                     Row = row,
+                    FullName = fullName,
                     Email = email,
-                    Reasons = errors
+                    RollNo = rollNo,
+                    TemporaryPassword = finalPassword
                 });
-                continue;
             }
 
-            // Generate password if not provided
-            var finalPassword = string.IsNullOrWhiteSpace(password) ? GeneratePassword() : password;
-
-            var user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                FullName = fullName,
-                FullNameAr = string.IsNullOrWhiteSpace(fullNameAr) ? null : fullNameAr,
-                RollNo = rollNo,
-                PhoneNumber = string.IsNullOrWhiteSpace(mobile) ? null : mobile,
-                DisplayName = fullName,
-                Status = UserStatus.Active,
-                IsBlocked = false,
-                EmailConfirmed = true,
-                DepartmentId = departmentId,
-                CreatedBy = createdBy,
-                CreatedDate = UaeTimeHelper.NowUae,
-                EncryptedPassword = _encryption.Encrypt(finalPassword)
-            };
-
-            var createResult = await _userManager.CreateAsync(user, finalPassword);
-            if (!createResult.Succeeded)
-            {
-                result.SkippedCount++;
-                result.Errors.Add(new CandidateImportErrorDto
-                {
-                    Row = row,
-                    Email = email,
-                    Reasons = createResult.Errors.Select(e => e.Description).ToList()
-                });
-                continue;
-            }
-
-            await _userManager.AddToRoleAsync(user, AppRoles.Candidate);
-            emailSet.Add(email);
-            rollSet.Add(rollNo);
-
-            result.InsertedCount++;
-            result.CreatedAccounts.Add(new CandidateImportedAccountDto
-            {
-                Row = row,
-                FullName = fullName,
-                Email = email,
-                RollNo = rollNo,
-                TemporaryPassword = finalPassword
-            });
+            var message = $"Import complete: {result.InsertedCount} inserted, {result.SkippedCount} skipped.";
+            return ApiResponse<CandidateImportResultDto>.SuccessResponse(result, message);
         }
-
-        var message = $"Import complete: {result.InsertedCount} inserted, {result.SkippedCount} skipped.";
-        return ApiResponse<CandidateImportResultDto>.SuccessResponse(result, message);
+        catch (Exception ex)
+        {
+            var inner = ex.InnerException?.Message ?? ex.Message;
+            return ApiResponse<CandidateImportResultDto>.FailureResponse(
+                $"Failed to process the Excel file. Please make sure it matches the downloaded template and contains no formulas or merged cells. Detail: {inner}");
+        }
     }
 
     // ── Helpers ────────────────────────────────────────────────
@@ -568,7 +764,9 @@ public class CandidateAdminService : ICandidateAdminService
         IsBlocked = u.IsBlocked,
         IsWalkIn = u.IsWalkIn,
         CreatedDate = u.CreatedDate,
-        CreatedBy = u.CreatedBy
+        CreatedBy = u.CreatedBy,
+        DeletedBy = u.DeletedBy,
+        DeletedDate = u.IsDeleted ? u.UpdatedDate : null,
     };
 
     private static string GeneratePassword()

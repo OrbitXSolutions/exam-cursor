@@ -15,6 +15,8 @@ public class CandidateListDto
     public DateTimeOffset CreatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
+    public string? DeletedBy { get; set; }
+    public DateTimeOffset? DeletedDate { get; set; }
 }
 
 // ── Create ─────────────────────────────────────────────────────
@@ -26,6 +28,11 @@ public class CreateCandidateDto
     public string? Password { get; set; }
     public string? RollNo { get; set; }
     public string? Mobile { get; set; }
+    /// <summary>
+    /// When true and the email belongs to a previously soft-deleted candidate,
+    /// restore and update that record instead of creating a new one.
+    /// </summary>
+    public bool ForceReactivate { get; set; } = false;
 }
 
 // ── Update ─────────────────────────────────────────────────────
@@ -37,6 +44,14 @@ public class UpdateCandidateDto
     public string? Password { get; set; }
     public string? RollNo { get; set; }
     public string? Mobile { get; set; }
+}
+
+// ── Export filter (no pagination — export always fetches all) ──
+public class CandidateExportFilterDto
+{
+    public string? Search { get; set; }
+    public string? Status { get; set; }
+    public string? DepartmentId { get; set; }
 }
 
 // ── Filter / Query ─────────────────────────────────────────────

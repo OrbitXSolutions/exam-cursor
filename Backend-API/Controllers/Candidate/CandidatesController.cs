@@ -77,7 +77,7 @@ public class CandidatesController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
-    /// <summary>Delete a candidate (safe â€” blocks if has attempts)</summary>
+    /// <summary>Delete a candidate (safe — blocks if has attempts)</summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteCandidate(string id)
@@ -86,10 +86,28 @@ public class CandidatesController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    /// <summary>Permanently delete a soft-deleted candidate (Admin + SuperAdmin)</summary>
+    [HttpDelete("{id}/permanent")]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PermanentDeleteCandidate(string id)
+    {
+        var result = await _service.PermanentDeleteCandidateAsync(id, _currentUser.UserId!);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    /// <summary>Look up a soft-deleted candidate by email (Admin + SuperAdmin)</summary>
+    [HttpGet("deleted-by-email")]
+    [ProducesResponseType(typeof(ApiResponse<CandidateListDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FindDeletedByEmail([FromQuery] string email)
+    {
+        var result = await _service.FindDeletedByEmailAsync(email);
+        return result.Success ? Ok(result) : NotFound(result);
+    }
+
     /// <summary>Export candidates to Excel</summary>
     [HttpGet("export")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ExportCandidates([FromQuery] CandidateFilterDto filter)
+    public async Task<IActionResult> ExportCandidates([FromQuery] CandidateExportFilterDto filter)
     {
         var bytes = await _service.ExportCandidatesAsync(filter);
         var fileName = $"candidates_{UaeTimeHelper.NowUae:yyyy-MM-dd}.xlsx";

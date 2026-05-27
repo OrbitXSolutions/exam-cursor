@@ -12,7 +12,9 @@ public interface ICandidateAdminService
     Task<ApiResponse<bool>> BlockCandidateAsync(string id, string blockedBy);
     Task<ApiResponse<bool>> UnblockCandidateAsync(string id, string updatedBy);
     Task<ApiResponse<bool>> DeleteCandidateAsync(string id, string deletedBy);
+    Task<ApiResponse<bool>> PermanentDeleteCandidateAsync(string id, string requestedBy);
+    Task<ApiResponse<CandidateListDto?>> FindDeletedByEmailAsync(string email);
     Task<ApiResponse<CandidateImportResultDto>> ImportCandidatesAsync(Stream fileStream, string createdBy);
-    Task<byte[]> ExportCandidatesAsync(CandidateFilterDto filter);
+    Task<byte[]> ExportCandidatesAsync(CandidateExportFilterDto filter);
     Task<byte[]> GetImportTemplateAsync();
 }

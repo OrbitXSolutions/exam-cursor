@@ -32,7 +32,8 @@ import {
 } from "lucide-react"
 import {
   getCandidates, createCandidate, updateCandidate, blockCandidate, unblockCandidate,
-  deleteCandidate, exportCandidates, downloadImportTemplate, importCandidates,
+  deleteCandidate, permanentDeleteCandidate, findDeletedCandidateByEmail,
+  exportCandidates, downloadImportTemplate, importCandidates,
   type CandidateDto, type CandidateImportResult,
 } from "@/lib/api/candidate-admin"
 
@@ -70,7 +71,8 @@ export default function CandidatesDataPage() {
   const [blockOpen, setBlockOpen] = useState(false)
   const [blockTarget, setBlockTarget] = useState<CandidateDto | null>(null)
   const [blockLoading, setBlockLoading] = useState(false)
-
+  // ── Block-instead dialog (shown when delete fails due to attempts) ──
+  const [blockInsteadOpen, setBlockInsteadOpen] = useState(false)
   // ── Import state ───────────────────────────────────────────
   const [importLoading, setImportLoading] = useState(false)
   const [importResultOpen, setImportResultOpen] = useState(false)
@@ -79,6 +81,15 @@ export default function CandidatesDataPage() {
 
   // ── Export state ───────────────────────────────────────────
   const [exportLoading, setExportLoading] = useState(false)
+
+  // ── Reactivate / Permanent-delete dialog ───────────────────
+  // Shown when create fails with "previously deleted account" error
+  const [reactivateOpen, setReactivateOpen] = useState(false)
+  const [deletedCandidateInfo, setDeletedCandidateInfo] = useState<CandidateDto | null>(null)
+  const [reactivateLoading, setReactivateLoading] = useState(false)
+  const [permanentDeleteLoading, setPermanentDeleteLoading] = useState(false)
+  // Holds the pending create payload so we can retry with forceReactivate
+  const pendingCreatePayloadRef = useRef<Parameters<typeof createCandidate>[0] | null>(null)
 
   // ── Load data ──────────────────────────────────────────────
   const loadCandidates = useCallback(async () => {
@@ -159,14 +170,15 @@ export default function CandidatesDataPage() {
     setFormLoading(true)
     try {
       if (formMode === "create") {
-        await createCandidate({
+        const payload = {
           fullName: formData.fullName,
           fullNameAr: formData.fullNameAr || undefined,
           email: formData.email,
           password: formData.password || undefined,
           rollNo: formData.rollNo || undefined,
           mobile: formData.mobile || undefined,
-        })
+        }
+        await createCandidate(payload)
         toast.success(isAr ? "تم إنشاء المرشح بنجاح" : "Candidate created successfully")
       } else if (selectedCandidate) {
         await updateCandidate(selectedCandidate.id, {
@@ -182,9 +194,64 @@ export default function CandidatesDataPage() {
       setFormOpen(false)
       loadCandidates()
     } catch (e: any) {
-      toast.error(e.message || "Operation failed")
+      // Special case: email belongs to a soft-deleted account — offer reactivate or permanent delete
+      if (formMode === "create" && e.message?.includes("previously deleted account")) {
+        pendingCreatePayloadRef.current = {
+          fullName: formData.fullName,
+          fullNameAr: formData.fullNameAr || undefined,
+          email: formData.email,
+          password: formData.password || undefined,
+          rollNo: formData.rollNo || undefined,
+          mobile: formData.mobile || undefined,
+        }
+        // Eagerly fetch deleted candidate info for display
+        findDeletedCandidateByEmail(formData.email)
+          .then(info => setDeletedCandidateInfo(info))
+          .catch(() => setDeletedCandidateInfo(null))
+        setFormOpen(false)   // close create form so reactivate dialog has full width
+        setReactivateOpen(true)
+      } else {
+        toast.error(e.message || "Operation failed")
+      }
     } finally {
       setFormLoading(false)
+    }
+  }
+
+  // ── Reactivate (restore deleted account with new data) ─────
+  const handleReactivate = async () => {
+    if (!pendingCreatePayloadRef.current) return
+    setReactivateLoading(true)
+    try {
+      await createCandidate({ ...pendingCreatePayloadRef.current, forceReactivate: true })
+      toast.success(isAr ? "تم استعادة المرشح بنجاح" : "Candidate reactivated successfully")
+      setReactivateOpen(false)
+      setFormOpen(false)
+      loadCandidates()
+    } catch (e: any) {
+      toast.error(e.message || "Reactivation failed")
+    } finally {
+      setReactivateLoading(false)
+    }
+  }
+
+  // ── Permanent Delete (SuperAdmin only — frees the email) ───
+  const handlePermanentDelete = async () => {
+    if (!pendingCreatePayloadRef.current) return
+    setPermanentDeleteLoading(true)
+    try {
+      // Step 1: look up the deleted candidate's ID by email
+      const deleted = await findDeletedCandidateByEmail(pendingCreatePayloadRef.current.email)
+      // Step 2: permanently delete it
+      await permanentDeleteCandidate(deleted.id)
+      toast.success(isAr ? "تم الحذف النهائي. يمكنك الآن إعادة الإنشاء." : "Account permanently deleted. You can now create a new one.")
+      setReactivateOpen(false)
+      // Re-open the create form automatically so the user can proceed
+      setFormOpen(true)
+    } catch (e: any) {
+      toast.error(e.message || "Permanent delete failed")
+    } finally {
+      setPermanentDeleteLoading(false)
     }
   }
 
@@ -198,9 +265,32 @@ export default function CandidatesDataPage() {
       setDeleteOpen(false)
       loadCandidates()
     } catch (e: any) {
-      toast.error(e.message || "Delete failed")
+      const msg: string = e.message || ""
+      if (msg.toLowerCase().includes("attempt")) {
+        // Has exam attempts — offer block instead of toast error
+        setDeleteOpen(false)
+        setBlockInsteadOpen(true)
+      } else {
+        toast.error(msg || "Delete failed")
+      }
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  // ── Block from "block-instead" dialog ─────────────────────
+  const handleBlockInstead = async () => {
+    if (!deleteTarget) return
+    setBlockLoading(true)
+    try {
+      await blockCandidate(deleteTarget.id)
+      toast.success(isAr ? "تم حظر المرشح" : "Candidate blocked")
+      setBlockInsteadOpen(false)
+      loadCandidates()
+    } catch (e: any) {
+      toast.error(e.message || "Block failed")
+    } finally {
+      setBlockLoading(false)
     }
   }
 
@@ -232,7 +322,13 @@ export default function CandidatesDataPage() {
       await exportCandidates({ search, status: statusFilter })
       toast.success(isAr ? "تم تصدير البيانات" : "Export completed")
     } catch (e: any) {
-      toast.error(e.message || "Export failed")
+      const description =
+        Array.isArray(e.details) && e.details.length > 0
+          ? e.details.join(" | ")
+          : e.statusCode
+          ? `Status: ${e.statusCode}`
+          : undefined
+      toast.error(e.message || "Export failed", { description })
     } finally {
       setExportLoading(false)
     }
@@ -612,6 +708,34 @@ export default function CandidatesDataPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* ── Block-Instead Dialog ─────────────────────────── */}
+      <AlertDialog open={blockInsteadOpen} onOpenChange={setBlockInsteadOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isAr ? "لا يمكن حذف المرشح" : "Cannot Delete Candidate"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isAr
+                ? `لا يمكن حذف «${deleteTarget?.fullName}» لأنه لديه محاولات اختبار سابقة. هل تريد حظره بدلاً من ذلك؟ سيمنعه من تسجيل الدخول والتقدم للاختبارات.`
+                : `"${deleteTarget?.fullName}" cannot be deleted because they have exam attempts on record. Would you like to block them instead? This will prevent them from logging in or taking exams.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={blockLoading}>
+              {isAr ? "إلغاء" : "Cancel"}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBlockInstead}
+              disabled={blockLoading}
+            >
+              {blockLoading && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+              {isAr ? "حظر المرشح" : "Block Candidate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* ── Block/Unblock Alert ───────────────────────────── */}
       <AlertDialog open={blockOpen} onOpenChange={setBlockOpen}>
         <AlertDialogContent>
@@ -738,6 +862,87 @@ export default function CandidatesDataPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Reactivate / Permanent Delete Dialog ─────────── */}
+      <AlertDialog open={reactivateOpen} onOpenChange={setReactivateOpen}>
+        <AlertDialogContent className="max-w-lg">
+          {/* Header */}
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-600 text-base shrink-0">⚠</span>
+              {isAr ? "البريد مستخدم لحساب محذوف" : "Email Belongs to a Deleted Account"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isAr
+                ? `البريد الإلكتروني "${pendingCreatePayloadRef.current?.email}" مرتبط بحساب مرشح تم حذفه مسبقاً.`
+                : `The email "${pendingCreatePayloadRef.current?.email}" belongs to a previously deleted candidate account.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Deleted account info card */}
+          {deletedCandidateInfo && (
+            <div className="rounded-lg border bg-muted/40 px-4 py-3 text-sm space-y-1.5">
+              <p className="font-semibold text-foreground">{isAr ? "معلومات الحساب المحذوف" : "Deleted Account Info"}</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-muted-foreground">
+                <span className="font-medium text-foreground">{isAr ? "الاسم" : "Name"}</span>
+                <span>{deletedCandidateInfo.fullName || "—"}</span>
+                <span className="font-medium text-foreground">{isAr ? "البريد" : "Email"}</span>
+                <span className="break-all">{deletedCandidateInfo.email}</span>
+                {deletedCandidateInfo.rollNo && (<>
+                  <span className="font-medium text-foreground">{isAr ? "رقم القيد" : "Roll No"}</span>
+                  <span>{deletedCandidateInfo.rollNo}</span>
+                </>)}
+                <span className="font-medium text-foreground">{isAr ? "تاريخ الحذف" : "Deleted On"}</span>
+                <span>{deletedCandidateInfo.deletedDate ? new Date(deletedCandidateInfo.deletedDate).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</span>
+                <span className="font-medium text-foreground">{isAr ? "حُذف بواسطة" : "Deleted By"}</span>
+                <span>{deletedCandidateInfo.deletedBy || "—"}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Option cards */}
+          <div className="space-y-2 text-sm">
+            <p className="font-semibold text-foreground">{isAr ? "اختر أحد الخيارين:" : "Choose an option:"}</p>
+            <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3">
+              <p className="font-semibold text-green-800">{isAr ? "استعادة الحساب" : "Reactivate"}</p>
+              <p className="text-green-700 mt-0.5">{isAr ? "استعادة الحساب المحذوف وتحديث بياناته بالمعلومات الجديدة (يحتفظ بنفس المعرّف والسجل التاريخي)." : "Restore the deleted account and update it with the new information. The same ID and history are preserved."}</p>
+            </div>
+            <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+              <p className="font-semibold text-red-800">{isAr ? "حذف نهائي وإنشاء جديد" : "Permanently Delete & Create New"}</p>
+              <p className="text-red-700 mt-0.5">{isAr ? "حذف الحساب القديم نهائياً وإنشاء حساب جديد بنفس البريد. للمسؤول فقط." : "Permanently wipe the old account and create a fresh one with the same email. Admin & SuperAdmin only."}</p>
+            </div>
+          </div>
+
+          {/* Footer — plain div to avoid AlertDialogFooter's sm:flex-row override */}
+          <div className="flex flex-col gap-2 pt-1">
+            <Button
+              onClick={handleReactivate}
+              disabled={reactivateLoading || permanentDeleteLoading}
+              className="w-full"
+            >
+              {reactivateLoading && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+              {isAr ? "استعادة الحساب" : "Reactivate Account"}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handlePermanentDelete}
+              disabled={reactivateLoading || permanentDeleteLoading}
+              className="w-full"
+            >
+              {permanentDeleteLoading && <Loader2 className="h-4 w-4 animate-spin me-2" />}
+              {isAr ? "حذف نهائي وإنشاء جديد" : "Permanently Delete & Create New"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setReactivateOpen(false)}
+              disabled={reactivateLoading || permanentDeleteLoading}
+              className="w-full"
+            >
+              {isAr ? "إلغاء" : "Cancel"}
+            </Button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

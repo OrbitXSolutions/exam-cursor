@@ -14,6 +14,8 @@ export interface CandidateDto {
   createdDate: string;
   createdBy: string | null;
   createdByName: string | null;
+  deletedBy: string | null;
+  deletedDate: string | null;
 }
 
 export interface CreateCandidatePayload {
@@ -23,6 +25,7 @@ export interface CreateCandidatePayload {
   password?: string;
   rollNo?: string;
   mobile?: string;
+  forceReactivate?: boolean;
 }
 
 export interface UpdateCandidatePayload {
@@ -108,6 +111,18 @@ export async function deleteCandidate(id: string): Promise<boolean> {
   return apiClient.delete<boolean>(`/Candidates/${id}`);
 }
 
+export async function permanentDeleteCandidate(id: string): Promise<boolean> {
+  return apiClient.delete<boolean>(`/Candidates/${id}/permanent`);
+}
+
+export async function findDeletedCandidateByEmail(
+  email: string,
+): Promise<CandidateDto> {
+  return apiClient.get<CandidateDto>(
+    `/Candidates/deleted-by-email?email=${encodeURIComponent(email)}`,
+  );
+}
+
 export async function importCandidates(
   file: File,
 ): Promise<CandidateImportResult> {
@@ -136,8 +151,6 @@ export async function exportCandidates(params?: {
   status?: string;
 }): Promise<void> {
   const query = new URLSearchParams();
-  query.set("PageNumber", "1");
-  query.set("PageSize", "100000");
   if (params?.search) query.set("Search", params.search);
   if (params?.status && params.status !== "all")
     query.set("Status", params.status);
@@ -151,7 +164,29 @@ export async function exportCandidates(params?: {
     },
   });
 
-  if (!res.ok) throw new Error("Export failed");
+  if (!res.ok) {
+    // Try to extract error details from the JSON response
+    let errorMessage = `Export failed (HTTP ${res.status})`;
+    let errorDetails: string[] = [];
+    try {
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const errBody = await res.json();
+        if (errBody?.message) errorMessage = errBody.message;
+        if (Array.isArray(errBody?.errors) && errBody.errors.length > 0)
+          errorDetails = errBody.errors;
+      } else {
+        const text = await res.text();
+        if (text) errorMessage = text;
+      }
+    } catch {
+      // ignore parse errors; keep generic message
+    }
+    const err = new Error(errorMessage) as any;
+    err.statusCode = res.status;
+    err.details = errorDetails;
+    throw err;
+  }
 
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
