@@ -125,6 +125,10 @@ public class RequestResponseLoggingMiddleware
             sw.Stop();
             context.Response.Body = originalResponseBody;
 
+            // If GlobalExceptionMiddleware swallowed the exception, recover it for Developer log
+            if (caughtException == null)
+                caughtException = context.Items["UnhandledException"] as Exception;
+
             // Read response body
             responseStream.Position = 0;
             var responseBytes = responseStream.ToArray();

@@ -320,13 +320,14 @@ export default function UsersPage() {
                   <TableHead>{language === "ar" ? "القسم" : "Department"}</TableHead>
                   <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                   <TableHead>{language === "ar" ? "تاريخ الإنشاء" : "Created"}</TableHead>
+                  <TableHead>{language === "ar" ? "آخر تسجيل دخول" : "Last Login"}</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       {language === "ar" ? "لا يوجد مستخدمون" : "No users found"}
                     </TableCell>
                   </TableRow>
@@ -355,6 +356,11 @@ export default function UsersPage() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(user.createdDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {user.lastLoginDate
+                          ? new Date(user.lastLoginDate).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" })
+                          : "—"}
                       </TableCell>
                       <TableCell>
                         {user.isProtected === true ? (

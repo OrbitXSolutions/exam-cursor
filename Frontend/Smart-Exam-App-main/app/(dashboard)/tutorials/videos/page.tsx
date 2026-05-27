@@ -90,17 +90,28 @@ const videoTutorials: VideoTutorial[] = [
   },
   {
     id: 6,
-    titleEn: "Candidate Management & Walk-In",
-    titleAr: "إدارة المرشحين والدخول المباشر",
+    titleEn: "Walk-In Registration Management",
+    titleAr: "إدارة تسجيل الحضور المباشر",
     descriptionEn:
-      "Manage candidate profiles, assign exams, handle walk-in registrations, and track candidate history.",
+      "Learn how to manage self-registration candidate data, create self-registration type exams, and configure detailed registration fields.",
     descriptionAr:
-      "إدارة ملفات المرشحين وتعيين الاختبارات ومعالجة تسجيلات الدخول المباشر وتتبع سجل المرشحين.",
+      "تعلّم كيفية إدارة بيانات المرشحين ذوي التسجيل الذاتي، وإنشاء اختبار من نوع التسجيل الذاتي، وضبط الحقول التفصيلية وإدارتها.",
     icon: UserCog,
-    videoPath: "/tutorials/candidate-management-walkin.mp4",
+    videoPath: "/tutorials/walkin-registration.mp4",
   },
   {
     id: 7,
+    titleEn: "Candidate Management",
+    titleAr: "إدارة المرشحين",
+    descriptionEn:
+      "Learn how to upload candidate data in bulk, export candidate records, and verify candidate identity before an exam.",
+    descriptionAr:
+      "تعلّم كيفية رفع بيانات المرشحين بشكل مجمّع، وتصدير سجلاتهم، والتحقق من هوية المرشح قبل الاختبار.",
+    icon: UserCog,
+    videoPath: "/tutorials/candidate-management.mp4",
+  },
+  {
+    id: 8,
     titleEn: "Administration & Advanced Settings",
     titleAr: "الإدارة والإعدادات المتقدمة",
     descriptionEn:

@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { getExams } from "@/lib/api/exams"
-import type { Exam } from "@/lib/types"
+import { getExams, getWalkInAnswers } from "@/lib/api/exams"
+import type { Exam, WalkInAnswerValue } from "@/lib/types"
 import { getCandidateResultList, type CandidateResultListItem } from "@/lib/api/results"
 import { getGradingSessionByAttempt } from "@/lib/api/grading"
 import { exportCandidateReportExcel, exportCandidateReportPdf, exportCandidateReportPdfAr } from "@/lib/export/candidate-report"
@@ -26,6 +26,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { EmptyState } from "@/components/ui/empty-state"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 import {
   BarChart3,
@@ -45,6 +52,7 @@ import {
   Download,
   ChevronDown,
   CheckCircle2,
+  ClipboardList,
 } from "lucide-react"
 
 const ALL_EXAMS_VALUE = "__all__"
@@ -88,6 +96,11 @@ export default function CandidateResultPage() {
   const retryRef = useRef(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  // Walk-In Registration Info modal
+  const [walkInModal, setWalkInModal] = useState<{ candidateName: string; candidateId: string; examId: number } | null>(null)
+  const [walkInAnswers, setWalkInAnswers] = useState<WalkInAnswerValue[]>([])
+  const [loadingWalkIn, setLoadingWalkIn] = useState(false)
+
   function handleSelectExam(exam: Exam | null) {
     if (exam === null) {
       setSelectedExamId(ALL_EXAMS_VALUE)
@@ -112,6 +125,21 @@ export default function CandidateResultPage() {
   const loadCandidates = useCallback(() => {
     setRefreshKey((k) => k + 1)
   }, [])
+
+  async function openWalkInModal(row: EnrichedCandidate) {
+    setWalkInModal({ candidateName: row.candidateName, candidateId: row.candidateId, examId: row.examId })
+    setWalkInAnswers([])
+    setLoadingWalkIn(true)
+    try {
+      const all = await getWalkInAnswers(row.examId)
+      const mine = all.find((a) => a.candidateId === row.candidateId)
+      setWalkInAnswers(mine?.answers ?? [])
+    } catch {
+      setWalkInAnswers([])
+    } finally {
+      setLoadingWalkIn(false)
+    }
+  }
 
   const PAGE_SIZE_EXAM = 20
   async function loadExamsPage(search: string, page: number, replace: boolean) {
@@ -606,6 +634,9 @@ export default function CandidateResultPage() {
                                   <Video className="h-4 w-4 me-2" />{language === "ar" ? "وسائط المحاولة" : "Attempt Media"}
                                 </Link>
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openWalkInModal(row)}>
+                                <ClipboardList className="h-4 w-4 me-2" />{language === "ar" ? "بيانات التسجيل المفتوح" : "Registration Info"}
+                              </DropdownMenuItem>
                               {canExport(row) && (
                                 <>
                                   <DropdownMenuSeparator />
@@ -695,6 +726,37 @@ export default function CandidateResultPage() {
           </CardContent>
           )}
         </Card>
+
+      {/* Walk-In Registration Info Dialog */}
+      <Dialog open={walkInModal !== null} onOpenChange={(open) => { if (!open) setWalkInModal(null) }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="h-5 w-5" />
+              {language === "ar" ? "بيانات التسجيل المفتوح" : "Registration Info"}
+            </DialogTitle>
+            <DialogDescription>{walkInModal?.candidateName}</DialogDescription>
+          </DialogHeader>
+          {loadingWalkIn ? (
+            <div className="flex justify-center py-8"><LoadingSpinner size="md" /></div>
+          ) : walkInAnswers.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              {language === "ar" ? "لا توجد بيانات تسجيل لهذا المرشح" : "No registration data was collected for this candidate."}
+            </p>
+          ) : (
+            <div className="space-y-3 py-2">
+              {walkInAnswers.map((a) => (
+                <div key={a.fieldId} className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {language === "ar" ? a.labelAr : a.labelEn}
+                  </span>
+                  <span className="text-sm font-medium border rounded-md px-3 py-1.5 bg-muted/40">{a.value || "—"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
