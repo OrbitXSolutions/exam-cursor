@@ -17,8 +17,10 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Bell, User, Settings, LogOut, HelpCircle } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { getLicenseStatus, type LicenseStatusResult } from "@/lib/api/license"
 import { UserRole } from "@/lib/types"
+import { useNotifications } from "@/lib/hooks/useNotifications"
 
 function getLicenseBadgeStyle(stateText: string): string {
   switch (stateText) {
@@ -44,6 +46,8 @@ function getLicenseBadgeLabel(stateText: string): string {
 export function Header() {
   const { t, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
+  const router = useRouter()
+  const { unreadCount } = useNotifications()
   const [licenseStatus, setLicenseStatus] = useState<LicenseStatusResult | null>(null)
 
   const isAdmin = hasRole(UserRole.Admin) || hasRole(UserRole.SuperAdmin)
@@ -98,12 +102,18 @@ export function Header() {
         )}
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          onClick={() => router.push("/notifications")}
+        >
           <Bell className="h-5 w-5" />
-          <span className="absolute end-1 top-1 flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-          </span>
+          {unreadCount > 0 && (
+            <span className="absolute -end-0.5 -top-0.5 flex min-w-[1.1rem] h-[1.1rem] items-center justify-center rounded-full bg-destructive text-[0.6rem] font-bold text-destructive-foreground px-0.5">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
         </Button>
 
         {/* Theme & Language */}

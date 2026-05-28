@@ -161,11 +161,23 @@ public class RequestResponseLoggingMiddleware
                 var email = context.User.FindFirstValue(ClaimTypes.Email);
                 var role = context.User.FindFirstValue(ClaimTypes.Role);
 
+                // Enrich error message for auth/authz failures that don't throw exceptions
+                var enrichedErrorMessage = caughtException?.Message;
+                if (enrichedErrorMessage == null)
+                {
+                    enrichedErrorMessage = statusCode switch
+                    {
+                        401 => $"Authentication required: unauthenticated request to {context.Request.Method} {path}",
+                        403 => $"Access denied: role '{role ?? "anonymous"}' is not authorized to perform {context.Request.Method} {path}",
+                        _ => null
+                    };
+                }
+
                 var log = new SystemLog
                 {
                     Timestamp = UaeTimeHelper.NowUae,
                     Level = isError
-                        ? (statusCode >= 500 || statusCode == 400
+                        ? (statusCode >= 500 || statusCode == 400 || statusCode == 403 || statusCode == 401
                             ? SystemLogLevel.Error
                             : SystemLogLevel.Warning)
                         : SystemLogLevel.Info,
@@ -180,7 +192,7 @@ public class RequestResponseLoggingMiddleware
                     RequestBody = isError || context.Request.Method != "GET" ? requestBody : null,
                     ResponseStatusCode = statusCode,
                     ResponseBody = isError ? responseBody : null,
-                    ErrorMessage = caughtException?.Message,
+                    ErrorMessage = enrichedErrorMessage,
                     StackTrace = caughtException != null ? caughtException.ToString() : null,
                     ExceptionType = caughtException?.GetType().FullName,
                     TraceId = traceId,
@@ -210,7 +222,7 @@ public class RequestResponseLoggingMiddleware
                         RequestBody = requestBody,
                         ResponseStatusCode = statusCode,
                         ResponseBody = responseBody,
-                        ErrorMessage = caughtException?.Message,
+                        ErrorMessage = enrichedErrorMessage,
                         StackTrace = caughtException?.ToString(),
                         ExceptionType = caughtException?.GetType().FullName,
                         TraceId = traceId,

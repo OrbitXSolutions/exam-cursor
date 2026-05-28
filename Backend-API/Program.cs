@@ -222,6 +222,8 @@ builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<Smart_Core.Infrastructure.Services.Authorization.ResourceAuthorizationService>();
 builder.Services.AddSingleton<IEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<INotificationService, Smart_Core.Infrastructure.Services.Notification.NotificationService>();
+builder.Services.AddScoped<IUserNotificationService, Smart_Core.Infrastructure.Services.Notification.UserNotificationService>();
+builder.Services.AddSingleton<INotificationDispatcher, Smart_Core.Infrastructure.Services.Notification.NotificationDispatcher>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<DatabaseSeeder>();
@@ -407,6 +409,7 @@ app.MapControllers();
 
 // SignalR Hubs
 app.MapHub<ProctorHub>("/hubs/proctor");
+app.MapHub<Smart_Core.Infrastructure.Hubs.NotificationHub>("/hubs/notifications");
 
 // Apply pending migrations and seed data in development
 // Note: Auto-migration disabled to prevent conflicts when DB already has tables.

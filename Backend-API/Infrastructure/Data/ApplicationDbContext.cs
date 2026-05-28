@@ -111,6 +111,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<NotificationSettings> NotificationSettings { get; set; } = null!;
     public DbSet<NotificationTemplate> NotificationTemplates { get; set; } = null!;
     public DbSet<NotificationLog> NotificationLogs { get; set; } = null!;
+    public DbSet<UserNotification> UserNotifications { get; set; } = null!;
 
     // System Logs
     public DbSet<SystemLog> SystemLogs { get; set; } = null!;

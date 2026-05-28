@@ -13,6 +13,9 @@ import { useApplyBrandingColor } from "@/lib/hooks/use-branding"
 import { UserRole } from "@/lib/types"
 import { LicenseExpiredDialog } from "@/components/license-expired-dialog"
 
+// Routes accessible without authentication (public / anonymous).
+const PUBLIC_PATHS = ["/tutorials", "/tutorials/videos"]
+
 // Route-to-allowed-roles map — mirrors sidebar access matrix.
 // Paths not listed here are open to all authenticated users (dashboard, profile, tutorials, journey).
 const ROUTE_ROLE_MAP: { prefix: string; roles: UserRole[] }[] = [
@@ -21,7 +24,7 @@ const ROUTE_ROLE_MAP: { prefix: string; roles: UserRole[] }[] = [
   { prefix: "/departments",     roles: [UserRole.SuperAdmin] },
   { prefix: "/organization",    roles: [UserRole.SuperAdmin] },
   { prefix: "/settings/license",roles: [UserRole.SuperAdmin] },
-  { prefix: "/notifications",   roles: [UserRole.SuperAdmin, UserRole.Admin] },
+  { prefix: "/notifications",   roles: [UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor, UserRole.Proctor, UserRole.Candidate, UserRole.Examiner] },
   { prefix: "/audit",           roles: [UserRole.SuperAdmin] },
   { prefix: "/logs",            roles: [UserRole.SuperAdmin] },
   // Admin + Instructor + SuperAdmin
@@ -61,11 +64,15 @@ export default function DashboardLayout({
   const isCandidate = hasRole(UserRole.Candidate)
   useApplyBrandingColor(isCandidate)
 
+  const isPublicPath = PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  )
+
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated && !isPublicPath) {
       router.push("/login")
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router, isPublicPath])
 
   // Route-role guard: redirect if the user's role is not permitted on this path
   useEffect(() => {
@@ -78,12 +85,17 @@ export default function DashboardLayout({
     }
   }, [pathname, user, isLoading, isAuthenticated, router]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (isLoading) {
+  if (isLoading && !isPublicPath) {
     return <FullPageLoader />
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isPublicPath) {
     return null
+  }
+
+  // Public path visited by unauthenticated user — render without sidebar/header
+  if (!isAuthenticated && isPublicPath) {
+    return <>{children}</>
   }
 
   // Synchronous render-time gate — prevents children from mounting (and firing API calls)

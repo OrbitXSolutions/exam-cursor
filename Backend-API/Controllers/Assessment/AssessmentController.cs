@@ -4,6 +4,7 @@ using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Assessment;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Enums;
 
 namespace Smart_Core.Controllers.Assessment;
 
@@ -15,15 +16,18 @@ public class AssessmentController : ControllerBase
     private readonly IAssessmentService _assessmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IExamShareService _examShareService;
+    private readonly INotificationDispatcher _notifications;
 
     public AssessmentController(
         IAssessmentService assessmentService,
         ICurrentUserService currentUserService,
-        IExamShareService examShareService)
+        IExamShareService examShareService,
+        INotificationDispatcher notifications)
     {
         _assessmentService = assessmentService;
         _currentUserService = currentUserService;
         _examShareService = examShareService;
+        _notifications = notifications;
     }
 
     #region Exams
@@ -98,6 +102,13 @@ public class AssessmentController : ControllerBase
     {
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.PublishExamAsync(id, userId);
+        if (result.Success)
+            _notifications.NotifyRoles(
+                [AppRoles.SuperAdmin, AppRoles.Admin, AppRoles.Instructor],
+                UserNotificationType.ExamPublished,
+                "Exam Published", "تم نشر الاختبار",
+                "An exam has been published successfully.", "تم نشر الاختبار بنجاح.",
+                relatedExamId: id);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
