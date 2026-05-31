@@ -25,6 +25,20 @@ public interface IUserNotificationService
         int? relatedAttemptId = null,
         string? actorUserId = null);
 
+    /// <summary>
+    /// Create a notification for users in the given roles, scoped to the department of the related exam.
+    /// SuperAdmin is always included. Other roles are filtered by matching DepartmentId.
+    /// Falls back to unscoped CreateForRolesAsync if department cannot be resolved.
+    /// </summary>
+    Task CreateForRolesScopedAsync(
+        string[] roles,
+        UserNotificationType type,
+        string titleEn, string titleAr,
+        string messageEn, string messageAr,
+        int? relatedExamId = null,
+        int? relatedAttemptId = null,
+        string? actorUserId = null);
+
     /// <summary>Paginated list for the current user. Pass isRead=null for all.</summary>
     Task<UserNotificationPagedResultDto> GetPagedAsync(string userId, int page, int pageSize, bool? isRead = null);
 

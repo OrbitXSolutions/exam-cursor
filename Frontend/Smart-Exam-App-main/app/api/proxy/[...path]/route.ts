@@ -56,6 +56,11 @@ export async function GET(
       });
     }
 
+    // 204/205 responses must not have a body (Fetch API spec)
+    if (response.status === 204 || response.status === 205) {
+      return new NextResponse(null, { status: response.status });
+    }
+
     const data = await response.json().catch(() => ({}));
     console.log(`[Proxy GET Response] ${url}`, {
       status: response.status,
@@ -105,6 +110,11 @@ export async function POST(
     }
 
     const response = await fetch(url, { method: "POST", headers, body });
+
+    // 204/205 responses must not have a body (Fetch API spec)
+    if (response.status === 204 || response.status === 205) {
+      return new NextResponse(null, { status: response.status });
+    }
 
     const responseText = await response.text();
     let data: any;
@@ -159,6 +169,11 @@ export async function PUT(
       body: JSON.stringify(body),
     });
 
+    // 204/205 responses must not have a body (Fetch API spec)
+    if (response.status === 204 || response.status === 205) {
+      return new NextResponse(null, { status: response.status });
+    }
+
     const data = await response.json().catch(() => ({}));
     console.log(`[Proxy PUT Response] ${url}`, {
       status: response.status,
@@ -203,6 +218,11 @@ export async function PATCH(
       body: JSON.stringify(body),
     });
 
+    // 204/205 responses must not have a body (Fetch API spec)
+    if (response.status === 204 || response.status === 205) {
+      return new NextResponse(null, { status: response.status });
+    }
+
     const data = await response.json().catch(() => ({}));
     console.log(`[Proxy PATCH Response] ${url}`, {
       status: response.status,
@@ -244,6 +264,11 @@ export async function DELETE(
         ...(token && { Authorization: token }),
       },
     });
+
+    // 204/205 responses must not have a body (Fetch API spec)
+    if (response.status === 204 || response.status === 205) {
+      return new NextResponse(null, { status: response.status });
+    }
 
     const data = await response.json().catch(() => ({}));
     console.log(`[Proxy DELETE Response] ${url}`, {

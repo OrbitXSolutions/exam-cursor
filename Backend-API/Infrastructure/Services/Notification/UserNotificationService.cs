@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Notification;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
 using Smart_Core.Domain.Entities.Notification;
@@ -216,6 +217,137 @@ public class UserNotificationService : IUserNotificationService
             n.ReadAt = now;
         }
         await _unitOfWork.Context.SaveChangesAsync();
+    }
+
+    public async Task CreateForRolesScopedAsync(
+        string[] roles,
+        UserNotificationType type,
+        string titleEn, string titleAr,
+        string messageEn, string messageAr,
+        int? relatedExamId = null,
+        int? relatedAttemptId = null,
+        string? actorUserId = null)
+    {
+        // 1. Resolve the exam's department
+        int? deptId = null;
+        if (relatedExamId.HasValue)
+        {
+            deptId = await _unitOfWork.Context.Exams
+                .Where(e => e.Id == relatedExamId.Value)
+                .Select(e => (int?)e.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+        else if (relatedAttemptId.HasValue)
+        {
+            deptId = await _unitOfWork.Context.Attempts
+                .Where(a => a.Id == relatedAttemptId.Value)
+                .Select(a => (int?)a.Exam.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+
+        // If department cannot be resolved, fall back to global broadcast
+        if (!deptId.HasValue)
+        {
+            _logger.LogWarning("CreateForRolesScopedAsync: could not resolve DepartmentId (examId={ExamId}, attemptId={AttemptId}). Falling back to unscoped broadcast.",
+                relatedExamId, relatedAttemptId);
+            await CreateForRolesAsync(roles, type, titleEn, titleAr, messageEn, messageAr,
+                relatedExamId, relatedAttemptId, actorUserId);
+            return;
+        }
+
+        // 2. Enrich messages with exam/attempt title (same pattern as CreateForRolesAsync)
+        if (relatedExamId.HasValue)
+        {
+            var exam = await _unitOfWork.Context.Exams
+                .Where(e => e.Id == relatedExamId.Value)
+                .Select(e => new { e.TitleEn, e.TitleAr })
+                .FirstOrDefaultAsync();
+            if (exam != null)
+            {
+                messageEn += $" Exam: {exam.TitleEn}";
+                messageAr += $" الاختبار: {exam.TitleAr}";
+            }
+        }
+        else if (relatedAttemptId.HasValue)
+        {
+            var row = await _unitOfWork.Context.Attempts
+                .Where(a => a.Id == relatedAttemptId.Value)
+                .Select(a => new { a.Exam.TitleEn, a.Exam.TitleAr })
+                .FirstOrDefaultAsync();
+            if (row != null)
+            {
+                messageEn += $" Exam: {row.TitleEn}";
+                messageAr += $" الاختبار: {row.TitleAr}";
+            }
+        }
+
+        if (!string.IsNullOrEmpty(actorUserId))
+        {
+            var actor = await _userManager.FindByIdAsync(actorUserId);
+            if (actor?.Email != null)
+            {
+                messageEn += $" Candidate: {actor.Email}";
+                messageAr += $" المرشح: {actor.Email}";
+            }
+        }
+
+        // 3. Collect scoped user IDs via direct EF query
+        //    SuperAdmin → global (no department restriction)
+        //    All other roles → filtered to users in the exam's department only
+        var userIds = new HashSet<string>();
+        foreach (var role in roles)
+        {
+            List<string> ids;
+            if (role == AppRoles.SuperAdmin)
+            {
+                ids = await (
+                    from u in _unitOfWork.Context.Users
+                    join ur in _unitOfWork.Context.UserRoles on u.Id equals ur.UserId
+                    join r in _unitOfWork.Context.Roles on ur.RoleId equals r.Id
+                    where r.Name == role && !u.IsDeleted
+                    select u.Id
+                ).ToListAsync();
+            }
+            else
+            {
+                ids = await (
+                    from u in _unitOfWork.Context.Users
+                    join ur in _unitOfWork.Context.UserRoles on u.Id equals ur.UserId
+                    join r in _unitOfWork.Context.Roles on ur.RoleId equals r.Id
+                    where r.Name == role && !u.IsDeleted && u.DepartmentId == deptId
+                    select u.Id
+                ).ToListAsync();
+            }
+            foreach (var id in ids)
+                userIds.Add(id);
+        }
+
+        if (userIds.Count == 0) return;
+
+        // 4. Persist and push real-time via SignalR
+        var notifications = userIds.Select(uid => new UserNotification
+        {
+            UserId = uid,
+            Type = type,
+            TitleEn = titleEn,
+            TitleAr = titleAr,
+            MessageEn = messageEn,
+            MessageAr = messageAr,
+            RelatedExamId = relatedExamId,
+            RelatedAttemptId = relatedAttemptId,
+            CreatedAt = UaeTimeHelper.NowUae
+        }).ToList();
+
+        _unitOfWork.Context.UserNotifications.AddRange(notifications);
+        await _unitOfWork.Context.SaveChangesAsync();
+
+        foreach (var n in notifications)
+        {
+            var dto = MapToDto(n);
+            _ = _hubContext.Clients
+                .Group($"user-{n.UserId}")
+                .SendAsync("ReceiveNotification", dto);
+        }
     }
 
     // ── Mapping ────────────────────────────────────────────────────────
