@@ -5,6 +5,7 @@ using Smart_Core.Application.DTOs.ExamAssignment;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.ExamAssignment;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Enums;
 
 namespace Smart_Core.Controllers.ExamAssignment;
 
@@ -15,11 +16,16 @@ public class AssignmentsController : ControllerBase
 {
     private readonly IExamAssignmentService _service;
     private readonly ICurrentUserService _currentUser;
+    private readonly INotificationDispatcher _notifications;
 
-    public AssignmentsController(IExamAssignmentService service, ICurrentUserService currentUser)
+    public AssignmentsController(
+        IExamAssignmentService service,
+        ICurrentUserService currentUser,
+        INotificationDispatcher notifications)
     {
         _service = service;
         _currentUser = currentUser;
+        _notifications = notifications;
     }
 
     /// <summary>
@@ -42,6 +48,17 @@ public class AssignmentsController : ControllerBase
     public async Task<IActionResult> Assign([FromBody] AssignExamDto dto)
     {
         var result = await _service.AssignAsync(dto, _currentUser.UserId!);
+        if (result.Success && dto.CandidateIds is { Count: > 0 })
+        {
+            var skippedIds = result.Data?.SkippedDetails.Select(s => s.CandidateId).ToHashSet() ?? [];
+            foreach (var candidateId in dto.CandidateIds.Where(id => !skippedIds.Contains(id)))
+                _notifications.NotifyUser(
+                    candidateId,
+                    UserNotificationType.ExamAssigned,
+                    "Exam Assigned", "تم تعيينك في اختبار",
+                    "You have been assigned to a new exam.", "تم تعيينك في اختبار جديد.",
+                    relatedExamId: dto.ExamId);
+        }
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

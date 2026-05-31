@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Entities.Notification;
 
 namespace Smart_Core.Domain.Entities;
 
@@ -36,6 +37,9 @@ public class ApplicationUser : IdentityUser
 
   // Tracking
   public DateTimeOffset? LastLoginDate { get; set; }
+
+  // In-app notifications
+  public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }
 
 public enum UserStatus

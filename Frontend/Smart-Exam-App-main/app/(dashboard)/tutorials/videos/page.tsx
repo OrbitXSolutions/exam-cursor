@@ -4,6 +4,12 @@ import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   PlayCircle,
   ChevronLeft,
   BookOpen,
@@ -13,7 +19,6 @@ import {
   BarChart3,
   UserCog,
   Settings,
-  Maximize2,
   Loader2,
 } from "lucide-react"
 import Link from "next/link"
@@ -125,19 +130,22 @@ const videoTutorials: VideoTutorial[] = [
 
 export default function VideoTutorialsPage() {
   const { language, isRTL } = useI18n()
-  const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({})
-  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({})
+  const [activeVideo, setActiveVideo] = useState<VideoTutorial | null>(null)
+  const [modalLoading, setModalLoading] = useState(false)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
-  const setLoading = useCallback((id: number, value: boolean) => {
-    setLoadingStates(prev => ({ ...prev, [id]: value }))
+  const openVideo = useCallback((video: VideoTutorial) => {
+    setActiveVideo(video)
+    setModalLoading(true)
   }, [])
 
-  const handleFullscreen = useCallback((id: number) => {
-    const video = videoRefs.current[id]
-    if (!video) return
-    if (video.requestFullscreen) {
-      video.requestFullscreen()
+  const closeVideo = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.pause()
+      videoRef.current.src = ""
     }
+    setActiveVideo(null)
+    setModalLoading(false)
   }, [])
 
   return (
@@ -180,63 +188,32 @@ export default function VideoTutorialsPage() {
           </p>
         </div>
 
-        {/* Video Grid */}
+        {/* Video Grid — thumbnail cards only, no video elements */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {videoTutorials.map((video) => {
             const Icon = video.icon
             return (
               <Card key={video.id} className="overflow-hidden flex flex-col">
-                {/* Video area */}
-                <div className="relative bg-black/5 aspect-video group/video">
-                  <video
-                    ref={(el) => { videoRefs.current[video.id] = el }}
-                    src={`/api/backend-files${video.videoPath}`}
-                    controls
-                    className="w-full h-full rounded-t-xl"
-                    preload="metadata"
-                    onLoadStart={() => setLoading(video.id, true)}
-                    onCanPlay={() => setLoading(video.id, false)}
-                    onError={(e) => {
-                      setLoading(video.id, false)
-                      const target = e.currentTarget
-                      target.style.display = "none"
-                      const fallback = target.nextElementSibling as HTMLElement
-                      if (fallback) fallback.style.display = "flex"
-                    }}
-                  />
-                  {/* Loading spinner */}
-                  {loadingStates[video.id] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-xl pointer-events-none">
-                      <Loader2 className="h-10 w-10 text-white animate-spin" />
+                {/* Thumbnail / placeholder — no video loaded here */}
+                <button
+                  onClick={() => openVideo(video)}
+                  className="relative bg-muted aspect-video group/thumb w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label={language === "ar" ? `تشغيل: ${video.titleAr}` : `Watch: ${video.titleEn}`}
+                >
+                  {/* Centred play icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 group-hover/thumb:bg-primary/20 transition-colors">
+                      <Icon className="h-7 w-7 text-primary/60" />
                     </div>
-                  )}
-                  {/* Fallback — shown only when video fails to load */}
-                  <div
-                    className="hidden absolute inset-0 flex-col items-center justify-center gap-3 text-muted-foreground bg-muted/30 rounded-t-xl"
-                  >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                      <Icon className="h-7 w-7 text-primary/50" />
+                    <div className="absolute flex h-12 w-12 items-center justify-center rounded-full bg-primary/80 group-hover/thumb:bg-primary transition-colors shadow-lg">
+                      <PlayCircle className="h-6 w-6 text-primary-foreground" />
                     </div>
-                    <p className="text-xs font-mono text-muted-foreground/60">{video.videoPath}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {language === "ar"
-                        ? "ضع الفيديو في مجلد wwwroot/tutorials/"
-                        : "Place video in wwwroot/tutorials/ folder"}
-                    </p>
                   </div>
                   {/* Number badge */}
                   <span className="absolute top-3 left-3 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shadow pointer-events-none">
                     {video.id}
                   </span>
-                  {/* Fullscreen button */}
-                  <button
-                    onClick={() => handleFullscreen(video.id)}
-                    title={language === "ar" ? "ملء الشاشة" : "Fullscreen"}
-                    className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover/video:opacity-100 transition-opacity hover:bg-black/70 focus:opacity-100 focus:outline-none"
-                  >
-                    <Maximize2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+                </button>
 
                 {/* Info */}
                 <CardContent className="p-4 flex-1 flex flex-col">
@@ -252,6 +229,47 @@ export default function VideoTutorialsPage() {
           })}
         </div>
       </div>
+
+      {/* Video modal — single video player, loaded only on demand */}
+      <Dialog open={!!activeVideo} onOpenChange={(open) => { if (!open) closeVideo() }}>
+        <DialogContent className="max-w-3xl w-full p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-4 pb-2">
+            <DialogTitle>
+              {activeVideo
+                ? (language === "ar" ? activeVideo.titleAr : activeVideo.titleEn)
+                : ""}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="relative bg-black aspect-video w-full">
+            {modalLoading && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <Loader2 className="h-10 w-10 text-white animate-spin" />
+              </div>
+            )}
+            {activeVideo && (
+              <video
+                key={activeVideo.id}
+                ref={videoRef}
+                src={`/api/backend-files${activeVideo.videoPath}`}
+                controls
+                autoPlay
+                preload="none"
+                className="w-full h-full"
+                onCanPlay={() => setModalLoading(false)}
+                onLoadStart={() => setModalLoading(true)}
+                onError={() => setModalLoading(false)}
+              />
+            )}
+          </div>
+
+          {activeVideo && (
+            <p className="px-5 py-3 text-sm text-muted-foreground">
+              {language === "ar" ? activeVideo.descriptionAr : activeVideo.descriptionEn}
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
     </ScrollArea>
   )
 }
