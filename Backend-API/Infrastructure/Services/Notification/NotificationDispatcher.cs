@@ -52,6 +52,22 @@ public class NotificationDispatcher : INotificationDispatcher
         });
     }
 
+    public void NotifyRolesScoped(
+        string[] roles,
+        UserNotificationType type,
+        string titleEn, string titleAr,
+        string messageEn, string messageAr,
+        int? relatedExamId = null,
+        int? relatedAttemptId = null,
+        string? actorUserId = null)
+    {
+        Fire(async scope =>
+        {
+            var svc = scope.ServiceProvider.GetRequiredService<IUserNotificationService>();
+            await svc.CreateForRolesScopedAsync(roles, type, titleEn, titleAr, messageEn, messageAr, relatedExamId, relatedAttemptId, actorUserId);
+        });
+    }
+
     // ── Internal fire-and-forget helper ──────────────────────────────
 
     private void Fire(Func<IServiceScope, Task> action)

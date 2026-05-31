@@ -39,12 +39,12 @@ public class AttemptController : ControllerBase
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-         return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _attemptService.StartAttemptAsync(dto, candidateId);
         if (result.Success && result.Data != null)
-            _notifications.NotifyRoles(
+            _notifications.NotifyRolesScoped(
                 [AppRoles.SuperAdmin, AppRoles.Admin],
                 UserNotificationType.CandidateStartedExam,
                 "Candidate Started Exam", "بدأ مرشح الاختبار",
@@ -63,13 +63,13 @@ public class AttemptController : ControllerBase
     public async Task<IActionResult> GetAttemptSession(int attemptId)
     {
         var candidateId = _currentUserService.UserId;
- if (string.IsNullOrEmpty(candidateId))
-      {
+        if (string.IsNullOrEmpty(candidateId))
+        {
             return Unauthorized();
         }
 
         var result = await _attemptService.GetAttemptSessionAsync(attemptId, candidateId);
-     return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -82,12 +82,12 @@ public class AttemptController : ControllerBase
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-  return Unauthorized();
+            return Unauthorized();
         }
 
-     var result = await _attemptService.SubmitAttemptAsync(attemptId, candidateId);
+        var result = await _attemptService.SubmitAttemptAsync(attemptId, candidateId);
         if (result.Success)
-            _notifications.NotifyRoles(
+            _notifications.NotifyRolesScoped(
                 [AppRoles.SuperAdmin, AppRoles.Admin],
                 UserNotificationType.CandidateSubmittedExam,
                 "Candidate Submitted Exam", "أتم مرشح تقديم الاختبار",
@@ -103,12 +103,12 @@ public class AttemptController : ControllerBase
     [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("{attemptId}/timer")]
     public async Task<IActionResult> GetAttemptTimer(int attemptId)
-  {
+    {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
             return Unauthorized();
-}
+        }
 
         var result = await _attemptService.GetAttemptTimerAsync(attemptId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -121,10 +121,10 @@ public class AttemptController : ControllerBase
     [HttpPost("{attemptId}/answers")]
     public async Task<IActionResult> SaveAnswer(int attemptId, [FromBody] SaveAnswerDto dto)
     {
-      var candidateId = _currentUserService.UserId;
+        var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-   return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _attemptService.SaveAnswerAsync(attemptId, dto, candidateId);
@@ -140,7 +140,7 @@ public class AttemptController : ControllerBase
     {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
-      {
+        {
             return Unauthorized();
         }
 
@@ -154,14 +154,14 @@ public class AttemptController : ControllerBase
     [Authorize(Roles = "SuperAdmin,Candidate")]
     [HttpGet("{attemptId}/answers")]
     public async Task<IActionResult> GetAttemptAnswers(int attemptId)
- {
+    {
         var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-  return Unauthorized();
+            return Unauthorized();
         }
 
-   var result = await _attemptService.GetAttemptAnswersAsync(attemptId, candidateId);
+        var result = await _attemptService.GetAttemptAnswersAsync(attemptId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -172,10 +172,10 @@ public class AttemptController : ControllerBase
     [HttpPost("{attemptId}/events")]
     public async Task<IActionResult> LogEvent(int attemptId, [FromBody] LogAttemptEventDto dto)
     {
-    var candidateId = _currentUserService.UserId;
+        var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
-   return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _attemptService.LogEventAsync(attemptId, dto, candidateId);
@@ -189,11 +189,11 @@ public class AttemptController : ControllerBase
     [HttpGet("exam/{examId}/my-attempts")]
     public async Task<IActionResult> GetMyExamAttempts(int examId)
     {
-     var candidateId = _currentUserService.UserId;
+        var candidateId = _currentUserService.UserId;
         if (string.IsNullOrEmpty(candidateId))
         {
             return Unauthorized();
-      }
+        }
 
         var result = await _attemptService.GetCandidateExamAttemptsAsync(examId, candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
@@ -207,13 +207,13 @@ public class AttemptController : ControllerBase
     public async Task<IActionResult> GetMyAttempts([FromQuery] AttemptSearchDto searchDto)
     {
         var candidateId = _currentUserService.UserId;
-  if (string.IsNullOrEmpty(candidateId))
+        if (string.IsNullOrEmpty(candidateId))
         {
-        return Unauthorized();
+            return Unauthorized();
         }
 
         var result = await _attemptService.GetCandidateAttemptsAsync(candidateId, searchDto);
-return result.Success ? Ok(result) : BadRequest(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     #endregion
@@ -224,10 +224,10 @@ return result.Success ? Ok(result) : BadRequest(result);
     /// Get all attempts with pagination and filtering (Admin)
     /// </summary>
     [HttpGet]
- [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetAttempts([FromQuery] AttemptSearchDto searchDto)
     {
- var result = await _attemptService.GetAttemptsAsync(searchDto);
+        var result = await _attemptService.GetAttemptsAsync(searchDto);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -235,10 +235,10 @@ return result.Success ? Ok(result) : BadRequest(result);
     /// Get attempt by ID (Admin)
     /// </summary>
     [HttpGet("{attemptId}")]
- [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
     public async Task<IActionResult> GetAttemptById(int attemptId)
     {
-   var result = await _attemptService.GetAttemptByIdAsync(attemptId);
+        var result = await _attemptService.GetAttemptByIdAsync(attemptId);
         return result.Success ? Ok(result) : NotFound(result);
     }
 
@@ -258,10 +258,10 @@ return result.Success ? Ok(result) : BadRequest(result);
     /// </summary>
     [HttpGet("{attemptId}/events")]
     [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
-  public async Task<IActionResult> GetAttemptEvents(int attemptId)
+    public async Task<IActionResult> GetAttemptEvents(int attemptId)
     {
-var result = await _attemptService.GetAttemptEventsAsync(attemptId);
-  return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _attemptService.GetAttemptEventsAsync(attemptId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -269,11 +269,11 @@ var result = await _attemptService.GetAttemptEventsAsync(attemptId);
     /// </summary>
     [HttpPost("cancel")]
     [Authorize(Roles = "SuperAdmin,Admin")]
-  public async Task<IActionResult> CancelAttempt([FromBody] CancelAttemptDto dto)
+    public async Task<IActionResult> CancelAttempt([FromBody] CancelAttemptDto dto)
     {
         var adminUserId = _currentUserService.UserId ?? "system";
-  var result = await _attemptService.CancelAttemptAsync(dto, adminUserId);
- return result.Success ? Ok(result) : BadRequest(result);
+        var result = await _attemptService.CancelAttemptAsync(dto, adminUserId);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     /// <summary>
@@ -282,9 +282,9 @@ var result = await _attemptService.GetAttemptEventsAsync(attemptId);
     [HttpPost("{attemptId}/force-submit")]
     [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> ForceSubmitAttempt(int attemptId)
-{
+    {
         var adminUserId = _currentUserService.UserId ?? "system";
-  var result = await _attemptService.ForceSubmitAttemptAsync(attemptId, adminUserId);
+        var result = await _attemptService.ForceSubmitAttemptAsync(attemptId, adminUserId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
