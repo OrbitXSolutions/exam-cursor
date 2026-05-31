@@ -29,4 +29,19 @@ public interface INotificationDispatcher
         int? relatedExamId = null,
         int? relatedAttemptId = null,
         string? actorUserId = null);
+
+    /// <summary>
+    /// Notify users in the given roles, scoped to the department of the related exam.
+    /// SuperAdmin role is always included regardless of department.
+    /// Admin/Instructor/other roles are filtered to users whose DepartmentId matches the exam's department.
+    /// Falls back to unscoped NotifyRoles if department cannot be resolved.
+    /// </summary>
+    void NotifyRolesScoped(
+        string[] roles,
+        UserNotificationType type,
+        string titleEn, string titleAr,
+        string messageEn, string messageAr,
+        int? relatedExamId = null,
+        int? relatedAttemptId = null,
+        string? actorUserId = null);
 }

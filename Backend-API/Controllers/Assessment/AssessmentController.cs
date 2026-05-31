@@ -103,7 +103,7 @@ public class AssessmentController : ControllerBase
         var userId = _currentUserService.UserId ?? "system";
         var result = await _assessmentService.PublishExamAsync(id, userId);
         if (result.Success)
-            _notifications.NotifyRoles(
+            _notifications.NotifyRolesScoped(
                 [AppRoles.SuperAdmin, AppRoles.Admin, AppRoles.Instructor],
                 UserNotificationType.ExamPublished,
                 "Exam Published", "تم نشر الاختبار",
