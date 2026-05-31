@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Attempt;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Attempt;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Enums;
 
 namespace Smart_Core.Controllers.Attempt;
 
@@ -13,13 +15,16 @@ public class AttemptController : ControllerBase
 {
     private readonly IAttemptService _attemptService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly INotificationDispatcher _notifications;
 
     public AttemptController(
         IAttemptService attemptService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        INotificationDispatcher notifications)
     {
         _attemptService = attemptService;
         _currentUserService = currentUserService;
+        _notifications = notifications;
     }
 
     #region Candidate Endpoints
@@ -38,6 +43,15 @@ public class AttemptController : ControllerBase
         }
 
         var result = await _attemptService.StartAttemptAsync(dto, candidateId);
+        if (result.Success && result.Data != null)
+            _notifications.NotifyRoles(
+                [AppRoles.SuperAdmin, AppRoles.Admin],
+                UserNotificationType.CandidateStartedExam,
+                "Candidate Started Exam", "بدأ مرشح الاختبار",
+                $"A candidate has started the exam.", "بدأ مرشح خوض الاختبار.",
+                relatedExamId: result.Data.ExamId,
+                relatedAttemptId: result.Data.AttemptId,
+                actorUserId: candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -72,6 +86,14 @@ public class AttemptController : ControllerBase
         }
 
      var result = await _attemptService.SubmitAttemptAsync(attemptId, candidateId);
+        if (result.Success)
+            _notifications.NotifyRoles(
+                [AppRoles.SuperAdmin, AppRoles.Admin],
+                UserNotificationType.CandidateSubmittedExam,
+                "Candidate Submitted Exam", "أتم مرشح تقديم الاختبار",
+                "A candidate has submitted their exam.", "أتم مرشح تقديم الاختبار.",
+                relatedAttemptId: attemptId,
+                actorUserId: candidateId);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

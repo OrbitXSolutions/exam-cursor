@@ -616,11 +616,6 @@ export default function SessionDetailPage() {
               {t("proctor.addTime")}
             </Button>
           )}
-          <Button variant="outline" onClick={handleCreateIncident}>
-            <AlertTriangle className="h-4 w-4 me-2" />
-            {t("proctor.createIncident")}
-          </Button>
-
           {session.status === "Active" && (
             <Button variant="outline" onClick={() => setWarningDialogOpen(true)}>
               <MessageSquare className="h-4 w-4 me-2" />

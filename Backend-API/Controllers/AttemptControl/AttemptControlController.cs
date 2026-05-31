@@ -10,7 +10,7 @@ namespace Smart_Core.Controllers.AttemptControl;
 
 [ApiController]
 [Route("api/attempt-control")]
-[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor}")]
+[Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Instructor},{AppRoles.Proctor}")]
 public class AttemptControlController : ControllerBase
 {
     private readonly IAttemptControlService _service;
