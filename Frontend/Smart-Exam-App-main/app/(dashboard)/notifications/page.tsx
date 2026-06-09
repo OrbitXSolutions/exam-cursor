@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import {
   getUserNotifications,
@@ -32,6 +33,7 @@ import {
   Clock,
   UserCheck,
   Send,
+  ExternalLink,
 } from "lucide-react"
 
 // ── Notification type config ────────────────────────────────────────────────
@@ -46,6 +48,30 @@ const TYPE_CONFIG: Record<number, { en: string; ar: string; icon: typeof Bell }>
 
 function getTypeConfig(type: number) {
   return TYPE_CONFIG[type] ?? { en: "Notification", ar: "إشعار", icon: Bell }
+}
+
+// Build a navigation URL for actionable notification types
+function getActionLink(notification: UserNotificationDto): { href: string; labelEn: string; labelAr: string } | null {
+  // type 4 = CandidateStartedExam → go to proctor center live sessions
+  if (notification.type === 4) {
+    return {
+      href: "/proctor-center",
+      labelEn: "Watch Session",
+      labelAr: "مشاهدة الجلسة",
+    }
+  }
+  // type 5 = CandidateSubmittedExam → go to candidate results, scoped to exam if available
+  if (notification.type === 5) {
+    const href = notification.relatedExamId
+      ? `/results/candidate-result?examId=${notification.relatedExamId}`
+      : "/results/candidate-result"
+    return {
+      href,
+      labelEn: "Watch Result",
+      labelAr: "مشاهدة النتيجة",
+    }
+  }
+  return null
 }
 
 // ── Page ────────────────────────────────────────────────────────────────────
@@ -172,6 +198,7 @@ export default function NotificationsPage() {
                   <TableHead>{isRtl ? "العنوان" : "Title"}</TableHead>
                   <TableHead className="hidden md:table-cell">{isRtl ? "الرسالة" : "Message"}</TableHead>
                   <TableHead className="hidden sm:table-cell">{isRtl ? "التاريخ" : "Date"}</TableHead>
+                  <TableHead className="w-28">{isRtl ? "الإجراء" : "Action"}</TableHead>
                   <TableHead className="w-24">{isRtl ? "الحالة" : "Status"}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -205,6 +232,20 @@ export default function NotificationsPage() {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-xs text-muted-foreground whitespace-nowrap">
                         {formattedDate}
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const action = getActionLink(notification)
+                          if (!action) return null
+                          return (
+                            <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1" asChild>
+                              <Link href={action.href}>
+                                <ExternalLink className="h-3 w-3" />
+                                {isRtl ? action.labelAr : action.labelEn}
+                              </Link>
+                            </Button>
+                          )
+                        })()}
                       </TableCell>
                       <TableCell>
                         {notification.isRead ? (
