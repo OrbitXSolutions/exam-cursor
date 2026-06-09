@@ -14,13 +14,13 @@ public class AuthController : ControllerBase
 {
   private readonly IAuthService _authService;
   private readonly ICurrentUserService _currentUserService;
-  private readonly IAuditService _auditService;
+  private readonly IServiceScopeFactory _scopeFactory;
 
-  public AuthController(IAuthService authService, ICurrentUserService currentUserService, IAuditService auditService)
+  public AuthController(IAuthService authService, ICurrentUserService currentUserService, IServiceScopeFactory scopeFactory)
   {
     _authService = authService;
     _currentUserService = currentUserService;
-    _auditService = auditService;
+    _scopeFactory = scopeFactory;
   }
 
   /// <summary>
@@ -45,24 +45,27 @@ public class AuthController : ControllerBase
   {
     var result = await _authService.LoginAsync(dto);
 
-    // Fire-and-forget audit log for login
+    // Fire-and-forget audit log for login — uses a fresh DI scope to avoid ObjectDisposedException
+    var capturedIp = HttpContext.Connection.RemoteIpAddress?.ToString();
     _ = Task.Run(async () =>
     {
       try
       {
+        using var scope = _scopeFactory.CreateScope();
+        var auditService = scope.ServiceProvider.GetRequiredService<IAuditService>();
         if (result.Success)
         {
-          await _auditService.LogSuccessAsync(
+          await auditService.LogSuccessAsync(
                   AuditActions.AuthLogin, "User", dto.Email ?? "",
                   actorId: null,
-                  metadata: new { email = dto.Email, ip = HttpContext.Connection.RemoteIpAddress?.ToString() });
+                  metadata: new { email = dto.Email, ip = capturedIp });
         }
         else
         {
-          await _auditService.LogFailureAsync(
+          await auditService.LogFailureAsync(
                   AuditActions.AuthLoginFailed, "User", dto.Email ?? "",
                   result.Message ?? "Login failed",
-                  metadata: new { email = dto.Email, ip = HttpContext.Connection.RemoteIpAddress?.ToString() });
+                  metadata: new { email = dto.Email, ip = capturedIp });
         }
       }
       catch { /* audit should never block login */ }

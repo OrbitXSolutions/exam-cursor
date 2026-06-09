@@ -7,6 +7,7 @@ import { localizeText } from "@/lib/i18n/runtime"
 import { getLiveSessions, flagSession, sendWarning, terminateSession, getTriageRecommendations } from "@/lib/api/proctoring"
 import type { LiveSession } from "@/lib/types/proctoring"
 import type { TriageRecommendation } from "@/lib/api/proctoring"
+import { useProctorSessionRefresh } from "@/lib/hooks/useNotifications"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -75,6 +76,9 @@ export default function ProctorCenterPage() {
   const filterModeRef = useRef(filterMode)
   searchQueryRef.current = searchQuery
   filterModeRef.current = filterMode
+
+  // Auto-reload sessions instantly when a candidate starts or submits via SignalR push
+  useProctorSessionRefresh(loadSessions)
   function getRiskBadge(score?: number) {
     if (score == null) return null
     if (score <= 20) return { label: localizeText("Low", "منخفض", locale), color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" }

@@ -522,6 +522,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     return ApiResponse<AttemptSubmittedDto>.SuccessResponse(new AttemptSubmittedDto
     {
       AttemptId = attemptId,
+      ExamId = attempt.ExamId,
       SubmittedAt = now,
       Status = AttemptStatus.Submitted,
       TotalQuestions = totalQuestions,
