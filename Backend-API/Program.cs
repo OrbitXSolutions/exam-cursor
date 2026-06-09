@@ -326,8 +326,32 @@ app.UseRequestResponseLogging();
 // Global Exception Handling
 app.UseGlobalExceptionMiddleware();
 
-// Serilog Request Logging
-app.UseSerilogRequestLogging();
+// Serilog Request Logging — enriched with user/IP/UA for useful file logs
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms" +
+        " | User:{UserEmail} | IP:{ClientIp} | UA:{UserAgent}";
+
+    options.EnrichDiagnosticContext = (diagCtx, httpCtx) =>
+    {
+        diagCtx.Set("ClientIp",
+            httpCtx.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded)
+                ? forwarded.ToString().Split(',')[0].Trim()
+                : httpCtx.Connection.RemoteIpAddress?.ToString() ?? "-");
+
+        var ua = httpCtx.Request.Headers.UserAgent.ToString();
+        diagCtx.Set("UserAgent", ua.Length > 200 ? ua[..200] : ua);
+
+        var email = httpCtx.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                    ?? httpCtx.User.FindFirst("email")?.Value
+                    ?? "-";
+        diagCtx.Set("UserEmail", email);
+
+        var userId = httpCtx.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "-";
+        diagCtx.Set("UserId", userId);
+    };
+});
 
 // Swagger (available in all environments for now, restrict in production if needed)
 app.UseSwagger();

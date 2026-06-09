@@ -212,6 +212,7 @@ const logsNavGroup: NavGroup = {
     { icon: Eye, labelKey: "nav.proctorLogs", href: "/logs/proctor" },
     { icon: UserCog, labelKey: "nav.userLogs", href: "/logs/users" },
     { icon: Bug, labelKey: "nav.developerLogs", href: "/logs/developer" },
+    { icon: Activity, labelKey: "nav.appLogs", href: "/logs/app-logs" },
   ],
 }
 

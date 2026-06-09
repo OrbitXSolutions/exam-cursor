@@ -141,9 +141,10 @@ public class RequestResponseLoggingMiddleware
 
             var statusCode = context.Response.StatusCode;
             var isError = statusCode >= 400 || caughtException != null;
+            var captureResponse = isError || IsDebugResponsePath(path);
 
-            // Capture response body only for errors (limit to 8KB)
-            if (isError && responseBytes.Length > 0)
+            // Capture response body for errors OR for investigation endpoints (limit to 8KB)
+            if (captureResponse && responseBytes.Length > 0)
             {
                 var maxLen = Math.Min(responseBytes.Length, 8192);
                 responseBody = Encoding.UTF8.GetString(responseBytes, 0, maxLen);
@@ -191,7 +192,7 @@ public class RequestResponseLoggingMiddleware
                     HttpMethod = context.Request.Method,
                     RequestBody = isError || context.Request.Method != "GET" ? requestBody : null,
                     ResponseStatusCode = statusCode,
-                    ResponseBody = isError ? responseBody : null,
+                    ResponseBody = captureResponse ? responseBody : null,
                     ErrorMessage = enrichedErrorMessage,
                     StackTrace = caughtException != null ? caughtException.ToString() : null,
                     ExceptionType = caughtException?.GetType().FullName,
@@ -251,6 +252,29 @@ public class RequestResponseLoggingMiddleware
             _ when isError => LogCategory.Developer,
             _ => LogCategory.User
         };
+    }
+
+    // Specific endpoints where we capture response body even on success,
+    // for candidate/proctor investigation use cases.
+    private static readonly HashSet<string> DebugResponsePaths = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Candidate exam flow
+        "/api/attempt/start",
+        "/api/attempt",           // covers /api/attempt/{id}/submit, /api/attempt/{id}/answers, etc.
+        // Proctor live session
+        "/api/proctor/session",   // covers /api/proctor/session, /api/proctor/session/{id}/end|flag|terminate|warning
+        "/api/proctor/event",
+    };
+
+    private static bool IsDebugResponsePath(string path)
+    {
+        var lower = path.ToLowerInvariant();
+        foreach (var p in DebugResponsePaths)
+        {
+            if (lower.StartsWith(p, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
     }
 
     private static bool IsImportantAction(string path, string method)

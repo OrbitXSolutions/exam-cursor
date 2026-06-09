@@ -164,6 +164,7 @@ export const translations = {
       proctorLogs: "Proctor Logs",
       userLogs: "Users Logs",
       developerLogs: "Developer Logs",
+      appLogs: "App Logs",
       // Roles
       roleAdmin: "Administrator",
       roleInstructor: "Instructor",
@@ -1724,6 +1725,7 @@ export const translations = {
       proctorLogs: "سجلات المراقبين",
       userLogs: "سجلات المستخدمين",
       developerLogs: "سجلات المطورين",
+      appLogs: "سجلات التطبيق",
       // Roles
       roleAdmin: "مدير النظام",
       roleInstructor: "مدرب",

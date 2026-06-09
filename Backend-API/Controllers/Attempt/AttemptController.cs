@@ -45,7 +45,7 @@ public class AttemptController : ControllerBase
         var result = await _attemptService.StartAttemptAsync(dto, candidateId);
         if (result.Success && result.Data != null)
             _notifications.NotifyRolesScoped(
-                [AppRoles.SuperAdmin, AppRoles.Admin],
+                [AppRoles.SuperAdmin, AppRoles.Admin, AppRoles.Proctor],
                 UserNotificationType.CandidateStartedExam,
                 "Candidate Started Exam", "بدأ مرشح الاختبار",
                 $"A candidate has started the exam.", "بدأ مرشح خوض الاختبار.",
@@ -86,12 +86,13 @@ public class AttemptController : ControllerBase
         }
 
         var result = await _attemptService.SubmitAttemptAsync(attemptId, candidateId);
-        if (result.Success)
+        if (result.Success && result.Data != null)
             _notifications.NotifyRolesScoped(
-                [AppRoles.SuperAdmin, AppRoles.Admin],
+                [AppRoles.SuperAdmin, AppRoles.Admin, AppRoles.Proctor],
                 UserNotificationType.CandidateSubmittedExam,
                 "Candidate Submitted Exam", "أتم مرشح تقديم الاختبار",
                 "A candidate has submitted their exam.", "أتم مرشح تقديم الاختبار.",
+                relatedExamId: result.Data.ExamId,
                 relatedAttemptId: attemptId,
                 actorUserId: candidateId);
         return result.Success ? Ok(result) : BadRequest(result);

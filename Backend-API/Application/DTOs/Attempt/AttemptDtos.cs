@@ -259,6 +259,7 @@ public class SubmitAttemptDto
 public class AttemptSubmittedDto
 {
     public int AttemptId { get; set; }
+    public int ExamId { get; set; }
     public DateTimeOffset SubmittedAt { get; set; }
     public AttemptStatus Status { get; set; }
     public string StatusName => Status.ToString();
