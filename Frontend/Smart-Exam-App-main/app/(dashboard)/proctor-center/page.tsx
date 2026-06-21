@@ -51,6 +51,8 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  Info,
+  WifiOff,
 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -72,6 +74,7 @@ export default function ProctorCenterPage() {
   const [triageLoading, setTriageLoading] = useState(false)
   const [useSampleData, setUseSampleData] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
+  const [dismissedMediaHint, setDismissedMediaHint] = useState(false)
   const searchQueryRef = useRef(searchQuery)
   const filterModeRef = useRef(filterMode)
   searchQueryRef.current = searchQuery
@@ -377,6 +380,26 @@ export default function ProctorCenterPage() {
 
       </div>
 
+      {/* Network Policy Media Hint — shown when at least one active session has no snapshots */}
+      {!dismissedMediaHint && sessions.some(s => s.status === "Active" && !s.latestSnapshotUrl) && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 px-4 py-3">
+          <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+          <p className="text-sm text-amber-800 dark:text-amber-300 flex-1">
+            {locale === "ar"
+              ? "بعض الجلسات لا تعرض لقطات أو وسائط. قد يكون سياسة الشبكة لدى المرشح يحجب رفع الملفات. المرشح لا يزال يؤدي الاختبار ومرئي هنا."
+              : "Some sessions show no media preview. The candidate\u2019s network or security policy may be blocking snapshot uploads. The candidate is still actively taking the exam and visible here."}
+          </p>
+          <button
+            type="button"
+            onClick={() => setDismissedMediaHint(true)}
+            className="text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors shrink-0 text-lg leading-none"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Sessions Grid */}
       {sortedSessions.length === 0 ? (
         <EmptyState icon={Video} title={t("proctor.noSessions")} description={t("proctor.noSessionsDesc")} />
@@ -398,7 +421,7 @@ export default function ProctorCenterPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted-foreground/10 text-muted-foreground text-xl font-semibold">
                       {session.candidateName
                         .split(" ")
@@ -407,6 +430,10 @@ export default function ProctorCenterPage() {
                         .slice(0, 2)
                         .toUpperCase()}
                     </div>
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground/60">
+                      <WifiOff className="h-3 w-3" />
+                      {locale === "ar" ? "لا توجد وسائط · قد يكون محجوباً" : "No media · may be blocked"}
+                    </span>
                   </div>
                 )}
                 <div className="absolute top-2 start-2 flex items-center gap-2">

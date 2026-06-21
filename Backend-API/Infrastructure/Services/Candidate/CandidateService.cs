@@ -1,6 +1,7 @@
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Candidate;
@@ -13,6 +14,7 @@ using Smart_Core.Application.Interfaces.Grading;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Attempt;
+using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
@@ -31,6 +33,7 @@ public class CandidateService : ICandidateService
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ICacheService _cache;
     private readonly IHubContext<ProctorHub> _proctorHub;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CandidateService(
         ApplicationDbContext context,
@@ -40,7 +43,8 @@ public class CandidateService : ICandidateService
         ILogger<CandidateService> logger,
         IServiceScopeFactory serviceScopeFactory,
         ICacheService cache,
-        IHubContext<ProctorHub> proctorHub)
+        IHubContext<ProctorHub> proctorHub,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _userManager = userManager;
@@ -50,6 +54,7 @@ public class CandidateService : ICandidateService
         _serviceScopeFactory = serviceScopeFactory;
         _cache = cache;
         _proctorHub = proctorHub;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     private void InvalidateAttemptProgressCaches()
@@ -66,6 +71,59 @@ public class CandidateService : ICandidateService
         _cache.RemoveByPrefix(CacheKeys.ResultsPrefix);
         _cache.RemoveByPrefix(CacheKeys.GradingPrefix);
         _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
+    }
+
+    private static (string Name, string Version) ParseBrowser(string ua)
+    {
+        if (string.IsNullOrEmpty(ua)) return ("Unknown", "");
+        if (ua.Contains("Edg/"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Edg/([\d.]+)");
+            return ("Edge", m.Success ? m.Groups[1].Value : "");
+        }
+        if (ua.Contains("OPR/") || ua.Contains("Opera"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"OPR/([\d.]+)");
+            return ("Opera", m.Success ? m.Groups[1].Value : "");
+        }
+        if (ua.Contains("Chrome/"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Chrome/([\d.]+)");
+            return ("Chrome", m.Success ? m.Groups[1].Value : "");
+        }
+        if (ua.Contains("Firefox/"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Firefox/([\d.]+)");
+            return ("Firefox", m.Success ? m.Groups[1].Value : "");
+        }
+        if (ua.Contains("Safari/") && !ua.Contains("Chrome"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Version/([\d.]+)");
+            return ("Safari", m.Success ? m.Groups[1].Value : "");
+        }
+        return ("Unknown", "");
+    }
+
+    private static string ParseOS(string ua)
+    {
+        if (string.IsNullOrEmpty(ua)) return "Unknown";
+        if (ua.Contains("Windows NT 10")) return "Windows 10/11";
+        if (ua.Contains("Windows NT 6.3")) return "Windows 8.1";
+        if (ua.Contains("Windows NT 6.1")) return "Windows 7";
+        if (ua.Contains("Windows")) return "Windows";
+        if (ua.Contains("Mac OS X"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Mac OS X ([\d_]+)");
+            return m.Success ? "macOS " + m.Groups[1].Value.Replace('_', '.') : "macOS";
+        }
+        if (ua.Contains("Android"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ua, @"Android ([\d.]+)");
+            return m.Success ? "Android " + m.Groups[1].Value : "Android";
+        }
+        if (ua.Contains("iPhone") || ua.Contains("iPad")) return "iOS";
+        if (ua.Contains("Linux")) return "Linux";
+        return "Unknown";
     }
 
     #region Exam Discovery & Preview
@@ -581,7 +639,36 @@ public class CandidateService : ICandidateService
             }
             else
             {
-                // Resume existing
+                // Resume existing — heal pre-fix attempts that have no ProctorSession yet
+                var existingResumePs = await _context.Set<ProctorSession>()
+                    .FirstOrDefaultAsync(s => s.AttemptId == existingActive.Id && s.Mode == ProctorMode.Soft);
+                if (existingResumePs == null)
+                {
+                    var ua = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString() ?? "";
+                    var (browserName, browserVersion) = ParseBrowser(ua);
+                    var operatingSystem = ParseOS(ua);
+                    _context.Set<ProctorSession>().Add(new ProctorSession
+                    {
+                        AttemptId = existingActive.Id,
+                        ExamId = examId,
+                        CandidateId = candidateId,
+                        Mode = ProctorMode.Soft,
+                        StartedAt = now,
+                        Status = ProctorSessionStatus.Active,
+                        IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
+                        UserAgent = ua,
+                        BrowserName = browserName,
+                        BrowserVersion = browserVersion,
+                        OperatingSystem = operatingSystem,
+                        TotalEvents = 0,
+                        TotalViolations = 0,
+                        RiskScore = 0,
+                        LastHeartbeatAt = now,
+                        CreatedDate = now,
+                        CreatedBy = candidateId
+                    });
+                    await _context.SaveChangesAsync();
+                }
                 await startTransaction.CommitAsync();
                 return ApiResponse<CandidateAttemptSessionDto>.SuccessResponse(
                      await BuildCandidateSessionDto(existingActive, exam),
@@ -724,6 +811,39 @@ public class CandidateService : ICandidateService
             CreatedBy = candidateId
         };
         _context.Set<AttemptEvent>().Add(startEvent);
+
+        // Auto-create ProctorSession (idempotent, Soft mode) so the candidate is visible in
+        // Proctor Center immediately at exam start — even when snapshot/video uploads are
+        // blocked by client network policy (403 on /video-chunk). Upload failures will only
+        // update monitoring health/warnings and must NOT prevent the session from appearing.
+        var existingPs = await _context.Set<ProctorSession>()
+            .FirstOrDefaultAsync(s => s.AttemptId == attempt.Id && s.Mode == ProctorMode.Soft);
+        if (existingPs == null)
+        {
+            var ua = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString() ?? "";
+            var (browserName, browserVersion) = ParseBrowser(ua);
+            var operatingSystem = ParseOS(ua);
+            _context.Set<ProctorSession>().Add(new ProctorSession
+            {
+                AttemptId = attempt.Id,
+                ExamId = examId,
+                CandidateId = candidateId,
+                Mode = ProctorMode.Soft,
+                StartedAt = now,
+                Status = ProctorSessionStatus.Active,
+                IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
+                UserAgent = ua,
+                BrowserName = browserName,
+                BrowserVersion = browserVersion,
+                OperatingSystem = operatingSystem,
+                TotalEvents = 0,
+                TotalViolations = 0,
+                RiskScore = 0,
+                LastHeartbeatAt = now,
+                CreatedDate = now,
+                CreatedBy = candidateId
+            });
+        }
 
         await _context.SaveChangesAsync();
         InvalidateAttemptProgressCaches();
