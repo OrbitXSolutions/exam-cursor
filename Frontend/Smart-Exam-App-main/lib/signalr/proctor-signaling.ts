@@ -409,7 +409,9 @@ export class ProctorSignaling {
     if (typeof window === "undefined") return "http://localhost:5221";
     // In production, the backend runs on the same host or a configured URL
     // Check for env variable first
-    const envUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const envUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL ||
+      process.env.NEXT_PUBLIC_API_BASE_URL;
     if (envUrl) {
       // Strip trailing /api or /api/ — SignalR hubs are at root path, not under /api
       return envUrl.replace(/\/+$/, "").replace(/\/api\/?$/, "");
