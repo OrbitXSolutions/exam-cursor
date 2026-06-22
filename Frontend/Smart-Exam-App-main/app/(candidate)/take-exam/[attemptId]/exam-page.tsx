@@ -482,24 +482,45 @@ export default function ExamPage() {
         }
       } : null
 
-      // Signal 2: Window blur → rapid focus (< 1500 ms)
-      // Covers Snipping Tool (Win+Shift+S), macOS Cmd+Shift+3/4/5, and other
-      // screenshot overlay tools that briefly steal window focus then return it.
+      // Signal 2: Window blur while page stays VISIBLE → focus returns within 8s
+      //
+      // Key insight: Win+Shift+S (Snipping Tool), macOS Cmd+Shift+3/4/5, and
+      // similar screenshot overlay tools cause window.blur but do NOT trigger
+      // document.hidden = true (the page remains visible in the background).
+      // A real Alt+Tab / window switch makes document.hidden go true.
+      // By tracking whether the page actually went hidden during the blur, we can
+      // distinguish screenshot tools from innocent window switches.
+      //
+      // Threshold is 8 s to accommodate realistic snip-selection times (1–5 s).
       let desktopBlurAt: number | null = null
+      let pageWentHiddenDuringBlur = false
+
       const handleDesktopWindowBlur = !isMobileUA ? () => {
         desktopBlurAt = Date.now()
+        pageWentHiddenDuringBlur = false
       } : null
+
+      // Track if the page actually went hidden between blur and focus
+      const handleDesktopPageVisibility = !isMobileUA ? () => {
+        if (document.hidden && desktopBlurAt !== null) {
+          pageWentHiddenDuringBlur = true
+        }
+      } : null
+
       const handleDesktopWindowFocus = !isMobileUA ? () => {
         if (desktopBlurAt !== null) {
           const elapsed = Date.now() - desktopBlurAt
+          const wasHidden = pageWentHiddenDuringBlur
           desktopBlurAt = null
-          // Very rapid blur→focus (< 1500 ms) = suspected screenshot tool
-          if (elapsed > 0 && elapsed < 1500) {
+          pageWentHiddenDuringBlur = false
+          // Page stayed visible (no tab switch) and focus returned within 8 s
+          // → strong signal of a screenshot overlay tool
+          if (!wasHidden && elapsed > 50 && elapsed < 8000) {
             logAttemptEvent(session.attemptId, {
               eventType: AttemptEventType.ScreenshotAttempt,
               metadataJson: JSON.stringify({
                 timestamp: new Date().toISOString(),
-                method: "windowBlurRapidFocus",
+                method: "windowBlurNoVisibilityChange",
                 blurDurationMs: elapsed,
                 screenResolution: `${screen.width}x${screen.height}`,
               }),
@@ -518,6 +539,7 @@ export default function ExamPage() {
       if (handleMobileScreenshot) document.addEventListener("visibilitychange", handleMobileScreenshot)
       if (handleDesktopKeyDown) document.addEventListener("keydown", handleDesktopKeyDown)
       if (handleDesktopWindowBlur) window.addEventListener("blur", handleDesktopWindowBlur)
+      if (handleDesktopPageVisibility) document.addEventListener("visibilitychange", handleDesktopPageVisibility)
       if (handleDesktopWindowFocus) window.addEventListener("focus", handleDesktopWindowFocus)
 
       return () => {
@@ -528,6 +550,7 @@ export default function ExamPage() {
         if (handleMobileScreenshot) document.removeEventListener("visibilitychange", handleMobileScreenshot)
         if (handleDesktopKeyDown) document.removeEventListener("keydown", handleDesktopKeyDown)
         if (handleDesktopWindowBlur) window.removeEventListener("blur", handleDesktopWindowBlur)
+        if (handleDesktopPageVisibility) document.removeEventListener("visibilitychange", handleDesktopPageVisibility)
         if (handleDesktopWindowFocus) window.removeEventListener("focus", handleDesktopWindowFocus)
 
         if (settings?.requireFullscreen && document.fullscreenElement) {
