@@ -153,21 +153,15 @@ export default function SessionDetailPage() {
               setSessionEnded({ reason: reason as "Submitted" | "Expired" | "Terminated" })
               setHasRemoteStream(false)
               viewerRef.current?.disconnect()
-              const reportUrl = `/results/ai-report/${data.session.examId}/${data.session.candidateId}`
               toast.info(
                 `${t("proctor.sessionTerminatedTitle")}: ${reason}`,
                 {
-                  description: t("proctor.redirectingToReport", { seconds: "10" }),
-                  duration: 10000,
-                  action: {
-                    label: t("proctor.viewReportNow"),
-                    onClick: () => router.push(reportUrl),
-                  },
+                  duration: 5000,
                 }
               )
               setTimeout(() => {
-                router.push(reportUrl)
-              }, 10000)
+                router.push("/proctor-center")
+              }, 5000)
             }
           } catch {
             // silent — don't redirect on poll failure
@@ -224,27 +218,19 @@ export default function SessionDetailPage() {
             setScreenshots(data.screenshots)
           }).catch(() => {})
 
-          // Build the redirect URL — recording page with all session evidence
-          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
-
-          // Prominent toast with 15s duration + action button
+          // Prominent toast with auto-redirect back to proctor center
           toast.success(
             t("proctor.candidateSubmittedExam", { id: String(attemptId) }),
             {
-              description: t("proctor.redirectingToReport", { seconds: "15" }),
-              duration: 15000,
+              duration: 5000,
               icon: "✅",
-              action: {
-                label: t("proctor.viewReportNow"),
-                onClick: () => router.push(reportUrl),
-              },
             }
           )
 
-          // Auto-redirect after 15 seconds
+          // Auto-redirect after 5 seconds
           setTimeout(() => {
-            router.push(reportUrl)
-          }, 15000)
+            router.push("/proctor-center")
+          }, 5000)
         },
         onExamTerminated: (termEvent) => {
           // If the proctor themselves just triggered this termination, ignore the
@@ -260,24 +246,17 @@ export default function SessionDetailPage() {
             setScreenshots(data.screenshots)
           }).catch(() => {})
 
-          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
-
           toast.error(
             t("proctor.examTerminatedReason", { reason: termEvent.reason }),
             {
-              description: t("proctor.redirectingToReport", { seconds: "10" }),
-              duration: 10000,
+              duration: 5000,
               icon: "🚫",
-              action: {
-                label: t("proctor.viewReportNow"),
-                onClick: () => router.push(reportUrl),
-              },
             }
           )
 
           setTimeout(() => {
-            router.push(reportUrl)
-          }, 10000)
+            router.push("/proctor-center")
+          }, 5000)
         },
         onSignalRStatusChange: (connected) => {
           console.log(`[SmartPoll] Proctor SignalR status changed: connected=${connected}`)
@@ -311,21 +290,14 @@ export default function SessionDetailPage() {
             setScreenshots(data.screenshots)
           }).catch(() => {})
 
-          const reportUrl = `/results/ai-report/${session?.examId}/${session?.candidateId}`
-
           toast.warning(t("proctor.examExpiredAttempt", { id: String(expEvent.attemptId) }), {
-            description: t("proctor.redirectingToReport", { seconds: "10" }),
-            duration: 10000,
+            duration: 5000,
             icon: "⏰",
-            action: {
-              label: t("proctor.viewReportNow"),
-              onClick: () => router.push(reportUrl),
-            },
           })
 
           setTimeout(() => {
-            router.push(reportUrl)
-          }, 10000)
+            router.push("/proctor-center")
+          }, 5000)
         },
       })
 
@@ -487,12 +459,7 @@ export default function SessionDetailPage() {
       toast.success(t("proctor.sessionTerminated"))
       setTerminateDialogOpen(false)
       setTerminateReason("")
-      // Redirect to session report instead of the list
-      if (session.attemptId) {
-        router.push(`/results/ai-report/${session.examId}/${session.candidateId}`)
-      } else {
-        router.push("/proctor-center")
-      }
+      router.push("/proctor-center")
     } catch (error) {
       // Reset the guard — the termination request failed, so future system-level
       // SessionTerminated pushes (e.g. auto-termination) must still reach onExamTerminated.
