@@ -465,11 +465,60 @@ export default function ExamPage() {
         }
       } : null
 
+      // ── Desktop screenshot detection ─────────────────────────────────────────
+      // Signal 1: PrintScreen key (fires keydown in Chrome/Edge on Windows)
+      const handleDesktopKeyDown = !isMobileUA ? (e: KeyboardEvent) => {
+        if (e.key === "PrintScreen") {
+          logAttemptEvent(session.attemptId, {
+            eventType: AttemptEventType.ScreenshotAttempt,
+            metadataJson: JSON.stringify({
+              timestamp: new Date().toISOString(),
+              method: "PrintScreen",
+              screenResolution: `${screen.width}x${screen.height}`,
+            }),
+          }).catch(() => { })
+          playWarningBeep()
+          toast.warning(t("exam.screenshotAttemptWarning"))
+        }
+      } : null
+
+      // Signal 2: Window blur → rapid focus (< 1500 ms)
+      // Covers Snipping Tool (Win+Shift+S), macOS Cmd+Shift+3/4/5, and other
+      // screenshot overlay tools that briefly steal window focus then return it.
+      let desktopBlurAt: number | null = null
+      const handleDesktopWindowBlur = !isMobileUA ? () => {
+        desktopBlurAt = Date.now()
+      } : null
+      const handleDesktopWindowFocus = !isMobileUA ? () => {
+        if (desktopBlurAt !== null) {
+          const elapsed = Date.now() - desktopBlurAt
+          desktopBlurAt = null
+          // Very rapid blur→focus (< 1500 ms) = suspected screenshot tool
+          if (elapsed > 0 && elapsed < 1500) {
+            logAttemptEvent(session.attemptId, {
+              eventType: AttemptEventType.ScreenshotAttempt,
+              metadataJson: JSON.stringify({
+                timestamp: new Date().toISOString(),
+                method: "windowBlurRapidFocus",
+                blurDurationMs: elapsed,
+                screenResolution: `${screen.width}x${screen.height}`,
+              }),
+            }).catch(() => { })
+            playWarningBeep()
+            toast.warning(t("exam.screenshotAttemptWarning"))
+          }
+        }
+      } : null
+      // ────────────────────────────────────────────────────────────────────────
+
       if (handleFullscreenChange) document.addEventListener("fullscreenchange", handleFullscreenChange)
       if (handleVisibilityChange) document.addEventListener("visibilitychange", handleVisibilityChange)
       if (handleCopy) document.addEventListener("copy", handleCopy)
       if (handlePaste) document.addEventListener("paste", handlePaste)
       if (handleMobileScreenshot) document.addEventListener("visibilitychange", handleMobileScreenshot)
+      if (handleDesktopKeyDown) document.addEventListener("keydown", handleDesktopKeyDown)
+      if (handleDesktopWindowBlur) window.addEventListener("blur", handleDesktopWindowBlur)
+      if (handleDesktopWindowFocus) window.addEventListener("focus", handleDesktopWindowFocus)
 
       return () => {
         if (handleFullscreenChange) document.removeEventListener("fullscreenchange", handleFullscreenChange)
@@ -477,6 +526,9 @@ export default function ExamPage() {
         if (handleCopy) document.removeEventListener("copy", handleCopy)
         if (handlePaste) document.removeEventListener("paste", handlePaste)
         if (handleMobileScreenshot) document.removeEventListener("visibilitychange", handleMobileScreenshot)
+        if (handleDesktopKeyDown) document.removeEventListener("keydown", handleDesktopKeyDown)
+        if (handleDesktopWindowBlur) window.removeEventListener("blur", handleDesktopWindowBlur)
+        if (handleDesktopWindowFocus) window.removeEventListener("focus", handleDesktopWindowFocus)
 
         if (settings?.requireFullscreen && document.fullscreenElement) {
           document.exitFullscreen().catch(() => { })
