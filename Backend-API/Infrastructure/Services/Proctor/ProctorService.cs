@@ -877,7 +877,8 @@ public class ProctorService : IProctorService
             + c(AttemptEventType.WindowBlur) * 4
             + c(AttemptEventType.CopyAttempt) * 10
             + c(AttemptEventType.PasteAttempt) * 10
-            + c(AttemptEventType.RightClickAttempt) * 5;
+            + c(AttemptEventType.RightClickAttempt) * 5
+            + c(AttemptEventType.ScreenshotAttempt) * 15;
         var behaviorScore = (decimal)Math.Max(0, Math.Min(100, 100 - behaviorPenalty));
 
         // Environment Score (no missingInfoPenalty — device info is now captured reliably)
