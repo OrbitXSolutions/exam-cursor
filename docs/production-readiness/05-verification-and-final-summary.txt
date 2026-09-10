@@ -1,0 +1,197 @@
+FINAL SUMMARY — PRESERVED BLOCKED PHASE 1 ASSESSMENT
+Assessment date: 2026-09-10
+Original baseline: 630cee0
+Overall result: BLOCKED. NOT PRODUCTION-READY. PHASE 2 NOT STARTED.
+
+DELIVERED
+- A narrowly scoped repository fix: nested backend Logs source directories are
+  no longer silently ignored; root runtime log directories remain ignored.
+- Organized reports retaining the system map, confirmed findings, review limits,
+  decisions, baseline evidence, open risks, and exact continuation requirements.
+- No changes to exam business logic, SeedData/AllowAnonymous, application runtime
+  code, database schema, or dependency versions.
+
+REPORT INDEX
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/01-phase1-system-and-checkpoint.txt
+  Architecture, original-source blocker, change rationale, checkpoint decision.
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/02-phase1-multi-server.txt
+  Local caches, SignalR, files, workers, rate limiting, deployment-local state.
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/03-phase1-logging-and-support.txt
+  Missing logging source, buffering, privacy, diagnostics, failure isolation.
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/04-phase1-configuration-and-security.txt
+  Configuration map, sensitive locations without values, open security findings.
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/05-verification-and-final-summary.txt
+  This consolidated evidence and handoff.
+
+STATUS LEGEND
+VERIFIED means a specifically observed command/source result, including failure.
+PARTIALLY VERIFIED means inspection without adequate operational evidence.
+NOT VERIFIED means no adequate test was performed.
+BLOCKED means a concrete prerequisite prevents completion.
+
+BASELINE BUILD / VALIDATION EVIDENCE
+Checks ran before application edits; no application edits were subsequently made.
+Runtime available: Linux x64; .NET SDK 10.0.400 (other installed SDKs include 9);
+Node 22.23.2; pnpm 10.15.1 through Corepack. API target net9.0; signer net8.0.
+
+1. Backend Release build — VERIFIED FAILURE / BLOCKED
+Command:
+dotnet build /home/runner/work/exam-cursor/exam-cursor/Backend-API/Smart_Core.csproj -c Release
+Restore succeeded. Build failed: 6 errors, 0 warnings.
+Errors:
+- CS0234, missing Smart_Core.Domain.Entities.Logs:
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Data/ApplicationDbContext.cs:17
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs:7
+- CS0234, missing Smart_Core.Infrastructure.Services.Logs:
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs:9
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:57
+- CS0234, missing Smart_Core.Application.Interfaces.Logs:
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:55
+- CS0246, missing SystemLog:
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Data/ApplicationDbContext.cs:117
+No running API or backend integration tests can be claimed from this result.
+
+2. License signer Release build — VERIFIED PASS
+Command:
+dotnet build /home/runner/work/exam-cursor/exam-cursor/LicenseSigner/LicenseSigner.csproj -c Release
+0 errors, 0 warnings. This verifies compilation only, not signing, key custody,
+license/domain behavior, or customer deployment.
+
+3. Frontend frozen-lockfile installation — VERIFIED PASS
+Working directory:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main
+Command: corepack pnpm install --frozen-lockfile
+499 existing packages installed; tracked manifests/lockfile unchanged.
+pnpm reported ignored build scripts for core-js and sharp. No new dependency
+or testing/linting tool was added. Installation is not a vulnerability audit.
+
+4. Frontend production build — VERIFIED FAILURE / BLOCKED
+Same frontend directory; command: corepack pnpm build
+Failed to fetch Geist and Geist Mono through next/font from Google Fonts.
+No production artifact was established. This proves a build-time network
+dependency in this environment, not that fonts require customer-browser access.
+Other warnings included fstream/rimraf external resolution and stale browser
+mapping data; these were not silently upgraded or bypassed.
+
+5. Frontend lint — BLOCKED
+Same frontend directory; command: corepack pnpm lint
+Result: "sh: 1: eslint: not found".
+package.json declares the lint command but does not declare an ESLint dependency.
+No lint success is claimed and no new lint framework was introduced.
+
+6. Frontend typecheck — VERIFIED FAILURE
+Same frontend directory; command: corepack pnpm exec tsc --noEmit
+204 diagnostics containing "error TS". Representative groups:
+- 25 diagnostics:
+  /home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/i18n/translations.ts
+- 25 diagnostics:
+  /home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/(dashboard)/exams/[id]/builder/page.tsx
+- 22 diagnostics:
+  /home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/mock-data/index.ts
+- 15 diagnostics:
+  /home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/components/ui/video-chunk-player.tsx
+Examples include duplicate object properties, missing/incorrect API type fields,
+missing exports, and record/type-assignment mismatches. These are pre-existing
+diagnostics; they are not all established runtime bugs. Reconcile contracts
+rather than inserting blanket casts or suppressions.
+
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/next.config.mjs:4-6
+already sets ignoreBuildErrors=true. Even a successful Next.js build would not
+by itself constitute a passing TypeScript check.
+
+7. Existing automated tests — NOT VERIFIED
+No configured automated unit/integration/browser test suite was identified.
+Existing markdown test reports are historical documentation, not evidence of
+tests passing in this session. No synthetic "50 users" test was presented as
+50 concurrent live exams. No existing tests were removed or modified.
+
+SAFE CHANGE VERIFICATION
+VERIFIED:
+- Before the edit, git check-ignore matched the backend's unanchored Logs rule
+  for nested entity/service/controller source paths.
+- After the edit, git check-ignore returned no match (expected exit 1) for:
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Domain/Entities/Logs/SystemLog.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Logs/SystemLogChannel.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Logs/LogPersistenceService.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Application/Interfaces/Logs/ISystemLogService.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Logs/SystemLogsController.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Application/DTOs/Logs/SystemLogDto.cs
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Data/Configurations/Logs/SystemLogConfiguration.cs
+  These are path-pattern tests, NOT recovered/created source files.
+- Root Log/log/Logs/logs runtime text output remains ignored, as does a nested
+  *.log file. git diff --check passed.
+- Full reachable history was fetched without switching branches; searches for
+  the original missing logging classes found no recovery source.
+
+Automated changed-file secret scan and final diff review results:
+Pending final validation; this section will be updated before handoff.
+
+Session-local raw evidence (not durable artifacts; summaries above are retained):
+/tmp/exam-validation/backend-build.log
+/tmp/exam-validation/licensesigner-build.log
+/tmp/exam-validation/frontend-install.log
+/tmp/exam-validation/frontend-build.log
+/tmp/exam-validation/frontend-lint.log
+/tmp/exam-validation/frontend-tsc.log
+Re-run the listed commands in a resumed session rather than depending on /tmp.
+
+WHAT IS NOT VERIFIED / REMAINS BLOCKED
+- Full Phase 1 completion, safe customer templates, original logging runtime.
+- SQL migrations/data integrity, integration with SMTP/SMS/object storage/AI.
+- Two-node cache consistency, hub delivery, shared file access, worker coordination.
+- Notification correctness for exam start/end and delivery/reconnection.
+- The known incident/backup operation closing the live Proctor camera: root
+  cause, safe simple repair versus disabling the optional feature, and regression
+  tests are all NOT VERIFIED; no camera code was changed.
+- Full-system regression, security remediation, and production-like performance.
+- 50 candidates concurrently taking live exams: NOT VERIFIED.
+No customer infrastructure, private credentials, or production data was used.
+
+EXACT STOPPING POINT AND NEXT ACTION
+Stopped in Phase 1, after baseline investigation, a source-ignore repair, and
+preservation of findings. This is a blocked assessment checkpoint, NOT the
+user's required completed Phase 1 checkpoint. Phase 2 was not begun.
+The stopping reason is missing original source and inability to validate the
+application, not lack of willingness to continue after Phase 1 completion.
+
+Maintainer action first: supply original missing logging source (including
+associated mappings, interfaces, DTOs/controllers and persistence services) or
+identify a recoverable commit. Expected directories include:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Domain/Entities/Logs/
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Application/Interfaces/Logs/
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Logs/
+The complete original module is preferable to just the types named by the
+first compiler errors. Do not fabricate stubs or delete the logging feature.
+
+After restoration:
+1. Establish a compiling original baseline and inspect recovered log contracts.
+2. Complete the Phase 1 fixes identified in the other reports, preserving
+   business behavior; provide validated configuration templates without secrets.
+3. Run builds/typechecks and focused functional, failure-isolation and two-node
+   tests; fix regressions, review final diff, document evidence, commit and push
+   a genuinely completed Phase 1 checkpoint on the current agent branch.
+4. Only then continue Phase 2: start/end notifications, camera-backup root cause
+   and safe fix or disablement, full regression/security follow-up, and load work.
+5. If constrained, preserve only clean, reviewed, documented work and record
+   precise remaining tasks rather than starting risky partial application edits.
+
+PRODUCTION-LIKE LOAD ACCEPTANCE STILL REQUIRED
+Use at least 50 independent authenticated browser sessions with realistic exam
+questions, synchronized starts, normal answer/autosave/heartbeat traffic,
+proctor video/signaling and enabled monitoring/uploads. Include simultaneous
+submissions, actual proctor viewers, reconnection, and loss/restart of one node.
+Use both nodes behind the intended balancer, shared SQL/storage/backplane and
+the final logging/notification configuration. Monitor latency/error/rejection
+rates, CPU/memory/GC, SQL waits/connections, queue depth, and persisted answers,
+attempts/results/events for lost or duplicated effects. Agree acceptable limits
+with the owner; do not invent them or confuse HTTP request concurrency with
+camera-enabled live candidates. This workload has not been run here.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+No broad refactoring, global concurrency migration, new observability platform,
+or speculative unused-code cleanup was performed. Human review can consider:
+- Locally hosted build/font/model assets for isolated deployment.
+- A reproducible integration/browser test suite and representative load harness.
+- Operator dashboards and log collection after diagnostic correctness is fixed.
+- Dependency/support-lifecycle review and a repeatable deployment/restore drill.
+These are not substitutes for the unresolved confirmed defects in the reports.

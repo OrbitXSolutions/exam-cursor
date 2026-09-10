@@ -1,0 +1,116 @@
+PHASE 1 — PRODUCTION LOGGING AND SUPPORTABILITY
+Assessment date: 2026-09-10
+Status: PARTIALLY VERIFIED (source); runtime/persistence verification BLOCKED.
+
+WHAT WAS REVIEWED
+Serilog registration/configuration, request/response middleware, global exception
+handling, intended SystemLogs persistence, database audits, background notification
+dispatch/expiry, frontend API/auth diagnostics, and support-facing error traces.
+
+CURRENT ARCHITECTURE
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:62-67,235-245,323-354
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/appsettings.json:65-202
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Migrations/20260306132902_AddSystemLogsTable.cs:14-74
+Serilog is configured with file and SQL sinks. Business audit records and
+notification delivery records are separate from technical logs. The middleware
+constructs SystemLog entries intended for a channel and background persistence
+service. The original implementation of that subsystem is missing.
+
+PROBLEMS FOUND / WHY THEY MATTER
+
+1. Missing original logging source prevents the application from compiling.
+VERIFIED: six baseline compiler errors. It is not possible to inspect channel
+capacity, overflow policy, batching, shutdown draining, SQL failure isolation,
+read permissions, export behavior, or retention without its implementation.
+The schema alone cannot establish these properties.
+
+2. Request middleware buffers every API response, not just diagnostics.
+VERIFIED in source:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs:109-150
+The response body is replaced with a MemoryStream, fully accumulated, copied
+again with ToArray, and then written to the original stream. The 8 KB cap applies
+only to the captured log text, not to buffering/allocation of the response.
+Large file/video/export responses therefore lose normal streaming and incur
+response-sized memory costs. Peak memory or timing under live load was not
+measured; "zero impact" in the middleware comment is not supported by evidence.
+
+Required remediation after restoration: avoid payload buffering in general
+request logging; retain operation/status/duration/correlation metadata and
+explicit service-level failure context. Verify exception responses, client
+disconnects, streamed downloads, and partial-response failures when altering
+middleware; a mechanical removal of buffering is not sufficient testing.
+
+3. Payload diagnostics expose sensitive values.
+VERIFIED source finding from the security specialist:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/auth/context.tsx:109-111
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/api-client.ts:71-89
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs:59-62,95-105,193-195
+Frontend login/API diagnostics include complete request/response payloads.
+The backend regex omits password variants and access/refresh-token field names.
+A specialist's synthetic, in-memory regex test confirmed the omissions; actual
+backend persistence was NOT VERIFIED. Successful attempt/proctor responses are
+also eligible for capture; they are not automatically safe support material.
+
+Required: remove authentication payload logging and default to metadata rather
+than sensitive bodies. Do not rely on a field-name regex as the privacy boundary.
+Do not ask the customer to send raw browser/backend dumps before sanitization.
+
+4. Error context exists, but end-to-end completeness is unproven.
+PARTIALLY VERIFIED:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/GlobalExceptionMiddleware.cs:34-72
+Unhandled exceptions include exception objects, route/method and trace identifiers;
+generic server responses omit internal exception detail and include a trace ID.
+This is useful existing behavior to preserve. Failures handled inside services,
+hub disconnects, provider refusals, cancellation, and infrastructure failures
+need their own actionable context; the global exception handler does not prove
+coverage of all failed exam or notification operations.
+
+5. Detached audit work can lose diagnostic evidence.
+VERIFIED source pattern:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Background/AttemptExpiryBackgroundService.cs:160-188
+Task.Run closures use an audit service obtained from the surrounding scope,
+which may be disposed before they finish; catches discard the exceptions.
+There is no evidence of durable completion. Remediation must preserve the
+expiry action while observing audit failures and respecting scoped lifetimes.
+The exact runtime failure frequency is NOT VERIFIED.
+
+6. Log stores have distinct schemas and retention responsibilities.
+PARTIALLY VERIFIED:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/LogCleanupService.cs:34-46
+This cleanup targets the Serilog Logs table. SystemLogs and ErrorLogs are
+different stores; do NOT "fix" the table name to SystemLogs. Its retention and
+the missing subsystem's cleanup need review together. File rotation/SQL batching
+configuration alone does not prove behavior during a disk-full or SQL outage.
+
+CHANGES MADE
+The backend ignore rule now permits restoration of the omitted logging source.
+No logging pipeline, audit schema, diagnostic payload, or business action was
+changed while its original contracts and a passing baseline remain unavailable.
+
+VERIFICATION / RESULTS
+VERIFIED: baseline compilation failure, ignore-rule before/after behavior, and
+the source patterns above. The synthetic regex check used no real credentials.
+NOT VERIFIED: live log delivery, caller/reader permissions, correlation across
+frontend/API/worker/node, retention, fault tolerance, support-user workflows,
+exception completeness, or logging overhead at 50 concurrent candidates.
+BLOCKED: the API cannot run from this checkout.
+
+REMAINING RISKS / REQUIRED ACCEPTANCE EVIDENCE
+After restoration/remediation, exercise successful and failed login, exam
+start/save/submit/expire, proctor warnings/termination, grading, uploads, API
+validation, and email/SMS delivery. For each, locate operation/entity identifiers,
+node, timestamp, duration/status, trace ID, and safe failure context.
+Verify that secrets, exam answers/content, identity images, and tokens are not
+included in routine diagnostics. Test SQL unavailable, disk full, queue pressure,
+shutdown, large streaming responses, and concurrent requests without sacrificing
+exam operations. Never infer success solely from a background send being queued.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS (NOT IMPLEMENTED)
+- Prefer the existing file-log plus audit/action approach over introducing a new
+  logging platform without need. Support operators should have read-only log
+  access; application write access and retention policy should be separate.
+- Consider a node-aware log collector and diagnostic dashboards only after the
+  core contracts, bounded buffering, failure visibility, and privacy are fixed.
+- Capture deployment/version identity and documented clock/time-zone conventions
+  so support can correlate existing UTC/UAE timestamps without changing business
+  scheduling rules as an incidental logging refactor.

@@ -1,0 +1,122 @@
+ON-PREMISE READINESS — PHASE 1 SYSTEM REVIEW AND CHECKPOINT
+Assessment date: 2026-09-10
+Baseline commit: 630cee0
+Overall status: BLOCKED — not a completed Phase 1 deployment checkpoint.
+
+STATUS DEFINITIONS
+VERIFIED: the specific stated result has direct command or source evidence.
+PARTIALLY VERIFIED: source was inspected, but operational behavior is unproven.
+NOT VERIFIED: no adequate test evidence was obtained.
+BLOCKED: a concrete prerequisite prevents the requested verification/completion.
+A verified source defect does not constitute a successful runtime test.
+
+1. WHAT WAS REVIEWED
+The available ASP.NET Core API, Next.js frontend, license signer, project
+configuration, deployment guidance, service registrations, EF Core persistence,
+logging middleware, cache implementation, background workers, and real-time
+integration were inspected. Specialist read-only reviews covered backend state,
+frontend integration, and security. This is an incomplete readiness assessment,
+not a claim to have fully understood or tested every operation in the system.
+
+System outline (PARTIALLY VERIFIED, source only):
+- The API targets net9.0 and uses SQL Server through EF Core and ASP.NET Identity.
+  JWT authentication, role/resource authorization, and license middleware gate
+  operations. Database migrations are present; automatic migration is disabled.
+- Domain modules include question banks, assessments and sharing/walk-in access,
+  candidates/batches/assignments, attempts and attempt control, grading/results/
+  certificates, proctor sessions and identity verification, incidents/appeals,
+  audit, organization/settings, and notifications.
+- The Next.js application supplies the administration, candidate, examination,
+  and proctor interfaces. Its server-side API proxy and direct real-time/media
+  connections require consistent backend URL configuration.
+- ProctorHub carries WebRTC signaling and live exam events. NotificationHub
+  pushes in-app notifications; SQL-backed notification logs drive email/SMS.
+- Media may use a local provider or S3-compatible storage. Other uploads also
+  use filesystem locations. Background services expire attempts, deliver
+  notifications, clean logs/media, and check licenses.
+- Logging is intended to combine Serilog, database audit/action records, and a
+  channel-backed SystemLogs subsystem. The latter is not included in this clone.
+
+Representative entry points:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:60-460
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Smart_Core.csproj:1-54
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Data/ApplicationDbContext.cs:21-145
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/package.json:5-90
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/api-client.ts:6-145
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/next.config.mjs:10-24
+
+2. CONFIRMED STOPPING DEFECT
+VERIFIED: the unchanged API fails its Release build with six compiler errors,
+CS0234/CS0246, for missing logging namespaces and SystemLog. NuGet restore
+succeeded, so the reported failure is not an unavailable SDK or package feed.
+
+References that cannot be resolved include:
+- SystemLog in ApplicationDbContext and RequestResponseLoggingMiddleware.
+- SystemLogChannel in middleware and service registration.
+- ISystemLogService, SystemLogService, and LogPersistenceService in Program.
+The initial six compiler errors may mask further errors.
+
+Evidence:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:55-58,235-244
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Data/ApplicationDbContext.cs:17,116-117
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs:7-9,72
+
+VERIFIED: before the fix, the unanchored [Ll]og/ and [Ll]ogs/ ignore patterns
+excluded source folders named Logs anywhere below the backend project.
+git check-ignore demonstrated this for entity, service, and controller paths;
+the fix was checked for interfaces, DTOs, and EF configuration as well.
+No original logging source was found in the
+checkout or fetched reachable history after git fetch --unshallow origin.
+This does not establish that no developer workstation or other branch has it.
+
+The migration describes a database table, not the missing service/controller
+contracts, batching, retention, authorization, or failure semantics. Recreating
+the subsystem from that migration would be a replacement design, not recovery
+of known working code. Removing registrations or stubbing services merely to
+make the build pass would conceal a supportability regression.
+
+3. CHANGE MADE AND WHY
+Only the backend ignore rule was changed: runtime Log/Logs directories are now
+anchored at the project root, allowing nested logging source to be committed.
+The existing *.log exclusion still protects log files anywhere.
+
+Changed file:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/.gitignore:33-35
+
+This prevents recurrence when the original source is restored; it does NOT
+restore missing code or resolve the build. No production application behavior,
+database schema, dependency version, exam rule, or SeedData/AllowAnonymous
+behavior was changed. The accompanying reports document unresolved findings.
+
+4. VERIFICATION AND RESULTS
+VERIFIED:
+- Backend baseline Release build: failed, six errors, zero warnings.
+- License signer baseline Release build: passed, zero errors/warnings.
+- Before/after git check-ignore: nested source paths changed from ignored to
+  not ignored; root Log/log/Logs/logs output and nested *.log remain ignored.
+- git diff --check passed for the ignore change.
+
+Detailed validation evidence and limitations are in:
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/05-verification-and-final-summary.txt
+
+5. CHECKPOINT DECISION / REQUIRED INPUT
+BLOCKED: Phase 1 application fixes and regression verification cannot be safely
+completed against an incomplete, non-building baseline. The committed/pushed
+assessment must not be interpreted as the requested completed Phase 1 checkpoint.
+
+Required from the maintainer:
+1. Supply the original missing logging source directories, including their
+   interfaces, entities/EF mappings, DTOs, controllers, and persistence services,
+   from the working application or identify a commit containing them.
+2. Confirm that a fresh checkout builds with that source; then resume Phase 1
+   fixes, original contract verification, and customer configuration templates.
+3. Provide an isolated production-like SQL Server, deployment configuration,
+   and integration services for operational testing, without putting real
+   customer secrets or data in Git.
+
+Phase 2 has NOT been started. Notification end-to-end testing, the reported
+camera-backup defect, comprehensive regression/security remediation, and
+50-candidate load validation remain pending. This honors the explicit requirement
+to finish, verify, commit, and push Phase 1 before proceeding to Phase 2.
+
+No merge, history rewrite, or base-branch modification was performed.

@@ -1,0 +1,121 @@
+PHASE 1 — TWO-SERVER STATE AND CACHE REVIEW
+Assessment date: 2026-09-10
+Status: PARTIALLY VERIFIED (source inspection); operational validation BLOCKED.
+
+WHAT WAS REVIEWED
+API service lifetimes, shared SQL persistence, ICacheService consumers, SignalR
+registration and groups, filesystem providers/static file roots, background
+workers, authentication/rate-limit ordering, and local license state.
+
+PROBLEMS FOUND / EVIDENCE / REQUIRED FOLLOW-UP
+
+1. Application cache invalidation is process-local.
+VERIFIED in source:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:136-138,227
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/CacheService.cs:10-20,50-83
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Attempt/AttemptService.cs:82-95
+IMemoryCache stores values locally; the static key dictionary and RemoveByPrefix
+also operate only inside one process. Read caches span exams, attempt detail/
+lists, candidates, results, grading, lookups, users, and incidents. Mutations
+on node A cannot invalidate node B's previously cached responses.
+
+Impact: inconsistent read views after mutation until expiration. This review
+does not establish that cached data permits extra exam time or corrupts answers;
+those stronger claims would require tracing and testing the authoritative
+attempt paths. Several attempt lifecycle reads access SQL directly.
+
+Safest initial candidate for remediation after the build is restored: bypass
+the application read cache behind the existing abstraction, preserving database
+queries and authorization ordering, then measure SQL load. This is not yet an
+implemented or performance-approved decision. If load requires shared caching,
+use a supported distributed implementation with cross-node invalidation;
+simply retaining the local prefix dictionary with Redis would not solve it.
+Redis package references alone do not establish working cache scale-out.
+
+2. SignalR uses the default in-process hub lifetime manager.
+VERIFIED in source:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:250-251,434-436
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Hubs/ProctorHub.cs:49-72,99-175
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Hubs/NotificationHub.cs
+There is no configured backplane. A candidate connected to A and proctor
+connected to B cannot exchange group events through the current in-process
+manager. User notification pushes have the same boundary.
+
+Required: supported on-premise SignalR scale-out and load-balancer transport/
+affinity configuration, validated with peers intentionally on different nodes.
+Per-browser stickiness alone does not put two different users on the same node.
+The IDistributedCache Redis package is not a SignalR backplane.
+
+3. Persisted file metadata can outlive or cross the node holding the file.
+VERIFIED in source:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Storage/LocalStorageProvider.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:176-185,366-420
+The default storage provider and static roots use local filesystem paths.
+Program also serves organization images, identity images, and tutorials from
+separate directories. Switching the generic media provider alone is not proof
+that every file path is shared.
+
+Required: inventory each upload/read/delete path, configure shared durable
+storage accessible to both service identities, and test upload on A/read on B
+including range playback and retention. Do not replicate logs into a single
+shared rolling file; keep node-specific logs or use a supported collector.
+
+4. Both application instances start background workers.
+VERIFIED source risk:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:239-245
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Notification/NotificationBackgroundService.cs:47-95,176-193
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Background/AttemptExpiryBackgroundService.cs:57-158
+Notification workers independently select Pending rows, perform external sends,
+then save delivery status. No atomic claim is visible in that path, so two
+workers can send the same pending row. Attempt expiry independently selects and
+updates active attempts and inserts events; concurrency behavior against exam
+submission/time extension has not been exercised.
+
+Required: establish single ownership or database-backed coordination for each
+job's critical section, test contention and crash recovery, and define delivery
+retry semantics. Do not claim exactly-once email delivery: a provider accepting
+a message before a crash and before status persistence is a separate problem.
+No blanket concurrency-token migration or global job redesign was undertaken.
+
+5. Rate limiting runs before authentication.
+VERIFIED source ordering:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:140-154,422-427
+The partition key uses the current identity name, falling back to Host, but JWT
+authentication runs later. Normal unauthenticated-at-this-point requests can
+share the same host bucket, including candidate polling/uploads. This is also
+a per-process limiter, not a global two-node admission limit.
+
+Required: evaluate ordering and authenticated/anonymous partition keys and
+budgets against measured exam traffic; do not just raise limits arbitrarily.
+Real request-rate and rejection behavior is NOT VERIFIED.
+
+6. Additional deployment-local state needs deliberate configuration.
+PARTIALLY VERIFIED:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:75-115
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/License/LicenseValidationService.cs:14-34,56-104
+Both servers need consistent JWT/encryption configuration, Identity data-
+protection key handling, license artifacts, host forwarding, and synchronized
+clocks. License state is locally cached and refreshed; artifact rollout and
+reload procedures must cover both nodes. A local lock is not itself a defect
+requiring distributed locking. JWT authentication alone does not require a new
+distributed session store.
+
+CHANGES MADE
+No cache, transport, storage, worker, or rate-limit application change was made:
+the backend baseline cannot compile because original logging code is absent.
+Only the source-ignore defect and assessment reports were changed.
+
+VERIFICATION / RESULTS / UNVERIFIED ITEMS
+Source findings above were inspected; no two-node runtime was brought up.
+Cross-node invalidation, real-time delivery, shared storage failover, worker
+ownership, proxy trust, key sharing, and performance are NOT VERIFIED.
+Application-level verification is BLOCKED by missing logging source.
+No claim of two-server readiness or 50-candidate capacity is made.
+
+REMAINING RISKS / BLOCKERS
+All numbered application findings remain unresolved. Before customer delivery,
+restore the missing original source, resolve the confirmed deployment defects,
+and test normal operation plus node loss/restart without changing exam rules.
+Required evidence includes persisted answers and submissions, correct event
+delivery, no unintended duplicate provider sends, and accessible media after
+traffic moves between nodes.

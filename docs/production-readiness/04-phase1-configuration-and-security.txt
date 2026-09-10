@@ -1,0 +1,138 @@
+PHASE 1 — CONFIGURATION, CREDENTIALS AND SECURITY REVIEW
+Assessment date: 2026-09-10
+Status: PARTIALLY VERIFIED; remediation and deployment verification BLOCKED.
+
+WHAT WAS REVIEWED
+A read-only security specialist inspected authentication, configuration,
+logging privacy, file exposure, and hub authorization. Architecture review
+also covered backend settings, frontend API/proxy/real-time configuration,
+deployment documentation, ignore rules, and tooling manifests.
+This is NOT certification of a complete repository/history/binary secret audit
+or an exhaustive vulnerability assessment. Secret values are intentionally
+omitted here, and no real credentials were tested against external services.
+
+PHASE 1 FINDINGS
+
+1. Sensitive environment configuration is present in the tracked settings file.
+PARTIALLY VERIFIED: locations confirmed, credential validity NOT VERIFIED.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/appsettings.json:4,8,11,19,54,214
+The specialist identified connection/security/provider-related settings at
+these locations. Do not copy their values into customer templates or reports.
+Deleting a value from the current tree would not revoke copies in history.
+
+Required: inventory consumers, replace tracked deployment values with safe
+templates, use deployment-secret/environment providers or protected settings,
+and arrange rotation of any credentials that were actually used. Encryption-key
+rotation requires a migration/re-encryption and recovery procedure for existing
+encrypted database values; changing that key blindly can make stored provider
+credentials and other encrypted data unusable. No values were rotated here.
+
+2. SQL server certificate validation is disabled in the checked-in connection.
+VERIFIED source behavior, MEDIUM severity, specialist confidence 9/10.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/appsettings.json:4
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:72-73
+TrustServerCertificate bypasses server certificate validation. Deploy a trusted
+SQL certificate and explicitly require encrypted, validated connections; verify
+with the customer's PKI rather than breaking connectivity through an untested
+configuration edit. Production overrides and network/TLS behavior are unknown.
+
+3. Sensitive diagnostics need correction.
+VERIFIED source finding, MEDIUM severity, specialist confidence 9/10.
+See the logging report for unguarded browser authentication payloads and
+incomplete backend redaction. These remain unresolved; the absence of working
+backend persistence does not make the frontend payload logging safe.
+
+4. Backend environment-specific defaults are embedded outside settings.
+VERIFIED in inspected source:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:253-273
+  CORS contains fixed development/demo origins, not customer configuration.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Notification/NotificationBackgroundService.cs:123-142
+  Notification login URL falls back to an external deployment.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/EmailService.cs:30-60
+  SMTP uses DB settings first, then configuration, with vendor/sender defaults.
+Inventory similar fallbacks and customer-facing links before supplying templates.
+Known provider API endpoints are not necessarily secrets or defects, but offline
+on-premise connectivity must be explicit. No whole-repository clean bill is given.
+
+5. Frontend configuration must distinguish API base from backend origin.
+VERIFIED in source:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/api/proxy/[...path]/route.ts:3-14
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/next.config.mjs:10-23
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/signalr/notification-hub.ts:65-72
+The server proxy appends endpoint paths to BACKEND_URL (or
+NEXT_PUBLIC_BACKEND_URL), with a default including /api. Media rewrites strip
+/api; browser SignalR strips it and uses the origin. A single mistaken value can
+leave REST working but break real-time/media, or vice versa.
+
+Required template/documentation coverage after remediation:
+- Backend SQL connection, JWT issuer/audience/key and encryption configuration.
+- Allowed browser origins, trusted load-balancer forwarding, storage locations,
+  license distribution, SMTP/SMS and notification login URL settings.
+- Server-only BACKEND_URL pointing to the API base (including /api in the current
+  implementation), and browser-visible NEXT_PUBLIC_BACKEND_URL for the reachable
+  backend. NEXT_PUBLIC_* values are public and normally baked into Next.js builds;
+  they must never contain credentials.
+- Redis/backplane settings only if actually supported by the final implementation.
+- WebRTC ICE/TURN and AI/model/CDN dependencies, offline reachability, log
+  retention, service identities, least-privilege permissions, and backup/restore.
+No customer-ready template was invented before these contracts were validated.
+
+6. Existing deployment instructions cannot be used unchanged.
+VERIFIED discrepancies:
+/home/runner/work/exam-cursor/exam-cursor/docs/ONPREMISE_DEPLOYMENT_GUIDE.md:22-32,193-197,222-223
+The guide suggests .NET 8 while the API targets net9.0. It shows
+NEXT_PUBLIC_API_URL, whereas the inspected proxy/real-time paths use the
+variables above. Static export is not equivalent to running this application's
+Next.js API proxy. Hosting with the proper server runtime must be validated.
+Generic .env/appsettings override ignore patterns also need narrowly scoped
+exceptions when real example files are added; never unignore real credentials.
+
+SECURITY FINDINGS ENCOUNTERED DURING THE INITIAL REPOSITORY AUDIT
+These were identified before stopping at the Phase 1 gate. They are unresolved
+source findings, NOT completed Phase 2 investigation or live exploit tests.
+
+HIGH, confidence 10/10: private proctor recording storage is exposed through the
+public static media root, bypassing protected download endpoints.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs:366-378
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Proctor/VideoRecordingController.cs:124-139,490-503
+Follow-up: separate private storage and serve recordings through resource-
+authorized paths; preserve explicitly public assets and expected playback.
+
+HIGH, confidence 9/10: identity upload validation trusts declared content type
+and retains the supplied extension, permitting active content under a static
+origin. Frontend rewrites can expose it under the application's browser origin.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Proctor/IdentityVerificationController.cs:105-130
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/next.config.mjs:20-21
+Follow-up: validate/decode actual supported image formats, control stored
+extensions/content, and require appropriate access for private identity data.
+
+HIGH, confidence 9/10: token refresh does not apply the inactive-account check
+used by password login; deactivation does not revoke the refresh credential.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/AuthService.cs:98-105,220-241
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/UserService.cs:496-519
+Follow-up: preserve the existing account-eligibility rule at refresh and verify
+revocation across nodes, including already-issued access-token semantics.
+
+HIGH, confidence 9/10: proctor/admin hub room authorization does not apply the
+department/assignment checks present in REST resource authorization.
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Hubs/ProctorHub.cs:423-435
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Authorization/ResourceAuthorizationService.cs:105-167
+Follow-up: enforce the existing resource boundary inside hub methods and target
+validation; never assume that a direct hub caller first used an authorized API.
+
+CHANGES MADE / RESULTS
+No production security/configuration behavior changed. The sole repository
+configuration fix anchors runtime log ignore directories to allow missing source
+restoration. No secret value, customer credential, or private key was added.
+All findings above remain open. Runtime exploitation, installed customer
+overrides, key handling, recovery, and operational access controls are NOT
+VERIFIED. Deployment completion is BLOCKED by the non-building baseline.
+
+SeedData functionality and AllowAnonymous are intentional and unchanged.
+Do not use the security findings as a reason to alter that exception.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS (NOT IMPLEMENTED)
+After confirmed defects are fixed, consider a managed secret store and automated
+deployment preflight checks if the customer's infrastructure supports them.
+Do not add platforms, broad authentication redesigns, dependency upgrades, or
+new hosting topology solely because they are architectural preferences.
