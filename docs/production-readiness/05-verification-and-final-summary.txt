@@ -1,3 +1,8 @@
+HISTORICAL BASELINE SUMMARY — the original-source waiting decision below was
+superseded by authorization to implement a production-quality replacement.
+See the resumed Phase 1 reports 06 and 07 in
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/ for current status.
+
 FINAL SUMMARY — PRESERVED BLOCKED PHASE 1 ASSESSMENT
 Assessment date: 2026-09-10
 Original baseline: 630cee0

@@ -69,7 +69,7 @@ export default function QuestionDetailPage() {
         setQuestion(q)
       }
     } catch (error) {
-      console.error("[v0] Failed to fetch question:", error)
+      console.error("[v0] Failed to fetch question")
       toast.error(localizeText("Failed to load question", "فشل تحميل السؤال", language))
     }
     setIsLoading(false)
@@ -82,7 +82,7 @@ export default function QuestionDetailPage() {
       toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       router.push("/question-bank")
     } catch (error) {
-      console.error("[v0] Failed to delete question:", error)
+      console.error("[v0] Failed to delete question")
       toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
     }
     setIsDeleting(false)

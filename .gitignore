@@ -16,6 +16,8 @@ out/
 .env
 .env.*
 appsettings.*.json
+!.env.example
+!appsettings.Production.example.json
 
 # ===== OS =====
 .DS_Store

@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Background;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -23,21 +25,31 @@ public class VideoRetentionService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Wait 5 minutes after startup to let the app fully initialize
-        await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            try
-            {
-                await CleanupExpiredRecordingsAsync(stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during video retention cleanup");
-            }
+            // Wait 5 minutes after startup to let the app fully initialize
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
 
-            await Task.Delay(_interval, stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await CleanupExpiredRecordingsAsync(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during video retention cleanup");
+                }
+
+                await Task.Delay(_interval, stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
         }
     }
 
@@ -45,11 +57,12 @@ public class VideoRetentionService : BackgroundService
     {
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+        await using var workerLock = await SqlServerWorkerLock.TryAcquireAsync(
+            db, "SmartCore:Worker:VideoRetention", ct);
+        if (workerLock == null)
+            return;
 
-        var mediaBasePath = Path.IsPathRooted("MediaStorage")
-            ? "MediaStorage"
-            : Path.Combine(env.ContentRootPath, "MediaStorage");
+        var mediaBasePath = scope.ServiceProvider.GetRequiredService<StoragePaths>().MediaPath;
 
         // Get retention days from settings
         var settings = await db.SystemSettings.FirstOrDefaultAsync(ct);
@@ -75,10 +88,12 @@ public class VideoRetentionService : BackgroundService
 
         foreach (var recording in expiredRecordings)
         {
+            ct.ThrowIfCancellationRequested();
+            await workerLock.EnsureHeldAsync(ct);
             try
             {
                 // Delete the MP4/WebM file
-                var fullPath = Path.Combine(mediaBasePath, recording.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                var fullPath = StoragePaths.ResolveRelativePath(mediaBasePath, recording.FilePath);
                 if (File.Exists(fullPath))
                 {
                     File.Delete(fullPath);
@@ -112,6 +127,7 @@ public class VideoRetentionService : BackgroundService
 
         if (expiredRecordings.Count > 0)
         {
+            await workerLock.EnsureHeldAsync(ct);
             await db.SaveChangesAsync(ct);
             _logger.LogInformation(
                 "Video retention cleanup: {Total} records processed, {Files} files deleted, {ChunkDirs} chunk dirs removed (retention={Days} days)",
@@ -124,6 +140,8 @@ public class VideoRetentionService : BackgroundService
         {
             foreach (var chunkDir in Directory.GetDirectories(chunkBasePath))
             {
+                ct.ThrowIfCancellationRequested();
+                await workerLock.EnsureHeldAsync(ct);
                 try
                 {
                     var dirInfo = new DirectoryInfo(chunkDir);

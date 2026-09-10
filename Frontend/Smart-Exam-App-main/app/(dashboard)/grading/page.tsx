@@ -67,7 +67,7 @@ export default function GradingPage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("Failed to load grading list:", error)
+          console.error("Failed to load grading list")
           setSubmissions([])
           setTotalCount(0)
         }

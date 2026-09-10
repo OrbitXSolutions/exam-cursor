@@ -207,7 +207,7 @@ export async function initiateGrading(attemptId: number): Promise<boolean> {
     await apiClient.post("/Grading/initiate", { attemptId });
     return true;
   } catch (err) {
-    console.warn("[initiateGrading] Failed:", err);
+    console.warn("[initiateGrading] Failed");
     return false;
   }
 }
@@ -285,7 +285,7 @@ export async function finalizeResult(
   } catch (err) {
     const msg = (err as Error)?.message ?? "";
     if (msg.includes("already exists")) return true;
-    console.warn("[finalizeResult] Failed:", err);
+    console.warn("[finalizeResult] Failed");
     return false;
   }
 }
@@ -318,7 +318,7 @@ export async function getAiGradeSuggestion(
     return { data: result ?? null };
   } catch (err) {
     const msg = (err as Error)?.message ?? "AI service unavailable";
-    console.warn("[getAiGradeSuggestion] Failed:", msg);
+    console.warn("[getAiGradeSuggestion] Failed");
     return { data: null, error: msg };
   }
 }

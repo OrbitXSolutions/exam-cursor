@@ -1,9 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:5221/api";
+import { backendApiUrl as BACKEND_URL } from "@/lib/server/backend-config";
 
 /**
  * Proxy to serve individual video chunk files.
@@ -64,7 +60,7 @@ export async function GET(
       headers,
     });
   } catch (error) {
-    console.error(`[VideoChunk File Proxy Error]`, error);
+    console.error("[VideoChunk File Proxy] Request failed");
     return NextResponse.json(
       { error: "Failed to stream video chunk" },
       { status: 500 },

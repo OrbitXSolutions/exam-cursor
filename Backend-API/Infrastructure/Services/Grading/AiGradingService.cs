@@ -191,7 +191,7 @@ public class AiGradingService : IAiGradingService
         HttpResponseMessage response;
         try
         {
-            response = await client.PostAsync("https://api.openai.com/v1/chat/completions", content);
+            response = await client.PostAsync(_openAiSettings.Endpoint, content);
         }
         catch (TaskCanceledException)
         {
@@ -206,8 +206,7 @@ public class AiGradingService : IAiGradingService
 
         if (!response.IsSuccessStatusCode)
         {
-            var errorBody = await response.Content.ReadAsStringAsync();
-            _logger.LogWarning("OpenAI API error: {StatusCode} - {Body}", response.StatusCode, errorBody);
+            _logger.LogWarning("OpenAI grading rejected. HTTP status: {StatusCode}", response.StatusCode);
 
             var errorMessage = response.StatusCode switch
             {
@@ -239,7 +238,7 @@ public class AiGradingService : IAiGradingService
         }
         catch (JsonException ex)
         {
-            _logger.LogWarning(ex, "Failed to parse OpenAI response: {Content}", messageContent);
+            _logger.LogWarning(ex, "Failed to parse OpenAI grading response");
 
             // Attempt graceful fallback: try to extract from possible markdown wrapper
             var cleaned = messageContent.Trim();

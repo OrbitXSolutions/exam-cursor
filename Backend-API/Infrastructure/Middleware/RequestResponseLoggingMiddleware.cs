@@ -1,74 +1,40 @@
 using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Logs;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Services.Logs;
 
 namespace Smart_Core.Infrastructure.Middleware;
 
-/// <summary>
-/// Captures request/response data for the SystemLog system.
-/// - Developer category: errors/exceptions only (full request + response + stack trace)
-/// - Candidate/Proctor/User: important actions only (login, submit, session, etc.)
-/// Writes to Channel — zero impact on request performance.
-/// </summary>
 public class RequestResponseLoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
 
-    // Important action patterns worth logging (non-error) per user type
-    private static readonly HashSet<string> ImportantPatterns = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Auth
-        "/api/auth/login",
-        "/api/auth/register",
-        "/api/auth/refresh",
-        "/api/auth/change-password",
-
-        // Candidate actions
-        "/api/attempt",
-        "/api/candidate",
-        "/api/examtaking",
-
-        // Proctor actions
-        "/api/proctor",
-        "/api/identityverification",
-        "/api/incident",
-
-        // Admin actions
-        "/api/users",
-        "/api/roles",
-        "/api/departments",
-        "/api/assessment",
-        "/api/exam",
-        "/api/grading",
-        "/api/seed",
-        "/api/settings",
-        "/api/notification",
-        "/api/batch",
-        "/api/examassignment",
-        "/api/examoperations",
-        "/api/attemptcontrol",
-    };
-
-    // Sensitive fields to redact from request bodies
-    private static readonly Regex SensitiveFieldPattern = new(
-        @"""(password|token|secret|authorization|apiKey|smtpPassword|smsAuthToken|customSmsApiKey)"":\s*""[^""]*""",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    public RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<RequestResponseLoggingMiddleware> logger)
+    public RequestResponseLoggingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
+        if (!context.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
+        {
+            await _next(context);
+            return;
+        }
+
+        var traceId = SafeLogMetadata.TraceId(context);
+        if (!context.Response.HasStarted)
+        {
+            // OnStarting also survives Response.Clear() when the exception middleware handles an error.
+            context.Response.OnStarting(() =>
+            {
+                context.Response.Headers["X-Correlation-ID"] = traceId;
+                context.Response.Headers["X-Trace-Id"] = traceId;
+                return Task.CompletedTask;
+            });
+        }
         var channel = context.RequestServices.GetService<SystemLogChannel>();
         if (channel == null)
         {
@@ -76,239 +42,65 @@ public class RequestResponseLoggingMiddleware
             return;
         }
 
-        var path = context.Request.Path.Value ?? "";
-
-        // Skip non-API requests (swagger, static files, signalr health checks)
-        if (!path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase))
-        {
-            await _next(context);
-            return;
-        }
-
-        var sw = Stopwatch.StartNew();
-        var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
-        string? requestBody = null;
-        string? responseBody = null;
-        Exception? caughtException = null;
-
-        // Read request body for non-GET (only for important actions or if it errors)
-        if (context.Request.Method != "GET" && context.Request.ContentLength > 0 && context.Request.ContentLength < 64_000)
-        {
-            context.Request.EnableBuffering();
-            using var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true);
-            requestBody = await reader.ReadToEndAsync();
-            context.Request.Body.Position = 0;
-
-            // Sanitize sensitive data
-            if (!string.IsNullOrEmpty(requestBody))
-            {
-                requestBody = SensitiveFieldPattern.Replace(requestBody, @"""$1"": ""***REDACTED***""");
-            }
-        }
-
-        // Capture response body only for errors
-        var originalResponseBody = context.Response.Body;
-        using var responseStream = new MemoryStream();
-        context.Response.Body = responseStream;
-
+        var started = Stopwatch.GetTimestamp();
+        Exception? failure = null;
         try
         {
             await _next(context);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            caughtException = ex;
-            throw; // Let GlobalExceptionMiddleware handle the response
+            failure = exception;
+            throw;
         }
         finally
         {
-            sw.Stop();
-            context.Response.Body = originalResponseBody;
-
-            // If GlobalExceptionMiddleware swallowed the exception, recover it for Developer log
-            if (caughtException == null)
-                caughtException = context.Items["UnhandledException"] as Exception;
-
-            // Read response body
-            responseStream.Position = 0;
-            var responseBytes = responseStream.ToArray();
-
-            // Copy response to original stream
-            if (responseBytes.Length > 0)
+            failure ??= context.Items[GlobalExceptionMiddleware.ExceptionKey] as Exception;
+            var disconnected = context.RequestAborted.IsCancellationRequested;
+            var status = disconnected ? 499 : failure == null
+                ? context.Response.StatusCode
+                : SafeLogMetadata.ExceptionStatus(failure);
+            var isError = status >= 400;
+            var method = SafeLogMetadata.Method(context);
+            if (isError || method is not ("GET" or "HEAD" or "OPTIONS"))
             {
-                await originalResponseBody.WriteAsync(responseBytes);
-            }
-
-            var statusCode = context.Response.StatusCode;
-            var isError = statusCode >= 400 || caughtException != null;
-            var captureResponse = isError || IsDebugResponsePath(path);
-
-            // Capture response body for errors OR for investigation endpoints (limit to 8KB)
-            if (captureResponse && responseBytes.Length > 0)
-            {
-                var maxLen = Math.Min(responseBytes.Length, 8192);
-                responseBody = Encoding.UTF8.GetString(responseBytes, 0, maxLen);
-            }
-
-            // Determine category from user role
-            var category = ResolveCategory(context, isError);
-
-            // Should we log this request?
-            var shouldLog = isError || IsImportantAction(path, context.Request.Method);
-
-            if (shouldLog)
-            {
-                var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var email = context.User.FindFirstValue(ClaimTypes.Email);
-                var role = context.User.FindFirstValue(ClaimTypes.Role);
-
-                // Enrich error message for auth/authz failures that don't throw exceptions
-                var enrichedErrorMessage = caughtException?.Message;
-                if (enrichedErrorMessage == null)
+                var role = SafeLogMetadata.Role(context);
+                var category = role switch
                 {
-                    enrichedErrorMessage = statusCode switch
-                    {
-                        401 => $"Authentication required: unauthenticated request to {context.Request.Method} {path}",
-                        403 => $"Access denied: role '{role ?? "anonymous"}' is not authorized to perform {context.Request.Method} {path}",
-                        _ => null
-                    };
-                }
-
+                    AppRoles.Candidate => LogCategory.Candidate,
+                    AppRoles.Proctor => LogCategory.Proctor,
+                    _ => isError ? LogCategory.Developer : LogCategory.User
+                };
+                var controller = SafeLogMetadata.Controller(context);
                 var log = new SystemLog
                 {
                     Timestamp = UaeTimeHelper.NowUae,
-                    Level = isError
-                        ? (statusCode >= 500 || statusCode == 400 || statusCode == 403 || statusCode == 401
-                            ? SystemLogLevel.Error
-                            : SystemLogLevel.Warning)
-                        : SystemLogLevel.Info,
+                    Level = status >= 500 ? SystemLogLevel.Error : isError ? SystemLogLevel.Warning : SystemLogLevel.Info,
                     Category = category,
-                    UserId = userId,
-                    UserDisplayName = email,
+                    UserId = SafeLogMetadata.UserId(context),
                     UserRole = role,
-                    Action = ResolveAction(path, context.Request.Method),
-                    Controller = ExtractController(path),
-                    Endpoint = path,
-                    HttpMethod = context.Request.Method,
-                    RequestBody = isError || context.Request.Method != "GET" ? requestBody : null,
-                    ResponseStatusCode = statusCode,
-                    ResponseBody = captureResponse ? responseBody : null,
-                    ErrorMessage = enrichedErrorMessage,
-                    StackTrace = caughtException != null ? caughtException.ToString() : null,
-                    ExceptionType = caughtException?.GetType().FullName,
+                    Action = $"{method} {controller}",
+                    Controller = controller,
+                    Endpoint = SafeLogMetadata.Path(context),
+                    HttpMethod = method,
+                    ResponseStatusCode = status,
+                    ExceptionType = failure == null || disconnected ? null : SafeLogMetadata.ExceptionType(failure),
                     TraceId = traceId,
-                    IpAddress = context.Connection.RemoteIpAddress?.ToString(),
-                    UserAgent = context.Request.Headers.UserAgent.ToString().Length > 512
-                        ? context.Request.Headers.UserAgent.ToString()[..512]
-                        : context.Request.Headers.UserAgent.ToString(),
-                    DurationMs = sw.ElapsedMilliseconds
+                    DurationMs = (long)Stopwatch.GetElapsedTime(started).TotalMilliseconds
                 };
-
-                // For Developer logs on errors, always log with full detail
-                if (isError && category != LogCategory.Developer)
-                {
-                    // Also write a Developer-category log for error tracking
-                    var devLog = new SystemLog
-                    {
-                        Timestamp = log.Timestamp,
-                        Level = log.Level,
-                        Category = LogCategory.Developer,
-                        UserId = userId,
-                        UserDisplayName = email,
-                        UserRole = role,
-                        Action = log.Action,
-                        Controller = log.Controller,
-                        Endpoint = log.Endpoint,
-                        HttpMethod = log.HttpMethod,
-                        RequestBody = requestBody,
-                        ResponseStatusCode = statusCode,
-                        ResponseBody = responseBody,
-                        ErrorMessage = enrichedErrorMessage,
-                        StackTrace = caughtException?.ToString(),
-                        ExceptionType = caughtException?.GetType().FullName,
-                        TraceId = traceId,
-                        IpAddress = log.IpAddress,
-                        UserAgent = log.UserAgent,
-                        DurationMs = sw.ElapsedMilliseconds
-                    };
-                    channel.TryWrite(devLog);
-                }
-
                 channel.TryWrite(log);
+                if (isError && !disconnected && category != LogCategory.Developer)
+                {
+                    log.Category = LogCategory.Developer;
+                    channel.TryWrite(log);
+                }
             }
         }
-    }
-
-    private static LogCategory ResolveCategory(HttpContext context, bool isError)
-    {
-        if (isError && !context.User.Identity?.IsAuthenticated == true)
-            return LogCategory.Developer;
-
-        var role = context.User.FindFirstValue(ClaimTypes.Role);
-        return role?.ToLower() switch
-        {
-            "candidate" => LogCategory.Candidate,
-            "proctor" => LogCategory.Proctor,
-            _ when isError => LogCategory.Developer,
-            _ => LogCategory.User
-        };
-    }
-
-    // Specific endpoints where we capture response body even on success,
-    // for candidate/proctor investigation use cases.
-    private static readonly HashSet<string> DebugResponsePaths = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Candidate exam flow
-        "/api/attempt/start",
-        "/api/attempt",           // covers /api/attempt/{id}/submit, /api/attempt/{id}/answers, etc.
-        // Proctor live session
-        "/api/proctor/session",   // covers /api/proctor/session, /api/proctor/session/{id}/end|flag|terminate|warning
-        "/api/proctor/event",
-    };
-
-    private static bool IsDebugResponsePath(string path)
-    {
-        var lower = path.ToLowerInvariant();
-        foreach (var p in DebugResponsePaths)
-        {
-            if (lower.StartsWith(p, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
-        return false;
-    }
-
-    private static bool IsImportantAction(string path, string method)
-    {
-        // All non-GET mutations on important endpoints
-        if (method == "GET") return false;
-
-        var lowerPath = path.ToLowerInvariant();
-        foreach (var pattern in ImportantPatterns)
-        {
-            if (lowerPath.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
-        return false;
-    }
-
-    private static string ResolveAction(string path, string method)
-    {
-        var controller = ExtractController(path);
-        return $"{method} {controller}";
-    }
-
-    private static string ExtractController(string path)
-    {
-        // /api/Controller/... → Controller
-        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        return segments.Length >= 2 ? segments[1] : path;
     }
 }
 
 public static class RequestResponseLoggingMiddlewareExtensions
 {
-    public static IApplicationBuilder UseRequestResponseLogging(this IApplicationBuilder app)
-    {
-        return app.UseMiddleware<RequestResponseLoggingMiddleware>();
-    }
+    public static IApplicationBuilder UseRequestResponseLogging(this IApplicationBuilder app) =>
+        app.UseMiddleware<RequestResponseLoggingMiddleware>();
 }

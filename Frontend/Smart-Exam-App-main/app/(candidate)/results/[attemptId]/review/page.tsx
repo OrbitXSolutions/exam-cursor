@@ -96,7 +96,7 @@ export default function ReviewPage() {
       const data = await getMyResultReview(attemptId)
       setReview(data)
     } catch (err) {
-      console.error("[v0] Error loading review:", err)
+      console.error("[v0] Error loading review")
       setError(t("results.reviewNotAllowed"))
     } finally {
       setLoading(false)

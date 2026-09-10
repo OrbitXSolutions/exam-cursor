@@ -205,7 +205,7 @@ export default function CandidateResultPage() {
           setTimeout(() => setRefreshKey((k) => k + 1), 2000)
         }
       } catch (err) {
-        console.error("[CandidateResult] Failed to load candidates:", err)
+        console.error("[CandidateResult] Failed to load candidates")
         if (!cancelled) setCandidates([])
       } finally {
         if (!cancelled) setLoadingCandidates(false)
@@ -270,7 +270,7 @@ export default function CandidateResultPage() {
       toast.success(language === "ar" ? "تم نشر النتيجة" : "Result published successfully")
       loadCandidates()
     } catch (err) {
-      console.error("Failed to publish:", err)
+      console.error("Failed to publish")
       toast.error(language === "ar" ? "فشل في نشر النتيجة" : "Failed to publish result")
     } finally {
       setPublishingIds((prev) => {
@@ -342,7 +342,7 @@ export default function CandidateResultPage() {
         await exportCandidateReportPdf(session)
       }
     } catch (err) {
-      console.error(`[Export ${format}] Failed:`, err)
+      console.error(`[Export ${format}] Failed`)
       toast.error(language === "ar" ? "فشل تصدير التقرير" : "Failed to export report")
     } finally {
       setExportingIds((prev) => {

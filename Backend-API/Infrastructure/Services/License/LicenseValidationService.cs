@@ -6,6 +6,7 @@ using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Domain.Models;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Infrastructure.Services.License;
 
@@ -18,17 +19,21 @@ public class LicenseValidationService : ILicenseValidationService
 
     private LicenseStatusResult _cachedStatus;
     private DateTimeOffset _lastChecked = DateTimeOffset.MinValue;
+    private FileMetadata? _licenseMetadata;
+    private FileMetadata? _publicKeyMetadata;
 
     private const int WarningDaysBeforeExpiry = 40;
 
-    public LicenseValidationService(IWebHostEnvironment env, ILogger<LicenseValidationService> logger)
+    public LicenseValidationService(StoragePaths storagePaths, ILogger<LicenseValidationService> logger)
     {
-        var licenseDir = Path.Combine(env.ContentRootPath, "License");
+        var licenseDir = storagePaths.LicenseDirectory;
         _licenseFilePath = Path.Combine(licenseDir, "license.json");
         _publicKeyPath = Path.Combine(licenseDir, "public.pem");
         _logger = logger;
 
         // Initial validation on startup
+        _licenseMetadata = ReadFileMetadata(_licenseFilePath);
+        _publicKeyMetadata = ReadFileMetadata(_publicKeyPath);
         _cachedStatus = Validate();
         _lastChecked = UaeTimeHelper.NowUae;
         _logger.LogInformation("License validation on startup: State={State}, Message={Message}",
@@ -55,23 +60,25 @@ public class LicenseValidationService : ILicenseValidationService
 
     public void ReloadLicense()
     {
-        var previousState = _cachedStatus.State;
-        var newStatus = Validate();
-
         lock (_lock)
         {
+            var previousState = _cachedStatus.State;
+            // Capture before reading so a concurrent replacement is detected on the next check.
+            _licenseMetadata = ReadFileMetadata(_licenseFilePath);
+            _publicKeyMetadata = ReadFileMetadata(_publicKeyPath);
+            var newStatus = Validate();
             _cachedStatus = newStatus;
             _lastChecked = UaeTimeHelper.NowUae;
-        }
 
-        if (previousState != newStatus.State)
-        {
-            _logger.LogWarning("License state changed: {OldState} → {NewState}. {Message}",
-                previousState, newStatus.State, newStatus.Message);
-        }
+            if (previousState != newStatus.State)
+            {
+                _logger.LogWarning("License state changed: {OldState} → {NewState}. {Message}",
+                    previousState, newStatus.State, newStatus.Message);
+            }
 
-        _logger.LogInformation("License reloaded: State={State}, Message={Message}",
-            newStatus.State, newStatus.Message);
+            _logger.LogInformation("License reloaded: State={State}, Message={Message}",
+                newStatus.State, newStatus.Message);
+        }
     }
 
     /// <summary>
@@ -80,6 +87,7 @@ public class LicenseValidationService : ILicenseValidationService
     /// </summary>
     public bool IsDomainValid(string requestHost)
     {
+        RefreshIfStale();
         lock (_lock)
         {
             if (_cachedStatus.State == LicenseState.Missing || _cachedStatus.State == LicenseState.Invalid)
@@ -97,12 +105,35 @@ public class LicenseValidationService : ILicenseValidationService
 
     private void RefreshIfStale()
     {
-        // Auto-refresh cache if older than 24 hours
-        if ((UaeTimeHelper.NowUae - _lastChecked).TotalHours >= 24)
+        lock (_lock)
         {
-            ReloadLicense();
+            var licenseMetadata = ReadFileMetadata(_licenseFilePath);
+            var publicKeyMetadata = ReadFileMetadata(_publicKeyPath);
+            var filesChanged = (licenseMetadata.HasValue && licenseMetadata != _licenseMetadata) ||
+                (publicKeyMetadata.HasValue && publicKeyMetadata != _publicKeyMetadata);
+            if (filesChanged || (UaeTimeHelper.NowUae - _lastChecked).TotalHours >= 24)
+                ReloadLicense();
         }
     }
+
+    private static FileMetadata? ReadFileMetadata(string path)
+    {
+        try
+        {
+            var file = new FileInfo(path);
+            file.Refresh();
+            return file.Exists
+                ? new FileMetadata(true, file.LastWriteTimeUtc, file.Length)
+                : new FileMetadata(false, default, 0);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+        {
+            // A transient shared-mount stat failure must not fail the request.
+            return null;
+        }
+    }
+
+    private readonly record struct FileMetadata(bool Exists, DateTime LastWriteTimeUtc, long Length);
 
     private LicenseStatusResult Validate()
     {

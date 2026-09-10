@@ -195,7 +195,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setSubjectPage(page)
       setSubjectTotalPages(response.totalPages ?? 0)
     } catch (err) {
-      console.error("Failed to load subjects:", err)
+      console.error("Failed to load subjects")
     } finally {
       setSubjectsLoading(false)
     }
@@ -232,7 +232,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         return next
       })
     } catch (err) {
-      console.error(`Failed to load topics for subject ${subjectId}:`, err)
+      console.error(`Failed to load topics for subject ${subjectId}`)
       setTopicsPageMeta(prev => {
         const next = new Map(prev)
         const existing = next.get(subjectId) ?? { page, search, loading: false, totalPages: 0 }
@@ -266,7 +266,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setQuestionsCount(prev => new Map(prev).set(key, data))
       return data
     } catch (err) {
-      console.error("Failed to fetch questions count:", err)
+      console.error("Failed to fetch questions count")
       return { count: 0, totalPoints: 0 }
     }
   }, [questionsCount])
@@ -327,7 +327,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       }
     } catch (err) {
       // If no builder data exists, that's okay - it's a fresh exam
-      console.log("No existing builder data or error loading:", err)
+      console.log("No existing builder data or error loading")
     } finally {
       setBuilderLoading(false)
     }

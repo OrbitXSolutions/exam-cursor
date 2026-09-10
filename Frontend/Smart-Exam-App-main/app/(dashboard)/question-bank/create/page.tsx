@@ -210,7 +210,7 @@ const CreateQuestionPage = () => {
         setFormData((prev) => ({ ...prev, questionTypeId: String(mcqType.id) }))
       }
     } catch (error) {
-      console.error("[v0] Failed to fetch lookups:", error)
+      console.error("[v0] Failed to fetch lookups")
       toast.error(localizeText("Failed to load question types", "فشل تحميل أنواع الأسئلة", language))
     }
     setIsLoading(false)
@@ -356,7 +356,7 @@ const CreateQuestionPage = () => {
                 uploadedPath = result.file?.url || result.file?.path || result.filePath || null
               }
             } catch (err) {
-              console.warn('Option image upload failed:', err)
+              console.warn('Option image upload failed')
             }
           }
           return { ...opt, attachmentPath: uploadedPath }
@@ -432,7 +432,7 @@ const CreateQuestionPage = () => {
             }
           }
         } catch (imgErr) {
-          console.warn('Image upload failed, question was created:', imgErr)
+          console.warn('Image upload failed, question was created')
           toast.warning(localizeText('Question created but image upload failed. You can add the image later.', 'تم إنشاء السؤال لكن فشل رفع الصورة. يمكنك إضافتها لاحقاً.', language))
         }
       }

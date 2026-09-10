@@ -55,7 +55,7 @@ export default function MyResultsPage() {
       console.log("[v0] Loaded results from API:", data.length)
       setResults(data)
     } catch (error) {
-      console.error("[v0] Error loading results:", error)
+      console.error("[v0] Error loading results")
       toast.error(t("common.errorOccurred"))
     } finally {
       setLoading(false)

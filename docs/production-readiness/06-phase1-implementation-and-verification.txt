@@ -1,0 +1,181 @@
+RESUMED PHASE 1 — IMPLEMENTATION AND VERIFICATION
+Date: 2026-09-10
+Resume baseline: 8f5545b
+Status: implementation checkpoint in progress; verification results below will
+be finalized before the Phase 1 push. No production-readiness certification.
+
+SCOPE AND DECISION
+The original logging files are unavailable. Per the resumed instruction, this
+is treated as a repository defect, not a reason to stop unrelated work. The
+replacement derives its contract from the existing logging UI/API calls,
+SystemLogs migration/current EF snapshot, enums and middleware usages. No
+attempt was made to recover invented historical behavior. Reports 01-05 are
+preserved as historical baseline evidence; their waiting decision is superseded.
+
+Phase 1 includes logging, state/cache/worker/real-time readiness, shared storage,
+configuration/credential handling, and focused regression verification. Each
+unavailable integration is tracked individually rather than blocking all work.
+SeedData functionality and AllowAnonymous declarations are unchanged.
+
+CHANGES AND RATIONALE
+
+A. Logging and support APIs
+Reviewed middleware, migrations/snapshot, enums, UI request/filter/response
+contracts, Serilog configuration, service registration and audit usage.
+- Restored a mapped SystemLog entity and metadata DTO/service/controller APIs
+  for the existing support screens, with bounded page size and SuperAdmin access.
+- Added a bounded channel and background database batching with finite timeout,
+  backoff and drop reporting. Full queues and failed batches do not block exam
+  requests and are not retried indefinitely.
+- Removed whole-response MemoryStream capture, request/response body capture,
+  raw authentication diagnostics, and historical payload exposure in support
+  projections. Large responses no longer incur response-sized logging copies.
+- Safe exception diagnostics and generated trace identifiers preserve technical
+  support context without storing arbitrary exception messages/payloads.
+- Technical files are node/environment identified and asynchronously written
+  through a bounded sink. Default legacy dual SQL Serilog sinks are retired;
+  business audit records and SystemLogs remain distinct. Old SQL tables are not
+  dropped. Runtime log failures are observable through stderr/queue warnings.
+- Bounded SystemLogs retention replaces cleanup targeting the retired default
+  Serilog sink. OS file retention remains separately configured.
+- Frontend diagnostics are metadata-only; proxy URLs omit query parameters.
+
+Logging is best-effort diagnostics, not a lossless audit journal. Queue overload,
+process failure or unavailable SQL/disk can lose entries. Existing business
+audit records retain their separate semantics. Test evidence must not be read
+as proof that every legacy service log statement is safe in every failure.
+
+Representative files:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Logs/
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Logs/SystemLogsController.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/RequestResponseLoggingMiddleware.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Middleware/GlobalExceptionMiddleware.cs
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/safe-logging.ts
+
+B. Multi-server state
+Reviewed cache consumers, hub registration, limiter ordering, Identity key
+handling, background mutation cycles and filesystem read/write/delete paths.
+- ICacheService remains compatible with existing consumers, but now always
+  misses/executes the authoritative query. No process-local DTO cache/key registry
+  remains behind it. No speculative distributed cache invalidation was added.
+- Added the supported SignalR Redis backplane when Redis is configured.
+  MultiServer startup validation requires it and consistent configured shared
+  paths. Redis is not used as a new business-data cache.
+- JWT authentication now precedes rate limiting; authenticated users no longer
+  share the unauthenticated Host bucket. Anonymous clients use the trusted
+  remote IP. Per-node limits remain configurable, not globally distributed.
+- Added explicit trusted proxy forwarding, exact configurable CORS origins,
+  and optional shared data-protection key-ring/certificate configuration;
+  multi-server mode requires the latter to avoid node-local Identity tokens.
+- SQL session application locks coordinate background work. Attempt expiry
+  changes are made conditionally/transactionally to avoid stale status writes;
+  audit work no longer outlives its scoped service through detached Task.Run.
+- Shared StoragePaths resolves the same configured roots for serving/upload/
+  download/retention and license operations. Relative single-node compatibility
+  is retained; shared data migration is an operator procedure, not automatic.
+- The public static route no longer exposes video-chunks; existing authorized
+  recording APIs must be used. Image upload type validation and controlled
+  extensions prevent the confirmed active-document upload path.
+
+Removing caches increases SQL work. This is an intentional correctness-first
+trade-off, NOT evidence of unchanged performance. Real two-node SQL/backplane/
+storage/network testing and full workload measurement remain required.
+
+Representative files:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/CacheService.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/ProductionConfiguration.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Background/SqlServerWorkerLock.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Storage/StoragePaths.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs
+
+C. Configuration and provider diagnostics
+Reviewed tracked backend configuration, production defaults, frontend URL usage,
+SMTP/SMS/OpenAI diagnostics, notification URL defaults and deployment guidance.
+- Removed deployment connection/SMTP values from appsettings; JWT/encryption
+  values must be supplied securely, with startup validation rather than fallback
+  to known placeholder values. No actual credentials were tested or rotated.
+- Added customer examples with documentation-only addresses/blank secrets,
+  safe JSON override semantics and explicit multi-server prerequisites.
+- Externalized CORS, storage/license roots, proxy trust and provider endpoint
+  settings. SMTP sender/vendor and notification external-demo fallbacks are not
+  acceptable production defaults. Existing DB provider settings keep precedence.
+- SMTP and SMS delivery waits are bounded; diagnostics omit recipient lists and
+  raw provider response bodies. AI diagnostics no longer emit model content.
+- Frontend normalizes backend API-base/origin configuration and removes the
+  build-time network font dependency where supported by the existing system stack.
+- No blanket TypeScript casting, unrelated business-rule adjustment or dependency
+  upgrade campaign was undertaken to hide pre-existing validation failures.
+
+New production dependencies were selected only for the missing capabilities:
+Microsoft.AspNetCore.SignalR.StackExchangeRedis 9.0.20 and
+Serilog.Sinks.Async 2.1.0. The advisory tool reported no vulnerabilities for
+these requested versions before installation. This is not a complete dependency
+vulnerability assessment. Focused test tooling is tracked in the test project.
+
+VERIFICATION EVIDENCE
+VERIFIED:
+- Initial integrated backend Release build succeeded after logging replacement:
+  0 errors, 20 warnings (/tmp/phase1-interim-build.log).
+- Subsequent backend Release build after Program/provider/config changes:
+  0 errors, 20 warnings (/tmp/phase1-program-build.log).
+  Warnings include existing nullable/unreachable patterns and obsolete SMTP
+  ServicePointManager use; they were not suppressed or claimed fixed.
+- Source review confirms SeedController/DatabaseSeeder not modified.
+
+VERIFIED by the implementing/test agents at the first implementation checkpoint:
+- Backend integrated build: 0 errors, 20 existing warnings.
+- Focused .NET suite: 127 passed, 0 failed, 0 skipped. Includes real isolated
+  SQL Server cross-server application locks, migration/schema compatibility,
+  metadata persistence and old-payload suppression; real Redis group/user
+  delivery and channel-prefix isolation; shared encrypted data-protection key
+  ring; bounded async logging and stream preservation.
+- Frontend production build passed; running /login returned HTTP 200.
+- Frontend typecheck retained the same 204 baseline diagnostics, no additions
+  or removals at that snapshot. Lint remains BLOCKED: ESLint is undeclared/missing.
+- Frontend synthetic API/proxy/config/privacy checks passed, including 20
+  method/status cases. 39 logging-only files were AST-equivalent after excluding
+  console calls. No frontend dependency versions changed.
+- Storage implementation build and 41 focused assertions passed.
+- Changed backend/test/report and frontend files were secret-scanned: no secrets
+  detected in the supplied changed paths. This does not clear historical secrets.
+- Blank backend deployment configuration failed startup before any service
+  operation, with a configuration-key diagnostic and no credential value.
+
+The focused suite command (run by the test implementer):
+dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore --verbosity minimal
+Generated SQL credentials were not printed/committed; temporary containers and
+key-ring artifacts were removed by the test implementer.
+
+Review found and prompted additional integration corrections: filter private
+recordings at the file-provider boundary against repeated-slash aliases; allow
+WebP in the identity static allowlist consistently with accepted uploads; and
+unify existing response/log trace references. Final focused verification of
+these follow-ups and metadata-only handled-failure diagnostics is still pending.
+No live browser-camera or customer deployment test is inferred from these tests.
+
+STATUS DEFINITIONS
+VERIFIED = a specifically observed command/test/source result, not a general
+claim of application safety. PARTIALLY VERIFIED = inspected or unit tested but
+not adequately integrated. NOT VERIFIED = no adequate evidence. BLOCKED =
+specific unavailable prerequisite. Historical reports are not tests run now.
+
+OPEN ACCEPTANCE ITEMS
+- Cross-node browser/WebRTC delivery/failover, external email/SMS inbox/handset
+  delivery, customer storage ACLs/durable mounts and PKI are NOT VERIFIED.
+- Customer SQL migration/application-data regression is NOT VERIFIED unless
+  explicitly established in the final test matrix.
+- At least 50 realistic concurrent candidate exams is NOT VERIFIED. HTTP/unit
+  concurrency alone does not prove a camera-enabled live-exam workload.
+- Full repository/history/binary secret eradication is NOT VERIFIED. Revoke
+  any previously used checked-in credentials outside Git, preserving encrypted
+  data readability through a planned key migration.
+- Known Phase 2 issues remain queued: notification start/end delivery, camera
+  backup interference, inactive-user refresh, hub resource authorization, and
+  wider integration/regression/performance review.
+
+NEXT GATE
+Finalize focused tests and review, record each unresolved integration separately,
+then commit and push this Phase 1 implementation checkpoint before Phase 2.
+Do not claim production acceptance from a source/build checkpoint.
+Customer setup and support procedure:
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/07-deployment-and-support.txt

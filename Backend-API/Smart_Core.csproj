@@ -10,6 +10,8 @@
     <!-- ASP.NET Core & OpenAPI -->
     <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="9.0.20" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     
     <!-- Entity Framework Core -->

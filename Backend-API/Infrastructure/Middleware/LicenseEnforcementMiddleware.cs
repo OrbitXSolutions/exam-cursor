@@ -83,7 +83,7 @@ public class LicenseEnforcementMiddleware
 
             var response = ApiResponse<object>.FailureResponse(
                 "License expired. Read-only mode active. Please contact your administrator to renew the license.");
-            response.TraceId = context.TraceIdentifier;
+            response.TraceId = Smart_Core.Infrastructure.Services.Logs.SafeLogMetadata.TraceId(context);
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));

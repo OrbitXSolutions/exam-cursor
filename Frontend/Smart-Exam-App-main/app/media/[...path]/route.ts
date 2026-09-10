@@ -1,8 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const BACKEND_API_URL =
-  process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5221/api"
-const BACKEND_BASE_URL = BACKEND_API_URL.replace(/\/api\/?$/, "")
+import { backendBaseUrl as BACKEND_BASE_URL } from "@/lib/server/backend-config"
 
 export async function GET(
   _request: NextRequest,
@@ -20,7 +17,7 @@ export async function GET(
       headers: { "Content-Type": contentType },
     })
   } catch (error) {
-    console.error(`[Media Proxy Error] ${url}`, error)
+    console.error("[Media Proxy] Request failed")
     return new NextResponse(null, { status: 502 })
   }
 }

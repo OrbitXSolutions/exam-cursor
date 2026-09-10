@@ -66,7 +66,7 @@ export default function ExamReviewPage() {
         }
         setSession(data)
       } catch (err) {
-        console.error("Failed to load review:", err)
+        console.error("Failed to load review")
         setError(language === "ar" ? "فشل في تحميل المراجعة" : "Failed to load review")
       } finally {
         setLoading(false)

@@ -2,6 +2,7 @@ import {
   getResolvedLanguage,
   translateServerMessage,
 } from "@/lib/i18n/runtime";
+import { getCorrelationId, getSafePath, logRequest } from "@/lib/safe-logging";
 
 const API_BASE_URL = "/api/proxy";
 
@@ -68,25 +69,20 @@ class ApiClient {
       ...options.headers,
     };
 
-    console.log(
-      `[API Request] ${options.method || "GET"} ${url}`,
-      options.body ? JSON.parse(options.body as string) : "",
-      token ? "(with auth token)" : "(no auth token)",
-    );
+    const startedAt = Date.now();
+    let status: number | undefined;
+    let correlationId: string | undefined;
+    let failed = false;
 
     try {
       const response = await fetch(url, {
         ...options,
         headers,
       });
+      status = response.status;
+      correlationId = getCorrelationId(response.headers);
 
       const jsonResponse = await response.json().catch(() => ({}));
-
-      console.log(`[API Response] ${options.method || "GET"} ${url}`, {
-        status: response.status,
-        ok: response.ok,
-        data: jsonResponse,
-      });
 
       if (!response.ok) {
         const language = getResolvedLanguage();
@@ -174,7 +170,7 @@ class ApiClient {
 
       return jsonResponse.data !== undefined ? jsonResponse.data : jsonResponse;
     } catch (error) {
-      console.error(`[API Error] ${options.method || "GET"} ${url}`, error);
+      failed = true;
 
       if (
         mockData !== undefined &&
@@ -182,12 +178,15 @@ class ApiClient {
         (error as Error).message === "Failed to fetch"
       ) {
         console.warn(
-          `[API Fallback] Network error - Using mock data for ${endpoint}`,
+          "[API] Network fallback used",
+          { path: getSafePath(url) },
         );
         return mockData;
       }
 
       throw error;
+    } finally {
+      logRequest("API", options.method || "GET", url, startedAt, status, correlationId, failed);
     }
   }
 
@@ -247,11 +246,10 @@ class ApiClient {
 
     const token = this.getToken();
 
-    console.log(`[API Upload] POST ${url}`, {
-      fileName: file.name,
-      size: file.size,
-      type: file.type,
-    });
+    const startedAt = Date.now();
+    let status: number | undefined;
+    let correlationId: string | undefined;
+    let failed = false;
 
     try {
       const response = await fetch(url, {
@@ -261,10 +259,11 @@ class ApiClient {
         },
         body: formData,
       });
+      status = response.status;
+      correlationId = getCorrelationId(response.headers);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error(`[API Upload Error] POST ${url}`, errorData);
         throw new Error(
           translateServerMessage(
             errorData.message || "Upload failed",
@@ -274,11 +273,12 @@ class ApiClient {
       }
 
       const jsonResponse = await response.json();
-      console.log(`[API Upload Response] POST ${url}`, jsonResponse);
       return jsonResponse.data !== undefined ? jsonResponse.data : jsonResponse;
     } catch (error) {
-      console.error(`[API Upload Error] POST ${url}`, error);
+      failed = true;
       throw error;
+    } finally {
+      logRequest("API Upload", "POST", url, startedAt, status, correlationId, failed);
     }
   }
 }

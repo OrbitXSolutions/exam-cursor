@@ -1,15 +1,21 @@
 using System.Text;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using StackExchange.Redis;
+using Smart_Core.Infrastructure;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Assessment;
 using Smart_Core.Application.Interfaces.Attempt;
@@ -58,13 +64,29 @@ using Smart_Core.Infrastructure.Services.Logs;
 using Smart_Core.Infrastructure.Services.License;
 
 var builder = WebApplication.CreateBuilder(args);
+ProductionConfiguration.Validate(builder.Configuration, builder.Environment);
 
 // Configure Serilog
+Serilog.Debugging.SelfLog.Enable(TextWriter.Synchronized(Console.Error));
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("MachineName", Environment.MachineName)
+    .Enrich.WithProperty("EnvironmentName", builder.Environment.EnvironmentName)
     .CreateLogger();
 
 builder.Host.UseSerilog();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    ProductionConfiguration.ConfigureForwarding(options, builder.Configuration));
+
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("SmartExam");
+var keyRingPath = builder.Configuration["DataProtection:KeyRingPath"];
+if (!string.IsNullOrWhiteSpace(keyRingPath))
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyRingPath));
+var keyCertificatePath = builder.Configuration["DataProtection:CertificatePath"];
+if (!string.IsNullOrWhiteSpace(keyCertificatePath))
+    dataProtection.ProtectKeysWithCertificate(X509CertificateLoader.LoadPkcs12FromFile(
+        keyCertificatePath, builder.Configuration["DataProtection:CertificatePassword"]));
 
 // Add services to the container
 
@@ -133,9 +155,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// In-Memory Caching
-builder.Services.AddMemoryCache();
-Log.Information("In-memory cache configured");
+// Application read caches are bypassed so every node reads authoritative SQL state.
 
 // Rate Limiting
 var rateLimitSettings = builder.Configuration.GetSection("RateLimiting");
@@ -143,19 +163,25 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+            partitionKey: httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) is { } userId
+                ? $"user:{userId}"
+                : $"ip:{httpContext.Connection.RemoteIpAddress}",
             factory: partition => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
-                PermitLimit = int.Parse(rateLimitSettings["PermitLimit"] ?? "100"),
+                PermitLimit = httpContext.User.Identity?.IsAuthenticated == true
+                    ? rateLimitSettings.GetValue<int>("PermitLimit", 100)
+                    : rateLimitSettings.GetValue<int>("AnonymousPermitLimit", 100),
                 Window = TimeSpan.FromSeconds(int.Parse(rateLimitSettings["WindowInSeconds"] ?? "60")),
-                QueueLimit = int.Parse(rateLimitSettings["QueueLimit"] ?? "10"),
+                QueueLimit = int.Parse(rateLimitSettings["QueueLimit"] ?? "0"),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst
             }));
 
     options.OnRejected = async (context, token) =>
     {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+            context.HttpContext.Response.Headers.RetryAfter = Math.Ceiling(retryAfter.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture);
         await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
     };
 });
@@ -169,10 +195,14 @@ MappingConfig.RegisterMappings();
 
 // Media Storage Configuration
 builder.Services.Configure<MediaStorageSettings>(builder.Configuration.GetSection("MediaStorage"));
+builder.Services.AddSingleton<StoragePaths>();
 
 // OpenAI Configuration
 builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Sms", client =>
+    client.Timeout = TimeSpan.FromSeconds(Math.Clamp(builder.Configuration.GetValue<int>("SmsSettings:TimeoutSeconds", 30), 1, 120)))
+    .RemoveAllLoggers();
 var mediaStorageProvider = builder.Configuration.GetValue<string>("MediaStorage:Provider") ?? "Local";
 
 if (mediaStorageProvider.Equals("S3", StringComparison.OrdinalIgnoreCase))
@@ -247,27 +277,27 @@ builder.Services.AddHostedService<LicenseCheckBackgroundService>();
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
 
-// SignalR
-builder.Services.AddSignalR();
+// Redis is a SignalR backplane, not an application-data cache.
+var signalR = builder.Services.AddSignalR();
+var redisConnection = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrWhiteSpace(redisConnection))
+{
+    signalR.AddStackExchangeRedis(redisConnection, options =>
+    {
+        options.Configuration.ChannelPrefix = RedisChannel.Literal(
+            builder.Configuration["SignalR:ChannelPrefix"] ?? "SmartExam");
+    });
+}
 
 // CORS policy for SignalR — allow frontend origins
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("SignalRCors", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:3000",
-                "https://localhost:3000",
-                "http://localhost:5221",
-                "https://localhost:7184",
-                // Testing environment
-                "https://smartexam-sable.vercel.app",
-                "https://zoolker-003-site8.jtempurl.com",
-                // Demo / Business environment
-                "https://exam-demo-black.vercel.app",
-                "https://zoolker-003-site9.jtempurl.com")
+        policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
             .AllowAnyHeader()
             .AllowAnyMethod()
+            .WithExposedHeaders("X-Trace-Id", "X-License-State", "Retry-After", "Content-Disposition")
             .AllowCredentials();
     });
 });
@@ -316,55 +346,45 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+app.UseForwardedHeaders();
+app.UseRouting();
 
 // CORS — required for SignalR WebSocket from frontend origin
 app.UseCors("SignalRCors");
 
-// Request/Response Logging (writes to Channel — zero blocking)
+// Metadata-only request diagnostics use a bounded, non-blocking channel.
 app.UseRequestResponseLogging();
 
 // Global Exception Handling
 app.UseGlobalExceptionMiddleware();
 
-// Serilog Request Logging — enriched with user/IP/UA for useful file logs
-app.UseSerilogRequestLogging(options =>
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
-    options.MessageTemplate =
-        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms" +
-        " | User:{UserEmail} | IP:{ClientIp} | UA:{UserAgent}";
-
-    options.EnrichDiagnosticContext = (diagCtx, httpCtx) =>
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        diagCtx.Set("ClientIp",
-            httpCtx.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded)
-                ? forwarded.ToString().Split(',')[0].Trim()
-                : httpCtx.Connection.RemoteIpAddress?.ToString() ?? "-");
-
-        var ua = httpCtx.Request.Headers.UserAgent.ToString();
-        diagCtx.Set("UserAgent", ua.Length > 200 ? ua[..200] : ua);
-
-        var email = httpCtx.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                    ?? httpCtx.User.FindFirst("email")?.Value
-                    ?? "-";
-        diagCtx.Set("UserEmail", email);
-
-        var userId = httpCtx.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "-";
-        diagCtx.Set("UserId", userId);
-    };
-});
-
-// Swagger (available in all environments for now, restrict in production if needed)
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Core API v1");
-    options.RoutePrefix = string.Empty; // Swagger at startup page
-});
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Core API v1");
+        options.RoutePrefix = string.Empty;
+    });
+}
 
 app.UseHttpsRedirection();
 
-// Ensure MediaStorage directory exists and serve static files
-var mediaStoragePath = Path.Combine(builder.Environment.ContentRootPath, "MediaStorage");
+var storagePaths = app.Services.GetRequiredService<StoragePaths>();
+
+// Recordings must use the authorized download API, never the public asset route.
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/media/video-chunks", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+    await next(context);
+});
+
+// Use the same configured roots as uploads and background retention.
+var mediaStoragePath = storagePaths.MediaPath;
 if (!Directory.Exists(mediaStoragePath))
 {
     Directory.CreateDirectory(mediaStoragePath);
@@ -373,12 +393,12 @@ if (!Directory.Exists(mediaStoragePath))
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(mediaStoragePath),
+    FileProvider = new PublicMediaFileProvider(mediaStoragePath),
     RequestPath = "/media"
 });
 
 // Serve organization images from wwwroot/Organization/
-var orgImagePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "Organization");
+var orgImagePath = storagePaths.OrganizationPath;
 if (!Directory.Exists(orgImagePath))
 {
     Directory.CreateDirectory(orgImagePath);
@@ -388,11 +408,18 @@ if (!Directory.Exists(orgImagePath))
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(orgImagePath),
-    RequestPath = "/organization"
+    RequestPath = "/organization",
+    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider(
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [".jpg"] = "image/jpeg", [".jpeg"] = "image/jpeg", [".png"] = "image/png",
+            [".webp"] = "image/webp", [".ico"] = "image/x-icon"
+        }),
+    OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
 });
 
 // Serve candidate identity verification photos from wwwroot/candidateIDs/
-var candidateIDsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "candidateIDs");
+var candidateIDsPath = storagePaths.IdentityPath;
 if (!Directory.Exists(candidateIDsPath))
 {
     Directory.CreateDirectory(candidateIDsPath);
@@ -402,11 +429,18 @@ if (!Directory.Exists(candidateIDsPath))
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(candidateIDsPath),
-    RequestPath = "/candidateIDs"
+    RequestPath = "/candidateIDs",
+    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider(
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [".jpg"] = "image/jpeg", [".jpeg"] = "image/jpeg", [".png"] = "image/png",
+            [".webp"] = "image/webp"
+        }),
+    OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
 });
 
 // Serve tutorial videos from wwwroot/tutorials/
-var tutorialsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "tutorials");
+var tutorialsPath = storagePaths.TutorialsPath;
 if (!Directory.Exists(tutorialsPath))
 {
     Directory.CreateDirectory(tutorialsPath);
@@ -419,11 +453,9 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/tutorials"
 });
 
-// Rate Limiting
-app.UseRateLimiter();
-
 // Authentication & Authorization
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 // License enforcement — after auth, before controllers
@@ -453,6 +485,7 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
+    Environment.ExitCode = 1;
 }
 finally
 {

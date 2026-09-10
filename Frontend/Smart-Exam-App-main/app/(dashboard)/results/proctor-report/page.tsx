@@ -36,7 +36,7 @@ export default function ProctorReportPage() {
           if (!cancelled) setData(res?.items ?? [])
         })
         .catch((err) => {
-          console.warn("[ProctorReport] Failed to load data:", err)
+          console.warn("[ProctorReport] Failed to load data")
           if (!cancelled) setData([])
         })
         .finally(() => {

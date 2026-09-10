@@ -437,7 +437,10 @@ export default function NotificationSettingsPage() {
                 <div className="space-y-2">
                   <Label>{language === "ar" ? "رابط تسجيل الدخول" : "Login URL"}</Label>
                   <Input
-                    placeholder="https://smartexam-sable.vercel.app/login"
+                    placeholder={`${(
+                      process.env.NEXT_PUBLIC_FRONTEND_URL ||
+                      (typeof window !== "undefined" ? window.location.origin : "")
+                    ).replace(/\/+$/, "")}/login`}
                     value={settings.loginUrl}
                     onChange={(e) => setSettings({ ...settings, loginUrl: e.target.value })}
                   />

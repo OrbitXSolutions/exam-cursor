@@ -1,10 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:5221/api";
-const BACKEND_BASE_URL = BACKEND_API_URL.replace(/\/api\/?$/, "");
+import { backendBaseUrl as BACKEND_BASE_URL } from "@/lib/server/backend-config";
 
 /**
  * Proxy for backend static files (organization logos, favicons, videos, etc.)
@@ -61,7 +56,7 @@ export async function GET(
       headers: responseHeaders,
     });
   } catch (error) {
-    console.error(`[Backend Files Proxy Error] ${url}`, error);
+    console.error("[Backend Files Proxy] Request failed");
     return new NextResponse(null, { status: 502 });
   }
 }

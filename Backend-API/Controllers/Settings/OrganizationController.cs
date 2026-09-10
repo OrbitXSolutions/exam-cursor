@@ -6,6 +6,7 @@ using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Controllers.Settings;
 
@@ -14,16 +15,14 @@ namespace Smart_Core.Controllers.Settings;
 public class OrganizationController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
-    private readonly IWebHostEnvironment _env;
+    private readonly StoragePaths _storagePaths;
 
-    private static readonly string[] AllowedImageExtensions = { ".png", ".jpg", ".jpeg", ".svg" };
-    private static readonly string[] AllowedFaviconExtensions = { ".png", ".jpg", ".jpeg", ".svg", ".ico" };
     private const long MaxImageSizeBytes = 5 * 1024 * 1024; // 5 MB
 
-    public OrganizationController(ApplicationDbContext db, IWebHostEnvironment env)
+    public OrganizationController(ApplicationDbContext db, StoragePaths storagePaths)
     {
         _db = db;
-        _env = env;
+        _storagePaths = storagePaths;
     }
 
     // ─── Admin: GET organization settings ─────────────────────────────
@@ -72,17 +71,17 @@ public class OrganizationController : ControllerBase
         if (file.Length > MaxImageSizeBytes)
             return BadRequest(ApiResponse<string>.FailureResponse("File size exceeds 5 MB limit."));
 
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var allowedExts = type.ToLower() == "favicon" ? AllowedFaviconExtensions : AllowedImageExtensions;
-
-        if (!allowedExts.Contains(ext))
-            return BadRequest(ApiResponse<string>.FailureResponse($"Invalid file type. Allowed: {string.Join(", ", allowedExts)}"));
-
-        if (type.ToLower() != "logo" && type.ToLower() != "favicon")
+        type = type.ToLowerInvariant();
+        if (type != "logo" && type != "favicon")
             return BadRequest(ApiResponse<string>.FailureResponse("Type must be 'logo' or 'favicon'."));
 
-        // Ensure wwwroot/Organization/ exists
-        var orgFolder = Path.Combine(_env.ContentRootPath, "wwwroot", "Organization");
+        var ext = await ImageUploadValidator.GetSafeExtensionAsync(file, allowIcon: type == "favicon",
+            cancellationToken: HttpContext.RequestAborted);
+        if (ext == null)
+            return BadRequest(ApiResponse<string>.FailureResponse(
+                "Upload a valid PNG or JPEG image (ICO is also allowed for favicons) with a matching file extension and content type."));
+
+        var orgFolder = _storagePaths.OrganizationPath;
         if (!Directory.Exists(orgFolder))
             Directory.CreateDirectory(orgFolder);
 

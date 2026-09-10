@@ -136,7 +136,7 @@ export default function CandidateVideoPage() {
           setAttemptEvents([])
         }
       } catch (err) {
-        console.error("Failed to load proctor data:", err)
+        console.error("Failed to load proctor data")
         setError(language === "ar" ? "فشل في تحميل بيانات المراقبة" : "Failed to load proctoring data")
       } finally {
         setLoading(false)
@@ -180,7 +180,7 @@ export default function CandidateVideoPage() {
       setScreenSnapshots(screenOnly.length > 0 ? screenOnly : snapshotList)
       setSelectedImage(null)
     } catch (err) {
-      console.warn("Failed to load snapshots:", err)
+      console.warn("Failed to load snapshots")
       setSnapshots([])
     }
   }
@@ -191,7 +191,7 @@ export default function CandidateVideoPage() {
       const eventList = normalizeList<AttemptEvent>(res)
       setAttemptEvents(eventList)
     } catch (err) {
-      console.warn("Failed to load attempt events:", err)
+      console.warn("Failed to load attempt events")
       setAttemptEvents([])
     }
   }

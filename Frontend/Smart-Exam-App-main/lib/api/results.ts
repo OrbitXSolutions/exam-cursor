@@ -223,7 +223,7 @@ export async function getAttemptIdForCandidate(
         return gradingItems[0].attemptId ?? gradingItems[0].id ?? null;
       }
     } catch (err) {
-      console.warn("[getAttemptIdForCandidate] Grading lookup failed:", err);
+      console.warn("[getAttemptIdForCandidate] Grading lookup failed");
     }
 
     // 2) Fall back to latest submitted/expired attempt
@@ -270,7 +270,7 @@ export async function getAttemptIdForCandidate(
 
     return null;
   } catch (err) {
-    console.warn("[getAttemptIdForCandidate] Failed:", err);
+    console.warn("[getAttemptIdForCandidate] Failed");
     return null;
   }
 }

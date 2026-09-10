@@ -73,9 +73,7 @@ export class CandidatePublisher {
     try {
       // Load STUN config from server
       const config = await getVideoConfig();
-      console.log("[WebRTC Publisher] Video config:", JSON.stringify(config));
       _rtcConfig = buildRtcConfig(config);
-      console.log("[WebRTC Publisher] RTC config:", JSON.stringify(_rtcConfig));
 
       // Reuse existing webcam stream or create new one
       if (existingStream) {
@@ -126,7 +124,6 @@ export class CandidatePublisher {
           } catch (error) {
             console.error(
               "[WebRTC Publisher] Error setting remote description:",
-              error,
             );
           }
         },
@@ -144,7 +141,6 @@ export class CandidatePublisher {
           } catch (error) {
             console.error(
               "[WebRTC Publisher] Error adding ICE candidate:",
-              error,
             );
           }
         },
@@ -156,20 +152,14 @@ export class CandidatePublisher {
           await this.createAndSendOffer();
         },
         onWarningReceived: (event) => {
-          console.log(
-            `%c[WebRTC Publisher] \u26a0\ufe0f Warning received from proctor: "${event.message}"`,
-            "color: #ff9800; font-weight: bold",
-          );
+          console.log("[WebRTC Publisher] Warning received from proctor");
           this.callbacks.onWarningReceived?.(
             event.message,
             event.isLastWarning,
           );
         },
         onTerminationReceived: (event) => {
-          console.log(
-            `%c[WebRTC Publisher] \u274c Termination received from proctor: "${event.reason}"`,
-            "color: #f44336; font-weight: bold",
-          );
+          console.log("[WebRTC Publisher] Termination received from proctor");
           this.callbacks.onTerminationReceived?.(event.reason);
         },
         onTimeExtended: (event) => {
@@ -180,10 +170,7 @@ export class CandidatePublisher {
           this.callbacks.onTimeExtended?.(event);
         },
         onAttemptExpired: (event) => {
-          console.log(
-            `%c[WebRTC Publisher] \u274c AttemptExpired: type=${event.eventType}, reason=${event.reason}`,
-            "color: #f44336; font-weight: bold",
-          );
+          console.log("[WebRTC Publisher] AttemptExpired");
           this.callbacks.onAttemptExpired?.(event);
         },
         onReconnecting: () => {
@@ -221,7 +208,7 @@ export class CandidatePublisher {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[WebRTC Publisher] Start failed:", error);
+      console.error("[WebRTC Publisher] Start failed");
       this.setStatus("failed");
     }
   }
@@ -250,16 +237,13 @@ export class CandidatePublisher {
     // ICE candidate handling
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log(
-          `[WebRTC Publisher] Local ICE candidate: ${event.candidate.candidate.substring(0, 60)}...`,
-        );
         this.signaling
           ?.sendIceCandidate(
             JSON.stringify(event.candidate.toJSON()),
             this.proctorConnectionId ?? undefined,
           )
           .catch((e) =>
-            console.error("[WebRTC Publisher] Error sending ICE:", e),
+            console.error("[WebRTC Publisher] Error sending ICE"),
           );
       }
     };
@@ -358,7 +342,6 @@ export class CandidatePublisher {
       console.error(
         "%c[WebRTC Publisher] \u274c Error creating/sending offer:",
         "color: red; font-weight: bold",
-        error,
       );
     }
   }
@@ -374,7 +357,6 @@ export class CandidatePublisher {
     } catch (error) {
       console.error(
         "[WebRTC Publisher] ICE restart failed, trying hard reset:",
-        error,
       );
       await this.resetPeerConnection();
     }
@@ -415,7 +397,7 @@ export class CandidatePublisher {
       this.createPeerConnection();
       this.reconnectAttempts = 0;
     } catch (error) {
-      console.error("[WebRTC Publisher] Reconnect failed:", error);
+      console.error("[WebRTC Publisher] Reconnect failed");
       this.attemptReconnect();
     }
   }

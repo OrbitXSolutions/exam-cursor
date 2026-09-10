@@ -68,7 +68,7 @@ export default function MyExamsPage() {
       const examsResponse = await getAvailableExams()
       setExams(Array.isArray(examsResponse) ? examsResponse : [])
     } catch (error) {
-      console.error("[my-exams] API error:", error)
+      console.error("[my-exams] API error")
       toast.error(error instanceof Error ? error.message : localizeText("Failed to load exams", "فشل تحميل الاختبارات", language))
       setExams([])
     } finally {

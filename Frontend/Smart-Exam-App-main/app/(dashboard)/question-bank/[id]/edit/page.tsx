@@ -160,7 +160,7 @@ export default function EditQuestionPage() {
         setSubjects(subjectsList.items)
       }
     } catch (error) {
-      console.error("[v0] Failed to fetch data:", error)
+      console.error("[v0] Failed to fetch data")
       toast.error(localizeText("Failed to load question data", "فشل تحميل بيانات السؤال", language))
     }
     setIsLoading(false)
@@ -342,7 +342,7 @@ export default function EditQuestionPage() {
             }
           }
         } catch (imgErr) {
-          console.warn('Image upload failed:', imgErr)
+          console.warn('Image upload failed')
           toast.warning(localizeText('Question updated but image upload failed.', 'تم تحديث السؤال لكن فشل رفع الصورة.', language))
         } finally {
           setIsUploadingImage(false)
@@ -373,7 +373,7 @@ export default function EditQuestionPage() {
                     uploadedPath = result.file?.url || result.file?.path || result.filePath || null
                   }
                 } catch (err) {
-                  console.warn('Option image upload failed:', err)
+                  console.warn('Option image upload failed')
                 }
               }
               return { ...opt, attachmentPath: uploadedPath }
@@ -404,7 +404,7 @@ export default function EditQuestionPage() {
             })
           }
         } catch (optErr) {
-          console.warn('Option update failed:', optErr)
+          console.warn('Option update failed')
         }
       }
 
@@ -415,7 +415,7 @@ export default function EditQuestionPage() {
         toast.error((response as any)?.message || localizeText("Failed to update question", "فشل تحديث السؤال", language))
       }
     } catch (error) {
-      console.error("[v0] Update error:", error)
+      console.error("[v0] Update error")
       toast.error(localizeText("Failed to update question", "فشل تحديث السؤال", language))
     }
 

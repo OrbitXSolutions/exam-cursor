@@ -165,7 +165,7 @@ export async function getExamListForDropdown(): Promise<ExamDropdownItem[]> {
       : null;
     return Array.isArray(arr) ? (arr as ExamDropdownItem[]) : [];
   } catch (err) {
-    console.warn("[getExamListForDropdown] Failed:", err);
+    console.warn("[getExamListForDropdown] Failed");
     return [];
   }
 }
@@ -199,7 +199,7 @@ export async function getExams(params?: {
       ),
     };
   } catch (err) {
-    console.warn("[getExams] Failed to load exams:", err);
+    console.warn("[getExams] Failed to load exams");
     return {
       items: [],
       totalCount: 0,

@@ -115,7 +115,7 @@ export default function ExamOperationsPage() {
       setTotalCount(result.totalCount)
     } catch (error) {
       toast.error("Failed to load candidates")
-      console.error(error)
+      console.error("Exam operation failed")
     } finally {
       setLoading(false)
     }

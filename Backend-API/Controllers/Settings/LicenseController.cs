@@ -7,6 +7,7 @@ using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Models;
 using Smart_Core.Infrastructure.Services.License;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Controllers.Settings;
 
@@ -15,16 +16,16 @@ namespace Smart_Core.Controllers.Settings;
 public class LicenseController : ControllerBase
 {
     private readonly ILicenseValidationService _licenseService;
-    private readonly IWebHostEnvironment _env;
+    private readonly StoragePaths _storagePaths;
     private readonly ILogger<LicenseController> _logger;
 
     public LicenseController(
         ILicenseValidationService licenseService,
-        IWebHostEnvironment env,
+        StoragePaths storagePaths,
         ILogger<LicenseController> logger)
     {
         _licenseService = licenseService;
-        _env = env;
+        _storagePaths = storagePaths;
         _logger = logger;
     }
 
@@ -71,12 +72,22 @@ public class LicenseController : ControllerBase
             }
 
             // Save to License directory
-            var licenseDir = Path.Combine(_env.ContentRootPath, "License");
+            var licenseDir = _storagePaths.LicenseDirectory;
             if (!Directory.Exists(licenseDir))
                 Directory.CreateDirectory(licenseDir);
 
             var licensePath = Path.Combine(licenseDir, "license.json");
-            await System.IO.File.WriteAllTextAsync(licensePath, json);
+            var stagedPath = Path.Combine(licenseDir, $".license-{Guid.NewGuid():N}.pending");
+            try
+            {
+                await System.IO.File.WriteAllTextAsync(stagedPath, json, HttpContext.RequestAborted);
+                System.IO.File.Move(stagedPath, licensePath, overwrite: true);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(stagedPath))
+                    System.IO.File.Delete(stagedPath);
+            }
 
             _logger.LogInformation("License file uploaded by {User}. Customer={Customer}",
                 User.Identity?.Name, license.CustomerName);

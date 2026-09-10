@@ -98,7 +98,7 @@ export default function JourneyPage() {
       const data = await getExamJourney()
       setJourney(data)
     } catch (error) {
-      console.error("[journey] API error:", error)
+      console.error("[journey] API error")
       toast.error(error instanceof Error ? error.message : "Failed to load journey")
     } finally {
       setLoading(false)

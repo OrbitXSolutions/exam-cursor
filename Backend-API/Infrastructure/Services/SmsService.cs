@@ -74,7 +74,7 @@ public class SmsService : ISmsService
             var config = await GetSmsConfigAsync();
             if (config == null)
             {
-                _logger.LogWarning("SMS not configured. Message to {PhoneNumber} skipped.", phoneNumber);
+                _logger.LogWarning("SMS delivery skipped: provider not configured");
                 return false;
             }
 
@@ -89,57 +89,55 @@ public class SmsService : ISmsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send SMS to {PhoneNumber}", phoneNumber);
+            _logger.LogError(ex, "SMS delivery failed");
             return false;
         }
     }
 
     private async Task<bool> SendViaTwilioAsync(string accountSid, string authToken, string from, string to, string body)
     {
-        var client = _httpClientFactory.CreateClient();
+        using var client = _httpClientFactory.CreateClient("Sms");
         var url = $"https://api.twilio.com/2010-04-01/Accounts/{Uri.EscapeDataString(accountSid)}/Messages.json";
 
         var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountSid}:{authToken}"));
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
-        var content = new FormUrlEncodedContent(new[]
+        using var content = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("To", to),
             new KeyValuePair<string, string>("From", from),
             new KeyValuePair<string, string>("Body", body)
         });
 
-        var response = await client.PostAsync(url, content);
+        using var response = await client.PostAsync(url, content);
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("SMS sent via Twilio to {PhoneNumber}", to);
+            _logger.LogInformation("SMS accepted by Twilio");
             return true;
         }
 
-        var responseBody = await response.Content.ReadAsStringAsync();
-        _logger.LogError("Twilio SMS failed. Status: {Status}, Response: {Body}", response.StatusCode, responseBody);
+        _logger.LogError("Twilio SMS rejected. HTTP status: {Status}", response.StatusCode);
         return false;
     }
 
     private async Task<bool> SendViaCustomApiAsync(string apiUrl, string apiKey, string to, string body)
     {
-        var client = _httpClientFactory.CreateClient();
+        using var client = _httpClientFactory.CreateClient("Sms");
         client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
 
         var payload = JsonSerializer.Serialize(new { to, message = body });
-        var content = new StringContent(payload, Encoding.UTF8, "application/json");
+        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync(apiUrl, content);
+        using var response = await client.PostAsync(apiUrl, content);
 
         if (response.IsSuccessStatusCode)
         {
-            _logger.LogInformation("SMS sent via Custom API to {PhoneNumber}", to);
+            _logger.LogInformation("SMS accepted by custom provider");
             return true;
         }
 
-        var responseBody = await response.Content.ReadAsStringAsync();
-        _logger.LogError("Custom SMS API failed. Status: {Status}, Response: {Body}", response.StatusCode, responseBody);
+        _logger.LogError("Custom SMS provider rejected message. HTTP status: {Status}", response.StatusCode);
         return false;
     }
 

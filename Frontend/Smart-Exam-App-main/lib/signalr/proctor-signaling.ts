@@ -3,6 +3,8 @@
  * Uses the ProctorHub at /hubs/proctor with JWT auth via query string.
  */
 import * as signalR from "@microsoft/signalr";
+import { getBackendBaseUrl } from "@/lib/backend-url.mjs";
+import { safeSignalRLogger } from "@/lib/safe-logging";
 
 export type PeerRole = "candidate" | "proctor";
 
@@ -157,13 +159,11 @@ export class ProctorSignaling {
       console.error(`[SignalR] No auth_token in localStorage! Cannot connect.`);
       throw new Error("No auth token available");
     }
-    console.log(`[SignalR] Token found (${token.substring(0, 20)}...)`);
 
     // Build hub URL — go through Next.js proxy is not needed for SignalR,
     // connect directly to backend
     const backendUrl = this.getBackendUrl();
     const hubUrl = `${backendUrl}/hubs/proctor`;
-    console.log(`[SignalR] Hub URL: ${hubUrl}`);
 
     // On localhost: skip negotiate, pure WebSockets (fastest dev experience, no round-trip).
     // In production: WebSockets first, SSE as fallback — LongPolling is excluded because it
@@ -190,35 +190,33 @@ export class ProctorSignaling {
             }),
       })
       .withAutomaticReconnect([0, 1000, 2000, 5000, 10000, 30000])
-      .configureLogging(signalR.LogLevel.Information)
+      .configureLogging(safeSignalRLogger)
       .build();
     console.log(`[SignalR] HubConnection built, starting...`);
 
     // Register event handlers
     this.connection.on("PeerJoined", (event: PeerJoinedEvent) => {
-      console.log("[SignalR] PeerJoined:", event);
+      console.log("[SignalR] PeerJoined");
       this.callbacks.onPeerJoined?.(event);
     });
 
     this.connection.on("PeerLeft", (event) => {
-      console.log("[SignalR] PeerLeft:", event);
+      console.log("[SignalR] PeerLeft");
       this.callbacks.onPeerLeft?.(event);
     });
 
     this.connection.on("ReceiveOffer", (event) => {
-      console.log("[SignalR] ReceiveOffer from:", event.fromConnectionId);
+      console.log("[SignalR] ReceiveOffer");
       this.callbacks.onReceiveOffer?.(event);
     });
 
     this.connection.on("ReceiveAnswer", (event) => {
-      console.log("[SignalR] ReceiveAnswer from:", event.fromConnectionId);
+      console.log("[SignalR] ReceiveAnswer");
       this.callbacks.onReceiveAnswer?.(event);
     });
 
     this.connection.on("ReceiveIceCandidate", (event) => {
-      console.log(
-        `[SignalR] ReceiveIceCandidate from: ${event.fromConnectionId}`,
-      );
+      console.log("[SignalR] ReceiveIceCandidate");
       this.callbacks.onReceiveIceCandidate?.(event);
     });
 
@@ -231,27 +229,18 @@ export class ProctorSignaling {
     });
 
     this.connection.on("ReceiveWarning", (event) => {
-      console.log(
-        `%c[SignalR] ReceiveWarning from proctor: "${event.message}"`,
-        "color: #ff9800; font-weight: bold",
-      );
+      console.log("[SignalR] ReceiveWarning");
       this.callbacks.onWarningReceived?.(event);
     });
 
     this.connection.on("SessionTerminated", (event) => {
-      console.log(
-        `%c[SignalR] SessionTerminated by proctor for attempt ${event.attemptId}: "${event.reason}"`,
-        "color: #f44336; font-weight: bold",
-      );
+      console.log("[SignalR] SessionTerminated");
       this.callbacks.onTerminationReceived?.(event);
     });
 
     // Auto-termination warning from backend (different from manual proctor "ReceiveWarning")
     this.connection.on("ProctorWarning", (event) => {
-      console.log(
-        `%c[SignalR] ProctorWarning (auto): "${event.message}", isLastWarning=${event.isLastWarning}`,
-        "color: #ff9800; font-weight: bold",
-      );
+      console.log("[SignalR] ProctorWarning");
       this.callbacks.onWarningReceived?.({
         fromConnectionId: "",
         fromUserId: "system",
@@ -263,10 +252,7 @@ export class ProctorSignaling {
 
     // Auto-termination from backend (different from manual proctor "SessionTerminated")
     this.connection.on("ExamTerminated", (event) => {
-      console.log(
-        `%c[SignalR] ExamTerminated (auto): "${event.reason}"`,
-        "color: #f44336; font-weight: bold",
-      );
+      console.log("[SignalR] ExamTerminated");
       this.callbacks.onTerminationReceived?.({
         fromConnectionId: "",
         fromUserId: "system",
@@ -281,15 +267,12 @@ export class ProctorSignaling {
     });
 
     this.connection.on("ConnectionStatusChanged", (event) => {
-      console.log("[SignalR] ConnectionStatusChanged:", event.status);
+      console.log("[SignalR] ConnectionStatusChanged");
       this.callbacks.onConnectionStatusChanged?.(event);
     });
 
     this.connection.on("ViolationEventReceived", (event) => {
-      console.log(
-        `%c[SignalR] ViolationEventReceived: ${event.eventType} (severity=${event.severity})`,
-        "color: #ff5722; font-weight: bold",
-      );
+      console.log("[SignalR] ViolationEventReceived");
       this.callbacks.onViolationEventReceived?.(event);
     });
 
@@ -302,50 +285,38 @@ export class ProctorSignaling {
     });
 
     this.connection.on("AttemptExpired", (event) => {
-      console.log(
-        `%c[SignalR] AttemptExpired: type=${event.eventType}, reason=${event.reason}`,
-        "color: #f44336; font-weight: bold",
-      );
+      console.log("[SignalR] AttemptExpired");
       this.callbacks.onAttemptExpired?.(event);
     });
 
     // Screen share signaling events
     this.connection.on("ScreenPeerJoined", (event) => {
-      console.log("[SignalR] ScreenPeerJoined:", event);
+      console.log("[SignalR] ScreenPeerJoined");
       this.callbacks.onScreenPeerJoined?.(event);
     });
 
     this.connection.on("ScreenPeerLeft", (event) => {
-      console.log("[SignalR] ScreenPeerLeft:", event);
+      console.log("[SignalR] ScreenPeerLeft");
       this.callbacks.onScreenPeerLeft?.(event);
     });
 
     this.connection.on("ReceiveScreenOffer", (event) => {
-      console.log("[SignalR] ReceiveScreenOffer from:", event.fromConnectionId);
+      console.log("[SignalR] ReceiveScreenOffer");
       this.callbacks.onReceiveScreenOffer?.(event);
     });
 
     this.connection.on("ReceiveScreenAnswer", (event) => {
-      console.log(
-        "[SignalR] ReceiveScreenAnswer from:",
-        event.fromConnectionId,
-      );
+      console.log("[SignalR] ReceiveScreenAnswer");
       this.callbacks.onReceiveScreenAnswer?.(event);
     });
 
     this.connection.on("ReceiveScreenIceCandidate", (event) => {
-      console.log(
-        "[SignalR] ReceiveScreenIceCandidate from:",
-        event.fromConnectionId,
-      );
+      console.log("[SignalR] ReceiveScreenIceCandidate");
       this.callbacks.onReceiveScreenIceCandidate?.(event);
     });
 
     this.connection.on("ScreenShareStatusChanged", (event) => {
-      console.log(
-        `%c[SignalR] ScreenShareStatusChanged: ${event.status}`,
-        "color: #ff9800; font-weight: bold",
-      );
+      console.log("[SignalR] ScreenShareStatusChanged");
       this.callbacks.onScreenShareStatusChanged?.(event);
     });
 
@@ -371,13 +342,13 @@ export class ProctorSignaling {
           );
         }
       } catch (e) {
-        console.error("[SignalR] Failed to rejoin room:", e);
+        console.error("[SignalR] Failed to rejoin room");
       }
       this.callbacks.onReconnected?.();
     });
 
     this.connection.onclose((error) => {
-      console.log("[SignalR] Disconnected:", error);
+      console.log("[SignalR] Disconnected");
       this.callbacks.onDisconnected?.(error);
     });
 
@@ -392,7 +363,6 @@ export class ProctorSignaling {
       console.error(
         `%c[SignalR] ❌ Failed to start connection!`,
         "color: red; font-weight: bold",
-        err,
       );
       throw err;
     }
@@ -406,14 +376,9 @@ export class ProctorSignaling {
   }
 
   private getBackendUrl(): string {
-    if (typeof window === "undefined") return "http://localhost:5221";
-    // In production, the backend runs on the same host or a configured URL
-    // Check for env variable first
     const envUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    if (envUrl) {
-      // Strip trailing /api or /api/ — SignalR hubs are at root path, not under /api
-      return envUrl.replace(/\/+$/, "").replace(/\/api\/?$/, "");
-    }
+    if (envUrl) return getBackendBaseUrl(envUrl);
+    if (typeof window === "undefined") return "http://localhost:5221";
     // Default: same origin (assumes reverse proxy) or localhost for dev
     if (
       window.location.hostname === "localhost" ||
@@ -433,9 +398,7 @@ export class ProctorSignaling {
   }
 
   async sendAnswer(sdp: string, targetConnectionId: string): Promise<void> {
-    console.log(
-      `[SignalR] Sending SDP answer to ${targetConnectionId} (${sdp.length} chars)`,
-    );
+    console.log("[SignalR] Sending SDP answer");
     await this.connection?.invoke(
       "SendAnswer",
       this.attemptId,
@@ -449,9 +412,7 @@ export class ProctorSignaling {
     candidate: string,
     targetConnectionId?: string,
   ): Promise<void> {
-    console.log(
-      `[SignalR] Sending ICE candidate (target=${targetConnectionId ?? "broadcast"})`,
-    );
+    console.log("[SignalR] Sending ICE candidate");
     await this.connection?.invoke(
       "SendIceCandidate",
       this.attemptId,

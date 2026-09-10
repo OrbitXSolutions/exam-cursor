@@ -13,10 +13,7 @@ using Smart_Core.Domain.Common;
 namespace Smart_Core.Infrastructure.Services.Background;
 
 /// <summary>
-/// Background service that runs every 30 seconds to:
-/// 1. Expire overdue attempts (timer ran out) with heartbeat-based ExpiryReason detection.
-/// 2. Force-expire attempts whose exam schedule window (EndAt) has passed (ExamWindowClosed).
-/// 3. Push SignalR events to affected candidates.
+/// Expires overdue attempts and closed exam windows every 30 seconds, then notifies candidates.
 /// </summary>
 public class AttemptExpiryBackgroundService : BackgroundService
 {
@@ -39,18 +36,28 @@ public class AttemptExpiryBackgroundService : BackgroundService
     {
         _logger.LogInformation("AttemptExpiryBackgroundService started.");
 
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await ProcessExpiredAttemptsAsync(stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in AttemptExpiryBackgroundService cycle.");
-            }
+                try
+                {
+                    await ProcessExpiredAttemptsAsync(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in AttemptExpiryBackgroundService cycle.");
+                }
 
-            await Task.Delay(_interval, stoppingToken);
+                await Task.Delay(_interval, stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
         }
     }
 
@@ -58,153 +65,156 @@ public class AttemptExpiryBackgroundService : BackgroundService
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await using var workerLock = await SqlServerWorkerLock.TryAcquireAsync(
+            db, "SmartCore:Worker:AttemptExpiry", ct);
+        if (workerLock == null)
+            return;
 
         var now = UaeTimeHelper.NowUae;
-
-        // ── 1) Timer-expired attempts (ExpiresAt < now) ────────────────────
-        var timerExpired = await db.Attempts
+        var activeAttempts = db.Attempts.AsNoTracking()
             .Where(a => !a.IsDeleted
                 && (a.Status == AttemptStatus.Started
                     || a.Status == AttemptStatus.InProgress
-                    || a.Status == AttemptStatus.Resumed)
-                && a.ExpiresAt.HasValue
-                && a.ExpiresAt.Value < now)
+                    || a.Status == AttemptStatus.Resumed));
+        var candidates = await activeAttempts
+            .Where(a => a.ExpiresAt.HasValue && a.ExpiresAt.Value < now)
+            .Select(a => a.Id)
+            .Union(activeAttempts
+                .Where(a => a.Exam.EndAt.HasValue && a.Exam.EndAt.Value < now
+                    && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
+                .Select(a => a.Id))
             .ToListAsync(ct);
 
-        foreach (var attempt in timerExpired)
+        var timerCount = 0;
+        var windowCount = 0;
+        foreach (var attemptId in candidates)
         {
-            attempt.Status = AttemptStatus.Expired;
-            attempt.UpdatedDate = now;
+            ct.ThrowIfCancellationRequested();
+            await workerLock.EnsureHeldAsync(ct);
+            var expired = await TryExpireAttemptAsync(db, attemptId, now, ct);
+            if (expired == null)
+                continue;
 
-            // Determine expiry reason based on heartbeat gap
-            var disconnectedThreshold = attempt.ExpiresAt!.Value.AddMinutes(-5);
-            if (attempt.LastActivityAt.HasValue && attempt.LastActivityAt.Value >= disconnectedThreshold)
-            {
-                attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
-            }
+            var windowClosed = expired.ExpiryReason == ExpiryReason.ExamWindowClosed;
+            if (windowClosed)
+                windowCount++;
             else
+                timerCount++;
+
+            // Auditing is awaited within its own live scope, after the expiry transaction commits.
+            try
             {
-                attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileDisconnected;
+                using var auditScope = _scopeFactory.CreateScope();
+                var auditService = auditScope.ServiceProvider.GetRequiredService<IAuditService>();
+                await auditService.LogSuccessAsync(
+                    windowClosed ? AuditActions.AttemptExamWindowClosed : AuditActions.AttemptExpired,
+                    "Attempt", attemptId.ToString(), actorId: "system",
+                    metadata: windowClosed
+                        ? (object)new { attemptId, examEndAt = expired.ExamEndAt }
+                        : new { attemptId, expiryReason = expired.ExpiryReason.ToString() });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to audit expiry for attempt {AttemptId}", attemptId);
             }
 
-            db.AttemptEvents.Add(new AttemptEvent
-            {
-                AttemptId = attempt.Id,
-                EventType = AttemptEventType.TimedOut,
-                OccurredAt = now,
-                MetadataJson = JsonSerializer.Serialize(new
-                {
-                    expiredAt = attempt.ExpiresAt,
-                    expiryReason = attempt.ExpiryReason.ToString(),
-                    source = "BackgroundService"
-                }),
-                CreatedDate = now,
-                CreatedBy = "system"
-            });
+            await PushExpiryNotification(
+                attemptId, windowClosed ? "ExamWindowClosed" : "TimerExpired",
+                expired.ExpiryReason.ToString(), ct);
         }
 
-        // ── 2) Exam-window-closed attempts (exam.EndAt < now) ──────────────
-        var windowClosed = await db.Attempts
-            .Include(a => a.Exam)
-            .Where(a => !a.IsDeleted
-                && (a.Status == AttemptStatus.Started
-                    || a.Status == AttemptStatus.InProgress
-                    || a.Status == AttemptStatus.Resumed)
-                && a.Exam.EndAt.HasValue
-                && a.Exam.EndAt.Value < now
-                // Exclude attempts already caught by timer expiry above
-                && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
-            .ToListAsync(ct);
-
-        foreach (var attempt in windowClosed)
+        if (timerCount + windowCount > 0)
         {
-            attempt.Status = AttemptStatus.Expired;
-            attempt.ExpiryReason = ExpiryReason.ExamWindowClosed;
-            attempt.UpdatedDate = now;
-
-            db.AttemptEvents.Add(new AttemptEvent
-            {
-                AttemptId = attempt.Id,
-                EventType = AttemptEventType.TimedOut,
-                OccurredAt = now,
-                MetadataJson = JsonSerializer.Serialize(new
-                {
-                    examEndAt = attempt.Exam.EndAt,
-                    expiryReason = ExpiryReason.ExamWindowClosed.ToString(),
-                    source = "BackgroundService"
-                }),
-                CreatedDate = now,
-                CreatedBy = "system"
-            });
-        }
-
-        // ── 3) Close proctor sessions for all newly expired attempts ───────
-        var allExpiredIds = timerExpired.Concat(windowClosed).Select(a => a.Id).ToList();
-
-        if (allExpiredIds.Count > 0)
-        {
-            var orphanSessions = await db.Set<ProctorSession>()
-                .Where(s => allExpiredIds.Contains(s.AttemptId) && s.Status == ProctorSessionStatus.Active)
-                .ToListAsync(ct);
-
-            foreach (var ps in orphanSessions)
-            {
-                ps.Status = ProctorSessionStatus.Completed;
-                ps.EndedAt = now;
-                ps.UpdatedDate = now;
-                ps.UpdatedBy = "system";
-            }
-
-            await db.SaveChangesAsync(ct);
-
-            // Audit log all expirations
-            var auditService = scope.ServiceProvider.GetRequiredService<IAuditService>();
-            foreach (var attempt in timerExpired)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await auditService.LogSuccessAsync(
-                            AuditActions.AttemptExpired, "Attempt", attempt.Id.ToString(),
-                            actorId: "system",
-                            metadata: new { attemptId = attempt.Id, expiryReason = attempt.ExpiryReason.ToString() });
-                    }
-                    catch { }
-                });
-            }
-            foreach (var attempt in windowClosed)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await auditService.LogSuccessAsync(
-                            AuditActions.AttemptExamWindowClosed, "Attempt", attempt.Id.ToString(),
-                            actorId: "system",
-                            metadata: new { attemptId = attempt.Id, examEndAt = attempt.Exam.EndAt });
-                    }
-                    catch { }
-                });
-            }
-
             _logger.LogInformation(
                 "AttemptExpiryBackgroundService: expired {TimerCount} timer-overdue + {WindowCount} window-closed attempts.",
-                timerExpired.Count, windowClosed.Count);
-
-            // ── 4) Push SignalR notifications to candidates ────────────────
-            foreach (var attempt in timerExpired)
-            {
-                _ = PushExpiryNotification(attempt.Id, "TimerExpired", attempt.ExpiryReason.ToString());
-            }
-            foreach (var attempt in windowClosed)
-            {
-                _ = PushExpiryNotification(attempt.Id, "ExamWindowClosed", ExpiryReason.ExamWindowClosed.ToString());
-            }
+                timerCount, windowCount);
         }
     }
 
-    private async Task PushExpiryNotification(int attemptId, string eventType, string reason)
+    private static async Task<ExpiredAttempt?> TryExpireAttemptAsync(
+        ApplicationDbContext db, int attemptId, DateTimeOffset now, CancellationToken ct)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        var activeAttempt = db.Attempts.Where(a => a.Id == attemptId && !a.IsDeleted
+            && (a.Status == AttemptStatus.Started
+                || a.Status == AttemptStatus.InProgress
+                || a.Status == AttemptStatus.Resumed));
+
+        // Recheck status and deadlines in the UPDATE, not on a stale tracked attempt.
+        var updated = await activeAttempt
+            .Where(a => a.ExpiresAt.HasValue && a.ExpiresAt.Value < now)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(a => a.Status, AttemptStatus.Expired)
+                .SetProperty(a => a.ExpiryReason, a =>
+                    a.LastActivityAt.HasValue && a.LastActivityAt.Value >= a.ExpiresAt!.Value.AddMinutes(-5)
+                        ? ExpiryReason.TimerExpiredWhileActive
+                        : ExpiryReason.TimerExpiredWhileDisconnected)
+                .SetProperty(a => a.UpdatedDate, now), ct);
+
+        if (updated == 0)
+        {
+            updated = await activeAttempt
+                .Where(a => a.Exam.EndAt.HasValue && a.Exam.EndAt.Value < now
+                    && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(a => a.Status, AttemptStatus.Expired)
+                    .SetProperty(a => a.ExpiryReason, ExpiryReason.ExamWindowClosed)
+                    .SetProperty(a => a.UpdatedDate, now), ct);
+        }
+
+        if (updated == 0)
+            return null;
+
+        var snapshot = await db.Attempts.AsNoTracking()
+            .Where(a => a.Id == attemptId)
+            .Select(a => new { a.ExamId, a.ExpiresAt, a.ExpiryReason })
+            .SingleAsync(ct);
+        var windowClosed = snapshot.ExpiryReason == ExpiryReason.ExamWindowClosed;
+        var examEndAt = windowClosed
+            ? await db.Exams.IgnoreQueryFilters().Where(e => e.Id == snapshot.ExamId)
+                .Select(e => e.EndAt).SingleAsync(ct)
+            : null;
+        var expired = new ExpiredAttempt(snapshot.ExpiresAt, examEndAt, snapshot.ExpiryReason);
+        var attemptEvent = new AttemptEvent
+        {
+            AttemptId = attemptId,
+            EventType = AttemptEventType.TimedOut,
+            OccurredAt = now,
+            MetadataJson = windowClosed
+                ? JsonSerializer.Serialize(new
+                {
+                    examEndAt = expired.ExamEndAt,
+                    expiryReason = expired.ExpiryReason.ToString(),
+                    source = "BackgroundService"
+                })
+                : JsonSerializer.Serialize(new
+                {
+                    expiredAt = expired.ExpiresAt,
+                    expiryReason = expired.ExpiryReason.ToString(),
+                    source = "BackgroundService"
+                }),
+            CreatedDate = now,
+            CreatedBy = "system"
+        };
+        db.AttemptEvents.Add(attemptEvent);
+
+        await db.Set<ProctorSession>()
+            .Where(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(s => s.Status, ProctorSessionStatus.Completed)
+                .SetProperty(s => s.EndedAt, now)
+                .SetProperty(s => s.UpdatedDate, now)
+                .SetProperty(s => s.UpdatedBy, "system"), ct);
+        await db.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        db.Entry(attemptEvent).State = EntityState.Detached;
+        return expired;
+    }
+
+    private sealed record ExpiredAttempt(
+        DateTimeOffset? ExpiresAt, DateTimeOffset? ExamEndAt, ExpiryReason ExpiryReason);
+
+    private async Task PushExpiryNotification(int attemptId, string eventType, string reason, CancellationToken ct)
     {
         try
         {
@@ -217,7 +227,11 @@ public class AttemptExpiryBackgroundService : BackgroundService
                 message = eventType == "ExamWindowClosed"
                     ? "The exam schedule window has closed. Your attempt has been ended."
                     : "Your exam time has expired."
-            });
+            }, ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {

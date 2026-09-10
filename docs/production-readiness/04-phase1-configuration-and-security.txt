@@ -1,3 +1,6 @@
+HISTORICAL BASELINE — see the resumed Phase 1 reports 06 and 07 in
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/ for current status.
+
 PHASE 1 — CONFIGURATION, CREDENTIALS AND SECURITY REVIEW
 Assessment date: 2026-09-10
 Status: PARTIALLY VERIFIED; remediation and deployment verification BLOCKED.

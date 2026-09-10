@@ -60,11 +60,10 @@ export default function ResultsPage() {
       setGradingPending(false)
 
       const data = await getMyResult(attemptId)
-      console.log("[v0] Result loaded:", data)
       setResult(data)
       pollCountRef.current = 0 // reset on success
     } catch (err) {
-      console.error("[v0] Error loading result:", err)
+      console.error("[v0] Error loading result")
 
       // If just submitted and result not ready, poll up to 6 times (30s total)
       if (justSubmitted && pollCountRef.current < 6) {

@@ -73,7 +73,7 @@ export class ScreenSharePublisher {
         });
       } catch (err: unknown) {
         const error = err as Error;
-        console.warn("[Screen Publisher] Screen share denied:", error.message);
+        console.warn("[Screen Publisher] Screen share denied");
         this.setStatus("denied");
         return false;
       }
@@ -122,7 +122,6 @@ export class ScreenSharePublisher {
           } catch (error) {
             console.error(
               "[Screen Publisher] Error setting remote description:",
-              error,
             );
           }
         },
@@ -135,7 +134,6 @@ export class ScreenSharePublisher {
           } catch (error) {
             console.error(
               "[Screen Publisher] Error adding ICE candidate:",
-              error,
             );
           }
         },
@@ -178,7 +176,7 @@ export class ScreenSharePublisher {
       );
       return true;
     } catch (error) {
-      console.error("[Screen Publisher] Start failed:", error);
+      console.error("[Screen Publisher] Start failed");
       this.setStatus("failed");
       this.callbacks.onError?.(error as Error);
       return false;
@@ -259,7 +257,7 @@ export class ScreenSharePublisher {
             this.proctorConnectionId ?? undefined,
           )
           .catch((e) =>
-            console.error("[Screen Publisher] Error sending ICE:", e),
+            console.error("[Screen Publisher] Error sending ICE"),
           );
       }
     };
@@ -308,7 +306,7 @@ export class ScreenSharePublisher {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[Screen Publisher] Error creating/sending offer:", error);
+      console.error("[Screen Publisher] Error creating/sending offer");
     }
   }
 
@@ -320,7 +318,7 @@ export class ScreenSharePublisher {
       await this.pc.setLocalDescription(offer);
       await this.signaling.sendScreenOffer(offer.sdp!);
     } catch (error) {
-      console.error("[Screen Publisher] ICE restart failed:", error);
+      console.error("[Screen Publisher] ICE restart failed");
       await this.resetPeerConnection();
     }
   }

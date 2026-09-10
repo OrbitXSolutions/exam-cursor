@@ -7,6 +7,7 @@ using Smart_Core.Domain.Entities.Notification;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Background;
 
 namespace Smart_Core.Infrastructure.Services.Notification;
 
@@ -14,31 +15,44 @@ public class NotificationBackgroundService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<NotificationBackgroundService> _logger;
+    private readonly IConfiguration _configuration;
 
     public NotificationBackgroundService(
         IServiceProvider serviceProvider,
-        ILogger<NotificationBackgroundService> logger)
+        ILogger<NotificationBackgroundService> logger,
+        IConfiguration configuration)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _configuration = configuration;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("NotificationBackgroundService started.");
 
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await ProcessPendingNotificationsAsync(stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in NotificationBackgroundService loop.");
-            }
+                try
+                {
+                    await ProcessPendingNotificationsAsync(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in NotificationBackgroundService loop.");
+                }
 
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
         }
 
         _logger.LogInformation("NotificationBackgroundService stopped.");
@@ -48,15 +62,20 @@ public class NotificationBackgroundService : BackgroundService
     {
         using var scope = _serviceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await using var workerLock = await SqlServerWorkerLock.TryAcquireAsync(
+            db, "SmartCore:Worker:Notifications", stoppingToken);
+        if (workerLock == null)
+            return;
+
         var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
         var smsService = scope.ServiceProvider.GetRequiredService<ISmsService>();
         var encryption = scope.ServiceProvider.GetRequiredService<IEncryptionService>();
 
         // Get notification settings for batch size
         var settings = await db.NotificationSettings.FirstOrDefaultAsync(stoppingToken);
-        var emailBatchSize = settings?.EmailBatchSize ?? 50;
-        var smsBatchSize = settings?.SmsBatchSize ?? 50;
-        var batchDelayMs = settings?.BatchDelayMs ?? 1000;
+        var emailBatchSize = Math.Clamp(settings?.EmailBatchSize ?? 50, 1, 500);
+        var smsBatchSize = Math.Clamp(settings?.SmsBatchSize ?? 50, 1, 500);
+        var batchDelayMs = Math.Clamp(settings?.BatchDelayMs ?? 1000, 0, 60000);
 
         // Process email notifications — group by EventType to load correct template per batch
         var pendingEmails = await db.NotificationLogs
@@ -74,7 +93,7 @@ public class NotificationBackgroundService : BackgroundService
             foreach (var group in emailGroups)
             {
                 _logger.LogInformation("Processing {Count} pending email notifications for event {EventType}.", group.Count(), group.Key);
-                await ProcessEmailBatchAsync(db, emailService, encryption, group.ToList(), stoppingToken);
+                await ProcessEmailBatchAsync(db, workerLock, emailService, encryption, group.ToList(), stoppingToken);
             }
             await Task.Delay(batchDelayMs, stoppingToken);
         }
@@ -90,13 +109,17 @@ public class NotificationBackgroundService : BackgroundService
 
         if (pendingSms.Count > 0)
         {
-            _logger.LogInformation("Processing {Count} pending SMS notifications.", pendingSms.Count);
-            await ProcessSmsBatchAsync(db, smsService, encryption, pendingSms, stoppingToken);
+            foreach (var group in pendingSms.GroupBy(l => l.EventType))
+            {
+                _logger.LogInformation("Processing {Count} pending SMS notifications for event {EventType}.", group.Count(), group.Key);
+                await ProcessSmsBatchAsync(db, workerLock, smsService, encryption, group.ToList(), stoppingToken);
+            }
         }
     }
 
     private async Task ProcessEmailBatchAsync(
         ApplicationDbContext db,
+        SqlServerWorkerLock workerLock,
         IEmailService emailService,
         IEncryptionService encryption,
         List<NotificationLog> logs,
@@ -127,14 +150,16 @@ public class NotificationBackgroundService : BackgroundService
         var supportEmail = orgSettings?.SupportEmail ?? systemSettings?.SupportEmail ?? "";
         var primaryColor = orgSettings?.PrimaryColor ?? systemSettings?.PrimaryColor ?? "#0d9488";
         var logoUrl = orgSettings?.LogoPath ?? systemSettings?.LogoUrl ?? "";
-        var loginUrl = notifSettings?.LoginUrl ?? "https://smartexam-sable.vercel.app/login";
+        var loginUrl = ResolveLoginUrl(notifSettings?.LoginUrl);
 
         // Build ExamURL from share links (batch lookup for efficiency)
         var examIds = logs.Where(l => l.ExamId.HasValue).Select(l => l.ExamId!.Value).Distinct().ToList();
         var shareLinks = await db.ExamShareLinks
             .Where(sl => examIds.Contains(sl.ExamId) && sl.IsActive)
             .ToListAsync(stoppingToken);
-        var shareLinkMap = shareLinks.ToDictionary(sl => sl.ExamId, sl => sl.ShareToken);
+        var shareLinkMap = shareLinks
+            .GroupBy(sl => sl.ExamId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(sl => sl.Id).First().ShareToken);
 
         // Base URL for public exam access (derive from loginUrl)
         var baseUrl = loginUrl.Contains("/login")
@@ -143,7 +168,9 @@ public class NotificationBackgroundService : BackgroundService
 
         foreach (var log in logs)
         {
-            if (stoppingToken.IsCancellationRequested) break;
+            using var logScope = BeginNotificationScope(log);
+            stoppingToken.ThrowIfCancellationRequested();
+            await workerLock.EnsureHeldAsync(stoppingToken);
 
             try
             {
@@ -181,20 +208,25 @@ public class NotificationBackgroundService : BackgroundService
                 log.SentAt = success ? UaeTimeHelper.NowUae : null;
                 log.UpdatedDate = UaeTimeHelper.NowUae;
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 log.Status = NotificationStatus.Failed;
-                log.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
+                log.ErrorMessage = "Email notification processing failed.";
                 log.UpdatedDate = UaeTimeHelper.NowUae;
                 _logger.LogError(ex, "Failed to process email notification {LogId}.", log.Id);
             }
-        }
 
-        await db.SaveChangesAsync(stoppingToken);
+            await SaveDeliveryResultAsync(db, workerLock);
+        }
     }
 
     private async Task ProcessSmsBatchAsync(
         ApplicationDbContext db,
+        SqlServerWorkerLock workerLock,
         ISmsService smsService,
         IEncryptionService encryption,
         List<NotificationLog> logs,
@@ -221,18 +253,21 @@ public class NotificationBackgroundService : BackgroundService
 
         foreach (var log in logs)
         {
-            if (stoppingToken.IsCancellationRequested) break;
+            using var logScope = BeginNotificationScope(log);
+            stoppingToken.ThrowIfCancellationRequested();
+            await workerLock.EnsureHeldAsync(stoppingToken);
+
+            if (string.IsNullOrWhiteSpace(log.RecipientPhone))
+            {
+                log.Status = NotificationStatus.Failed;
+                log.ErrorMessage = "No phone number available.";
+                log.UpdatedDate = UaeTimeHelper.NowUae;
+                await SaveDeliveryResultAsync(db, workerLock);
+                continue;
+            }
 
             try
             {
-                if (string.IsNullOrWhiteSpace(log.RecipientPhone))
-                {
-                    log.Status = NotificationStatus.Failed;
-                    log.ErrorMessage = "No phone number available.";
-                    log.UpdatedDate = UaeTimeHelper.NowUae;
-                    continue;
-                }
-
                 var candidate = log.Candidate;
                 var exam = log.Exam;
 
@@ -247,16 +282,50 @@ public class NotificationBackgroundService : BackgroundService
                 log.SentAt = success ? UaeTimeHelper.NowUae : null;
                 log.UpdatedDate = UaeTimeHelper.NowUae;
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 log.Status = NotificationStatus.Failed;
-                log.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
+                log.ErrorMessage = "SMS notification processing failed.";
                 log.UpdatedDate = UaeTimeHelper.NowUae;
                 _logger.LogError(ex, "Failed to process SMS notification {LogId}.", log.Id);
             }
-        }
 
-        await db.SaveChangesAsync(stoppingToken);
+            await SaveDeliveryResultAsync(db, workerLock);
+        }
+    }
+
+    private IDisposable? BeginNotificationScope(NotificationLog log) =>
+        _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["NotificationLogId"] = log.Id,
+            ["EventType"] = log.EventType.ToString(),
+            ["Channel"] = log.Channel.ToString()
+        });
+
+    private static async Task SaveDeliveryResultAsync(ApplicationDbContext db, SqlServerWorkerLock workerLock)
+    {
+        // Persist each completed delivery even during shutdown; never replay an entire completed batch.
+        // A crash between provider acceptance and this save can still result in duplicate delivery.
+        using var saveTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        await workerLock.EnsureHeldAsync(saveTimeout.Token);
+        await db.SaveChangesAsync(saveTimeout.Token);
+    }
+
+    private string ResolveLoginUrl(string? configuredLoginUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(configuredLoginUrl))
+            return configuredLoginUrl.Trim();
+
+        var baseUrl = _configuration["AppSettings:BaseUrl"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new InvalidOperationException(
+                "Notification login URL is not configured. Set NotificationSettings.LoginUrl or AppSettings:BaseUrl.");
+
+        return $"{baseUrl.Trim().TrimEnd('/')}/login";
     }
 
     private static string ReplacePlaceholders(

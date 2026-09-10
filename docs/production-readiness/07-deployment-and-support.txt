@@ -1,0 +1,153 @@
+ON-PREMISE DEPLOYMENT / SUPPORT HANDOFF — RESUMED PHASE 1
+Date: 2026-09-10
+Status: configuration contract documented; customer topology NOT VERIFIED.
+Do not deploy until the remaining acceptance checks in report 06 are satisfied.
+This supplements/corrects the historical deployment guide, not a delivery approval.
+
+CONFIGURATION TEMPLATES
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/appsettings.Production.example.json
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/appsettings.json
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/.env.example
+
+Copy the backend production example to appsettings.Production.json in the
+deployment directory and replace example.invalid/documentation addresses and
+shared paths. Supply real values securely; do not commit them. Standard ASP.NET
+configuration environment overrides use double underscores, e.g.
+ConnectionStrings__DefaultConnection, JwtSettings__SecretKey,
+EncryptionSettings__Key and DataProtection__CertificatePassword.
+JSON strings such as "${ENV_VAR}" are NOT automatically interpolated.
+Set ASPNETCORE_ENVIRONMENT=Production and use the runtime matching net9.0;
+the old guide's .NET 8 recommendation does not match this API target.
+
+Startup rejects missing connection/JWT/encryption values and placeholder/short
+keys, and validates allowed origins and multi-server prerequisites. Blank values
+in the checked-in template are deliberate. Generate new high-entropy deployment
+keys for a NEW environment using a secure generator. For an EXISTING database,
+preserve the exact encryption key and algorithm until a coordinated re-encryption
+procedure is performed: replacing it blindly breaks stored encrypted values.
+JWT changes invalidate existing tokens, so schedule rotation outside live exams.
+Revoke/rotate any SQL/SMTP credentials previously used from repository history;
+removal from the current file is not revocation or history erasure.
+
+SEED EXCEPTION
+SeedData methods and their AllowAnonymous behavior remain unchanged. SeedKey
+continues to be OPTIONAL as in the existing implementation: a blank SeedKey does
+not disable seeding or secure the anonymous endpoint. Configure it appropriately
+where supported by that existing method; not every seed route checks it.
+Do not assume this work hardens intentional demo/seed behavior. Restrict customer
+network access operationally and protect initial credentials through the existing
+handover process; do not alter SeedData business rules as a side effect.
+
+TWO APPLICATION NODES
+- Use the SAME SQL database, JWT values, encryption key, license/public verification
+  key, key-ring certificate/private key, and shared storage locations on both nodes.
+- Set Deployment:MultiServer=true on both. Startup requires a Redis connection,
+  nonempty SignalR channel prefix, shared absolute paths and a data-protection
+  certificate path. These checks validate configuration shape, not whether two
+  machines actually share the same mount. Customer IT must verify that explicitly.
+- Redis is used ONLY for SignalR scale-out. Application DTO caches are bypassed:
+  each node reads authoritative SQL using existing queries and authorizations.
+  This trades stale local reads for additional SQL load; measure before rollout.
+- Provision a supported on-premise Redis service with protected network access,
+  TLS/authentication as appropriate. Use the SAME SignalR:ChannelPrefix on both
+  nodes, UNIQUE to this deployment/database; do not mix unrelated customers.
+  Redis outages can interrupt real-time events; there is no durable backplane
+  delivery guarantee. Verify reconnect and fallback behavior.
+- Enable WebSockets and correct idle timeouts in the load balancer. SignalR
+  negotiation/transport may require client affinity even with a backplane; a
+  sticky connection is not a replacement for cross-node message distribution.
+- Preserve the public Host, terminate/re-encrypt TLS appropriately, and configure
+  ReverseProxy:KnownProxies with exact trusted immediate proxy IPs. Arbitrary
+  X-Forwarded-For is not trusted. The configured forwarding limit is one hop;
+  do not introduce extra proxy layers without verifying the trust chain.
+- Rate limits now partition authenticated requests by stable user ID, after JWT
+  authentication. Anonymous traffic partitions by trusted remote IP. These
+  limits remain PER NODE, not a distributed admission-control policy. NAT groups
+  share anonymous budgets. Tune from measured request rates, not guesswork.
+- All mutable filesystem paths must resolve to the same durable shares:
+  MediaStorage:Local:BasePath, Storage:OrganizationPath, Storage:IdentityPath,
+  Storage:TutorialsPath, License:Directory, and DataProtection:KeyRingPath.
+  Relative paths remain supported for single-node/development compatibility.
+  No existing files are moved automatically. Copy/verify existing data during a
+  controlled deployment, preserving stored relative paths before serving traffic.
+- Data-protection keys use the shared ring, fixed application name SmartExam,
+  and configured PFX certificate for encryption at rest. Protect the PFX file and
+  password; both nodes need its private key. Back up the ring and certificate.
+  Without the same ring/certificate, Identity-generated tokens may fail on B.
+- SQL background workers coordinate through session-owned sp_getapplock with
+  non-pooled, non-retrying connections. Provision appropriate SQL permissions
+  and test ownership release after worker/node loss. Session locking is not an
+  external email provider idempotency guarantee.
+
+FRONTEND
+Run a real Next.js server; this application has proxy route handlers and is not
+equivalent to a static export. Build with the documented public backend URL.
+BACKEND_URL is server-only; NEXT_PUBLIC_* values are public build-time values.
+Never put API/SMTP/SQL/Redis credentials in NEXT_PUBLIC_* or browser bundles.
+Verify API base versus origin using the example: server proxy uses /api while
+real-time/media connections use the backend origin. Configure exact backend
+Cors:AllowedOrigins; trailing path/slash/wildcard origins are not accepted.
+
+NETWORK / PROVIDERS
+Notification SMTP settings primarily come from the existing backend settings
+screen/database; appsettings SMTP is a fallback. Configure host, port, TLS,
+sender and credentials explicitly. NotificationSettings.LoginUrl or configured
+AppSettings:BaseUrl must point to the customer frontend, not a demonstration site.
+SMTP acceptance is not proof of final inbox delivery. SMS HTTP acceptance is not
+proof of handset delivery. SMTP/SMS timeouts are bounded/configurable.
+Configure OpenAI:Endpoint and ApiKey if AI features are used; model outputs and
+provider response bodies are not routine diagnostic payloads. Verify permitted
+egress and customer privacy policy before transmitting any exam/identity data.
+Configure Proctoring:StunServers for the customer network. Empty means LAN-only
+ICE candidates, not guaranteed routed/NAT traversal. TURN support/network design
+requires explicit validation; it has not been redesigned by this work.
+
+TECHNICAL LOGS
+Default technical files: each NODE'S deployment-local Logs/app-log-*.txt.
+Do NOT point two processes at the same rolling log file on a shared disk.
+The bounded asynchronous sink avoids blocking exam requests on file writes;
+queue saturation can lose diagnostics. File sink failures go to service stderr
+through Serilog SelfLog. Monitor stderr, file availability, disk capacity and
+queue-loss reports; logs are not an exactly-once journal.
+Daily/size rotation is configured at 50 MiB per file and 30 retained files
+(a count of files, NOT necessarily 30 days at high log volume).
+
+Database SystemLogs is a second, bounded metadata stream for existing support
+screens. It uses the existing migrated schema; deploy normal EF migrations
+through the established release procedure, never concurrent automatic migration
+on both nodes. The new service does not create or mutate exam tables at startup.
+Requests do not wait for its channel/database. Full queues/failed batches can
+drop metadata; file diagnostics and durable business audit records remain
+distinct. The retired Serilog Logs/ErrorLogs SQL sinks are not recreated.
+Existing old tables/data are not deleted by deployment; review their retention
+and sensitive contents with the data owner.
+
+Configure the SystemLogging section (not SystemLogs): Capacity,
+BatchSize, FlushIntervalSeconds, PersistenceTimeoutSeconds,
+FailureBackoffSeconds and RetentionDays (bounded ranges apply).
+Use metadata-only support screens restricted to SuperAdmin, plus OS-protected
+read-only technical files for support personnel. Do not broaden log access just
+to avoid an authorization error. Old payload columns are not exposed by the
+new metadata projections; database administrators still need appropriate controls.
+
+INCIDENT INVESTIGATION
+1. Obtain time/time-zone, user/exam/attempt identifiers, operation, frontend
+   message/status and generated X-Trace-Id / error trace identifier, not passwords.
+2. Search both nodes' technical files and SystemLogs using the trace/user/action.
+   File entries contain node/environment identity; background provider logs include
+   available notification/job identifiers. Follow safe exception types, codes and
+   stack locations, not raw request/response payloads.
+3. Check matching durable attempt/audit/notification rows to distinguish a
+   committed operation, queued work, provider acceptance, or client disconnect.
+4. If file/DB diagnostics are missing, inspect queue drops, SQL connectivity,
+   sink stderr and retention before assuming the operation never happened.
+5. Share sanitized excerpts only. Browser/backend full dumps can contain legacy
+   diagnostics; this change is not permission to collect customer exam answers,
+   identity images, credentials, keys, or raw browser storage.
+
+CUSTOMER ACCEPTANCE STILL REQUIRED
+Test two-node cache reads, SignalR peers deliberately split across nodes, shared
+upload/download/retention, key-ring token validation across nodes, license renewal,
+node failure/rejoin, log/SQL/disk outages, notification delivery, and at least
+50 realistic camera-enabled concurrent exam sessions. Use report 06's evidence
+matrix; successful compilation is not production-load or failover certification.

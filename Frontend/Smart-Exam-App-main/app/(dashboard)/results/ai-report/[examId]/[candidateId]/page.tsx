@@ -398,7 +398,7 @@ export default function AIReportPage() {
           setError(language === "ar" ? "لا توجد بيانات مراقبة" : "No proctoring data found")
         }
       } catch (err) {
-        console.error("Failed to load AI report:", err)
+        console.error("Failed to load AI report")
         setError(language === "ar" ? "فشل في تحميل التقرير" : "Failed to load report")
       } finally {
         setLoading(false)
@@ -417,7 +417,7 @@ export default function AIReportPage() {
       setAttemptEvents(evts)
       return evts
     } catch (err) {
-      console.warn("Failed to load attempt events:", err)
+      console.warn("Failed to load attempt events")
       setAttemptEvents([])
       return []
     }
@@ -428,7 +428,7 @@ export default function AIReportPage() {
       const res = await apiClient.get<unknown>(`/Proctor/session/${sessionId}/evidence`)
       setEvidence(normalizeList<ProctorEvidence>(res))
     } catch (err) {
-      console.warn("Failed to load evidence:", err)
+      console.warn("Failed to load evidence")
       setEvidence([])
     }
   }

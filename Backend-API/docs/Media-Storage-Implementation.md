@@ -139,6 +139,43 @@ Smart_Core/
 }
 ```
 
+### Shared filesystem paths
+
+All local paths are resolved once by `StoragePaths`. Relative configuration values
+are relative to the application's content root, not the process working directory.
+Uploads, reads, deletion/retention, and static serving use the same resolved paths.
+
+| Configuration key | Default relative to content root |
+| --- | --- |
+| `MediaStorage:Local:BasePath` | `MediaStorage` |
+| `Storage:OrganizationPath` | `wwwroot/Organization` |
+| `Storage:IdentityPath` | `wwwroot/candidateIDs` |
+| `Storage:TutorialsPath` | `wwwroot/tutorials` |
+| `License:Directory` | `License` |
+
+Use absolute paths on a shared mounted filesystem when running multiple API
+instances; configure every instance consistently and grant the application the
+required read/write permissions. `License:Directory` contains both `license.json`
+and `public.pem`. Environment variables use double underscores, for example
+`MediaStorage__Local__BasePath` and `Storage__IdentityPath`.
+
+Each license-service instance checks `license.json` and `public.pem` existence,
+last-write UTC timestamp, and length on access. A visible metadata change reloads
+that instance's cache on the next request; the existing 24-hour refresh remains
+for time-based license state changes. This does not use filesystem watchers.
+
+Changing a path does **not** copy or migrate existing data. Arrange the mount or
+copy existing files during a controlled deployment before changing configuration.
+Public URL prefixes remain `/media`, `/organization`, `/candidateIDs`, and
+`/tutorials`; video chunks must be read through the role-protected
+`/api/Proctor/video-chunks` endpoints, not `/media/video-chunks`.
+
+Identity photos accept JPEG, PNG, or WebP; organization logos accept JPEG or PNG,
+and favicons additionally accept ICO. Upload validation requires a matching
+extension, MIME type, and image signature and uses a server-selected extension.
+SVG and HTML are not accepted. Signature checks are a minimum file-type check,
+not image decoding or malware scanning.
+
 ### File Organization
 
 Files are automatically organized by:

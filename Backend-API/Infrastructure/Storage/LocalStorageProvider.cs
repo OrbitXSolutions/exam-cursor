@@ -18,15 +18,12 @@ public class LocalStorageProvider : IStorageProvider
     public LocalStorageProvider(
         IOptions<MediaStorageSettings> settings,
     ILogger<LocalStorageProvider> logger,
-        IWebHostEnvironment environment)
+        StoragePaths storagePaths)
     {
         _settings = settings.Value.Local;
         _logger = logger;
 
-        // Resolve base path - if relative, combine with content root
-        _basePath = Path.IsPathRooted(_settings.BasePath)
-            ? _settings.BasePath
-            : Path.Combine(environment.ContentRootPath, _settings.BasePath);
+        _basePath = storagePaths.MediaPath;
 
         // Ensure base directory exists
         EnsureDirectoryExists(_basePath);
@@ -45,7 +42,7 @@ Stream stream,
             EnsureDirectoryExists(directoryPath);
 
             // Full file path
-            var filePath = Path.Combine(directoryPath, fileName);
+            var filePath = StoragePaths.ResolveRelativePath(directoryPath, fileName);
 
             // Write file to disk
             await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
@@ -72,7 +69,7 @@ Stream stream,
     {
         try
         {
-            var fullPath = Path.Combine(_basePath, path.Replace("/", Path.DirectorySeparatorChar.ToString()));
+            var fullPath = StoragePaths.ResolveRelativePath(_basePath, path);
 
             if (!File.Exists(fullPath))
             {
@@ -99,7 +96,7 @@ Stream stream,
     {
         try
         {
-            var fullPath = Path.Combine(_basePath, path.Replace("/", Path.DirectorySeparatorChar.ToString()));
+            var fullPath = StoragePaths.ResolveRelativePath(_basePath, path);
 
             if (File.Exists(fullPath))
             {
@@ -120,7 +117,7 @@ Stream stream,
 
     public Task<bool> ExistsAsync(string path)
     {
-        var fullPath = Path.Combine(_basePath, path.Replace("/", Path.DirectorySeparatorChar.ToString()));
+        var fullPath = StoragePaths.ResolveRelativePath(_basePath, path);
         return Task.FromResult(File.Exists(fullPath));
     }
 
@@ -131,7 +128,7 @@ Stream stream,
 
         if (!string.IsNullOrWhiteSpace(folder))
         {
-            return Path.Combine(_basePath, folder, yearMonth);
+            return StoragePaths.ResolveRelativePath(_basePath, $"{folder}/{yearMonth}");
         }
 
         return Path.Combine(_basePath, yearMonth);

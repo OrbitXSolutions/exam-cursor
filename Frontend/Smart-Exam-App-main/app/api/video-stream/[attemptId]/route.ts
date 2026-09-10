@@ -1,9 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:5221/api";
+import { backendApiUrl as BACKEND_URL } from "@/lib/server/backend-config";
 
 /**
  * Dedicated video-stream proxy that supports token via query param.
@@ -69,7 +65,7 @@ export async function GET(
       headers,
     });
   } catch (error) {
-    console.error(`[VideoStream Proxy Error]`, error);
+    console.error("[VideoStream Proxy] Request failed");
     return NextResponse.json(
       { error: "Failed to stream video" },
       { status: 500 },

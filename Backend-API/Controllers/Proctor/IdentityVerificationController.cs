@@ -6,6 +6,7 @@ using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -16,16 +17,16 @@ public class IdentityVerificationController : ControllerBase
 {
     private readonly IIdentityVerificationService _service;
     private readonly ICurrentUserService _currentUserService;
-    private readonly IWebHostEnvironment _env;
+    private readonly StoragePaths _storagePaths;
 
     public IdentityVerificationController(
         IIdentityVerificationService service,
         ICurrentUserService currentUserService,
-        IWebHostEnvironment env)
+        StoragePaths storagePaths)
     {
         _service = service;
         _currentUserService = currentUserService;
-        _env = env;
+        _storagePaths = storagePaths;
     }
 
     /// <summary>
@@ -80,7 +81,7 @@ public class IdentityVerificationController : ControllerBase
 
     /// <summary>
     /// Submit identity verification (selfie + Emirates ID photo + info).
-    /// Candidate-only. Files saved to wwwroot/candidateIDs/{candidateId}/
+    /// Candidate-only. Files saved under the configured identity storage directory.
     /// </summary>
     [HttpPost("submit")]
     [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Candidate}")]
@@ -102,19 +103,20 @@ public class IdentityVerificationController : ControllerBase
         if (idPhoto == null || idPhoto.Length == 0)
             return BadRequest(ApiResponse<string>.FailureResponse("ID photo is required."));
 
-        var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
-        if (!allowedTypes.Contains(selfiePhoto.ContentType))
-            return BadRequest(ApiResponse<string>.FailureResponse("Selfie must be JPEG, PNG, or WebP."));
-        if (!allowedTypes.Contains(idPhoto.ContentType))
-            return BadRequest(ApiResponse<string>.FailureResponse("ID photo must be JPEG, PNG, or WebP."));
+        var selfieExt = await ImageUploadValidator.GetSafeExtensionAsync(selfiePhoto, allowWebP: true,
+            cancellationToken: HttpContext.RequestAborted);
+        if (selfieExt == null)
+            return BadRequest(ApiResponse<string>.FailureResponse("Selfie must be a JPEG, PNG, or WebP image with a matching file extension and content type."));
+        var idExt = await ImageUploadValidator.GetSafeExtensionAsync(idPhoto, allowWebP: true,
+            cancellationToken: HttpContext.RequestAborted);
+        if (idExt == null)
+            return BadRequest(ApiResponse<string>.FailureResponse("ID photo must be a JPEG, PNG, or WebP image with a matching file extension and content type."));
 
         // Create candidate folder
-        var candidateDir = Path.Combine(_env.ContentRootPath, "wwwroot", "candidateIDs", candidateId);
+        var candidateDir = StoragePaths.ResolveRelativePath(_storagePaths.IdentityPath, candidateId);
         Directory.CreateDirectory(candidateDir);
 
-        var timestamp = UaeTimeHelper.NowUae.ToString("yyyyMMdd_HHmmss");
-        var selfieExt = Path.GetExtension(selfiePhoto.FileName);
-        var idExt = Path.GetExtension(idPhoto.FileName);
+        var timestamp = $"{UaeTimeHelper.NowUae:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}";
 
         var selfieFileName = $"selfie_{timestamp}{selfieExt}";
         var idFileName = $"id_{timestamp}{idExt}";
@@ -123,11 +125,11 @@ public class IdentityVerificationController : ControllerBase
         var idPath = Path.Combine(candidateDir, idFileName);
 
         // Save files
-        await using (var stream = new FileStream(selfiePath, FileMode.Create))
-            await selfiePhoto.CopyToAsync(stream);
+        await using (var stream = new FileStream(selfiePath, FileMode.CreateNew))
+            await selfiePhoto.CopyToAsync(stream, HttpContext.RequestAborted);
 
-        await using (var stream = new FileStream(idPath, FileMode.Create))
-            await idPhoto.CopyToAsync(stream);
+        await using (var stream = new FileStream(idPath, FileMode.CreateNew))
+            await idPhoto.CopyToAsync(stream, HttpContext.RequestAborted);
 
         // Relative paths for DB storage
         var selfieRelative = $"candidateIDs/{candidateId}/{selfieFileName}";

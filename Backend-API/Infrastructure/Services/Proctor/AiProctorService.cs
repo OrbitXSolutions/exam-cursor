@@ -969,7 +969,7 @@ public class AiProctorService : IAiProctorService
         HttpResponseMessage response;
         try
         {
-            response = await client.PostAsync("https://api.openai.com/v1/chat/completions", content);
+            response = await client.PostAsync(_openAiSettings.Endpoint, content);
         }
         catch (TaskCanceledException)
         {
@@ -984,8 +984,7 @@ public class AiProctorService : IAiProctorService
 
         if (!response.IsSuccessStatusCode)
         {
-            var errorBody = await response.Content.ReadAsStringAsync();
-            _logger.LogWarning("OpenAI API error for proctor analysis: {StatusCode} - {Body}", response.StatusCode, errorBody);
+            _logger.LogWarning("OpenAI proctor analysis rejected. HTTP status: {StatusCode}", response.StatusCode);
 
             var errorMessage = response.StatusCode switch
             {
@@ -1017,7 +1016,7 @@ public class AiProctorService : IAiProctorService
         }
         catch (JsonException ex)
         {
-            _logger.LogWarning(ex, "Failed to parse OpenAI proctor analysis response: {Content}", messageContent);
+            _logger.LogWarning(ex, "Failed to parse OpenAI proctor analysis response");
 
             // Attempt graceful fallback: try to extract from possible markdown wrapper
             var cleaned = messageContent.Trim();

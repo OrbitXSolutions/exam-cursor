@@ -302,7 +302,7 @@ export default function SessionDetailPage() {
       })
 
       viewerRef.current = viewer
-      viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal):", e))
+      viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal)"))
 
       // Screen share viewer (only if exam has screen monitoring enabled)
       if (cfg.enableScreenMonitoring) {
@@ -329,10 +329,10 @@ export default function SessionDetailPage() {
           },
         })
         screenViewerRef.current = screenViewer
-        screenViewer.connect().catch((e) => console.error("[ProctorPage] Screen viewer connect failed (non-fatal):", e))
+        screenViewer.connect().catch((e) => console.error("[ProctorPage] Screen viewer connect failed (non-fatal)"))
       }
     }).catch((e) => {
-      console.warn("[ProctorPage] Video config fetch failed (non-fatal):", e)
+      console.warn("[ProctorPage] Video config fetch failed (non-fatal)")
     })
 
     return () => {

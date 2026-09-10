@@ -151,7 +151,7 @@ export async function getIncidents(params?: {
       totalCount: raw?.totalCount ?? 0,
     };
   } catch (err) {
-    console.warn("[Proctor] getIncidents failed:", err);
+    console.warn("[Proctor] getIncidents failed");
     return { items: [], totalCount: 0 };
   }
 }
@@ -198,7 +198,7 @@ export async function getLiveSessions(
     return items.map(mapToLiveSession);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("[Proctor] getLiveSessions failed:", msg, err);
+    console.error("[Proctor] getLiveSessions failed");
     throw err; // let caller show toast instead of silently returning []
   }
 }
@@ -240,7 +240,7 @@ export async function getTriageRecommendations(
     }
     return [];
   } catch (err) {
-    console.warn("[Proctor] getTriageRecommendations failed:", err);
+    console.warn("[Proctor] getTriageRecommendations failed");
     return [];
   }
 }
@@ -782,7 +782,6 @@ export async function uploadProctorSnapshot(
       lastError = err?.message ?? String(err);
       console.warn(
         `[Proctor] Snapshot upload attempt ${attempt + 1}/${maxRetries + 1} failed:`,
-        lastError,
       );
       if (attempt < maxRetries) {
         await new Promise((r) => setTimeout(r, retryDelayMs));
@@ -837,7 +836,7 @@ export async function getIdentityVerifications(params?: {
       }
     );
   } catch (err) {
-    console.warn("[Proctor] getIdentityVerifications failed:", err);
+    console.warn("[Proctor] getIdentityVerifications failed");
     return {
       items: [],
       totalCount: 0,
@@ -860,7 +859,7 @@ export async function getIdentityVerificationDetail(
       `/proctor/authentication/verifications/${id}`,
     );
   } catch (err) {
-    console.warn("[Proctor] getIdentityVerificationDetail failed:", err);
+    console.warn("[Proctor] getIdentityVerificationDetail failed");
     return null;
   }
 }
@@ -1147,7 +1146,7 @@ export async function getIncidentCase(
     );
     return res ?? null;
   } catch (err) {
-    console.warn("[Incident] getIncidentCase failed:", err);
+    console.warn("[Incident] getIncidentCase failed");
     return null;
   }
 }

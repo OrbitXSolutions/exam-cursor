@@ -1,9 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:5221/api";
+import { backendApiUrl as BACKEND_URL } from "@/lib/server/backend-config";
 
 /**
  * Proxy for video chunk list.
@@ -35,7 +31,7 @@ export async function GET(
     const data = await response.json().catch(() => ({}));
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error(`[VideoChunks Proxy Error]`, error);
+    console.error("[VideoChunks Proxy] Request failed");
     return NextResponse.json(
       { error: "Failed to fetch video chunks" },
       { status: 500 },

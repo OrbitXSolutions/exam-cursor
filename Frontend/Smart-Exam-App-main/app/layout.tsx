@@ -1,12 +1,8 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Providers } from "./providers"
-
-const geist = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: {
@@ -33,7 +29,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Build4IT", url: "https://www.build4it.com" }],
   creator: "Build4IT",
   publisher: "Build4IT",
-  metadataBase: new URL("https://app.smartexam.io"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"),
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -107,7 +103,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <body className={`${geist.className} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <Providers>{children}</Providers>
         <Analytics />
       </body>

@@ -169,10 +169,9 @@ export default function ExamInstructionsPage() {
 
       // Single API call to get exam preview with eligibility
       const preview = await getExamPreview(examId)
-      console.log("[v0] Loaded exam preview:", preview)
       setExamPreview(preview)
     } catch (error) {
-      console.log("[v0] API error, using mock data:", error)
+      console.log("[v0] API error, using mock data")
       // Fallback to mock data
       setExamPreview({ ...MOCK_EXAM_PREVIEW, examId })
     } finally {
@@ -230,7 +229,7 @@ export default function ExamInstructionsPage() {
           operatingSystem: os.trim(),
           screenResolution: `${screen.width}x${screen.height}`,
         })
-      } catch (e) { console.warn("[v0] Device info collection failed:", e) }
+      } catch (e) { console.warn("[v0] Device info collection failed") }
       
       // Request fullscreen before navigating to exam page (only if required)
       if (examPreview?.accessPolicy.requireFullscreen) {
@@ -250,7 +249,7 @@ export default function ExamInstructionsPage() {
             await docEl.msRequestFullscreen()
           }
         } catch (fsError) {
-          console.log("[v0] Fullscreen request failed:", fsError)
+          console.log("[v0] Fullscreen request failed")
           // Continue even if fullscreen fails - exam page will try again
         }
       }
@@ -258,7 +257,7 @@ export default function ExamInstructionsPage() {
       // Redirect to exam taking page with attemptId
       router.push(`/take-exam/${session.attemptId}`)
     } catch (error: unknown) {
-      console.error("[v0] Error starting exam:", error)
+      console.error("[v0] Error starting exam")
       const errorMessage =
         error instanceof Error
           ? translateServerMessage(error.message, language)

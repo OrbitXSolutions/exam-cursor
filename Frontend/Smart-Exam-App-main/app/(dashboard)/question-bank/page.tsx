@@ -111,7 +111,7 @@ export default function QuestionBankPage() {
         }
       })
       .catch((err) => {
-        console.error("Error fetching questions:", err)
+        console.error("Error fetching questions")
         if (!cancelled) {
           setError(
             err instanceof Error && err.message

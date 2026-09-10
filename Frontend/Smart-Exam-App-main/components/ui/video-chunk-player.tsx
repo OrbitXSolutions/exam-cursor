@@ -264,7 +264,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
 
             resolve(true)
           } catch (err: unknown) {
-            if (!aborted) console.error("[MSE] Unexpected error with codec", codec, err)
+            if (!aborted) console.error("[MSE] Unexpected error with codec", codec)
             resolve(false)
           }
         }, { once: true })

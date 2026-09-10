@@ -1,15 +1,14 @@
-using System.Diagnostics;
-using System.Net;
-using System.Security.Claims;
 using System.Text.Json;
 using FluentValidation;
-using Serilog.Context;
 using Smart_Core.Application.DTOs.Common;
+using Smart_Core.Infrastructure.Services.Logs;
 
 namespace Smart_Core.Infrastructure.Middleware;
 
 public class GlobalExceptionMiddleware
 {
+    internal static readonly object ExceptionKey = new();
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
@@ -25,91 +24,57 @@ public class GlobalExceptionMiddleware
         {
             await _next(context);
         }
-        catch (Exception ex)
+        catch (Exception exception) when (context.RequestAborted.IsCancellationRequested &&
+                                          exception is OperationCanceledException or IOException)
         {
-            await HandleExceptionAsync(context, ex);
+            if (!context.Response.HasStarted) context.Response.StatusCode = 499;
         }
-    }
-
-    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
-        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        using var _1 = LogContext.PushProperty("ExceptionMessage", exception.Message);
-        using var _2 = LogContext.PushProperty("ExceptionType", exception.GetType().FullName ?? "Unknown");
-        using var _3 = LogContext.PushProperty("InnerException", exception.InnerException?.Message ?? (object?)null);
-        using var _4 = LogContext.PushProperty("Endpoint", $"{context.Request.Method} {context.Request.Path}");
-        using var _5 = LogContext.PushProperty("RequestId", traceId);
-        using var _6 = LogContext.PushProperty("UserId", userId ?? (object?)null);
-
-        // Share exception with RequestResponseLoggingMiddleware (outer) so it appears in Developer log
-        context.Items["UnhandledException"] = exception;
-
-        _logger.LogError(exception,
-            "Unhandled exception | TraceId={TraceId} | Path={Path} | Method={Method} | Message={Message}",
-            traceId, context.Request.Path, context.Request.Method, exception.Message);
-
-        context.Response.ContentType = "application/json";
-
-        var response = exception switch
+        catch (Exception exception)
         {
-            ValidationException validationException => HandleValidationException(context, validationException),
-            UnauthorizedAccessException => HandleUnauthorizedAccessException(context),
-            KeyNotFoundException => HandleNotFoundException(context, exception),
-            ArgumentException argumentException => HandleArgumentException(context, argumentException),
-            _ => HandleGenericException(context, exception)
-        };
+            context.Items[ExceptionKey] = exception;
+            var traceId = SafeLogMetadata.TraceId(context);
+            // Passing the Exception object to a sink would disclose its message/inner exception/data.
+            _logger.LogError(
+                "Request failed. TraceId={TraceId} Method={Method} Path={Path} UserId={UserId} ExceptionType={ExceptionType} Stack={Stack}",
+                traceId, SafeLogMetadata.Method(context), SafeLogMetadata.Path(context),
+                SafeLogMetadata.UserId(context), SafeLogMetadata.ExceptionType(exception), SafeLogMetadata.Stack(exception));
 
-        // Attach traceId to every error response
-        response.TraceId = traceId;
+            if (context.RequestAborted.IsCancellationRequested) return;
+            if (context.Response.HasStarted)
+            {
+                context.Abort();
+                return;
+            }
 
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
-    }
-
-    private ApiResponse<object> HandleValidationException(HttpContext context, ValidationException exception)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-        return ApiResponse<object>.FailureResponse(
-            "Validation failed.",
-            exception.Errors.Select(e => e.ErrorMessage).ToList());
-    }
-
-    private ApiResponse<object> HandleUnauthorizedAccessException(HttpContext context)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-        return ApiResponse<object>.FailureResponse("Unauthorized access.");
-    }
-
-    private ApiResponse<object> HandleNotFoundException(HttpContext context, Exception exception)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-        return ApiResponse<object>.FailureResponse(exception.Message);
-    }
-
-    private ApiResponse<object> HandleArgumentException(HttpContext context, ArgumentException exception)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-        return ApiResponse<object>.FailureResponse(exception.Message);
-    }
-
-    private ApiResponse<object> HandleGenericException(HttpContext context, Exception exception)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-        return ApiResponse<object>.FailureResponse(
-            "An internal server error occurred. Please try again later.");
+            context.Response.Clear();
+            context.Response.StatusCode = SafeLogMetadata.ExceptionStatus(exception);
+            context.Response.ContentType = "application/json";
+            var response = exception switch
+            {
+                ValidationException validation => ApiResponse<object>.FailureResponse(
+                    "Validation failed.", validation.Errors.Select(e => e.ErrorMessage).ToList()),
+                UnauthorizedAccessException => ApiResponse<object>.FailureResponse("Unauthorized access."),
+                KeyNotFoundException => ApiResponse<object>.FailureResponse(exception.Message),
+                ArgumentException => ApiResponse<object>.FailureResponse(exception.Message),
+                BadHttpRequestException => ApiResponse<object>.FailureResponse("Invalid request."),
+                _ => ApiResponse<object>.FailureResponse("An internal server error occurred. Please try again later.")
+            };
+            response.TraceId = traceId;
+            try
+            {
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response, JsonOptions), context.RequestAborted);
+            }
+            catch (Exception writeException) when (writeException is OperationCanceledException or IOException)
+            {
+                // The client may disconnect after the initial cancellation/HasStarted checks.
+                context.Abort();
+            }
+        }
     }
 }
 
 public static class GlobalExceptionMiddlewareExtensions
 {
-    public static IApplicationBuilder UseGlobalExceptionMiddleware(this IApplicationBuilder app)
-    {
-        return app.UseMiddleware<GlobalExceptionMiddleware>();
-    }
+    public static IApplicationBuilder UseGlobalExceptionMiddleware(this IApplicationBuilder app) =>
+        app.UseMiddleware<GlobalExceptionMiddleware>();
 }

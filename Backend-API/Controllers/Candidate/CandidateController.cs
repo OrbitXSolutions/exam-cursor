@@ -154,7 +154,7 @@ public class CandidateController : ControllerBase
             return Unauthorized();
         }
 
-        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var traceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier;
         var result = await _candidateService.SubmitAttemptAsync(attemptId, candidateId);
 
         if (!result.Success)

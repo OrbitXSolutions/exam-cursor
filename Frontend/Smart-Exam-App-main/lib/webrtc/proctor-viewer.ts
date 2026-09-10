@@ -72,9 +72,7 @@ export class ProctorViewer {
     try {
       // Load STUN config from server
       const config = await getVideoConfig();
-      console.log("[WebRTC Viewer] Video config:", JSON.stringify(config));
       _rtcConfig = buildRtcConfig(config);
-      console.log("[WebRTC Viewer] RTC config:", JSON.stringify(_rtcConfig));
 
       this.signaling = new ProctorSignaling(this.attemptId, "proctor", {
         onPeerJoined: (event) => {
@@ -101,7 +99,6 @@ export class ProctorViewer {
                   .catch((e) =>
                     console.warn(
                       "[WebRTC Viewer] renegotiation request failed:",
-                      e,
                     ),
                   );
               }
@@ -131,7 +128,7 @@ export class ProctorViewer {
               this.pendingIceCandidates.push(event.candidate);
             }
           } catch (error) {
-            console.error("[WebRTC Viewer] Error adding ICE candidate:", error);
+            console.error("[WebRTC Viewer] Error adding ICE candidate");
           }
         },
         onConnectionStatusChanged: (event) => {
@@ -153,7 +150,7 @@ export class ProctorViewer {
           try {
             await this.signaling?.requestRenegotiation();
           } catch (e) {
-            console.error("[WebRTC Viewer] Renegotiation request failed:", e);
+            console.error("[WebRTC Viewer] Renegotiation request failed");
           }
         },
         onDisconnected: () => {
@@ -178,20 +175,14 @@ export class ProctorViewer {
           this.callbacks.onExamSubmitted?.(event.attemptId);
         },
         onTerminationReceived: (event) => {
-          console.log(
-            `%c[WebRTC Viewer] ExamTerminated for attempt ${event.attemptId}: "${event.reason}"`,
-            "color: #f44336; font-weight: bold",
-          );
+          console.log("[WebRTC Viewer] ExamTerminated");
           this.callbacks.onExamTerminated?.({
             attemptId: event.attemptId,
             reason: event.reason,
           });
         },
         onAttemptExpired: (event) => {
-          console.log(
-            `%c[WebRTC Viewer] AttemptExpired: reason=${event.reason}`,
-            "color: #f44336; font-weight: bold",
-          );
+          console.log("[WebRTC Viewer] AttemptExpired");
           this.callbacks.onAttemptExpired?.(event);
         },
       });
@@ -204,7 +195,7 @@ export class ProctorViewer {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[WebRTC Viewer] Connect failed:", error);
+      console.error("[WebRTC Viewer] Connect failed");
       this.setStatus("offline");
       if (!this.disposed) {
         this.attemptReconnect();
@@ -233,15 +224,12 @@ export class ProctorViewer {
     // ICE candidate handling
     this.pc.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log(
-          `[WebRTC Viewer] Local ICE candidate: ${event.candidate.candidate.substring(0, 60)}...`,
-        );
         this.signaling
           ?.sendIceCandidate(
             JSON.stringify(event.candidate.toJSON()),
             this.candidateConnectionId ?? undefined,
           )
-          .catch((e) => console.error("[WebRTC Viewer] Error sending ICE:", e));
+          .catch((e) => console.error("[WebRTC Viewer] Error sending ICE"));
       }
     };
 
@@ -322,7 +310,6 @@ export class ProctorViewer {
         } catch (e) {
           console.error(
             "[WebRTC Viewer] Error adding queued ICE candidate:",
-            e,
           );
         }
       }
@@ -343,7 +330,7 @@ export class ProctorViewer {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[WebRTC Viewer] Error handling offer:", error);
+      console.error("[WebRTC Viewer] Error handling offer");
     }
   }
 
@@ -353,7 +340,7 @@ export class ProctorViewer {
       console.log("[WebRTC Viewer] Requesting renegotiation...");
       await this.signaling.requestRenegotiation();
     } catch (error) {
-      console.error("[WebRTC Viewer] Renegotiation request failed:", error);
+      console.error("[WebRTC Viewer] Renegotiation request failed");
     }
   }
 
@@ -381,7 +368,7 @@ export class ProctorViewer {
       await this.signaling?.disconnect();
       await this.connect();
     } catch (error) {
-      console.error("[WebRTC Viewer] Reconnect failed:", error);
+      console.error("[WebRTC Viewer] Reconnect failed");
       this.attemptReconnect();
     }
   }

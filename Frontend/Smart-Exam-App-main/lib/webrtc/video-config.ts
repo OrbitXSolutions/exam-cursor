@@ -53,13 +53,9 @@ export async function getVideoConfig(): Promise<VideoConfig> {
         enableScreenMonitoring: data?.enableScreenMonitoring ?? false,
         stunServers: Array.isArray(data?.stunServers) ? data.stunServers : [],
       };
-      console.log(
-        `%c[VideoConfig] ✅ Fetched config: enableLiveVideo=${cachedConfig.enableLiveVideo}, enableVideoRecording=${cachedConfig.enableVideoRecording}, stunServers=${JSON.stringify(cachedConfig.stunServers)}`,
-        "color: #2196f3; font-weight: bold",
-      );
       return cachedConfig;
     } catch (e) {
-      console.warn("[VideoConfig] Fetch error, using defaults (disabled):", e);
+      console.warn("[VideoConfig] Fetch error, using defaults (disabled)");
       cachedConfig = DEFAULT_CONFIG;
       return DEFAULT_CONFIG;
     } finally {

@@ -67,7 +67,7 @@ export default function ScoreCardPage() {
         }
         setSession(data)
       } catch (err) {
-        console.error("Failed to load score card:", err)
+        console.error("Failed to load score card")
         setError(language === "ar" ? "فشل في تحميل كشف الدرجات" : "Failed to load score card")
       } finally {
         setLoading(false)

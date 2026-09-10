@@ -124,11 +124,11 @@ export default function CertificatePage() {
             }
           }
         } catch (err) {
-          console.error("Failed to load result:", err)
+          console.error("Failed to load result")
           setResult(null)
         }
       } catch (err) {
-        console.error("Failed to load certificate:", err)
+        console.error("Failed to load certificate")
         setError(language === "ar" ? "فشل في تحميل الشهادة" : "Failed to load certificate")
       } finally {
         setLoading(false)

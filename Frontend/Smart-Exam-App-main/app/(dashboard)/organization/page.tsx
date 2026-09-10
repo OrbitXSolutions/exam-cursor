@@ -211,11 +211,11 @@ export default function OrganizationPage() {
                         )}
                         {language === "ar" ? "رفع شعار" : "Upload Logo"}
                       </Button>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, SVG. Max 5MB</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG. Max 5MB</p>
                       <input
                         ref={logoInputRef}
                         type="file"
-                        accept=".png,.jpg,.jpeg,.svg"
+                        accept=".png,.jpg,.jpeg"
                         className="hidden"
                         onChange={handleLogoUpload}
                       />
@@ -251,11 +251,11 @@ export default function OrganizationPage() {
                         )}
                         {language === "ar" ? "رفع أيقونة" : "Upload Favicon"}
                       </Button>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, SVG, ICO. Max 5MB</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, ICO. Max 5MB</p>
                       <input
                         ref={faviconInputRef}
                         type="file"
-                        accept=".png,.jpg,.jpeg,.svg,.ico"
+                        accept=".png,.jpg,.jpeg,.ico"
                         className="hidden"
                         onChange={handleFaviconUpload}
                       />

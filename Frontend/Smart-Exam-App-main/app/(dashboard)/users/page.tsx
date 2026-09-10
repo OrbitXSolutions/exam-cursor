@@ -133,7 +133,7 @@ export default function UsersPage() {
       setTotalCount(res.totalCount)
       setTotalPages(res.totalPages)
     } catch (e) {
-      console.error("Failed to load users", e)
+      console.error("Failed to load users")
       toast.error(localizeText("Failed to load users", "فشل تحميل المستخدمين", language))
       setUsers([])
     } finally {

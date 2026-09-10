@@ -1,9 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { backendApiUrl as BACKEND_URL } from "@/lib/server/backend-config";
+import { getCorrelationId, logRequest } from "@/lib/safe-logging";
 
-const BACKEND_URL =
-  process.env.BACKEND_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:5221/api";
+async function fetchBackend(url: string, options: RequestInit): Promise<Response> {
+  const startedAt = Date.now();
+  try {
+    const response = await fetch(url, options);
+    logRequest("Proxy", options.method || "GET", url, startedAt, response.status, getCorrelationId(response.headers));
+    return response;
+  } catch (error) {
+    logRequest("Proxy", options.method || "GET", url, startedAt, undefined, undefined, true);
+    throw error;
+  }
+}
+
+function supportHeaders(response: Response): Record<string, string> {
+  const headers: Record<string, string> = {};
+  const correlationId = getCorrelationId(response.headers);
+  if (correlationId) headers["X-Trace-Id"] = correlationId;
+  const licenseState = response.headers.get("X-License-State");
+  if (licenseState) headers["X-License-State"] = licenseState;
+  const retryAfter = response.headers.get("Retry-After");
+  if (retryAfter) headers["Retry-After"] = retryAfter;
+  return headers;
+}
 
 export async function GET(
   request: NextRequest,
@@ -13,11 +33,9 @@ export async function GET(
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
 
-  console.log(`[Proxy GET] ${url}`);
-
   try {
     const token = request.headers.get("authorization");
-    const response = await fetch(url, {
+    const response = await fetchBackend(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -27,19 +45,19 @@ export async function GET(
 
     const contentType = response.headers.get("content-type") || "";
     if (
-      contentType.includes("text/html") ||
-      contentType.includes("application/pdf")
+      contentType.includes("text/html")
     ) {
       const text = await response.text();
       return new NextResponse(text, {
         status: response.status,
-        headers: { "Content-Type": contentType },
+        headers: { ...supportHeaders(response), "Content-Type": contentType },
       });
     }
 
     // Binary file downloads (Excel, zip, etc.)
     if (
       contentType.includes("application/vnd.openxmlformats") ||
+      contentType.includes("application/pdf") ||
       contentType.includes("application/octet-stream") ||
       contentType.includes("application/zip") ||
       contentType.includes("image/") ||
@@ -50,6 +68,7 @@ export async function GET(
       return new NextResponse(buffer, {
         status: response.status,
         headers: {
+          ...supportHeaders(response),
           "Content-Type": contentType,
           ...(disposition && { "Content-Disposition": disposition }),
         },
@@ -58,18 +77,13 @@ export async function GET(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status });
+      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
     }
 
     const data = await response.json().catch(() => ({}));
-    console.log(`[Proxy GET Response] ${url}`, {
-      status: response.status,
-      data,
-    });
-
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
   } catch (error) {
-    console.error(`[Proxy GET Error] ${url}`, error);
+    console.error("[Proxy GET] Request failed");
     return NextResponse.json(
       {
         success: false,
@@ -90,8 +104,6 @@ export async function POST(
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
 
-  console.log(`[Proxy POST] ${url}`);
-
   try {
     const contentType = request.headers.get("content-type") || "";
     const isMultipart = contentType.includes("multipart/form-data");
@@ -109,11 +121,11 @@ export async function POST(
       body = JSON.stringify(await request.json().catch(() => ({})));
     }
 
-    const response = await fetch(url, { method: "POST", headers, body });
+    const response = await fetchBackend(url, { method: "POST", headers, body });
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status });
+      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
     }
 
     const responseText = await response.text();
@@ -131,9 +143,9 @@ export async function POST(
         errors: [],
       };
     }
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
   } catch (error) {
-    console.error(`[Proxy POST Error] ${url}`, error);
+    console.error("[Proxy POST] Request failed");
     return NextResponse.json(
       {
         success: false,
@@ -154,13 +166,11 @@ export async function PUT(
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
 
-  console.log(`[Proxy PUT] ${url}`);
-
   try {
     const token = request.headers.get("authorization");
     const body = await request.json().catch(() => ({}));
 
-    const response = await fetch(url, {
+    const response = await fetchBackend(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -171,18 +181,13 @@ export async function PUT(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status });
+      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
     }
 
     const data = await response.json().catch(() => ({}));
-    console.log(`[Proxy PUT Response] ${url}`, {
-      status: response.status,
-      data,
-    });
-
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
   } catch (error) {
-    console.error(`[Proxy PUT Error] ${url}`, error);
+    console.error("[Proxy PUT] Request failed");
     return NextResponse.json(
       {
         success: false,
@@ -203,13 +208,11 @@ export async function PATCH(
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
 
-  console.log(`[Proxy PATCH] ${url}`);
-
   try {
     const token = request.headers.get("authorization");
     const body = await request.json().catch(() => ({}));
 
-    const response = await fetch(url, {
+    const response = await fetchBackend(url, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -220,18 +223,13 @@ export async function PATCH(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status });
+      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
     }
 
     const data = await response.json().catch(() => ({}));
-    console.log(`[Proxy PATCH Response] ${url}`, {
-      status: response.status,
-      data,
-    });
-
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
   } catch (error) {
-    console.error(`[Proxy PATCH Error] ${url}`, error);
+    console.error("[Proxy PATCH] Request failed");
     return NextResponse.json(
       {
         success: false,
@@ -252,12 +250,10 @@ export async function DELETE(
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/${path.join("/")}${searchParams ? `?${searchParams}` : ""}`;
 
-  console.log(`[Proxy DELETE] ${url}`);
-
   try {
     const token = request.headers.get("authorization");
 
-    const response = await fetch(url, {
+    const response = await fetchBackend(url, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -267,18 +263,13 @@ export async function DELETE(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status });
+      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
     }
 
     const data = await response.json().catch(() => ({}));
-    console.log(`[Proxy DELETE Response] ${url}`, {
-      status: response.status,
-      data,
-    });
-
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
   } catch (error) {
-    console.error(`[Proxy DELETE Error] ${url}`, error);
+    console.error("[Proxy DELETE] Request failed");
     return NextResponse.json(
       {
         success: false,

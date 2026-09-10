@@ -185,7 +185,7 @@ public class ExamOperationsService : IExamOperationsService
     public async Task<ApiResponse<AllowNewAttemptResultDto>> AllowNewAttemptAsync(
         AllowNewAttemptDto dto, string adminUserId)
     {
-        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
 
         if (string.IsNullOrWhiteSpace(dto.CandidateId))
             return ApiResponse<AllowNewAttemptResultDto>.FailureResponse("CandidateId is required.");
@@ -295,7 +295,7 @@ public class ExamOperationsService : IExamOperationsService
     public async Task<ApiResponse<OperationAddTimeResultDto>> AddTimeAsync(
         OperationAddTimeDto dto, string adminUserId)
     {
-        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
 
         if (dto.AttemptId <= 0)
             return ApiResponse<OperationAddTimeResultDto>.FailureResponse("AttemptId is required.");
@@ -392,7 +392,7 @@ public class ExamOperationsService : IExamOperationsService
     public async Task<ApiResponse<TerminateAttemptResultDto>> TerminateAttemptAsync(
         TerminateAttemptDto dto, string adminUserId)
     {
-        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
 
         if (dto.AttemptId <= 0)
             return ApiResponse<TerminateAttemptResultDto>.FailureResponse("AttemptId is required.");
@@ -489,7 +489,7 @@ public class ExamOperationsService : IExamOperationsService
     public async Task<ApiResponse<ResumeAttemptOperationResultDto>> ResumeAttemptAsync(
         ResumeAttemptOperationDto dto, string adminUserId)
     {
-        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
 
         if (dto.AttemptId <= 0)
             return ApiResponse<ResumeAttemptOperationResultDto>.FailureResponse("AttemptId is required.");

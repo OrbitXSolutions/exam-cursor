@@ -1,3 +1,7 @@
+HISTORICAL BASELINE — superseded by the resumed Phase 1 reports 06 and 07 in
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/
+The original source is unavailable; the authorized replacement is being delivered.
+
 ON-PREMISE READINESS — PHASE 1 SYSTEM REVIEW AND CHECKPOINT
 Assessment date: 2026-09-10
 Baseline commit: 630cee0

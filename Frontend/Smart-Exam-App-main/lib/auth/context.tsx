@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { apiClient } from "@/lib/api-client"
 import { useI18n } from "@/lib/i18n/context"
 import { translateServerMessage } from "@/lib/i18n/runtime"
+import { getCorrelationId, logRequest } from "@/lib/safe-logging"
 import type { User, UserRole } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -96,6 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
+    const startedAt = Date.now()
+    let status: number | undefined
+    let correlationId: string | undefined
+    let failed = false
 
     try {
       const response = await fetch("/api/proxy/Auth/login", {
@@ -105,10 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         body: JSON.stringify({ email, password }),
       })
+      status = response.status
+      correlationId = getCorrelationId(response.headers)
 
       const result: LoginApiResponse = await response.json()
-
-      console.log("[Auth] Login response:", result)
 
       if (result.success && result.data) {
         const mappedUser: User = {
@@ -126,7 +131,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("user", JSON.stringify(mappedUser))
         localStorage.setItem("refreshToken", result.data.refreshToken)
 
-        console.log("[Auth] Login successful, token stored")
         toast.success(t("auth.loginSuccess"))
         setIsLoading(false)
         return true
@@ -136,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const errorMsg = result.errors?.join(", ") || result.message || "Login failed"
       throw new Error(translateServerMessage(errorMsg, language))
     } catch (error) {
-      console.error("[Auth] Login error:", error)
+      failed = true
       toast.error(
         error instanceof Error
           ? translateServerMessage(error.message, language)
@@ -144,6 +148,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       )
       setIsLoading(false)
       return false
+    } finally {
+      logRequest("Auth", "POST", "/api/proxy/Auth/login", startedAt, status, correlationId, failed)
     }
   }
 

@@ -309,7 +309,7 @@ export default function ExamPage() {
           }
         }
       } catch (error) {
-        console.log("[v0] Fullscreen request failed:", error)
+        console.log("[v0] Fullscreen request failed")
       }
     }
     
@@ -377,7 +377,7 @@ export default function ExamPage() {
             }
           }
         } catch (error) {
-          console.log("[v0] Fullscreen request failed:", error)
+          console.log("[v0] Fullscreen request failed")
         }
       }
 
@@ -601,7 +601,7 @@ export default function ExamPage() {
         console.log("[Proctor] Webcam stream initialized successfully")
         return true
       } catch (error: any) {
-        console.warn("[Proctor] Could not initialize webcam:", error)
+        console.warn("[Proctor] Could not initialize webcam")
         const msg = error?.message ?? String(error)
         setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
         setWebcamError(msg)
@@ -693,7 +693,7 @@ export default function ExamPage() {
           }).catch(() => {})
         }
       } catch (error) {
-        console.warn("[Proctor] Snapshot capture failed:", error)
+        console.warn("[Proctor] Snapshot capture failed")
       }
     }
 
@@ -710,7 +710,6 @@ export default function ExamPage() {
         if (webcamStreamRef.current && session?.attemptId) {
           console.log(`%c[ExamPage] Fetching video config for attempt ${session.attemptId}...`, 'color: #2196f3; font-weight: bold')
           getVideoConfig().then((cfg) => {
-            console.log(`%c[ExamPage] Video config received: enableLiveVideo=${cfg.enableLiveVideo}, enableVideoRecording=${cfg.enableVideoRecording}, stunServers=${JSON.stringify(cfg.stunServers)}`, 'color: #2196f3; font-weight: bold')
             if (!isActive || !webcamStreamRef.current || !session?.attemptId) {
               console.warn('[ExamPage] Skipping video init: isActive=', isActive, 'stream=', !!webcamStreamRef.current, 'attemptId=', session?.attemptId)
               return
@@ -732,7 +731,7 @@ export default function ExamPage() {
                     setSignalRConnected(connected)
                   },
                   onTerminationReceived: (reason) => {
-                    console.log(`[SmartPoll] Termination received via SignalR: "${reason}"`)
+                    console.log("[SmartPoll] Termination received via SignalR")
                     stopAllBackgroundActivity()
                     toast.error(
                       translateCandidateMessage(reason) ?? t("exam.terminatedByProctor"),
@@ -764,7 +763,7 @@ export default function ExamPage() {
                     )
                   },
                   onAttemptExpired: (event) => {
-                    console.log(`[SmartPoll] Attempt expired via SignalR: type=${event.eventType}, reason=${event.reason}`)
+                    console.log("[SmartPoll] Attempt expired via SignalR")
                     stopAllBackgroundActivity()
                     const message = event.eventType === "ExamWindowClosed"
                       ? t("exam.examWindowClosed")
@@ -774,11 +773,11 @@ export default function ExamPage() {
                   },
                 })
                 publisher.start(webcamStreamRef.current).catch((err) => {
-                  console.warn("[Proctor] WebRTC publisher failed to start (non-fatal):", err)
+                  console.warn("[Proctor] WebRTC publisher failed to start (non-fatal)")
                 })
                 publisherRef.current = publisher
               } catch (err) {
-                console.warn("[Proctor] WebRTC publisher init failed (non-fatal):", err)
+                console.warn("[Proctor] WebRTC publisher init failed (non-fatal)")
               }
             } else {
               console.warn('[ExamPage] enableLiveVideo=false, skipping WebRTC publisher')
@@ -793,16 +792,16 @@ export default function ExamPage() {
                     console.log(`[Proctor] Chunk ${idx} uploaded`)
                   },
                   onChunkFailed: (idx, err) => {
-                    console.warn(`[Proctor] Chunk ${idx} failed: ${err}`)
+                    console.warn(`[Proctor] Chunk ${idx} failed`)
                   },
                   onError: (err) => {
-                    console.error("[Proctor] ChunkRecorder error (non-fatal):", err)
+                    console.error("[Proctor] ChunkRecorder error (non-fatal)")
                   },
                 })
                 recorder.start(webcamStreamRef.current!)
                 chunkRecorderRef.current = recorder
               } catch (err) {
-                console.warn("[Proctor] ChunkRecorder init failed (non-fatal):", err)
+                console.warn("[Proctor] ChunkRecorder init failed (non-fatal)")
               }
             }
 
@@ -821,7 +820,7 @@ export default function ExamPage() {
 
                 const monitor = new SmartMonitoring({
                   onViolation: (event) => {
-                    console.log(`%c[SmartMonitoring] ðŸš¨ Violation: ${event.type} â€” ${event.message}`, 'color: #f44336; font-weight: bold')
+                    console.log("[SmartMonitoring] Violation detected")
 
                     // Play a single soft alert beep (not the aggressive 3-beep used for proctor warnings)
                     try {
@@ -879,7 +878,7 @@ export default function ExamPage() {
                 })
                 smartMonitoringRef.current = monitor
               } catch (err) {
-                console.warn("[SmartMonitoring] Init failed (non-fatal):", err)
+                console.warn("[SmartMonitoring] Init failed (non-fatal)")
               }
             } else if (!cfg.enableSmartMonitoring) {
               console.log('[ExamPage] enableSmartMonitoring=false, skipping AI detection')
@@ -896,7 +895,7 @@ export default function ExamPage() {
               autoStartScreenShare()
             }
           }).catch((err) => {
-            console.warn("[Proctor] Video config fetch failed (non-fatal):", err)
+            console.warn("[Proctor] Video config fetch failed (non-fatal)")
           })
         }
       }
@@ -1052,7 +1051,7 @@ export default function ExamPage() {
       // which only polls when SignalR is disconnected (signalRConnected === false).
 
     } catch (error: unknown) {
-      console.error("[v0] Failed to start exam:", error)
+      console.error("[v0] Failed to start exam")
       // Extract error message from API response
       let errorMessage = t("common.error")
       if (error instanceof Error) {
@@ -1124,7 +1123,7 @@ export default function ExamPage() {
           saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
 
         } catch (error) {
-          console.error("[v0] Failed to save answer:", error)
+          console.error("[v0] Failed to save answer")
           setSaveStatus("error")
           if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
           saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 5000)
@@ -1224,7 +1223,7 @@ export default function ExamPage() {
         logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareTrackEnded }).catch(() => {})
       },
       onError: (error) => {
-        console.warn("[ExamPage] Screen share error:", error.message)
+        console.warn("[ExamPage] Screen share error")
       },
     })
     screenSharePublisherRef.current = publisher
@@ -1432,7 +1431,7 @@ export default function ExamPage() {
         try {
           await chunkRecorderRef.current.stop()
         } catch (e) {
-          console.warn("[Proctor] ChunkRecorder stop failed:", e)
+          console.warn("[Proctor] ChunkRecorder stop failed")
         }
         chunkRecorderRef.current = null
       }
@@ -1443,7 +1442,7 @@ export default function ExamPage() {
           await publisherRef.current.signalingConnection.notifyExamSubmitted()
           console.log('[ExamPage] Proctor notified of exam submission via SignalR')
         } catch (e) {
-          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal):', e)
+          console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal)')
         }
       }
 
@@ -1464,10 +1463,10 @@ export default function ExamPage() {
           }).then(() => {
             console.log("[Proctor] Video finalize request sent (202 accepted)")
           }).catch((e) => {
-            console.warn("[Proctor] Video finalize request failed (non-fatal):", e)
+            console.warn("[Proctor] Video finalize request failed (non-fatal)")
           })
         } catch (e) {
-          console.warn("[Proctor] Video finalize setup failed (non-fatal):", e)
+          console.warn("[Proctor] Video finalize setup failed (non-fatal)")
         }
       }
 
@@ -1483,7 +1482,7 @@ export default function ExamPage() {
         router.push("/my-exams")
       }
     } catch (error: unknown) {
-      console.error("[v0] Failed to submit exam:", error)
+      console.error("[v0] Failed to submit exam")
       // Show meaningful error with traceId reference if available
       const errMsg = error instanceof Error ? error.message : ""
       if (errMsg && errMsg !== "An error occurred") {
@@ -2735,6 +2734,5 @@ function QuestionCard({
     </Card>
   )
 }
-
 
 

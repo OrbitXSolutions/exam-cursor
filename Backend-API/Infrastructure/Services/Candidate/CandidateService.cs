@@ -536,7 +536,7 @@ public class CandidateService : ICandidateService
 
         // Validate schedule (Flexible vs Fixed)
         var now = UaeTimeHelper.NowUae;
-        var traceId = Activity.Current?.Id ?? Guid.NewGuid().ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
 
         if (!exam.StartAt.HasValue && !exam.EndAt.HasValue)
         {

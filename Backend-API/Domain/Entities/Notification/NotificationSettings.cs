@@ -34,5 +34,5 @@ public class NotificationSettings : BaseEntity
     public int BatchDelayMs { get; set; } = 1000;
 
     // Frontend login URL for email links
-    public string LoginUrl { get; set; } = "https://smartexam-sable.vercel.app/login";
+    public string LoginUrl { get; set; } = string.Empty;
 }

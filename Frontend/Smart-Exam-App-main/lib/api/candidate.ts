@@ -530,7 +530,6 @@ export async function getCandidateDashboard(): Promise<CandidateDashboard> {
   const response = await apiClient.get<CandidateDashboard>(
     "/Candidate/dashboard",
   );
-  console.log("[v0] Dashboard loaded:", response);
   return response;
 }
 
@@ -553,7 +552,6 @@ export async function getDashboard(): Promise<CandidateDashboard> {
 export async function getExamJourney(): Promise<ExamJourney> {
   console.log("[v0] Fetching exam journey...");
   const response = await apiClient.get<ExamJourney>("/Candidate/journey");
-  console.log("[v0] Journey loaded:", response);
   return response;
 }
 
@@ -584,7 +582,6 @@ export async function getExamPreview(examId: number): Promise<ExamPreview> {
   const response = await apiClient.get<ExamPreview>(
     `/Candidate/exams/${examId}/preview`,
   );
-  console.log("[v0] Exam preview loaded:", response);
   return response;
 }
 
@@ -643,7 +640,6 @@ export async function saveAnswers(
     `/Candidate/attempts/${attemptId}/answers`,
     request,
   );
-  console.log("[v0] Answers saved:", response);
   return response;
 }
 
@@ -660,7 +656,6 @@ export async function submitAttempt(attemptId: number): Promise<SubmitResult> {
     `/Candidate/attempts/${attemptId}/submit`,
     {},
   );
-  console.log("[v0] Attempt submitted:", response);
   return response;
 }
 
@@ -676,7 +671,6 @@ export async function getMyResult(attemptId: number): Promise<CandidateResult> {
   const response = await apiClient.get<CandidateResult>(
     `/Candidate/results/my-result/${attemptId}`,
   );
-  console.log("[v0] Result loaded:", response);
   return response;
 }
 
@@ -708,7 +702,7 @@ export async function getMyResults(): Promise<CandidateResultDto[]> {
     console.log("[v0] Results loaded:", items?.length ?? 0);
     return Array.isArray(items) ? items : [];
   } catch (err) {
-    console.warn("[v0] getMyResults failed:", err);
+    console.warn("[v0] getMyResults failed");
     return [];
   }
 }
@@ -770,7 +764,7 @@ export async function logAttemptEvent(
     });
     return true;
   } catch (err) {
-    console.warn("[v0] Failed to log attempt event:", err);
+    console.warn("[v0] Failed to log attempt event");
     return false;
   }
 }

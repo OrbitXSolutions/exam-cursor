@@ -82,7 +82,7 @@ export class ScreenShareViewer {
               this.pendingIceCandidates.push(event.candidate);
             }
           } catch (error) {
-            console.error("[Screen Viewer] Error adding ICE candidate:", error);
+            console.error("[Screen Viewer] Error adding ICE candidate");
           }
         },
         onScreenShareStatusChanged: (event) => {
@@ -118,7 +118,7 @@ export class ScreenShareViewer {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[Screen Viewer] Connect failed:", error);
+      console.error("[Screen Viewer] Connect failed");
       this.setStatus("offline");
       if (!this.disposed) {
         this.attemptReconnect();
@@ -153,7 +153,7 @@ export class ScreenShareViewer {
             JSON.stringify(event.candidate.toJSON()),
             this.candidateConnectionId ?? undefined,
           )
-          .catch((e) => console.error("[Screen Viewer] Error sending ICE:", e));
+          .catch((e) => console.error("[Screen Viewer] Error sending ICE"));
       }
     };
 
@@ -205,7 +205,6 @@ export class ScreenShareViewer {
         } catch (e) {
           console.error(
             "[Screen Viewer] Error adding queued ICE candidate:",
-            e,
           );
         }
       }
@@ -219,7 +218,7 @@ export class ScreenShareViewer {
         "color: #4caf50; font-weight: bold",
       );
     } catch (error) {
-      console.error("[Screen Viewer] Error handling screen offer:", error);
+      console.error("[Screen Viewer] Error handling screen offer");
     }
   }
 

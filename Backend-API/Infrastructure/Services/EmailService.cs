@@ -51,12 +51,12 @@ public class EmailService : IEmailService
         // Fallback to appsettings
         var smtpSettings = _configuration.GetSection("SmtpSettings");
         return (
-            smtpSettings["Host"] ?? "smtp.gmail.com",
+            smtpSettings["Host"] ?? "",
             int.Parse(smtpSettings["Port"] ?? "587"),
             smtpSettings["Username"] ?? "",
             smtpSettings["Password"] ?? "",
-            smtpSettings["FromEmail"] ?? "noreply@smartcore.com",
-            smtpSettings["FromName"] ?? "Smart Core",
+            smtpSettings["FromEmail"] ?? "",
+            smtpSettings["FromName"] ?? "",
             bool.Parse(smtpSettings["EnableSsl"] ?? "true")
         );
     }
@@ -89,14 +89,15 @@ public class EmailService : IEmailService
             };
             message.To.Add(to);
 
-            await client.SendMailAsync(message);
-            _logger.LogInformation("Test email sent successfully to {Recipient}", to);
+            using var timeout = CreateDeliveryTimeout();
+            await client.SendMailAsync(message, timeout.Token);
+            _logger.LogInformation("Test email accepted by SMTP server");
             return (true, null);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send test email to {Recipient}", to);
-            return (false, ex.Message);
+            _logger.LogError(ex, "Test email delivery failed");
+            return (false, $"SMTP delivery failed ({ex.GetType().Name}). See technical logs for the request trace.");
         }
     }
 
@@ -127,16 +128,20 @@ public class EmailService : IEmailService
                 message.To.Add(recipient);
             }
 
-            await client.SendMailAsync(message);
-            _logger.LogInformation("Email sent successfully to {Recipients}", string.Join(", ", to));
+            using var timeout = CreateDeliveryTimeout();
+            await client.SendMailAsync(message, timeout.Token);
+            _logger.LogInformation("Email accepted by SMTP server for {RecipientCount} recipients", to.Count);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send email to {Recipients}", string.Join(", ", to));
+            _logger.LogError(ex, "Email delivery failed for {RecipientCount} recipients", to.Count);
             return false;
         }
     }
+
+    private CancellationTokenSource CreateDeliveryTimeout() =>
+        new(TimeSpan.FromSeconds(Math.Clamp(_configuration.GetValue<int>("SmtpSettings:TimeoutSeconds", 30), 1, 120)));
 
     public async Task<bool> SendPasswordResetEmailAsync(string to, string resetLink)
     {

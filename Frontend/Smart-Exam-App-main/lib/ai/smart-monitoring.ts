@@ -196,7 +196,6 @@ export class SmartMonitoring {
     } catch (err) {
       console.warn(
         "[SmartMonitoring] Failed to load FaceLandmarker (non-fatal):",
-        err,
       );
       return false;
     }

@@ -132,9 +132,6 @@ export default function ExamConfigurationPage() {
         getAccessPolicy(id),
       ])
       
-      console.log("[v0] Configuration page - exam data:", examData)
-      console.log("[v0] Configuration page - instructions:", instructionsData)
-      console.log("[v0] Configuration page - access policy:", policyData)
       
       setExam(examData)
       setInstructions(instructionsData.sort((a, b) => a.order - b.order))
@@ -177,7 +174,7 @@ export default function ExamConfigurationPage() {
         }
       }
     } catch (error) {
-      console.log("[v0] Configuration page - error:", error)
+      console.log("[v0] Configuration page - error")
       toast.error(error instanceof Error ? error.message : t("common.error"))
     } finally {
       setLoading(false)
@@ -352,7 +349,6 @@ export default function ExamConfigurationPage() {
         screenShareGracePeriod: formData.screenShareGracePeriod,
       }
       
-      console.log("[v0] Saving exam settings (full payload):", updatePayload)
       await updateExam(id, updatePayload)
       toast.success(t("common.saved"))
       showResult("success", t("common.saved"))
@@ -360,7 +356,7 @@ export default function ExamConfigurationPage() {
       // Update local exam state with new values
       setExam(prev => prev ? { ...prev, ...formData } : null)
     } catch (error) {
-      console.log("[v0] Save settings error:", error)
+      console.log("[v0] Save settings error")
       const msg = error instanceof Error ? error.message : t("common.error")
       toast.error(msg)
       showResult("error", msg)
@@ -398,14 +394,12 @@ export default function ExamConfigurationPage() {
       
       if (editingInstruction) {
         // Update existing
-        console.log("[v0] Updating instruction:", editingInstruction.id, instructionForm)
         await updateInstruction(editingInstruction.id, instructionForm)
         toast.success(t("common.saved"))
         showResult("success", t("common.saved"))
       } else {
         // Create new
         const newOrder = instructions.length + 1
-        console.log("[v0] Creating instruction:", { ...instructionForm, order: newOrder })
         await createInstruction(id, { ...instructionForm, order: newOrder })
         toast.success(t("common.added"))
         showResult("success", t("common.added"))
@@ -416,7 +410,7 @@ export default function ExamConfigurationPage() {
       setInstructions(updatedInstructions.sort((a, b) => a.order - b.order))
       setInstructionDialogOpen(false)
     } catch (error) {
-      console.log("[v0] Save instruction error:", error)
+      console.log("[v0] Save instruction error")
       const msg = error instanceof Error ? error.message : t("common.error")
       toast.error(msg)
       showResult("error", msg)
@@ -437,7 +431,7 @@ export default function ExamConfigurationPage() {
       const updatedInstructions = await getExamInstructions(id)
       setInstructions(updatedInstructions.sort((a, b) => a.order - b.order))
     } catch (error) {
-      console.log("[v0] Delete instruction error:", error)
+      console.log("[v0] Delete instruction error")
       toast.error(error instanceof Error ? error.message : t("common.error"))
     }
   }
@@ -446,7 +440,6 @@ export default function ExamConfigurationPage() {
   async function handleSaveAccessPolicy() {
     try {
       setSavingAccessPolicy(true)
-      console.log("[v0] Saving access policy:", accessPolicyForm)
       await saveAccessPolicy(id, accessPolicyForm)
       toast.success(t("common.saved"))
       showResult("success", t("common.saved"))
@@ -455,7 +448,7 @@ export default function ExamConfigurationPage() {
       const updatedPolicy = await getAccessPolicy(id)
       setAccessPolicy(updatedPolicy)
     } catch (error) {
-      console.log("[v0] Save access policy error:", error)
+      console.log("[v0] Save access policy error")
       const msg = error instanceof Error ? error.message : t("common.error")
       toast.error(msg)
       showResult("error", msg)

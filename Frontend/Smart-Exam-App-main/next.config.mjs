@@ -1,3 +1,5 @@
+import { getBackendBaseUrl } from "./lib/backend-url.mjs"
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -9,8 +11,7 @@ const nextConfig = {
   },
   async rewrites() {
     const backend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5221"
-    // Strip trailing /api if present so we get the root origin
-    const origin = backend.replace(/\/api\/?$/, "")
+    const origin = getBackendBaseUrl(backend)
     return [
       {
         source: "/media/:path*",

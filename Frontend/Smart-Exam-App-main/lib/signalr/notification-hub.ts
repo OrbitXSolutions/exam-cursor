@@ -5,6 +5,8 @@
  */
 import * as signalR from "@microsoft/signalr";
 import type { UserNotificationDto } from "@/lib/api/user-notifications";
+import { getBackendBaseUrl } from "@/lib/backend-url.mjs";
+import { safeSignalRLogger } from "@/lib/safe-logging";
 
 type NotificationHandler = (notification: UserNotificationDto) => void;
 
@@ -38,7 +40,7 @@ export class NotificationHubClient {
           : { transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents }),
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-      .configureLogging(signalR.LogLevel.Warning)
+      .configureLogging(safeSignalRLogger)
       .build();
 
     this.connection.on("ReceiveNotification", (notification: UserNotificationDto) => {
@@ -63,9 +65,9 @@ export class NotificationHubClient {
   }
 
   private getBackendUrl(): string {
-    if (typeof window === "undefined") return "http://localhost:5221";
     const envUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    if (envUrl) return envUrl.replace(/\/+$/, "").replace(/\/api\/?$/, "");
+    if (envUrl) return getBackendBaseUrl(envUrl);
+    if (typeof window === "undefined") return "http://localhost:5221";
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
       return "http://localhost:5221";
     }

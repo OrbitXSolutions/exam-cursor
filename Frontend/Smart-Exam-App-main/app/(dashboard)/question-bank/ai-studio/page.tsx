@@ -114,7 +114,7 @@ export default function AiStudioPage() {
       // Filter to only supported types (MCQ Single, MCQ Multi, True/False)
       setTypes(allTypes.filter((t: QuestionType) => SUPPORTED_TYPES.includes(t.id)))
     } catch (err) {
-      console.error("Failed to load lookups:", err)
+      console.error("Failed to load lookups")
       toast.error(localizeText("Failed to load form data", "فشل تحميل بيانات النموذج", language))
     } finally {
       setIsLoadingLookups(false)
@@ -153,7 +153,7 @@ export default function AiStudioPage() {
       setCurrentStep("review")
       toast.success(localizeText(`Generated ${editableQuestions.length} questions successfully!`, `تم توليد ${editableQuestions.length} سؤال بنجاح!`, language))
     } catch (err: any) {
-      console.error("Generation failed:", err)
+      console.error("Generation failed")
       toast.error(err?.message || localizeText("Failed to generate questions. Please try again.", "فشل توليد الأسئلة. يرجى المحاولة مرة أخرى.", language))
     } finally {
       setIsGenerating(false)
@@ -270,7 +270,7 @@ export default function AiStudioPage() {
         saved++
         setSavedCount((prev) => prev + 1)
       } catch (err: any) {
-        console.error(`Failed to save question: ${question._id}`, err)
+        console.error(`Failed to save question: ${question._id}`)
         updateQuestion(question._id, { _saving: false })
         toast.error(localizeText(`Failed to save a question: ${err?.message || "Unknown error"}`, `فشل حفظ سؤال: ${err?.message || "Unknown error"}`, language))
       }

@@ -9,6 +9,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Storage;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -23,7 +24,6 @@ public class VideoRecordingController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
-    private readonly IWebHostEnvironment _env;
     private readonly ILogger<VideoRecordingController> _logger;
     private readonly IConfiguration _configuration;
     private readonly IServiceScopeFactory _scopeFactory;
@@ -32,20 +32,17 @@ public class VideoRecordingController : ControllerBase
     public VideoRecordingController(
         ApplicationDbContext db,
         ICurrentUserService currentUser,
-        IWebHostEnvironment env,
+        StoragePaths storagePaths,
         ILogger<VideoRecordingController> logger,
         IConfiguration configuration,
         IServiceScopeFactory scopeFactory)
     {
         _db = db;
         _currentUser = currentUser;
-        _env = env;
         _logger = logger;
         _configuration = configuration;
         _scopeFactory = scopeFactory;
-        _mediaBasePath = Path.IsPathRooted("MediaStorage")
-            ? "MediaStorage"
-            : Path.Combine(env.ContentRootPath, "MediaStorage");
+        _mediaBasePath = storagePaths.MediaPath;
     }
 
     /// <summary>
@@ -197,7 +194,6 @@ public class VideoRecordingController : ControllerBase
         // Capture values needed by background task before returning
         var startedAt = attempt.StartedAt;
         var mediaBasePath = _mediaBasePath;
-        var contentRootPath = _env.ContentRootPath;
 
         _logger.LogInformation("Video finalize accepted for attempt {AttemptId} ({Chunks} chunks). Processing in background.",
             attemptId, chunkCount);
@@ -207,7 +203,7 @@ public class VideoRecordingController : ControllerBase
         {
             try
             {
-                await ProcessVideoFinalization(attemptId, candidateId, startedAt, mediaBasePath, contentRootPath);
+                await ProcessVideoFinalization(attemptId, candidateId, startedAt, mediaBasePath);
             }
             catch (Exception ex)
             {
@@ -230,7 +226,7 @@ public class VideoRecordingController : ControllerBase
     /// Background method: creates evidence record from chunks (no FFmpeg needed).
     /// The frontend uses MediaSource Extensions (MSE) to stitch WebM chunks in-browser.
     /// </summary>
-    private async Task ProcessVideoFinalization(int attemptId, string candidateId, DateTimeOffset startedAt, string mediaBasePath, string contentRootPath)
+    private async Task ProcessVideoFinalization(int attemptId, string candidateId, DateTimeOffset startedAt, string mediaBasePath)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -315,8 +311,9 @@ public class VideoRecordingController : ControllerBase
                 return NotFound(ApiResponse<object>.FailureResponse("No video recording found for this attempt"));
 
             // Check if file still exists on disk
-            var fullPath = Path.Combine(_mediaBasePath, evidence.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
-            if (!System.IO.File.Exists(fullPath))
+            var fullPath = StoragePaths.ResolveRelativePath(_mediaBasePath, evidence.FilePath);
+            var isChunkRecording = evidence.FilePath.TrimEnd('/') == $"video-chunks/{attemptId}";
+            if (isChunkRecording ? !Directory.Exists(fullPath) : !System.IO.File.Exists(fullPath))
                 return NotFound(ApiResponse<object>.FailureResponse("Recording file not found on disk"));
 
             // Get proctor events for timeline
@@ -371,7 +368,8 @@ public class VideoRecordingController : ControllerBase
             {
                 evidenceId = evidence.Id,
                 attemptId,
-                videoUrl = $"/media/{evidence.FilePath}",
+                videoUrl = isChunkRecording ? null : $"/api/Proctor/video-stream/{attemptId}",
+                chunksUrl = isChunkRecording ? $"/api/Proctor/video-chunks/{attemptId}" : null,
                 contentType = evidence.ContentType,
                 fileSize = evidence.FileSize,
                 duration = evidence.DurationSeconds,
@@ -411,7 +409,7 @@ public class VideoRecordingController : ControllerBase
         if (evidence == null)
             return NotFound("No recording found");
 
-        var fullPath = Path.Combine(_mediaBasePath, evidence.FilePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+        var fullPath = StoragePaths.ResolveRelativePath(_mediaBasePath, evidence.FilePath);
         if (!System.IO.File.Exists(fullPath))
             return NotFound("File not found");
 

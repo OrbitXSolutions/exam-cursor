@@ -69,7 +69,7 @@ export class ChunkRecorder {
       this.mediaRecorder.onerror = (event: Event) => {
         const error =
           (event as ErrorEvent).error?.message || "MediaRecorder error";
-        console.error("[ChunkRecorder] Error:", error);
+        console.error("[ChunkRecorder] Recording error");
         this.callbacks.onError?.(error);
       };
 
@@ -84,7 +84,7 @@ export class ChunkRecorder {
       this.callbacks.onRecordingStarted?.();
       console.log(`[ChunkRecorder] Started recording (${mimeType})`);
     } catch (error: any) {
-      console.error("[ChunkRecorder] Failed to start:", error);
+      console.error("[ChunkRecorder] Failed to start");
       this.callbacks.onError?.(error?.message || "Failed to start recording");
     }
   }
@@ -174,7 +174,6 @@ export class ChunkRecorder {
         console.error(
           `[ChunkRecorder] Upload chunk ${chunkIndex} failed:`,
           response.status,
-          errorData,
         );
         return false;
       }
@@ -184,7 +183,7 @@ export class ChunkRecorder {
       );
       return true;
     } catch (error) {
-      console.error(`[ChunkRecorder] Upload chunk ${chunkIndex} error:`, error);
+      console.error(`[ChunkRecorder] Upload chunk ${chunkIndex} error`);
       return false;
     }
   }
