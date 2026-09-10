@@ -163,6 +163,8 @@ Each license-service instance checks `license.json` and `public.pem` existence,
 last-write UTC timestamp, and length on access. A visible metadata change reloads
 that instance's cache on the next request; the existing 24-hour refresh remains
 for time-based license state changes. This does not use filesystem watchers.
+License uploads stage a complete file in the same directory before replacement,
+so other instances do not read a partially written upload.
 
 Changing a path does **not** copy or migrate existing data. Arrange the mount or
 copy existing files during a controlled deployment before changing configuration.

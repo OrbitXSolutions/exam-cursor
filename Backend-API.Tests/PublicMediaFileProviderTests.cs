@@ -12,6 +12,10 @@ public sealed class PublicMediaFileProviderTests
     [InlineData("VIDEO-CHUNKS/1/chunk.webm")]
     [InlineData("public/../video-chunks/1/chunk.webm")]
     [InlineData("./video-chunks/1/chunk.webm")]
+    [InlineData("video-chunks./1/chunk.webm")]
+    [InlineData("video-chunks /1/chunk.webm")]
+    [InlineData("VIDEO-~1/1/chunk.webm")]
+    [InlineData("video-chunks/1/chunk.webm::$DATA")]
     public void PrivateRecordingsCannotBeResolvedThroughPublicProvider(string path)
     {
         var root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));

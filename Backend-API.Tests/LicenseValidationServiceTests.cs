@@ -57,11 +57,15 @@ public sealed class LicenseValidationServiceTests
     {
         using var files = new LicenseFiles();
         files.WriteLicense("first.example");
+        var originalJson = File.ReadAllText(files.LicensePath);
+        var replacementJson = files.CreateLicenseJson("other.example");
+        var sharedLength = Math.Max(originalJson.Length, replacementJson.Length);
+        File.WriteAllText(files.LicensePath, originalJson.PadRight(sharedLength));
         var service = files.CreateService();
         var previousLength = new FileInfo(files.LicensePath).Length;
         var previousWriteTime = File.GetLastWriteTimeUtc(files.LicensePath);
 
-        files.WriteLicense("other.example");
+        File.WriteAllText(files.LicensePath, replacementJson.PadRight(sharedLength));
         File.SetLastWriteTimeUtc(files.LicensePath, previousWriteTime.AddMinutes(1));
 
         Assert.Equal(previousLength, new FileInfo(files.LicensePath).Length);

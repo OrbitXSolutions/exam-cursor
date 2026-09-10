@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -129,6 +131,7 @@ public sealed class SystemLoggingTests
         var logger = new RecordingLogger<GlobalExceptionMiddleware>();
         var context = Context(services);
         context.User = User();
+        context.Request.RouteValues["attemptId"] = 123;
         context.Response.Body = new MemoryStream();
         var errors = new GlobalExceptionMiddleware(_ => throw new InvalidOperationException(
             "******", new Exception("nested-secret-marker")), logger);
@@ -139,6 +142,8 @@ public sealed class SystemLoggingTests
         Assert.DoesNotContain("secret-marker", json);
         Assert.Single(logger.Messages);
         Assert.Contains(nameof(InvalidOperationException), logger.Messages[0]);
+        Assert.Contains("attemptId=123", logger.Messages[0]);
+        Assert.Contains("Cause[1] Type=System.Exception", logger.Messages[0]);
         Assert.Contains(nameof(ExceptionLogsContainTypeAndFramesButNoMessagesBodiesOrSecrets), logger.Messages[0]);
         Assert.DoesNotContain("secret-marker", logger.Messages[0]);
         Assert.DoesNotContain("private-token", logger.Messages[0]);
@@ -228,6 +233,109 @@ public sealed class SystemLoggingTests
         Assert.Equal("trace-test", response.Headers["X-Correlation-ID"]);
         Assert.Equal("trace-test", response.Headers["X-Trace-Id"]);
         Assert.Equal(fail ? 500 : 200, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(200)]
+    [InlineData(201)]
+    [InlineData(204)]
+    [InlineData(302)]
+    [InlineData(400)]
+    [InlineData(401)]
+    [InlineData(403)]
+    [InlineData(404)]
+    [InlineData(429)]
+    [InlineData(500)]
+    [InlineData(503)]
+    public async Task CorrelationHeaderIsAvailableOnEveryApiStatus(int status)
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        var response = new StartingResponseFeature();
+        context.Features.Set<IHttpResponseFeature>(response);
+        await new RequestResponseLoggingMiddleware(ctx =>
+        {
+            ctx.Response.StatusCode = status;
+            return Task.CompletedTask;
+        }).InvokeAsync(context);
+        await response.StartAsync();
+        Assert.Equal("trace-test", response.Headers["X-Trace-Id"]);
+        Assert.Equal(status, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(53, 0, 20)]
+    [InlineData(208, 1, 16)]
+    [InlineData(-2, 0, 11)]
+    [InlineData(18456, 1, 14)]
+    public void SqlDiagnosticsDistinguishConnectivitySchemaAndAuthenticationWithoutProviderMessages(int number, byte state, byte severity)
+    {
+        var sql = SqlFailure(number, state, severity);
+        var wrapper = new DbUpdateException("private-wrapper-message", CaptureCause(sql));
+        var diagnostics = SafeLogMetadata.Diagnostics(wrapper);
+        Assert.Contains("Cause[0] Type=Microsoft.EntityFrameworkCore.DbUpdateException", diagnostics);
+        Assert.Contains("Cause[1] Type=Microsoft.Data.SqlClient.SqlException", diagnostics);
+        Assert.Contains($"SqlNumber={number} SqlState={state} SqlClass={severity}", diagnostics);
+        Assert.Contains(nameof(CaptureCause), diagnostics);
+        Assert.DoesNotContain("private-", diagnostics);
+    }
+
+    [Fact]
+    public void HttpAndIoDiagnosticsIncludeSafeCodesAndInnerMethodFramesOnly()
+    {
+        var io = CaptureCause(new IOException("private-io-message", unchecked((int)0x80070020)));
+        var http = new HttpRequestException("private-url-and-token", io, HttpStatusCode.ServiceUnavailable);
+        var diagnostics = SafeLogMetadata.Diagnostics(http);
+        Assert.Contains("HttpStatus=503", diagnostics);
+        Assert.Contains("Cause[1] Type=System.IO.IOException", diagnostics);
+        Assert.Contains("HResult=0x80070020", diagnostics);
+        Assert.Contains(nameof(CaptureCause), diagnostics);
+        Assert.DoesNotContain("private-", diagnostics);
+    }
+
+    [Fact]
+    public void ExceptionDiagnosticsBoundDepthAndAggregateBreadth()
+    {
+        Exception cause = new IOException("private-deepest");
+        for (var index = 0; index < 20; index++) cause = new Exception("private-wrapper", cause);
+        var deep = SafeLogMetadata.Diagnostics(cause);
+        Assert.Contains("Cause[3]", deep);
+        Assert.DoesNotContain("Cause[4]", deep);
+        var aggregate = new AggregateException(Enumerable.Range(0, 100)
+            .Select(_ => new IOException("private-aggregate-message")));
+        var broad = SafeLogMetadata.Diagnostics(aggregate);
+        Assert.Contains("Cause[3]", broad);
+        Assert.DoesNotContain("Cause[4]", broad);
+        Assert.True(broad.Length <= 16384);
+        Assert.DoesNotContain("private-", deep + broad);
+    }
+
+    [Fact]
+    public void RouteIdentifiersAllowOnlyNamedNumericEntityIds()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        context.Request.RouteValues["id"] = "000123";
+        context.Request.RouteValues["attemptId"] = 456;
+        context.Request.RouteValues["examId"] = 789L;
+        context.Request.RouteValues["token"] = "999999";
+        context.Request.RouteValues["userId"] = "123456";
+        context.Request.RouteValues["email"] = "private@example.invalid";
+        Assert.Equal("id=123 attemptId=456 examId=789", SafeLogMetadata.RouteIdentifiers(context));
+    }
+
+    [Theory]
+    [InlineData("private-token")]
+    [InlineData("+123")]
+    [InlineData("-123")]
+    [InlineData("1.23")]
+    [InlineData("123456789012345678901")]
+    public void RouteIdentifiersRejectNonnumericAndOutOfRangeValues(string value)
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        context.Request.RouteValues["id"] = value;
+        Assert.Empty(SafeLogMetadata.RouteIdentifiers(context));
     }
 
     [Fact]
@@ -381,7 +489,7 @@ public sealed class SystemLoggingTests
             new TestDatabase((_, _) =>
             {
                 Interlocked.Increment(ref attempts);
-                throw new InvalidOperationException("Server=secret-marker;******");
+                throw new DbUpdateException("private-provider-message", SqlFailure(208, 1, 16));
             })).BuildServiceProvider();
         channel.TryWrite(new SystemLog { Action = "first" });
         channel.TryWrite(new SystemLog { Action = "second" });
@@ -391,7 +499,9 @@ public sealed class SystemLoggingTests
         await worker.StopAsync(CancellationToken.None);
         Assert.Equal(1, attempts);
         Assert.Contains(logger.Messages, message => message.Contains("discarded 2"));
+        Assert.Contains(logger.Messages, message => message.Contains("SqlNumber=208"));
         Assert.DoesNotContain(logger.Messages, message => message.Contains("secret-marker"));
+        Assert.DoesNotContain(logger.Messages, message => message.Contains("private-"));
         Assert.All(logger.Exceptions, Assert.Null);
         Assert.False(channel.Reader.TryRead(out _));
     }
@@ -405,6 +515,36 @@ public sealed class SystemLoggingTests
             ["SystemLogging:PersistenceTimeoutSeconds"] = "1",
             ["SystemLogging:FailureBackoffSeconds"] = "1"
         }).Build();
+
+    private static Exception CaptureCause(Exception exception)
+    {
+        try { throw exception; }
+        catch (Exception captured) { return captured; }
+    }
+
+    private static SqlException SqlFailure(int number, byte state, byte severity)
+    {
+        var constructor = typeof(SqlError).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+            .OrderBy(candidate => candidate.GetParameters().Length)
+            .First(candidate => candidate.GetParameters().Length >= 7);
+        var arguments = constructor.GetParameters().Select((parameter, index) => index switch
+        {
+            0 => (object)number,
+            1 => state,
+            2 => severity,
+            3 => "private-server",
+            4 => "private-sql-message",
+            5 => "private-procedure",
+            6 => 1,
+            _ => parameter.ParameterType.IsValueType ? Activator.CreateInstance(parameter.ParameterType) : null
+        }).ToArray();
+        var error = (SqlError)constructor.Invoke(arguments);
+        var errors = (SqlErrorCollection)Activator.CreateInstance(typeof(SqlErrorCollection), nonPublic: true)!;
+        typeof(SqlErrorCollection).GetMethod("Add", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(errors, [error]);
+        var factory = typeof(SqlException).GetMethod("CreateException", BindingFlags.Static | BindingFlags.NonPublic,
+            binder: null, types: [typeof(SqlErrorCollection), typeof(string)], modifiers: null)!;
+        return (SqlException)factory.Invoke(null, [errors, "private-server-version"])!;
+    }
 
     private static DefaultHttpContext Context(IServiceProvider services)
     {

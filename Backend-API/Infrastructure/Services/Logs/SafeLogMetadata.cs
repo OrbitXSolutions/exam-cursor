@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Data.SqlClient;
 using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Infrastructure.Services.Logs;
@@ -53,6 +56,65 @@ public static class SafeLogMetadata
             var method = frame.GetMethod();
             return Limit($"{method?.DeclaringType?.FullName}.{method?.Name}", 256);
         }));
+    }
+
+    public static string Diagnostics(Exception exception)
+    {
+        var pending = new Queue<Exception>();
+        pending.Enqueue(exception);
+        var details = new StringBuilder();
+        var count = 0;
+        while (pending.Count > 0 && count < 4)
+        {
+            var cause = pending.Dequeue();
+            if (count > 0) details.Append(" | ");
+            details.Append(CultureInfo.InvariantCulture, $"Cause[{count}] Type={ExceptionType(cause)}");
+            switch (cause)
+            {
+                case SqlException sql:
+                    details.Append(CultureInfo.InvariantCulture,
+                        $" SqlNumber={sql.Number} SqlState={sql.State} SqlClass={sql.Class}");
+                    break;
+                case HttpRequestException http when http.StatusCode.HasValue:
+                    details.Append(CultureInfo.InvariantCulture, $" HttpStatus={(int)http.StatusCode.Value}");
+                    break;
+                case IOException io:
+                    details.Append(CultureInfo.InvariantCulture, $" HResult=0x{io.HResult:X8}");
+                    break;
+            }
+            details.Append(" Stack=").Append(Stack(cause));
+            count++;
+            if (cause is AggregateException aggregate)
+            {
+                foreach (var inner in aggregate.InnerExceptions.Take(4 - count - pending.Count))
+                    pending.Enqueue(inner);
+            }
+            else if (cause.InnerException is { } inner && count + pending.Count < 4)
+            {
+                pending.Enqueue(inner);
+            }
+        }
+        return Limit(details.ToString(), 16384) ?? string.Empty;
+    }
+
+    public static string RouteIdentifiers(HttpContext context)
+    {
+        var identifiers = new List<string>(3);
+        foreach (var key in new[] { "id", "attemptId", "examId" })
+        {
+            if (!context.Request.RouteValues.TryGetValue(key, out var value)) continue;
+            var text = value switch
+            {
+                string literal => literal,
+                int number => number.ToString(CultureInfo.InvariantCulture),
+                long number => number.ToString(CultureInfo.InvariantCulture),
+                _ => null
+            };
+            if (text is { Length: > 0 and <= 19 } &&
+                long.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var id))
+                identifiers.Add($"{key}={id.ToString(CultureInfo.InvariantCulture)}");
+        }
+        return string.Join(" ", identifiers);
     }
 
     public static int ExceptionStatus(Exception exception) => exception switch

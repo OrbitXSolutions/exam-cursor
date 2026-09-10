@@ -35,9 +35,10 @@ public class GlobalExceptionMiddleware
             var traceId = SafeLogMetadata.TraceId(context);
             // Passing the Exception object to a sink would disclose its message/inner exception/data.
             _logger.LogError(
-                "Request failed. TraceId={TraceId} Method={Method} Path={Path} UserId={UserId} ExceptionType={ExceptionType} Stack={Stack}",
+                "Request failed. TraceId={TraceId} Method={Method} Path={Path} UserId={UserId} EntityIds={EntityIds} ExceptionType={ExceptionType} Diagnostics={Diagnostics}",
                 traceId, SafeLogMetadata.Method(context), SafeLogMetadata.Path(context),
-                SafeLogMetadata.UserId(context), SafeLogMetadata.ExceptionType(exception), SafeLogMetadata.Stack(exception));
+                SafeLogMetadata.UserId(context), SafeLogMetadata.RouteIdentifiers(context),
+                SafeLogMetadata.ExceptionType(exception), SafeLogMetadata.Diagnostics(exception));
 
             if (context.RequestAborted.IsCancellationRequested) return;
             if (context.Response.HasStarted)

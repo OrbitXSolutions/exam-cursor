@@ -50,8 +50,8 @@ public sealed class LogCleanupService : BackgroundService
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogWarning("System log cleanup failed. ExceptionType={ExceptionType}",
-                        SafeLogMetadata.ExceptionType(exception));
+                    _logger.LogWarning("System log cleanup failed. ExceptionType={ExceptionType} Diagnostics={Diagnostics}",
+                        SafeLogMetadata.ExceptionType(exception), SafeLogMetadata.Diagnostics(exception));
                 }
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }

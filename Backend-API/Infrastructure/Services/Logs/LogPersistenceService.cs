@@ -50,8 +50,8 @@ public sealed class LogPersistenceService : BackgroundService
                 catch (Exception exception)
                 {
                     // Drop the failed batch. Never retain/retry records indefinitely during an outage.
-                    _logger.LogWarning("System log persistence failed; discarded {Count} records. ExceptionType={ExceptionType}",
-                        batch.Count, SafeLogMetadata.ExceptionType(exception));
+                    _logger.LogWarning("System log persistence failed; discarded {Count} records. ExceptionType={ExceptionType} Diagnostics={Diagnostics}",
+                        batch.Count, SafeLogMetadata.ExceptionType(exception), SafeLogMetadata.Diagnostics(exception));
                     await Task.Delay(TimeSpan.FromSeconds(_options.FailureBackoffSeconds), stoppingToken);
                 }
                 ReportDroppedRecords();
