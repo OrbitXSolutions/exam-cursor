@@ -123,8 +123,25 @@ VERIFIED:
 - Full reachable history was fetched without switching branches; searches for
   the original missing logging classes found no recovery source.
 
-Automated changed-file secret scan and final diff review results:
-Pending final validation; this section will be updated before handoff.
+Changed-file security and final diff review results:
+- VERIFIED: changed-file secret scanning reported no secrets in all six changed
+  files before the checkpoint commit. This does not clear pre-existing secrets
+  or constitute an audit of the whole repository/history.
+- The required parallel validation was invoked after committing the changes.
+  Its review wrapper reported success but also stated the reviewer model was
+  unavailable. Treat that automated review as BLOCKED, not as a clean review.
+- A separate read-only code-review agent reviewed the committed baseline-to-HEAD
+  change set as a fallback and reported no significant issues. This reviewed
+  the ignore fix/reports, not the safety of the unchanged application.
+- CodeQL was skipped by the validation tool for metadata/documentation-only
+  changes. No CodeQL security analysis of application code is claimed.
+- Final self-review confirmed only the ignore rule and five reports changed;
+  baseline-to-HEAD git diff --check passed, and the checkpoint working tree
+  was clean. No application, dependency or schema changes were hidden in it.
+
+Preserved checkpoint: 7c36fb7, "Fix logging-source ignore rule and preserve
+blocked Phase 1 assessment", committed and pushed on the current agent branch.
+The final validation notes are preserved in a follow-up documentation commit.
 
 Session-local raw evidence (not durable artifacts; summaries above are retained):
 /tmp/exam-validation/backend-build.log
