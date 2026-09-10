@@ -349,14 +349,14 @@ var app = builder.Build();
 app.UseForwardedHeaders();
 app.UseRouting();
 
-// CORS — required for SignalR WebSocket from frontend origin
-app.UseCors("SignalRCors");
-
 // Metadata-only request diagnostics use a bounded, non-blocking channel.
 app.UseRequestResponseLogging();
 
 // Global Exception Handling
 app.UseGlobalExceptionMiddleware();
+
+// CORS — required for SignalR WebSocket from frontend origin
+app.UseCors("SignalRCors");
 
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 {

@@ -70,6 +70,16 @@ TWO APPLICATION NODES
   Relative paths remain supported for single-node/development compatibility.
   No existing files are moved automatically. Copy/verify existing data during a
   controlled deployment, preserving stored relative paths before serving traffic.
+- Public /media serves supported images/PDFs only; video chunks and filesystem
+  path aliases are excluded at the file-provider boundary. Use the existing
+  authorized recording APIs, not direct public recording URLs. Review any custom
+  media extension configuration before rollout. Identity images still have a
+  separate public-serving privacy risk pending Phase 2 authorization review.
+- License and verification-key changes invalidate the local parsed-license cache
+  through file existence/mtime/length checks. Uploads use staged atomic replacement.
+  External file-copy tooling must preserve neither the old timestamp AND size for
+  changed contents; filesystem metadata/atomic behavior on the actual customer
+  share needs testing.
 - Data-protection keys use the shared ring, fixed application name SmartExam,
   and configured PFX certificate for encryption at rest. Protect the PFX file and
   password; both nodes need its private key. Back up the ring and certificate.

@@ -1,8 +1,8 @@
 RESUMED PHASE 1 — IMPLEMENTATION AND VERIFICATION
 Date: 2026-09-10
 Resume baseline: 8f5545b
-Status: implementation checkpoint in progress; verification results below will
-be finalized before the Phase 1 push. No production-readiness certification.
+Implementation checkpoint 0982567 and follow-up 1b29881 are pushed. Final logging
+integration remains in progress. No production-readiness certification.
 
 SCOPE AND DECISION
 The original logging files are unavailable. Per the resumed instruction, this
@@ -37,7 +37,9 @@ contracts, Serilog configuration, service registration and audit usage.
   business audit records and SystemLogs remain distinct. Old SQL tables are not
   dropped. Runtime log failures are observable through stderr/queue warnings.
 - Bounded SystemLogs retention replaces cleanup targeting the retired default
-  Serilog sink. OS file retention remains separately configured.
+  Serilog sink. Each sweep is limited to ten 1,000-row deletes; a full sweep is
+  revisited after one minute rather than being capped at 10,000 expired rows/day.
+  Partial/empty sweeps wait 24 hours. OS file retention is separately configured.
 - Frontend diagnostics are metadata-only; proxy URLs omit query parameters.
 
 Logging is best-effort diagnostics, not a lossless audit journal. Queue overload,
@@ -146,11 +148,44 @@ dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-
 Generated SQL credentials were not printed/committed; temporary containers and
 key-ring artifacts were removed by the test implementer.
 
-Review found and prompted additional integration corrections: filter private
-recordings at the file-provider boundary against repeated-slash aliases; allow
-WebP in the identity static allowlist consistently with accepted uploads; and
-unify existing response/log trace references. Final focused verification of
-these follow-ups and metadata-only handled-failure diagnostics is still pending.
+Follow-up evidence from the implementing/test agents:
+- Combined suite with isolated real SQL Server and Redis: 141 passed, zero
+  failed/skipped, followed by 168 passed, zero failed/skipped after the latest
+  private-media alias and logging changes (10 seconds). Focused logging run:
+  49 passed, including SQL DELETE translation, retention bounds and retry cadence. These
+  overlapping counts must not be added together.
+- EF Database.HasPendingModelChanges() is false, and logging mapping matches the
+  current snapshot: no unintended migration is needed.
+- Storage/media/license grouped run: 37 passed; nine license regressions include
+  shared-file changes and atomic upload behavior. Shared customer mounts were not
+  exercised. License refresh detects file metadata changes, not arbitrary
+  same-size/same-timestamp content replacement by external tools.
+- Frontend proxy checks preserve PDF/high-bit bytes, Content-Disposition/type,
+  trace/license headers and Retry-After across all five methods. These use
+  synthetic backend responses, not the customer's real proxy.
+
+Review prompted further corrections: private recordings are filtered at the
+file-provider boundary against repeated-slash, backslash and Windows path aliases;
+the public provider only serves the supported image/PDF extensions. Custom media
+extensions require deliberate review, not a blanket static-file allowance.
+Identity WebP remains served consistently with accepted uploads. Existing
+response/log trace references use the same generated trace ID. Request diagnostics
+now wrap CORS so preflight short circuits can also receive trace headers.
+Windows-specific normalization is guarded in source but has NOT been executed on
+a Windows host. The expanded provider tests passed on Linux. Final focused
+verification of request-file completion and handled-failure logging is pending.
+
+Automated combined Code Review/CodeQL was attempted but is BLOCKED: tool timeouts,
+reviewer configuration failures, JavaScript analysis failure and C# analysis
+database size limits prevented completed results. The tool's circuit breaker
+instructed against further retries. No automated security pass is claimed.
+Read-only review/security agents supplied specific findings; the confirmed
+private-media aliases and identity WebP regression were addressed. This limited
+review does not certify the entire repository.
+The security specialist confirmed the latest Windows alias mitigation by source
+inspection and found no confirmed new credential/provider-body disclosure in the
+brief changed-provider/worker/license/AI exception-log pass. Arbitrary legacy
+exception messages are not thereby proven free of personal information.
 No live browser-camera or customer deployment test is inferred from these tests.
 
 STATUS DEFINITIONS

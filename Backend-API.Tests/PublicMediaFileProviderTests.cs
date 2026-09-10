@@ -18,7 +18,7 @@ public sealed class PublicMediaFileProviderTests
     [InlineData("video-chunks/1/chunk.webm::$DATA")]
     public void PrivateRecordingsCannotBeResolvedThroughPublicProvider(string path)
     {
-        var root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(AppContext.BaseDirectory, "public-media-tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(Path.Combine(root, "video-chunks", "1"));
         File.WriteAllText(Path.Combine(root, "video-chunks", "1", "chunk.webm"), "test media");
         File.WriteAllText(Path.Combine(root, "public.png"), "test public asset");

@@ -8,6 +8,10 @@ using Smart_Core.Domain.Enums;
 
 namespace Smart_Core.Controllers.Logs;
 
+/// <summary>
+/// Metadata-only log reads restricted to SuperAdmin, matching the dashboard's /logs access rule.
+/// Category names describe log subjects; Candidate and Proctor roles do not gain log-reading access.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = AppRoles.SuperAdmin)]

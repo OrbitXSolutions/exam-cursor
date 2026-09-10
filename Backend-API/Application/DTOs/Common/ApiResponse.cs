@@ -1,12 +1,20 @@
 namespace Smart_Core.Application.DTOs.Common;
 
-public class ApiResponse<T>
+public interface IApiResponse
+{
+    bool Success { get; }
+    int ErrorCount { get; }
+    string? TraceId { get; set; }
+}
+
+public class ApiResponse<T> : IApiResponse
 {
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
     public T? Data { get; set; }
     public List<string> Errors { get; set; } = new();
     public string? TraceId { get; set; }
+    int IApiResponse.ErrorCount => Errors?.Count ?? 0;
 
     public static ApiResponse<T> SuccessResponse(T data, string message = "Operation successful")
     {

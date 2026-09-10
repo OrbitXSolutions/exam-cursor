@@ -1,31 +1,39 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Net;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Smart_Core.Application.DTOs.Logs;
+using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Controllers;
 using Smart_Core.Controllers.Logs;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities.Logs;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Filters.Logs;
 using Smart_Core.Infrastructure.Middleware;
+using Smart_Core.Infrastructure.Services;
 using Smart_Core.Infrastructure.Services.Logs;
 
 namespace Backend_API.Tests.Logs;
@@ -121,6 +129,269 @@ public sealed class SystemLoggingTests
             return Task.CompletedTask;
         }).InvokeAsync(context);
         Assert.Equal(expected, channel.Reader.TryRead(out _));
+    }
+
+    [Theory]
+    [InlineData("GET", 200, true, false)]
+    [InlineData("GET", 200, false, false)]
+    [InlineData("HEAD", 200, true, false)]
+    [InlineData("OPTIONS", 204, true, false)]
+    [InlineData("POST", 201, true, true)]
+    [InlineData("DELETE", 204, true, true)]
+    [InlineData("GET", 403, true, true)]
+    [InlineData("GET", 500, true, true)]
+    public async Task EveryApiRequestWritesOneSafeFileCompletionWhileDatabaseStaysSelective(
+        string method, int status, bool channelEnabled, bool expectDatabaseRecord)
+    {
+        var channel = new SystemLogChannel(Configuration());
+        var registrations = new ServiceCollection();
+        if (channelEnabled) registrations.AddSingleton(channel);
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        registrations.AddSingleton<ILogger<RequestResponseLoggingMiddleware>>(logger);
+        using var services = registrations.BuildServiceProvider();
+        var context = Context(services);
+        context.Request.Method = method;
+        context.Request.Body = new UnreadableBody();
+        context.Request.QueryString = new QueryString("?token=private-query");
+        context.Request.Headers.Authorization = "******";
+        context.Request.RouteValues["attemptId"] = 123;
+        context.Request.RouteValues["examId"] = 456;
+        context.Request.RouteValues["token"] = "private-route-token";
+        context.User = User();
+        var response = new MemoryStream();
+        context.Response.Body = response;
+        RequestDelegate next = async ctx =>
+        {
+            Assert.Same(response, ctx.Response.Body);
+            ctx.Response.StatusCode = status;
+            await ctx.Response.Body.WriteAsync(Encoding.UTF8.GetBytes("private-response-payload"));
+        };
+        var middleware = ActivatorUtilities.CreateInstance<RequestResponseLoggingMiddleware>(services, next);
+        await middleware.InvokeAsync(context);
+        Assert.Single(logger.Messages);
+        Assert.DoesNotContain("private-", logger.Messages[0]);
+        Assert.DoesNotContain("private@example.invalid", logger.Messages[0]);
+        Assert.Null(logger.Exceptions[0]);
+        Assert.Equal(status >= 500 ? LogLevel.Error : status >= 400 ? LogLevel.Warning : LogLevel.Information, logger.Levels[0]);
+        Assert.Equal(method, logger.Properties[0]["Method"]);
+        Assert.Equal("/api/attempt/{token}/answers", logger.Properties[0]["Path"]);
+        Assert.Equal(status, logger.Properties[0]["StatusCode"]);
+        Assert.Equal("trace-test", logger.Properties[0]["TraceId"]);
+        Assert.Equal("candidate-id", logger.Properties[0]["UserId"]);
+        Assert.Equal("attemptId=123 examId=456", logger.Properties[0]["EntityIds"]);
+        Assert.IsType<long>(logger.Properties[0]["DurationMs"]);
+        Assert.Equal(expectDatabaseRecord, channel.Reader.TryRead(out _));
+        Assert.Equal("private-response-payload", Encoding.UTF8.GetString(response.ToArray()));
+    }
+
+    [Fact]
+    public async Task FileLoggerFailureCannotReplaceSuccessfulResponseOrPreventQueuedMetadata()
+    {
+        var channel = new SystemLogChannel(Configuration());
+        using var services = new ServiceCollection().AddSingleton(channel).BuildServiceProvider();
+        var context = Context(services);
+        context.Response.Body = new MemoryStream();
+        await new RequestResponseLoggingMiddleware(async ctx =>
+        {
+            ctx.Response.StatusCode = 202;
+            await ctx.Response.WriteAsync("original-response");
+        }, new ThrowingLogger<RequestResponseLoggingMiddleware>()).InvokeAsync(context);
+        Assert.Equal(202, context.Response.StatusCode);
+        Assert.Equal("original-response", Encoding.UTF8.GetString(((MemoryStream)context.Response.Body).ToArray()));
+        Assert.True(channel.Reader.TryRead(out var metadata));
+        Assert.Equal(202, metadata.ResponseStatusCode);
+    }
+
+    [Fact]
+    public async Task FileLoggerFailureCannotReplaceOriginalUnhandledException()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        var original = new ArgumentException("original-exception");
+        var middleware = new RequestResponseLoggingMiddleware(_ => throw original,
+            new ThrowingLogger<RequestResponseLoggingMiddleware>());
+        var thrown = await Assert.ThrowsAsync<ArgumentException>(() => middleware.InvokeAsync(context));
+        Assert.Same(original, thrown);
+    }
+
+    [Fact]
+    public async Task BothDiagnosticLoggersCanFailWithoutPreventingSafeErrorResponse()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        context.Response.Body = new MemoryStream();
+        var errors = new GlobalExceptionMiddleware(_ => throw new InvalidOperationException("private-message"),
+            new ThrowingLogger<GlobalExceptionMiddleware>());
+        await new RequestResponseLoggingMiddleware(errors.InvokeAsync,
+            new ThrowingLogger<RequestResponseLoggingMiddleware>()).InvokeAsync(context);
+        Assert.Equal(500, context.Response.StatusCode);
+        var response = Encoding.UTF8.GetString(((MemoryStream)context.Response.Body).ToArray());
+        Assert.Contains("trace-test", response);
+        Assert.DoesNotContain("private-message", response);
+    }
+
+    [Fact]
+    public async Task ServerAbortAfterResponseStartedIsReportedAsFailureNotClientDisconnect()
+    {
+        var channel = new SystemLogChannel(Configuration());
+        using var services = new ServiceCollection().AddSingleton(channel).BuildServiceProvider();
+        var context = Context(services);
+        context.Features.Set<IHttpResponseFeature>(new StartedResponseFeature());
+        context.Features.Set<IHttpRequestLifetimeFeature>(new TrackingLifetimeFeature { CancelOnAbort = true });
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        var errors = new GlobalExceptionMiddleware(_ => throw new InvalidOperationException("private-message"),
+            new RecordingLogger<GlobalExceptionMiddleware>());
+        await new RequestResponseLoggingMiddleware(errors.InvokeAsync, logger).InvokeAsync(context);
+        Assert.True(context.RequestAborted.IsCancellationRequested);
+        Assert.Equal(206, context.Response.StatusCode);
+        Assert.Single(logger.Messages);
+        Assert.Equal(500, logger.Properties[0]["StatusCode"]);
+        Assert.Null(logger.Exceptions[0]);
+        Assert.True(channel.Reader.TryRead(out var metadata));
+        Assert.Equal(500, metadata.ResponseStatusCode);
+    }
+
+    [Theory]
+    [InlineData(false, 0)]
+    [InlineData(false, 3)]
+    [InlineData(true, 0)]
+    [InlineData(true, 3)]
+    public async Task FailedApiEnvelopeAtHttp200GetsTraceAndRejectedWarningWithoutReadingMessages(
+        bool jsonResult, int errorCount)
+    {
+        var channel = new SystemLogChannel(Configuration());
+        using var services = new ServiceCollection().AddSingleton(channel).BuildServiceProvider();
+        var context = Context(services);
+        context.Request.Method = "GET";
+        context.Request.Body = new UnreadableBody();
+        context.Response.Body = new UnreadableBody();
+        context.User = User();
+        var envelope = ApiResponse<object>.FailureResponse("private-message",
+            Enumerable.Range(0, errorCount).Select(index => $"private-error-{index}").ToList());
+        envelope.TraceId = "private-untrusted-trace";
+        IActionResult result = jsonResult ? new JsonResult(envelope) : new OkObjectResult(envelope);
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        var executed = 0;
+        await new RequestResponseLoggingMiddleware(async ctx =>
+        {
+            ctx.Response.StatusCode = 200;
+            await ExecuteResultFilter(ctx, result, () => executed++);
+        }, logger).InvokeAsync(context);
+        Assert.Equal(1, executed);
+        Assert.Equal("trace-test", envelope.TraceId);
+        Assert.Single(logger.Messages);
+        Assert.Equal(LogLevel.Warning, logger.Levels[0]);
+        Assert.Equal("Rejected", logger.Properties[0]["Outcome"]);
+        Assert.Equal(errorCount, logger.Properties[0]["ErrorCount"]);
+        Assert.Equal(200, logger.Properties[0]["StatusCode"]);
+        Assert.DoesNotContain("private-", logger.Messages[0]);
+        Assert.Null(logger.Exceptions[0]);
+        Assert.True(channel.Reader.TryRead(out var candidate));
+        Assert.True(channel.Reader.TryRead(out var developer));
+        Assert.Equal(SystemLogLevel.Warning, candidate.Level);
+        Assert.Equal(SystemLogLevel.Warning, developer.Level);
+        Assert.Equal(200, developer.ResponseStatusCode);
+        Assert.Null(developer.ErrorMessage);
+        Assert.Null(developer.ResponseBody);
+        Assert.Null(developer.RequestBody);
+        Assert.Equal(LogCategory.Developer, developer.Category);
+    }
+
+    [Fact]
+    public async Task SuccessfulApiEnvelopeKeepsShapeAndDoesNotCreateRejection()
+    {
+        var channel = new SystemLogChannel(Configuration());
+        using var services = new ServiceCollection().AddSingleton(channel).BuildServiceProvider();
+        var context = Context(services);
+        context.Request.Method = "GET";
+        var envelope = ApiResponse<string>.SuccessResponse("private-data", "private-message");
+        envelope.Errors.Add("private-not-a-failure");
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        await new RequestResponseLoggingMiddleware(ctx =>
+            ExecuteResultFilter(ctx, new ObjectResult(envelope)), logger).InvokeAsync(context);
+        Assert.Null(envelope.TraceId);
+        Assert.Equal(LogLevel.Information, logger.Levels.Single());
+        Assert.Equal("Succeeded", logger.Properties[0]["Outcome"]);
+        Assert.Equal(0, logger.Properties[0]["ErrorCount"]);
+        Assert.DoesNotContain("private-", logger.Messages[0]);
+        Assert.False(channel.Reader.TryRead(out _));
+    }
+
+    [Fact]
+    public void ApiResponseDiagnosticInterfaceDoesNotChangeSerializedEnvelope()
+    {
+        var envelope = ApiResponse<int>.FailureResponse("message", ["first", "second"]);
+        IApiResponse metadata = envelope;
+        Assert.False(metadata.Success);
+        Assert.Equal(2, metadata.ErrorCount);
+        var json = JsonSerializer.SerializeToElement(envelope, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        Assert.Equal(new[] { "data", "errors", "message", "success", "traceId" },
+            json.EnumerateObject().Select(property => property.Name).Order().ToArray());
+        Assert.False(json.TryGetProperty("errorCount", out _));
+        Assert.True(typeof(IAsyncAlwaysRunResultFilter).IsAssignableFrom(typeof(ApiResponseLoggingFilter)));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ResultFilterNeverParsesUntypedOrStringResponseBodies(bool untypedJson)
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        context.Request.Method = "GET";
+        context.Request.Body = new UnreadableBody();
+        context.Response.Body = new UnreadableBody();
+        IActionResult result = untypedJson
+            ? new JsonResult(new { success = false, message = "private-value" })
+            : new ContentResult { Content = "{\"success\":false,\"message\":\"private-value\"}" };
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        await new RequestResponseLoggingMiddleware(ctx => ExecuteResultFilter(ctx, result), logger).InvokeAsync(context);
+        Assert.Equal("Succeeded", logger.Properties[0]["Outcome"]);
+        Assert.Equal(0, logger.Properties[0]["ErrorCount"]);
+        Assert.DoesNotContain("private-value", logger.Messages[0]);
+    }
+
+    [Fact]
+    public async Task GlobalValidationFailureReportsOnlyNumericErrorCountInCompletion()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        context.Response.Body = new MemoryStream();
+        var logger = new RecordingLogger<RequestResponseLoggingMiddleware>();
+        var errors = new GlobalExceptionMiddleware(_ => throw new FluentValidation.ValidationException(
+        [
+            new FluentValidation.Results.ValidationFailure("private-field-one", "private-error-one"),
+            new FluentValidation.Results.ValidationFailure("private-field-two", "private-error-two")
+        ]), new RecordingLogger<GlobalExceptionMiddleware>());
+        await new RequestResponseLoggingMiddleware(errors.InvokeAsync, logger).InvokeAsync(context);
+        Assert.Equal(400, context.Response.StatusCode);
+        Assert.Equal("Rejected", logger.Properties[0]["Outcome"]);
+        Assert.Equal(2, logger.Properties[0]["ErrorCount"]);
+        Assert.DoesNotContain("private-", logger.Messages[0]);
+    }
+
+    [Fact]
+    public async Task ResultFilterDoesNotSwallowResultExecutionFailure()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var context = Context(services);
+        var original = new IOException("original-result-exception");
+        var thrown = await Assert.ThrowsAsync<IOException>(() => ExecuteResultFilter(context,
+            new ObjectResult(ApiResponse<object>.FailureResponse("private-message")), () => throw original));
+        Assert.Same(original, thrown);
+    }
+
+    private static Task ExecuteResultFilter(HttpContext context, IActionResult result, Action? onExecuted = null)
+    {
+        var action = new ActionContext(context, new RouteData(), new ActionDescriptor());
+        var filters = Array.Empty<IFilterMetadata>();
+        var controller = new object();
+        var executing = new ResultExecutingContext(action, filters, result, controller);
+        return new ApiResponseLoggingFilter().OnResultExecutionAsync(executing, () =>
+        {
+            onExecuted?.Invoke();
+            return Task.FromResult(new ResultExecutedContext(action, filters, executing.Result, controller));
+        });
     }
 
     [Fact]
@@ -506,6 +777,63 @@ public sealed class SystemLoggingTests
         Assert.False(channel.Reader.TryRead(out _));
     }
 
+    [Theory]
+    [InlineData(1000, 10, true)]
+    [InlineData(25, 1, false)]
+    [InlineData(0, 1, false)]
+    public async Task CleanupTranslatesBoundedSqlDeletesAndReschedulesBacklog(int deletedPerBatch, int expectedBatches, bool expectedBacklog)
+    {
+        var commands = new DeleteInterceptor(_ => deletedPerBatch);
+        using var db = CleanupDatabase(commands);
+        using var services = new ServiceCollection().BuildServiceProvider();
+        using var cleanup = new LogCleanupService(services.GetRequiredService<IServiceScopeFactory>(),
+            Configuration(), new RecordingLogger<LogCleanupService>());
+        var hasBacklog = await CleanupSweep(cleanup, db, CancellationToken.None);
+        Assert.Equal(expectedBacklog, hasBacklog);
+        Assert.Equal(expectedBatches, commands.Commands.Count);
+        Assert.All(commands.Commands, command =>
+        {
+            Assert.Contains("DELETE", command.Sql);
+            Assert.Contains("[SystemLogs]", command.Sql);
+            Assert.Contains("TOP(", command.Sql);
+            Assert.Contains("[Timestamp] <", command.Sql);
+            Assert.Contains("ORDER BY", command.Sql);
+            Assert.Contains(command.Parameters, value => value is int count && count == 1000);
+            Assert.Contains(command.Parameters, value => value is DateTimeOffset timestamp &&
+                timestamp.Offset == TimeSpan.FromHours(4) &&
+                timestamp > DateTimeOffset.UtcNow.AddDays(-31) &&
+                timestamp < DateTimeOffset.UtcNow.AddDays(-29));
+        });
+        var delayMethod = typeof(LogCleanupService).GetMethod("NextSweepDelay", BindingFlags.NonPublic | BindingFlags.Static)!;
+        Assert.Equal(expectedBacklog ? TimeSpan.FromMinutes(1) : TimeSpan.FromHours(24),
+            (TimeSpan)delayMethod.Invoke(null, [hasBacklog])!);
+    }
+
+    [Fact]
+    public async Task CleanupStopsAtFirstPartialBatchAndHonorsCancellationBeforeSql()
+    {
+        var commands = new DeleteInterceptor(call => call < 3 ? 1000 : 25);
+        using var db = CleanupDatabase(commands);
+        using var services = new ServiceCollection().BuildServiceProvider();
+        using var cleanup = new LogCleanupService(services.GetRequiredService<IServiceScopeFactory>(),
+            Configuration(), new RecordingLogger<LogCleanupService>());
+        Assert.False(await CleanupSweep(cleanup, db, CancellationToken.None));
+        Assert.Equal(3, commands.Commands.Count);
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => CleanupSweep(cleanup, db, cancelled.Token));
+        Assert.Equal(3, commands.Commands.Count);
+    }
+
+    private static Task<bool> CleanupSweep(LogCleanupService cleanup, ApplicationDbContext db, CancellationToken token) =>
+        (Task<bool>)typeof(LogCleanupService).GetMethod("CleanupSweepAsync", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(cleanup, [db, token])!;
+
+    private static ApplicationDbContext CleanupDatabase(DeleteInterceptor commands) =>
+        new(new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlServer("Server=127.0.0.1;Database=MetadataOnly;Integrated Security=true;Connect Timeout=1")
+            .AddInterceptors(new SuppressedConnection(), commands).Options);
+
     private static IConfiguration Configuration(int capacity = 8, int batchSize = 2) =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -574,10 +902,31 @@ public sealed class SystemLoggingTests
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => save(this, cancellationToken);
     }
 
+    private sealed class SuppressedConnection : DbConnectionInterceptor
+    {
+        public override ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection,
+            ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default) =>
+            ValueTask.FromResult(InterceptionResult.Suppress());
+    }
+
+    private sealed class DeleteInterceptor(Func<int, int> deletedCount) : DbCommandInterceptor
+    {
+        public List<(string Sql, object?[] Parameters)> Commands { get; } = [];
+        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            if (Commands.Count >= 10) throw new InvalidOperationException("Cleanup exceeded its batch budget");
+            Commands.Add((command.CommandText, command.Parameters.Cast<DbParameter>().Select(parameter => parameter.Value).ToArray()));
+            return ValueTask.FromResult(InterceptionResult<int>.SuppressWithResult(deletedCount(Commands.Count)));
+        }
+    }
+
     private sealed class RecordingLogger<T> : ILogger<T>
     {
         public List<string> Messages { get; } = [];
         public List<Exception?> Exceptions { get; } = [];
+        public List<LogLevel> Levels { get; } = [];
+        public List<Dictionary<string, object?>> Properties { get; } = [];
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
@@ -587,8 +936,20 @@ public sealed class SystemLoggingTests
             {
                 Messages.Add(formatter(state, exception));
                 Exceptions.Add(exception);
+                Levels.Add(logLevel);
+                Properties.Add(state is IEnumerable<KeyValuePair<string, object?>> properties
+                    ? properties.ToDictionary(property => property.Key, property => property.Value)
+                    : []);
             }
         }
+    }
+
+    private sealed class ThrowingLogger<T> : ILogger<T>
+    {
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter) => throw new InvalidOperationException("diagnostic sink unavailable");
     }
 
     private sealed class UnreadableBody : Stream
@@ -646,6 +1007,11 @@ public sealed class SystemLoggingTests
     {
         public CancellationToken RequestAborted { get; set; }
         public bool Aborted { get; private set; }
-        public void Abort() => Aborted = true;
+        public bool CancelOnAbort { get; init; }
+        public void Abort()
+        {
+            Aborted = true;
+            if (CancelOnAbort) RequestAborted = new CancellationToken(canceled: true);
+        }
     }
 }

@@ -34,7 +34,8 @@ public sealed class SystemLogService : ISystemLogService
         Endpoint = log.Endpoint,
         HttpMethod = log.HttpMethod,
         ResponseStatusCode = log.ResponseStatusCode,
-        ErrorMessage = log.ResponseStatusCode >= 400 ? "Request did not complete successfully." : null,
+        ErrorMessage = log.ResponseStatusCode >= 400 || log.Level >= SystemLogLevel.Warning
+            ? "Request did not complete successfully." : null,
         ExceptionType = log.ExceptionType,
         TraceId = log.TraceId,
         DurationMs = log.DurationMs
@@ -98,7 +99,7 @@ public sealed class SystemLogService : ISystemLogService
     {
         var systemFilter = ConvertFilter(filter);
         var query = _db.SystemLogs.AsNoTracking().Where(log => log.Category == LogCategory.Developer &&
-            (log.ResponseStatusCode >= 400 || log.Level >= SystemLogLevel.Error));
+            (log.ResponseStatusCode >= 400 || log.Level >= SystemLogLevel.Warning));
         var page = await PageAsync(Filter(query, systemFilter), systemFilter, cancellationToken);
         return new PaginatedResponse<AppErrorEntryDto>
         {
