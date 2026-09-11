@@ -96,6 +96,10 @@ sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
 The integrated suite initially encountered an incorrectly supplied Redis test
 connection. After correcting that test environment, the targeted Redis test and
 the complete suite passed without changing production code.
+Both task-owned test containers were removed after the implementation agents
+finished validation; the generated SQL/Redis credential files were also removed.
+Provision equivalent isolated services for a future run; do not expect these
+ephemeral endpoints or credentials to survive the session.
 
 Parallel implementers own separate files and use the existing test/build tooling.
 Backend builds/tests are coordinated separately from runtime work to avoid shared
@@ -160,6 +164,20 @@ Phase 1 was completed/pushed before Phase 2. This continuation preserves the
 bounded Phase 2 fixes, tests, reports and the investigated limitations; it does
 not authorize customer go-live. No base-branch merge, history rewrite, SeedData
 behavior change, new package, schema migration or speculative redesign is included.
+
+Preservation evidence:
+- Implementation checkpoint 5a18d20 was committed and pushed to the current agent
+  branch after secret scanning all 18 added/modified delivery files.
+- No secrets were detected. Unstaged/staged whitespace checks and the committed
+  diff check passed. No generated scratch file is tracked; the accidental empty
+  build lock is deleted. SeedController and DatabaseSeeder are unchanged.
+- Final committed-snapshot parallel validation classified the changes as
+  nontrivial but was refused by the existing two-timeout circuit breaker. No
+  further attempt was made; the independent reviews and executed tests above
+  remain the available evidence, not a substitute CodeQL pass.
+- The remaining closeout changes are documentation only. The working tree was
+  clean at the implementation checkpoint; the final documentation checkpoint
+  records these results and the next-work instructions below.
 
 Next work, in order:
 1. Provision the representative two-node/customer-like acceptance environment

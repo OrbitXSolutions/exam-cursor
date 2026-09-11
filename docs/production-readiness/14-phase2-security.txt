@@ -63,7 +63,7 @@ The follow-up run rebuilt production and tests and includes the strengthened
 invocation-driven eviction regression. Build emitted 20 pre-existing warnings
 and no errors. The parent authorized normal ignored bin/obj outputs.
 Exact final command (240-second outer process bound):
-  dotnet test Backend-API.Tests/Backend-API.Tests.csproj --no-restore
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore
     --filter FullyQualifiedName~SecurityIntegrationTests --verbosity minimal
     -p:UseSharedCompilation=false
 Credentials were loaded from the existing isolated SQL/Redis containers directly
