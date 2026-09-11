@@ -513,10 +513,16 @@ public class UserService : IUserService
     }
 
     user.Status = UserStatus.Inactive;
+    user.RefreshToken = null;
+    user.RefreshTokenExpiryTime = null;
     user.UpdatedDate = UaeTimeHelper.NowUae;
     user.UpdatedBy = deactivatedBy;
 
-    await _userManager.UpdateAsync(user);
+    var update = await _userManager.UpdateAsync(user);
+    if (!update.Succeeded)
+    {
+      return ApiResponse<bool>.FailureResponse("Unable to deactivate user.");
+    }
 
     InvalidateUserCache();
     return ApiResponse<bool>.SuccessResponse(true, "User deactivated successfully.");

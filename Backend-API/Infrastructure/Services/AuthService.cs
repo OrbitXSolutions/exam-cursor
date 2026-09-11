@@ -226,7 +226,10 @@ result.Errors.Select(e => e.Description).ToList());
     }
 
     var user = await _userManager.FindByIdAsync(userId);
-    if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= UaeTimeHelper.NowUae)
+    if (user == null || user.IsDeleted || user.IsBlocked || user.Status != UserStatus.Active ||
+        string.IsNullOrWhiteSpace(dto.RefreshToken) || string.IsNullOrWhiteSpace(user.RefreshToken) ||
+        user.RefreshToken != dto.RefreshToken || !user.RefreshTokenExpiryTime.HasValue ||
+        user.RefreshTokenExpiryTime.Value <= UaeTimeHelper.NowUae)
     {
       return ApiResponse<TokenResponseDto>.FailureResponse("Invalid or expired refresh token.");
     }
@@ -238,7 +241,11 @@ result.Errors.Select(e => e.Description).ToList());
     user.RefreshToken = newRefreshToken;
     user.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddHours(
     double.Parse(_configuration["JwtSettings:RefreshTokenExpirationHours"] ?? "20"));
-    await _userManager.UpdateAsync(user);
+    var update = await _userManager.UpdateAsync(user);
+    if (!update.Succeeded)
+    {
+      return ApiResponse<TokenResponseDto>.FailureResponse("Invalid or expired refresh token.");
+    }
 
     var userDto = user.Adapt<UserDto>();
     userDto.Roles = roles.ToList();

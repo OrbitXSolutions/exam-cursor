@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Smart_Core.Application.DTOs.Attempt;
+using Smart_Core.Application.DTOs.Candidate;
 using Smart_Core.Domain.Common;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Assessment;
@@ -18,6 +21,7 @@ using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Infrastructure.Services;
 using Smart_Core.Infrastructure.Services.Attempt;
+using Smart_Core.Infrastructure.Services.Candidate;
 using Xunit.Abstractions;
 
 namespace Backend_API.Tests;
@@ -194,16 +198,95 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
         Assert.True((await Service(retry).SubmitAttemptAsync(attemptId, seed.Candidates[0])).Success);
     }
 
-    [SqlServerFact]
-    public async Task ConcurrentStartsCreateOneCompleteSnapshotWithoutDeadlock()
+    [SqlServerConcurrencyTheory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task SqlFailureInAnswerEventRollsBackAnswerAndStatusAndAllowsRetry(bool bulk, bool candidateApi)
+    {
+        var seed = await SeedAsync();
+        var attemptId = await StartAsync(seed, seed.Candidates[0]);
+        await using (var setup = Database())
+        {
+            Assert.Equal(2, (int)AttemptEventType.AnswerSaved);
+            await setup.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE [AttemptEvents] ADD CONSTRAINT [CK_Concurrency_AnswerFailure]
+                CHECK ([EventType] <> 2);
+                """);
+        }
+        try
+        {
+            await using var failing = Database();
+            await Assert.ThrowsAsync<DbUpdateException>(() =>
+                candidateApi
+                    ? SaveAtEntryPointAsync(failing, attemptId, seed, true, "rolled back")
+                    : SaveAsync(Service(failing), attemptId, seed, bulk, "rolled back"));
+            await using var verify = Database();
+            Assert.Equal(AttemptStatus.Started, (await verify.Attempts.SingleAsync(a => a.Id == attemptId)).Status);
+            Assert.False(await verify.AttemptAnswers.AnyAsync(a => a.AttemptId == attemptId));
+            Assert.False(await verify.AttemptEvents.AnyAsync(e =>
+                e.AttemptId == attemptId && e.EventType == AttemptEventType.AnswerSaved));
+        }
+        finally
+        {
+            await using var cleanup = Database();
+            await cleanup.Database.ExecuteSqlRawAsync(
+                "ALTER TABLE [AttemptEvents] DROP CONSTRAINT [CK_Concurrency_AnswerFailure]");
+        }
+        await using var retry = Database();
+        Assert.True(candidateApi
+            ? await SaveAtEntryPointAsync(retry, attemptId, seed, true, "retry")
+            : await SaveAsync(Service(retry), attemptId, seed, bulk, "retry"));
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SqlFailureInStartSnapshotRollsBackWholeAttemptAndAllowsRetry(bool candidateApi)
+    {
+        var seed = await SeedAsync();
+        await using (var setup = Database())
+            await setup.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE [AttemptQuestions] ADD CONSTRAINT [CK_Concurrency_SnapshotFailure]
+                CHECK ([Order] < 2);
+                """);
+        try
+        {
+            await using var failing = Database();
+            await Assert.ThrowsAsync<DbUpdateException>(() =>
+                StartAtEntryPointAsync(failing, seed, seed.Candidates[0], candidateApi));
+            await using var verify = Database();
+            Assert.Empty(await verify.Attempts.ToListAsync());
+            Assert.Empty(await verify.AttemptQuestions.ToListAsync());
+            Assert.Empty(await verify.AttemptEvents.ToListAsync());
+            Assert.Empty(await verify.ProctorSessions.ToListAsync());
+        }
+        finally
+        {
+            await using var cleanup = Database();
+            await cleanup.Database.ExecuteSqlRawAsync(
+                "ALTER TABLE [AttemptQuestions] DROP CONSTRAINT [CK_Concurrency_SnapshotFailure]");
+        }
+        await using var retry = Database();
+        var attemptId = await StartAtEntryPointAsync(retry, seed, seed.Candidates[0], candidateApi);
+        await using var verifyRetry = Database();
+        Assert.Equal(1, (await verifyRetry.Attempts.SingleAsync(a => a.Id == attemptId)).AttemptNumber);
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task ConcurrentStartsCreateOneCompleteSnapshotWithoutDeadlock(bool firstCandidateApi, bool secondCandidateApi)
     {
         var seed = await SeedAsync();
         var pause = new PauseBeforeSave();
         await using var firstDb = Database(pause);
         await using var secondDb = Database();
-        var first = Service(firstDb).StartAttemptAsync(new StartAttemptDto { ExamId = seed.ExamId }, seed.Candidates[0]);
+        var first = StartAtEntryPointAsync(firstDb, seed, seed.Candidates[0], firstCandidateApi);
         await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
-        var second = Service(secondDb).StartAttemptAsync(new StartAttemptDto { ExamId = seed.ExamId }, seed.Candidates[0]);
+        var second = StartAtEntryPointAsync(secondDb, seed, seed.Candidates[0], secondCandidateApi);
         try
         {
             await Task.WhenAny(second, Task.Delay(500));
@@ -213,9 +296,7 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
             pause.Release.TrySetResult();
         }
         await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(30));
-        Assert.True(first.Result.Success, first.Result.Message);
-        Assert.True(second.Result.Success, second.Result.Message);
-        Assert.Equal(first.Result.Data!.AttemptId, second.Result.Data!.AttemptId);
+        Assert.Equal(first.Result, second.Result);
         await using var verify = Database();
         var attempt = await verify.Attempts.SingleAsync(a => a.ExamId == seed.ExamId);
         Assert.Equal(1, attempt.AttemptNumber);
@@ -223,6 +304,220 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
         Assert.Equal(1, await verify.ProctorSessions.CountAsync(s => s.AttemptId == attempt.Id));
         Assert.Equal(1, await verify.AttemptEvents.CountAsync(e =>
             e.AttemptId == attempt.Id && e.EventType == AttemptEventType.Started));
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StartingOneCandidateDoesNotBlockAnotherCandidate(bool candidateApi)
+    {
+        var seed = await SeedAsync(candidateCount: 2);
+        var pause = new PauseBeforeSave();
+        await using var firstDb = Database(pause);
+        var first = StartAtEntryPointAsync(firstDb, seed, seed.Candidates[0], candidateApi);
+        await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        try
+        {
+            await using var secondDb = Database();
+            await StartAtEntryPointAsync(secondDb, seed, seed.Candidates[1], !candidateApi).WaitAsync(TimeSpan.FromSeconds(10));
+        }
+        finally
+        {
+            pause.Release.TrySetResult();
+            await first.WaitAsync(TimeSpan.FromSeconds(30));
+        }
+        await using var verify = Database();
+        Assert.Equal(2, await verify.Attempts.CountAsync(a => a.ExamId == seed.ExamId));
+    }
+
+    [SqlServerFact]
+    public async Task ExpiredActiveAttemptStaysExpiredWhenMaximumAttemptsPreventsRestart()
+    {
+        var seed = await SeedAsync();
+        var attemptId = await StartAsync(seed, seed.Candidates[0]);
+        await using (var setup = Database())
+            await setup.Attempts.Where(a => a.Id == attemptId).ExecuteUpdateAsync(s =>
+                s.SetProperty(a => a.ExpiresAt, UaeTimeHelper.NowUae.AddMinutes(-1)));
+        await using (var restarting = Database())
+        {
+            var result = await Service(restarting).StartAttemptAsync(
+                new StartAttemptDto { ExamId = seed.ExamId }, seed.Candidates[0]);
+            Assert.False(result.Success);
+            Assert.Contains("Maximum attempts (1)", result.Message);
+        }
+        await using var verify = Database();
+        var attempt = await verify.Attempts.SingleAsync(a => a.ExamId == seed.ExamId);
+        Assert.Equal(AttemptStatus.Expired, attempt.Status);
+        Assert.Equal(ExpiryReason.TimerExpiredWhileActive, attempt.ExpiryReason);
+    }
+
+    [SqlServerFact]
+    public async Task CandidateStartPreservesMaximumAttemptsAndConsumesOneAdminOverride()
+    {
+        var seed = await SeedAsync();
+        var originalId = await StartAsync(seed, seed.Candidates[0]);
+        await using (var setup = Database())
+            await setup.Attempts.Where(a => a.Id == originalId).ExecuteUpdateAsync(s =>
+                s.SetProperty(a => a.ExpiresAt, UaeTimeHelper.NowUae.AddMinutes(-1)));
+        await using (var denied = Database())
+        {
+            var result = await CandidateService(denied).StartExamAsync(seed.ExamId, new StartExamRequest(), seed.Candidates[0]);
+            Assert.False(result.Success);
+            Assert.Contains("Maximum attempts (1)", result.Message);
+        }
+        await using (var setup = Database())
+        {
+            Assert.Equal(AttemptStatus.Expired, (await setup.Attempts.SingleAsync(a => a.Id == originalId)).Status);
+            setup.Set<AdminAttemptOverride>().Add(new AdminAttemptOverride
+            {
+                ExamId = seed.ExamId, CandidateId = seed.Candidates[0], GrantedBy = seed.Candidates[0],
+                Reason = "Concurrency regression", GrantedAt = UaeTimeHelper.NowUae
+            });
+            await setup.SaveChangesAsync();
+        }
+        var pause = new PauseBeforeSave();
+        await using var firstDb = Database(pause);
+        await using var secondDb = Database();
+        var first = StartAtEntryPointAsync(firstDb, seed, seed.Candidates[0], true);
+        await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        var second = StartAtEntryPointAsync(secondDb, seed, seed.Candidates[0], true);
+        try
+        {
+            await Task.WhenAny(second, Task.Delay(500));
+        }
+        finally
+        {
+            pause.Release.TrySetResult();
+        }
+        await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(30));
+        Assert.Equal(first.Result, second.Result);
+        await using var verify = Database();
+        var resumed = await verify.Attempts.SingleAsync(a => a.Id == first.Result);
+        Assert.Equal(AttemptStatus.Resumed, resumed.Status);
+        Assert.Equal(2, resumed.AttemptNumber);
+        Assert.Equal(originalId, resumed.ResumedFromAttemptId);
+        var usedOverride = await verify.Set<AdminAttemptOverride>().SingleAsync();
+        Assert.True(usedOverride.IsUsed);
+        Assert.Equal(resumed.Id, usedOverride.UsedAttemptId);
+        Assert.Equal(2, await verify.Attempts.CountAsync(a => a.ExamId == seed.ExamId));
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task CandidateAndAttemptAnswerEntryPointsShareUpsertLock(bool firstCandidateApi, bool secondCandidateApi)
+    {
+        var seed = await SeedAsync();
+        var attemptId = await StartAsync(seed, seed.Candidates[0]);
+        var pause = new PauseBeforeSave();
+        await using var firstDb = Database(pause);
+        await using var secondDb = Database();
+        var first = SaveAtEntryPointAsync(firstDb, attemptId, seed, firstCandidateApi, "first");
+        await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        var second = SaveAtEntryPointAsync(secondDb, attemptId, seed, secondCandidateApi, "second");
+        try
+        {
+            await Task.WhenAny(second, Task.Delay(500));
+        }
+        finally
+        {
+            pause.Release.TrySetResult();
+        }
+        await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(30));
+        Assert.True(first.Result);
+        Assert.True(second.Result);
+        await using var verify = Database();
+        Assert.Equal("second", (await verify.AttemptAnswers.SingleAsync(a => a.AttemptId == attemptId)).TextAnswer);
+        Assert.Equal(2, await verify.AttemptEvents.CountAsync(e =>
+            e.AttemptId == attemptId && e.EventType == AttemptEventType.AnswerSaved));
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(true, false, false)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, false)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    public async Task CandidateAndAttemptEntryPointsShareSubmitLock(bool candidateSave, bool candidateSubmit, bool submitFirst)
+    {
+        var seed = await SeedAsync();
+        var attemptId = await StartAsync(seed, seed.Candidates[0]);
+        var pause = new PauseBeforeSave();
+        await using var firstDb = Database(pause);
+        await using var secondDb = Database();
+        var first = submitFirst
+            ? SubmitAtEntryPointAsync(firstDb, attemptId, seed.Candidates[0], candidateSubmit)
+            : SaveAtEntryPointAsync(firstDb, attemptId, seed, candidateSave, "before submit");
+        await pause.Entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        var second = submitFirst
+            ? SaveAtEntryPointAsync(secondDb, attemptId, seed, candidateSave, "too late")
+            : SubmitAtEntryPointAsync(secondDb, attemptId, seed.Candidates[0], candidateSubmit);
+        try
+        {
+            await Task.WhenAny(second, Task.Delay(500));
+        }
+        finally
+        {
+            pause.Release.TrySetResult();
+        }
+        await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(30));
+        Assert.True(first.Result);
+        Assert.Equal(!submitFirst, second.Result);
+        await using var verify = Database();
+        Assert.Equal(AttemptStatus.Submitted, (await verify.Attempts.SingleAsync(a => a.Id == attemptId)).Status);
+        Assert.Equal(submitFirst ? 0 : 1, await verify.AttemptAnswers.CountAsync(a => a.AttemptId == attemptId));
+        Assert.Equal(1, await verify.AttemptEvents.CountAsync(e =>
+            e.AttemptId == attemptId && e.EventType == AttemptEventType.Submitted));
+        Assert.Equal(ProctorSessionStatus.Completed,
+            (await verify.ProctorSessions.SingleAsync(s => s.AttemptId == attemptId)).Status);
+    }
+
+    [SqlServerConcurrencyTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CandidateSubmitSqlFailureRollsBackAndLateSubmitAndDuplicateRulesArePreserved(bool late)
+    {
+        var seed = await SeedAsync();
+        var attemptId = await StartAsync(seed, seed.Candidates[0]);
+        await using (var setup = Database())
+        {
+            if (late)
+                await setup.Attempts.Where(a => a.Id == attemptId).ExecuteUpdateAsync(s =>
+                    s.SetProperty(a => a.ExpiresAt, UaeTimeHelper.NowUae.AddMinutes(-1)));
+            await setup.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE [AttemptEvents] ADD CONSTRAINT [CK_Concurrency_CandidateSubmitFailure]
+                CHECK ([EventType] <> 6);
+                """);
+        }
+        try
+        {
+            await using var failing = Database();
+            await Assert.ThrowsAsync<DbUpdateException>(() =>
+                CandidateService(failing).SubmitAttemptAsync(attemptId, seed.Candidates[0]));
+            await using var verify = Database();
+            var attempt = await verify.Attempts.SingleAsync(a => a.Id == attemptId);
+            Assert.Equal(AttemptStatus.Started, attempt.Status);
+            Assert.Null(attempt.SubmittedAt);
+            Assert.Equal(ProctorSessionStatus.Active,
+                (await verify.ProctorSessions.SingleAsync(s => s.AttemptId == attemptId)).Status);
+            Assert.False(await verify.AttemptEvents.AnyAsync(e =>
+                e.AttemptId == attemptId && e.EventType == AttemptEventType.Submitted));
+        }
+        finally
+        {
+            await using var cleanup = Database();
+            await cleanup.Database.ExecuteSqlRawAsync(
+                "ALTER TABLE [AttemptEvents] DROP CONSTRAINT [CK_Concurrency_CandidateSubmitFailure]");
+        }
+        await using (var retry = Database())
+            Assert.True((await CandidateService(retry).SubmitAttemptAsync(attemptId, seed.Candidates[0])).Success);
+        await using (var duplicate = Database())
+            Assert.True((await CandidateService(duplicate).SubmitAttemptAsync(attemptId, seed.Candidates[0])).Success);
+        await using var verifyRetry = Database();
+        Assert.Equal(1, await verifyRetry.AttemptEvents.CountAsync(e =>
+            e.AttemptId == attemptId && e.EventType == AttemptEventType.Submitted));
     }
 
     [SqlServerConcurrencyTheory]
@@ -312,6 +607,12 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
         Assert.All(attempts, a => Assert.Equal(AttemptStatus.Submitted, a.Status));
         Assert.Equal(candidateCount * seed.QuestionIds.Length,
             await verify.AttemptAnswers.CountAsync(a => a.Attempt.ExamId == seed.ExamId));
+        Assert.Equal(candidateCount * seed.QuestionIds.Length,
+            await verify.AttemptQuestions.CountAsync(q => q.Attempt.ExamId == seed.ExamId));
+        Assert.Equal(candidateCount * seed.QuestionIds.Length * 2,
+            await verify.AttemptEvents.CountAsync(e => e.Attempt.ExamId == seed.ExamId && e.EventType == AttemptEventType.AnswerSaved));
+        Assert.Equal(candidateCount,
+            await verify.AttemptEvents.CountAsync(e => e.Attempt.ExamId == seed.ExamId && e.EventType == AttemptEventType.Started));
         Assert.Equal(candidateCount,
             await verify.AttemptEvents.CountAsync(e => e.Attempt.ExamId == seed.ExamId && e.EventType == AttemptEventType.Submitted));
         Assert.Equal(candidateCount,
@@ -346,6 +647,37 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
     private static AttemptService Service(ApplicationDbContext db) =>
         new(db, new TestHub(), new HttpContextAccessor(), new CacheService(), null!);
 
+    private static CandidateService CandidateService(ApplicationDbContext db) =>
+        new(db, null!, null!, null!, NullLogger<CandidateService>.Instance,
+            new NoGradingScopeFactory(), new CacheService(), new TestHub(), new HttpContextAccessor());
+
+    private static async Task<int> StartAtEntryPointAsync(ApplicationDbContext db, Seed seed, string candidate, bool candidateApi)
+    {
+        if (candidateApi)
+        {
+            var result = await CandidateService(db).StartExamAsync(seed.ExamId, new StartExamRequest(), candidate);
+            Assert.True(result.Success, result.Message);
+            return result.Data!.AttemptId;
+        }
+        var attemptResult = await Service(db).StartAttemptAsync(new StartAttemptDto { ExamId = seed.ExamId }, candidate);
+        Assert.True(attemptResult.Success, attemptResult.Message);
+        return attemptResult.Data!.AttemptId;
+    }
+
+    private static async Task<bool> SaveAtEntryPointAsync(ApplicationDbContext db, int attemptId, Seed seed, bool candidateApi, string text)
+    {
+        if (!candidateApi) return await SaveAsync(Service(db), attemptId, seed, true, text);
+        return (await CandidateService(db).SaveAnswersAsync(attemptId, new BulkSaveAnswersRequest
+        {
+            Answers = [new SaveAnswerRequest { QuestionId = seed.QuestionIds[0], TextAnswer = text }]
+        }, seed.Candidates[0])).Success;
+    }
+
+    private static async Task<bool> SubmitAtEntryPointAsync(ApplicationDbContext db, int attemptId, string candidate, bool candidateApi) =>
+        candidateApi
+            ? (await CandidateService(db).SubmitAttemptAsync(attemptId, candidate)).Success
+            : (await Service(db).SubmitAttemptAsync(attemptId, candidate)).Success;
+
     private async Task<int> StartAsync(Seed seed, string candidate)
     {
         await using var db = Database();
@@ -367,9 +699,10 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
     private async Task<Seed> SeedAsync(int candidateCount = 1, int questionCount = 2)
     {
         await using var db = Database();
-        var department = new Department { NameEn = "Concurrency", NameAr = "Concurrency" };
+        var suffix = Guid.NewGuid().ToString("N");
+        var department = new Department { NameEn = $"Concurrency-{suffix}", NameAr = $"Concurrency-{suffix}" };
         var subject = new QuestionSubject { NameEn = "Concurrency", NameAr = "Concurrency", Department = department };
-        var type = new QuestionType { NameEn = "Essay", NameAr = "Essay" };
+        var type = new QuestionType { NameEn = $"Essay-{suffix}", NameAr = $"Essay-{suffix}" };
         var exam = new Exam
         {
             Department = department, TitleEn = "Concurrency", TitleAr = "Concurrency",
@@ -394,6 +727,12 @@ public sealed class AttemptConcurrencyTests(ITestOutputHelper output) : IAsyncLi
     }
 
     private sealed record Seed(int ExamId, int[] QuestionIds, string[] Candidates);
+
+    private sealed class NoGradingScopeFactory : IServiceScopeFactory
+    {
+        public IServiceScope CreateScope() =>
+            throw new NotSupportedException("Background grading is outside these persistence regression tests.");
+    }
 
     private sealed class PauseBeforeSave : SaveChangesInterceptor
     {

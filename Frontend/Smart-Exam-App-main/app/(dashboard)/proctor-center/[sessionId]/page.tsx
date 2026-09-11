@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { translateServerMessage } from "@/lib/i18n/runtime"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, createIncidentFromProctor, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
@@ -376,9 +376,10 @@ export default function SessionDetailPage() {
     }
   }, [session?.status])
 
-  async function loadSession() {
+  async function loadSession(isRefresh = false) {
     try {
-      setLoading(true)
+      // Keep the video elements mounted during action refreshes; replacing them loses srcObject.
+      if (!isRefresh) setLoading(true)
       const data = await getSessionDetails(sessionId)
       setSession(data.session)
       setIncidents(data.incidents)
@@ -399,9 +400,9 @@ export default function SessionDetailPage() {
       }
     } catch (error) {
       toast.error(t("proctor.failedToLoadSession"))
-      router.push("/proctor-center")
+      if (!isRefresh) router.push("/proctor-center")
     } finally {
-      setLoading(false)
+      if (!isRefresh) setLoading(false)
     }
   }
 
@@ -413,7 +414,7 @@ export default function SessionDetailPage() {
       setReviewDialogOpen(false)
       setSelectedIncident(null)
       setReviewNotes("")
-      loadSession()
+      await loadSession(true)
     } catch (error) {
       toast.error(t("proctor.failedToReviewIncident"))
     }
@@ -424,7 +425,7 @@ export default function SessionDetailPage() {
     try {
       await flagSession(session.id, !session.flagged)
       toast.success(session.flagged ? t("proctor.unflagged") : t("proctor.flagged"))
-      loadSession()
+      await loadSession(true)
     } catch (error) {
       toast.error(t("proctor.failedToUpdateFlag"))
     }
@@ -486,22 +487,11 @@ export default function SessionDetailPage() {
       setAddTimeMinutes(10)
       setAddTimeReason("")
       // Refresh session data to show updated time
-      loadSession()
+      await loadSession(true)
     } catch (error) {
       toast.error(t("proctor.failedToAddTime"))
     } finally {
       setAddTimeLoading(false)
-    }
-  }
-
-  async function handleCreateIncident() {
-    if (!session) return
-    try {
-      const result = await createIncidentFromProctor(parseInt(session.id))
-      toast.success(t("proctor.incidentCreatedNum", { num: result.caseNumber }))
-      router.push(`/proctor-center/incidents/${result.id}`)
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToCreateIncident"))
     }
   }
 

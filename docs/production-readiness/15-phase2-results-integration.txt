@@ -1,0 +1,155 @@
+PHASE 2 — CANDIDATE RESULT SUMMARY INTEGRATION
+Date: 2026-09-11
+Status: Confirmed defect reproduced, narrowly fixed, SQL regressions passed.
+
+OWNERSHIP AND CALL CHAIN
+Only ExamResultService.cs and new ResultSummaryConcurrencyTests.cs were changed
+for this implementation, plus this report. No attempt, notification, identity,
+hub, certificate service, SeedData, AllowAnonymous, or agent-configuration edits.
+
+Inspected the actual callers before changing the shared helper:
+- FinalizeResultAsync saves the Result and attempt scores, then refreshes.
+- UpdateResultFromRegradingAsync saves updated scores, then refreshes.
+- GetCandidateExamSummaryAsync repairs a missing summary on a read.
+- RefreshCandidateExamSummaryAsync provides the explicit refresh endpoint.
+- GetExamCandidateSummariesAsync invokes orphan-pair repair, which refreshes.
+- GradingService.CompleteGradingAsync calls finalization after its own save.
+- CandidateService background grading calls finalization in a fresh DI scope.
+These current callers do not enclose summary refresh in another transaction.
+
+CONFIRMED DEFECT AND BASELINE EVIDENCE
+The original helper read results, tested for a missing summary, then inserted or
+updated it with no ownership across requests. The unique SQL index
+IX_CandidateExamSummaries_ExamId_CandidateId_Unique prevents duplicate rows, but
+does not make this read/compute/write operation safe.
+
+Actual SQL Server reproduction, not an in-memory database:
+- First explicit refresh paused immediately before SaveChanges; an overlapping
+  read-repair completed first. Releasing the first request threw DbUpdateException
+  with the above duplicate-key index identified by SqlException.
+- For an existing summary, the first request computed 85 while a concurrent
+  regrade/refresh computed and persisted 95. Releasing the older request persisted
+  85 over the newer aggregate. The regression asserted expected 95, actual 85.
+- A reused context with tracked results returned 80 after another context had
+  persisted 95, demonstrating why a lock alone does not fix EF identity-map state.
+Initial five-test baseline: 3 passed, 2 failed. After strengthening the existing
+summary race to dirty its score before the interleave, that targeted baseline
+also failed with the documented 85-versus-95 overwrite.
+
+IMPLEMENTATION
+RefreshCandidateExamSummaryInternalAsync takes a ReadCommitted SQL transaction
+and a parameterized UPDLOCK, ROWLOCK on the existing AspNetUsers candidate row
+BEFORE reading results or the summary. This also owns first creation where there
+is no summary row to lock. SaveChanges and transaction commit finish before the
+next refresh for that candidate can read/compute its aggregate.
+
+Aggregate results use AsNoTracking, so previously tracked regrading data cannot
+replace newly read values. An existing tracked summary is reloaded under ownership,
+refreshing its original-value snapshot as well as current fields. The summary DTO
+reads the best result's score denominator explicitly, preserving percentage
+calculation without relying on tracking-driven navigation fixup.
+
+Preserved rules: non-deleted results only; published and unpublished results both
+count; highest score wins with earliest FinalizedAt breaking score ties; latest
+uses descending FinalizedAt, not StartedAt or attempt number; LastAttemptAt uses
+the selected latest attempt's StartedAt; pass flags, attempt counts, remaining
+attempt calculation, creation audit, and no-results behavior remain intact.
+No certificate generation or publishing semantics were changed.
+
+VERIFICATION
+New ResultSummaryConcurrencyTests: 5 passed, 0 failed, 0 skipped against the
+isolated SQL Server Developer instance. Each test creates and drops its own
+database using the application's EF model; persistence assertions use a separate
+context. Concurrent tests pause before summary save and observe the competing
+SQL session's actual lock wait (or its completion on the unfixed code), rather
+than assuming overlap after an arbitrary sleep.
+
+Coverage:
+1. Concurrent first explicit refresh and read-repair produce one persisted row.
+2. An older existing refresh cannot overwrite a newer committed aggregate.
+3. Pretracked result/summary snapshots cannot corrupt refreshed values, including
+   changes that would otherwise be omitted by EF original-value comparisons.
+4. Ranking, pass flags, soft-delete filtering, unpublished results, audit fields,
+   remaining attempts, repeated refresh, and empty-candidate behavior persist.
+5. A real SQL CHECK failure leaves no partial summary, preserves result rows,
+   releases ownership, and permits a successful retry from another request.
+
+Existing commands, with TEST_SQLSERVER_CONNECTION / TEST_SQLSERVER_PASSWORD
+provided securely by the isolated test environment:
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore --filter FullyQualifiedName~ResultSummaryConcurrencyTests
+  dotnet build /home/runner/work/exam-cursor/exam-cursor/Backend-API/Smart_Core.csproj --no-restore -v:q
+Final direct test run: all 5 passed in 45.28 seconds. Final production build:
+success, zero warnings/errors reported. No dependencies added.
+
+INTEGRATED BACKEND VERIFICATION REQUESTED BY THE PARENT
+The root backend suite at the time of this run was built and executed against the same
+isolated, authenticated SQL Server and Redis services. Credentials were supplied
+only in the test process environment; output was captured in the tool console,
+not a repository log. A 420-second outer process timeout bounded the run.
+
+Exact corrected integrated result:
+  Total: 262; passed: 262; failed: 0; skipped: 0.
+  Runner elapsed: 1.3856 minutes. Command exit code: 0.
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore --logger "console;verbosity=detailed"
+
+Included current concurrency/integration classes:
+  AttemptConcurrencyTests: 36 passed, including the 50-candidate workload.
+  NotificationIntegrationTests: 15 passed.
+  SecurityIntegrationTests: 7 passed.
+  ResultSummaryConcurrencyTests: 5 passed.
+  RedisBackplaneTests: 1 passed.
+  SqlServerLoggingTests: 1 passed; SqlServerWorkerLockTests: 6 passed.
+All remaining existing backend tests also passed in that same 262-case run.
+The invocation-driven revoked-peer eviction follow-up was made later and has
+separate validation in report 14; this full-suite result must not be presented
+as a new whole-suite execution after that later change.
+
+Snapshot limitation: after this run, the security owner reported a further
+ProctorHub/SecurityIntegrationTests change at approximately 08:43 UTC: revoked
+callers are evicted from both channels on an invoked operation, and a regression
+asserts no further receipt after denial without an explicit Leave. That later
+change is NOT covered by this integrated result. The security owner subsequently
+reported a rebuilt, final focused SecurityIntegrationTests run: 7 passed,
+0 failed, 0 skipped, 18 seconds, exit code 0; see report 14. This report does not
+claim a full-suite pass of the later final tree. The parent requested no
+additional suite rerun from this agent after accepting the completed evidence.
+
+An initial integrated attempt had an incorrectly supplied Redis connection
+configuration and failed authentication; it is not counted as a passing run.
+The isolated Redis service answered authenticated PING, the targeted Redis test
+then passed 1/1 with connection options constructed in-process, and the complete
+262-case run above passed after that configuration correction. No production
+change was made to obtain those passes.
+
+50-CANDIDATE WORKLOAD BOUNDS AND MEASURED OUTPUT
+Scope: backend service calls and real SQL persistence, 50 candidates, 10 questions
+each; 50 starts + 100 overlapping bulk saves + 50 submits = 200 operations.
+Its existing workload Task.WhenAll has a three-minute timeout, within the full
+suite's seven-minute outer bound. Measured workload elapsed: 2.323 seconds;
+throughput: 86.09 operations/second in this isolated run.
+
+  Operation   Samples   p50 ms   p95 ms   p99 ms   Maximum ms
+  bulk-save       100     22.4    402.1    655.3       1887.6
+  start            50   1322.2   2192.7   2269.9       2269.9
+  submit           50     30.0    101.3    129.8        129.8
+
+The workload asserts 50 submitted attempts, 500 answer rows, 500 question
+snapshots, 1000 answer-saved events, 50 start events, 50 submission events, and
+50 completed proctor sessions. It does NOT measure HTTP traffic, browsers,
+WebRTC, or SignalR transport, and is not a production capacity/SLA claim.
+
+LIMITS AND PRODUCT DECISIONS
+This is backend service/SQL validation, not HTTP/browser, realistic exam load,
+migration rollout, or whole-system acceptance. The lock serializes refreshes for
+one candidate across exams; it is not a process-local mutex. Final result writes
+still commit before summary refresh, preserving the existing integration boundary;
+this is not a new atomic transaction covering grading and summary creation.
+
+Single-result publication automatically creates a certificate for passed results;
+bulk/exam publication does not. That difference remains for product review, not
+an inferred defect to change in this patch. CacheService is a no-op; missing
+certificate cache invalidation is not a live bug.
+
+Parallel code-review/CodeQL validation was requested, but the tool declined
+because its validation time limit was reached. No automated review/security pass
+is claimed; the parent coordinator should retain this limitation in the handoff.

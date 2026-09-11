@@ -1,0 +1,110 @@
+PHASE 2 — SYSTEM VALIDATION AND COVERAGE
+Date: 2026-09-11
+Resume baseline: 8e0a8f4 (interrupted Phase 2), after Phase 1 checkpoint 87cc6c9.
+Status: PARTIALLY VERIFIED; individual results below are not a delivery certification.
+
+SCOPE
+The available application comprises the ASP.NET/SQL examination API, Next.js
+candidate/admin/proctor interfaces, SignalR/WebRTC, local/shared media, grading/
+results/certificates, notification providers, and license/configuration layers.
+This continuation reviews the interrupted notification/concurrency work and
+investigates camera backup and existing authorization boundaries. A separate
+read-only review covers grading/results/certificate integration. SeedData and
+its intentional AllowAnonymous behavior are unchanged.
+
+EXISTING TOOLING AND INDEPENDENT BASELINE CHECKS
+VERIFIED in this resumed session:
+- Frontend frozen-lockfile installation succeeded; no dependency updates.
+- Frontend production build succeeded at the resumed baseline.
+- Frontend production build also succeeded after the camera action-refresh fix;
+  the typecheck's only output changes were shifted line numbers in that page.
+- TypeScript: 204 existing diagnostics, matching the prior reported count.
+  The existing ignoreBuildErrors setting means a successful Next.js build is
+  not a passing TypeScript check. No blanket suppression or unrelated type
+  cleanup is being used to hide these diagnostics.
+- LicenseSigner Release build passed with zero warnings/errors.
+- The built /login endpoint returned HTTP 200 on loopback, 14,219 bytes,
+  with the SmartExam page title. No login or exam transaction was performed.
+BLOCKED:
+- Existing pnpm lint command reports "eslint: not found". No new linter added.
+- The available Playwright browser tool reports "Transport closed". The HTTP
+  login smoke check is not a browser or camera/WebRTC test.
+
+REPRODUCIBLE EXISTING COMMANDS
+Frontend working directory:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main
+corepack pnpm install --frozen-lockfile
+corepack pnpm build
+corepack pnpm exec tsc --noEmit
+corepack pnpm lint
+corepack pnpm start --hostname 127.0.0.1 --port 3000
+
+dotnet build /home/runner/work/exam-cursor/exam-cursor/LicenseSigner/LicenseSigner.csproj -c Release --verbosity minimal
+
+Backend existing suite:
+dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj -c Release --verbosity minimal
+SQL/Redis tests require explicitly configured isolated services; otherwise
+conditional skips must be reported, not counted as successful integration.
+
+ISOLATED SERVICES
+The parent provisioned fresh, authenticated, loopback-only SQL Server Developer
+and Redis containers; no customer endpoints, credentials, messages or data used.
+Images resolved in this session:
+mcr.microsoft.com/mssql/server@sha256:97b448857967be55e005424a660056fe6d51814435804dc07e8f79f028bab5fb
+redis@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+Test secrets and raw logs are temporary, outside Git. Do not depend on those
+temporary files to resume. Integration test database fixtures use unique names.
+Production certificate validation must not use the isolated SQL test exception.
+
+REMAINING EVIDENCE
+Area-specific implementation and verification results are retained in reports
+09-11 and 14-15. Historical Phase 1 counts are not added to new test counts.
+No whole-system end-to-end, Windows/shared-mount, customer-provider, or realistic
+50-camera-browser acceptance pass is claimed by these baseline checks.
+
+The later integrated backend run in report 15 passed 262/262, zero failed/skipped,
+against isolated SQL/Redis, including the 36-case attempt class and existing
+logging/worker/backplane tests. It preceded the final detected-revocation cleanup;
+that narrowly scoped follow-up has its own verification record in report 14.
+Do not combine earlier focused-test counts with the integrated count.
+
+WIDER INTEGRATION REVIEW — SOURCE FINDINGS AND DECISIONS
+Reviewed result generation/publication, certificate creation and candidate exam
+summary refresh, in addition to the independently owned attempt workflows.
+This is a targeted review, not an exhaustive execution of every system feature.
+
+- The candidate summary helper has a check-then-insert race against the unique
+  exam/candidate index, and potentially stale concurrent aggregate writes.
+  These were reproduced and corrected; five focused real SQL regressions passed.
+  Evidence and preserved ranking/aggregate rules are retained in report 15.
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/ExamResult/ExamResultService.cs:1435-1483
+- Single result publication invokes automatic certificate creation for passed
+  results, whereas bulk/exam publication does not. This observed difference
+  requires product/owner confirmation before changing issuance semantics;
+  it is documented, not silently expanded into new certificate side effects.
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/ExamResult/ExamResultService.cs:312-480
+- A suggested certificate-cache invalidation bug was rejected: CacheService now
+  always misses and Set/Remove are no-ops. Additional invalidation calls would
+  not fix a current runtime defect.
+  /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/CacheService.cs:10-35
+- Exception paths may leave finalized/published result side effects without all
+  secondary work (notifications/certificates/summaries). Not every such sequence
+  is transactional by contract. Full grading/publication fault-injection and
+  financial/business-style exactly-once redesign were not claimed or introduced.
+
+No speculative stale-cache fixes, blanket aggregate changes, certificate policy
+changes, unrelated type suppression, or broad cleanup were applied.
+
+REVIEW STATUS
+The read-only Phase 2 correctness reviewer found no significant issues in the
+reviewed concurrency, summary, notification and camera diff. Focused security
+review identified additional revoked-caller cleanup; its disposition is retained
+in the final handoff/security report rather than suppressed. An idle connection's
+pre-existing entitlement/JWT revocation limitations are not a new instant-
+revocation guarantee. Automated CodeQL attempts hit time/analysis limits; no
+successful full-system CodeQL result is claimed.
+
+Full grading/regrading/publication/certificate HTTP workflows, file export and
+actual inbox/handset delivery have not been comprehensively executed in this
+continuation. An accepted backend service regression is not acceptance of every
+UI/API integration. Outstanding production-like checks are listed in report 13.

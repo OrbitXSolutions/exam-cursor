@@ -1,0 +1,140 @@
+PHASE 2 NOTIFICATIONS - EXECUTED VALIDATION
+Date: 2026-09-11 UTC
+Baseline reviewed: 87cc6c9 -> partial HEAD 8e0a8f4
+
+Scope and outcome
+Reviewed notification services, NotificationIntegrationTests, notification-hub,
+useNotifications, and notification templates. Retained the partial production
+changes after checking their actual code paths. This follow-up adds six SQL
+regression tests, bringing NotificationIntegrationTests to 15 tests. No further
+production-code defect was demonstrated by the checks below. No triggers,
+recipient rules, dependencies, authentication, attempt logic, or camera UI were
+changed by this notification follow-up.
+
+Backend execution - real SQL Server, not an in-memory provider
+SQL Server Developer: 127.0.0.1:14339. Credentials supplied only through process
+environment; never printed or stored in the report. Each test creates and deletes
+a uniquely named Phase2Notifications database using the existing xUnit SQL setup.
+Build/test operations waited for other active dotnet builds/tests to finish.
+
+Executed:
+dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore
+  --filter FullyQualifiedName~NotificationIntegrationTests
+  --logger "trx;LogFileName=notifications.trx" --verbosity quiet
+Result: 13 passed, 0 failed, 0 skipped. Runner duration: 1 minute 29 seconds.
+TRX execution window: 08:19:06-08:20:45 UTC.
+
+After adding the cancellation and dispatcher tests, executed:
+dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore
+  --filter "FullyQualifiedName~SlowPushReceivesCancellation|FullyQualifiedName~DispatcherUsesIndependentScope"
+  --logger "trx;LogFileName=notification-push.trx" --verbosity quiet
+Result: 2 passed, 0 failed, 0 skipped. Runner duration: 36 seconds.
+TRX execution window: 08:25:47-08:26:27 UTC.
+
+The two TRX files were parsed: 15 distinct tests executed, all passed.
+This is the union of two runs, not a claim of one final 15-test suite run.
+
+Executed backend coverage
+1. All three event-specific English email templates and compact SMS messages.
+   Credential-free templates/SMS succeed with deliberately unreadable encrypted
+   candidate credentials; unused decryption is never invoked.
+2. Missing/inactive event templates fail without calling delivery providers.
+3. Independent batching: five emails and five SMS, email limit two and SMS limit
+   three, four cycles with exact provider and pending/sent row counts.
+   The existing SMS query already had Take(smsBatchSize); it was not changed.
+4. Password placeholders independently in English subject and body: decryption
+   failure records Failed without sending email; explicit retry with working
+   decryption renders both locations. SMS never includes those credentials.
+5. Separate worker service providers cannot deliver the same pending row while
+   one worker holds the SQL application lock.
+6. Shutdown after provider acceptance persists that delivery; the remaining row
+   stays pending and can subsequently record a provider failure.
+7. Assignment deduplication is per channel, handles repeated IDs, allows a newly
+   enabled email channel, preserves failed rows for explicit retry, and does not
+   queue assignments for an unpublished exam.
+8. Two published attempts for one candidate produce one result email; repeated
+   queueing does not add a result SMS or expiry event.
+9. Actual ExamAssignmentService.AssignAsync -> NotificationService -> SQL logs
+   -> worker -> recording email/SMS providers. Updating an existing assignment's
+   schedule does not enqueue another notification.
+10. Actual ExamResultService.BulkPublishResultsAsync -> published results ->
+    NotificationService -> one SQL email row -> worker -> recording email
+    provider. Two attempts and repeated publication do not add duplicate email.
+11. A deterministic SQL interceptor completes a delivery between retry/send-now
+    read and UPDATE: both compare-and-set paths preserve Sent and retry count.
+12. Scoped start/submit in-app notifications persist and push to department
+    Admin/Proctor and global SuperAdmin only; overlapping roles deduplicate.
+    REST paging/unread/read/all-read operations remain user-scoped.
+13. Push failure is awaited and observed after persistence; REST still returns
+    the unread notification and the failure is logged.
+14. A stalled push receives the service's cancellation token; the actual
+    ten-second cancellation completes creation without losing the persisted
+    notification. This tests a transport that honors cancellation.
+15. Actual NotificationDispatcher.NotifyUser creates an independent DI scope
+    after the caller's seed context is disposed, persists, and pushes the
+    correct notification/group without a dispatcher failure.
+
+Frontend execution
+Used installed TypeScript and Node 22, without adding a test framework, package,
+package.json script, or persistent harness. An inline Node assertion harness
+transpiled the actual notification-hub.ts and useNotifications.ts with TypeScript
+and executed them with controlled SignalR, HTTP, timer, and hook dependencies.
+
+PASS: initial SignalR start failure retries; accessTokenFactory observes a newly
+rotated token; remote WebSocket/SSE settings and reconnect delays are preserved;
+reconnect resynchronizes; repeated close callbacks create one retry; disconnect
+clears retry/callbacks; unauthenticated connect is a no-op.
+
+PASS: unread badge uses REST values instead of incrementing duplicate pushes;
+older HTTP responses cannot overwrite newer ones; reconnect refreshes the badge;
+30-second polling refreshes; unmount clears polling and rejects late responses;
+proctor refresh accepts only start/submit event types and connection recovery.
+
+Scoped TypeScript compiler check used the existing tsconfig from the frontend
+working directory, with the hub, hooks, and templates page as entrypoints:
+0 diagnostics in those files. There are 25 diagnostics in the imported,
+out-of-scope lib/i18n/translations.ts. This is not a clean whole-app typecheck.
+An initial check invoked from the repository root could not resolve Node types;
+rerunning from the frontend directory resolved that invocation issue without
+installing packages. No browser/React renderer or full Next build was run by this
+notification follow-up; the Node harness uses controlled hook dependencies.
+
+Producer/product boundaries intentionally preserved
+ExamAssignmentService and bulk result publication were exercised end-to-end
+through persistence and the worker, with recording delivery providers.
+NotificationDispatcher.NotifyUser was exercised through real DI persistence.
+Start/submit role notification behavior was tested at UserNotificationService,
+not by invoking AttemptService in this follow-up.
+AssessmentService.PublishExamAsync, single-result publication, whole-exam result
+publication, and actual attempt/expiry producers were not executed by these
+notification tests; do not treat source references as runtime coverage.
+
+ExamExpired has templates and worker formatting but no automatic email/SMS
+producer was introduced. Exam-start email triggers remain absent. These are
+product decisions, not technical defects repaired by this work.
+Result publication remains email-only; result/expiry SMS formatting tests insert
+explicit log rows and do not prove an automatic SMS producer exists.
+SMS remains compact system text, not editable email-template content. Event
+activation still gates both channels. English fields are the fields actually
+rendered by this worker; Arabic template rendering/localization is not added.
+Existing role/department scoping and unresolved-department fallback are unchanged.
+
+Review and limitations
+parallel_validation completed code review, reporting six comments across the
+wider branch. The Arabic-password suggestion does not match the rendering path:
+only English subject/body are rendered, so checking unused Arabic placeholders
+would reintroduce unnecessary decryption. The login-URL suggestion concerns an
+unchanged baseline helper and broader configuration behavior; no new URL policy
+was introduced. Other comments concerned files outside this ownership scope.
+CodeQL did NOT pass: JavaScript analysis failed; C# analysis was skipped because
+the database was too large. Zero reported alerts is not successful coverage.
+
+These tests do not send live SMTP/SMS or use a real SignalR browser transport.
+They validate SQL persistence and notification decisions with recording
+providers. Concurrent producer insertion deduplication is not proven; current
+dedup tests cover repeated calls and repeated results within a call.
+Provider acceptance followed by process failure before persisting Sent can still
+cause replay; provider idempotency/exactly-once delivery is not implemented.
+NotificationDispatcher remains in-process fire-and-forget, not a durable outbox.
+Push timeout requires transport cancellation support; it is not evidence that
+an arbitrary cancellation-ignoring provider cannot hang.

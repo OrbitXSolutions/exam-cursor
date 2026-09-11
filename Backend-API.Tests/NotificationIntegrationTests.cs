@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Smart_Core.Application.DTOs.ExamAssignment;
+using Smart_Core.Application.DTOs.ExamResult;
 using Smart_Core.Application.DTOs.Notification;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Domain.Entities;
@@ -18,6 +20,10 @@ using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Infrastructure.Persistence;
+using Smart_Core.Infrastructure.Services;
+using Smart_Core.Infrastructure.Services.Authorization;
+using Smart_Core.Infrastructure.Services.ExamAssignment;
+using Smart_Core.Infrastructure.Services.ExamResult;
 using Smart_Core.Infrastructure.Services.Notification;
 using AttemptEntity = Smart_Core.Domain.Entities.Attempt.Attempt;
 
@@ -87,6 +93,99 @@ public sealed class NotificationIntegrationTests
         Assert.Empty(provider.Sms);
         Assert.All(await db.NotificationLogs.AsNoTracking().ToListAsync(),
             log => Assert.Equal(NotificationStatus.Failed, log.Status));
+    }
+
+    [SqlServerFact]
+    public async Task WorkerHonorsIndependentEmailAndSmsBatchLimitsAcrossCycles()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        await using var db = fixture.Database();
+        var (candidate, exam) = await SeedAsync(db);
+        var settings = await db.NotificationSettings.SingleAsync();
+        settings.EmailBatchSize = 2;
+        settings.SmsBatchSize = 3;
+        db.NotificationTemplates.Add(Template());
+        for (var index = 0; index < 5; index++)
+        {
+            db.NotificationLogs.Add(Log(candidate, exam));
+            db.NotificationLogs.Add(Log(candidate, exam, channel: NotificationChannel.Sms));
+        }
+        await db.SaveChangesAsync();
+        var provider = new RecordingDelivery();
+        await using var services = fixture.Services(provider);
+        using var worker = Worker(services);
+
+        foreach (var (emails, sms) in new[] { (2, 3), (4, 5), (5, 5), (5, 5) })
+        {
+            await Cycle(worker);
+            Assert.Equal(emails, provider.Emails.Count);
+            Assert.Equal(sms, provider.Sms.Count);
+            Assert.Equal(emails + sms,
+                await db.NotificationLogs.CountAsync(l => l.Status == NotificationStatus.Sent));
+            Assert.Equal(10 - emails - sms,
+                await db.NotificationLogs.CountAsync(l => l.Status == NotificationStatus.Pending));
+        }
+    }
+
+    [SqlServerFact]
+    public async Task PasswordTemplatesFailSafelyThenExplicitRetryRendersSubjectAndBodyCredentials()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        await using var db = fixture.Database();
+        var (candidate, exam) = await SeedAsync(db);
+        db.NotificationTemplates.AddRange(
+            new NotificationTemplate
+            {
+                EventType = NotificationEventType.ExamPublished,
+                SubjectEn = "Invitation {{Password}}", BodyEn = "Hello {{CandidateName}}"
+            },
+            new NotificationTemplate
+            {
+                EventType = NotificationEventType.ResultPublished,
+                SubjectEn = "Results", BodyEn = "Credential {{Password}}"
+            });
+        foreach (var type in new[] { NotificationEventType.ExamPublished, NotificationEventType.ResultPublished })
+        {
+            db.NotificationLogs.Add(Log(candidate, exam, type));
+            db.NotificationLogs.Add(Log(candidate, exam, type, NotificationChannel.Sms));
+        }
+        await db.SaveChangesAsync();
+        var provider = new RecordingDelivery();
+        var unreadable = new UnusedEncryption();
+        await using (var services = fixture.Services(provider, unreadable))
+        {
+            using var worker = Worker(services);
+            await Cycle(worker);
+        }
+
+        Assert.Equal(2, unreadable.Decryptions);
+        Assert.Empty(provider.Emails);
+        Assert.Equal(2, provider.Sms.Count);
+        var failed = await db.NotificationLogs.AsNoTracking()
+            .Where(l => l.Channel == NotificationChannel.Email).ToListAsync();
+        var service = NotificationService(db);
+        foreach (var row in failed)
+        {
+            Assert.Equal(NotificationStatus.Failed, row.Status);
+            Assert.Null(row.SentAt);
+            Assert.Equal("Email notification processing failed.", row.ErrorMessage);
+            Assert.True((await service.RetryNotificationAsync(row.Id)).Success);
+        }
+
+        var encryption = new ReadableEncryption();
+        await using (var services = fixture.Services(provider, encryption))
+        {
+            using var worker = Worker(services);
+            await Cycle(worker);
+        }
+        Assert.Equal(2, encryption.Decryptions);
+        Assert.Equal(2, provider.Emails.Count);
+        Assert.Contains(provider.Emails, e => e.Subject == "Invitation synthetic-credential");
+        Assert.Contains(provider.Emails, e => e.Body.Contains("Credential synthetic-credential"));
+        Assert.Equal(2, provider.Sms.Count);
+        Assert.DoesNotContain(provider.Sms, text => text.Contains("synthetic-credential"));
+        Assert.All(await db.NotificationLogs.AsNoTracking().ToListAsync(),
+            row => Assert.Equal(NotificationStatus.Sent, row.Status));
     }
 
     [SqlServerFact]
@@ -214,6 +313,88 @@ public sealed class NotificationIntegrationTests
     }
 
     [SqlServerFact]
+    public async Task AssignmentProducerQueuesBothChannelsOnlyForNewAssignments()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        await using var db = fixture.Database();
+        var (candidate, exam) = await SeedAsync(db);
+        db.NotificationTemplates.Add(Template());
+        await db.SaveChangesAsync();
+        var service = new ExamAssignmentService(db, null!, NotificationService(db),
+            NullLogger<ExamAssignmentService>.Instance, new CacheService());
+        var request = new AssignExamDto
+        {
+            ExamId = exam.Id, CandidateIds = [candidate.Id, candidate.Id],
+            ScheduleFrom = DateTimeOffset.UtcNow, ScheduleTo = DateTimeOffset.UtcNow.AddHours(2)
+        };
+        Assert.True((await service.AssignAsync(request, "operator")).Success);
+        Assert.Single(await db.ExamAssignments.ToListAsync());
+        Assert.Equal(2, await db.NotificationLogs.CountAsync());
+        request.ScheduleTo = request.ScheduleTo.AddHours(1);
+        Assert.True((await service.AssignAsync(request, "operator")).Success);
+        Assert.Equal(2, await db.NotificationLogs.CountAsync());
+
+        var provider = new RecordingDelivery();
+        await using var services = fixture.Services(provider);
+        using var worker = Worker(services);
+        await Cycle(worker);
+        Assert.Single(provider.Emails);
+        Assert.Single(provider.Sms);
+    }
+
+    [SqlServerFact]
+    public async Task BulkResultPublicationProducerPersistsOneEmailForMultipleAttempts()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        await using var db = fixture.Database();
+        var (candidate, exam) = await SeedAsync(db);
+        db.Roles.Add(new ApplicationRole { Id = "SuperAdmin", Name = "SuperAdmin", NormalizedName = "SUPERADMIN" });
+        db.Users.Add(new ApplicationUser { Id = "publisher", UserName = "publisher" });
+        db.UserRoles.Add(new IdentityUserRole<string> { UserId = "publisher", RoleId = "SuperAdmin" });
+        for (var attempt = 1; attempt <= 2; attempt++)
+        {
+            db.Results.Add(new Result
+            {
+                Candidate = candidate, Exam = exam,
+                Attempt = new AttemptEntity
+                {
+                    Candidate = candidate, Exam = exam, AttemptNumber = attempt,
+                    Status = AttemptStatus.Submitted, StartedAt = DateTimeOffset.UtcNow
+                },
+                FinalizedAt = DateTimeOffset.UtcNow
+            });
+        }
+        db.NotificationTemplates.Add(new NotificationTemplate
+        {
+            EventType = NotificationEventType.ResultPublished, SubjectEn = "Published result",
+            BodyEn = "Results for {{ExamTitle}}"
+        });
+        await db.SaveChangesAsync();
+        await using var identityServices = fixture.IdentityServices();
+        await using var scope = identityServices.CreateAsyncScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var service = new ExamResultService(db, null!, null!, null!, userManager, NotificationService(db),
+            new CacheService(), new ResourceAuthorizationService(db, userManager, null!));
+        var request = new BulkPublishResultsDto { ResultIds = await db.Results.Select(r => r.Id).ToListAsync() };
+
+        var response = await service.BulkPublishResultsAsync(request, "publisher");
+        Assert.True(response.Success);
+        Assert.Equal(2, response.Data);
+        Assert.Equal(2, await db.Results.CountAsync(r => r.IsPublishedToCandidate));
+        Assert.True((await service.BulkPublishResultsAsync(request, "publisher")).Success);
+        var row = await db.NotificationLogs.SingleAsync();
+        Assert.Equal(NotificationChannel.Email, row.Channel);
+        Assert.Equal(NotificationEventType.ResultPublished, row.EventType);
+
+        var provider = new RecordingDelivery();
+        await using var services = fixture.Services(provider);
+        using var worker = Worker(services);
+        await Cycle(worker);
+        Assert.Single(provider.Emails);
+        Assert.Empty(provider.Sms);
+    }
+
+    [SqlServerFact]
     public async Task RetryAndSendNowNeverOverwriteAConcurrentlyCompletedDelivery()
     {
         await using var fixture = await NotificationDatabase.CreateAsync();
@@ -334,6 +515,72 @@ public sealed class NotificationIntegrationTests
         Assert.Single(logger.Entries);
     }
 
+    [SqlServerFact]
+    public async Task SlowPushReceivesCancellationAndLeavesItsPersistedNotificationReadable()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        await using var db = fixture.Database();
+        var (candidate, exam) = await SeedAsync(db);
+        var entered = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var hub = new RecordingNotificationHub
+        {
+            OnSendWithCancellation = token =>
+            {
+                entered.SetResult(token);
+                return Task.Delay(Timeout.InfiniteTimeSpan, token);
+            }
+        };
+        var logger = new RecordingLogger<UserNotificationService>();
+        var service = new UserNotificationService(new UnitOfWork(db), hub, null!, logger);
+        var creating = service.CreateAsync(candidate.Id, UserNotificationType.ExamAssigned,
+            "Assigned", "Assigned", "Message", "Message", exam.Id);
+        var token = await entered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        Assert.True(token.CanBeCanceled);
+        await using (var reading = fixture.Database())
+            Assert.Single(await reading.UserNotifications.ToListAsync());
+
+        await creating.WaitAsync(TimeSpan.FromSeconds(15));
+        Assert.True(token.IsCancellationRequested);
+        Assert.Equal(1, await service.GetUnreadCountAsync(candidate.Id));
+        Assert.Single(logger.Entries);
+    }
+
+    [SqlServerFact]
+    public async Task DispatcherUsesIndependentScopeToPersistAndPushUserNotification()
+    {
+        await using var fixture = await NotificationDatabase.CreateAsync();
+        int examId;
+        string candidateId;
+        await using (var db = fixture.Database())
+        {
+            var (candidate, exam) = await SeedAsync(db);
+            examId = exam.Id;
+            candidateId = candidate.Id;
+        }
+
+        var delivered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var hub = new RecordingNotificationHub { OnSend = () => { delivered.TrySetResult(); return Task.CompletedTask; } };
+        var logger = new RecordingLogger<NotificationDispatcher>();
+        await using var services = new ServiceCollection()
+            .AddScoped(_ => fixture.Database())
+            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IUserNotificationService>(sp => new UserNotificationService(
+                sp.GetRequiredService<IUnitOfWork>(), hub, null!, NullLogger<UserNotificationService>.Instance))
+            .BuildServiceProvider();
+        var dispatcher = new NotificationDispatcher(services.GetRequiredService<IServiceScopeFactory>(), logger);
+        dispatcher.NotifyUser(candidateId, UserNotificationType.ExamAssigned,
+            "Assigned", "Assigned", "Message", "Message", examId);
+
+        await delivered.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        await using var reading = fixture.Database();
+        var row = await reading.UserNotifications.SingleAsync();
+        Assert.Equal(candidateId, row.UserId);
+        Assert.Equal(examId, row.RelatedExamId);
+        Assert.Equal(UserNotificationType.ExamAssigned, row.Type);
+        Assert.Equal($"user-{candidateId}", Assert.Single(hub.Pushes).Group);
+        Assert.Empty(logger.Entries);
+    }
+
     internal static async Task<(ApplicationUser Candidate, Exam Exam)> SeedAsync(ApplicationDbContext db)
     {
         var candidate = new ApplicationUser
@@ -450,6 +697,17 @@ internal sealed class UnusedEncryption : IEncryptionService
     }
 }
 
+internal sealed class ReadableEncryption : IEncryptionService
+{
+    public int Decryptions { get; private set; }
+    public string Encrypt(string value) => throw new NotSupportedException();
+    public string Decrypt(string value)
+    {
+        Decryptions++;
+        return "synthetic-credential";
+    }
+}
+
 internal sealed class RecordingDelivery : IEmailService, ISmsService
 {
     public ConcurrentQueue<(string Subject, string Body)> Emails { get; } = new();
@@ -478,6 +736,7 @@ internal sealed class RecordingNotificationHub : IHubContext<NotificationHub>, I
 {
     public ConcurrentQueue<(string Group, string Method, UserNotificationDto Notification)> Pushes { get; } = new();
     public Func<Task> OnSend { get; set; } = () => Task.CompletedTask;
+    public Func<CancellationToken, Task>? OnSendWithCancellation { get; set; }
     IHubClients IHubContext<NotificationHub>.Clients => this;
     IGroupManager IHubContext<NotificationHub>.Groups => throw new NotSupportedException();
     public IClientProxy Group(string groupName) => new Proxy(this, groupName);
@@ -494,7 +753,7 @@ internal sealed class RecordingNotificationHub : IHubContext<NotificationHub>, I
         public Task SendCoreAsync(string method, object?[] args, CancellationToken cancellationToken = default)
         {
             hub.Pushes.Enqueue((group, method, Assert.IsType<UserNotificationDto>(args[0])));
-            return hub.OnSend();
+            return hub.OnSendWithCancellation?.Invoke(cancellationToken) ?? hub.OnSend();
         }
     }
 }

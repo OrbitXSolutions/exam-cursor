@@ -1,6 +1,6 @@
-PHASE 2 — VALIDATION CHECKPOINT AND CONTINUATION
+FINAL SUMMARY — PHASE 2 VALIDATION CHECKPOINT AND CONTINUATION
 Date: 2026-09-11
-Starting commit: 87cc6c9
+Starting commit: 87cc6c9; resumed from interrupted checkpoint 8e0a8f4.
 Phase 1 gate: completed implementation checkpoint already pushed.
 
 READ THIS BEFORE USING HISTORICAL REPORTS
@@ -29,8 +29,56 @@ NOT VERIFIED: no adequate test evidence for the stated capability.
 BLOCKED: a specific unavailable prerequisite prevents that particular check.
 
 CURRENT WORK / FINAL RESULTS
-Implementation and targeted validation are in progress. This section is updated
-before the final commit; no pending check is a claimed pass.
+The interrupted checkpoint preserved notification changes and concurrency tests,
+but no completed Phase 2 verification report. This continuation reviewed that
+work and added focused corrections/validation. Completed evidence:
+- Notification worker/producer/dispatch regression coverage: 15 distinct SQL
+  tests passed across two runs (13 + 2), with recording delivery providers.
+  Frontend retry/polling behavior was tested with controlled Node dependencies.
+- Refresh/deactivation and hub authorization: 7 real SQL/Identity/JWT/WebSocket
+  tests passed, including two Redis-backed application hosts. Neither test-host
+  scale-out nor simulated signaling implies browser-camera acceptance.
+- Attempt and Candidate API start/save/submit entry points now share SQL row-lock
+  transactions. Confirmed duplicate-answer, overwritten-terminal-state, start
+  deadlock and partial-submit defects were reproduced and fixed. The final class
+  contains 36 cases; focused evidence and workload metrics are in report 11.
+- Candidate result-summary creation/stale-update races were reproduced and fixed
+  with a candidate-row lock and authoritative aggregate reads. Five SQL
+  regressions passed; score ranking and certificate policies were preserved.
+- Camera action refreshes no longer remove video DOM or redirect on a refresh
+  failure. Seven synthetic loader checks and the existing frontend build passed;
+  the underlying WebRTC effect was not changed. The dormant optional incident
+  shortcut had no bound control and was removed, not re-enabled.
+- TypeScript still reports the 204 pre-existing diagnostics (line shifts only
+  after the camera edit); lint remains blocked by missing ESLint.
+- Read-only review of the current Phase 2 correctness diff found no significant
+  issues. Focused security review confirmed that the follow-up removes revoked
+  callers' main/screen memberships on detection without requiring voluntary Leave.
+- An integrated backend build/test run passed 262/262 tests, zero failed/skipped,
+  in 1.3856 minutes with real isolated SQL/Redis (report 15). This includes all 36
+  attempt cases, 15 notification cases, seven security cases, five summary cases,
+  Redis-backplane and SQL logging/worker-lock tests. Do not add these counts to
+  the separate focused runs or historical Phase 1 results. The integrated run
+  preceded the last invocation-driven revocation cleanup; its follow-up result
+  is recorded separately in report 14.
+- The final security follow-up rebuilt successfully and passed all seven tests,
+  zero failed/skipped, in 18 seconds. The revoked-peer test demonstrates removal
+  from both media channels without voluntary Leave; no new full-suite run after
+  this follow-up is claimed.
+- A final focused concurrency/model invocation passed 37/37, zero failed/skipped,
+  including all 36 current attempt cases and schema validation (report 11).
+
+Backend-only workload: three focused 50-candidate runs completed 200 service
+operations each in 5.651, 6.086 and 7.030 seconds with all persistence assertions
+satisfied; the final focused invocation recorded 2.370 seconds. The integrated
+run independently recorded 2.323 seconds. These are different shared-host runs,
+NOT a before/after comparison, a capacity guarantee, or 50 camera-enabled live
+examinations. Several focused start calls took seconds; no acceptable customer
+latency threshold was assumed.
+
+The accidentally committed empty .phase2-local/build.lock is deleted. Generated
+scratch artifacts are excluded from the checkpoint. No temporary binary,
+generated credential or helper script belongs in the delivered change set.
 
 ISOLATED TEST ENVIRONMENT
 An ephemeral SQL Server Developer container was provisioned on loopback port
@@ -42,10 +90,18 @@ Test credentials were generated for this container only and not printed or
 committed. TrustServerCertificate in the test-only connection accommodates the
 isolated container's certificate; it is not a customer configuration example.
 No test contacts a customer's database or sends to real customer recipients.
+Redis used the loopback-only exam-phase2-redis container on port 16379 with
+authentication; image digest:
+sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+The integrated suite initially encountered an incorrectly supplied Redis test
+connection. After correcting that test environment, the targeted Redis test and
+the complete suite passed without changing production code.
 
 Parallel implementers own separate files and use the existing test/build tooling.
-Backend builds/tests are serialized with a temporary build lock to avoid shared
-artifact races. This test-process coordination is not an application runtime lock.
+Backend builds/tests are coordinated separately from runtime work to avoid shared
+artifact races. Compiler-server inherited lock handles were identified during
+validation; flock --close prevents a child compiler server retaining the handle.
+This test-process coordination is not an application runtime lock.
 Temporary logs/credentials are outside Git; summaries and reproducible commands
 belong in the area reports. Do not depend on temporary session paths to resume.
 
@@ -64,9 +120,72 @@ Even a backend-only workload with 50 independent candidates is not evidence of
   from the durability of queued notification records.
 Thresholds and permitted degradation must be agreed with the owner, not invented.
 
+REVIEW DISPOSITION AND REMAINING RISKS
+- VERIFIED: read-only correctness review found no significant issues. Security
+  review's detected-revocation cleanup finding was addressed and re-reviewed;
+  its idle-recipient limitation remains explicit rather than claimed fixed.
+- BLOCKED: full CodeQL coverage. Attempts failed/timed out (JavaScript analysis
+  failure, C# database-size limit, later timeout circuit breaker). Automated
+  zero-alert output is NOT evidence of a successful scan. No security clearance
+  or full vulnerability-audit pass is claimed.
+- Wider-branch automatic comments were checked against current source:
+  SystemLogChannel uses nonblocking TryWrite and counts rejected entries; Wait
+  mode does not make that method wait. SystemLogService already maps Info to
+  Information, and CORS already exposes X-Trace-Id. No speculative fixes applied.
+  Notification Arabic-placeholder suggestions do not match the English-only
+  rendering path. Login URL still comes from NotificationSettings.LoginUrl or
+  AppSettings:BaseUrl; a new fallback/URL policy was not invented.
+- NOT VERIFIED: immediate revocation of already-issued JWTs and idle hub peers.
+  An idle peer may receive signaling until detection/leave/disconnect; removing
+  group membership does not itself stop an established WebRTC media connection.
+- PARTIALLY VERIFIED: notification dispatch and retry with recording providers.
+  Real SMTP/SMS receipt, all start/end/expiry producer/controller paths and a
+  browser recovery journey were not fully executed. Process-local dispatcher
+  work can be lost on process exit; provider acceptance before Sent persistence
+  can replay. No durable outbox/exactly-once delivery guarantee was introduced.
+- PARTIALLY VERIFIED: camera-refresh DOM lifecycle correction. The customer's
+  exact "backup" control was not identified or reproduced with physical cameras.
+  The unbound optional shortcut was removed; the camera acquisition/stream effect
+  was not redesigned. Obtain the exact route/action before changing other flows.
+- BLOCKED: frontend lint (existing missing ESLint) and browser automation
+  (transport closed). Whole-app TypeScript has 204 pre-existing diagnostics;
+  they were not hidden. Production build and unauthenticated login HTTP smoke
+  succeeded, but do not imply authenticated browser acceptance.
+- NOT VERIFIED: full customer two-node topology, realistic media load, sustained
+  resource/latency behavior, all lifecycle-writer races, shared-mount/PKI rollout,
+  physical camera backup, and complete grading/export/certificate UI journeys.
+
+EXACT STOPPING POINT AND CONTINUATION
+Phase 1 was completed/pushed before Phase 2. This continuation preserves the
+bounded Phase 2 fixes, tests, reports and the investigated limitations; it does
+not authorize customer go-live. No base-branch merge, history rewrite, SeedData
+behavior change, new package, schema migration or speculative redesign is included.
+
+Next work, in order:
+1. Provision the representative two-node/customer-like acceptance environment
+   described above and rerun existing suites with explicit SQL/Redis variables.
+   Tests lacking those prerequisites skip; a skip must not be reported as a pass.
+2. Identify the customer's exact incident/backup control and exercise it with real
+   proctor/candidate cameras, including incident review, flag and add-time refresh.
+3. Execute authenticated start/submit/expiry and notification recovery journeys;
+   verify both persisted records and real recipient receipt. Confirm intended
+   external start/expiry notification rules before adding any trigger.
+4. Execute the representative 50-browser/camera examination workload and node-loss
+   drills; collect agreed latency/resource/error thresholds and inspect persistence.
+5. Complete application security scanning in an adequately provisioned environment
+   and resolve any findings. Decide the required administrative revocation behavior.
+6. Complete the remaining grading/regrading/publication/export/certificate journeys
+   and obtain technical/product acceptance for the explicit residual risks.
+
 RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
 Do not treat this report as permission for an unrelated architecture rewrite.
 Broad type-system cleanup, new test platforms, global concurrency-token migrations,
 new log collection products and speculative code deletion require separate review.
 Current failures and unverified acceptance items must remain explicit rather than
 being hidden by casts, suppressed diagnostics, mock claims or arbitrary limits.
+Separately review durable notification dispatch/provider idempotency, distributed
+administrative hub/JWT/media revocation, lifecycle concurrency outside the tested
+start/save/submit paths, and customer-appropriate observability/retention limits.
+Product confirmation is needed for absent external start/expiry notification
+triggers and the single-versus-bulk publication certificate difference. These
+ideas were documented, not automatically implemented.

@@ -16,6 +16,8 @@ public class ProctorHub : Hub
 {
     private readonly ILogger<ProctorHub> _logger;
     private readonly ApplicationDbContext _db;
+    private const string CandidateRole = "candidate";
+    private const string ProctorRole = "proctor";
 
     public ProctorHub(ILogger<ProctorHub> logger, ApplicationDbContext db)
     {
@@ -44,23 +46,15 @@ public class ProctorHub : Hub
     /// <summary>
     /// Candidate or proctor joins the signaling room for an attempt.
     /// Authorization: caller must be the candidate who owns the attempt,
-    /// or a Proctor / Admin / SuperAdmin.
+    /// or staff with department/assignment access (or SuperAdmin).
     /// </summary>
     public async Task JoinAttemptRoom(int attemptId, string role)
     {
-        if (!await IsAuthorizedForAttemptAsync(attemptId))
-        {
-            _logger.LogWarning(
-                "ProctorHub: Unauthorized JoinAttemptRoom by {UserId} for attempt {AttemptId}",
-                Context.UserIdentifier, attemptId);
-            return;
-        }
-
-        var group = $"attempt_{attemptId}";
-        await Groups.AddToGroupAsync(Context.ConnectionId, group);
+        var group = Room(attemptId);
+        role = await JoinRoomAsync(attemptId, false, role);
 
         // Notify others in the room (e.g. proctor gets "candidate-joined")
-        await Clients.OthersInGroup(group).SendAsync("PeerJoined", new
+        await Clients.Group(RoleGroup(group, OppositeRole(role))).SendAsync("PeerJoined", new
         {
             userId = Context.UserIdentifier,
             connectionId = Context.ConnectionId,
@@ -77,10 +71,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task LeaveAttemptRoom(int attemptId)
     {
-        var group = $"attempt_{attemptId}";
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+        var group = Room(attemptId);
+        var role = await LeaveRoomAsync(attemptId, false);
+        if (role == null) return;
 
-        await Clients.OthersInGroup(group).SendAsync("PeerLeft", new
+        await Clients.Group(RoleGroup(group, OppositeRole(role))).SendAsync("PeerLeft", new
         {
             userId = Context.UserIdentifier,
             connectionId = Context.ConnectionId,
@@ -98,10 +93,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendOffer(int attemptId, string sdp)
     {
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, CandidateRole);
+        var group = RoleGroup(Room(attemptId), ProctorRole);
         _logger.LogInformation("ProctorHub: SendOffer from {ConnId} for attempt {AttemptId} (sdp={SdpLen} chars)",
             Context.ConnectionId, attemptId, sdp?.Length ?? 0);
-        await Clients.OthersInGroup(group).SendAsync("ReceiveOffer", new
+        await Clients.Group(group).SendAsync("ReceiveOffer", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -116,9 +112,10 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendAnswer(int attemptId, string sdp, string targetConnectionId)
     {
+        await RequireJoinedRoleAsync(attemptId, false, ProctorRole);
         _logger.LogInformation("ProctorHub: SendAnswer from {ConnId} to {TargetConnId} for attempt {AttemptId} (sdp={SdpLen} chars)",
             Context.ConnectionId, targetConnectionId, attemptId, sdp?.Length ?? 0);
-        await Clients.Client(targetConnectionId).SendAsync("ReceiveAnswer", new
+        await Target(attemptId, false, CandidateRole, targetConnectionId).SendAsync("ReceiveAnswer", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -133,14 +130,15 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendIceCandidate(int attemptId, string candidate, string? targetConnectionId = null)
     {
-        var group = $"attempt_{attemptId}";
+        var role = await RequireJoinedRoleAsync(attemptId, false);
+        var group = RoleGroup(Room(attemptId), OppositeRole(role));
         _logger.LogInformation("ProctorHub: SendIceCandidate from {ConnId} for attempt {AttemptId} (target={Target})",
             Context.ConnectionId, attemptId, targetConnectionId ?? "broadcast");
 
         if (!string.IsNullOrEmpty(targetConnectionId))
         {
             // Send to specific peer
-            await Clients.Client(targetConnectionId).SendAsync("ReceiveIceCandidate", new
+            await Target(attemptId, false, OppositeRole(role), targetConnectionId).SendAsync("ReceiveIceCandidate", new
             {
                 fromConnectionId = Context.ConnectionId,
                 candidate,
@@ -150,7 +148,7 @@ public class ProctorHub : Hub
         else
         {
             // Broadcast to all others in the group
-            await Clients.OthersInGroup(group).SendAsync("ReceiveIceCandidate", new
+            await Clients.Group(group).SendAsync("ReceiveIceCandidate", new
             {
                 fromConnectionId = Context.ConnectionId,
                 candidate,
@@ -164,10 +162,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task RequestRenegotiation(int attemptId)
     {
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, ProctorRole);
+        var group = RoleGroup(Room(attemptId), CandidateRole);
         _logger.LogInformation("ProctorHub: RequestRenegotiation from {ConnId} for attempt {AttemptId}",
             Context.ConnectionId, attemptId);
-        await Clients.OthersInGroup(group).SendAsync("RenegotiationRequested", new
+        await Clients.Group(group).SendAsync("RenegotiationRequested", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -180,10 +179,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task NotifyExamSubmitted(int attemptId)
     {
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, CandidateRole);
+        var group = RoleGroup(Room(attemptId), ProctorRole);
         _logger.LogInformation("ProctorHub: NotifyExamSubmitted from {ConnId} for attempt {AttemptId}",
             Context.ConnectionId, attemptId);
-        await Clients.OthersInGroup(group).SendAsync("ExamSubmitted", new
+        await Clients.Group(group).SendAsync("ExamSubmitted", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -197,18 +197,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendWarningToCandidate(int attemptId, string message)
     {
-        // Only proctors and admin-level roles may send warnings via the hub.
-        if (!Context.User!.IsInRole(AppRoles.Proctor) &&
-            !Context.User.IsInRole(AppRoles.Admin) &&
-            !Context.User.IsInRole(AppRoles.SuperAdmin))
-        {
-            _logger.LogWarning("ProctorHub: Unauthorized SendWarningToCandidate attempt by {UserId}", Context.UserIdentifier);
-            return;
-        }
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, ProctorRole);
+        var group = RoleGroup(Room(attemptId), CandidateRole);
         _logger.LogInformation("ProctorHub: SendWarningToCandidate from {ConnId} for attempt {AttemptId}: {Message}",
             Context.ConnectionId, attemptId, message);
-        await Clients.OthersInGroup(group).SendAsync("ReceiveWarning", new
+        await Clients.Group(group).SendAsync("ReceiveWarning", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -222,10 +215,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task NotifyConnectionStatus(int attemptId, string status)
     {
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, CandidateRole);
+        var group = RoleGroup(Room(attemptId), ProctorRole);
         _logger.LogInformation("ProctorHub: NotifyConnectionStatus from {ConnId} for attempt {AttemptId}: status={Status}",
             Context.ConnectionId, attemptId, status);
-        await Clients.OthersInGroup(group).SendAsync("ConnectionStatusChanged", new
+        await Clients.Group(group).SendAsync("ConnectionStatusChanged", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -240,18 +234,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendTerminationToCandidate(int attemptId, string reason)
     {
-        // Only proctors and admin-level roles may send terminations via the hub.
-        if (!Context.User!.IsInRole(AppRoles.Proctor) &&
-            !Context.User.IsInRole(AppRoles.Admin) &&
-            !Context.User.IsInRole(AppRoles.SuperAdmin))
-        {
-            _logger.LogWarning("ProctorHub: Unauthorized SendTerminationToCandidate attempt by {UserId}", Context.UserIdentifier);
-            return;
-        }
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, ProctorRole);
+        var group = RoleGroup(Room(attemptId), CandidateRole);
         _logger.LogInformation("ProctorHub: SendTerminationToCandidate from {ConnId} for attempt {AttemptId}: {Reason}",
             Context.ConnectionId, attemptId, reason);
-        await Clients.OthersInGroup(group).SendAsync("SessionTerminated", new
+        await Clients.Group(group).SendAsync("SessionTerminated", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -266,7 +253,8 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task NotifyTimeExtended(int attemptId, int extraMinutes, int newRemainingSeconds)
     {
-        var group = $"attempt_{attemptId}";
+        await RequireJoinedRoleAsync(attemptId, false, ProctorRole);
+        var group = Room(attemptId);
         _logger.LogInformation("ProctorHub: NotifyTimeExtended for attempt {AttemptId}: +{Extra}min, remaining={Remaining}s",
             attemptId, extraMinutes, newRemainingSeconds);
         await Clients.Group(group).SendAsync("TimeExtended", new
@@ -287,18 +275,10 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task JoinScreenRoom(int attemptId, string role)
     {
-        if (!await IsAuthorizedForAttemptAsync(attemptId))
-        {
-            _logger.LogWarning(
-                "ProctorHub: Unauthorized JoinScreenRoom by {UserId} for attempt {AttemptId}",
-                Context.UserIdentifier, attemptId);
-            return;
-        }
+        var group = Room(attemptId, true);
+        role = await JoinRoomAsync(attemptId, true, role);
 
-        var group = $"attempt_{attemptId}_screen";
-        await Groups.AddToGroupAsync(Context.ConnectionId, group);
-
-        await Clients.OthersInGroup(group).SendAsync("ScreenPeerJoined", new
+        await Clients.Group(RoleGroup(group, OppositeRole(role))).SendAsync("ScreenPeerJoined", new
         {
             userId = Context.UserIdentifier,
             connectionId = Context.ConnectionId,
@@ -315,10 +295,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task LeaveScreenRoom(int attemptId)
     {
-        var group = $"attempt_{attemptId}_screen";
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+        var group = Room(attemptId, true);
+        var role = await LeaveRoomAsync(attemptId, true);
+        if (role == null) return;
 
-        await Clients.OthersInGroup(group).SendAsync("ScreenPeerLeft", new
+        await Clients.Group(RoleGroup(group, OppositeRole(role))).SendAsync("ScreenPeerLeft", new
         {
             userId = Context.UserIdentifier,
             connectionId = Context.ConnectionId,
@@ -334,10 +315,11 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendScreenOffer(int attemptId, string sdp)
     {
-        var group = $"attempt_{attemptId}_screen";
+        await RequireJoinedRoleAsync(attemptId, true, CandidateRole);
+        var group = RoleGroup(Room(attemptId, true), ProctorRole);
         _logger.LogInformation("ProctorHub: SendScreenOffer from {ConnId} for attempt {AttemptId}",
             Context.ConnectionId, attemptId);
-        await Clients.OthersInGroup(group).SendAsync("ReceiveScreenOffer", new
+        await Clients.Group(group).SendAsync("ReceiveScreenOffer", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -351,9 +333,10 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendScreenAnswer(int attemptId, string sdp, string targetConnectionId)
     {
+        await RequireJoinedRoleAsync(attemptId, true, ProctorRole);
         _logger.LogInformation("ProctorHub: SendScreenAnswer from {ConnId} to {TargetConnId} for attempt {AttemptId}",
             Context.ConnectionId, targetConnectionId, attemptId);
-        await Clients.Client(targetConnectionId).SendAsync("ReceiveScreenAnswer", new
+        await Target(attemptId, true, CandidateRole, targetConnectionId).SendAsync("ReceiveScreenAnswer", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -367,13 +350,14 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task SendScreenIceCandidate(int attemptId, string candidate, string? targetConnectionId = null)
     {
-        var group = $"attempt_{attemptId}_screen";
+        var role = await RequireJoinedRoleAsync(attemptId, true);
+        var group = RoleGroup(Room(attemptId, true), OppositeRole(role));
         _logger.LogInformation("ProctorHub: SendScreenIceCandidate from {ConnId} for attempt {AttemptId} (target={Target})",
             Context.ConnectionId, attemptId, targetConnectionId ?? "broadcast");
 
         if (!string.IsNullOrEmpty(targetConnectionId))
         {
-            await Clients.Client(targetConnectionId).SendAsync("ReceiveScreenIceCandidate", new
+            await Target(attemptId, true, OppositeRole(role), targetConnectionId).SendAsync("ReceiveScreenIceCandidate", new
             {
                 fromConnectionId = Context.ConnectionId,
                 candidate,
@@ -382,7 +366,7 @@ public class ProctorHub : Hub
         }
         else
         {
-            await Clients.OthersInGroup(group).SendAsync("ReceiveScreenIceCandidate", new
+            await Clients.Group(group).SendAsync("ReceiveScreenIceCandidate", new
             {
                 fromConnectionId = Context.ConnectionId,
                 candidate,
@@ -397,10 +381,12 @@ public class ProctorHub : Hub
     /// </summary>
     public async Task NotifyScreenShareStatus(int attemptId, string status)
     {
-        var group = $"attempt_{attemptId}";
+        // Screen publishers also join the main room; status is consumed by webcam viewers.
+        await RequireJoinedRoleAsync(attemptId, false, CandidateRole);
+        var group = RoleGroup(Room(attemptId), ProctorRole);
         _logger.LogInformation("ProctorHub: NotifyScreenShareStatus from {ConnId} for attempt {AttemptId}: status={Status}",
             Context.ConnectionId, attemptId, status);
-        await Clients.OthersInGroup(group).SendAsync("ScreenShareStatusChanged", new
+        await Clients.Group(group).SendAsync("ScreenShareStatusChanged", new
         {
             fromConnectionId = Context.ConnectionId,
             fromUserId = Context.UserIdentifier,
@@ -411,35 +397,132 @@ public class ProctorHub : Hub
 
     // ── Authorization helpers ─────────────────────────────────────────
 
-    /// <summary>
-    /// Returns true if the connected user is allowed to participate in the
-    /// SignalR rooms for the given attempt:
-    ///   - The candidate who owns the attempt, OR
-    ///   - A Proctor / Admin / SuperAdmin (monitoring rights).
-    /// Candidates belonging to a different attempt are rejected, preventing
-    /// IDOR attacks where they could receive another candidate's violation
-    /// events or WebRTC signaling (live webcam/screen SDP).
-    /// </summary>
-    private async Task<bool> IsAuthorizedForAttemptAsync(int attemptId)
+    private static string Room(int attemptId, bool screen = false)
+        => screen ? $"attempt_{attemptId}_screen" : $"attempt_{attemptId}";
+
+    private static string RoleGroup(string room, string role) => $"{room}:role:{role}";
+    private static string PeerGroup(string room, string role, string connectionId)
+        => $"{RoleGroup(room, role)}:connection:{connectionId}";
+    private static string OppositeRole(string role) => role == CandidateRole ? ProctorRole : CandidateRole;
+
+    private IClientProxy Target(int attemptId, bool screen, string role, string connectionId)
+    {
+        if (string.IsNullOrWhiteSpace(connectionId))
+            throw new HubException("A target connection is required.");
+        // Membership, including remote-node removal on leave/disconnect, is owned by SignalR.
+        // Never send to an arbitrary connection or rely on a process-local recipient registry.
+        return Clients.Group(PeerGroup(Room(attemptId, screen), role, connectionId));
+    }
+
+    private async Task<string> JoinRoomAsync(int attemptId, bool screen, string requestedRole)
+    {
+        var role = await CurrentRoleAsync(attemptId);
+        if (role == null || role != requestedRole)
+            throw new HubException("Not authorized for this attempt or role.");
+
+        var room = Room(attemptId, screen);
+        try
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, room);
+            await Groups.AddToGroupAsync(Context.ConnectionId, RoleGroup(room, role));
+            await Groups.AddToGroupAsync(Context.ConnectionId, PeerGroup(room, role, Context.ConnectionId));
+        }
+        catch
+        {
+            // A partial backplane failure must not leave a receive-only unauthorized session.
+            Context.Abort();
+            throw;
+        }
+        // Caller-only state survives hub instances, not connections. Targets use distributed groups.
+        Context.Items[room] = role;
+        return role;
+    }
+
+    private async Task<string?> LeaveRoomAsync(int attemptId, bool screen)
+    {
+        var currentRole = await CurrentRoleAsync(attemptId);
+        var role = await RemoveRoomMembershipAsync(Room(attemptId, screen));
+        if (role == null)
+            throw new HubException("Join the attempt room first.");
+        return currentRole == role ? role : null;
+    }
+
+    private async Task<string?> RemoveRoomMembershipAsync(string room)
+    {
+        if (!Context.Items.TryGetValue(room, out var value) || value is not string role)
+            return null;
+
+        Context.Items.Remove(room);
+        try
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, PeerGroup(room, role, Context.ConnectionId));
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, RoleGroup(room, role));
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, room);
+        }
+        catch
+        {
+            Context.Abort();
+            throw;
+        }
+        return role;
+    }
+
+    private async Task<string> RequireJoinedRoleAsync(int attemptId, bool screen, string? requiredRole = null)
+    {
+        // Check before the membership/operation-role guards so even a wrong-channel or
+        // wrong-role invocation evicts a previously joined caller whose entitlement was revoked.
+        var currentRole = await CurrentRoleAsync(attemptId);
+        if (!Context.Items.TryGetValue(Room(attemptId, screen), out var value) ||
+            value is not string role || (requiredRole != null && role != requiredRole) ||
+            currentRole != role)
+            throw new HubException("Not authorized for this attempt or role.");
+        return role;
+    }
+
+    private async Task<string?> CurrentRoleAsync(int attemptId)
+    {
+        var role = await AuthorizedRoleAsync(attemptId);
+        var rooms = new[] { Room(attemptId), Room(attemptId, true) };
+        if (role == null || rooms.Any(room =>
+                Context.Items.TryGetValue(room, out var previousRole) && !Equals(previousRole, role)))
+        {
+            foreach (var room in rooms)
+                await RemoveRoomMembershipAsync(room);
+            return null;
+        }
+        return role;
+    }
+
+    private async Task<string?> AuthorizedRoleAsync(int attemptId)
     {
         var userId = Context.UserIdentifier;
-        if (string.IsNullOrEmpty(userId))
-            return false;
+        if (string.IsNullOrEmpty(userId) || Context.User?.Identity?.IsAuthenticated != true)
+            return null;
 
-        // Proctor-level roles are always permitted — they have legitimate monitoring
-        // rights over all attempts they can access (department scoping is enforced
-        // at the REST API / ProctorService layer before they reach this hub).
-        if (Context.User!.IsInRole(AppRoles.Proctor) ||
-            Context.User.IsInRole(AppRoles.Admin) ||
-            Context.User.IsInRole(AppRoles.SuperAdmin))
-            return true;
-
-        // For candidates: verify they own this specific attempt.
-        var candidateId = await _db.Attempts
-            .Where(a => a.Id == attemptId && !a.IsDeleted)
-            .Select(a => (string?)a.CandidateId)
+        var attempt = await _db.Attempts
+            .Where(a => a.Id == attemptId && !a.IsDeleted && !a.Exam.IsDeleted)
+            .Select(a => new { a.CandidateId, a.ExamId, a.Exam.DepartmentId })
             .FirstOrDefaultAsync();
+        if (attempt == null)
+            return null;
 
-        return candidateId == userId;
+        // Do not use CanAccessAttemptForUserAsync: an exam-assigned sibling candidate
+        // may access the exam, but must never access this candidate's media.
+        if (attempt.CandidateId == userId)
+            return CandidateRole;
+        if (Context.User.IsInRole(AppRoles.SuperAdmin))
+            return ProctorRole;
+        if (!Context.User.IsInRole(AppRoles.Proctor) && !Context.User.IsInRole(AppRoles.Admin))
+            return null;
+
+        // Match ResourceAuthorizationService's department OR explicit-proctor entitlement.
+        var user = await _db.Users.Where(u => u.Id == userId && !u.IsDeleted)
+            .Select(u => new { u.DepartmentId }).FirstOrDefaultAsync();
+        if (user == null)
+            return null;
+        return (user.DepartmentId.HasValue && user.DepartmentId == attempt.DepartmentId) ||
+            await _db.ExamProctors.AnyAsync(ep =>
+                ep.ExamId == attempt.ExamId && ep.ProctorId == userId && !ep.IsDeleted)
+            ? ProctorRole : null;
     }
 }

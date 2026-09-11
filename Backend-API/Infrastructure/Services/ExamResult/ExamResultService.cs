@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -609,8 +610,12 @@ public class ExamResultService : IExamResultService
         ? Math.Max(0, exam.MaxAttempts - summary.TotalAttempts)
     : -1; // -1 indicates unlimited
 
-        var percentage = summary.BestScore.HasValue && summary.BestResult != null
-            ? (summary.BestScore.Value / summary.BestResult.MaxPossibleScore) * 100
+        var bestMaxPossibleScore = await _context.Set<Result>()
+            .Where(r => r.Id == summary.BestResultId)
+            .Select(r => (decimal?)r.MaxPossibleScore)
+            .FirstOrDefaultAsync();
+        var percentage = summary.BestScore.HasValue && bestMaxPossibleScore > 0
+            ? (summary.BestScore.Value / bestMaxPossibleScore.Value) * 100
      : 0;
 
         var dto = new CandidateExamSummaryDto
@@ -1435,7 +1440,15 @@ public class ExamResultService : IExamResultService
     private async Task<CandidateExamSummary?> RefreshCandidateExamSummaryInternalAsync(
       int examId, string candidateId, string userId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+        // The candidate exists even before the first summary. Own refreshes before
+        // reading either results or the summary so a waiting refresh cannot save an old aggregate.
+        await _context.Database.SqlQuery<string>(
+            $"SELECT [Id] AS [Value] FROM [AspNetUsers] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {candidateId}")
+            .SingleOrDefaultAsync();
+
         var results = await _context.Set<Result>()
+        .AsNoTracking()
         .Include(r => r.Attempt)
         .Where(r => r.ExamId == examId && r.CandidateId == candidateId)
        .OrderByDescending(r => r.TotalScore)
@@ -1465,6 +1478,11 @@ public class ExamResultService : IExamResultService
             };
             _context.Set<CandidateExamSummary>().Add(summary);
         }
+        else
+        {
+            // A regrading/repair caller may already track an older snapshot.
+            await _context.Entry(summary).ReloadAsync();
+        }
 
         summary.TotalAttempts = results.Count;
         summary.BestAttemptId = bestResult.AttemptId;
@@ -1479,6 +1497,7 @@ public class ExamResultService : IExamResultService
         summary.UpdatedBy = userId;
 
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return summary;
     }

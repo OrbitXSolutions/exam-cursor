@@ -1,0 +1,89 @@
+PHASE 2 — PROCTOR CAMERA / OPTIONAL INCIDENT BACKUP
+Date: 2026-09-11
+Status: PARTIALLY VERIFIED; real camera reproduction/acceptance NOT VERIFIED.
+
+WHAT WAS REVIEWED
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/[sessionId]/page.tsx
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/webrtc/proctor-viewer.ts
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/api/proctoring.ts
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Incident/IncidentService.cs
+Reviewed live-viewer creation/cleanup and video DOM ownership, incident actions,
+refresh call sites and incident creation. The candidate recorder is separate;
+its real behavior under customer camera/backup operations was not exercised.
+
+FINDINGS — IMPORTANT DISTINCTION
+An initial investigation identified a create-incident handler that navigated
+away and would dispose the viewer. Parent verification found it was UNUSED:
+handleCreateIncident had exactly one occurrence, its declaration, and no JSX
+action binding. That dormant code is NOT proof of the reported customer's
+reachable backup failure. The current live page has no bound create-incident
+backup action. No new optional backup UI was introduced or re-enabled.
+
+A separate, reachable camera-display defect was confirmed in source:
+- handleReviewIncident, handleAddTime, and handleToggleFlag call loadSession.
+- loadSession previously set the page-wide loading flag on every refresh.
+- The loading render returns only a spinner, removing the live video elements.
+- The viewer effect depends on attemptId and session status, not loading. For
+  the same active session it need not reconnect or receive another stream event.
+- Webcam srcObject was assigned on stream arrival. Remounting a fresh video
+  element after the spinner therefore loses its binding to the existing stream.
+- A failed follow-up fetch also redirected away, invoking viewer cleanup even
+  though a nonessential refresh failure does not establish exam termination.
+This is a confirmed component lifecycle risk, not a real-browser reproduction.
+
+CHANGES MADE / WHY
+The existing loader now distinguishes an action refresh from initial load:
+- Initial loading/error navigation behavior remains unchanged.
+- Incident-review, flag and add-time refreshes keep the video DOM mounted.
+- Refresh failure retains monitoring and shows the existing error toast rather
+  than redirecting the proctor. A confirmed non-active session still follows
+  the existing termination/end behavior.
+- Removed only the unused optional create-incident handler and its import,
+  keeping the already-unavailable shortcut from being accidentally rebound.
+  Incident APIs and other incident management pages are unchanged.
+- No changes to webcam acquisition, MediaStream ownership, WebRTC peer setup,
+  screen capture, candidate recording, codecs or viewer disconnection logic.
+  The actual WebRTC effect body and dependency list are unchanged.
+
+VERIFICATION / RESULTS
+VERIFIED:
+- Existing production frontend build succeeded after this edit.
+- Typecheck still produces 204 diagnostics. The only differences from the
+  resumed baseline output are moved line numbers in this page, not new errors.
+- Seven direct tests of the actual TypeScript loader function (transpiled by
+  the installed TypeScript compiler and executed with synthetic API/state
+  callbacks) passed:
+  initial success; initial session failure; initial events failure; refresh
+  success; refresh session failure; refresh events failure; completed-session
+  refresh. Checked loading transitions, redirects, error toasts, event ordering
+  and existing completed-session handling.
+- AST/source checks confirmed all three action callers use the refresh path,
+  the WebRTC effect is byte-for-byte unchanged, and the dormant incident handler
+  had no call site before removal and no remaining reference afterward.
+- git diff --check passed.
+These synthetic checks do not mount React or exercise browser media hardware.
+No new testing dependency/framework or live-camera redesign was introduced.
+
+BLOCKED / NOT VERIFIED
+The provided browser automation transport closed before navigation. The separate
+HTTP /login smoke test does not establish camera behavior. No real candidate and
+proctor devices or camera-enabled browser sessions were exercised.
+The exact customer operation called "backup" remains unmapped to a reachable
+control in this checkout; do not claim this entire reported issue is reproduced
+or resolved. The reachable refresh defect is fixed and the dormant optional
+incident shortcut remains unavailable.
+
+REMAINING ACCEPTANCE / NEXT STEPS
+On a production-like staging setup, monitor live webcam and screen streams,
+review an existing incident, add time, and exercise the available flag action;
+check that stream playback continues without viewer recreation. Repeat with
+failed session/events fetches. Confirm submit, expiry, termination and deliberate
+navigation still close the viewer normally. Test camera recording independently.
+Ask support to identify the exact UI label/route/steps for any different backup
+operation. If that optional path still interrupts live monitoring, disable that
+specific control rather than broadening camera-flow changes merely to retain it.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+Consider browser lifecycle regressions with controlled fake media devices once
+the existing browser tooling is available. A global media context or camera
+architecture rewrite was deliberately not implemented.

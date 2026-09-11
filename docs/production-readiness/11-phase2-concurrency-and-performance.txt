@@ -1,0 +1,271 @@
+PHASE 2 - ATTEMPT CONCURRENCY AND BACKEND PERSISTENCE WORKLOAD
+Date: 2026-09-11
+Phase 1 checkpoint: 87cc6c9
+Interrupted Phase 2 baseline investigated: 8e0a8f4
+
+STATUS AND SCOPE
+VERIFIED: The bounded answer-upsert, answer-versus-submit, concurrent-start and
+submission-rollback defects described below were reproduced against real SQL
+Server and fixed. This is not certification of every attempt lifecycle writer
+or of a customer deployment.
+
+Files owned by this work:
+- /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Attempt/AttemptService.cs
+- /home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Candidate/CandidateService.cs, limited to
+  the alternate attempt start/save/submit persistence boundaries.
+- /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/AttemptConcurrencyTests.cs
+- This report.
+
+CandidateService required the same locks: the Candidate API has separate
+StartExamAsync, SaveAnswersAsync and SubmitAttemptAsync implementations that
+write the same tables. Fixing only AttemptService would leave those alternate
+entry points able to race with it. No notification, authorization, camera,
+SeedData or AllowAnonymous code was changed by this work. No dependency or
+schema migration was added. This implementer did not commit changes.
+
+PRODUCTION CHANGES
+1. StartAttemptAsync and StartExamAsync acquire an update lock on the existing
+   AspNetUsers candidate row in an explicit READ COMMITTED transaction before
+   checking the attempt range/count. This provides a lock even for the first
+   attempt, without SERIALIZABLE shared-range-to-insert conversion deadlocks.
+   Both entry points use the same candidate row. Different candidates do not
+   deliberately share this lock; starts for one candidate across different
+   exams are serialized. An existing active attempt is also read with UPDLOCK.
+   Schedule time is evaluated after acquiring the candidate lock.
+
+2. Single save, bulk save, Candidate save, and both submit implementations
+   acquire UPDLOCK, ROWLOCK on the attempt before reading its mutable status
+   and answers. The transaction lasts through the associated writes. Waiting
+   saves therefore see the prior save's answer row instead of both inserting;
+   a save that wins completes before submission; a submit that wins causes
+   subsequent saves to observe the terminal status.
+
+3. Submission's ExecuteUpdate and subsequent event/session SaveChanges now
+   participate in the same transaction. SQL failure inserting the event does
+   not leave the attempt irreversibly Submitted without its event/session
+   update. Successful commits precede existing SignalR/background-grading
+   dispatch and cache invalidation. This is not a durable outbox guarantee.
+
+4. Expiry/disconnect paths that intentionally save an expired state commit that
+   state even though the answer/start response is a business-rule rejection.
+   Disconnect-helper invalidation is deferred until commit in transactional
+   answer paths; its existing nontransactional callers retain their behavior.
+
+5. Existing SQL uniqueness constraints remain the integrity backstop:
+   Attempts(ExamId, CandidateId, AttemptNumber) and
+   AttemptAnswers(AttemptId, QuestionId). No constraint was removed or weakened.
+
+BUSINESS-RULE BOUNDARY
+The existing APIs are deliberately not unified:
+- AttemptService rejects late submission and duplicate submission.
+- CandidateService accepts a time-expired-but-not-yet-marked-Expired attempt's
+  submission, and returns success for an already submitted attempt.
+- CandidateService retains admin overrides, Resumed links, fixed/flexible
+  schedule handling and question-builder behavior.
+- Existing answer validation, ownership checks, maximum attempts and disconnect
+  thresholds were not replaced with new policies.
+
+Real SQL tests cover ownership/invalid answers, timer expiry, disconnect expiry,
+maximum-attempt rejection, Candidate late/duplicate submission, and concurrent
+consumption of exactly one admin override. They also preserve complete snapshot
+rollback and the already-atomic SaveChanges answer rollback.
+Fixed-start grace windows, access-code permutations, shuffled/builder question
+selection and every lifecycle status permutation were not exhaustively tested.
+
+TEST ENVIRONMENT AND REPRODUCIBILITY
+SQL Server: isolated exam-phase2-sql container, loopback 127.0.0.1:14339,
+image mcr.microsoft.com/mssql/server:2022-latest. Docker reported no explicit
+CPU or memory limit for this SQL container. The shared x86_64 host exposed
+four logical CPUs. Other concurrent work was present; hardware utilization
+was not sampled, so these timings are not controlled capacity measurements.
+
+Build SDK: dotnet 10.0.400; project target: net9.0.
+Existing test tooling: xUnit/VSTest and the repository's existing dependencies.
+Each SQL test creates a uniquely named RegressionAttempts_* database using
+EnsureCreated, verifies persisted state through fresh DbContexts, and deletes
+the test database on disposal. No customer database or real recipient is used.
+Connection pool cap in this test fixture: 150; command timeout: 45 seconds.
+
+Credentials were consumed from the isolated container into process environment
+variables, not printed, written to a report, or committed. Normal reruns should
+set TEST_SQLSERVER_CONNECTION and TEST_SQLSERVER_PASSWORD using approved local
+test infrastructure. Without SQL environment variables these tests SKIP; a
+skipped test is not SQL concurrency evidence.
+
+Baseline reproduction used production source from git archive 8e0a8f4 with the
+then-current owned test file overlaid. The fixed comparison used that same
+source tree plus the owned AttemptService/CandidateService changes. Current
+owned sources were compared byte-for-byte with the tested source copies.
+This isolates these results from unrelated concurrent branch changes.
+After SQL readiness was explicitly confirmed, a final check also compiled an
+isolated snapshot of the current integrated backend and test sources (not only
+the baseline plus owned changes). That check used ConnectRetryCount=0 and ran
+all 36 final concurrency cases plus the existing model test together.
+
+The required path policy prevented using the proposed /tmp build-lock path.
+Initial builds used repository-local .phase2-local/build.lock. Shared cleanup
+then removed that directory and earlier artifacts, so the definitive comparison
+used separate build outputs under a repository-local .git validation workspace
+and its own flock lock. No shared root bin/obj outputs were used for that
+comparison. Use flock --close when invoking dotnet: an ordinary flock command
+can otherwise leak its lock descriptor into VBCSCompiler after a build ends.
+
+Equivalent final-check commands, after configuring the isolated SQL environment:
+  dotnet restore /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --verbosity quiet
+  dotnet build /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore --verbosity quiet
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-build --no-restore \
+    --filter "FullyQualifiedName~AttemptConcurrencyTests" \
+    --logger "console;verbosity=detailed"
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-build --no-restore \
+    --filter "FullyQualifiedName~DatabaseModelTests"
+Serialize builds/tests with an approved flock path, or isolate all build outputs.
+No helper script or new test tool is needed.
+
+EXACT EXECUTION RESULTS
+Prerequisite probe:
+- Initial --no-restore build failed NETSDK1004: project.assets.json missing.
+- Restoring existing dependencies succeeded; no package manifest was changed.
+
+Builds:
+- Original baseline test-project build: 20 warnings, 0 errors.
+- Reconstructed 8e0a8f4 production + regression tests: 20 warnings, 0 errors;
+  elapsed 52.90 seconds.
+- Same tree + production concurrency fixes: 20 warnings, 0 errors;
+  elapsed 49.76 seconds.
+- Subsequent incremental test-only build: 0 warnings, 0 errors;
+  elapsed 4.15 seconds.
+- Final expanded-test build: 0 warnings, 0 errors; elapsed 2.90 seconds.
+- Final current-integrated-backend snapshot build: 20 warnings, 0 errors;
+  elapsed 14.90 seconds.
+The 20 warnings were also present before these production changes; they were
+not suppressed. A full rebuild is not claimed warning-free.
+
+Baseline SQL run:
+  filter: FullyQualifiedName~AttemptConcurrencyTests&FullyQualifiedName!~FiftyCandidates
+  33 cases; 10 passed, 23 failed; total 3.7148 minutes.
+Breakdown of the 23 failures:
+- 7 answer-upsert races: four single/bulk combinations plus three Candidate/
+  Attempt combinations failed with duplicate-key errors on
+  IX_AttemptAnswers_AttemptId_QuestionId.
+- 5 save-before-submit races reopened Submitted attempts as InProgress.
+- 3 submission rollback failures left status Submitted after the submitted
+  event violated a real SQL CHECK constraint: AttemptService and Candidate's
+  normal/late submit branches.
+- 6 start tests encountered SQL deadlocks: all four same-candidate entry-point
+  combinations and both independent-candidate combinations.
+- 2 failures were TEST FIXTURE defects, not production concurrency defects:
+  a second seed in one test reused globally unique Department/QuestionType names.
+  The fixture now generates unique names. Do not count these as two additional
+  production races.
+The baseline 50-candidate workload was not run; no before/after throughput
+improvement is claimed.
+
+Fixed SQL class run:
+  filter: FullyQualifiedName~AttemptConcurrencyTests
+  All 34 cases then present passed; 0 failed; total 2.4064 minutes.
+This included both start entry points, mixed save/submit entry points, real
+SQL event/snapshot constraint failures, retry using fresh contexts, existing
+business-rule checks and the 50-candidate workload.
+
+Additional final targeted checks after expanding coverage:
+  filter: answer-event rollback | Candidate admin-override start | DatabaseModelTests
+  5 passed; 0 failed; total 21.6594 seconds.
+These are three answer-rollback variants (single, bulk, Candidate), one
+concurrent override-consumption case, and the existing model-versus-migration
+snapshot test. Two previously covered answer cases were repeated. Across
+these runs, all 36 distinct concurrency cases in the final class were exercised
+successfully, plus the schema-drift test.
+
+Final confirmed-environment check on current integrated backend sources:
+  filter: FullyQualifiedName~AttemptConcurrencyTests|FullyQualifiedName~DatabaseModelTests
+  37 passed; 0 failed; 0 skipped; total 1.0105 minutes.
+This single invocation includes all 36 final concurrency cases and the schema
+test. SQL connection reconnect count was explicitly zero. Owned sources were
+again compared byte-for-byte with the tested snapshot after the run.
+The separate integrated 262-test result is in report 15; the later security
+follow-up is in report 14. This report claims the focused checks above.
+The validation scratch trees, logs and locks were removed after recording these
+results. No temporary build/test artifacts are part of this handoff.
+
+Two additional workload-only runs each passed 1/1:
+  run 2 test-process time: 13.8023 seconds
+  run 3 test-process time: 13.4189 seconds
+
+git diff --check was clean for the owned source/test changes.
+Secret scanning found no secrets in the two owned production files, test file
+and this report. No commit was made by this implementer.
+The required parallel-validation tool returned its already-tripped circuit
+breaker after two prior timeouts and instructed no further calls. No completed
+CodeQL or automatic code-review pass is claimed by this report.
+
+BACKEND-ONLY 50-CANDIDATE WORKLOAD
+Definition:
+- Fifty independent candidate identities, one exam, ten essay questions each.
+- A common release starts fifty candidate pipelines. Each pipeline starts an
+  attempt, overlaps two ten-answer bulk saves, then submits.
+- Counts per run: 50 starts + 100 bulk saves + 50 submits = 200 service operations.
+- Phases overlap across candidates; this is not a barrier-synchronized burst
+  of fifty simultaneous submissions.
+- Workload start calls use AttemptService. CandidateService mixed-entry-point
+  correctness is tested separately, not claimed as a 50-client Candidate load run.
+- Stopwatch excludes database creation/seeding and final verification.
+- All operation results must succeed. Independent verification requires:
+  50 Submitted attempts; 500 question snapshots; 500 unique answer rows;
+  1,000 AnswerSaved events; 50 Started events; 50 Submitted events;
+  50 completed proctor-session records.
+
+Observed workload durations and throughput:
+  run 1: 5.651 seconds; 35.39 service operations/second
+  run 2: 6.086 seconds; 32.86 service operations/second
+  run 3: 7.030 seconds; 28.45 service operations/second
+  run 4: 2.370 seconds; 84.39 service operations/second
+Run 4 is from the final confirmed-environment/current-integrated-source check.
+All four runs satisfied the persistence assertions without a failed operation.
+The differing timings on this shared host are not evidence of a code-driven
+performance improvement between runs.
+
+Per-operation latency in milliseconds (nearest-rank percentiles):
+Run  Operation   n      p50      p95      p99      max
+1    start       50   3600.3   5243.5   5513.2   5513.2
+1    bulk-save  100     39.5   1726.9   2582.8   4683.2
+1    submit      50     45.9    264.7    418.3    418.3
+2    start       50   3633.4   5729.2   5830.1   5830.1
+2    bulk-save  100     57.3   1065.1   3995.5   4004.4
+2    submit      50     59.2    226.6    238.6    238.6
+3    start       50   3949.3   6439.1   6905.7   6905.7
+3    bulk-save  100     73.2    857.3   4420.2   4445.1
+3    submit      50     82.9    154.1    318.5    318.5
+4    start       50   1379.8   2216.0   2313.8   2313.8
+4    bulk-save  100     23.9    632.7    678.1   1963.0
+4    submit      50     24.1     75.8     84.0     84.0
+With n=50, nearest-rank p99 equals the maximum; these are small-sample observations,
+not a statistically established production latency guarantee.
+
+LIMITATIONS AND REQUIRED CUSTOMER ACCEPTANCE
+- These are service-to-SQL tests with separate DbContexts, not HTTP tests or two
+  deployed application nodes. SignalR is a no-op test hub; Candidate background
+  grading is deliberately excluded by a test scope factory. No Redis transport,
+  browser, camera, WebRTC, media upload, notification receipt or grading/result
+  completion was measured. In particular, this is NOT evidence of 50 live cameras.
+- This workload does not establish an SLA, a maximum user count, sustained
+  throughput, long-duration stability, or acceptable worst-case tail latency.
+  Several start calls took multiple seconds; acceptance thresholds must be
+  agreed with the system owner rather than inferred from "tests passed".
+- The tested transactions assume the application's current SQL Server provider
+  and request-scoped DbContext pattern. Retry after injected failure uses a
+  fresh context. No retrying EF execution strategy, general deadlock retry,
+  context-reuse contract or lock-timeout policy was introduced.
+- Timer/session getters, proctor/admin control writers, expiry workers and
+  other lifecycle paths were not exhaustively interleaved in this bounded
+  suite. This report does not claim all possible lifecycle races are removed.
+- Late Candidate submission retains its existing special behavior, including
+  the distinct session-handling branch. Broader lifecycle-policy reconciliation
+  is a separate decision, not silently included in this concurrency patch.
+- No production index execution plans, SQL wait statistics, CPU/GC/memory,
+  connection-pool saturation, packet loss, node failure or storage exhaustion
+  were measured. ROWLOCK is a requested SQL lock granularity, not proof that
+  escalation or unrelated database deadlocks can never occur.
+- Customer acceptance still requires representative exams, all configured
+  monitoring/media features, two actual application nodes and shared services,
+  simultaneous start/save/submit traffic, reconnection/node-loss drills,
+  persisted-state inspection, and measured resource/error/latency thresholds.

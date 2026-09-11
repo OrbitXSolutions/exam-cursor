@@ -95,6 +95,10 @@ public class AttemptService : IAttemptService
     _cache.RemoveByPrefix(CacheKeys.ExamOpsPrefix);
   }
 
+  private IQueryable<Domain.Entities.Attempt.Attempt> QueryAttemptForUpdate(int attemptId) =>
+    _context.Set<Domain.Entities.Attempt.Attempt>().FromSqlInterpolated(
+      $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {attemptId}");
+
   #region Attempt Lifecycle
 
   public async Task<ApiResponse<AttemptSessionDto>> StartAttemptAsync(StartAttemptDto dto, string candidateId)
@@ -133,6 +137,13 @@ public class AttemptService : IAttemptService
       return ApiResponse<AttemptSessionDto>.FailureResponse("Exam is not published");
     }
 
+    await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+    // Lock an existing parent row even for a candidate's first attempt. Serializable
+    // reads of an empty attempt range allow competing readers to deadlock on insert.
+    await _context.Database.SqlQuery<string>(
+      $"SELECT [Id] AS [Value] FROM [AspNetUsers] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {candidateId}")
+      .SingleOrDefaultAsync();
+
     // 3. Validate exam schedule
     var now = UaeTimeHelper.NowUae;
 
@@ -162,10 +173,10 @@ public class AttemptService : IAttemptService
       }
     }
 
-    await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-
     // 5. Check for existing active attempt
     var existingActiveAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+      .FromSqlInterpolated(
+        $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [ExamId] = {dto.ExamId} AND [CandidateId] = {candidateId}")
 .Include(a => a.Questions)
    .ThenInclude(aq => aq.Answers)
 .FirstOrDefaultAsync(a =>
@@ -181,7 +192,6 @@ public class AttemptService : IAttemptService
         existingActiveAttempt.Status = AttemptStatus.Expired;
         existingActiveAttempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
         await _context.SaveChangesAsync();
-        InvalidateAttemptCompletionCaches();
         // Continue to create new attempt if allowed
       }
       else
@@ -201,6 +211,8 @@ public class AttemptService : IAttemptService
     if (exam.MaxAttempts > 0 && attemptCount >= exam.MaxAttempts)
     {
       await startTransaction.CommitAsync();
+      if (existingActiveAttempt != null)
+        InvalidateAttemptCompletionCaches();
       return ApiResponse<AttemptSessionDto>.FailureResponse(
  $"Maximum attempts ({exam.MaxAttempts}) reached for this exam");
     }
@@ -292,8 +304,10 @@ public class AttemptService : IAttemptService
     }
 
     await _context.SaveChangesAsync();
-    InvalidateAttemptProgressCaches();
     await startTransaction.CommitAsync();
+    if (existingActiveAttempt != null)
+      InvalidateAttemptCompletionCaches();
+    InvalidateAttemptProgressCaches();
 
     // 11. Reload attempt with questions
     var createdAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -381,7 +395,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
   public async Task<ApiResponse<AttemptSubmittedDto>> SubmitAttemptAsync(int attemptId, string candidateId)
   {
-    var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+    await using var submitTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+    var attempt = await QueryAttemptForUpdate(attemptId)
   .Include(a => a.Questions)
 .ThenInclude(aq => aq.Answers)
         .FirstOrDefaultAsync(a => a.Id == attemptId);
@@ -426,6 +441,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
           .SetProperty(a => a.UpdatedDate, now)
           .SetProperty(a => a.UpdatedBy, candidateId));
 
+      await submitTransaction.CommitAsync();
       InvalidateAttemptCompletionCaches();
       if (expiredRows == 0)
       {
@@ -498,6 +514,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     }
 
     await _context.SaveChangesAsync();
+    await submitTransaction.CommitAsync();
 
     // Notify proctor via SignalR (server-side, reliable)
     _ = Task.Run(async () =>
@@ -665,7 +682,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
 
   public async Task<ApiResponse<AnswerSavedDto>> SaveAnswerAsync(int attemptId, SaveAnswerDto dto, string candidateId)
   {
-    var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+    await using var answerTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+    var attempt = await QueryAttemptForUpdate(attemptId)
         .FirstOrDefaultAsync(a => a.Id == attemptId);
 
     if (attempt == null)
@@ -679,8 +697,10 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     }
 
     // Check disconnect budget before anything else
-    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt, invalidateCaches: false))
     {
+      await answerTransaction.CommitAsync();
+      InvalidateAttemptCompletionCaches();
       return ApiResponse<AnswerSavedDto>.FailureResponse(
           "Attempt expired: disconnect time exceeded allowed limit. Cannot save answers.");
     }
@@ -700,6 +720,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       attempt.Status = AttemptStatus.Expired;
       attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       await _context.SaveChangesAsync();
+      await answerTransaction.CommitAsync();
       InvalidateAttemptCompletionCaches();
       return ApiResponse<AnswerSavedDto>.FailureResponse("Attempt has expired. Cannot save answers.");
     }
@@ -773,6 +794,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     _context.Set<AttemptEvent>().Add(answerEvent);
 
     await _context.SaveChangesAsync();
+    await answerTransaction.CommitAsync();
     InvalidateAttemptProgressCaches();
 
     return ApiResponse<AnswerSavedDto>.SuccessResponse(new AnswerSavedDto
@@ -795,7 +817,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<List<AnswerSavedDto>>.SuccessResponse(results, "All answers saved successfully");
     }
 
-    var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+    await using var answerTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+    var attempt = await QueryAttemptForUpdate(attemptId)
         .FirstOrDefaultAsync(a => a.Id == attemptId);
 
     if (attempt == null)
@@ -808,8 +831,10 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<List<AnswerSavedDto>>.FailureResponse("You do not have access to this attempt");
     }
 
-    if (await CheckAndApplyDisconnectBudgetAsync(attempt))
+    if (await CheckAndApplyDisconnectBudgetAsync(attempt, invalidateCaches: false))
     {
+      await answerTransaction.CommitAsync();
+      InvalidateAttemptCompletionCaches();
       return ApiResponse<List<AnswerSavedDto>>.FailureResponse(
           "Attempt expired: disconnect time exceeded allowed limit. Cannot save answers.");
     }
@@ -827,6 +852,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       attempt.Status = AttemptStatus.Expired;
       attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
       await _context.SaveChangesAsync();
+      await answerTransaction.CommitAsync();
       InvalidateAttemptCompletionCaches();
       return ApiResponse<List<AnswerSavedDto>>.FailureResponse("Attempt has expired. Cannot save answers.");
     }
@@ -936,6 +962,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     if (savedAnswers.Any())
     {
       await _context.SaveChangesAsync();
+      await answerTransaction.CommitAsync();
       InvalidateAttemptProgressCaches();
 
       foreach (var savedAnswer in savedAnswers)
@@ -1611,7 +1638,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
   /// Detects disconnect gaps via ProctorSession.LastHeartbeatAt staleness.
   /// Returns true if the attempt was expired due to disconnect timeout.
   /// </summary>
-  private async Task<bool> CheckAndApplyDisconnectBudgetAsync(Domain.Entities.Attempt.Attempt attempt)
+  private async Task<bool> CheckAndApplyDisconnectBudgetAsync(
+    Domain.Entities.Attempt.Attempt attempt, bool invalidateCaches = true)
   {
     if (attempt.Status != AttemptStatus.Started &&
         attempt.Status != AttemptStatus.InProgress &&
@@ -1675,7 +1703,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       });
 
       await _context.SaveChangesAsync();
-      InvalidateAttemptCompletionCaches();
+      if (invalidateCaches)
+        InvalidateAttemptCompletionCaches();
       return true;
     }
 

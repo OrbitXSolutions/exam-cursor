@@ -534,6 +534,12 @@ public class CandidateService : ICandidateService
             return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam is not available");
         }
 
+        await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+        // Use the same candidate lock as AttemptService, including when no attempt exists yet.
+        await _context.Database.SqlQuery<string>(
+            $"SELECT [Id] AS [Value] FROM [AspNetUsers] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {candidateId}")
+            .SingleOrDefaultAsync();
+
         // Validate schedule (Flexible vs Fixed)
         var now = UaeTimeHelper.NowUae;
         var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
@@ -616,10 +622,10 @@ public class CandidateService : ICandidateService
             }
         }
 
-        await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-
         // Check for existing active attempt
         var existingActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .FromSqlInterpolated(
+                $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [ExamId] = {examId} AND [CandidateId] = {candidateId}")
                  .Include(a => a.Questions.OrderBy(q => q.Order))
         .ThenInclude(aq => aq.Answers)
                  .FirstOrDefaultAsync(a =>
@@ -635,7 +641,6 @@ public class CandidateService : ICandidateService
                 existingActive.Status = AttemptStatus.Expired;
                 existingActive.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
                 await _context.SaveChangesAsync();
-                InvalidateAttemptCompletionCaches();
             }
             else
             {
@@ -694,6 +699,8 @@ public class CandidateService : ICandidateService
             if (adminOverride == null)
             {
                 await startTransaction.CommitAsync();
+                if (existingActive != null)
+                    InvalidateAttemptCompletionCaches();
                 return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(
                      $"Maximum attempts ({exam.MaxAttempts}) reached");
             }
@@ -726,7 +733,6 @@ public class CandidateService : ICandidateService
 
         _context.Set<Domain.Entities.Attempt.Attempt>().Add(attempt);
         await _context.SaveChangesAsync();
-        InvalidateAttemptProgressCaches();
 
         // Mark admin override as used (if applicable)
         if (adminOverride != null)
@@ -737,7 +743,6 @@ public class CandidateService : ICandidateService
             adminOverride.UpdatedDate = now;
             adminOverride.UpdatedBy = candidateId;
             await _context.SaveChangesAsync();
-            InvalidateAttemptProgressCaches();
         }
 
         // Generate attempt questions
@@ -846,8 +851,10 @@ public class CandidateService : ICandidateService
         }
 
         await _context.SaveChangesAsync();
-        InvalidateAttemptProgressCaches();
         await startTransaction.CommitAsync();
+        if (existingActive != null)
+            InvalidateAttemptCompletionCaches();
+        InvalidateAttemptProgressCaches();
 
         // Reload with questions
         var createdAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
@@ -907,7 +914,10 @@ $"Attempt is {attempt.Status}. Cannot resume.");
     public async Task<ApiResponse<bool>> SaveAnswersAsync(
      int attemptId, BulkSaveAnswersRequest request, string candidateId)
     {
+        await using var answerTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
         var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .FromSqlInterpolated(
+                $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {attemptId}")
             .FirstOrDefaultAsync(a => a.Id == attemptId);
 
         if (attempt == null)
@@ -934,6 +944,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
             await _context.SaveChangesAsync();
+            await answerTransaction.CommitAsync();
             InvalidateAttemptCompletionCaches();
             return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
@@ -1008,6 +1019,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         }
 
         await _context.SaveChangesAsync();
+        await answerTransaction.CommitAsync();
         InvalidateAttemptProgressCaches();
 
         return ApiResponse<bool>.SuccessResponse(true, "Answers saved successfully");
@@ -1015,7 +1027,10 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
     public async Task<ApiResponse<CandidateResultSummaryDto>> SubmitAttemptAsync(int attemptId, string candidateId)
     {
+        await using var submitTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
         var attempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .FromSqlInterpolated(
+                $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {attemptId}")
             .Include(a => a.Exam)
             .Include(a => a.Questions)
                 .ThenInclude(aq => aq.Answers)
@@ -1119,6 +1134,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 CreatedBy = candidateId
             });
             await _context.SaveChangesAsync();
+            await submitTransaction.CommitAsync();
             InvalidateAttemptCompletionCaches();
 
             // Notify proctor via SignalR (server-side, reliable)
@@ -1226,6 +1242,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         }
 
         await _context.SaveChangesAsync();
+        await submitTransaction.CommitAsync();
         InvalidateAttemptCompletionCaches();
 
         _logger.LogInformation("Submit succeeded: Attempt {AttemptId} submitted | CandidateId={CandidateId} | ExamId={ExamId}",

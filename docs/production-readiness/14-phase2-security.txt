@@ -1,0 +1,136 @@
+PHASE 2 SECURITY FIXES AND VALIDATION
+Date: 2026-09-11
+
+Scope
+Owned changes: AuthService.cs, UserService.cs, ProctorHub.cs,
+Backend-API.Tests/SecurityIntegrationTests.cs, and this report.
+No dependencies, migrations, seed data, anonymous endpoints, notification code,
+AttemptService, or camera/screen frontend were changed by this security task.
+
+Refresh and deactivation
+- Refresh requires an existing, active, unblocked, undeleted user, a nonempty
+  matching refresh token, and an explicitly present future expiry.
+- Successful refresh still rotates access and refresh tokens. Failed Identity
+  persistence does not return a successful token response.
+- Deactivation clears both refresh credential fields in the same Identity update,
+  checks persistence success, and does not restore credentials on reactivation.
+- This does NOT instantly revoke already-issued JWTs. Their normal expiry and
+  existing authentication configuration still apply. No authentication redesign.
+
+ProctorHub authorization
+- Candidate access is exact attempt ownership, not general exam access.
+  A sibling candidate assigned to the same exam cannot join the other attempt.
+- Monitoring requires Proctor/Admin plus the existing department OR nondeleted
+  explicit ExamProctor assignment entitlement, or SuperAdmin.
+- Missing/deleted attempts and deleted exams cannot be joined.
+- Both room joins validate the client role against the server-derived role.
+- Every media/signaling/control invocation requires a prior authorized join to
+  its channel and rechecks current caller ownership/monitor entitlement.
+  Publisher-only and monitor-only operations enforce their respective roles.
+- Follow-up: when an invocation or join detects entitlement loss, all main and
+  screen memberships for that attempt are removed before denying the caller.
+  This includes role/connection-specific groups; a removal failure aborts the
+  connection. Wrong-channel/wrong-operation-role calls cannot bypass this check.
+- Directed answers/ICE use SignalR groups partitioned by attempt, media channel,
+  validated peer role, and connection ID. Wrong/unknown recipients receive
+  nothing; empty required answer targets fail. No arbitrary Clients.Client send
+  remains in the hub and there is no process-local recipient registry.
+- Context.Items records only this connection's own authorized room role.
+  Distributed delivery and recipient membership are managed by SignalR/Redis.
+  Leave removes all relevant subgroups; disconnect cleanup is SignalR-owned.
+  Partial join/leave failures abort the connection rather than retaining a
+  partially authorized receive-only connection.
+- Main attempt groups remain for existing backend notifications. Offers, ICE,
+  peer lifecycle, and directional controls go to the appropriate peer role.
+
+Frontend compatibility checked
+- proctor-signaling.ts connect() joins the main room. connectScreenRoom() calls
+  connect() first, then joins screen; reconnect rejoins both when appropriate.
+- Candidate/proctor webcam and screen offer/answer/ICE sequences remain supported.
+- Screen status intentionally requires the main-room candidate join and reaches
+  main-room monitors, matching screen-share-publisher.ts and current viewers.
+- Leaving screen does not remove camera/main membership. Reconnected connections
+  must join again. A single authorized connection may legitimately join both.
+
+Executed validation
+Command (with isolated SQL/Redis environment configured, credentials not logged):
+  dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj --no-restore
+    --filter FullyQualifiedName~SecurityIntegrationTests --verbosity minimal
+Initial result: Passed 7, failed 0, skipped 0; reported duration 1 minute, .NET 9.
+Final follow-up result on the reviewed current worktree: Passed 7, failed 0,
+skipped 0; reported duration 18 seconds, exit code 0, .NET 9.
+The follow-up run rebuilt production and tests and includes the strengthened
+invocation-driven eviction regression. Build emitted 20 pre-existing warnings
+and no errors. The parent authorized normal ignored bin/obj outputs.
+Exact final command (240-second outer process bound):
+  dotnet test Backend-API.Tests/Backend-API.Tests.csproj --no-restore
+    --filter FullyQualifiedName~SecurityIntegrationTests --verbosity minimal
+    -p:UseSharedCompilation=false
+Credentials were loaded from the existing isolated SQL/Redis containers directly
+into the child process environment. Console output only; no credential, log,
+helper, or lock file was created. No staging/commit/push was performed.
+An initial test compilation found an ambiguous IServer import; the import was
+fixed before the complete successful run. No new packages were installed.
+git diff --check passed.
+Secret scanning of all five security-owned files found no secrets.
+
+The seven tests exercise:
+1. Refresh rejection for inactive/pending/suspended/blocked/deleted/missing users,
+   invalid access tokens, missing/expired expiry, absent/empty/mismatched refresh
+   tokens; active rotation, old-token replay denial, persisted replacement.
+2. Persisted deactivation credential removal, rejection before/after reactivation,
+   and the explicitly unchanged cryptographic validity of an existing JWT.
+3. Real SQL Identity concurrency failures during refresh and deactivation:
+   failure responses and unchanged persisted credentials/status.
+4. Real authenticated hub rejection of unjoined callers (including otherwise
+   entitled users), sibling candidates, cross-department Proctor/Admin, spoofed
+   roles, candidate control escalation, monitor publisher impersonation, and
+   unauthenticated negotiation.
+5. Working same-department Proctor/Admin, cross-department explicitly assigned
+   proctor, assigned proctor without department, and SuperAdmin flows across two
+   independent Redis-backed Kestrel nodes; webcam/screen negotiation, targeted
+   and broadcast ICE, controls, statuses, and leave notifications.
+6. Wrong attempt/media/role/self/unknown/empty targets; camera/screen separation;
+   targeting a peer after leave; disconnected IDs versus replacement connections;
+   reconnect requiring an authorized rejoin.
+7. The final executed revocation regression: an idle revoked monitor first
+   demonstrably receives an offer, then its rejected publisher-only invocation
+   removes BOTH channels without any Leave/disconnect. Later broadcasts, directed
+   ICE, and backend base-group messages do not reach that still-connected peer.
+   Other revoked operations/joins and deleted/missing attempts are rejected.
+
+Test implementation
+- Real SQL Server and EF Identity persistence in uniquely named test databases.
+- Real JWT authentication, HTTP negotiation, WebSockets, SignalR hub dispatch,
+  per-connection state, and two separately configured Redis lifetime managers.
+- Uses existing project dependencies and BCL ClientWebSocket, not a mocked hub.
+- Negative delivery assertions use a 150 ms bounded silence interval followed
+  by an actual client barrier, not an immediate empty-queue check.
+- Test databases, clients, and test application hosts are disposed by fixtures.
+
+Review and limits
+- Read-only security-diff-review inspected the follow-up worktree hub blob
+  4fc36f4735d7a1d523e213c58d8c31cb02604dd4 and test blob
+  e00c33826d3a2e2a56bd40299fb3094d9ca4b8c0. It confirmed that the invocation-cleanup
+  gap is addressed, the regression no longer relies on cooperative Leave, and
+  reported no new high-confidence finding. This was code review, not a test run.
+- parallel_validation code review completed over the wider branch (100 files).
+  Its four comments concerned pre-existing logging/header files outside this
+  task's ownership; no comment concerned these security-owned files.
+- CodeQL timed out. No completed/clean CodeQL result is claimed; the tool advised
+  against retrying within this session. Parent must assess wider-branch comments.
+- Tests use two application hosts on one machine, not a production load balancer,
+  geographically separated servers, TURN, or actual browser media capture.
+  No packet-loss/backplane-outage fault injection or browser camera UI test here.
+- Receiver authorization is established on join; per-invocation authorization
+  rechecks the caller and now removes that attempt's memberships when revocation
+  is detected. Existing idle group members are NOT proactively evicted merely
+  because an administrator changes their entitlement. They can still receive
+  broadcasts/directed signaling until a relevant invocation detects the change,
+  they leave, or they disconnect. Already established WebRTC media is not stopped
+  by hub membership removal alone. This pre-existing immediate-revocation gap
+  remains unresolved: there is no distributed administrative eviction mechanism,
+  per-recipient entitlement recheck, JWT revocation, or peer-media teardown here.
+- This bounded fix does not redesign multi-viewer WebRTC behavior, the frontend
+  screen client's existing main-room membership, token storage, or login policy.
+- No claim of overall production readiness or full application security audit.
