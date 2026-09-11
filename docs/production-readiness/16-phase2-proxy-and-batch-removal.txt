@@ -1,7 +1,8 @@
 PHASE 2 CONTINUATION — API PROXY / BATCH REMOVAL
 Date: 2026-09-11
 Starting checkpoint: 157bba4
-Status: verification in progress; final results recorded below before handoff.
+Status: VERIFIED bounded HTTP proxy regression suite; browser/database acceptance
+remains NOT VERIFIED.
 
 WHAT WAS REVIEWED
 /home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/api/proxy/[...path]/route.ts
@@ -44,7 +45,21 @@ corepack pnpm build
 node --test tests/api-proxy.test.cjs
 
 VERIFICATION / RESULTS
-Pending baseline reproduction and final focused/build verification.
+Resumed from interrupted checkpoint 8537056:
+- Existing frozen-lockfile installation succeeded without manifest changes.
+- Production Next.js build succeeded.
+- node --test tests/api-proxy.test.cjs passed all seven tests, zero failures,
+  skips or cancellations, in 652.79 ms on loopback.
+- The DELETE-body fix was already present in the interrupted checkpoint. It
+  was reviewed and exercised, not reimplemented; no before-fix execution is
+  claimed in this resumed session.
+- Whole-app typecheck FAILED with 204 diagnostics, matching the earlier count;
+  no diagnostic named IdentityImage. Equal counts do not prove absence of all
+  regressions. Production builds retain the pre-existing typecheck bypass.
+- The existing lint command failed: eslint not found. No missing linter was
+  silently installed and no lint pass is claimed.
+Raw logs were retained during the session under /tmp/exam-continuation/frontend;
+they are ephemeral, so the commands and results above are the durable summary.
 
 LIMITS / REMAINING ACCEPTANCE
 The recording upstream verifies the proxy's HTTP contract, not database batch

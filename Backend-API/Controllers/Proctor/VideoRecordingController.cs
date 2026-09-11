@@ -10,6 +10,7 @@ using Smart_Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Domain.Common;
 using Smart_Core.Infrastructure.Storage;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -27,6 +28,7 @@ public class VideoRecordingController : ControllerBase
     private readonly ILogger<VideoRecordingController> _logger;
     private readonly IConfiguration _configuration;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ResourceAuthorizationService _authorization;
     private readonly string _mediaBasePath;
 
     public VideoRecordingController(
@@ -35,13 +37,15 @@ public class VideoRecordingController : ControllerBase
         StoragePaths storagePaths,
         ILogger<VideoRecordingController> logger,
         IConfiguration configuration,
-        IServiceScopeFactory scopeFactory)
+        IServiceScopeFactory scopeFactory,
+        ResourceAuthorizationService authorization)
     {
         _db = db;
         _currentUser = currentUser;
         _logger = logger;
         _configuration = configuration;
         _scopeFactory = scopeFactory;
+        _authorization = authorization;
         _mediaBasePath = storagePaths.MediaPath;
     }
 
@@ -300,6 +304,10 @@ public class VideoRecordingController : ControllerBase
     [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> GetVideoRecording(int attemptId)
     {
+        var denied = await AuthorizeRecordingReadAsync(attemptId);
+        if (denied != null)
+            return denied;
+
         try
         {
             var evidence = await _db.ProctorEvidence
@@ -401,6 +409,10 @@ public class VideoRecordingController : ControllerBase
     [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
     public async Task<IActionResult> StreamVideo(int attemptId)
     {
+        var denied = await AuthorizeRecordingReadAsync(attemptId);
+        if (denied != null)
+            return denied;
+
         var evidence = await _db.ProctorEvidence
             .Where(e => e.AttemptId == attemptId && e.Type == EvidenceType.Video && e.IsUploaded && !e.IsExpired)
             .OrderByDescending(e => e.UploadedAt)
@@ -423,8 +435,12 @@ public class VideoRecordingController : ControllerBase
     /// </summary>
     [HttpGet("video-chunks/{attemptId}")]
     [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
-    public IActionResult GetVideoChunks(int attemptId)
+    public async Task<IActionResult> GetVideoChunks(int attemptId)
     {
+        var denied = await AuthorizeRecordingReadAsync(attemptId);
+        if (denied != null)
+            return denied;
+
         try
         {
             var chunkDir = Path.Combine(_mediaBasePath, "video-chunks", attemptId.ToString());
@@ -487,8 +503,12 @@ public class VideoRecordingController : ControllerBase
     /// </summary>
     [HttpGet("video-chunks/{attemptId}/{filename}")]
     [Authorize(Roles = $"{AppRoles.SuperAdmin},{AppRoles.Admin},{AppRoles.Proctor}")]
-    public IActionResult GetVideoChunkFile(int attemptId, string filename)
+    public async Task<IActionResult> GetVideoChunkFile(int attemptId, string filename)
     {
+        var denied = await AuthorizeRecordingReadAsync(attemptId);
+        if (denied != null)
+            return denied;
+
         // Validate filename pattern to prevent path traversal
         if (!System.Text.RegularExpressions.Regex.IsMatch(filename, @"^chunk_\d{6}\.webm$"))
             return BadRequest(ApiResponse<object>.FailureResponse("Invalid chunk filename"));
@@ -502,6 +522,27 @@ public class VideoRecordingController : ControllerBase
     }
 
     // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    private async Task<IActionResult?> AuthorizeRecordingReadAsync(int attemptId)
+    {
+        Response.Headers.CacheControl = "private, no-store";
+        Response.Headers.XContentTypeOptions = "nosniff";
+
+        var examId = await _db.Attempts.AsNoTracking()
+            .Where(a => a.Id == attemptId && !a.IsDeleted && !a.Exam.IsDeleted)
+            .Select(a => (int?)a.ExamId)
+            .FirstOrDefaultAsync(HttpContext.RequestAborted);
+        if (!examId.HasValue)
+            return NotFound(ApiResponse<object>.FailureResponse("Attempt not found"));
+
+        var userId = _currentUser.UserId;
+        if (string.IsNullOrWhiteSpace(userId) ||
+            !await _db.Users.AnyAsync(u => u.Id == userId && !u.IsDeleted, HttpContext.RequestAborted) ||
+            !await _authorization.CanAccessExamAsync(examId.Value))
+            return Forbid();
+
+        return null;
+    }
 
     private async Task<bool> IsVideoRecordingEnabled()
     {

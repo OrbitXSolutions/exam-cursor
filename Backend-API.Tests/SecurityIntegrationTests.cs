@@ -349,8 +349,10 @@ public sealed class SecurityIntegrationTests
         await owner.InvokeAsync("JoinAttemptRoom", seed.AttemptId, "candidate");
         await owner.InvokeAsync("JoinScreenRoom", seed.AttemptId, "candidate");
         await monitor.InvokeAsync("JoinAttemptRoom", seed.AttemptId, "proctor");
+        await owner.EventAsync("PeerJoined");
         await monitor.InvokeAsync("JoinScreenRoom", seed.AttemptId, "proctor");
-        await owner.ClearAsync();
+        // A local barrier can overtake remote Redis group events; observe both joins explicitly.
+        await owner.EventAsync("ScreenPeerJoined");
         await using (var db = fixture.Database())
             await db.ExamProctors.Where(p => p.ProctorId == seed.Assigned)
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsDeleted, true));

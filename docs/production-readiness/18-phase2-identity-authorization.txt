@@ -1,0 +1,95 @@
+PHASE 2 — PRIVATE IDENTITY DOCUMENTS AND REVIEW AUTHORIZATION
+Date: 2026-09-11
+Original continuation baseline: 157bba4
+Resumed interrupted checkpoint: 8537056
+Status: VERIFIED bounded SQL/HTTP cases; full browser/customer acceptance remains
+PARTIALLY VERIFIED / NOT VERIFIED as described below.
+
+WHAT WAS REVIEWED / INTERRUPTED STATE
+The prior checkpoint removed anonymous identity static-file registration and
+added authenticated identity-image retrieval, scoped verification queries,
+an authenticated browser image component, and SQL/HTTP regression tests.
+This report was missing at interruption; implementation presence is not proof
+that those changes had passed their required tests.
+
+Files:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Proctor/IdentityVerificationController.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/Proctor/IdentityVerificationService.cs
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Program.cs
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/components/proctor/identity-image.tsx
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/(dashboard)/proctor/user-identification/page.tsx
+/home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/IdentityAuthorizationTests.cs
+
+CONFIRMED PROBLEM AND INTENDED MINIMAL CORRECTION
+Serving identity photographs through an anonymous static path bypassed their
+API authentication and review scope. Moving those images behind authorization
+also requires updating browser image loading: an ordinary img request cannot
+attach the application's bearer token.
+
+The preserved implementation uses server-generated verification image routes
+instead of exposing stored filenames/URLs. Its private image endpoint:
+- Reuses the verification detail scope before reading the document.
+- Restricts image kind, accepted formats and stored paths.
+- Resolves supported legacy paths locally; never fetches an arbitrary URL.
+- Sets private/no-store and nosniff headers.
+The browser component only attaches credentials to the expected same-origin
+proxy path, rejects redirects, and revokes object URLs on cleanup.
+
+List/detail/single/bulk review scoping must agree with existing department,
+explicit exam-proctor assignment and SuperAdmin boundaries; unrelated sibling
+candidates must not gain access just because they share an exam.
+Existing candidate submission, status and image validation are preserved.
+This does not change identity approval policy or SeedData/AllowAnonymous.
+
+EXISTING REGRESSION DESIGN
+The test class uses existing xUnit, isolated SQL Server, real Identity roles,
+JWT validation and loopback Kestrel requests to production MVC/service code.
+Cases cover owner/sibling/staff scopes, assignments and revocation, missing/
+deleted verifications, restricted bulk actions, legacy local identity paths,
+traversal/foreign paths/symlinks, unsafe image bytes and candidate submission.
+Assertions include returned bytes, MIME, private/no-store and nosniff headers.
+A source check verifies that Program does not register anonymous identity files.
+Synthetic image fixtures are not real customer identity data.
+
+RESUMED SECURITY FINDING AND CORRECTION
+The read-only specialist found that the scoped identity query did not require
+the requesting account to exist undeleted. A soft-deleted assigned monitor could
+retain role/assignment rows and continue with an unexpired JWT. This is a local
+resource-authorization defect, not a request to redesign token revocation.
+
+Added a nondeleted-requester check before all identity-scope branches. A new
+SQL/HTTP regression deletes the assigned monitor but retains their role and exam
+assignment and the same token, then checks detail/images/list/single/bulk review.
+The test requires no exposed document and no unauthorized review mutation.
+
+VERIFICATION / RESULTS
+- All five original identity cases passed in the resumed baseline; this does not
+  mean they covered deleted requesters.
+- The new deleted-monitor regression was run before the production fix. After
+  correcting an isolated SQL credential mismatch, it failed with expected 404
+  versus actual 200, confirming the access defect. The earlier login failure was
+  an environment error, not defect reproduction.
+- After the requester check: all six identity cases passed within a 21-case
+  recording/identity/worker-lock focused run, zero failures/skips.
+- Next.js production build and seven HTTP proxy tests passed. The existing
+  typecheck still failed with 204 diagnostics; lint failed because ESLint is
+  unavailable. These are not authenticated browser tests of IdentityImage.
+- Final integrated-suite and security/correctness review results are in report 19.
+No tests from the interrupted session are assumed to have passed.
+
+LIMITS / REMAINING RISKS
+The loopback fixture does not substitute for exercising the actual Program
+pipeline behind IIS/Next.js and the customer's load balancer. It also does not
+prove browser login, reviewer interaction, logout/revocation behavior, shared
+mount ACLs, storage migration, real image rendering or customer privacy policy.
+Signature/type validation does not mean full image decoding/re-encoding.
+Previously exposed files/URLs in browser or intermediary caches cannot be
+recalled merely by changing the API. Production rollout must remove any
+independent static-server mapping to the identity directory and review cache
+retention/previous exposure. No application-wide security clearance is claimed.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+Document the customer's privacy/retention requirements and test a real reviewer
+journey before go-live. Broad token-storage redesign, image processing services
+or distributed immediate revocation are separate decisions, not prerequisites
+invented to justify changing the working live camera flow.

@@ -334,7 +334,8 @@ public class IdentityVerificationService : IIdentityVerificationService
     {
         query = query.Where(v => !v.IsDeleted);
         var userId = _authorization.CurrentUserId;
-        if (string.IsNullOrWhiteSpace(userId))
+        if (string.IsNullOrWhiteSpace(userId) ||
+            !await _context.Users.AnyAsync(u => u.Id == userId && !u.IsDeleted))
             return query.Where(_ => false);
         if (await _authorization.IsCurrentUserSuperAdminAsync())
             return query;

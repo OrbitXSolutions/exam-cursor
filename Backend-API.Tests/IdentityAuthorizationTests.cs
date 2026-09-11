@@ -155,6 +155,35 @@ public sealed class IdentityAuthorizationTests
     }
 
     [SqlServerFact]
+    public async Task DeletedAssignedMonitorCannotReadOrReviewWithAnUnexpiredToken()
+    {
+        await using var fixture = await Fixture.StartAsync();
+        using var assigned = fixture.Client("assigned");
+        var detail = $"{Api}/verifications/{fixture.VerificationId}";
+        Assert.Equal(HttpStatusCode.OK, (await assigned.GetAsync(detail + "/images/document")).StatusCode);
+
+        await using var db = fixture.Database();
+        var actorId = fixture.UserId("assigned");
+        await db.Users.Where(u => u.Id == actorId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.IsDeleted, true));
+        Assert.True(await db.ExamProctors.AnyAsync(ep => ep.ProctorId == actorId && !ep.IsDeleted));
+        Assert.True(await db.UserRoles.AnyAsync(ur => ur.UserId == actorId));
+
+        foreach (var path in new[] { detail, detail + "/images/document", detail + "/images/selfie" })
+            Assert.Equal(HttpStatusCode.NotFound, (await assigned.GetAsync(path)).StatusCode);
+        var list = await JsonAsync(await assigned.GetAsync($"{Api}/verifications"));
+        Assert.Empty(list.GetProperty("data").GetProperty("items").EnumerateArray());
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await assigned.PostAsJsonAsync(detail + "/action", new { action = "Approve" })).StatusCode);
+        var bulk = await JsonAsync(await assigned.PostAsJsonAsync($"{Api}/bulk-action",
+            new { ids = new[] { fixture.VerificationId }, action = "Reject" }));
+        Assert.Equal(0, bulk.GetProperty("data").GetProperty("succeeded").GetInt32());
+        Assert.Equal(1, bulk.GetProperty("data").GetProperty("failed").GetInt32());
+        Assert.Equal(IdentityVerificationStatus.Pending,
+            (await db.IdentityVerifications.SingleAsync(v => v.Id == fixture.VerificationId)).Status);
+    }
+
+    [SqlServerFact]
     public async Task HttpSupportsStoredLegacyIdentityPathsButRejectsTraversalForeignDocumentsAndUnsafeImages()
     {
         await using var fixture = await Fixture.StartAsync();

@@ -1,6 +1,7 @@
 PHASE 2 CONTINUATION — INTEGRATION AND PRIVATE MEDIA
 Date: 2026-09-11
 Starting checkpoint: 157bba4
+Resumed interrupted checkpoint: 8537056
 Status: IN PROGRESS; final validation and preservation results recorded below.
 
 CURRENT STATE / SCOPE
@@ -8,6 +9,13 @@ Reports 01-05 describe a historical missing-source blocker, not the current tree
 Reports 06-08 completed Phase 1 implementation and pushed its checkpoint before
 Phase 2. Reports 09-15 retain the earlier Phase 2 work and its acceptance limits.
 This continuation does not repeat those changes or re-open the Phase 1 gate.
+
+The interrupted checkpoint contained recording regression tests but not the
+corresponding VideoRecordingController resource checks. It also preserved the
+identity controller/service/frontend changes without report 18 or final test
+results. These are incomplete work, not evidence of finished authorization.
+The resumed session first runs the existing suites against fresh isolated
+services and reviews these exact changes before completing their implementation.
 
 Continued work:
 - Verify the current backend suite with fresh isolated SQL/Redis services.

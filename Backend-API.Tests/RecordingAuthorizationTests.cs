@@ -96,7 +96,7 @@ public sealed class RecordingAuthorizationTests
     {
         await using var fixture = await RecordingServer.StartAsync();
         await using var db = fixture.Database();
-        foreach (var actor in new[] { "same-proctor", "assigned-proctor", "assigned-no-department", "same-admin" })
+        foreach (var actor in new[] { "same-proctor", "assigned-proctor", "assigned-no-department", "same-admin", "super" })
         {
             using var client = fixture.Client(actor);
             await AssertRoutesAsync(client, fixture.AttemptId, HttpStatusCode.OK);
@@ -104,7 +104,7 @@ public sealed class RecordingAuthorizationTests
             if (actor == "same-proctor")
                 await db.Users.Where(u => u.Id == userId)
                     .ExecuteUpdateAsync(s => s.SetProperty(u => u.DepartmentId, (int?)null));
-            else if (actor == "same-admin")
+            else if (actor is "same-admin" or "super")
                 await db.Users.Where(u => u.Id == userId)
                     .ExecuteUpdateAsync(s => s.SetProperty(u => u.IsDeleted, true));
             else
@@ -200,6 +200,9 @@ public sealed class RecordingAuthorizationTests
                 Assert.Equal(range == null ? HttpStatusCode.OK : HttpStatusCode.PartialContent, response.StatusCode);
                 Assert.Equal(bytes[start..(end + 1)], await response.Content.ReadAsByteArrayAsync());
                 Assert.Equal(type, response.Content.Headers.ContentType?.MediaType);
+                Assert.True(response.Headers.CacheControl!.Private);
+                Assert.True(response.Headers.CacheControl.NoStore);
+                Assert.Equal("nosniff", response.Headers.GetValues("X-Content-Type-Options").Single());
                 Assert.Equal(end - start + 1, response.Content.Headers.ContentLength);
                 Assert.Contains("bytes", response.Headers.AcceptRanges);
                 if (range != null)

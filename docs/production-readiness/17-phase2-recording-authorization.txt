@@ -16,8 +16,32 @@ Scope and confirmed defect
   Candidate upload and finalize ownership checks are outside this change.
 
 Implementation
-- Execution and final verification evidence will be recorded below after the
-  coordinated baseline run releases the .NET build/test lane.
+- The interrupted checkpoint 8537056 included the test class but not the
+  corresponding production gate. Resumed source review and six failing SQL/
+  HTTP tests confirmed the gap, including cross-department 200/206 responses.
+- Added one shared async check before all four recording reads, including before
+  filename validation or disk lookup. It requires an undeleted attempt and exam,
+  an existing nondeleted requester, and CanAccessExamAsync entitlement.
+- The existing SuperAdmin/Admin/Proctor endpoint role gates remain intact:
+  candidate ownership or exam assignment does not authorize playback.
+- Missing/deleted resources return 404; staff lacking access receive 403.
+  Entitlements are checked on every request, not cached on one application node.
+- Private/no-store and nosniff response headers protect these private responses.
+  Streaming/range behavior, bytes, metadata and successful payloads are unchanged.
+- Upload, finalization, live camera, schema and shared authorization rules were
+  not changed.
+
+Verification/results
+- Baseline: six of nine RecordingAuthorizationTests failed on the unchanged
+  controller, demonstrating missing resource gates rather than a speculative
+  security concern. Other baseline failures are separated in report 19.
+- After the fix: all nine recording cases passed in a 21-test focused SQL run
+  covering recording, identity and worker-lock cases; zero failures/skips.
+  Runtime: 24 seconds for the combined invocation, not nine separate durations.
+- Added deleted-SuperAdmin coverage to the existing recheck case and assertions
+  for private/no-store/nosniff on full and ranged responses.
+- Final integrated results and review disposition are recorded in report 19;
+  focused counts must not be added to overlapping integrated test counts.
 
 Validation design
 - Existing xUnit tooling, real SQL Server with isolated databases, persisted
