@@ -2,7 +2,8 @@ PHASE 2 CONTINUATION — INTEGRATION AND PRIVATE MEDIA
 Date: 2026-09-11
 Starting checkpoint: 157bba4
 Resumed interrupted checkpoint: 8537056
-Status: IN PROGRESS; final validation and preservation results recorded below.
+Status: COMPLETED BOUNDED PHASE 2 CHECKPOINT; customer deployment acceptance
+remains PARTIALLY VERIFIED / NOT VERIFIED. This is not go-live approval.
 
 CURRENT STATE / SCOPE
 Reports 01-05 describe a historical missing-source blocker, not the current tree.
@@ -73,8 +74,124 @@ Rejected or unproven suggestions:
   it is not automatically permission for a broad transaction redesign.
 - Single-versus-bulk certificate issuance remains an explicit product question.
 
-CURRENT VALIDATION
-Pending final area reports, isolated baseline disposition and change review.
+RESUMED CHANGES AND VERIFICATION
+The following results belong to this resumed session, not the historical
+reports 01-15. Counts from overlapping runs must not be added together.
+
+1. Baseline at 8537056:
+   Backend built with zero errors and 20 warnings. Full suite: 265 passed,
+   11 failed, zero skipped, 276 total. Failure disposition:
+   - Six recording cases reproduced missing access checks, including HTTP
+     200/206 for cross-department staff and retained chunks for absent attempts.
+   - Four worker-lock cases used an isolated connection's nonexistent initial
+     catalog. Switching that test connection to master fixed the fixture
+     prerequisite without changing application SQL or introducing retries.
+   - One hub test expected a backend notice but received ScreenPeerJoined. A
+     local-host barrier had overtaken the other host's Redis group event.
+
+2. Production corrections:
+   - All four recording reads now run a common existing-resource/undeleted-actor/
+     exam-entitlement check before filename validation, metadata or file reads.
+     The staff role gates, authorized range playback and camera/upload/finalize
+     flows are preserved. Responses are private/no-store and nosniff.
+   - A deleted requester can no longer enter any identity verification scope.
+     The new assigned-monitor regression failed before the fix (404 expected,
+     200 actual), then passed after it. Roles and assignments remain present in
+     the test; the same unexpired JWT is reused.
+   - The interrupted DELETE proxy and private-identity implementation were
+     reviewed and validated, not redesigned. Reports 16-18 detail these paths.
+
+3. Targeted verification:
+   - Recording/identity/worker-lock selection: 21 passed, zero failed/skipped.
+     This includes nine recording and six identity cases plus worker tests.
+     The SQL/HTTP fixtures use real production controllers/services, Identity
+     and JWTs, with synthetic media bytes and disposable databases.
+   - Added recording header and deleted-SuperAdmin assertions.
+   - The hub regression now explicitly observes PeerJoined and ScreenPeerJoined
+     before revoking entitlement. It no longer clears an asynchronously racing
+     queue. This strengthens the setup assertions without weakening any denied
+     signal/eviction checks; no production hub behavior changed.
+   - That targeted hub case passed after the test-only synchronization fix.
+
+4. Frontend and signer:
+   - Frozen-lockfile restore and Next.js production build passed.
+   - Seven built-server HTTP proxy tests passed, zero failed/skipped.
+   - Typecheck FAILED with 204 diagnostics, matching the previous count, not a
+     clean typecheck or a guarantee of zero regressions. No diagnostic named
+     IdentityImage; its real authenticated browser rendering remains untested.
+   - Lint FAILED because eslint was not found; no new linter was installed.
+   - LicenseSigner Release build passed with zero errors/warnings.
+
+5. Integrated follow-up and environment failures:
+   - The first post-fix integrated run: 272 passed, five failed, zero skipped,
+     277 total. All five failures were Redis-backplane/hub cases after test
+     Redis authentication was enabled without a matching client credential.
+     This is recorded as a failed run, not omitted or called a code regression.
+   - After repairing that isolated test connection, authenticated Redis PING
+     succeeded and all eight RedisBackplane/SecurityIntegration cases passed.
+   - Final complete integrated rerun with corrected authenticated SQL/Redis:
+     277 passed, zero failed/skipped, in 1 minute 25 seconds. This includes
+     the current recording, identity, notification, attempt/summary-concurrency,
+     logging, worker-lock and Redis/security suites. No code changed afterward.
+   - A clean Backend-API Release rebuild passed, zero errors and 20 warnings.
+     No warning suppression was introduced. The compile warnings were already
+     present at the resumed baseline.
+   - The suite's existing backend-only 50-candidate persistence case completed
+     50 starts, 100 overlapping bulk saves and 50 submissions (10 answers per
+     candidate) in 2.889 seconds on this shared host. It has no HTTP, browser,
+     camera or media transport; this is NOT evidence of 50 live camera-enabled
+     exams, a before/after performance comparison or a capacity guarantee.
+
+REVIEW AND SECURITY DISPOSITION
+- The read-only specialist confirmed both the missing recording gate and deleted
+  identity-reviewer access, and reported no vulnerabilities in the final bounded
+  review after those corrections. This is not a complete application audit.
+- Changed-file secret scanning reported no secrets before implementation commit
+  87e2520, which was pushed to the current agent branch.
+- The required post-commit parallel validation was invoked as nontrivial.
+  Its automatic code-review wrapper reported success but the reviewer model was
+  unavailable: treat that automated review as BLOCKED, not as a clean review.
+  JavaScript CodeQL analysis failed; C# analysis was skipped for database size.
+  Zero returned alerts are NOT a successful scan or security clearance.
+- Independent read-only correctness review of 157bba4 through the completed
+  implementation reported no significant issues. The narrow security rereview
+  and this review do not replace the failed full CodeQL scan.
+- Self-review and git diff --check passed. SeedController/DatabaseSeeder were
+  unchanged across this continuation. No dependencies or schema were changed,
+  and no unrelated test was removed or diagnostic suppressed.
+
+ISOLATED ENVIRONMENT / REPRODUCTION
+Tests used task-owned loopback SQL Server Developer and Redis containers,
+exam-sqlserver on 127.0.0.1:11433 and exam-redis on 127.0.0.1:16379. The latter
+was initially loopback-only without authentication, then configured with a
+generated password for the final corrected checks. SQL credentials were
+generated locally; neither service points at a customer environment.
+The final test connection uses SQL's master catalog for worker-lock tests;
+entity fixtures create and drop independently named databases. SQL certificate
+trust bypass is confined to this isolated test environment, not customer guidance.
+
+Commands after supplying equivalent isolated environment variables:
+dotnet test /home/runner/work/exam-cursor/exam-cursor/Backend-API.Tests/Backend-API.Tests.csproj -c Release
+dotnet build /home/runner/work/exam-cursor/exam-cursor/Backend-API/Smart_Core.csproj -c Release --no-restore --target:Rebuild
+dotnet build /home/runner/work/exam-cursor/exam-cursor/LicenseSigner/LicenseSigner.csproj -c Release
+Frontend working directory:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main
+corepack pnpm install --frozen-lockfile
+corepack pnpm build
+node --test tests/api-proxy.test.cjs
+corepack pnpm exec tsc --noEmit
+corepack pnpm lint
+
+TEST_SQLSERVER_CONNECTION / TEST_SQLSERVER_PASSWORD and TEST_REDIS_CONNECTION
+must be supplied securely. Missing variables cause infrastructure-dependent
+tests to skip; skipped cases must not be reported as passing.
+Session-local evidence is under /tmp/exam-continuation: baseline-results,
+identity-before, media-after, hub-after, frontend, final-results, redis-corrected
+and integrated-corrected. Do not rely on those temporary paths surviving a new
+session; the reports retain their relevant results without credential values.
+After all tests/reviews, both task-owned containers and generated credential
+files were removed. Provision fresh isolated services for another run; the
+addresses above are historical evidence, not live resources to depend on.
 
 REMAINING CUSTOMER ACCEPTANCE
 The following cannot be inferred from unit/loopback integration results:
@@ -92,8 +209,19 @@ The following cannot be inferred from unit/loopback integration results:
   are not a security clearance.
 
 EXACT CONTINUATION POINT
-Will be updated with final commits, results, residual risks and next actions
-before this session ends. Do not treat an in-progress report as release approval.
+Implementation checkpoint 87e2520 is pushed. Final integrated validation,
+independent reviews and environment cleanup are complete; this report closeout
+is preserved in the following documentation checkpoint.
+No new scoring, certificate, export, camera or notification policy is being
+implemented to fill the explicit acceptance gaps above.
+
+After this checkpoint, next work is customer-like acceptance: identify the exact
+reported backup control, exercise it with real cameras, execute authenticated
+start/end/expiry and recipient-recovery journeys, and run the sustained 50-browser
+two-node workload. Complete security scanning on a sufficiently provisioned
+runner. Resolve documented product decisions before implementing new triggers
+or a result-export subsystem. Do not repeat the historical missing-source
+investigation: Phase 1 was already completed and pushed.
 
 RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
 New observability products, broad type-system refactoring, durable notification
