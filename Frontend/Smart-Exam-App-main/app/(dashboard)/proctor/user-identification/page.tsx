@@ -41,6 +41,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { EmptyState } from "@/components/ui/empty-state"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { IdentityImage } from "@/components/proctor/identity-image"
 import { toast } from "sonner"
 import {
   Users,
@@ -550,10 +551,10 @@ export default function UserIdentificationPage() {
                   </p>
                   {detail.idDocumentUrl ? (
                     <div className="rounded-lg border overflow-hidden bg-muted/30">
-                      <img
-                        src={detail.idDocumentUrl}
+                      <IdentityImage
+                        url={detail.idDocumentUrl}
                         alt="ID Document"
-                        className="w-full h-auto max-h-48 object-contain"
+                        unavailable={t("identityVerification.noImage")}
                       />
                     </div>
                   ) : (
@@ -576,10 +577,10 @@ export default function UserIdentificationPage() {
                   </p>
                   {detail.selfieUrl ? (
                     <div className="rounded-lg border overflow-hidden bg-muted/30">
-                      <img
-                        src={detail.selfieUrl}
+                      <IdentityImage
+                        url={detail.selfieUrl}
                         alt="Selfie"
-                        className="w-full h-auto max-h-48 object-contain"
+                        unavailable={t("identityVerification.noImage")}
                       />
                     </div>
                   ) : (

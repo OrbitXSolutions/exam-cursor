@@ -6,6 +6,8 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Constants;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -13,11 +15,14 @@ public class IdentityVerificationService : IIdentityVerificationService
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<IdentityVerificationService> _logger;
+    private readonly ResourceAuthorizationService _authorization;
 
-    public IdentityVerificationService(ApplicationDbContext context, ILogger<IdentityVerificationService> logger)
+    public IdentityVerificationService(ApplicationDbContext context, ILogger<IdentityVerificationService> logger,
+        ResourceAuthorizationService authorization)
     {
         _context = context;
         _logger = logger;
+        _authorization = authorization;
     }
 
     // ─── List ───────────────────────────────────────────────────────────────
@@ -25,7 +30,7 @@ public class IdentityVerificationService : IIdentityVerificationService
     public async Task<ApiResponse<PaginatedResponse<IdentityVerificationListDto>>> GetVerificationsAsync(
         IdentityVerificationSearchDto searchDto)
     {
-        var query = _context.IdentityVerifications
+        var query = (await ScopeVerificationsAsync(_context.IdentityVerifications))
             .Include(v => v.Candidate)
             .Include(v => v.ProctorSession)
                 .ThenInclude(s => s.Exam)
@@ -91,7 +96,7 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     public async Task<ApiResponse<IdentityVerificationDetailDto>> GetVerificationDetailAsync(int id)
     {
-        var entity = await _context.IdentityVerifications
+        var entity = await (await ScopeVerificationsAsync(_context.IdentityVerifications))
             .Include(v => v.Candidate)
             .Include(v => v.ProctorSession)
                 .ThenInclude(s => s.Exam)
@@ -115,7 +120,7 @@ public class IdentityVerificationService : IIdentityVerificationService
     public async Task<ApiResponse<IdentityVerificationListDto>> ApplyActionAsync(
         IdentityVerificationActionDto dto, string reviewerId)
     {
-        var entity = await _context.IdentityVerifications
+        var entity = await (await ScopeVerificationsAsync(_context.IdentityVerifications))
             .Include(v => v.Candidate)
             .Include(v => v.ProctorSession).ThenInclude(s => s.Exam)
             .FirstOrDefaultAsync(v => v.Id == dto.Id);
@@ -156,7 +161,7 @@ public class IdentityVerificationService : IIdentityVerificationService
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var entities = await _context.IdentityVerifications
+            var entities = await (await ScopeVerificationsAsync(_context.IdentityVerifications))
                 .Where(v => dto.Ids.Contains(v.Id))
                 .ToListAsync();
 
@@ -324,6 +329,42 @@ public class IdentityVerificationService : IIdentityVerificationService
 
     // ─── Private helpers (original) ─────────────────────────────────────────
 
+    private async Task<IQueryable<IdentityVerification>> ScopeVerificationsAsync(
+        IQueryable<IdentityVerification> query)
+    {
+        query = query.Where(v => !v.IsDeleted);
+        var userId = _authorization.CurrentUserId;
+        if (string.IsNullOrWhiteSpace(userId))
+            return query.Where(_ => false);
+        if (await _authorization.IsCurrentUserSuperAdminAsync())
+            return query;
+
+        var monitorRoleIds = _context.Roles
+            .Where(r => r.Name == AppRoles.Admin || r.Name == AppRoles.Proctor)
+            .Select(r => r.Id);
+        var isMonitor = await _context.UserRoles.AnyAsync(r =>
+            r.UserId == userId && monitorRoleIds.Contains(r.RoleId));
+        if (!isMonitor)
+            return query.Where(v => v.CandidateId == userId);
+
+        // Identity is a candidate resource, including standalone submissions with no exam/session.
+        // Combine existing user scope and exam entitlements: ScopeUsers' department branch alone
+        // does not include explicit cross-department ExamProctor assignments.
+        var scopedUsers = (await _authorization.ScopeUsersAsync(_context.Users)).Select(u => u.Id);
+        var examIds = await _authorization.GetAccessibleExamIdsAsync();
+        var attemptCandidates = _context.Attempts
+            .Where(a => !a.IsDeleted && examIds.Contains(a.ExamId)).Select(a => a.CandidateId);
+        var assignedCandidates = _context.ExamAssignments
+            .Where(a => !a.IsDeleted && a.IsActive && examIds.Contains(a.ExamId)).Select(a => a.CandidateId);
+        var candidateRoleIds = _context.Roles.Where(r => r.Name == AppRoles.Candidate).Select(r => r.Id);
+        var candidates = _context.UserRoles
+            .Where(r => candidateRoleIds.Contains(r.RoleId)).Select(r => r.UserId);
+        return query.Where(v => v.CandidateId == userId ||
+            (candidates.Contains(v.CandidateId) &&
+             (scopedUsers.Contains(v.CandidateId) || attemptCandidates.Contains(v.CandidateId) ||
+              assignedCandidates.Contains(v.CandidateId))));
+    }
+
     private static IdentityVerificationStatus? ParseAction(string action) =>
         action.ToLower() switch
         {
@@ -363,15 +404,11 @@ public class IdentityVerificationService : IIdentityVerificationService
         CandidateName = v.Candidate?.FullName ?? v.Candidate?.DisplayName ?? "",
         IdDocumentUploaded = v.IdDocumentUploaded,
         IdDocumentUrl = !string.IsNullOrWhiteSpace(v.IdDocumentPath)
-            ? v.IdDocumentPath.StartsWith("candidateIDs/")
-                ? $"/{v.IdDocumentPath}"
-                : $"/media/{v.IdDocumentPath.TrimStart('/')}"
+            ? $"/api/proctor/authentication/verifications/{v.Id}/images/document"
             : null,
         IdDocumentType = v.IdDocumentType,
         SelfieUrl = !string.IsNullOrWhiteSpace(v.SelfiePath)
-            ? v.SelfiePath.StartsWith("candidateIDs/")
-                ? $"/{v.SelfiePath}"
-                : $"/media/{v.SelfiePath.TrimStart('/')}"
+            ? $"/api/proctor/authentication/verifications/{v.Id}/images/selfie"
             : null,
         FaceMatchScore = v.FaceMatchScore,
         LivenessResult = v.LivenessResult,

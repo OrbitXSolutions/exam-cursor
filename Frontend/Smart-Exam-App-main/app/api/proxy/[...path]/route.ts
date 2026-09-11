@@ -252,13 +252,15 @@ export async function DELETE(
 
   try {
     const token = request.headers.get("authorization");
+    const body = await request.arrayBuffer();
 
     const response = await fetchBackend(url, {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": request.headers.get("content-type") || "application/json",
         ...(token && { Authorization: token }),
       },
+      body: body.byteLength > 0 ? body : undefined,
     });
 
     // 204/205 responses must not have a body (Fetch API spec)

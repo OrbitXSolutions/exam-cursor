@@ -1,0 +1,59 @@
+PHASE 2 CONTINUATION — API PROXY / BATCH REMOVAL
+Date: 2026-09-11
+Starting checkpoint: 157bba4
+Status: verification in progress; final results recorded below before handoff.
+
+WHAT WAS REVIEWED
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/app/api/proxy/[...path]/route.ts
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/lib/api/batch.ts
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/Batch/BatchesController.cs
+The batch removal client sends a JSON candidateIds array in a DELETE body. The
+backend expects that body. The shared Next.js DELETE proxy forwarded the method
+and authentication but omitted the body, so the intended candidate selection
+could not reach the controller through the normal application route.
+
+This is transport loss, not a business-rule decision about removing candidates.
+The read-only wider result review was also checked against current source;
+no speculative scoring or certificate policy change was made.
+
+BOUNDED FIX
+Preserve the DELETE request body and incoming content type when forwarding.
+Keep bodyless DELETE supported, existing endpoint/query/auth forwarding, API
+error envelopes and correlation/license/retry response headers unchanged.
+No batch domain-service, validation, candidate assignment rule, schema or
+authorization change is needed for this transport correction.
+
+REGRESSION COVERAGE
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main/tests/api-proxy.test.cjs
+Uses the installed Next.js production server with a loopback recording HTTP
+upstream, Node's built-in test/assert modules, and existing packages. No extra
+test runner or dependency. The tests exercise actual built route handlers over
+HTTP, not a reimplementation of the proxy function.
+
+Coverage:
+- Batch DELETE payload, query, content type and authorization forwarding.
+- UTF-8 JSON bytes preserved without interpretation.
+- Bodyless DELETE and unchanged 204/205 responses.
+- Upstream 400/401/403/429/500 envelopes and support headers.
+- Binary Excel-export bytes and disposition.
+- Existing POST/PUT/PATCH JSON and multipart POST behavior.
+
+Run after the existing production build, from:
+/home/runner/work/exam-cursor/exam-cursor/Frontend/Smart-Exam-App-main
+corepack pnpm build
+node --test tests/api-proxy.test.cjs
+
+VERIFICATION / RESULTS
+Pending baseline reproduction and final focused/build verification.
+
+LIMITS / REMAINING ACCEPTANCE
+The recording upstream verifies the proxy's HTTP contract, not database batch
+membership mutation, a real authenticated browser, Excel workbook contents, or
+customer provider access. Synthetic byte fixtures are not production documents.
+Broader frontend typecheck/lint results are tracked separately in the continuation
+handoff; a production build alone is not a successful TypeScript check.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+Additional complete browser administration/import/export journeys remain useful.
+Do not broaden this fix into a proxy rewrite, blanket timeout/retry policy, or
+new frontend test platform simply to improve architecture.

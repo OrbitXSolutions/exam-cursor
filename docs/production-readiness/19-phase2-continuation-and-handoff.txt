@@ -1,0 +1,94 @@
+PHASE 2 CONTINUATION — INTEGRATION AND PRIVATE MEDIA
+Date: 2026-09-11
+Starting checkpoint: 157bba4
+Status: IN PROGRESS; final validation and preservation results recorded below.
+
+CURRENT STATE / SCOPE
+Reports 01-05 describe a historical missing-source blocker, not the current tree.
+Reports 06-08 completed Phase 1 implementation and pushed its checkpoint before
+Phase 2. Reports 09-15 retain the earlier Phase 2 work and its acceptance limits.
+This continuation does not repeat those changes or re-open the Phase 1 gate.
+
+Continued work:
+- Verify the current backend suite with fresh isolated SQL/Redis services.
+- Reproduce and fix the shared Next.js proxy dropping batch-removal DELETE bodies.
+- Apply existing resource boundaries to recording reads and private identity
+  photographs after a read-only specialist confirmed unauthorized access paths.
+- Preserve focused regression evidence and remaining customer acceptance work.
+
+No changes to SeedData or its intentional AllowAnonymous behavior are authorized.
+No base-branch merge, destructive Git operation, dependency overhaul, exam-rule
+change, or camera-flow redesign is part of this continuation.
+
+AREA REPORTS
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/16-phase2-proxy-and-batch-removal.txt
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/17-phase2-recording-authorization.txt
+/home/runner/work/exam-cursor/exam-cursor/docs/production-readiness/18-phase2-identity-authorization.txt
+These supplement, rather than overwrite, prior test counts and limitations.
+
+STATUS DEFINITIONS
+VERIFIED: direct evidence of the particular stated result, including failures.
+PARTIALLY VERIFIED: source or bounded integration evidence, not full acceptance.
+NOT VERIFIED: insufficient execution evidence.
+BLOCKED: a named unavailable prerequisite/tool prevents that particular check.
+
+ADDITIONAL GRADING/RESULT REVIEW — DECISIONS
+Reviewed current result publication/regrading, summary refresh, certificate
+integration and export job paths. No scoring or certificate policy was changed.
+
+Source-confirmed follow-up:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/ExamResult/ExamResultService.cs:313-368
+Single-result publication reads IsPassed before its atomic publication update.
+A concurrent regrade can change the flag between those operations. The exact
+certificate issuance/regrading ordering needs a deterministic SQL regression and
+agreement about the issuance point, not just another unprotected read.
+This continuation did not claim to reproduce or fix that interleaving.
+
+Incomplete export scaffolding:
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Infrastructure/Services/ExamResult/ExamResultService.cs:1353-1388
+/home/runner/work/exam-cursor/exam-cursor/Backend-API/Controllers/ExamResult/ExamResultController.cs:379-401
+ProcessPendingExportJobsAsync has no caller found in the repository. Its body
+marks placeholder paths completed without generating files; the download action
+also returns a placeholder. An HTTP export request can exist without a functioning
+worker/download journey. No result-export UI invocation was identified by the
+read-only survey. The working candidate/batch Excel downloads are separate paths.
+Do not report the result export job feature as accepted or implement a new
+export subsystem without confirming the intended deliverable.
+
+Rejected or unproven suggestions:
+- A correlated Any inside an EF IQueryable is not itself evidence of N+1 queries.
+  No speculative rewrite of the summary orphan query was made.
+- Bulk publishing modifies tracked publication properties, not score fields;
+  stale-score overwrites were not established merely by observing tracked reads.
+- Result writes and summary refresh currently commit separately. That boundary
+  is documented, but full failure-recovery/atomicity acceptance remains open;
+  it is not automatically permission for a broad transaction redesign.
+- Single-versus-bulk certificate issuance remains an explicit product question.
+
+CURRENT VALIDATION
+Pending final area reports, isolated baseline disposition and change review.
+
+REMAINING CUSTOMER ACCEPTANCE
+The following cannot be inferred from unit/loopback integration results:
+- Two physical application nodes behind the actual balancer with shared storage,
+  key ring, PKI, Redis, permitted origins, WebSockets and failover configuration.
+- Actual candidate/proctor cameras, screen sharing, and the customer's precisely
+  identified incident/backup operation; physical-device behavior remains unproven.
+- Real inbox/handset delivery and recovery of start/submission/expiry notifications.
+- At least 50 sustained, simultaneous camera-enabled browser examinations with
+  realistic autosave/heartbeat/upload traffic, synchronized starts/submissions,
+  node-loss drills and agreed latency/resource/error thresholds.
+- Complete grading/regrading/publication/certificate/export journeys and acceptance
+  of the explicit remaining policy/atomicity questions.
+- A successful, complete application security scan; prior timeouts/size limits
+  are not a security clearance.
+
+EXACT CONTINUATION POINT
+Will be updated with final commits, results, residual risks and next actions
+before this session ends. Do not treat an in-progress report as release approval.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+New observability products, broad type-system refactoring, durable notification
+outbox/provider idempotency, immediate distributed JWT/hub/media revocation, and
+global concurrency-token migrations remain human-review topics, not automatic
+changes. Keep confirmed technical fixes separate from new business requirements.

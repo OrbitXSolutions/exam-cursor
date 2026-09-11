@@ -419,26 +419,7 @@ app.UseStaticFiles(new StaticFileOptions
     OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
 });
 
-// Serve candidate identity verification photos from wwwroot/candidateIDs/
-var candidateIDsPath = storagePaths.IdentityPath;
-if (!Directory.Exists(candidateIDsPath))
-{
-    Directory.CreateDirectory(candidateIDsPath);
-    Log.Information("Created candidateIDs directory at {Path}", candidateIDsPath);
-}
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(candidateIDsPath),
-    RequestPath = "/candidateIDs",
-    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider(
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            [".jpg"] = "image/jpeg", [".jpeg"] = "image/jpeg", [".png"] = "image/png",
-            [".webp"] = "image/webp"
-        }),
-    OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
-});
+// Private identity photos are served only by IdentityVerificationController.
 
 // Serve tutorial videos from wwwroot/tutorials/
 var tutorialsPath = storagePaths.TutorialsPath;

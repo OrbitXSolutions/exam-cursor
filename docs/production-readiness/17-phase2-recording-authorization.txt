@@ -1,0 +1,52 @@
+PHASE 2 RECORDING READ AUTHORIZATION
+Date: 2026-09-11
+Starting revision: 157bba4
+
+Scope and confirmed defect
+- Owned files: Backend-API/Controllers/Proctor/VideoRecordingController.cs,
+  Backend-API.Tests/RecordingAuthorizationTests.cs, and this report.
+- All four recording read routes had SuperAdmin/Admin/Proctor role checks but
+  no attempt/exam resource authorization. Chunk listing and individual chunk
+  reads consulted disk without loading an attempt at all.
+- ResourceAuthorizationService defines staff exam access as same department
+  OR a nondeleted explicit ExamProctor assignment, with SuperAdmin access.
+  ProctorHub checks that both attempt and exam exist and are not deleted.
+- The recording API's existing staff-only gate is intentional in this fix:
+  candidate ownership or assignment to the exam does not grant playback.
+  Candidate upload and finalize ownership checks are outside this change.
+
+Implementation
+- Execution and final verification evidence will be recorded below after the
+  coordinated baseline run releases the .NET build/test lane.
+
+Validation design
+- Existing xUnit tooling, real SQL Server with isolated databases, persisted
+  Identity users/roles/departments/assignments, real signed JWT validation, and
+  loopback Kestrel HTTP requests to the production MVC controller.
+- Production CurrentUserService, ResourceAuthorizationService, StoragePaths,
+  and exception middleware; no mocked authorization/controller results.
+- Anonymous/invalid tokens, owner/sibling candidates (including an explicitly
+  assigned sibling), Instructor/Examiner, foreign-department Proctor/Admin,
+  missing department, and deleted assignments.
+- Same-department Proctor/Admin, explicitly assigned foreign-department
+  Proctor/Admin, assigned proctor without department, and SuperAdmin.
+- Rechecks after department removal, assignment soft deletion, user soft
+  deletion, attempt/exam soft deletion, and hard-deleted resources with files
+  deliberately retained. SQL foreign keys prohibit a dangling exam reference.
+- Recording metadata/events/screenshot links, chunk order/MIME metadata,
+  exact synthetic bytes, full and partial/suffix/open-ended range responses,
+  unsatisfiable ranges, invalid chunk names, traversal/absolute evidence paths,
+  missing assets, and chunks available before finalization.
+- Test fixtures stop application hosts, drop only their unique databases, and
+  remove their unique project-relative media directories.
+
+Limits
+- Synthetic bytes validate HTTP file/range behavior, not browser decoding,
+  live camera/screen capture, MSE playback, upload, finalize, retention workers,
+  actual FFmpeg conversion, or a production proxy/storage deployment.
+- Existing invalid stored-path handling is not redesigned: recording metadata
+  catches path errors as 500; stream errors become 400 through the existing
+  exception middleware. Neither returns the out-of-root file.
+- No schema, dependencies, frontend camera/recording/upload/finalize code,
+  seed/anonymous endpoint behavior, or shared authorization module changes.
+- No claim of overall production readiness or application-wide security audit.

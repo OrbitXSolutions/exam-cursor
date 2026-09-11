@@ -7,6 +7,8 @@ using Smart_Core.Application.Interfaces.Proctor;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Common;
 using Smart_Core.Infrastructure.Storage;
+using Smart_Core.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Smart_Core.Controllers.Proctor;
 
@@ -18,15 +20,18 @@ public class IdentityVerificationController : ControllerBase
     private readonly IIdentityVerificationService _service;
     private readonly ICurrentUserService _currentUserService;
     private readonly StoragePaths _storagePaths;
+    private readonly ApplicationDbContext _context;
 
     public IdentityVerificationController(
         IIdentityVerificationService service,
         ICurrentUserService currentUserService,
-        StoragePaths storagePaths)
+        StoragePaths storagePaths,
+        ApplicationDbContext context)
     {
         _service = service;
         _currentUserService = currentUserService;
         _storagePaths = storagePaths;
+        _context = context;
     }
 
     /// <summary>
@@ -49,6 +54,108 @@ public class IdentityVerificationController : ControllerBase
     {
         var result = await _service.GetVerificationDetailAsync(id);
         return result.Success ? Ok(result) : NotFound(result);
+    }
+
+    [HttpGet("verifications/{id:int}/images/{kind}")]
+    public async Task<IActionResult> GetImage(int id, string kind)
+    {
+        Response.Headers.CacheControl = "private, no-store";
+        Response.Headers.XContentTypeOptions = "nosniff";
+        if (kind is not ("selfie" or "document"))
+            return NotFound();
+
+        // Reuse the same resource boundary as detail, list, and review operations.
+        var verification = await _service.GetVerificationDetailAsync(id);
+        if (!verification.Success)
+            return NotFound();
+
+        var stored = await _context.IdentityVerifications.AsNoTracking()
+            .Where(v => v.Id == id && !v.IsDeleted)
+            .Select(v => new { v.CandidateId, Path = kind == "selfie" ? v.SelfiePath : v.IdDocumentPath })
+            .FirstOrDefaultAsync(HttpContext.RequestAborted);
+        if (stored == null || string.IsNullOrWhiteSpace(stored.Path))
+            return NotFound();
+
+        try
+        {
+            var path = ResolveIdentityImage(stored.CandidateId, stored.Path);
+            if (path == null || !System.IO.File.Exists(path))
+                return NotFound();
+
+            var contentType = Path.GetExtension(path).ToLowerInvariant() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                _ => null
+            };
+            if (contentType == null)
+                return NotFound();
+
+            var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            try
+            {
+                var file = new FormFile(stream, 0, stream.Length, "image", Path.GetFileName(path))
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = contentType
+                };
+                if (await ImageUploadValidator.GetSafeExtensionAsync(file, allowWebP: true,
+                        cancellationToken: HttpContext.RequestAborted) == null)
+                {
+                    await stream.DisposeAsync();
+                    return NotFound();
+                }
+                stream.Position = 0;
+                return File(stream, contentType);
+            }
+            catch
+            {
+                await stream.DisposeAsync();
+                throw;
+            }
+        }
+        catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
+        {
+            return NotFound();
+        }
+    }
+
+    private string? ResolveIdentityImage(string candidateId, string storedPath)
+    {
+        var relative = storedPath.Replace('\\', '/');
+        // Older records can store a public URL, a root-relative URL, or only the filename.
+        // URLs are parsed locally, never fetched; only the known identity path is accepted.
+        if (relative.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            relative.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!Uri.TryCreate(relative, UriKind.Absolute, out var url) ||
+                !string.IsNullOrEmpty(url.Query) || !string.IsNullOrEmpty(url.Fragment))
+                return null;
+            relative = Uri.UnescapeDataString(url.AbsolutePath);
+        }
+        relative = relative.TrimStart('/');
+        if (relative.StartsWith("candidateIDs/", StringComparison.OrdinalIgnoreCase))
+            relative = relative["candidateIDs/".Length..];
+        else if (!relative.Contains('/'))
+            relative = $"{candidateId}/{relative}";
+
+        if (!relative.StartsWith(candidateId + "/", StringComparison.Ordinal))
+            return null;
+        var path = StoragePaths.ResolveRelativePath(_storagePaths.IdentityPath, relative);
+        var candidateRoot = StoragePaths.ResolveRelativePath(_storagePaths.IdentityPath, candidateId);
+        _ = StoragePaths.ResolveRelativePath(candidateRoot, relative[(candidateId.Length + 1)..]);
+
+        // Lexical confinement must not be bypassed by a symlink in a shared storage volume.
+        for (FileSystemInfo? entry = new FileInfo(path); entry != null; entry =
+             entry is FileInfo file ? file.Directory : ((DirectoryInfo)entry).Parent)
+        {
+            if ((entry.Attributes & FileAttributes.ReparsePoint) != 0)
+                return null;
+            if (entry.FullName == _storagePaths.IdentityPath)
+                break;
+        }
+        return path;
     }
 
     /// <summary>
