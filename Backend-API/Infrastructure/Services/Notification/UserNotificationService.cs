@@ -69,11 +69,7 @@ public class UserNotificationService : IUserNotificationService
         _unitOfWork.Context.UserNotifications.Add(notification);
         await _unitOfWork.Context.SaveChangesAsync();
 
-        // Push real-time via SignalR (non-blocking — fire and forget)
-        var dto = MapToDto(notification);
-        _ = _hubContext.Clients
-            .Group($"user-{userId}")
-            .SendAsync("ReceiveNotification", dto);
+        await PushAsync(notification);
     }
 
     public async Task CreateForRolesAsync(
@@ -148,13 +144,9 @@ public class UserNotificationService : IUserNotificationService
         _unitOfWork.Context.UserNotifications.AddRange(notifications);
         await _unitOfWork.Context.SaveChangesAsync();
 
-        // Push to all connected users in these roles (fire-and-forget)
         foreach (var n in notifications)
         {
-            var dto = MapToDto(n);
-            _ = _hubContext.Clients
-                .Group($"user-{n.UserId}")
-                .SendAsync("ReceiveNotification", dto);
+            await PushAsync(n);
         }
     }
 
@@ -170,6 +162,7 @@ public class UserNotificationService : IUserNotificationService
 
         var items = await query
             .OrderByDescending(n => n.CreatedAt)
+            .ThenByDescending(n => n.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(n => MapToDto(n))
@@ -343,10 +336,23 @@ public class UserNotificationService : IUserNotificationService
 
         foreach (var n in notifications)
         {
-            var dto = MapToDto(n);
-            _ = _hubContext.Clients
-                .Group($"user-{n.UserId}")
-                .SendAsync("ReceiveNotification", dto);
+            await PushAsync(n);
+        }
+    }
+
+    private async Task PushAsync(UserNotification notification)
+    {
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await _hubContext.Clients.Group($"user-{notification.UserId}")
+                .SendAsync("ReceiveNotification", MapToDto(notification), timeout.Token);
+        }
+        catch (Exception ex)
+        {
+            // Persistence already succeeded; REST can recover when real-time delivery is unavailable.
+            _logger.LogWarning("Notification {NotificationId} real-time push failed ({ExceptionType}); available via REST.",
+                notification.Id, ex.GetType().Name);
         }
     }
 

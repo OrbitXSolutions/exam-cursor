@@ -12,11 +12,13 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const hubRef = useRef<NotificationHubClient | null>(null);
   const mountedRef = useRef(true);
+  const countRequestRef = useRef(0);
 
   const refreshCount = useCallback(async () => {
+    const request = ++countRequestRef.current;
     try {
       const { count } = await getUnreadCount();
-      if (mountedRef.current) setUnreadCount(count);
+      if (mountedRef.current && request === countRequestRef.current) setUnreadCount(count);
     } catch {
       // silently ignore — bell badge is non-critical
     }
@@ -32,15 +34,15 @@ export function useNotifications() {
     const hub = new NotificationHubClient();
     hubRef.current = hub;
 
-    hub.connect((notification: UserNotificationDto) => {
-      if (mountedRef.current && !notification.isRead) {
-        setUnreadCount((prev) => prev + 1);
-      }
-    });
+    // REST is authoritative: replayed pushes and events missed offline must not skew the badge.
+    void hub.connect(() => { void refreshCount(); }, () => { void refreshCount(); });
+    const poll = setInterval(() => { void refreshCount(); }, 30000);
 
     return () => {
       mountedRef.current = false;
-      hub.disconnect();
+      countRequestRef.current++;
+      clearInterval(poll);
+      void hub.disconnect();
       hubRef.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -64,14 +66,14 @@ export function useProctorSessionRefresh(onSessionChange: () => void) {
     const hub = new NotificationHubClient();
     hubRef.current = hub;
 
-    hub.connect((notification: UserNotificationDto) => {
+    void hub.connect((notification: UserNotificationDto) => {
       if (EXAM_SESSION_TYPES.has(notification.type)) {
         callbackRef.current();
       }
-    });
+    }, () => callbackRef.current());
 
     return () => {
-      hub.disconnect();
+      void hub.disconnect();
       hubRef.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

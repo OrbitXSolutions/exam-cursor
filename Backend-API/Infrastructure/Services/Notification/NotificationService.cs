@@ -190,37 +190,44 @@ public class NotificationService : INotificationService
 
     public async Task<ApiResponse<bool>> RetryNotificationAsync(int logId)
     {
-        var log = await _db.NotificationLogs.FindAsync(logId);
+        var log = await _db.NotificationLogs.AsNoTracking().FirstOrDefaultAsync(l => l.Id == logId);
         if (log == null)
             return ApiResponse<bool>.FailureResponse("Notification log not found.");
 
         if (log.Status != NotificationStatus.Failed)
             return ApiResponse<bool>.FailureResponse("Only failed notifications can be retried.");
 
-        log.Status = NotificationStatus.Pending;
-        log.ErrorMessage = null;
-        log.RetryCount++;
-        log.UpdatedDate = UaeTimeHelper.NowUae;
-
-        await _db.SaveChangesAsync();
+        var updated = await _db.NotificationLogs
+            .Where(l => l.Id == logId && l.Status == NotificationStatus.Failed)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(l => l.Status, NotificationStatus.Pending)
+                .SetProperty(l => l.ErrorMessage, (string?)null)
+                .SetProperty(l => l.RetryCount, l => l.RetryCount + 1)
+                .SetProperty(l => l.UpdatedDate, UaeTimeHelper.NowUae));
+        if (updated == 0)
+            return ApiResponse<bool>.FailureResponse("Only failed notifications can be retried.");
         return ApiResponse<bool>.SuccessResponse(true, "Notification queued for retry.");
     }
 
     public async Task<ApiResponse<bool>> SendNowAsync(int logId)
     {
-        var log = await _db.NotificationLogs.FindAsync(logId);
+        var log = await _db.NotificationLogs.AsNoTracking().FirstOrDefaultAsync(l => l.Id == logId);
         if (log == null)
             return ApiResponse<bool>.FailureResponse("Notification log not found.");
 
         if (log.Status == NotificationStatus.Sent)
             return ApiResponse<bool>.FailureResponse("Notification was already sent.");
 
-        log.Status = NotificationStatus.Pending;
-        log.ErrorMessage = null;
-        log.RetryCount++;
-        log.UpdatedDate = UaeTimeHelper.NowUae;
-
-        await _db.SaveChangesAsync();
+        // The worker may complete delivery after the read; never put a sent row back on the queue.
+        var updated = await _db.NotificationLogs
+            .Where(l => l.Id == logId && l.Status != NotificationStatus.Sent)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(l => l.Status, NotificationStatus.Pending)
+                .SetProperty(l => l.ErrorMessage, (string?)null)
+                .SetProperty(l => l.RetryCount, l => l.RetryCount + 1)
+                .SetProperty(l => l.UpdatedDate, UaeTimeHelper.NowUae));
+        if (updated == 0)
+            return ApiResponse<bool>.FailureResponse("Notification was already sent.");
         return ApiResponse<bool>.SuccessResponse(true, "Notification queued for immediate sending.");
     }
 
@@ -366,25 +373,18 @@ public class NotificationService : INotificationService
         var exam = await _db.Exams.FirstOrDefaultAsync(e => e.Id == examId);
         if (exam == null || !exam.IsPublished) return;
 
-        // Get candidates, skip those who already have a pending/sent notification for this exam
-        var alreadyNotifiedIds = await _db.NotificationLogs
+        // Deduplicate each channel independently. Failed rows remain available for explicit retry.
+        var existingNotifications = await _db.NotificationLogs
             .Where(l => l.ExamId == examId
                 && l.EventType == NotificationEventType.ExamPublished
-                && l.Channel == NotificationChannel.Email
                 && candidateIds.Contains(l.CandidateId))
-            .Select(l => l.CandidateId)
+            .Select(l => new { l.CandidateId, l.Channel })
             .Distinct()
             .ToListAsync();
-
-        var newCandidateIds = candidateIds.Except(alreadyNotifiedIds).ToList();
-        if (newCandidateIds.Count == 0)
-        {
-            _logger.LogInformation("All candidates already notified for exam {ExamId}. Skipping.", examId);
-            return;
-        }
+        var existingChannels = existingNotifications.Select(l => (l.CandidateId, l.Channel)).ToHashSet();
 
         var candidates = await _db.Users
-            .Where(u => newCandidateIds.Contains(u.Id) && !u.IsDeleted && !u.IsBlocked)
+            .Where(u => candidateIds.Contains(u.Id) && !u.IsDeleted && !u.IsBlocked)
             .ToListAsync();
 
         if (candidates.Count == 0) return;
@@ -393,7 +393,8 @@ public class NotificationService : INotificationService
 
         foreach (var candidate in candidates)
         {
-            if (settings.EnableEmail && !string.IsNullOrWhiteSpace(candidate.Email))
+            if (settings.EnableEmail && !string.IsNullOrWhiteSpace(candidate.Email)
+                && !existingChannels.Contains((candidate.Id, NotificationChannel.Email)))
             {
                 logs.Add(new NotificationLog
                 {
@@ -408,7 +409,8 @@ public class NotificationService : INotificationService
                 });
             }
 
-            if (settings.EnableSms && !string.IsNullOrWhiteSpace(candidate.PhoneNumber))
+            if (settings.EnableSms && !string.IsNullOrWhiteSpace(candidate.PhoneNumber)
+                && !existingChannels.Contains((candidate.Id, NotificationChannel.Sms)))
             {
                 logs.Add(new NotificationLog
                 {
@@ -461,7 +463,7 @@ public class NotificationService : INotificationService
 
         var logs = new List<NotificationLog>();
 
-        foreach (var result in publishedResults)
+        foreach (var result in publishedResults.DistinctBy(r => r.CandidateId))
         {
             var candidate = result.Candidate;
             if (candidate == null || string.IsNullOrWhiteSpace(candidate.Email)) continue;

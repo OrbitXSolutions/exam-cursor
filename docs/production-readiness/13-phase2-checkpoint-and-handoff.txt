@@ -1,0 +1,72 @@
+PHASE 2 — VALIDATION CHECKPOINT AND CONTINUATION
+Date: 2026-09-11
+Starting commit: 87cc6c9
+Phase 1 gate: completed implementation checkpoint already pushed.
+
+READ THIS BEFORE USING HISTORICAL REPORTS
+Reports 01-05 record the original non-building baseline. Their stop/wait decision
+was superseded by reports 06-08 and the restored, tested logging implementation.
+Report 08 documents the completed Phase 1 implementation checkpoint, including
+199 passing backend tests in its session and unresolved customer acceptance.
+Those are historical results, not tests re-executed in this Phase 2 session.
+Implementation completion is not certification of a customer's deployment.
+
+PHASE 2 SCOPE
+The current continuation investigates notifications around exam start/submission/
+expiry, the optional incident camera-backup interaction, remaining authorization
+and refresh risks, and concurrency of persisted attempts and answers. A separate
+read-only survey examines wider grading/results/certificate integration.
+
+The review preserves existing exam rules. SeedData functionality and its
+AllowAnonymous behavior are intentional and must remain unchanged. No base-branch
+merge or history rewrite is part of this work.
+
+EVIDENCE LABELS
+VERIFIED: a specific command, test, or source observation supports the statement.
+PARTIALLY VERIFIED: source/unit/integration evidence exists but not the full
+customer end-to-end scenario.
+NOT VERIFIED: no adequate test evidence for the stated capability.
+BLOCKED: a specific unavailable prerequisite prevents that particular check.
+
+CURRENT WORK / FINAL RESULTS
+Implementation and targeted validation are in progress. This section is updated
+before the final commit; no pending check is a claimed pass.
+
+ISOLATED TEST ENVIRONMENT
+An ephemeral SQL Server Developer container was provisioned on loopback port
+14339 for regression tests against independently named disposable databases.
+Image pulled: mcr.microsoft.com/mssql/server:2022-latest
+Image digest:
+sha256:97b448857967be55e005424a660056fe6d51814435804dc07e8f79f028bab5fb
+Test credentials were generated for this container only and not printed or
+committed. TrustServerCertificate in the test-only connection accommodates the
+isolated container's certificate; it is not a customer configuration example.
+No test contacts a customer's database or sends to real customer recipients.
+
+Parallel implementers own separate files and use the existing test/build tooling.
+Backend builds/tests are serialized with a temporary build lock to avoid shared
+artifact races. This test-process coordination is not an application runtime lock.
+Temporary logs/credentials are outside Git; summaries and reproducible commands
+belong in the area reports. Do not depend on temporary session paths to resume.
+
+ACCEPTANCE BOUNDARY
+Even a backend-only workload with 50 independent candidates is not evidence of
+50 camera-enabled live browser examinations. Production acceptance must include:
+- Two real application nodes behind the customer's balancer, split SignalR peers,
+  actual shared storage/key ring, customer PKI, and configured Redis backplane.
+- Representative exam sizes and timings, answer/autosave/heartbeat traffic,
+  proctor viewers, camera/screen monitoring and media uploads as configured.
+- Synchronized start/submission bursts, reconnection, node loss/restart and
+  inspection of persisted answers, terminal attempt states and events.
+- Latency/error/rejection rates, CPU/GC/memory, SQL waits/pools, storage/network
+  throughput, logging loss/queue pressure and notification delivery outcomes.
+- Real inbox/handset receipt separately from provider acceptance and separately
+  from the durability of queued notification records.
+Thresholds and permitted degradation must be agreed with the owner, not invented.
+
+RECOMMENDATIONS / OPTIONAL IMPROVEMENTS
+Do not treat this report as permission for an unrelated architecture rewrite.
+Broad type-system cleanup, new test platforms, global concurrency-token migrations,
+new log collection products and speculative code deletion require separate review.
+Current failures and unverified acceptance items must remain explicit rather than
+being hidden by casts, suppressed diagnostics, mock claims or arbitrary limits.

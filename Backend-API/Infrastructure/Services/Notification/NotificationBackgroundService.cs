@@ -177,8 +177,9 @@ public class NotificationBackgroundService : BackgroundService
                 var candidate = log.Candidate;
                 var exam = log.Exam;
 
-                // Decrypt password
-                var password = string.IsNullOrWhiteSpace(candidate?.EncryptedPassword)
+                // Result/expiry templates must not depend on decrypting unrelated credentials.
+                var needsPassword = template.SubjectEn.Contains("{{Password}}") || template.BodyEn.Contains("{{Password}}");
+                var password = !needsPassword || string.IsNullOrWhiteSpace(candidate?.EncryptedPassword)
                     ? "N/A"
                     : encryption.Decrypt(candidate.EncryptedPassword);
 
@@ -271,8 +272,14 @@ public class NotificationBackgroundService : BackgroundService
                 var candidate = log.Candidate;
                 var exam = log.Exam;
 
-                // SMS body is shorter - use a compact version
-                var smsBody = $"{brandName}: Exam \"{exam?.TitleEn ?? "N/A"}\" is now available. Login to take the exam.";
+                // SMS stays compact and credential-free; email templates control event activation.
+                var smsBody = eventType switch
+                {
+                    NotificationEventType.ExamPublished => $"{brandName}: Exam \"{exam?.TitleEn ?? "N/A"}\" is now available. Login to take the exam.",
+                    NotificationEventType.ResultPublished => $"{brandName}: Your results for exam \"{exam?.TitleEn ?? "N/A"}\" are now available. Login to view your results.",
+                    NotificationEventType.ExamExpired => $"{brandName}: Exam \"{exam?.TitleEn ?? "N/A"}\" has expired and is no longer available.",
+                    _ => throw new InvalidOperationException("Unsupported SMS notification event.")
+                };
 
                 var success = await smsService.SendSmsAsync(log.RecipientPhone, smsBody);
 

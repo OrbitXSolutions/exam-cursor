@@ -13,9 +13,11 @@ type NotificationHandler = (notification: UserNotificationDto) => void;
 export class NotificationHubClient {
   private connection: signalR.HubConnection | null = null;
   private onReceive: NotificationHandler | null = null;
+  private onConnected: (() => void) | null = null;
+  private retryTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Start the connection. Resolves when connected. */
-  async connect(onReceive: NotificationHandler): Promise<void> {
+  async connect(onReceive: NotificationHandler, onConnected?: () => void): Promise<void> {
     if (this.connection) return; // already connected
 
     const token =
@@ -23,6 +25,7 @@ export class NotificationHubClient {
     if (!token) return; // unauthenticated — no-op
 
     this.onReceive = onReceive;
+    this.onConnected = onConnected ?? null;
 
     const backendUrl = this.getBackendUrl();
     const hubUrl = `${backendUrl}/hubs/notifications`;
@@ -34,7 +37,7 @@ export class NotificationHubClient {
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
-        accessTokenFactory: () => token,
+        accessTokenFactory: () => localStorage.getItem("auth_token") ?? "",
         ...(isLocalhost
           ? { skipNegotiation: true, transport: signalR.HttpTransportType.WebSockets }
           : { transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents }),
@@ -46,22 +49,44 @@ export class NotificationHubClient {
     this.connection.on("ReceiveNotification", (notification: UserNotificationDto) => {
       this.onReceive?.(notification);
     });
+    const connection = this.connection;
+    connection.onreconnected(() => {
+      if (this.connection === connection) this.onConnected?.();
+    });
+    connection.onclose(() => this.scheduleRetry(connection));
 
+    await this.start(connection);
+  }
+
+  private async start(connection: signalR.HubConnection): Promise<void> {
     try {
-      await this.connection.start();
+      await connection.start();
+      if (this.connection === connection) this.onConnected?.();
     } catch {
-      // Non-critical — real-time won't work but REST polling still functions
-      this.connection = null;
+      // Automatic reconnect does not cover initial start failures or exhausted retries.
+      this.scheduleRetry(connection);
     }
+  }
+
+  private scheduleRetry(connection: signalR.HubConnection): void {
+    if (this.connection !== connection || this.retryTimer) return;
+    this.retryTimer = setTimeout(() => {
+      this.retryTimer = null;
+      if (this.connection === connection && localStorage.getItem("auth_token")) {
+        void this.start(connection);
+      }
+    }, 30000);
   }
 
   /** Disconnect and clean up. */
   async disconnect(): Promise<void> {
-    if (this.connection) {
-      await this.connection.stop();
-      this.connection = null;
-    }
+    const connection = this.connection;
+    this.connection = null;
     this.onReceive = null;
+    this.onConnected = null;
+    if (this.retryTimer) clearTimeout(this.retryTimer);
+    this.retryTimer = null;
+    if (connection) await connection.stop();
   }
 
   private getBackendUrl(): string {

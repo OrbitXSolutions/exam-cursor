@@ -101,8 +101,8 @@ export default function NotificationTemplatesPage() {
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           {language === "ar"
-            ? "تخصيص رسائل البريد الإلكتروني والرسائل القصيرة لكل حدث"
-            : "Customize email and SMS messages for each event type"}
+            ? "تخصيص البريد الإلكتروني وتفعيل الأحداث للبريد والرسائل القصيرة. تستخدم الرسائل القصيرة نصوص النظام المختصرة."
+            : "Customize email templates and enable events for email and SMS. SMS uses compact system messages."}
         </p>
       </div>
 
