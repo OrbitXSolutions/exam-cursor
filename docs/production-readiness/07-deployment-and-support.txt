@@ -155,6 +155,13 @@ INCIDENT INVESTIGATION
    diagnostics; this change is not permission to collect customer exam answers,
    identity images, credentials, keys, or raw browser storage.
 
+Handled application failures (including success=false with HTTP 200) now run
+through the globally registered result filter. Their existing body/status remain
+unchanged except for the generated trace identifier. File completion diagnostics
+record Outcome=Rejected and the error count without logging message/error payloads.
+Use the trace ID and operation/entity metadata to correlate a reported rejection;
+an HTTP 200 alone is not evidence that the business operation succeeded.
+
 CUSTOMER ACCEPTANCE STILL REQUIRED
 Test two-node cache reads, SignalR peers deliberately split across nodes, shared
 upload/download/retention, key-ring token validation across nodes, license renewal,

@@ -62,6 +62,7 @@ using Smart_Core.Application.Interfaces.Logs;
 using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Infrastructure.Services.Logs;
 using Smart_Core.Infrastructure.Services.License;
+using Smart_Core.Infrastructure.Filters.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 ProductionConfiguration.Validate(builder.Configuration, builder.Environment);
@@ -303,7 +304,7 @@ builder.Services.AddCors(options =>
 });
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<ApiResponseLoggingFilter>());
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
