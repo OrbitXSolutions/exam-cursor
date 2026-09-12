@@ -436,35 +436,6 @@ export default function ExamPage() {
         toast.warning(t("exam.copyPasteBlocked"))
       } : null
 
-      // Mobile screenshot detection
-      // True screenshot prevention is not possible via web APIs (OS-level).
-      // We detect rapid visibility changes (< 3s hidden then visible) on mobile
-      // as a strong signal of a screenshot or screen-recording attempt.
-      let mobileHiddenAt: number | null = null
-      const handleMobileScreenshot = isMobileUA ? () => {
-        if (document.hidden) {
-          mobileHiddenAt = Date.now()
-        } else if (mobileHiddenAt !== null) {
-          const elapsed = Date.now() - mobileHiddenAt
-          mobileHiddenAt = null
-          // Rapid hide→show (< 3s) on mobile = suspected screenshot / screen recording
-          if (elapsed < 3000) {
-            logAttemptEvent(session.attemptId, {
-              eventType: AttemptEventType.ScreenshotAttempt,
-              metadataJson: JSON.stringify({
-                timestamp: new Date().toISOString(),
-                hiddenDurationMs: elapsed,
-                userAgent: navigator.userAgent,
-                screenResolution: `${screen.width}x${screen.height}`,
-                isMobile: true,
-              }),
-            }).catch(() => { })
-            playWarningBeep()
-            toast.warning(t("exam.screenshotAttemptWarning"))
-          }
-        }
-      } : null
-
       // ── Desktop screenshot detection ─────────────────────────────────────────
       // Signal 1: PrintScreen key (fires keydown in Chrome/Edge on Windows)
       const handleDesktopKeyDown = !isMobileUA ? (e: KeyboardEvent) => {
@@ -536,7 +507,6 @@ export default function ExamPage() {
       if (handleVisibilityChange) document.addEventListener("visibilitychange", handleVisibilityChange)
       if (handleCopy) document.addEventListener("copy", handleCopy)
       if (handlePaste) document.addEventListener("paste", handlePaste)
-      if (handleMobileScreenshot) document.addEventListener("visibilitychange", handleMobileScreenshot)
       if (handleDesktopKeyDown) document.addEventListener("keydown", handleDesktopKeyDown)
       if (handleDesktopWindowBlur) window.addEventListener("blur", handleDesktopWindowBlur)
       if (handleDesktopPageVisibility) document.addEventListener("visibilitychange", handleDesktopPageVisibility)
@@ -547,7 +517,6 @@ export default function ExamPage() {
         if (handleVisibilityChange) document.removeEventListener("visibilitychange", handleVisibilityChange)
         if (handleCopy) document.removeEventListener("copy", handleCopy)
         if (handlePaste) document.removeEventListener("paste", handlePaste)
-        if (handleMobileScreenshot) document.removeEventListener("visibilitychange", handleMobileScreenshot)
         if (handleDesktopKeyDown) document.removeEventListener("keydown", handleDesktopKeyDown)
         if (handleDesktopWindowBlur) window.removeEventListener("blur", handleDesktopWindowBlur)
         if (handleDesktopPageVisibility) document.removeEventListener("visibilitychange", handleDesktopPageVisibility)
