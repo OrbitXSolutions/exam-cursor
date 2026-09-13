@@ -34,10 +34,6 @@ export default function NotificationSettingsPage() {
   const [sendingTestEmail, setSendingTestEmail] = useState(false)
   const [sendingTestSms, setSendingTestSms] = useState(false)
 
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
   async function loadSettings() {
     try {
       const data = await getNotificationSettings()
@@ -48,6 +44,10 @@ export default function NotificationSettingsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadSettings)
+  }, [])
 
   async function handleSave() {
     if (!settings) return

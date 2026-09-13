@@ -37,20 +37,21 @@ export default function CreateSchedulePage() {
     lateEntryMinutes: 15,
   })
 
-  useEffect(() => {
-    loadExam()
-  }, [id])
-
   async function loadExam() {
     try {
       const data = await getExam(id)
       setExam(data)
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => loadExam(), 0)
+    return () => clearTimeout(timer)
+  }, [id])
 
   function updateField(field: string, value: string | number | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -72,7 +73,7 @@ export default function CreateSchedulePage() {
       })
       toast.success(language === "ar" ? "تم إنشاء الجدول بنجاح" : "Schedule created successfully")
       router.push(`/exams/${id}/overview`)
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في إنشاء الجدول" : "Failed to create schedule")
     } finally {
       setSaving(false)

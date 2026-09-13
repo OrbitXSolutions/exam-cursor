@@ -26,11 +26,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { localizeText } from "@/lib/i18n/runtime"
 import { toast } from "sonner"
-import { Plus, Search, MoreHorizontal, Edit, Trash2, ListTree, Loader2 } from "lucide-react"
+import {  Search, ListTree, Loader2 } from "lucide-react"
 import {
   getQuestionTypes,
   createQuestionType,
@@ -40,7 +39,7 @@ import {
 } from "@/lib/api/lookups"
 
 function QuestionTypesContent() {
-  const { t, language } = useI18n()
+  const { language } = useI18n()
 
   const [types, setTypes] = useState<QuestionType[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,8 +47,8 @@ function QuestionTypesContent() {
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
-  const [editingType, setEditingType] = useState<QuestionType | null>(null)
+  const [dialogMode] = useState<"create" | "edit">("create")
+  const [editingType] = useState<QuestionType | null>(null)
   const [formData, setFormData] = useState({ nameEn: "", nameAr: "" })
   const [saving, setSaving] = useState(false)
 
@@ -58,35 +57,25 @@ function QuestionTypesContent() {
   const [typeToDelete, setTypeToDelete] = useState<QuestionType | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => {
-    loadTypes()
-  }, [])
-
   const loadTypes = async () => {
     setLoading(true)
     try {
       const result = await getQuestionTypes({ pageSize: 100 })
       setTypes(result.items || [])
-    } catch (error) {
+    } catch {
       toast.error(localizeText("Failed to load question types", "فشل تحميل أنواع الأسئلة", language))
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCreate = () => {
-    setDialogMode("create")
-    setEditingType(null)
-    setFormData({ nameEn: "", nameAr: "" })
-    setDialogOpen(true)
-  }
+  useEffect(() => {
+    void Promise.resolve().then(loadTypes)
+  }, [])
 
-  const handleEdit = (type: QuestionType) => {
-    setDialogMode("edit")
-    setEditingType(type)
-    setFormData({ nameEn: type.nameEn, nameAr: type.nameAr })
-    setDialogOpen(true)
-  }
+
+
+
 
   const handleSave = async () => {
     if (!formData.nameEn.trim() || !formData.nameAr.trim()) {
@@ -97,24 +86,16 @@ function QuestionTypesContent() {
     setSaving(true)
     try {
       if (dialogMode === "create") {
-        const result = await createQuestionType(formData)
-        if (result.success) {
-          toast.success(result.message || "Question type created successfully")
-          await loadTypes()
-        } else {
-          toast.error(result.message || "Failed to create question type")
-        }
+        await createQuestionType(formData)
+        toast.success("Question type created successfully")
+        await loadTypes()
       } else if (editingType) {
-        const result = await updateQuestionType(editingType.id, formData)
-        if (result.success) {
-          toast.success(result.message || "Question type updated successfully")
-          await loadTypes()
-        } else {
-          toast.error(result.message || "Failed to update question type")
-        }
+        await updateQuestionType(editingType.id, formData)
+        toast.success("Question type updated successfully")
+        await loadTypes()
       }
       setDialogOpen(false)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setSaving(false)
@@ -126,16 +107,12 @@ function QuestionTypesContent() {
 
     setDeleting(true)
     try {
-      const result = await deleteQuestionType(typeToDelete.id)
-      if (result.success) {
-        toast.success(result.message || "Question type deleted successfully")
-        await loadTypes()
-      } else {
-        toast.error(result.message || result.errors?.[0] || "Failed to delete question type")
-      }
+      await deleteQuestionType(typeToDelete.id)
+      toast.success("Question type deleted successfully")
+      await loadTypes()
       setDeleteDialogOpen(false)
       setTypeToDelete(null)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setDeleting(false)

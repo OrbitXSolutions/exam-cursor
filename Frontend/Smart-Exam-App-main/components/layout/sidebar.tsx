@@ -24,7 +24,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
   LogOut,
   BookOpen,
   BarChart3,
@@ -32,7 +31,6 @@ import {
   Settings,
   FolderTree,
   ListTree,
-  Award,
   CheckCircle2,
   Monitor,
   UserCheck,
@@ -45,19 +43,14 @@ import {
   UsersRound,
   UserPlus,
   Clock,
-  TimerOff,
-  PlayCircle,
   ClipboardCheck,
   Building2,
   Landmark,
-  Wrench,
   ShieldCheck,
   ShieldAlert,
   Copy,
-  Sparkles,
   HelpCircle,
   Bell,
-  Send,
   ScrollText,
   Bug,
   Activity,
@@ -283,18 +276,21 @@ export function Sidebar() {
 
   // Update open groups when route changes (auto-expand if route is inside group)
   useEffect(() => {
-    setOpenGroups(prev => {
-      const newState = { ...prev }
-      Object.entries(allGroups).forEach(([key, group]) => {
-        const isRouteInGroup = group.children.some(
-          (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
-        )
-        if (isRouteInGroup) {
-          newState[key] = true
-        }
+    const timeout = setTimeout(() => {
+      setOpenGroups(prev => {
+        const newState = { ...prev }
+        Object.entries(allGroups).forEach(([key, group]) => {
+          const isRouteInGroup = group.children.some(
+            (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+          )
+          if (isRouteInGroup) {
+            newState[key] = true
+          }
+        })
+        return newState
       })
-      return newState
-    })
+    }, 0)
+    return () => clearTimeout(timeout)
   }, [pathname, allGroups])
 
   const filterByRole = (items: NavItem[]) => {
@@ -309,13 +305,14 @@ export function Sidebar() {
   const showUserGuide = !hasRole(UserRole.Candidate) && filterByRole([userGuideNavItem]).length > 0
   const sectionHeadingClass = "mb-2 mt-4 px-3 text-start text-xs font-semibold uppercase tracking-wider text-muted-foreground"
 
-  const NavLink = ({ item }: { item: NavItem }) => {
+  const renderNavLink = (item: NavItem) => {
     const isActive = item.exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(`${item.href}/`))
     const Icon = item.icon
     const label = t(item.labelKey) || item.labelKey.split(".").pop()
 
     const link = (
       <Link
+        key={item.href}
         href={item.href}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium transition-all",
@@ -336,7 +333,7 @@ export function Sidebar() {
 
     if (isCollapsed) {
       return (
-        <Tooltip delayDuration={0}>
+        <Tooltip key={item.href} delayDuration={0}>
           <TooltipTrigger asChild>{link}</TooltipTrigger>
           <TooltipContent side={isRTL ? "left" : "right"} className="flex items-center gap-2">
             {label}
@@ -354,7 +351,7 @@ export function Sidebar() {
     return group.roles.some((r) => hasRole(r))
   }
 
-  const NavGroupBlock = ({ group, groupKey }: { group: NavGroup; groupKey: string }) => {
+  const renderNavGroupBlock = (group: NavGroup, groupKey: string) => {
     const isOpen = openGroups[groupKey] ?? false
     const Icon = group.icon
     const GroupChevron = isRTL ? ChevronLeft : ChevronRight
@@ -366,7 +363,7 @@ export function Sidebar() {
       return (
         <>
           {children.map((item) => (
-            <NavLink key={item.href} item={item} />
+            renderNavLink(item)
           ))}
         </>
       )
@@ -391,7 +388,7 @@ export function Sidebar() {
         {isOpen && (
           <div className="ms-6 space-y-0.5 border-s border-muted ps-2">
             {children.map((item) => (
-              <NavLink key={item.href} item={item} />
+              renderNavLink(item)
             ))}
           </div>
         )}
@@ -450,7 +447,7 @@ export function Sidebar() {
           <nav dir={isRTL ? "rtl" : "ltr"} className="flex flex-col gap-1">
             {/* Main Nav */}
             {mainNavItems.map((item) => (
-              <NavLink key={item.href} item={item} />
+              renderNavLink(item)
             ))}
 
             {/* Candidate Nav */}
@@ -462,7 +459,7 @@ export function Sidebar() {
                   </div>
                 )}
                 {filterByRole(candidateNavItems).map((item) => (
-                  <NavLink key={item.href} item={item} />
+                  renderNavLink(item)
                 ))}
                 {/* Verified status link */}
                 {verifiedStatus && (
@@ -515,7 +512,7 @@ export function Sidebar() {
                     {language === "ar" ? "بنك الأسئلة" : "Question Bank"}
                   </div>
                 )}
-                <NavGroupBlock group={questionBankNavGroup} groupKey="questionBank" />
+                {renderNavGroupBlock(questionBankNavGroup, "questionBank")}
               </>
             )}
 
@@ -527,7 +524,7 @@ export function Sidebar() {
                     {language === "ar" ? "إدارة الاختبارات" : "Exam Management"}
                   </div>
                 )}
-                <NavGroupBlock group={examsNavGroup} groupKey="exams" />
+                {renderNavGroupBlock(examsNavGroup, "exams")}
               </>
             )}
 
@@ -539,7 +536,7 @@ export function Sidebar() {
                     {language === "ar" ? "النتائج" : "Result"}
                   </div>
                 )}
-                <NavGroupBlock group={resultNavGroup} groupKey="result" />
+                {renderNavGroupBlock(resultNavGroup, "result")}
               </>
             )}
 
@@ -551,7 +548,7 @@ export function Sidebar() {
                     {language === "ar" ? "مركز المراقبة" : "Proctor Center"}
                   </div>
                 )}
-                <NavGroupBlock group={proctorNavGroup} groupKey="proctor" />
+                {renderNavGroupBlock(proctorNavGroup, "proctor")}
               </>
             )}
 
@@ -563,7 +560,7 @@ export function Sidebar() {
                     {language === "ar" ? "المرشحون" : "Candidates"}
                   </div>
                 )}
-                <NavGroupBlock group={candidatesNavGroup} groupKey="candidates" />
+                {renderNavGroupBlock(candidatesNavGroup, "candidates")}
               </>
             )}
 
@@ -575,7 +572,7 @@ export function Sidebar() {
                     {language === "ar" ? "الإدارة" : "Administration"}
                   </div>
                 )}
-                <NavGroupBlock group={administrationNavGroup} groupKey="administration" />
+                {renderNavGroupBlock(administrationNavGroup, "administration")}
               </>
             )}
 
@@ -587,7 +584,7 @@ export function Sidebar() {
                     {language === "ar" ? "الإشعارات" : "Notifications"}
                   </div>
                 )}
-                <NavGroupBlock group={notificationsNavGroup} groupKey="notifications" />
+                {renderNavGroupBlock(notificationsNavGroup, "notifications")}
               </>
             )}
 
@@ -599,7 +596,7 @@ export function Sidebar() {
                     {language === "ar" ? "سجلات النظام" : "System Logs"}
                   </div>
                 )}
-                <NavGroupBlock group={logsNavGroup} groupKey="logs" />
+                {renderNavGroupBlock(logsNavGroup, "logs")}
               </>
             )}
 
@@ -611,7 +608,7 @@ export function Sidebar() {
                     {language === "ar" ? "المساعدة" : "Help"}
                   </div>
                 )}
-                <NavLink item={userGuideNavItem} />
+                {renderNavLink(userGuideNavItem)}
               </>
             )}
           </nav>

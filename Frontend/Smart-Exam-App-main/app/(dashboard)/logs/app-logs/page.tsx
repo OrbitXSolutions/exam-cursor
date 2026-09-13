@@ -11,10 +11,9 @@ import {
 } from "@/lib/api/system-logs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -175,7 +174,7 @@ function RequestLogsTab() {
     }
   }, [filter])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function updateFilter(partial: Partial<AppLogFilter>) {
     setFilter(prev => ({ ...prev, ...partial }))
@@ -288,7 +287,7 @@ function ErrorLogsTab() {
     }
   }, [filter])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function updateFilter(partial: Partial<AppLogFilter>) {
     setFilter(prev => ({ ...prev, ...partial }))

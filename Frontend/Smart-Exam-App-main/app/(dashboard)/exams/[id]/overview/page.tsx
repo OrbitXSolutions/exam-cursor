@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import type { Exam } from "@/lib/types"
 import { getExam, publishExam, unpublishExam } from "@/lib/api/exams"
-import { queueExamEmails } from "@/lib/api/notifications"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -71,7 +70,7 @@ export default function ExamOverviewPage() {
       setLoading(true)
       const data = await getExam(examId)
       setExam(data)
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
     } finally {
       setLoading(false)
@@ -86,8 +85,8 @@ export default function ExamOverviewPage() {
       const updatedExam = { ...exam, isPublished: true }
       sessionStorage.setItem("publishedExam", JSON.stringify(updatedExam))
       router.push(`/exams/${exam.id}/published`)
-    } catch (error: any) {
-      const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
       setErrorMessage(msg)
       setErrorDialogOpen(true)
     } finally {
@@ -102,7 +101,7 @@ export default function ExamOverviewPage() {
       await unpublishExam(exam.id)
       toast.success(t("exams.archiveSuccess") || "Exam archived successfully")
       fetchExam()
-    } catch (error) {
+    } catch {
       toast.error(t("exams.archiveError") || "Failed to archive exam")
     } finally {
       setActionLoading(false)

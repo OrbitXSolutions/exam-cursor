@@ -5,23 +5,22 @@ import { useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { getMyResult, type CandidateResult } from "@/lib/api/candidate"
-import { getCertificateByResult } from "@/lib/api/certificates"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { CheckCircle2, XCircle, Trophy, Clock, Target, FileText, ArrowLeft, ArrowRight, Download, Share2, AlertCircle } from "lucide-react"
+import { CheckCircle2, XCircle, Trophy, Clock, Target, FileText, ArrowLeft, ArrowRight, Share2, AlertCircle } from "lucide-react"
 
 // Helper function to get localized field
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 export default function ResultsPage() {
@@ -31,27 +30,11 @@ export default function ResultsPage() {
   const justSubmitted = searchParams.get("submitted") === "true"
   const { t, language, dir } = useI18n()
   const [result, setResult] = useState<CandidateResult | null>(null)
-  const [certificate, setCertificate] = useState<{ id: number; downloadUrl: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [gradingPending, setGradingPending] = useState(false)
   const pollCountRef = useRef(0)
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    loadResult()
-    return () => {
-      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
-    }
-  }, [attemptId])
-
-  useEffect(() => {
-    if (result?.resultId && result?.isPassed) {
-      getCertificateByResult(result.resultId).then((cert) => {
-        if (cert) setCertificate({ id: cert.id, downloadUrl: cert.downloadUrl })
-      })
-    }
-  }, [result?.resultId, result?.isPassed])
 
   async function loadResult() {
     try {
@@ -62,7 +45,7 @@ export default function ResultsPage() {
       const data = await getMyResult(attemptId)
       setResult(data)
       pollCountRef.current = 0 // reset on success
-    } catch (err) {
+    } catch {
       console.error("[v0] Error loading result")
 
       // If just submitted and result not ready, poll up to 6 times (30s total)
@@ -79,6 +62,13 @@ export default function ResultsPage() {
       if (!gradingPending) setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadResult()
+    return () => {
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
+    }
+  }, [attemptId])
 
   if (loading || gradingPending) {
     return (

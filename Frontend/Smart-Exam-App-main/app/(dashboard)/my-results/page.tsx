@@ -7,7 +7,7 @@ import {
   getMyResults,
   type CandidateResultDto,
 } from "@/lib/api/candidate"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -26,24 +26,21 @@ import {
 } from "lucide-react"
 
 // Helper function to get localized field
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 export default function MyResultsPage() {
   const { t, locale, language } = useI18n()
   const [results, setResults] = useState<CandidateResultDto[]>([])
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadResults()
-  }, [])
 
   async function loadResults() {
     try {
@@ -54,13 +51,17 @@ export default function MyResultsPage() {
       data = await getMyResults()
       console.log("[v0] Loaded results from API:", data.length)
       setResults(data)
-    } catch (error) {
+    } catch {
       console.error("[v0] Error loading results")
       toast.error(t("common.errorOccurred"))
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadResults)
+  }, [])
 
   // Calculate stats (percentage can be null)
   const totalExams = results.length

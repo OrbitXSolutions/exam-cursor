@@ -206,7 +206,7 @@ export async function initiateGrading(attemptId: number): Promise<boolean> {
   try {
     await apiClient.post("/Grading/initiate", { attemptId });
     return true;
-  } catch (err) {
+  } catch {
     console.warn("[initiateGrading] Failed");
     return false;
   }

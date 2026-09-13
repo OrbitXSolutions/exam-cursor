@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { useI18n } from "@/lib/i18n/context"
-import { useAuth } from "@/lib/auth/context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,9 +36,40 @@ import {
   type CandidateDto, type CandidateImportResult,
 } from "@/lib/api/candidate-admin"
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message
+  ) {
+    return error.message
+  }
+
+  return fallback
+}
+
+function getErrorDescription(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null) return undefined
+
+  if ("details" in error && Array.isArray(error.details)) {
+    const details = error.details.filter((detail): detail is string => typeof detail === "string")
+    if (details.length > 0) return details.join(" | ")
+  }
+
+  if (
+    "statusCode" in error &&
+    (typeof error.statusCode === "number" || typeof error.statusCode === "string")
+  ) {
+    return `Status: ${error.statusCode}`
+  }
+
+  return undefined
+}
+
 export default function CandidatesDataPage() {
   const { language } = useI18n()
-  const { user } = useAuth()
   const isAr = language === "ar"
 
   // ── Data state ─────────────────────────────────────────────
@@ -89,7 +119,7 @@ export default function CandidatesDataPage() {
   const [reactivateLoading, setReactivateLoading] = useState(false)
   const [permanentDeleteLoading, setPermanentDeleteLoading] = useState(false)
   // Holds the pending create payload so we can retry with forceReactivate
-  const pendingCreatePayloadRef = useRef<Parameters<typeof createCandidate>[0] | null>(null)
+  const [pendingCreatePayload, setPendingCreatePayload] = useState<Parameters<typeof createCandidate>[0] | null>(null)
 
   // ── Load data ──────────────────────────────────────────────
   const loadCandidates = useCallback(async () => {
@@ -99,8 +129,8 @@ export default function CandidatesDataPage() {
       setCandidates(data.items)
       setTotalCount(data.totalCount)
       setTotalPages(data.totalPages)
-    } catch (e: any) {
-      toast.error(e.message || "Failed to load candidates")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to load candidates"))
     } finally {
       setLoading(false)
     }
@@ -111,7 +141,12 @@ export default function CandidatesDataPage() {
     setPage(1)
   }
 
-  useEffect(() => { loadCandidates() }, [loadCandidates])
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadCandidates()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadCandidates])
 
   // Debounced search
   const [searchDebounce, setSearchDebounce] = useState("")
@@ -191,17 +226,18 @@ export default function CandidatesDataPage() {
       }
       setFormOpen(false)
       loadCandidates()
-    } catch (e: any) {
+    } catch (error: unknown) {
       // Special case: email belongs to a soft-deleted account — offer reactivate or permanent delete
-      if (formMode === "create" && e.message?.includes("previously deleted account")) {
-        pendingCreatePayloadRef.current = {
+      const message = getErrorMessage(error, "")
+      if (formMode === "create" && message.includes("previously deleted account")) {
+        setPendingCreatePayload({
           fullName: formData.fullName,
           fullNameAr: formData.fullNameAr || undefined,
           email: formData.email,
           password: formData.password || undefined,
           rollNo: formData.rollNo || undefined,
           mobile: formData.mobile || undefined,
-        }
+        })
         // Eagerly fetch deleted candidate info for display
         findDeletedCandidateByEmail(formData.email)
           .then(info => setDeletedCandidateInfo(info))
@@ -209,7 +245,7 @@ export default function CandidatesDataPage() {
         setFormOpen(false)   // close create form so reactivate dialog has full width
         setReactivateOpen(true)
       } else {
-        toast.error(e.message || "Operation failed")
+        toast.error(message || "Operation failed")
       }
     } finally {
       setFormLoading(false)
@@ -218,16 +254,16 @@ export default function CandidatesDataPage() {
 
   // ── Reactivate (restore deleted account with new data) ─────
   const handleReactivate = async () => {
-    if (!pendingCreatePayloadRef.current) return
+    if (!pendingCreatePayload) return
     setReactivateLoading(true)
     try {
-      await createCandidate({ ...pendingCreatePayloadRef.current, forceReactivate: true })
+      await createCandidate({ ...pendingCreatePayload, forceReactivate: true })
       toast.success(isAr ? "تم استعادة المرشح بنجاح" : "Candidate reactivated successfully")
       setReactivateOpen(false)
       setFormOpen(false)
       loadCandidates()
-    } catch (e: any) {
-      toast.error(e.message || "Reactivation failed")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Reactivation failed"))
     } finally {
       setReactivateLoading(false)
     }
@@ -235,19 +271,19 @@ export default function CandidatesDataPage() {
 
   // ── Permanent Delete (SuperAdmin only — frees the email) ───
   const handlePermanentDelete = async () => {
-    if (!pendingCreatePayloadRef.current) return
+    if (!pendingCreatePayload) return
     setPermanentDeleteLoading(true)
     try {
       // Step 1: look up the deleted candidate's ID by email
-      const deleted = await findDeletedCandidateByEmail(pendingCreatePayloadRef.current.email)
+      const deleted = await findDeletedCandidateByEmail(pendingCreatePayload.email)
       // Step 2: permanently delete it
       await permanentDeleteCandidate(deleted.id)
       toast.success(isAr ? "تم الحذف النهائي. يمكنك الآن إعادة الإنشاء." : "Account permanently deleted. You can now create a new one.")
       setReactivateOpen(false)
       // Re-open the create form automatically so the user can proceed
       setFormOpen(true)
-    } catch (e: any) {
-      toast.error(e.message || "Permanent delete failed")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Permanent delete failed"))
     } finally {
       setPermanentDeleteLoading(false)
     }
@@ -262,8 +298,8 @@ export default function CandidatesDataPage() {
       toast.success(isAr ? "تم حذف المرشح" : "Candidate deleted")
       setDeleteOpen(false)
       loadCandidates()
-    } catch (e: any) {
-      const msg: string = e.message || ""
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, "")
       if (msg.toLowerCase().includes("attempt")) {
         // Has exam attempts — offer block instead of toast error
         setDeleteOpen(false)
@@ -285,8 +321,8 @@ export default function CandidatesDataPage() {
       toast.success(isAr ? "تم حظر المرشح" : "Candidate blocked")
       setBlockInsteadOpen(false)
       loadCandidates()
-    } catch (e: any) {
-      toast.error(e.message || "Block failed")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Block failed"))
     } finally {
       setBlockLoading(false)
     }
@@ -306,8 +342,8 @@ export default function CandidatesDataPage() {
       }
       setBlockOpen(false)
       loadCandidates()
-    } catch (e: any) {
-      toast.error(e.message || "Operation failed")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Operation failed"))
     } finally {
       setBlockLoading(false)
     }
@@ -319,14 +355,10 @@ export default function CandidatesDataPage() {
     try {
       await exportCandidates({ search, status: statusFilter })
       toast.success(isAr ? "تم تصدير البيانات" : "Export completed")
-    } catch (e: any) {
-      const description =
-        Array.isArray(e.details) && e.details.length > 0
-          ? e.details.join(" | ")
-          : e.statusCode
-          ? `Status: ${e.statusCode}`
-          : undefined
-      toast.error(e.message || "Export failed", { description })
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Export failed"), {
+        description: getErrorDescription(error),
+      })
     } finally {
       setExportLoading(false)
     }
@@ -344,8 +376,8 @@ export default function CandidatesDataPage() {
       setImportResult(result)
       setImportResultOpen(true)
       loadCandidates()
-    } catch (e: any) {
-      toast.error(e.message || "Import failed")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Import failed"))
     } finally {
       setImportLoading(false)
     }
@@ -885,8 +917,8 @@ export default function CandidatesDataPage() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {isAr
-                ? `البريد الإلكتروني "${pendingCreatePayloadRef.current?.email}" مرتبط بحساب مرشح تم حذفه مسبقاً.`
-                : `The email "${pendingCreatePayloadRef.current?.email}" belongs to a previously deleted candidate account.`}
+                ? `البريد الإلكتروني "${pendingCreatePayload?.email}" مرتبط بحساب مرشح تم حذفه مسبقاً.`
+                : `The email "${pendingCreatePayload?.email}" belongs to a previously deleted candidate account.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
 

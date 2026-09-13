@@ -3,7 +3,7 @@ export function getSafePath(url: string): string {
     const path = new URL(url, "http://frontend.invalid").pathname;
     // Share links contain a credential in the path, not just in the query.
     return path.replace(
-      /(\/(?:share(?:d)?(?:-link)?|public\/exam|certificate\/verify)\/)[^/]+/gi,
+      /(\/(?:share(?:d)?(?:-link)?|public\/exam)\/)[^/]+/gi,
       "$1[redacted]",
     );
   } catch {

@@ -102,6 +102,10 @@ interface ProctorEvidence {
   downloadUrl?: string
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback
+}
+
 
 
 export default function AIReportPage() {
@@ -347,6 +351,29 @@ export default function AIReportPage() {
     }
   }
 
+  async function loadAttemptEvents(attemptId: number): Promise<AttemptEvent[]> {
+    try {
+      const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
+      const evts = normalizeList<AttemptEvent>(res)
+      setAttemptEvents(evts)
+      return evts
+    } catch {
+      console.warn("Failed to load attempt events")
+      setAttemptEvents([])
+      return []
+    }
+  }
+
+  async function loadEvidence(sessionId: number) {
+    try {
+      const res = await apiClient.get<unknown>(`/Proctor/session/${sessionId}/evidence`)
+      setEvidence(normalizeList<ProctorEvidence>(res))
+    } catch {
+      console.warn("Failed to load evidence")
+      setEvidence([])
+    }
+  }
+
 
 
   useEffect(() => {
@@ -397,7 +424,7 @@ export default function AIReportPage() {
         } else {
           setError(language === "ar" ? "لا توجد بيانات مراقبة" : "No proctoring data found")
         }
-      } catch (err) {
+      } catch {
         console.error("Failed to load AI report")
         setError(language === "ar" ? "فشل في تحميل التقرير" : "Failed to load report")
       } finally {
@@ -410,29 +437,6 @@ export default function AIReportPage() {
     }
   }, [examId, candidateId, language, attemptIdFromQuery])
 
-  async function loadAttemptEvents(attemptId: number): Promise<AttemptEvent[]> {
-    try {
-      const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
-      const evts = normalizeList<AttemptEvent>(res)
-      setAttemptEvents(evts)
-      return evts
-    } catch (err) {
-      console.warn("Failed to load attempt events")
-      setAttemptEvents([])
-      return []
-    }
-  }
-
-  async function loadEvidence(sessionId: number) {
-    try {
-      const res = await apiClient.get<unknown>(`/Proctor/session/${sessionId}/evidence`)
-      setEvidence(normalizeList<ProctorEvidence>(res))
-    } catch (err) {
-      console.warn("Failed to load evidence")
-      setEvidence([])
-    }
-  }
-
   const handleGenerateAiAnalysis = async () => {
     if (!session?.id) return
     try {
@@ -441,8 +445,8 @@ export default function AIReportPage() {
       const result = await getAiProctorAnalysis(String(session.id), language)
       setAiAnalysis2(result)
       toast.success(language === "ar" ? "تم إنشاء تحليل الذكاء الاصطناعي" : "AI analysis generated successfully")
-    } catch (error: any) {
-      const msg = error?.message || (language === "ar" ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, language === "ar" ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
       setAiAnalysisError(msg)
       toast.error(msg)
     } finally {
@@ -1453,7 +1457,7 @@ export default function AIReportPage() {
                         {language === "ar" ? "الأسئلة الأبطأ" : "Slowest Questions"}
                       </p>
                       <div className="space-y-1.5">
-                        {slowest.map((q, i) => (
+                        {slowest.map((q) => (
                           <div key={q.qId} className="flex items-center justify-between p-2 rounded-md bg-muted/30 text-sm">
                             <span className="text-muted-foreground truncate max-w-[70%]">
                               {q.text || `Q#${q.qId}`}
@@ -1478,7 +1482,7 @@ export default function AIReportPage() {
                         </span>
                       </p>
                       <div className="space-y-1.5">
-                        {fastest.map((q, i) => (
+                        {fastest.map((q) => (
                           <div key={q.qId} className="flex items-center justify-between p-2 rounded-md bg-muted/30 text-sm">
                             <span className="text-muted-foreground truncate max-w-[70%]">
                               {q.text || `Q#${q.qId}`}

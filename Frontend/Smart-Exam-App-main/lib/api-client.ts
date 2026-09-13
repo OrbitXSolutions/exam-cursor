@@ -177,16 +177,21 @@ class ApiClient {
         error instanceof TypeError &&
         (error as Error).message === "Failed to fetch"
       ) {
-        console.warn(
-          "[API] Network fallback used",
-          { path: getSafePath(url) },
-        );
+        console.warn("[API] Network fallback used", { path: getSafePath(url) });
         return mockData;
       }
 
       throw error;
     } finally {
-      logRequest("API", options.method || "GET", url, startedAt, status, correlationId, failed);
+      logRequest(
+        "API",
+        options.method || "GET",
+        url,
+        startedAt,
+        status,
+        correlationId,
+        failed,
+      );
     }
   }
 
@@ -231,11 +236,11 @@ class ApiClient {
     return this.request<T>(endpoint, { method: "DELETE" }, mockData);
   }
 
-  async uploadFile(
+  async uploadFile<T = MediaUploadResult>(
     endpoint: string,
     file: File,
     folder?: string,
-  ): Promise<MediaUploadResult> {
+  ): Promise<T> {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -278,7 +283,15 @@ class ApiClient {
       failed = true;
       throw error;
     } finally {
-      logRequest("API Upload", "POST", url, startedAt, status, correlationId, failed);
+      logRequest(
+        "API Upload",
+        "POST",
+        url,
+        startedAt,
+        status,
+        correlationId,
+        failed,
+      );
     }
   }
 }

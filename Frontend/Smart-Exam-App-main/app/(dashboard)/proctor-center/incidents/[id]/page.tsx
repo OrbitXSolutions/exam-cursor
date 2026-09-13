@@ -16,7 +16,7 @@ import {
   type IncidentCommentDto,
 } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -35,11 +35,8 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import {
   ArrowLeft,
-  AlertTriangle,
-  CheckCircle2,
   Clock,
   User,
-  MessageSquare,
   Shield,
   FileText,
   RotateCcw,
@@ -48,12 +45,11 @@ import {
   Scale,
   Activity,
   Eye,
-  XCircle,
 } from "lucide-react"
 
 export default function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
+  useRouter()
   const { t, locale } = useI18n()
 
   const [caseDetail, setCaseDetail] = useState<IncidentCaseDetailDto | null>(null)
@@ -98,7 +94,7 @@ export default function IncidentDetailPage() {
       ])
       setCaseDetail(detail)
       setComments(cmts)
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToLoadCase"))
     } finally {
       setLoading(false)
@@ -119,8 +115,8 @@ export default function IncidentDetailPage() {
       setDecisionDialogOpen(false)
       setDecisionReason("")
       loadCase()
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToRecordDecision"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToRecordDecision"))
     } finally {
       setDecisionLoading(false)
     }
@@ -132,8 +128,8 @@ export default function IncidentDetailPage() {
       await closeIncidentCase(caseDetail.id)
       toast.success(t("proctor.caseClosed"))
       loadCase()
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToCloseCase"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToCloseCase"))
     }
   }
 
@@ -145,8 +141,8 @@ export default function IncidentDetailPage() {
       setReopenDialogOpen(false)
       setReopenReason("")
       loadCase()
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToReopenCase"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToReopenCase"))
     }
   }
 
@@ -158,8 +154,8 @@ export default function IncidentDetailPage() {
       setStatusDialogOpen(false)
       setStatusReason("")
       loadCase()
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToChangeStatus"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToChangeStatus"))
     }
   }
 
@@ -172,8 +168,8 @@ export default function IncidentDetailPage() {
       setCommentBody("")
       const cmts = await getIncidentComments(caseDetail.id)
       setComments(cmts)
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToAddComment"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToAddComment"))
     } finally {
       setCommentLoading(false)
     }

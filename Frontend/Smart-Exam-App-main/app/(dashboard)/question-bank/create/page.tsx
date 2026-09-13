@@ -37,7 +37,6 @@ import {
   AlertCircle,
   CheckCircle2,
   FileText,
-  Settings,
   ListChecks,
   ImageIcon,
   Upload,
@@ -47,12 +46,7 @@ import {
 import Link from "next/link"
 
 // Question Type IDs from backend
-const QUESTION_TYPE = {
-  MCQ_SINGLE: 1,
-  MCQ_MULTI: 2,
-  TRUE_FALSE: 3,
-  SUBJECTIVE: 4,
-}
+
 
 const PAGE_SIZE = 20
 
@@ -107,7 +101,7 @@ const CreateQuestionPage = () => {
   // Image attachment for question body
   const [questionImage, setQuestionImage] = useState<File | null>(null)
   const [questionImagePreview, setQuestionImagePreview] = useState<string | null>(null)
-  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [] = useState(false)
   const imageInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,12 +157,9 @@ const CreateQuestionPage = () => {
     updateOption(optionId, { imageFile: null, imagePreview: null, attachmentPath: null })
   }
 
-  useEffect(() => {
-    fetchLookups()
-  }, [])
-
-  useEffect(() => {
-    const currentType = types.find((t) => String(t.id) === formData.questionTypeId)
+  const handleQuestionTypeChange = (value: string, availableTypes = types) => {
+    setFormData((prev) => ({ ...prev, questionTypeId: value }))
+    const currentType = availableTypes.find((type) => String(type.id) === value)
     const typeName = currentType?.nameEn?.toLowerCase() || ""
     const isTF = typeName === "true/false" || typeName === "true_false" || typeName === "truefalse"
     const isMCQ = typeName.includes("mcq") || typeName.includes("multiple choice")
@@ -187,7 +178,7 @@ const CreateQuestionPage = () => {
         ])
       }
     }
-  }, [formData.questionTypeId, types])
+  }
 
   useEffect(() => {
     if (formErrors.length > 0 && errorRef.current) {
@@ -207,14 +198,19 @@ const CreateQuestionPage = () => {
       // Default to MCQ Single if available
       if (typesData.length > 0) {
         const mcqType = typesData.find((t) => t.nameEn?.toLowerCase().includes("single") || t.nameEn?.toLowerCase() === "mcq single") || typesData[0]
-        setFormData((prev) => ({ ...prev, questionTypeId: String(mcqType.id) }))
+        handleQuestionTypeChange(String(mcqType.id), typesData)
       }
-    } catch (error) {
+    } catch {
       console.error("[v0] Failed to fetch lookups")
       toast.error(localizeText("Failed to load question types", "فشل تحميل أنواع الأسئلة", language))
     }
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchLookups(), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   const addOption = () => {
     setOptions([
@@ -262,7 +258,7 @@ const CreateQuestionPage = () => {
     ])
   }
 
-  const selectedTypeId = Number(formData.questionTypeId)
+  Number(formData.questionTypeId)
   const selectedType = types.find((t) => String(t.id) === formData.questionTypeId)
   const selectedTypeName = selectedType?.nameEn?.toLowerCase() || ""
   const isMCQSingle = selectedTypeName === "mcq single" || selectedTypeName === "mcq_single" || selectedTypeName === "multiple choice (single)"
@@ -271,7 +267,7 @@ const CreateQuestionPage = () => {
   const isSubjective = selectedTypeName === "subjective" || selectedTypeName === "essay" || selectedTypeName === "short answer"
 
   const needsOptions = isMCQSingle || isMCQMulti || isTrueFalse
-  const isTextBased = isSubjective
+
 
   const validateForm = (): string[] => {
     const errors: string[] = []
@@ -355,7 +351,7 @@ const CreateQuestionPage = () => {
                 const result = await res.json()
                 uploadedPath = result.file?.url || result.file?.path || result.filePath || null
               }
-            } catch (err) {
+            } catch {
               console.warn('Option image upload failed')
             }
           }
@@ -374,7 +370,12 @@ const CreateQuestionPage = () => {
     }
 
     try {
-      const payload: any = {
+      const payload: Parameters<typeof createQuestion>[0] & {
+        answerKey?: {
+          rubricTextEn: string | null
+          rubricTextAr: string | null
+        }
+      } = {
         bodyEn: formData.bodyEn,
         bodyAr: formData.bodyAr || formData.bodyEn, // Fallback to English if Arabic is empty
         questionTypeId: Number(formData.questionTypeId),
@@ -396,9 +397,7 @@ const CreateQuestionPage = () => {
       }
 
       const response = await createQuestion(payload)
-
-      const responseAny = response as any
-      const createdQuestionId = responseAny.id || responseAny.data?.id
+      const createdQuestionId = response.id
 
       // Upload question image if selected
       if (createdQuestionId && questionImage) {
@@ -431,7 +430,7 @@ const CreateQuestionPage = () => {
               })
             }
           }
-        } catch (imgErr) {
+        } catch {
           console.warn('Image upload failed, question was created')
           toast.warning(localizeText('Question created but image upload failed. You can add the image later.', 'تم إنشاء السؤال لكن فشل رفع الصورة. يمكنك إضافتها لاحقاً.', language))
         }
@@ -439,19 +438,6 @@ const CreateQuestionPage = () => {
 
       if (createdQuestionId) {
         // Response is the Question directly
-        toast.success(localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
-        router.replace("/question-bank")
-      } else if (responseAny.success === true) {
-        // Response is wrapped { success, message, data }
-        toast.success(responseAny.message || localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
-        router.replace("/question-bank")
-      } else if (responseAny.success === false) {
-        // Response indicates failure
-        const apiErrors =
-          responseAny.errors?.length > 0 ? responseAny.errors : [responseAny.message || "Failed to create question"]
-        setFormErrors(apiErrors)
-      } else {
-        // Unknown response format, but we got a response so assume success
         toast.success(localizeText("Question created successfully", "تم إنشاء السؤال بنجاح", language))
         router.replace("/question-bank")
       }
@@ -474,9 +460,7 @@ const CreateQuestionPage = () => {
     )
   }
 
-  const ErrorAlert = () => {
-    if (formErrors.length === 0) return null
-    return (
+  const errorAlert = formErrors.length > 0 ? (
       <Alert variant="destructive" ref={errorRef} tabIndex={-1} className="animate-in fade-in-0 slide-in-from-top-2">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>{language === "ar" ? "يرجى إصلاح الأخطاء التالية" : "Please fix the following errors"}</AlertTitle>
@@ -488,8 +472,7 @@ const CreateQuestionPage = () => {
           </ul>
         </AlertDescription>
       </Alert>
-    )
-  }
+    ) : null
 
   return (
     <div className="flex flex-col">
@@ -505,7 +488,7 @@ const CreateQuestionPage = () => {
           </Button>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <ErrorAlert />
+            {errorAlert}
 
             <Card className="border-2 shadow-sm overflow-hidden pt-0">
               <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b py-4">
@@ -750,7 +733,7 @@ const CreateQuestionPage = () => {
                     </Label>
                     <Select
                       value={formData.questionTypeId}
-                      onValueChange={(value) => setFormData({ ...formData, questionTypeId: value })}
+                      onValueChange={handleQuestionTypeChange}
                     >
                       <SelectTrigger id="type" className="border-2 h-11 w-full">
                         <SelectValue placeholder={language === "ar" ? "اختر النوع" : "Select type"} />
@@ -1142,7 +1125,7 @@ const CreateQuestionPage = () => {
               </Card>
             )}
 
-            <ErrorAlert />
+            {errorAlert}
 
             {/* Submit Actions */}
             <div className="flex items-center justify-end gap-4 pt-4 border-t">

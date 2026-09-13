@@ -20,8 +20,5 @@ export async function getLicenseStatus(): Promise<LicenseStatusResult> {
 }
 
 export async function uploadLicense(file: File): Promise<LicenseStatusResult> {
-  return apiClient.uploadFile(
-    "/License/upload",
-    file,
-  ) as Promise<LicenseStatusResult>;
+  return apiClient.uploadFile<LicenseStatusResult>("/License/upload", file);
 }

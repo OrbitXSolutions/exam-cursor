@@ -38,7 +38,7 @@ import {
 import Link from "next/link"
 
 export default function CreateFromTemplatePage() {
-  const { t, language, dir } = useI18n()
+  const { language, dir } = useI18n()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -90,7 +90,8 @@ export default function CreateFromTemplatePage() {
   // Load initial list when dropdown opens
   useEffect(() => {
     if (!dropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
+    const timer = setTimeout(() => loadExamsPage(examSearch, 1, true), 0)
+    return () => clearTimeout(timer)
   }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced reload on search change while dropdown is open
@@ -171,8 +172,9 @@ export default function CreateFromTemplatePage() {
 
       toast.success(localizeText("Exam created from template successfully!", "تم إنشاء الاختبار من القالب بنجاح!", language))
       router.push(`/exams/${result.id}/overview`)
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || localizeText("Failed to create exam from template", "فشل في إنشاء الاختبار من القالب", language)
+    } catch (error: unknown) {
+      const errorDetails = error as { response?: { data?: { message?: string } }; message?: string }
+      const msg = errorDetails.response?.data?.message || errorDetails.message || localizeText("Failed to create exam from template", "فشل في إنشاء الاختبار من القالب", language)
       setError(msg)
       toast.error(msg)
     } finally {
@@ -185,7 +187,7 @@ export default function CreateFromTemplatePage() {
   }
 
   function getExamStatus(exam: Exam): string {
-    if ((exam as any).status) return (exam as any).status
+    if (exam.status) return exam.status
     if (!exam.isActive) return "Archived"
     if (exam.isPublished) return "Published"
     return "Draft"

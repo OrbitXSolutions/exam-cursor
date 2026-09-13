@@ -30,8 +30,6 @@ import {
   Bell,
   Copy,
   ExternalLink,
-  AlertTriangle,
-  Info,
   Loader2,
   Eye,
   KeyRound,
@@ -84,7 +82,7 @@ export default function ExamPublishedPage() {
         const cached = JSON.parse(raw) as Exam
         sessionStorage.removeItem("publishedExam")
         cachedExamId = cached.id
-        setExam(cached) // show title immediately while API loads
+        queueMicrotask(() => setExam(cached)) // show title immediately while API loads
       }
     } catch {
       // ignore parse errors

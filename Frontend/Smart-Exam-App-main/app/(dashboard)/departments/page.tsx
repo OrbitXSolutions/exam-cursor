@@ -43,6 +43,10 @@ import {
   type DepartmentListItem,
 } from "@/lib/api/departments"
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback
+}
+
 function DepartmentsContent() {
   const { language } = useI18n()
 
@@ -74,10 +78,6 @@ function DepartmentsContent() {
   const [departmentToDelete, setDepartmentToDelete] = useState<DepartmentListItem | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => {
-    loadDepartments()
-  }, [currentPage, pageSize, searchQuery, showInactive])
-
   const loadDepartments = async () => {
     setLoading(true)
     try {
@@ -90,12 +90,16 @@ function DepartmentsContent() {
       setDepartments(result.items || [])
       setTotalCount(result.totalCount || 0)
       setTotalPages(result.totalPages || 0)
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل تحميل الأقسام" : "Failed to load departments")
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadDepartments)
+  }, [currentPage, pageSize, searchQuery, showInactive])
 
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value))
@@ -159,8 +163,8 @@ function DepartmentsContent() {
       }
       setDialogOpen(false)
           loadDepartments()
-    } catch (error: any) {
-      toast.error(error?.message || (language === "ar" ? "حدث خطأ" : "An error occurred"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, language === "ar" ? "حدث خطأ" : "An error occurred"))
     } finally {
       setSaving(false)
     }
@@ -176,8 +180,8 @@ function DepartmentsContent() {
       setDeleteDialogOpen(false)
       setDepartmentToDelete(null)
       loadDepartments()
-    } catch (error: any) {
-      toast.error(error?.message || (language === "ar" ? "فشل حذف القسم" : "Failed to delete department"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, language === "ar" ? "فشل حذف القسم" : "Failed to delete department"))
     } finally {
       setDeleting(false)
     }
@@ -193,8 +197,8 @@ function DepartmentsContent() {
         toast.success(language === "ar" ? "تم تفعيل القسم" : "Department activated")
       }
       loadDepartments()
-    } catch (error: any) {
-      toast.error(error?.message || (language === "ar" ? "حدث خطأ" : "An error occurred"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, language === "ar" ? "حدث خطأ" : "An error occurred"))
     }
   }
 

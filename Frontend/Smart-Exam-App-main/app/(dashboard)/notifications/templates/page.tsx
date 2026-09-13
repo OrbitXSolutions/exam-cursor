@@ -44,10 +44,6 @@ export default function NotificationTemplatesPage() {
   const [templates, setTemplates] = useState<NotificationTemplateDto[]>([])
   const [savingId, setSavingId] = useState<number | null>(null)
 
-  useEffect(() => {
-    loadTemplates()
-  }, [])
-
   async function loadTemplates() {
     try {
       const data = await getNotificationTemplates()
@@ -58,6 +54,10 @@ export default function NotificationTemplatesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadTemplates)
+  }, [])
 
   async function handleSave(template: NotificationTemplateDto) {
     setSavingId(template.eventType)

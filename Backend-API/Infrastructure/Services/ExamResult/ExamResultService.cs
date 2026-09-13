@@ -20,7 +20,6 @@ namespace Smart_Core.Infrastructure.Services.ExamResult;
 public class ExamResultService : IExamResultService
 {
     private readonly ApplicationDbContext _context;
-    private readonly ICertificateService _certificateService;
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
@@ -30,7 +29,6 @@ public class ExamResultService : IExamResultService
 
     public ExamResultService(
         ApplicationDbContext context,
-        ICertificateService certificateService,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
         UserManager<ApplicationUser> userManager,
@@ -39,7 +37,6 @@ public class ExamResultService : IExamResultService
         ResourceAuthorizationService resourceAuthorization)
     {
         _context = context;
-        _certificateService = certificateService;
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
@@ -344,12 +341,6 @@ public class ExamResultService : IExamResultService
         if (publishedRows == 0)
         {
             return ApiResponse<ResultDto>.FailureResponse("Result is already published");
-        }
-
-        // Auto-create certificate for passed results
-        if (result.IsPassed)
-        {
-            await _certificateService.CreateForResultAsync(result.Id, userId);
         }
 
         InvalidateResultCache();

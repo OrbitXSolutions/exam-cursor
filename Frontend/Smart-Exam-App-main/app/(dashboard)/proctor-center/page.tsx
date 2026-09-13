@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
-import { getLiveSessions, flagSession, sendWarning, terminateSession, getTriageRecommendations } from "@/lib/api/proctoring"
+import { getLiveSessions, sendWarning, terminateSession, getTriageRecommendations } from "@/lib/api/proctoring"
 import type { LiveSession } from "@/lib/types/proctoring"
 import type { TriageRecommendation } from "@/lib/api/proctoring"
 import { useProctorSessionRefresh } from "@/lib/hooks/useNotifications"
@@ -33,9 +33,7 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
 import {
   Video,
-  Users,
   AlertTriangle,
-  Flag,
   Search,
   MoreVertical,
   Eye,
@@ -48,13 +46,10 @@ import {
   ArrowUpDown,
   Shield,
   Brain,
-  ChevronDown,
-  ChevronUp,
   Sparkles,
   Info,
   WifiOff,
 } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export default function ProctorCenterPage() {
   const { t, dir, locale } = useI18n()
@@ -68,12 +63,12 @@ export default function ProctorCenterPage() {
   const [terminateReason, setTerminateReason] = useState("")
   const [refreshing, setRefreshing] = useState(false)
   const [sortMode, setSortMode] = useState<"default" | "risk-desc" | "risk-asc">("default")
-  const [filterMode, setFilterMode] = useState<"all" | "flagged">("all")
+  const [filterMode] = useState<"all" | "flagged">("all")
   const [triageItems, setTriageItems] = useState<TriageRecommendation[]>([])
   const [triageOpen, setTriageOpen] = useState(false)
   const [triageLoading, setTriageLoading] = useState(false)
-  const [useSampleData, setUseSampleData] = useState(false)
-  const [demoMode, setDemoMode] = useState(false)
+  const [useSampleData] = useState(false)
+  const [demoMode] = useState(false)
   const [dismissedMediaHint, setDismissedMediaHint] = useState(false)
   const searchQueryRef = useRef(searchQuery)
   const filterModeRef = useRef(filterMode)
@@ -112,7 +107,7 @@ export default function ProctorCenterPage() {
         return s
       })
       setSessions(flagged)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("Failed to load sessions", "فشل تحميل الجلسات", locale))
     } finally {
       setLoading(false)
@@ -135,16 +130,6 @@ export default function ProctorCenterPage() {
     }
   }
 
-  async function handleToggleFlag(session: LiveSession) {
-    try {
-      await flagSession(session.id, !session.flagged)
-      toast.success(session.flagged ? t("proctor.unflagged") : t("proctor.flagged"))
-      loadSessions()
-    } catch (error) {
-      toast.error(localizeText("Failed to update flag", "فشل تحديث العلامة", locale))
-    }
-  }
-
   async function handleSendWarning() {
     if (!selectedSession || !warningMessage.trim()) return
     try {
@@ -153,7 +138,7 @@ export default function ProctorCenterPage() {
       setWarningDialogOpen(false)
       setWarningMessage("")
       setSelectedSession(null)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("Failed to send warning", "فشل إرسال التحذير", locale))
     }
   }
@@ -167,7 +152,7 @@ export default function ProctorCenterPage() {
       setTerminateReason("")
       setSelectedSession(null)
       loadSessions()
-    } catch (error) {
+    } catch {
       toast.error(localizeText("Failed to terminate session", "فشل إنهاء الجلسة", locale))
     }
   }
@@ -191,8 +176,6 @@ export default function ProctorCenterPage() {
   })()
 
   const activeSessions = sessions.filter((s) => s.status === "Active")
-  const flaggedSessions = sessions.filter((s) => s.flagged)
-  const totalIncidents = sessions.reduce((acc, s) => acc + s.incidentCount, 0)
 
   if (loading) {
     return (
@@ -561,7 +544,7 @@ export default function ProctorCenterPage() {
           <DialogHeader>
             <DialogTitle>{t("proctor.sendWarningTitle")}</DialogTitle>
             <DialogDescription>
-              {t("proctor.sendWarningDesc", { name: selectedSession?.candidateName })}
+              {t("proctor.sendWarningDesc", { name: selectedSession?.candidateName ?? "" })}
             </DialogDescription>
           </DialogHeader>
           <Textarea
@@ -591,7 +574,7 @@ export default function ProctorCenterPage() {
               {t("proctor.terminateSessionTitle")}
             </DialogTitle>
             <DialogDescription>
-              {t("proctor.terminateSessionDesc", { name: selectedSession?.candidateName })}
+              {t("proctor.terminateSessionDesc", { name: selectedSession?.candidateName ?? "" })}
             </DialogDescription>
           </DialogHeader>
           <Textarea

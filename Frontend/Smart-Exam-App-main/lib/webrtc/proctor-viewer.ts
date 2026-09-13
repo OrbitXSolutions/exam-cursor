@@ -96,7 +96,7 @@ export class ProctorViewer {
                 );
                 this.signaling
                   .requestRenegotiation()
-                  .catch((e) =>
+                  .catch(() =>
                     console.warn(
                       "[WebRTC Viewer] renegotiation request failed:",
                     ),
@@ -105,7 +105,7 @@ export class ProctorViewer {
             }, 500);
           }
         },
-        onPeerLeft: (event) => {
+        onPeerLeft: () => {
           console.log("[WebRTC Viewer] Candidate left");
           this.candidateConnectionId = null;
           this.setStatus("offline");
@@ -127,7 +127,7 @@ export class ProctorViewer {
               // Queue candidates until remote description is set
               this.pendingIceCandidates.push(event.candidate);
             }
-          } catch (error) {
+          } catch {
             console.error("[WebRTC Viewer] Error adding ICE candidate");
           }
         },
@@ -149,7 +149,7 @@ export class ProctorViewer {
           // Request candidate to resend offer
           try {
             await this.signaling?.requestRenegotiation();
-          } catch (e) {
+          } catch {
             console.error("[WebRTC Viewer] Renegotiation request failed");
           }
         },
@@ -194,7 +194,7 @@ export class ProctorViewer {
         `%c[WebRTC Viewer] \u2705 SignalR connected, waiting for candidate offer in room attempt_${this.attemptId}...`,
         "color: #4caf50; font-weight: bold",
       );
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Viewer] Connect failed");
       this.setStatus("offline");
       if (!this.disposed) {
@@ -229,7 +229,7 @@ export class ProctorViewer {
             JSON.stringify(event.candidate.toJSON()),
             this.candidateConnectionId ?? undefined,
           )
-          .catch((e) => console.error("[WebRTC Viewer] Error sending ICE"));
+          .catch(() => console.error("[WebRTC Viewer] Error sending ICE"));
       }
     };
 
@@ -307,7 +307,7 @@ export class ProctorViewer {
         try {
           const candidate = JSON.parse(candidateStr);
           await this.pc!.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (e) {
+        } catch {
           console.error(
             "[WebRTC Viewer] Error adding queued ICE candidate:",
           );
@@ -329,7 +329,7 @@ export class ProctorViewer {
         `%c[WebRTC Viewer] \u2705 Answer sent successfully to ${fromConnectionId}`,
         "color: #4caf50; font-weight: bold",
       );
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Viewer] Error handling offer");
     }
   }
@@ -339,7 +339,7 @@ export class ProctorViewer {
     try {
       console.log("[WebRTC Viewer] Requesting renegotiation...");
       await this.signaling.requestRenegotiation();
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Viewer] Renegotiation request failed");
     }
   }
@@ -367,7 +367,7 @@ export class ProctorViewer {
     try {
       await this.signaling?.disconnect();
       await this.connect();
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Viewer] Reconnect failed");
       this.attemptReconnect();
     }

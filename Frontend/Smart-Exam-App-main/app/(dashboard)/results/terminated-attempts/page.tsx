@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { getExams } from "@/lib/api/exams"
@@ -8,7 +8,7 @@ import type { Exam } from "@/lib/types"
 import { getCandidateResultList, type CandidateResultListItem } from "@/lib/api/results"
 import { allowNewAttempt } from "@/lib/api/exam-operations"
 import { apiClient } from "@/lib/api-client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -72,7 +72,7 @@ function formatDateTime(dateStr: string | undefined | null, lang: string): strin
 }
 
 export default function TerminatedAttemptsPage() {
-  const { t, language } = useI18n()
+  const { language } = useI18n()
   const isAr = language === "ar"
 
   // ── State ──
@@ -133,7 +133,7 @@ export default function TerminatedAttemptsPage() {
   // Load list when dropdown opens
   useEffect(() => {
     if (!dropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
+    void Promise.resolve().then(() => loadExamsPage(examSearch, 1, true))
   }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced reload on search change
@@ -157,16 +157,19 @@ export default function TerminatedAttemptsPage() {
   // Load candidates (server-side filtered: onlyTerminated=true)
   useEffect(() => {
     let cancelled = false
-    setLoadingData(true)
     const examIdParam = selectedExamId !== ALL_EXAMS_VALUE ? Number(selectedExamId) : undefined
 
-    getCandidateResultList(examIdParam, {
-      pageNumber: currentPage,
-      pageSize,
-      onlyTerminated: true,
-      statusFilter: terminationStatus !== STATUS_ALL ? terminationStatus : undefined,
-      search: debouncedSearch.trim() || undefined,
-    })
+    Promise.resolve()
+      .then(() => {
+        setLoadingData(true)
+        return getCandidateResultList(examIdParam, {
+          pageNumber: currentPage,
+          pageSize,
+          onlyTerminated: true,
+          statusFilter: terminationStatus !== STATUS_ALL ? terminationStatus : undefined,
+          search: debouncedSearch.trim() || undefined,
+        })
+      })
       .then((res) => {
         if (!cancelled) {
           setAllCandidates(res?.items ?? [])

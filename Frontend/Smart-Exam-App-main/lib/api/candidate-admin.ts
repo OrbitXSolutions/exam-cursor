@@ -183,9 +183,10 @@ export async function exportCandidates(params?: {
     } catch {
       // ignore parse errors; keep generic message
     }
-    const err = new Error(errorMessage) as any;
-    err.statusCode = res.status;
-    err.details = errorDetails;
+    const err = Object.assign(new Error(errorMessage), {
+      statusCode: res.status,
+      details: errorDetails,
+    });
     throw err;
   }
 

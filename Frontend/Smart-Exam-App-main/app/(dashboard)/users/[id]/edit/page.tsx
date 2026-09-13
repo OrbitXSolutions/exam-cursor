@@ -30,10 +30,6 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     isActive: true,
   })
 
-  useEffect(() => {
-    loadUser()
-  }, [id])
-
   async function loadUser() {
     try {
       const user = await getUserById(id)
@@ -50,6 +46,10 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadUser)
+  }, [id])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

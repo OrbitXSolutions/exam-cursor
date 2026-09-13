@@ -40,7 +40,7 @@ import {
 } from "@/lib/api/lookups"
 
 function QuestionCategoriesContent() {
-  const { t, language } = useI18n()
+  const { language } = useI18n()
 
   const [categories, setCategories] = useState<QuestionCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,21 +58,21 @@ function QuestionCategoriesContent() {
   const [categoryToDelete, setCategoryToDelete] = useState<QuestionCategory | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => {
-    loadCategories()
-  }, [])
-
   const loadCategories = async () => {
     setLoading(true)
     try {
       const result = await getQuestionCategories({ pageSize: 100 })
       setCategories(result.items || [])
-    } catch (error) {
+    } catch {
       toast.error(localizeText("Failed to load categories", "فشل تحميل الفئات", language))
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadCategories)
+  }, [])
 
   const handleCreate = () => {
     setDialogMode("create")
@@ -97,24 +97,16 @@ function QuestionCategoriesContent() {
     setSaving(true)
     try {
       if (dialogMode === "create") {
-        const result = await createQuestionCategory(formData)
-        if (result.success) {
-          toast.success(result.message || "Category created successfully")
-          await loadCategories()
-        } else {
-          toast.error(result.message || "Failed to create category")
-        }
+        await createQuestionCategory(formData)
+        toast.success("Category created successfully")
+        await loadCategories()
       } else if (editingCategory) {
-        const result = await updateQuestionCategory(editingCategory.id, formData)
-        if (result.success) {
-          toast.success(result.message || "Category updated successfully")
-          await loadCategories()
-        } else {
-          toast.error(result.message || "Failed to update category")
-        }
+        await updateQuestionCategory(editingCategory.id, formData)
+        toast.success("Category updated successfully")
+        await loadCategories()
       }
       setDialogOpen(false)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setSaving(false)
@@ -126,16 +118,12 @@ function QuestionCategoriesContent() {
 
     setDeleting(true)
     try {
-      const result = await deleteQuestionCategory(categoryToDelete.id)
-      if (result.success) {
-        toast.success(result.message || "Category deleted successfully")
-        await loadCategories()
-      } else {
-        toast.error(result.message || result.errors?.[0] || "Failed to delete category")
-      }
+      await deleteQuestionCategory(categoryToDelete.id)
+      toast.success("Category deleted successfully")
+      await loadCategories()
       setDeleteDialogOpen(false)
       setCategoryToDelete(null)
-    } catch (error) {
+    } catch {
       toast.error(localizeText("An error occurred", "حدث خطأ", language))
     } finally {
       setDeleting(false)

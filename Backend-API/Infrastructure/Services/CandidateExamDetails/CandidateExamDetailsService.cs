@@ -331,13 +331,6 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
                 .Select(g => (int?)g.Id)
                 .FirstOrDefaultAsync();
             resultInfo.GradingSessionId = gradingSessionId;
-
-            // Check for certificate
-            var certId = await _db.Certificates
-                .Where(c => c.AttemptId == attempt.Id && !c.IsDeleted)
-                .Select(c => (int?)c.Id)
-                .FirstOrDefaultAsync();
-            resultInfo.CertificateId = certId;
         }
 
         dto.ResultInfo = resultInfo;

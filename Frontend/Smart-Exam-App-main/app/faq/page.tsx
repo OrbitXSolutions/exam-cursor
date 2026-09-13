@@ -102,11 +102,6 @@ const faqCategories = [
         answer:
           "SmartExam provides comprehensive analytics including score distributions, question-level analysis (difficulty, discrimination index), time analysis, comparison reports, and exportable data for external analysis. Custom reports can be configured.",
       },
-      {
-        question: "Can certificates be generated automatically?",
-        answer:
-          "Yes! You can design custom certificate templates and configure automatic generation when candidates meet passing criteria. Certificates include verification QR codes and can be downloaded or emailed directly.",
-      },
     ],
   },
   {
@@ -202,7 +197,7 @@ export default function FAQPage() {
             </span>
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mb-8">
-            Find answers to common questions about SmartExam. Can't find what you're looking for? Contact our team.
+            {"Find answers to common questions about SmartExam. Can't find what you're looking for? Contact our team."}
           </p>
 
           {/* Search */}

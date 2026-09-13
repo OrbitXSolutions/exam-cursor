@@ -18,7 +18,8 @@ export function useNotifications() {
     const request = ++countRequestRef.current;
     try {
       const { count } = await getUnreadCount();
-      if (mountedRef.current && request === countRequestRef.current) setUnreadCount(count);
+      if (mountedRef.current && request === countRequestRef.current)
+        setUnreadCount(count);
     } catch {
       // silently ignore — bell badge is non-critical
     }
@@ -26,26 +27,39 @@ export function useNotifications() {
 
   useEffect(() => {
     mountedRef.current = true;
+    let active = true;
 
     // Fetch initial unread count
-    refreshCount();
+    queueMicrotask(() => {
+      if (active) void refreshCount();
+    });
 
     // Connect SignalR for real-time push
     const hub = new NotificationHubClient();
     hubRef.current = hub;
 
     // REST is authoritative: replayed pushes and events missed offline must not skew the badge.
-    void hub.connect(() => { void refreshCount(); }, () => { void refreshCount(); });
-    const poll = setInterval(() => { void refreshCount(); }, 30000);
+    void hub.connect(
+      () => {
+        void refreshCount();
+      },
+      () => {
+        void refreshCount();
+      },
+    );
+    const poll = setInterval(() => {
+      void refreshCount();
+    }, 30000);
 
     return () => {
+      active = false;
       mountedRef.current = false;
       countRequestRef.current++;
       clearInterval(poll);
       void hub.disconnect();
       hubRef.current = null;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [refreshCount]);
 
   return { unreadCount, setUnreadCount, refreshCount };
 }
@@ -60,21 +74,27 @@ export function useNotifications() {
 export function useProctorSessionRefresh(onSessionChange: () => void) {
   const hubRef = useRef<NotificationHubClient | null>(null);
   const callbackRef = useRef(onSessionChange);
-  callbackRef.current = onSessionChange; // always latest without re-subscribing
+
+  useEffect(() => {
+    callbackRef.current = onSessionChange;
+  }, [onSessionChange]);
 
   useEffect(() => {
     const hub = new NotificationHubClient();
     hubRef.current = hub;
 
-    void hub.connect((notification: UserNotificationDto) => {
-      if (EXAM_SESSION_TYPES.has(notification.type)) {
-        callbackRef.current();
-      }
-    }, () => callbackRef.current());
+    void hub.connect(
+      (notification: UserNotificationDto) => {
+        if (EXAM_SESSION_TYPES.has(notification.type)) {
+          callbackRef.current();
+        }
+      },
+      () => callbackRef.current(),
+    );
 
     return () => {
       void hub.disconnect();
       hubRef.current = null;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 }

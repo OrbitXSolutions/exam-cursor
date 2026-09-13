@@ -5,7 +5,6 @@ import { useI18n } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { getLicenseStatus, uploadLicense, type LicenseStatusResult } from "@/lib/api/license"
 import { UserRole } from "@/lib/types"
@@ -30,7 +29,7 @@ import {
 import { PageHeader } from "@/components/layout/page-header"
 
 export default function LicensePage() {
-  const { t, language } = useI18n()
+  const { language } = useI18n()
   const { hasRole } = useAuth()
   const [status, setStatus] = useState<LicenseStatusResult | null>(null)
   const [loading, setLoading] = useState(true)
@@ -280,7 +279,6 @@ export default function LicensePage() {
       <div className="flex-1 space-y-6 p-6">
         <PageHeader
           title={language === "ar" ? "إدارة الرخصة" : "License Management"}
-          description={language === "ar" ? "عرض حالة الرخصة وتحديثها" : "View and manage your system license"}
         />
 
         <div className="grid gap-6 md:grid-cols-2">

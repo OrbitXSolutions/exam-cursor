@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { FileText, Settings, Play, BarChart3, Award, ArrowRight, Check } from "lucide-react"
+import { FileText, Settings, Play, BarChart3, ArrowRight, Check } from "lucide-react"
 
 const steps = [
   {
@@ -35,14 +35,6 @@ const steps = [
     features: ["Instant grading and real-time results", "Export results for offline analysis", "Detailed analytics"],
     link: "Analyzing results",
     color: "amber",
-  },
-  {
-    icon: Award,
-    title: "Certification",
-    description: "Award achievements",
-    features: ["Automatic certification when test takers finish", "Set a required passmark to receive certificates"],
-    link: "Custom certificates",
-    color: "rose",
   },
 ]
 
@@ -142,7 +134,7 @@ export function HowItWorksSection() {
             <span className="text-slate-900">Works</span>
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            From creation to certification, manage the entire exam lifecycle in five simple steps.
+            Manage the entire exam lifecycle in four simple steps.
           </p>
         </div>
 

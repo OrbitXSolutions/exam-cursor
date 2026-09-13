@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -40,8 +39,7 @@ import {
 type Step = "check" | "capture" | "review" | "submitted"
 
 export default function VerifyIdentityPage() {
-  const { user } = useAuth()
-  const { t, language, isRTL, dir } = useI18n()
+  const { t, language, dir } = useI18n()
   const router = useRouter()
 
   const [step, setStep] = useState<Step>("check")

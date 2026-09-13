@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
-import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType, ExpiryReason } from "@/lib/api/candidate"
+import { getAvailableExams, type CandidateExam, AttemptStatus, ExamType } from "@/lib/api/candidate"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -29,14 +29,15 @@ import {
   ShieldPlus,
 } from "lucide-react"
 
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 export type CandidateExamFilter =
@@ -58,10 +59,6 @@ export default function MyExamsPage() {
   const [filter, setFilter] = useState<CandidateExamFilter>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
-  useEffect(() => {
-    loadExams()
-  }, [])
-
   async function loadExams() {
     try {
       setLoading(true)
@@ -75,6 +72,10 @@ export default function MyExamsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadExams)
+  }, [])
 
   const now = new Date()
 

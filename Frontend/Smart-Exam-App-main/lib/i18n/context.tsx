@@ -20,11 +20,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE)
 
   useEffect(() => {
+    let active = true
     const saved = localStorage.getItem("language") as Language
     if (saved && (saved === "en" || saved === "ar")) {
-      setLanguageState(saved)
+      queueMicrotask(() => {
+        if (active) setLanguageState(saved)
+      })
     } else {
       localStorage.setItem("language", DEFAULT_LANGUAGE)
+    }
+
+    return () => {
+      active = false
     }
   }, [])
 
@@ -81,16 +88,17 @@ export function useI18n() {
 }
 
 // Helper to get localized field value
-export function getLocalizedField<T extends Record<string, unknown>>(
+export function getLocalizedField<T extends object>(
   obj: T,
   fieldName: string,
   language: Language,
 ): string {
-  const enKey = `${fieldName}En` as keyof T
-  const arKey = `${fieldName}Ar` as keyof T
+  const record = obj as Record<string, unknown>
+  const enKey = `${fieldName}En`
+  const arKey = `${fieldName}Ar`
 
-  if (language === "ar" && obj[arKey]) {
-    return String(obj[arKey])
+  if (language === "ar" && record[arKey]) {
+    return String(record[arKey])
   }
-  return String(obj[enKey] || "")
+  return String(record[enKey] || "")
 }

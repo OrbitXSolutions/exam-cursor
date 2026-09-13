@@ -16,7 +16,6 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
 import {
   generateQuestionsWithAi,
   createQuestion,
@@ -39,16 +38,12 @@ import {
   Trash2,
   Edit,
   CheckCircle2,
-  AlertCircle,
   Loader2,
   Wand2,
   Eye,
   ChevronRight,
-  ChevronLeft,
   Check,
   X,
-  Brain,
-  Zap,
 } from "lucide-react"
 import { SearchableSelectInput } from "@/components/ui/searchable-select-input"
 
@@ -72,7 +67,7 @@ interface EditableQuestion extends AiGeneratedQuestion {
 }
 
 export default function AiStudioPage() {
-  const router = useRouter()
+  useRouter()
   const { t, language } = useI18n()
 
   // Step state
@@ -101,11 +96,7 @@ export default function AiStudioPage() {
 
   // Saving
   const [isSavingAll, setIsSavingAll] = useState(false)
-  const [savedCount, setSavedCount] = useState(0)
-
-  useEffect(() => {
-    fetchLookups()
-  }, [])
+  const [, setSavedCount] = useState(0)
 
   const fetchLookups = async () => {
     try {
@@ -113,13 +104,18 @@ export default function AiStudioPage() {
       const allTypes = typesRes?.items || []
       // Filter to only supported types (MCQ Single, MCQ Multi, True/False)
       setTypes(allTypes.filter((t: QuestionType) => SUPPORTED_TYPES.includes(t.id)))
-    } catch (err) {
+    } catch {
       console.error("Failed to load lookups")
       toast.error(localizeText("Failed to load form data", "فشل تحميل بيانات النموذج", language))
     } finally {
       setIsLoadingLookups(false)
     }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchLookups(), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleGenerate = async () => {
     // Validate
@@ -152,9 +148,9 @@ export default function AiStudioPage() {
       })
       setCurrentStep("review")
       toast.success(localizeText(`Generated ${editableQuestions.length} questions successfully!`, `تم توليد ${editableQuestions.length} سؤال بنجاح!`, language))
-    } catch (err: any) {
+    } catch (error: unknown) {
       console.error("Generation failed")
-      toast.error(err?.message || localizeText("Failed to generate questions. Please try again.", "فشل توليد الأسئلة. يرجى المحاولة مرة أخرى.", language))
+      toast.error(error instanceof Error ? error.message : localizeText("Failed to generate questions. Please try again.", "فشل توليد الأسئلة. يرجى المحاولة مرة أخرى.", language))
     } finally {
       setIsGenerating(false)
     }
@@ -269,10 +265,11 @@ export default function AiStudioPage() {
         updateQuestion(question._id, { _saved: true, _saving: false })
         saved++
         setSavedCount((prev) => prev + 1)
-      } catch (err: any) {
+      } catch (error: unknown) {
         console.error(`Failed to save question: ${question._id}`)
         updateQuestion(question._id, { _saving: false })
-        toast.error(localizeText(`Failed to save a question: ${err?.message || "Unknown error"}`, `فشل حفظ سؤال: ${err?.message || "Unknown error"}`, language))
+        const message = error instanceof Error ? error.message : "Unknown error"
+        toast.error(localizeText(`Failed to save a question: ${message}`, `فشل حفظ سؤال: ${message}`, language))
       }
     }
 
@@ -393,7 +390,7 @@ export default function AiStudioPage() {
                   <span className="text-destructive">*</span>
                 </Label>
                 <SearchableSelectInput
-                  value={formData.topicId}
+                  value={formData.topicId ?? null}
                   onChange={(val) =>
                     setFormData((prev) => ({ ...prev, topicId: Number(val) }))
                   }

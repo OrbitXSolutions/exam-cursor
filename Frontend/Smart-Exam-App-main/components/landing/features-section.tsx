@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { FileQuestion, Users, BarChart3, Shield, Globe, Clock, Award, Zap } from "lucide-react"
+import { FileQuestion, Users, BarChart3, Shield, Globe, Clock, Zap } from "lucide-react"
 
 const features = [
   {
@@ -33,11 +33,6 @@ const features = [
     icon: Clock,
     title: "Flexible Scheduling",
     description: "Schedule exams with custom time windows, late entry options, and timezone support.",
-  },
-  {
-    icon: Award,
-    title: "Auto Certification",
-    description: "Generate certificates automatically when candidates meet passing criteria.",
   },
   {
     icon: Zap,

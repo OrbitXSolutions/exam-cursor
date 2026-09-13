@@ -53,16 +53,6 @@ import {
   type ExamOperationsCandidateDto,
 } from "@/lib/api/exam-operations"
 
-function getLocalizedField<T extends Record<string, unknown>>(
-  obj: T,
-  fieldBase: string,
-  language: string
-): string {
-  const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
-  const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
-}
-
 export default function ExamOperationsPage() {
   const { t, language } = useI18n()
 
@@ -113,7 +103,7 @@ export default function ExamOperationsPage() {
       })
       setCandidates(result.items)
       setTotalCount(result.totalCount)
-    } catch (error) {
+    } catch {
       toast.error("Failed to load candidates")
       console.error("Exam operation failed")
     } finally {
@@ -122,7 +112,11 @@ export default function ExamOperationsPage() {
   }, [selectedExamId, search, page])
 
   useEffect(() => {
-    loadCandidates()
+    const timeoutId = window.setTimeout(() => {
+      void loadCandidates()
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
   }, [loadCandidates])
 
   // ── Actions ──────────────────────────────────────────

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { getGradingSessionByAttempt, initiateGrading, type GradingSessionDetail, type GradedAnswerItem } from "@/lib/api/grading"
 import { getAttemptIdForCandidate } from "@/lib/api/results"
@@ -19,9 +18,7 @@ import {
   User,
   FileText,
   Award,
-  Clock,
   Target,
-  HelpCircle,
   MessageSquare,
 } from "lucide-react"
 
@@ -66,7 +63,7 @@ export default function ScoreCardPage() {
           return
         }
         setSession(data)
-      } catch (err) {
+      } catch {
         console.error("Failed to load score card")
         setError(language === "ar" ? "فشل في تحميل كشف الدرجات" : "Failed to load score card")
       } finally {

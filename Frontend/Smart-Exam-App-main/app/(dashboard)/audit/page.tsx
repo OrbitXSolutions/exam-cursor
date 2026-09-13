@@ -68,7 +68,7 @@ export default function AuditLogPage() {
   }, [page, pageSize, search, actionFilter, entityFilter, outcomeFilter, dateFrom, dateTo])
 
   useEffect(() => {
-    loadLogs()
+    void Promise.resolve().then(loadLogs)
   }, [loadLogs])
 
   // Auto-refresh every 30 seconds

@@ -68,7 +68,7 @@ const ALERT_EVENT_TYPES = new Set([
   "HeadTurnDetected",
 ])
 
-const LIFECYCLE_EVENT_TYPES = new Set([
+new Set([
   "Started",
   "Submitted",
   "TimedOut",
@@ -232,16 +232,7 @@ function formatTime(dateStr: string, language: string): string {
   })
 }
 
-function formatDateTime(dateStr: string, language: string): string {
-  return new Date(dateStr).toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
-    timeZone: "Asia/Dubai",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  })
-}
+
 
 // Parse metadata and return rendered description
 function getEventDescription(
@@ -299,7 +290,7 @@ function getEventDescription(
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function AttemptEventLog({ events, className, maxHeight = "600px" }: AttemptEventLogProps) {
-  const { language, dir } = useI18n()
+  const { language } = useI18n()
   const [showAlertsOnly, setShowAlertsOnly] = useState(false)
 
   const alertCount = useMemo(() => events.filter((e) => ALERT_EVENT_TYPES.has(e.eventTypeName)).length, [events])

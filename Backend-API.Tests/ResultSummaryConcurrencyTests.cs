@@ -200,7 +200,8 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
 
         var emptyCandidate = new ApplicationUser
         {
-            Id = Guid.NewGuid().ToString("N"), DepartmentId = (await db.Exams.SingleAsync()).DepartmentId
+            Id = Guid.NewGuid().ToString("N"),
+            DepartmentId = (await db.Exams.SingleAsync()).DepartmentId
         };
         db.Users.Add(emptyCandidate);
         await db.SaveChangesAsync();
@@ -294,7 +295,7 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
             Options.Create(new IdentityOptions()), new PasswordHasher<ApplicationUser>(), [], [],
             new UpperInvariantLookupNormalizer(), new IdentityErrorDescriber(), null!,
             NullLogger<UserManager<ApplicationUser>>.Instance);
-        return new ExamResultService(db, null!, null!, currentUser, manager, null!,
+        return new ExamResultService(db, null!, currentUser, manager, null!,
             new CacheService(), new ResourceAuthorizationService(db, manager, currentUser));
     }
 
@@ -304,23 +305,38 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
         var department = new Department { NameEn = "Results", NameAr = "Results" };
         var candidate = new ApplicationUser
         {
-            Id = Guid.NewGuid().ToString("N"), Department = department, UserName = "summary-candidate"
+            Id = Guid.NewGuid().ToString("N"),
+            Department = department,
+            UserName = "summary-candidate"
         };
         var exam = new Exam
         {
-            Department = department, TitleEn = "Results", TitleAr = "Results",
-            MaxAttempts = 5, DurationMinutes = 60, PassScore = 50
+            Department = department,
+            TitleEn = "Results",
+            TitleAr = "Results",
+            MaxAttempts = 5,
+            DurationMinutes = 60,
+            PassScore = 50
         };
         var finalizedAt = new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.FromHours(4));
         var results = new[] { 80m, 80m, 20m, 100m }.Select((score, index) => new Result
         {
-            Candidate = candidate, Exam = exam, TotalScore = score, MaxPossibleScore = 100,
-            PassScore = 50, IsPassed = score >= 50, FinalizedAt = finalizedAt.AddMinutes(index),
-            IsPublishedToCandidate = false, IsDeleted = index == 3,
+            Candidate = candidate,
+            Exam = exam,
+            TotalScore = score,
+            MaxPossibleScore = 100,
+            PassScore = 50,
+            IsPassed = score >= 50,
+            FinalizedAt = finalizedAt.AddMinutes(index),
+            IsPublishedToCandidate = false,
+            IsDeleted = index == 3,
             Attempt = new AttemptEntity
             {
-                Candidate = candidate, Exam = exam, AttemptNumber = index + 1,
-                Status = AttemptStatus.Submitted, StartedAt = finalizedAt.AddHours(-index - 1)
+                Candidate = candidate,
+                Exam = exam,
+                AttemptNumber = index + 1,
+                Status = AttemptStatus.Submitted,
+                StartedAt = finalizedAt.AddHours(-index - 1)
             }
         }).ToArray();
         db.Results.AddRange(results);

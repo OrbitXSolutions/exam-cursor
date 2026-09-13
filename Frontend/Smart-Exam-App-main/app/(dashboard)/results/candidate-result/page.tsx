@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -38,10 +38,8 @@ import {
   BarChart3,
   BookOpen,
   Eye,
-  Award,
   FileText,
   Video,
-  Monitor,
   Search,
   RefreshCw,
   MoreHorizontal,
@@ -61,9 +59,9 @@ const RESULT_STATUS_PASSED = "passed"
 const RESULT_STATUS_FAILED = "failed"
 const RESULT_STATUS_UNDER_REVIEW = "under_review"
 const RESULT_STATUS_NOT_PUBLISHED = "not_published"
-const GRADING_STATUS_PENDING = 1
+
 const GRADING_STATUS_AUTO_GRADED = 2
-const GRADING_STATUS_MANUAL_REQUIRED = 3
+
 const GRADING_STATUS_COMPLETED = 4
 
 type EnrichedCandidate = CandidateResultListItem
@@ -164,7 +162,7 @@ export default function CandidateResultPage() {
   // Load list when dropdown opens
   useEffect(() => {
     if (!dropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
+    void Promise.resolve().then(() => loadExamsPage(examSearch, 1, true))
   }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced reload on search change
@@ -187,12 +185,12 @@ export default function CandidateResultPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoadingCandidates(true)
-    
+
     const examIdParam = selectedExamId && selectedExamId !== ALL_EXAMS_VALUE ? Number(selectedExamId) : undefined
 
     const fetchData = async () => {
       try {
+        setLoadingCandidates(true)
         const res = await getCandidateResultList(examIdParam, { pageNumber: currentPage, pageSize, excludeTerminated: true, search: debouncedSearch.trim() || undefined, resultStatus: resultStatus !== RESULT_STATUS_ALL ? resultStatus : undefined })
         if (cancelled) return
 
@@ -204,7 +202,7 @@ export default function CandidateResultPage() {
           retryRef.current = true
           setTimeout(() => setRefreshKey((k) => k + 1), 2000)
         }
-      } catch (err) {
+      } catch {
         console.error("[CandidateResult] Failed to load candidates")
         if (!cancelled) setCandidates([])
       } finally {
@@ -269,7 +267,7 @@ export default function CandidateResultPage() {
       await apiClient.post(`/ExamResult/${resultId}/publish`)
       toast.success(language === "ar" ? "تم نشر النتيجة" : "Result published successfully")
       loadCandidates()
-    } catch (err) {
+    } catch {
       console.error("Failed to publish")
       toast.error(language === "ar" ? "فشل في نشر النتيجة" : "Failed to publish result")
     } finally {
@@ -300,13 +298,6 @@ export default function CandidateResultPage() {
       row.gradingStatusCode === GRADING_STATUS_AUTO_GRADED ||
       row.gradingStatusCode === GRADING_STATUS_COMPLETED
     return gradingCompleted && !row.isPublished
-  }
-
-  const canGenerateCertificate = (row: EnrichedCandidate) => {
-    const gradingCompleted =
-      row.gradingStatusCode === GRADING_STATUS_AUTO_GRADED ||
-      row.gradingStatusCode === GRADING_STATUS_COMPLETED
-    return gradingCompleted && row.isPassed === true
   }
 
   const canExport = (row: EnrichedCandidate) => {
@@ -341,7 +332,7 @@ export default function CandidateResultPage() {
       } else {
         await exportCandidateReportPdf(session)
       }
-    } catch (err) {
+    } catch {
       console.error(`[Export ${format}] Failed`)
       toast.error(language === "ar" ? "فشل تصدير التقرير" : "Failed to export report")
     } finally {
@@ -535,8 +526,8 @@ export default function CandidateResultPage() {
                     const effectiveExamId = selectedExamId !== ALL_EXAMS_VALUE ? selectedExamId : String(row.examId ?? "")
                     const examTitle = row.examId != null
                       ? (language === "ar" ? row.examTitleAr : row.examTitleEn) ?? ""
-                      : exams.find((e) => String(e.id) === selectedExamId)
-                        ? (language === "ar" ? exams.find((e) => String(e.id) === selectedExamId)?.titleAr : exams.find((e) => String(e.id) === selectedExamId)?.titleEn) ?? ""
+                      : examItems.find((exam) => String(exam.id) === selectedExamId)
+                        ? (language === "ar" ? examItems.find((exam) => String(exam.id) === selectedExamId)?.titleAr : examItems.find((exam) => String(exam.id) === selectedExamId)?.titleEn) ?? ""
                         : ""
                     const publishKey = `${row.candidateId}-${row.examId}`
                     const isPublishing = publishingIds.has(publishKey)

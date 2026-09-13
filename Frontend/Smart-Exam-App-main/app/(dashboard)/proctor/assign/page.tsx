@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useEffectEvent, useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,9 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select"
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -40,7 +37,8 @@ export default function AssignToProctorPage() {
   const [examTotalPages, setExamTotalPages] = useState(0)
   const [examSearchLoading, setExamSearchLoading] = useState(false)
   const [selectedExamObj, setSelectedExamObj] = useState<{id: number; titleEn: string; titleAr: string} | null>(null)
-  const [selectedExamId, setSelectedExamId] = useState<string>("")
+  const initialExamId = searchParams.get("examId") ?? ""
+  const [selectedExamId, setSelectedExamId] = useState<string>(initialExamId)
   const [pageData, setPageData] = useState<ExamProctorPageDto | null>(null)
   const [loading, setLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
@@ -92,28 +90,43 @@ export default function AssignToProctorPage() {
     }
   }
 
+  async function loadPage(examId: number) {
+    setLoading(true)
+    setAssignSelected(new Set())
+    setRemoveSelected(new Set())
+    try {
+      const data = await getExamProctors(examId)
+      setPageData(data)
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message
+        ? error.message
+        : (isAr ? "فشل التحميل" : "Failed to load"))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadInitialExam = useEffectEvent((examId: number) => {
+    void loadPage(examId)
+    void loadExamsPage("", 1, true)
+  })
+
   // Auto-select from ?examId URL param on mount
   useEffect(() => {
-    const paramId = searchParams.get("examId")
-    if (paramId) {
-      setSelectedExamId(paramId)
-      loadPage(Number(paramId))
-      loadExamsPage("", 1, true)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // When examItems loads and a selectedExamId is set (from URL param), resolve the label
-  useEffect(() => {
-    if (selectedExamId && !selectedExamObj && examItems.length > 0) {
-      const found = examItems.find(e => String(e.id) === selectedExamId)
-      if (found) setSelectedExamObj(found)
-    }
-  }, [examItems, selectedExamId]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!initialExamId) return
+    const timer = setTimeout(() => {
+      loadInitialExam(Number(initialExamId))
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [initialExamId])
 
   // Load first page when dropdown opens
   useEffect(() => {
     if (!examDropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
+    const timer = setTimeout(() => {
+      void loadExamsPage(examSearch, 1, true)
+    }, 0)
+    return () => clearTimeout(timer)
   }, [examDropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced reload on search change while dropdown is open
@@ -124,21 +137,6 @@ export default function AssignToProctorPage() {
     }, 300)
     return () => clearTimeout(timer)
   }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Load proctor page data when exam changes ───────────────
-  const loadPage = useCallback(async (examId: number) => {
-    setLoading(true)
-    setAssignSelected(new Set())
-    setRemoveSelected(new Set())
-    try {
-      const data = await getExamProctors(examId)
-      setPageData(data)
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل التحميل" : "Failed to load"))
-    } finally {
-      setLoading(false)
-    }
-  }, [isAr])
 
   const handleExamChange = (value: string, obj?: {id: number; titleEn: string; titleAr: string}) => {
     setSelectedExamId(value)
@@ -170,8 +168,10 @@ export default function AssignToProctorPage() {
       }
       setConfirmOpen(false)
       loadPage(Number(selectedExamId))
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت العملية" : "Operation failed"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message
+        ? error.message
+        : (isAr ? "فشلت العملية" : "Operation failed"))
     } finally {
       setActionLoading(false)
     }
@@ -181,7 +181,11 @@ export default function AssignToProctorPage() {
   const toggleAssign = (id: string) => {
     setAssignSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
       return next
     })
   }
@@ -189,7 +193,11 @@ export default function AssignToProctorPage() {
   const toggleRemove = (id: string) => {
     setRemoveSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
       return next
     })
   }
@@ -212,6 +220,9 @@ export default function AssignToProctorPage() {
     && pageData!.assignedProctors.every(p => removeSelected.has(p.id))
 
   const confirmCount = confirmAction === "assign" ? assignSelected.size : removeSelected.size
+  const resolvedSelectedExamObj = selectedExamObj
+    ?? examItems.find((exam) => String(exam.id) === selectedExamId)
+    ?? null
 
   // ── Proctor display name helper ────────────────────────────
   const displayName = (p: ExamProctorItemDto) =>
@@ -257,9 +268,9 @@ export default function AssignToProctorPage() {
                 onClick={() => setExamDropdownOpen(!examDropdownOpen)}
                 className="w-full flex items-center justify-between px-3 py-2 h-10 text-sm rounded-md border bg-background hover:bg-accent/50 transition-colors"
               >
-                <span className={selectedExamObj ? "text-foreground" : "text-muted-foreground"}>
-                  {selectedExamObj
-                    ? (isAr ? selectedExamObj.titleAr : selectedExamObj.titleEn)
+                <span className={resolvedSelectedExamObj ? "text-foreground" : "text-muted-foreground"}>
+                  {resolvedSelectedExamObj
+                    ? (isAr ? resolvedSelectedExamObj.titleAr : resolvedSelectedExamObj.titleEn)
                     : (isAr ? "اختر اختبار..." : "Select exam...")}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${examDropdownOpen ? "rotate-180" : ""}`} />

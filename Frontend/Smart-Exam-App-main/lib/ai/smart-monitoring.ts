@@ -143,7 +143,7 @@ export class SmartMonitoring {
 
       // Suppress TensorFlow Lite XNNPACK info messages logged via console.error by WASM
       const origError = console.error;
-      console.error = (...args: any[]) => {
+      console.error = (...args: Parameters<typeof console.error>) => {
         if (
           typeof args[0] === "string" &&
           args[0].includes("TensorFlow Lite XNNPACK")
@@ -193,7 +193,7 @@ export class SmartMonitoring {
         `[SmartMonitoring] Detection loop started (${this.config.detectionIntervalMs}ms interval)`,
       );
       return true;
-    } catch (err) {
+    } catch {
       console.warn(
         "[SmartMonitoring] Failed to load FaceLandmarker (non-fatal):",
       );
@@ -241,7 +241,7 @@ export class SmartMonitoring {
 
       // 3. Evaluate all conditions
       this.evaluateConditions(result, isBlocked, now);
-    } catch (err) {
+    } catch {
       // Silent — one bad frame shouldn't kill the loop
       // (MediaPipe can occasionally throw on corrupted frames)
     }
@@ -415,7 +415,6 @@ export class SmartMonitoring {
 
       let sum = 0;
       let sumSq = 0;
-      const pixelCount = this.canvas.width * this.canvas.height;
 
       // Sample every 4th pixel for speed (still plenty for brightness check)
       let sampled = 0;

@@ -41,7 +41,8 @@ public sealed class NotificationIntegrationTests
         {
             db.NotificationTemplates.Add(new NotificationTemplate
             {
-                EventType = type, SubjectEn = $"{type}: {{{{ExamTitle}}}}",
+                EventType = type,
+                SubjectEn = $"{type}: {{{{ExamTitle}}}}",
                 BodyEn = $"{type} for {{{{CandidateName}}}} at {{{{LoginUrl}}}}"
             });
             db.NotificationLogs.Add(Log(candidate, exam, type));
@@ -80,7 +81,8 @@ public sealed class NotificationIntegrationTests
         var (candidate, exam) = await SeedAsync(db);
         db.NotificationTemplates.Add(new NotificationTemplate
         {
-            EventType = NotificationEventType.ResultPublished, IsActive = false
+            EventType = NotificationEventType.ResultPublished,
+            IsActive = false
         });
         db.NotificationLogs.Add(Log(candidate, exam, NotificationEventType.ExamPublished));
         db.NotificationLogs.Add(Log(candidate, exam, NotificationEventType.ResultPublished, NotificationChannel.Sms));
@@ -137,12 +139,14 @@ public sealed class NotificationIntegrationTests
             new NotificationTemplate
             {
                 EventType = NotificationEventType.ExamPublished,
-                SubjectEn = "Invitation {{Password}}", BodyEn = "Hello {{CandidateName}}"
+                SubjectEn = "Invitation {{Password}}",
+                BodyEn = "Hello {{CandidateName}}"
             },
             new NotificationTemplate
             {
                 EventType = NotificationEventType.ResultPublished,
-                SubjectEn = "Results", BodyEn = "Credential {{Password}}"
+                SubjectEn = "Results",
+                BodyEn = "Credential {{Password}}"
             });
         foreach (var type in new[] { NotificationEventType.ExamPublished, NotificationEventType.ResultPublished })
         {
@@ -294,11 +298,16 @@ public sealed class NotificationIntegrationTests
         {
             db.Results.Add(new Result
             {
-                Candidate = candidate, Exam = exam, IsPublishedToCandidate = true,
+                Candidate = candidate,
+                Exam = exam,
+                IsPublishedToCandidate = true,
                 Attempt = new AttemptEntity
                 {
-                    Candidate = candidate, Exam = exam, AttemptNumber = attempt,
-                    Status = AttemptStatus.Submitted, StartedAt = DateTimeOffset.UtcNow
+                    Candidate = candidate,
+                    Exam = exam,
+                    AttemptNumber = attempt,
+                    Status = AttemptStatus.Submitted,
+                    StartedAt = DateTimeOffset.UtcNow
                 },
                 FinalizedAt = DateTimeOffset.UtcNow
             });
@@ -324,8 +333,10 @@ public sealed class NotificationIntegrationTests
             NullLogger<ExamAssignmentService>.Instance, new CacheService());
         var request = new AssignExamDto
         {
-            ExamId = exam.Id, CandidateIds = [candidate.Id, candidate.Id],
-            ScheduleFrom = DateTimeOffset.UtcNow, ScheduleTo = DateTimeOffset.UtcNow.AddHours(2)
+            ExamId = exam.Id,
+            CandidateIds = [candidate.Id, candidate.Id],
+            ScheduleFrom = DateTimeOffset.UtcNow,
+            ScheduleTo = DateTimeOffset.UtcNow.AddHours(2)
         };
         Assert.True((await service.AssignAsync(request, "operator")).Success);
         Assert.Single(await db.ExamAssignments.ToListAsync());
@@ -355,25 +366,30 @@ public sealed class NotificationIntegrationTests
         {
             db.Results.Add(new Result
             {
-                Candidate = candidate, Exam = exam,
+                Candidate = candidate,
+                Exam = exam,
                 Attempt = new AttemptEntity
                 {
-                    Candidate = candidate, Exam = exam, AttemptNumber = attempt,
-                    Status = AttemptStatus.Submitted, StartedAt = DateTimeOffset.UtcNow
+                    Candidate = candidate,
+                    Exam = exam,
+                    AttemptNumber = attempt,
+                    Status = AttemptStatus.Submitted,
+                    StartedAt = DateTimeOffset.UtcNow
                 },
                 FinalizedAt = DateTimeOffset.UtcNow
             });
         }
         db.NotificationTemplates.Add(new NotificationTemplate
         {
-            EventType = NotificationEventType.ResultPublished, SubjectEn = "Published result",
+            EventType = NotificationEventType.ResultPublished,
+            SubjectEn = "Published result",
             BodyEn = "Results for {{ExamTitle}}"
         });
         await db.SaveChangesAsync();
         await using var identityServices = fixture.IdentityServices();
         await using var scope = identityServices.CreateAsyncScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var service = new ExamResultService(db, null!, null!, null!, userManager, NotificationService(db),
+        var service = new ExamResultService(db, null!, null!, userManager, NotificationService(db),
             new CacheService(), new ResourceAuthorizationService(db, userManager, null!));
         var request = new BulkPublishResultsDto { ResultIds = await db.Results.Select(r => r.Id).ToListAsync() };
 
@@ -585,18 +601,27 @@ public sealed class NotificationIntegrationTests
     {
         var candidate = new ApplicationUser
         {
-            Id = "candidate", UserName = "candidate", NormalizedUserName = "CANDIDATE",
-            Email = "candidate@example.invalid", FullName = "Candidate", PhoneNumber = "+15555550101",
+            Id = "candidate",
+            UserName = "candidate",
+            NormalizedUserName = "CANDIDATE",
+            Email = "candidate@example.invalid",
+            FullName = "Candidate",
+            PhoneNumber = "+15555550101",
             EncryptedPassword = "synthetic-unreadable-ciphertext"
         };
         var exam = new Exam
         {
             Department = new Department { NameEn = "Testing", NameAr = "Testing", Code = "TEST" },
-            TitleEn = "Notification Exam", TitleAr = "Notification Exam", IsPublished = true, DurationMinutes = 60
+            TitleEn = "Notification Exam",
+            TitleAr = "Notification Exam",
+            IsPublished = true,
+            DurationMinutes = 60
         };
         db.AddRange(candidate, exam, new NotificationSettings
         {
-            EnableEmail = true, EnableSms = true, BatchDelayMs = 0,
+            EnableEmail = true,
+            EnableSms = true,
+            BatchDelayMs = 0,
             LoginUrl = "https://exam.example.invalid/login"
         });
         await db.SaveChangesAsync();
@@ -607,14 +632,20 @@ public sealed class NotificationIntegrationTests
         NotificationEventType type = NotificationEventType.ExamPublished,
         NotificationChannel channel = NotificationChannel.Email) => new()
         {
-            Candidate = candidate, Exam = exam, EventType = type, Channel = channel,
-            Status = NotificationStatus.Pending, RecipientEmail = candidate.Email!,
+            Candidate = candidate,
+            Exam = exam,
+            EventType = type,
+            Channel = channel,
+            Status = NotificationStatus.Pending,
+            RecipientEmail = candidate.Email!,
             RecipientPhone = candidate.PhoneNumber
         };
 
     private static NotificationTemplate Template() => new()
     {
-        EventType = NotificationEventType.ExamPublished, SubjectEn = "Exam", BodyEn = "Exam invitation"
+        EventType = NotificationEventType.ExamPublished,
+        SubjectEn = "Exam",
+        BodyEn = "Exam invitation"
     };
 
     private static NotificationService NotificationService(ApplicationDbContext db) =>
@@ -653,7 +684,8 @@ internal sealed class NotificationDatabase : IAsyncDisposable
     {
         var builder = new SqlConnectionStringBuilder(SqlServerFactAttribute.ConnectionString)
         {
-            InitialCatalog = "Phase2Notifications_" + Guid.NewGuid().ToString("N"), Pooling = false
+            InitialCatalog = "Phase2Notifications_" + Guid.NewGuid().ToString("N"),
+            Pooling = false
         };
         var fixture = new NotificationDatabase(builder.ConnectionString);
         await using var db = fixture.Database();

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
 import type { User } from "@/lib/types"
-import { getUsers, getStaffUsers, getUserById, updateUser, deleteUser, getDepartmentsList } from "@/lib/api/admin"
+import {  getStaffUsers, deleteUser, getDepartmentsList } from "@/lib/api/admin"
 import type { DepartmentListItem } from "@/lib/api/admin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -132,7 +132,7 @@ export default function UsersPage() {
       setUsers(res.items)
       setTotalCount(res.totalCount)
       setTotalPages(res.totalPages)
-    } catch (e) {
+    } catch {
       console.error("Failed to load users")
       toast.error(localizeText("Failed to load users", "فشل تحميل المستخدمين", language))
       setUsers([])
@@ -157,7 +157,7 @@ export default function UsersPage() {
     }
   }
 
-  function handleResetPassword(user: User) {
+  function handleResetPassword() {
     toast.success(
       localizeText(
         "Password reset. Temporary password: TempPass123!",
@@ -388,7 +388,7 @@ export default function UsersPage() {
                                 <Pencil className="me-2 h-4 w-4" />
                                 {language === "ar" ? "تعديل" : "Edit"}
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleResetPassword(user)}>
+                              <DropdownMenuItem onClick={() => handleResetPassword()}>
                                 <KeyRound className="me-2 h-4 w-4" />
                                 {language === "ar" ? "إعادة تعيين كلمة المرور" : "Reset Password"}
                               </DropdownMenuItem>

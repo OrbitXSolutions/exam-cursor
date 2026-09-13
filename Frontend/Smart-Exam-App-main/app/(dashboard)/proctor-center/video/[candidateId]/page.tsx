@@ -17,11 +17,7 @@ import {
   VideoOff,
   User,
   Calendar,
-  Clock,
   AlertTriangle,
-  Play,
-  Pause,
-  Download,
   Info,
   Monitor,
   MonitorOff,
@@ -79,7 +75,7 @@ export default function CandidateVideoPage() {
   const { language, dir } = useI18n()
 
   const [sessions, setSessions] = useState<ProctorSession[]>([])
-  const [snapshots, setSnapshots] = useState<ProctorSnapshot[]>([])  
+  const [, setSnapshots] = useState<ProctorSnapshot[]>([])
   const [screenSnapshots, setScreenSnapshots] = useState<ProctorSnapshot[]>([])
   const [selectedImage, setSelectedImage] = useState<ProctorSnapshot | null>(null)
   const [attemptEvents, setAttemptEvents] = useState<AttemptEvent[]>([])
@@ -135,7 +131,7 @@ export default function CandidateVideoPage() {
         } else {
           setAttemptEvents([])
         }
-      } catch (err) {
+      } catch {
         console.error("Failed to load proctor data")
         setError(language === "ar" ? "فشل في تحميل بيانات المراقبة" : "Failed to load proctoring data")
       } finally {
@@ -179,7 +175,7 @@ export default function CandidateVideoPage() {
       )
       setScreenSnapshots(screenOnly.length > 0 ? screenOnly : snapshotList)
       setSelectedImage(null)
-    } catch (err) {
+    } catch {
       console.warn("Failed to load snapshots")
       setSnapshots([])
     }
@@ -190,7 +186,7 @@ export default function CandidateVideoPage() {
       const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
       const eventList = normalizeList<AttemptEvent>(res)
       setAttemptEvents(eventList)
-    } catch (err) {
+    } catch {
       console.warn("Failed to load attempt events")
       setAttemptEvents([])
     }

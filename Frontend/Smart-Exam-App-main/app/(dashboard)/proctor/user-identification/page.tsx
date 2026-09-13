@@ -95,20 +95,9 @@ function livenessVariant(val: number): "default" | "secondary" | "destructive" |
   }
 }
 
-function riskColor(score: number | null): string {
-  if (score === null || score === undefined) return "text-muted-foreground"
-  if (score >= 75) return "text-destructive"
-  if (score >= 50) return "text-orange-500"
-  if (score >= 25) return "text-yellow-500"
-  return "text-green-500"
-}
 
-function faceMatchColor(score: number | null): string {
-  if (score === null || score === undefined) return "text-muted-foreground"
-  if (score >= 90) return "text-green-500"
-  if (score >= 70) return "text-yellow-500"
-  return "text-destructive"
-}
+
+
 
 // ────────────────────────────────────────────────────
 // Main Page
@@ -177,9 +166,14 @@ export default function UserIdentificationPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, statusFilter, riskFilter, pageNumber])
+  }, [search, statusFilter, riskFilter, pageNumber, language])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchData()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [fetchData])
 
   // Debounced search
   const [searchInput, setSearchInput] = useState("")

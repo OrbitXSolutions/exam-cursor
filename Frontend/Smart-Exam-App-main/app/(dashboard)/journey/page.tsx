@@ -45,14 +45,15 @@ import {
 // HELPERS
 // ============================================
 
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 function formatTime(seconds: number): string {
@@ -83,7 +84,7 @@ function formatDuration(minutes: number): string {
 
 export default function JourneyPage() {
   const { t, language } = useI18n()
-  const router = useRouter()
+  useRouter()
   const [journey, setJourney] = useState<ExamJourney | null>(null)
   const [loading, setLoading] = useState(true)
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -495,7 +496,6 @@ function JourneySection({
   icon: Icon,
   iconColor,
   bgColor,
-  borderColor,
   cards,
   language,
   t,

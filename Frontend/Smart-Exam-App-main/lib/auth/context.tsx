@@ -19,37 +19,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const mockUsers: Record<string, User> = {
-  "ahmed.it.admin@examcore.com": {
-    id: "1",
-    email: "ahmed.it.admin@examcore.com",
-    fullNameEn: "Ahmed Hassan",
-    fullNameAr: "أحمد حسن",
-    role: "Admin" as UserRole,
-    isActive: true,
-    createdDate: new Date().toISOString(),
-  },
-  "sara.it.instructor@examcore.com": {
-    id: "2",
-    email: "sara.it.instructor@examcore.com",
-    fullNameEn: "Sara Ali",
-    fullNameAr: "سارة علي",
-    role: "Instructor" as UserRole,
-    isActive: true,
-    createdDate: new Date().toISOString(),
-  },
-  "ali.it.candidate@examcore.com": {
-    id: "3",
-    email: "ali.it.candidate@examcore.com",
-    fullNameEn: "Ali Mohammed",
-    fullNameAr: "علي محمد",
-    role: "Candidate" as UserRole,
-    isActive: true,
-    createdDate: new Date().toISOString(),
-  },
-}
 
-const MOCK_PASSWORD = "Demo@123456"
+
+
 
 interface LoginApiResponse {
   success: boolean
@@ -79,20 +51,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    let active = true
+
     // Check for existing session
     const token = localStorage.getItem("auth_token")
     const savedUser = localStorage.getItem("user")
+    let restoredUser: User | null = null
 
     if (token && savedUser) {
       try {
-        setUser(JSON.parse(savedUser))
+        restoredUser = JSON.parse(savedUser) as User
       } catch {
         apiClient.clearToken()
         localStorage.removeItem("user")
       }
     }
 
-    setIsLoading(false)
+    queueMicrotask(() => {
+      if (!active) return
+      if (restoredUser) setUser(restoredUser)
+      setIsLoading(false)
+    })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {

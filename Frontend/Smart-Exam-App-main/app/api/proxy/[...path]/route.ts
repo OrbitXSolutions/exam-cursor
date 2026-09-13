@@ -2,14 +2,32 @@ import { type NextRequest, NextResponse } from "next/server";
 import { backendApiUrl as BACKEND_URL } from "@/lib/server/backend-config";
 import { getCorrelationId, logRequest } from "@/lib/safe-logging";
 
-async function fetchBackend(url: string, options: RequestInit): Promise<Response> {
+async function fetchBackend(
+  url: string,
+  options: RequestInit,
+): Promise<Response> {
   const startedAt = Date.now();
   try {
     const response = await fetch(url, options);
-    logRequest("Proxy", options.method || "GET", url, startedAt, response.status, getCorrelationId(response.headers));
+    logRequest(
+      "Proxy",
+      options.method || "GET",
+      url,
+      startedAt,
+      response.status,
+      getCorrelationId(response.headers),
+    );
     return response;
   } catch (error) {
-    logRequest("Proxy", options.method || "GET", url, startedAt, undefined, undefined, true);
+    logRequest(
+      "Proxy",
+      options.method || "GET",
+      url,
+      startedAt,
+      undefined,
+      undefined,
+      true,
+    );
     throw error;
   }
 }
@@ -44,9 +62,7 @@ export async function GET(
     });
 
     const contentType = response.headers.get("content-type") || "";
-    if (
-      contentType.includes("text/html")
-    ) {
+    if (contentType.includes("text/html")) {
       const text = await response.text();
       return new NextResponse(text, {
         status: response.status,
@@ -77,12 +93,18 @@ export async function GET(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
+      return new NextResponse(null, {
+        status: response.status,
+        headers: supportHeaders(response),
+      });
     }
 
     const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
-  } catch (error) {
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: supportHeaders(response),
+    });
+  } catch {
     console.error("[Proxy GET] Request failed");
     return NextResponse.json(
       {
@@ -125,11 +147,14 @@ export async function POST(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
+      return new NextResponse(null, {
+        status: response.status,
+        headers: supportHeaders(response),
+      });
     }
 
     const responseText = await response.text();
-    let data: any;
+    let data: unknown;
     try {
       data = JSON.parse(responseText);
     } catch {
@@ -143,8 +168,11 @@ export async function POST(
         errors: [],
       };
     }
-    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
-  } catch (error) {
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: supportHeaders(response),
+    });
+  } catch {
     console.error("[Proxy POST] Request failed");
     return NextResponse.json(
       {
@@ -181,12 +209,18 @@ export async function PUT(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
+      return new NextResponse(null, {
+        status: response.status,
+        headers: supportHeaders(response),
+      });
     }
 
     const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
-  } catch (error) {
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: supportHeaders(response),
+    });
+  } catch {
     console.error("[Proxy PUT] Request failed");
     return NextResponse.json(
       {
@@ -223,12 +257,18 @@ export async function PATCH(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
+      return new NextResponse(null, {
+        status: response.status,
+        headers: supportHeaders(response),
+      });
     }
 
     const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
-  } catch (error) {
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: supportHeaders(response),
+    });
+  } catch {
     console.error("[Proxy PATCH] Request failed");
     return NextResponse.json(
       {
@@ -257,7 +297,8 @@ export async function DELETE(
     const response = await fetchBackend(url, {
       method: "DELETE",
       headers: {
-        "Content-Type": request.headers.get("content-type") || "application/json",
+        "Content-Type":
+          request.headers.get("content-type") || "application/json",
         ...(token && { Authorization: token }),
       },
       body: body.byteLength > 0 ? body : undefined,
@@ -265,12 +306,18 @@ export async function DELETE(
 
     // 204/205 responses must not have a body (Fetch API spec)
     if (response.status === 204 || response.status === 205) {
-      return new NextResponse(null, { status: response.status, headers: supportHeaders(response) });
+      return new NextResponse(null, {
+        status: response.status,
+        headers: supportHeaders(response),
+      });
     }
 
     const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data, { status: response.status, headers: supportHeaders(response) });
-  } catch (error) {
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: supportHeaders(response),
+    });
+  } catch {
     console.error("[Proxy DELETE] Request failed");
     return NextResponse.json(
       {

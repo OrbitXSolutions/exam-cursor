@@ -94,6 +94,7 @@ export function StatusBadge({ status, label, variant, className, showDot = true 
   
   const normalizedStatus = status.toLowerCase().replace(/[\s_-]/g, "")
   const resolvedVariant = variant || statusVariantMap[normalizedStatus] || "default"
+  const badgeVariant = resolvedVariant === "success" || resolvedVariant === "warning" ? null : resolvedVariant
 
   const dotColors: Record<StatusVariant, string> = {
     default: "bg-primary",
@@ -105,7 +106,7 @@ export function StatusBadge({ status, label, variant, className, showDot = true 
   }
 
   return (
-    <Badge variant={resolvedVariant} className={cn("gap-1.5 font-medium", className)}>
+    <Badge variant={badgeVariant} className={cn("gap-1.5 font-medium", className)}>
       {showDot && <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[resolvedVariant])} />}
       {label ?? status}
     </Badge>

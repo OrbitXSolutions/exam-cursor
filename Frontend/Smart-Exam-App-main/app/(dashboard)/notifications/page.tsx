@@ -107,7 +107,7 @@ export default function NotificationsPage() {
   }, [isRtl])
 
   useEffect(() => {
-    loadPage(1)
+    void Promise.resolve().then(() => loadPage(1))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMarkRead = async (id: number) => {

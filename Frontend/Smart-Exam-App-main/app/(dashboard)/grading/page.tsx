@@ -22,7 +22,8 @@ import { toast } from "sonner"
 function getLocalizedField(obj: GradingSessionListItem, fieldBase: string, language: string): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj as Record<string, string>)[field] || (obj as Record<string, string>)[fallback] || ""
+  const record = obj as unknown as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 type ListFilter = "pending" | "all"
@@ -65,7 +66,7 @@ export default function GradingPage() {
             setTotalPages(response.totalPages || 0)
           }
         }
-      } catch (error) {
+      } catch {
         if (!cancelled) {
           console.error("Failed to load grading list")
           setSubmissions([])

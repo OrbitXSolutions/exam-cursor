@@ -20,10 +20,6 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadUser()
-  }, [id])
-
   async function loadUser() {
     try {
       const data = await getUserById(id)
@@ -34,6 +30,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadUser)
+  }, [id])
 
   async function handleResetPassword() {
     if (!user) return
@@ -141,9 +141,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">{language === "ar" ? "الحالة" : "Status"}</span>
-              <StatusBadge status={user.isActive ? "success" : "muted"}>
-                {user.isActive ? (language === "ar" ? "نشط" : "Active") : language === "ar" ? "غير نشط" : "Inactive"}
-              </StatusBadge>
+              <StatusBadge
+                status={user.isActive ? "success" : "muted"}
+                label={user.isActive ? (language === "ar" ? "نشط" : "Active") : language === "ar" ? "غير نشط" : "Inactive"}
+              />
             </div>
           </CardContent>
         </Card>

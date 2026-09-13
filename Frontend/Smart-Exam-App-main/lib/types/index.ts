@@ -229,6 +229,14 @@ export interface Question {
   questionCategoryNameEn: string;
   questionCategoryNameAr: string;
   questionCategoryName?: string; // Legacy field
+  category?: { name: string }; // Legacy field
+  type?: { name: string }; // Legacy field
+  subjectId: number;
+  subjectNameEn: string;
+  subjectNameAr: string;
+  topicId: number | null;
+  topicNameEn: string | null;
+  topicNameAr: string | null;
   points: number;
   difficultyLevel: DifficultyLevel;
   difficultyLevelName: string;
@@ -363,10 +371,13 @@ export interface ExamSection {
   examId: number;
   titleEn: string;
   titleAr: string;
+  title?: string;
   descriptionEn: string | null;
   descriptionAr: string | null;
+  description?: string | null;
   order: number;
   durationMinutes: number | null;
+  timeLimit?: number | null;
   totalPointsOverride: number | null;
   createdDate: string;
   topicsCount: number; // Added topicsCount
@@ -442,6 +453,9 @@ export interface Exam {
   examType: ExamType; // Added examType
   titleEn: string;
   titleAr: string;
+  title?: string; // Legacy field for backward compatibility
+  code?: string;
+  status?: string;
   descriptionEn: string | null;
   descriptionAr: string | null;
   startAt: string | null;
@@ -454,6 +468,7 @@ export interface Exam {
   shuffleOptions: boolean;
   // Passing rule
   passScore: number;
+  passingScore?: number; // Legacy field for backward compatibility
   isPublished: boolean;
   isActive: boolean;
   // Result & Review Settings

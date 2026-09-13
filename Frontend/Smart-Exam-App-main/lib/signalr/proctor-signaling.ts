@@ -341,7 +341,7 @@ export class ProctorSignaling {
             this.role,
           );
         }
-      } catch (e) {
+      } catch {
         console.error("[SignalR] Failed to rejoin room");
       }
       this.callbacks.onReconnected?.();

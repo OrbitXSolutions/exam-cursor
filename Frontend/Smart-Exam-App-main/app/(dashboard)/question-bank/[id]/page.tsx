@@ -48,31 +48,30 @@ export default function QuestionDetailPage() {
   const isValidId = !isNaN(numericId) && numericId > 0
   const isCreateRoute = questionId === "create"
 
+  const fetchQuestion = async () => {
+    try {
+      const loadedQuestion = await getQuestionById(numericId)
+      if (loadedQuestion.id) {
+        setQuestion(loadedQuestion)
+      }
+    } catch {
+      console.error("[v0] Failed to fetch question")
+      toast.error(localizeText("Failed to load question", "فشل تحميل السؤال", language))
+    }
+    setIsLoading(false)
+  }
+
   useEffect(() => {
     if (isCreateRoute || !isValidId) {
-      setIsLoading(false)
       return
     }
-    fetchQuestion()
+    const timer = setTimeout(() => fetchQuestion(), 0)
+    return () => clearTimeout(timer)
   }, [questionId, isCreateRoute, isValidId])
 
   // If the ID is "create", render the create page directly
   if (isCreateRoute) {
     return <CreateQuestionPage />
-  }
-
-  const fetchQuestion = async () => {
-    try {
-      const response = await getQuestionById(numericId)
-      const q = (response as any)?.data || response
-      if (q && q.id) {
-        setQuestion(q)
-      }
-    } catch (error) {
-      console.error("[v0] Failed to fetch question")
-      toast.error(localizeText("Failed to load question", "فشل تحميل السؤال", language))
-    }
-    setIsLoading(false)
   }
 
   const handleDelete = async () => {
@@ -81,7 +80,7 @@ export default function QuestionDetailPage() {
       await deleteQuestion(numericId)
       toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       router.push("/question-bank")
-    } catch (error) {
+    } catch {
       console.error("[v0] Failed to delete question")
       toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
     }
@@ -92,7 +91,7 @@ export default function QuestionDetailPage() {
     return <CreateQuestionPage />
   }
 
-  if (isLoading) {
+  if (isLoading && isValidId) {
     return (
       <div className="flex flex-col">
         <PageHeader title={language === "ar" ? "تفاصيل السؤال" : "Question Details"} />

@@ -55,7 +55,7 @@ export async function GET(
       status: response.status, // preserves 206 for partial content
       headers: responseHeaders,
     });
-  } catch (error) {
+  } catch {
     console.error("[Backend Files Proxy] Request failed");
     return new NextResponse(null, { status: 502 });
   }

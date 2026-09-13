@@ -10,7 +10,6 @@ import {
   type AttemptSession,
   type SaveAnswerRequest,
   type ExamSection,
-  type ExamTopic,
   type AttemptQuestionDto,
   logAttemptEvent,
   AttemptEventType,
@@ -56,14 +55,33 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 // Helper function to get localized field
-function getLocalizedField(
-  obj: any,
+function getLocalizedField<T extends object>(
+  obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
+}
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const { message } = error
+    if (typeof message === "string") return message
+  }
+
+  return String(error)
+}
+
+function createAudioContext(): AudioContext {
+  const audioWindow = window as typeof window & {
+    webkitAudioContext?: typeof AudioContext
+  }
+  const AudioContextConstructor = audioWindow.AudioContext || audioWindow.webkitAudioContext
+  if (!AudioContextConstructor) throw new Error("Web Audio API is not supported")
+  return new AudioContextConstructor()
 }
 
 const EXAM_LANGUAGE_KEY = "examLanguage"
@@ -163,7 +181,7 @@ export default function ExamPage() {
   const [examTimeRemaining, setExamTimeRemaining] = useState(0)
   const [sectionTimers, setSectionTimers] = useState<Record<number, number>>({})
   // Track which sections have been activated (entered by candidate) - only activated sections count down
-  const [activatedSections, setActivatedSections] = useState<Set<number>>(new Set())
+  const [, setActivatedSections] = useState<Set<number>>(new Set())
 
   // UI state
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false)
@@ -221,7 +239,6 @@ export default function ExamPage() {
 
   // Screen share state
   const [screenShareStatus, setScreenShareStatus] = useState<ScreenShareStatus>("idle")
-  const [screenShareConsentOpen, setScreenShareConsentOpen] = useState(false)
   const [screenShareConsentMode, setScreenShareConsentMode] = useState<"optional" | "required" | "strict">("optional")
 
   // Computed values
@@ -252,12 +269,14 @@ export default function ExamPage() {
 
   // Auto-hide calculator & spreadsheet when navigating to context that doesn't allow it
   useEffect(() => {
-    if (!isCalculatorAllowedInContext && showCalculator) {
-      setShowCalculator(false)
-    }
-    if (!isCalculatorAllowedInContext && showSpreadsheet) {
-      setShowSpreadsheet(false)
-    }
+    if (isCalculatorAllowedInContext || (!showCalculator && !showSpreadsheet)) return
+
+    const hideToolsTimer = window.setTimeout(() => {
+      if (showCalculator) setShowCalculator(false)
+      if (showSpreadsheet) setShowSpreadsheet(false)
+    }, 0)
+
+    return () => window.clearTimeout(hideToolsTimer)
   }, [isCalculatorAllowedInContext, currentSectionId, currentQuestionIndex])
 
   // Check if can navigate back
@@ -308,7 +327,7 @@ export default function ExamPage() {
             await docEl.msRequestFullscreen()
           }
         }
-      } catch (error) {
+      } catch {
         console.log("[v0] Fullscreen request failed")
       }
     }
@@ -376,7 +395,7 @@ export default function ExamPage() {
               await docEl.msRequestFullscreen()
             }
           }
-        } catch (error) {
+        } catch {
           console.log("[v0] Fullscreen request failed")
         }
       }
@@ -570,8 +589,10 @@ export default function ExamPage() {
     if (!session?.attemptId) return
     // Skip webcam initialization entirely if webcam is not required
     if (!session.examSettings?.requireWebcam) {
-      setWebcamStatus("active") // Mark as OK so UI doesn't show errors
-      return
+      const markWebcamReadyTimer = window.setTimeout(() => {
+        setWebcamStatus("active") // Mark as OK so UI doesn't show errors
+      }, 0)
+      return () => window.clearTimeout(markWebcamReadyTimer)
     }
 
     let isActive = true
@@ -600,9 +621,9 @@ export default function ExamPage() {
         setWebcamError(null)
         console.log("[Proctor] Webcam stream initialized successfully")
         return true
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.warn("[Proctor] Could not initialize webcam")
-        const msg = error?.message ?? String(error)
+        const msg = getErrorMessage(error)
         setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
         setWebcamError(msg)
 
@@ -692,7 +713,7 @@ export default function ExamPage() {
             metadataJson: JSON.stringify({ error: result.error }),
           }).catch(() => {})
         }
-      } catch (error) {
+      } catch {
         console.warn("[Proctor] Snapshot capture failed")
       }
     }
@@ -745,7 +766,7 @@ export default function ExamPage() {
                     setExamTimeRemaining(event.newRemainingSeconds)
                     // Play a gentle notification sound (different from warning beep)
                     try {
-                      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
+                      const audioCtx = createAudioContext()
                       const osc = audioCtx.createOscillator()
                       const gain = audioCtx.createGain()
                       osc.connect(gain)
@@ -772,11 +793,11 @@ export default function ExamPage() {
                     router.push("/my-exams")
                   },
                 })
-                publisher.start(webcamStreamRef.current).catch((err) => {
+                publisher.start(webcamStreamRef.current).catch(() => {
                   console.warn("[Proctor] WebRTC publisher failed to start (non-fatal)")
                 })
                 publisherRef.current = publisher
-              } catch (err) {
+              } catch {
                 console.warn("[Proctor] WebRTC publisher init failed (non-fatal)")
               }
             } else {
@@ -791,16 +812,16 @@ export default function ExamPage() {
                   onChunkUploaded: (idx) => {
                     console.log(`[Proctor] Chunk ${idx} uploaded`)
                   },
-                  onChunkFailed: (idx, err) => {
+                  onChunkFailed: (idx) => {
                     console.warn(`[Proctor] Chunk ${idx} failed`)
                   },
-                  onError: (err) => {
+                  onError: () => {
                     console.error("[Proctor] ChunkRecorder error (non-fatal)")
                   },
                 })
                 recorder.start(webcamStreamRef.current!)
                 chunkRecorderRef.current = recorder
-              } catch (err) {
+              } catch {
                 console.warn("[Proctor] ChunkRecorder init failed (non-fatal)")
               }
             }
@@ -824,7 +845,7 @@ export default function ExamPage() {
 
                     // Play a single soft alert beep (not the aggressive 3-beep used for proctor warnings)
                     try {
-                      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+                      const ctx = createAudioContext()
                       const osc = ctx.createOscillator()
                       const gain = ctx.createGain()
                       osc.type = "sine"
@@ -877,7 +898,7 @@ export default function ExamPage() {
                   }
                 })
                 smartMonitoringRef.current = monitor
-              } catch (err) {
+              } catch {
                 console.warn("[SmartMonitoring] Init failed (non-fatal)")
               }
             } else if (!cfg.enableSmartMonitoring) {
@@ -894,7 +915,7 @@ export default function ExamPage() {
               // Auto-start screen share (candidate already tested on instructions page)
               autoStartScreenShare()
             }
-          }).catch((err) => {
+          }).catch(() => {
             console.warn("[Proctor] Video config fetch failed (non-fatal)")
           })
         }
@@ -1095,7 +1116,7 @@ export default function ExamPage() {
   }
 
   // Check if this is the last section
-  const isLastSection = currentSectionId ? sections.findIndex(s => s.sectionId === currentSectionId) === sections.length - 1 : false
+
 
   function formatTime(seconds: number) {
     const hours = Math.floor(seconds / 3600)
@@ -1122,7 +1143,7 @@ export default function ExamPage() {
           if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
           saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
 
-        } catch (error) {
+        } catch {
           console.error("[v0] Failed to save answer")
           setSaveStatus("error")
           if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
@@ -1154,7 +1175,7 @@ export default function ExamPage() {
   // Play a short beep sound to alert the candidate of a proctor warning
   function playWarningBeep() {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const ctx = createAudioContext()
       // First beep
       const osc1 = ctx.createOscillator()
       const gain1 = ctx.createGain()
@@ -1222,7 +1243,7 @@ export default function ExamPage() {
       onTrackEnded: () => {
         logAttemptEvent(session.attemptId, { eventType: AttemptEventType.ScreenShareTrackEnded }).catch(() => {})
       },
-      onError: (error) => {
+      onError: () => {
         console.warn("[ExamPage] Screen share error")
       },
     })
@@ -1313,15 +1334,9 @@ export default function ExamPage() {
     }
   }
 
-  async function handleScreenShareAccept() {
-    setScreenShareConsentOpen(false)
-    await autoStartScreenShare()
-  }
 
-  function handleScreenShareSkip() {
-    setScreenShareConsentOpen(false)
-    logAttemptEvent(session!.attemptId, { eventType: AttemptEventType.ScreenShareDenied, metadataJson: JSON.stringify({ reason: "user_skipped" }) }).catch(() => {})
-  }
+
+
 
   // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
   function stopAllBackgroundActivity() {
@@ -1430,7 +1445,7 @@ export default function ExamPage() {
       if (chunkRecorderRef.current) {
         try {
           await chunkRecorderRef.current.stop()
-        } catch (e) {
+        } catch {
           console.warn("[Proctor] ChunkRecorder stop failed")
         }
         chunkRecorderRef.current = null
@@ -1441,7 +1456,7 @@ export default function ExamPage() {
         try {
           await publisherRef.current.signalingConnection.notifyExamSubmitted()
           console.log('[ExamPage] Proctor notified of exam submission via SignalR')
-        } catch (e) {
+        } catch {
           console.warn('[ExamPage] Failed to notify proctor of submission (non-fatal)')
         }
       }
@@ -1462,10 +1477,10 @@ export default function ExamPage() {
             },
           }).then(() => {
             console.log("[Proctor] Video finalize request sent (202 accepted)")
-          }).catch((e) => {
+          }).catch(() => {
             console.warn("[Proctor] Video finalize request failed (non-fatal)")
           })
-        } catch (e) {
+        } catch {
           console.warn("[Proctor] Video finalize setup failed (non-fatal)")
         }
       }
@@ -1544,8 +1559,8 @@ export default function ExamPage() {
           }, "image/jpeg", 0.7)
         }
       }
-    } catch (error: any) {
-      const msg = error?.message ?? String(error)
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error)
       setWebcamStatus(msg.includes("Permission") || msg.includes("NotAllowed") ? "denied" : "error")
       setWebcamError(msg)
       toast.error(t("exam.cameraAccessFailed"))
@@ -2417,7 +2432,6 @@ export default function ExamPage() {
 // Section content component - shows ALL questions in the section
 function SectionContent({
   section,
-  sections,
   answers,
   flagged,
   savingAnswers,
@@ -2676,8 +2690,14 @@ function QuestionCard({
   const questionBody = getLocalizedField(question, "body", language)
 
   // Find primary image attachment for the question
-  const primaryImage = question.attachments?.find((a: any) => a.isPrimary && a.fileType?.toLowerCase().includes('image'))
-  const anyImage = !primaryImage ? question.attachments?.find((a: any) => a.fileType?.toLowerCase().includes('image')) : null
+  const primaryImage = question.attachments?.find((attachment) =>
+    "isPrimary" in attachment
+    && attachment.isPrimary === true
+    && attachment.fileType.toLowerCase().includes("image")
+  )
+  const anyImage = !primaryImage
+    ? question.attachments?.find((attachment) => attachment.fileType.toLowerCase().includes("image"))
+    : null
   const questionImage = primaryImage || anyImage
 
   return (

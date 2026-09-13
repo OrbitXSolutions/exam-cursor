@@ -16,7 +16,7 @@ export async function GET(
       status: response.status,
       headers: { "Content-Type": contentType },
     })
-  } catch (error) {
+  } catch {
     console.error("[Media Proxy] Request failed")
     return new NextResponse(null, { status: 502 })
   }

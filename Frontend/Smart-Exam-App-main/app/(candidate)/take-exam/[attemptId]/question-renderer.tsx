@@ -1,26 +1,24 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
-import type { AttemptQuestionDto, SaveAnswerRequest } from "@/lib/api/candidate"
+import type { AttemptQuestionDto, AttemptQuestionOptionDto, SaveAnswerRequest } from "@/lib/api/candidate"
 import { localizeText } from "@/lib/i18n/runtime"
 import { cn } from "@/lib/utils"
 import { ImageZoomModal } from "./image-zoom-modal"
 
 // Helper function to get localized field
 function getLocalizedField(
-  obj: any,
-  fieldBase: string,
+  option: AttemptQuestionOptionDto,
   language: string
 ): string {
-  const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
-  const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  return language === "ar"
+    ? option.textAr || option.textEn || ""
+    : option.textEn || option.textAr || ""
 }
 
 // Question type constants for matching both ID and name
@@ -85,6 +83,7 @@ function renderAnswerComponent(
     case "MCQ_SINGLE":
       return (
         <MCQSingleChoice
+          key={question.questionId}
           question={question}
           answer={answer}
           language={language}
@@ -94,6 +93,7 @@ function renderAnswerComponent(
     case "MCQ_MULTI":
       return (
         <MCQMultipleChoice
+          key={question.questionId}
           question={question}
           answer={answer}
           language={language}
@@ -103,6 +103,7 @@ function renderAnswerComponent(
     case "TRUE_FALSE":
       return (
         <TrueFalse
+          key={question.questionId}
           question={question}
           answer={answer}
           language={language}
@@ -112,6 +113,7 @@ function renderAnswerComponent(
     case "SUBJECTIVE":
       return (
         <Subjective
+          key={question.questionId}
           question={question}
           answer={answer}
           language={language}
@@ -139,10 +141,6 @@ function MCQSingleChoice({
     answer?.selectedOptionIds?.[0]?.toString() || ""
   )
 
-  useEffect(() => {
-    setSelectedOption(answer?.selectedOptionIds?.[0]?.toString() || "")
-  }, [answer])
-
   const handleChange = (value: string) => {
     setSelectedOption(value)
     onAnswerChange(question.questionId, {
@@ -160,7 +158,7 @@ function MCQSingleChoice({
   return (
     <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
-        const optionText = getLocalizedField(option, "text", language)
+        const optionText = getLocalizedField(option, language)
         const isSelected = selectedOption === option.id.toString()
 
         return (
@@ -212,10 +210,6 @@ function MCQMultipleChoice({
     new Set(answer?.selectedOptionIds || [])
   )
 
-  useEffect(() => {
-    setSelectedOptions(new Set(answer?.selectedOptionIds || []))
-  }, [answer])
-
   const handleChange = (optionId: number, checked: boolean) => {
     const newSelected = new Set(selectedOptions)
     if (checked) {
@@ -239,7 +233,7 @@ function MCQMultipleChoice({
   return (
     <div className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
-        const optionText = getLocalizedField(option, "text", language)
+        const optionText = getLocalizedField(option, language)
         const isSelected = selectedOptions.has(option.id)
 
         return (
@@ -292,10 +286,6 @@ function TrueFalse({
     answer?.selectedOptionIds?.[0]?.toString() || ""
   )
 
-  useEffect(() => {
-    setSelectedOption(answer?.selectedOptionIds?.[0]?.toString() || "")
-  }, [answer])
-
   const handleChange = (value: string) => {
     setSelectedOption(value)
     onAnswerChange(question.questionId, {
@@ -313,7 +303,7 @@ function TrueFalse({
   return (
     <RadioGroup value={selectedOption} onValueChange={handleChange} className="space-y-2" dir={dir}>
       {sortedOptions.map((option) => {
-        const optionText = getLocalizedField(option, "text", language)
+        const optionText = getLocalizedField(option, language)
         const isSelected = selectedOption === option.id.toString()
 
         return (
@@ -350,18 +340,14 @@ function Subjective({
   onAnswerChange,
 }: QuestionRendererProps) {
   const [text, setText] = useState(answer?.textAnswer || "")
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout>()
-
-  useEffect(() => {
-    setText(answer?.textAnswer || "")
-  }, [answer])
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleChange = (value: string) => {
     setText(value)
 
     // Debounce the save
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
     }
 
     const timeout = setTimeout(() => {
@@ -372,7 +358,7 @@ function Subjective({
       })
     }, 1000) // Save after 1 second of no typing
 
-    setDebounceTimeout(timeout)
+    debounceTimeoutRef.current = timeout
   }
 
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length

@@ -115,13 +115,6 @@ public static class CacheKeys
     public static string IncidentDecisions(int caseId) => $"incidents:decisions:{caseId}";
     public static string IncidentComments(int caseId) => $"incidents:comments:{caseId}";
 
-    // ── Certificates ──────────────────────────────────────────
-    public const string CertificatesPrefix = "certs:";
-    public static string CertificateById(int id) => $"certs:{id}";
-    public static string CertificateByResult(int resultId) => $"certs:result:{resultId}";
-    public static string CertificateByCode(string code) => $"certs:code:{code}";
-    public static string CertificatesByCandidate(string candidateId) => $"certs:candidate:{candidateId}";
-
     // ── ExamShare ─────────────────────────────────────────────
     public const string ExamSharePrefix = "share:";
     public static string ShareLinkByExam(int examId) => $"share:exam:{examId}";

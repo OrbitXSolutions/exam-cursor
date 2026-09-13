@@ -54,7 +54,7 @@ export async function getVideoConfig(): Promise<VideoConfig> {
         stunServers: Array.isArray(data?.stunServers) ? data.stunServers : [],
       };
       return cachedConfig;
-    } catch (e) {
+    } catch {
       console.warn("[VideoConfig] Fetch error, using defaults (disabled)");
       cachedConfig = DEFAULT_CONFIG;
       return DEFAULT_CONFIG;

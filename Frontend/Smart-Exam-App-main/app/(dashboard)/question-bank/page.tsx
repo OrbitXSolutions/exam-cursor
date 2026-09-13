@@ -31,10 +31,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import type { Question, QuestionType } from "@/lib/types"
+import type { Question } from "@/lib/types"
 import { DifficultyLevel } from "@/lib/types"
 import { getQuestions, deleteQuestion, toggleQuestionStatus } from "@/lib/api/question-bank"
-import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type QuestionSubject, type QuestionTopic } from "@/lib/api/lookups"
+import { getQuestionTypes, getQuestionSubjects, getQuestionTopics, type QuestionSubject, type QuestionTopic, type QuestionType } from "@/lib/api/lookups"
 import { toast } from "sonner"
 import {
   Plus,
@@ -93,19 +93,22 @@ export default function QuestionBankPage() {
   // Load questions with server-side pagination and filters
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError(null)
-    getQuestions({
-      pageNumber: currentPage,
-      pageSize,
-      search: searchQuery.trim() || undefined,
-      subjectId: selectedSubject !== "all" ? Number(selectedSubject) : undefined,
-      topicId: selectedTopic !== "all" ? Number(selectedTopic) : undefined,
-      questionTypeId: selectedType !== "all" ? Number(selectedType) : undefined,
-      difficultyLevel: selectedDifficulty !== "all" ? Number(selectedDifficulty) as DifficultyLevel : undefined,
+    Promise.resolve().then(() => {
+      if (cancelled) return null
+      setLoading(true)
+      setError(null)
+      return getQuestions({
+        pageNumber: currentPage,
+        pageSize,
+        search: searchQuery.trim() || undefined,
+        subjectId: selectedSubject !== "all" ? Number(selectedSubject) : undefined,
+        topicId: selectedTopic !== "all" ? Number(selectedTopic) : undefined,
+        questionTypeId: selectedType !== "all" ? Number(selectedType) : undefined,
+        difficultyLevel: selectedDifficulty !== "all" ? Number(selectedDifficulty) as DifficultyLevel : undefined,
+      })
     })
       .then((res) => {
-        if (!cancelled) {
+        if (!cancelled && res) {
           setQuestions(Array.isArray(res?.items) ? res.items : [])
           setTotalCount(res?.totalCount ?? 0)
         }
@@ -131,8 +134,10 @@ export default function QuestionBankPage() {
   // Fetch topics when subject changes
   useEffect(() => {
     if (selectedSubject === "all") {
-      setTopics([])
-      setSelectedTopic("all")
+      queueMicrotask(() => {
+        setTopics([])
+        setSelectedTopic("all")
+      })
       return
     }
     const fetchTopicsForSubject = async () => {
@@ -158,7 +163,7 @@ export default function QuestionBankPage() {
       } else {
         toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
       }
-    } catch (err) {
+    } catch {
       toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
     } finally {
       setIsDeleting(false)
@@ -180,7 +185,7 @@ export default function QuestionBankPage() {
       } else {
         toast.error(localizeText("Failed to update question status", "فشل تحديث حالة السؤال", language))
       }
-    } catch (err) {
+    } catch {
       toast.error(localizeText("Failed to update question status", "فشل تحديث حالة السؤال", language))
     }
   }

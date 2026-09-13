@@ -35,7 +35,7 @@ export default function ProctorReportPage() {
         .then((res) => {
           if (!cancelled) setData(res?.items ?? [])
         })
-        .catch((err) => {
+        .catch(() => {
           console.warn("[ProctorReport] Failed to load data")
           if (!cancelled) setData([])
         })
@@ -56,12 +56,11 @@ export default function ProctorReportPage() {
     const map = new Map<string, { id: string; name: string; email?: string; rollNo?: string }>()
     data.forEach((row) => {
       if (!map.has(row.candidateId)) {
-        const anyRow = row as Record<string, unknown>
         map.set(row.candidateId, {
           id: row.candidateId,
           name: row.candidateName,
           email: row.candidateEmail,
-          rollNo: (anyRow.rollNo ?? anyRow.RollNo ?? "") as string,
+          rollNo: row.candidateRollNo ?? "",
         })
       }
     })

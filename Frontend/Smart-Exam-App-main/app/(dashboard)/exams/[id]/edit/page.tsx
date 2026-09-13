@@ -47,10 +47,6 @@ export default function EditExamPage() {
     isActive: true,
   })
 
-  useEffect(() => {
-    loadExam()
-  }, [id])
-
   async function loadExam() {
     try {
       setLoading(true)
@@ -64,8 +60,8 @@ export default function EditExamPage() {
         titleAr: examData.titleAr || "",
         descriptionEn: examData.descriptionEn || "",
         descriptionAr: examData.descriptionAr || "",
-        startAt: examData.startAt ? formatDateTimeLocal(examData.startAt) : "",
-        endAt: examData.endAt ? formatDateTimeLocal(examData.endAt) : "",
+        startAt: examData.startAt ? utcToUaeInput(examData.startAt) : "",
+        endAt: examData.endAt ? utcToUaeInput(examData.endAt) : "",
         durationMinutes: examData.durationMinutes || 60,
         maxAttempts: examData.maxAttempts || 1,
         shuffleQuestions: examData.shuffleQuestions || false,
@@ -73,7 +69,7 @@ export default function EditExamPage() {
         passScore: examData.passScore || 0,
         isActive: examData.isActive ?? true,
       })
-    } catch (err) {
+    } catch {
       setError(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
       toast.error(language === "ar" ? "فشل في تحميل الاختبار" : "Failed to load exam")
     } finally {
@@ -81,9 +77,10 @@ export default function EditExamPage() {
     }
   }
 
-  function formatDateTimeLocal(dateString: string): string {
-    return utcToUaeInput(dateString)
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => loadExam(), 0)
+    return () => clearTimeout(timer)
+  }, [id])
 
   function updateField(field: string, value: string | number | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))

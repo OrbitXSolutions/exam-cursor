@@ -15,7 +15,7 @@ export function LanguageToggle() {
   const { language, setLanguage, dir } = useI18n()
 
   return (
-    <DropdownMenu>
+    <DropdownMenu dir={dir}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Languages className="h-4 w-4" />
@@ -24,7 +24,7 @@ export function LanguageToggle() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" dir={dir}>
+      <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => setLanguage("en")}
           className={language === "en" ? "bg-accent" : ""}

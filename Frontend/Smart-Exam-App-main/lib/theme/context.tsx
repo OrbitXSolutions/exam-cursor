@@ -28,15 +28,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    let active = true
     const savedTheme = localStorage.getItem("theme") as Theme
     const savedAccent = localStorage.getItem("accentColor") as AccentColor
 
-    if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
-      setThemeState(savedTheme)
-    }
-    if (savedAccent && accentColors[savedAccent]) {
-      setAccentColorState(savedAccent)
+    queueMicrotask(() => {
+      if (!active) return
+      if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
+        setThemeState(savedTheme)
+      }
+      if (savedAccent && accentColors[savedAccent]) {
+        setAccentColorState(savedAccent)
+      }
+      setMounted(true)
+    })
+
+    return () => {
+      active = false
     }
   }, [])
 

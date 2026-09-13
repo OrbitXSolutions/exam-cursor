@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useEffectEvent, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -30,6 +29,20 @@ import { getAiProctorAnalysis, type AiProctorAnalysis } from "@/lib/api/proctori
 import { AttemptEventLog, type AttemptEvent } from "@/components/attempt-event-log"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message
+  ) {
+    return error.message
+  }
+
+  return fallback
+}
 
 function formatDateTime(dateStr: string | undefined | null, language: string): string {
   if (!dateStr) return "—"
@@ -130,52 +143,6 @@ export default function CandidateExamDetailsPage() {
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false)
   const [aiAnalysisError, setAiAnalysisError] = useState<string | null>(null)
 
-  // ── Initialize from query params ──
-  useEffect(() => {
-    const cId = searchParams.get("candidateId")
-    const eId = searchParams.get("examId")
-    const aId = searchParams.get("attemptId")
-
-    if (cId && eId) {
-      setSelectedCandidateId(cId)
-      setSelectedExamId(Number(eId))
-      if (aId) setSelectedAttemptId(Number(aId))
-      setShowSearch(false)
-    }
-  }, [searchParams])
-
-  // ── Load details when candidate + exam are set ──
-  useEffect(() => {
-    if (selectedCandidateId && selectedExamId > 0) {
-      loadDetails()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCandidateId, selectedExamId, selectedAttemptId])
-
-  // ── Load candidate exams when candidate selected ──
-  useEffect(() => {
-    if (selectedCandidateId) {
-      loadCandidateExams(selectedCandidateId)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCandidateId])
-
-  // ── Load initial candidates on mount ──
-  useEffect(() => {
-    loadCandidateList()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // ── Debounced search when typing in dropdown ──
-  useEffect(() => {
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
-    searchDebounceRef.current = setTimeout(() => {
-      loadCandidateList(candidateSearch)
-    }, 300)
-    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [candidateSearch])
-
   // ── Search Candidates ──
   const loadCandidateList = useCallback(async (search?: string) => {
     setIsSearching(true)
@@ -190,17 +157,17 @@ export default function CandidateExamDetailsPage() {
   }, [])
 
   // ── Load Candidate Exams ──
-  const loadCandidateExams = async (candidateId: string) => {
+  const loadCandidateExams = useCallback(async (candidateId: string) => {
     try {
       const exams = await getCandidateExams(candidateId)
       setCandidateExams(exams)
     } catch {
       setCandidateExams([])
     }
-  }
+  }, [])
 
   // ── Load Details ──
-  const loadDetails = async () => {
+  const loadDetails = useCallback(async () => {
     setIsLoading(true)
     setAiAnalysis(null)
     setAiAnalysisError(null)
@@ -222,7 +189,64 @@ export default function CandidateExamDetailsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isRtl, selectedAttemptId, selectedCandidateId, selectedExamId])
+
+  const loadDetailsFromEffect = useEffectEvent(() => {
+    void loadDetails()
+  })
+
+  // ── Initialize from query params ──
+  useEffect(() => {
+    const candidateId = searchParams.get("candidateId")
+    const examId = searchParams.get("examId")
+    const attemptId = searchParams.get("attemptId")
+
+    if (!candidateId || !examId) return
+
+    const timeoutId = window.setTimeout(() => {
+      setSelectedCandidateId(candidateId)
+      setSelectedExamId(Number(examId))
+      if (attemptId) setSelectedAttemptId(Number(attemptId))
+      setShowSearch(false)
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [searchParams])
+
+  // ── Load details when candidate + exam are set ──
+  useEffect(() => {
+    if (!selectedCandidateId || selectedExamId <= 0) return
+
+    const timeoutId = window.setTimeout(loadDetailsFromEffect, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [selectedCandidateId, selectedExamId, selectedAttemptId])
+
+  // ── Load candidate exams when candidate selected ──
+  useEffect(() => {
+    if (!selectedCandidateId) return
+
+    const timeoutId = window.setTimeout(() => {
+      void loadCandidateExams(selectedCandidateId)
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadCandidateExams, selectedCandidateId])
+
+  // ── Load initial candidates on mount ──
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadCandidateList()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadCandidateList])
+
+  // ── Debounced search when typing in dropdown ──
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+    searchDebounceRef.current = setTimeout(() => {
+      void loadCandidateList(candidateSearch)
+    }, 300)
+    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current) }
+  }, [candidateSearch, loadCandidateList])
 
   // ── Select Candidate from List ──
   const handleSelectCandidate = (c: CandidateDto) => {
@@ -261,8 +285,8 @@ export default function CandidateExamDetailsPage() {
       const analysis = await getAiProctorAnalysis(String(data.proctor.sessionId))
       setAiAnalysis(analysis)
       toast.success(isRtl ? "تم إنشاء تحليل الذكاء الاصطناعي" : "AI analysis generated successfully")
-    } catch (error: any) {
-      const msg = error?.message || (isRtl ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, isRtl ? "فشل إنشاء تحليل الذكاء الاصطناعي" : "Failed to generate AI analysis")
       setAiAnalysisError(msg)
       toast.error(msg)
     } finally {

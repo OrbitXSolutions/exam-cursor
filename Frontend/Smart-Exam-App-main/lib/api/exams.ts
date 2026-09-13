@@ -45,6 +45,10 @@ const mockExams: Exam[] = [
     preventScreenCapture: false,
     requireFullscreen: false,
     browserLockdown: false,
+    enableScreenMonitoring: false,
+    screenMonitoringMode: 0,
+    screenShareGracePeriod: 20,
+    maxViolationWarnings: 0,
     createdDate: new Date().toISOString(),
     updatedDate: null,
     sectionsCount: 2,
@@ -83,6 +87,10 @@ const mockExams: Exam[] = [
     preventScreenCapture: false,
     requireFullscreen: false,
     browserLockdown: false,
+    enableScreenMonitoring: false,
+    screenMonitoringMode: 0,
+    screenShareGracePeriod: 20,
+    maxViolationWarnings: 0,
     createdDate: new Date().toISOString(),
     updatedDate: null,
     sectionsCount: 1,
@@ -138,6 +146,20 @@ function normalizePagedResponse<T>(response: unknown): {
   return { items, totalCount };
 }
 
+interface ItemsResponse<T> {
+  items?: T[];
+}
+
+interface SuccessResponse {
+  success?: boolean;
+}
+
+interface ValidateExamResponse {
+  isValid?: boolean;
+  errors?: string[];
+  warnings?: string[];
+}
+
 /** Exam id + name only (for dropdowns). Backend GET /Assessment/exams/list */
 export interface ExamDropdownItem {
   id: number;
@@ -164,7 +186,7 @@ export async function getExamListForDropdown(): Promise<ExamDropdownItem[]> {
       ? ((inner.data ?? inner.Data ?? inner.items ?? inner.Items) as unknown)
       : null;
     return Array.isArray(arr) ? (arr as ExamDropdownItem[]) : [];
-  } catch (err) {
+  } catch {
     console.warn("[getExamListForDropdown] Failed");
     return [];
   }
@@ -198,7 +220,7 @@ export async function getExams(params?: {
         (totalCount || items.length) / (params?.pageSize ?? 10),
       ),
     };
-  } catch (err) {
+  } catch {
     console.warn("[getExams] Failed to load exams");
     return {
       items: [],
@@ -223,10 +245,10 @@ export interface CreateExamParams {
   examType: ExamType;
   titleEn: string;
   titleAr: string;
-  descriptionEn?: string;
-  descriptionAr?: string;
-  startAt: string;
-  endAt: string;
+  descriptionEn?: string | null;
+  descriptionAr?: string | null;
+  startAt: string | null;
+  endAt: string | null;
   durationMinutes: number;
   // Attempts policy
   maxAttempts: number;
@@ -249,10 +271,18 @@ export interface CreateExamParams {
   preventScreenCapture?: boolean;
   requireFullscreen?: boolean;
   browserLockdown?: boolean;
+  enableScreenMonitoring?: boolean;
+  screenMonitoringMode?: number;
+  screenShareGracePeriod?: number;
+  maxViolationWarnings?: number;
 }
 
 export async function createExam(data: CreateExamParams): Promise<Exam> {
-  const response = await apiClient.post<any>("/Assessment/exams", data, null);
+  const response = await apiClient.post<Exam | null>(
+    "/Assessment/exams",
+    data,
+    null,
+  );
 
   if (response && response.id) {
     return response as Exam;
@@ -275,6 +305,10 @@ export async function createExam(data: CreateExamParams): Promise<Exam> {
     preventScreenCapture: data.preventScreenCapture ?? false,
     requireFullscreen: data.requireFullscreen ?? false,
     browserLockdown: data.browserLockdown ?? false,
+    enableScreenMonitoring: data.enableScreenMonitoring ?? false,
+    screenMonitoringMode: data.screenMonitoringMode ?? 0,
+    screenShareGracePeriod: data.screenShareGracePeriod ?? 20,
+    maxViolationWarnings: data.maxViolationWarnings ?? 0,
     createdDate: new Date().toISOString(),
     updatedDate: null,
     sectionsCount: 0,
@@ -291,7 +325,7 @@ export async function updateExam(
   id: string | number,
   data: Partial<CreateExamParams>,
 ): Promise<Exam> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<Exam | null>(
     `/Assessment/exams/${id}`,
     data,
     null,
@@ -311,21 +345,21 @@ export async function deleteExam(id: string | number): Promise<void> {
 }
 
 export async function publishExam(id: string | number): Promise<boolean> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<boolean | SuccessResponse | null>(
     `/Assessment/exams/${id}/publish`,
     undefined,
     null,
   );
-  return response === true || (response && response.success);
+  return (response === true || (response && response.success)) as boolean;
 }
 
 export async function unpublishExam(id: string | number): Promise<boolean> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<boolean | SuccessResponse | null>(
     `/Assessment/exams/${id}/unpublish`,
     undefined,
     null,
   );
-  return response === true || (response && response.success);
+  return (response === true || (response && response.success)) as boolean;
 }
 
 // ============ SHARE LINKS ============
@@ -372,7 +406,7 @@ export async function revokeShareLink(
 export async function validateExam(
   id: string | number,
 ): Promise<{ isValid: boolean; errors: string[]; warnings: string[] }> {
-  const response = await apiClient.get<any>(
+  const response = await apiClient.get<ValidateExamResponse | null>(
     `/Assessment/exams/${id}/validate`,
     null,
   );
@@ -392,10 +426,9 @@ export async function validateExam(
 export async function getExamSections(
   examId: string | number,
 ): Promise<ExamSection[]> {
-  const response = await apiClient.get<any>(
-    `/Assessment/exams/${examId}/sections`,
-    null,
-  );
+  const response = await apiClient.get<
+    ExamSection[] | ItemsResponse<ExamSection> | null
+  >(`/Assessment/exams/${examId}/sections`, null);
 
   if (Array.isArray(response)) {
     return response as ExamSection[];
@@ -422,7 +455,7 @@ export async function createExamSection(
   examId: string | number,
   data: CreateSectionParams,
 ): Promise<ExamSection> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<ExamSection | null>(
     `/Assessment/exams/${examId}/sections`,
     data,
     null,
@@ -456,7 +489,7 @@ export async function updateExamSection(
   sectionId: string | number,
   data: Partial<CreateSectionParams>,
 ): Promise<ExamSection> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<ExamSection | null>(
     `/Assessment/sections/${sectionId}`,
     data,
     null,
@@ -492,10 +525,9 @@ export async function reorderSections(
 export async function getSectionTopics(
   sectionId: string | number,
 ): Promise<ExamTopic[]> {
-  const response = await apiClient.get<any>(
-    `/Assessment/sections/${sectionId}/topics`,
-    null,
-  );
+  const response = await apiClient.get<
+    ExamTopic[] | ItemsResponse<ExamTopic> | null
+  >(`/Assessment/sections/${sectionId}/topics`, null);
 
   if (Array.isArray(response)) {
     return response as ExamTopic[];
@@ -520,7 +552,7 @@ export async function createTopic(
   sectionId: string | number,
   data: CreateTopicParams,
 ): Promise<ExamTopic> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<ExamTopic | null>(
     `/Assessment/sections/${sectionId}/topics`,
     data,
     null,
@@ -550,7 +582,7 @@ export async function updateTopic(
   topicId: string | number,
   data: Partial<CreateTopicParams>,
 ): Promise<ExamTopic> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<ExamTopic | null>(
     `/Assessment/topics/${topicId}`,
     data,
     null,
@@ -594,10 +626,9 @@ export async function reorderTopics(
 export async function getSectionQuestions(
   sectionId: string | number,
 ): Promise<ExamQuestion[]> {
-  const response = await apiClient.get<any>(
-    `/Assessment/sections/${sectionId}/questions`,
-    null,
-  );
+  const response = await apiClient.get<
+    ExamQuestion[] | ItemsResponse<ExamQuestion> | null
+  >(`/Assessment/sections/${sectionId}/questions`, null);
 
   if (Array.isArray(response)) {
     return response as ExamQuestion[];
@@ -613,10 +644,9 @@ export async function getSectionQuestions(
 export async function getTopicQuestions(
   topicId: string | number,
 ): Promise<ExamQuestion[]> {
-  const response = await apiClient.get<any>(
-    `/Assessment/topics/${topicId}/questions`,
-    null,
-  );
+  const response = await apiClient.get<
+    ExamQuestion[] | ItemsResponse<ExamQuestion> | null
+  >(`/Assessment/topics/${topicId}/questions`, null);
 
   if (Array.isArray(response)) {
     return response as ExamQuestion[];
@@ -640,7 +670,7 @@ export async function addQuestionToSection(
   sectionId: string | number,
   data: AddQuestionParams,
 ): Promise<ExamQuestion> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<ExamQuestion | null>(
     `/Assessment/sections/${sectionId}/questions`,
     data,
     null,
@@ -661,7 +691,11 @@ export async function addQuestionToSection(
     isRequired: data.isRequired ?? true,
     createdDate: new Date().toISOString(),
     questionBody: "Question",
+    questionBodyEn: "Question",
+    questionBodyAr: "Question",
     questionTypeName: "MCQ_Single",
+    questionTypeNameEn: "MCQ_Single",
+    questionTypeNameAr: "MCQ_Single",
     difficultyLevelName: "Medium",
     originalPoints: 1,
   };
@@ -671,7 +705,7 @@ export async function addQuestionToTopic(
   topicId: string | number,
   data: AddQuestionParams,
 ): Promise<ExamQuestion> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<ExamQuestion | null>(
     `/Assessment/topics/${topicId}/questions`,
     data,
     null,
@@ -692,7 +726,11 @@ export async function addQuestionToTopic(
     isRequired: data.isRequired ?? true,
     createdDate: new Date().toISOString(),
     questionBody: "Question",
+    questionBodyEn: "Question",
+    questionBodyAr: "Question",
     questionTypeName: "MCQ_Single",
+    questionTypeNameEn: "MCQ_Single",
+    questionTypeNameAr: "MCQ_Single",
     difficultyLevelName: "Medium",
     originalPoints: 1,
   };
@@ -708,11 +746,9 @@ export async function bulkAddQuestionsToSection(
   sectionId: string | number,
   data: BulkAddQuestionsParams,
 ): Promise<ExamQuestion[]> {
-  const response = await apiClient.post<any>(
-    `/Assessment/sections/${sectionId}/questions/bulk`,
-    data,
-    null,
-  );
+  const response = await apiClient.post<
+    ExamQuestion[] | ItemsResponse<ExamQuestion> | null
+  >(`/Assessment/sections/${sectionId}/questions/bulk`, data, null);
 
   if (Array.isArray(response)) {
     return response as ExamQuestion[];
@@ -729,11 +765,9 @@ export async function bulkAddQuestionsToTopic(
   topicId: string | number,
   data: BulkAddQuestionsParams,
 ): Promise<ExamQuestion[]> {
-  const response = await apiClient.post<any>(
-    `/Assessment/topics/${topicId}/questions/bulk`,
-    data,
-    null,
-  );
+  const response = await apiClient.post<
+    ExamQuestion[] | ItemsResponse<ExamQuestion> | null
+  >(`/Assessment/topics/${topicId}/questions/bulk`, data, null);
 
   if (Array.isArray(response)) {
     return response as ExamQuestion[];
@@ -750,7 +784,7 @@ export async function updateExamQuestion(
   examQuestionId: string | number,
   data: { order?: number; pointsOverride?: number; isRequired?: boolean },
 ): Promise<ExamQuestion> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<ExamQuestion | null>(
     `/Assessment/exam-questions/${examQuestionId}`,
     data,
     null,
@@ -771,7 +805,11 @@ export async function updateExamQuestion(
     isRequired: data.isRequired ?? true,
     createdDate: new Date().toISOString(),
     questionBody: "Question",
+    questionBodyEn: "Question",
+    questionBodyAr: "Question",
     questionTypeName: "MCQ_Single",
+    questionTypeNameEn: "MCQ_Single",
+    questionTypeNameAr: "MCQ_Single",
     difficultyLevelName: "Medium",
     originalPoints: 1,
   };
@@ -801,7 +839,7 @@ export async function reorderSectionQuestions(
 export async function getExamInstructions(
   examId: string | number,
 ): Promise<ExamInstruction[]> {
-  const response = await apiClient.get<any>(
+  const response = await apiClient.get<ExamInstruction[] | null>(
     `/Assessment/exams/${examId}/instructions`,
     null,
   );
@@ -823,7 +861,7 @@ export async function createInstruction(
   examId: string | number,
   data: CreateInstructionParams,
 ): Promise<ExamInstruction> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<ExamInstruction | null>(
     `/Assessment/exams/${examId}/instructions`,
     data,
     null,
@@ -847,7 +885,7 @@ export async function updateInstruction(
   instructionId: string | number,
   data: Partial<CreateInstructionParams>,
 ): Promise<ExamInstruction> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<ExamInstruction | null>(
     `/Assessment/instructions/${instructionId}`,
     data,
     null,
@@ -891,7 +929,7 @@ export async function reorderInstructions(
 export async function getAccessPolicy(
   examId: string | number,
 ): Promise<ExamAccessPolicy | null> {
-  const response = await apiClient.get<any>(
+  const response = await apiClient.get<ExamAccessPolicy | null>(
     `/Assessment/exams/${examId}/access-policy`,
     null,
   );
@@ -914,7 +952,7 @@ export async function saveAccessPolicy(
   examId: string | number,
   data: SaveAccessPolicyParams,
 ): Promise<ExamAccessPolicy> {
-  const response = await apiClient.put<any>(
+  const response = await apiClient.put<ExamAccessPolicy | null>(
     `/Assessment/exams/${examId}/access-policy`,
     data,
     null,
@@ -954,7 +992,7 @@ export interface ReorderWalkInFieldParams {
 export async function getWalkInFields(
   examId: string | number,
 ): Promise<WalkInField[]> {
-  const response = await apiClient.get<any>(
+  const response = await apiClient.get<WalkInField[] | null>(
     `/Assessment/exams/${examId}/walkin-fields`,
     null,
   );
@@ -966,28 +1004,28 @@ export async function saveWalkInField(
   fieldId: number | null,
   data: SaveWalkInFieldParams,
 ): Promise<WalkInField> {
-  let response: any;
+  let response: WalkInField | null;
   if (fieldId) {
-    response = await apiClient.put<any>(
+    response = await apiClient.put<WalkInField | null>(
       `/Assessment/exams/${examId}/walkin-fields/${fieldId}`,
       data,
       null,
     );
   } else {
-    response = await apiClient.post<any>(
+    response = await apiClient.post<WalkInField | null>(
       `/Assessment/exams/${examId}/walkin-fields`,
       data,
       null,
     );
   }
-  return response;
+  return response as WalkInField;
 }
 
 export async function deleteWalkInField(
   examId: string | number,
   fieldId: number,
 ): Promise<void> {
-  await apiClient.delete<any>(
+  await apiClient.delete<void | null>(
     `/Assessment/exams/${examId}/walkin-fields/${fieldId}`,
     null,
   );
@@ -997,7 +1035,7 @@ export async function reorderWalkInFields(
   examId: string | number,
   orders: ReorderWalkInFieldParams[],
 ): Promise<void> {
-  await apiClient.put<any>(
+  await apiClient.put<void | null>(
     `/Assessment/exams/${examId}/walkin-fields/reorder`,
     orders,
     null,
@@ -1007,7 +1045,7 @@ export async function reorderWalkInFields(
 export async function getWalkInAnswers(
   examId: string | number,
 ): Promise<WalkInAnswer[]> {
-  const response = await apiClient.get<any>(
+  const response = await apiClient.get<WalkInAnswer[] | null>(
     `/Assessment/exams/${examId}/walkin-answers`,
     null,
   );
@@ -1028,6 +1066,7 @@ export interface ExamSchedule {
 export async function getExamSchedules(
   examId: string | number,
 ): Promise<ExamSchedule[]> {
+  void examId;
   // Schedules API not yet implemented - return empty array
   return [];
 }
@@ -1058,12 +1097,12 @@ export async function createExamSchedule(
 // ============ ARCHIVE EXAM ============
 export async function archiveExam(id: string | number): Promise<boolean> {
   // Archive = toggle status to inactive
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<boolean | SuccessResponse | null>(
     `/Assessment/exams/${id}/toggle-status`,
     undefined,
     null,
   );
-  return response === true || (response && response.success);
+  return (response === true || (response && response.success)) as boolean;
 }
 
 // ============ REMOVE QUESTION FROM SECTION ============
@@ -1160,7 +1199,7 @@ export async function cloneExam(
   sourceExamId: number,
   data: CloneExamParams,
 ): Promise<Exam> {
-  const response = await apiClient.post<any>(
+  const response = await apiClient.post<Exam | null>(
     `/Assessment/exams/${sourceExamId}/clone`,
     data,
     null,

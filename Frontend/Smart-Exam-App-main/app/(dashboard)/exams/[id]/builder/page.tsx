@@ -12,7 +12,6 @@ import {
   deleteExamSection,
   addQuestionToSection,
   removeQuestionFromSection,
-  getSectionTopics,
   createTopic,
   updateTopic,
   deleteTopic,
@@ -65,7 +64,6 @@ import {
   X,
   Shuffle,
   MousePointer,
-  FolderOpen,
   BookOpen,
 } from "lucide-react"
 
@@ -76,7 +74,7 @@ export default function ExamBuilderPage() {
   const [sections, setSections] = useState<ExamSection[]>([])
   const [availableQuestions, setAvailableQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set())
 
   // Dialog states
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false)
@@ -93,7 +91,7 @@ export default function ExamBuilderPage() {
   // Topic states
   const [topicDialogOpen, setTopicDialogOpen] = useState(false)
   const [editingTopic, setEditingTopic] = useState<ExamTopic | null>(null)
-  const [activeSectionForTopic, setActiveSectionForTopic] = useState<string | null>(null)
+  const [activeSectionForTopic, setActiveSectionForTopic] = useState<number | null>(null)
   const [topicForm, setTopicForm] = useState({ 
     titleEn: "", 
     titleAr: "", 
@@ -104,8 +102,8 @@ export default function ExamBuilderPage() {
 
   // Question picker
   const [questionPickerOpen, setQuestionPickerOpen] = useState(false)
-  const [activeSectionForQuestions, setActiveSectionForQuestions] = useState<string | null>(null)
-  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set())
+  const [activeSectionForQuestions, setActiveSectionForQuestions] = useState<number | null>(null)
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(new Set())
   const [questionSearch, setQuestionSearch] = useState("")
   const [selectionMode, setSelectionMode] = useState<"manual" | "random">("manual")
   const [randomCount, setRandomCount] = useState(5)
@@ -129,14 +127,14 @@ export default function ExamBuilderPage() {
       setAvailableQuestions(questionsData.items.filter((q) => q.isActive))
       // Expand all sections by default
       setExpandedSections(new Set(sectionsData.map((s) => s.id)))
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في تحميل بيانات الاختبار" : "Failed to load exam data")
     } finally {
       setLoading(false)
     }
   }
 
-  function toggleSectionExpand(sectionId: string) {
+  function toggleSectionExpand(sectionId: number) {
     setExpandedSections((prev) => {
       const next = new Set(prev)
       if (next.has(sectionId)) {
@@ -209,13 +207,13 @@ export default function ExamBuilderPage() {
       toast.success(language === "ar" ? "تم حذف القسم" : "Section deleted")
       setDeleteSectionDialog(null)
       loadData()
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في حذف القسم" : "Failed to delete section")
     }
   }
 
   // Topic handlers
-  function openTopicDialog(sectionId: string, topic?: ExamTopic) {
+  function openTopicDialog(sectionId: number, topic?: ExamTopic) {
     setActiveSectionForTopic(sectionId)
     if (topic) {
       setEditingTopic(topic)
@@ -238,7 +236,7 @@ export default function ExamBuilderPage() {
       return
     }
 
-    const section = sections.find((s) => String(s.id) === activeSectionForTopic)
+    const section = sections.find((s) => s.id === activeSectionForTopic)
     const topicsCount = section?.topics?.length || 0
 
     try {
@@ -280,7 +278,7 @@ export default function ExamBuilderPage() {
     }
   }
 
-  function openQuestionPicker(sectionId: string) {
+  function openQuestionPicker(sectionId: number) {
     setActiveSectionForQuestions(sectionId)
     // Start with empty selection - only show questions not already in the exam
     setSelectedQuestions(new Set())
@@ -296,7 +294,7 @@ export default function ExamBuilderPage() {
     const maxOrder = section?.questions?.reduce((max, q) => Math.max(max, q.order || 0), 0) || 0
 
     // Find newly selected questions that are NOT already in ANY section of the exam
-    const newQuestionIds = Array.from(selectedQuestions).filter((qId) => !allExamQuestionIds.has(String(qId)))
+    const newQuestionIds = Array.from(selectedQuestions).filter((qId) => !allExamQuestionIds.has(qId))
 
     if (newQuestionIds.length === 0) {
       toast.error(t("exams.noNewQuestionsSelected"))
@@ -307,7 +305,7 @@ export default function ExamBuilderPage() {
     try {
       let orderIndex = maxOrder + 1 // Start from next order number after max
       for (const questionId of newQuestionIds) {
-        const question = availableQuestions.find((q) => String(q.id) === String(questionId))
+        const question = availableQuestions.find((q) => q.id === questionId)
         // API takes sectionId directly, include order to avoid duplicate order error
         await addQuestionToSection(activeSectionForQuestions, {
           questionId: Number(questionId),
@@ -328,13 +326,13 @@ export default function ExamBuilderPage() {
     }
   }
 
-  async function handleRemoveQuestion(sectionId: string, examQuestionId: string) {
+  async function handleRemoveQuestion(sectionId: number, examQuestionId: number) {
     try {
       // API takes examQuestionId directly
       await removeQuestionFromSection(id, sectionId, examQuestionId)
       toast.success(language === "ar" ? "تم إزالة السؤال" : "Question removed")
       loadData()
-    } catch (error) {
+    } catch {
       toast.error(language === "ar" ? "فشل في إزالة السؤال" : "Failed to remove question")
     }
   }
@@ -352,11 +350,11 @@ export default function ExamBuilderPage() {
 
   // Get all question IDs that are already in ANY section of the exam
   const allExamQuestionIds = new Set(
-    sections.flatMap(s => s.questions?.map(q => String(q.questionId)) || [])
+    sections.flatMap(s => s.questions?.map(q => q.questionId) || [])
   )
 
   // Filter questions that are NOT already in the exam
-  const questionsNotInExam = availableQuestions.filter(q => !allExamQuestionIds.has(String(q.id)))
+  const questionsNotInExam = availableQuestions.filter(q => !allExamQuestionIds.has(q.id))
   
   const filteredQuestions = questionsNotInExam.filter((q) => {
     const searchTerm = questionSearch.toLowerCase()
@@ -381,7 +379,7 @@ export default function ExamBuilderPage() {
     const shuffled = [...filteredQuestions].sort(() => Math.random() - 0.5)
     const randomIds = shuffled.slice(0, Math.min(randomCount, shuffled.length)).map(q => q.id)
     
-    setSelectedQuestions(new Set(randomIds.map(String)))
+    setSelectedQuestions(new Set(randomIds))
   }
 
   if (loading) {
@@ -442,6 +440,7 @@ export default function ExamBuilderPage() {
             const isExpanded = expandedSections.has(section.id)
             const questionCount = section.questions?.length || 0
             const totalPoints = section.questions?.reduce((sum, q) => sum + (q.points || 0), 0) || 0
+            const sectionTimeLimit = section.timeLimit || section.durationMinutes || 0
 
             return (
               <Card key={section.id} className="overflow-hidden">
@@ -466,10 +465,10 @@ export default function ExamBuilderPage() {
                           <span>
                             {totalPoints} {t("exams.points")}
                           </span>
-                          {(section.timeLimit || section.durationMinutes) && (section.timeLimit || section.durationMinutes) > 0 && (
+                          {sectionTimeLimit > 0 && (
                             <>
                               <span>•</span>
-                              <span>{section.timeLimit || section.durationMinutes} {t("exams.mins")}</span>
+                              <span>{sectionTimeLimit} {t("exams.mins")}</span>
                             </>
                           )}
                         </CardDescription>
@@ -529,7 +528,7 @@ export default function ExamBuilderPage() {
                             variant="outline"
                             size="sm"
                             className="bg-transparent"
-                            onClick={() => openTopicDialog(String(section.id))}
+                            onClick={() => openTopicDialog(section.id)}
                           >
                             <Plus className="h-4 w-4 me-2" />
                             {t("exams.addTopic") || "Add Topic"}
@@ -559,7 +558,7 @@ export default function ExamBuilderPage() {
                                   variant="ghost"
                                   size="icon"
                                   className="h-7 w-7"
-                                  onClick={() => openTopicDialog(String(section.id), topic)}
+                                  onClick={() => openTopicDialog(section.id, topic)}
                                 >
                                   <Pencil className="h-3.5 w-3.5" />
                                 </Button>
@@ -582,7 +581,7 @@ export default function ExamBuilderPage() {
                           variant="ghost"
                           size="sm"
                           className="text-muted-foreground hover:text-foreground"
-                          onClick={() => openTopicDialog(String(section.id))}
+                          onClick={() => openTopicDialog(section.id)}
                         >
                           <BookOpen className="h-4 w-4 me-2" />
                           {t("exams.addTopic") || "Add Topic"} ({t("common.optional") || "Optional"})
@@ -600,7 +599,7 @@ export default function ExamBuilderPage() {
                         variant="outline"
                         size="sm"
                         className="bg-transparent"
-                        onClick={() => openQuestionPicker(String(section.id))}
+                        onClick={() => openQuestionPicker(section.id)}
                       >
                         <Plus className="h-4 w-4 me-2" />
                         {t("exams.addQuestions")}
@@ -751,7 +750,7 @@ export default function ExamBuilderPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("common.confirmDelete")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("exams.deleteSectionConfirm", { title: deleteSectionDialog?.title })}
+              {t("exams.deleteSectionConfirm", { title: deleteSectionDialog?.title || deleteSectionDialog?.titleEn || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -914,7 +913,7 @@ export default function ExamBuilderPage() {
                 <ScrollArea className="h-[calc(100vh-380px)]">
                   <div className="space-y-2 pe-4">
                     {filteredQuestions.map((question) => {
-                      const isSelected = selectedQuestions.has(String(question.id))
+                      const isSelected = selectedQuestions.has(question.id)
                       return (
                         <div
                           key={question.id}
@@ -924,7 +923,7 @@ export default function ExamBuilderPage() {
                           onClick={() => {
                             setSelectedQuestions((prev) => {
                               const next = new Set(prev)
-                              const qId = String(question.id)
+                              const qId = question.id
                               if (next.has(qId)) {
                                 next.delete(qId)
                               } else {
@@ -1018,7 +1017,7 @@ export default function ExamBuilderPage() {
                     <ScrollArea className="h-[calc(100vh-520px)]">
                       <div className="space-y-2 pe-4">
                         {Array.from(selectedQuestions).map((qId) => {
-                          const question = availableQuestions.find(q => String(q.id) === qId)
+                          const question = availableQuestions.find(q => q.id === qId)
                           if (!question) return null
                           return (
                             <div key={qId} className="flex items-start gap-3 p-3 rounded-lg border border-primary bg-primary/5">

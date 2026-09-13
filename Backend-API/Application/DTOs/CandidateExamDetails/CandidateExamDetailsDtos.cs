@@ -188,7 +188,6 @@ public class ExamDetailsResultInfoDto
     public bool IsFinalized { get; set; }
     public bool IsPublished { get; set; }
     public int? GradingSessionId { get; set; }
-    public int? CertificateId { get; set; }
 }
 
 // ── Candidate Exams Dropdown ───────────────────────────────────────────────────

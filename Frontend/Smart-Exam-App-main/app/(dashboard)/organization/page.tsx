@@ -8,7 +8,6 @@ import {
   getOrganizationSettings,
   updateOrganizationSettings,
   uploadOrganizationImage,
-  type OrganizationSettingsDto,
 } from "@/lib/api/organization"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,10 +41,6 @@ export default function OrganizationPage() {
     isActive: true,
   })
 
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
   async function loadSettings() {
     try {
       const data = await getOrganizationSettings()
@@ -67,6 +62,10 @@ export default function OrganizationPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadSettings)
+  }, [])
 
   async function handleSave() {
     setSaving(true)

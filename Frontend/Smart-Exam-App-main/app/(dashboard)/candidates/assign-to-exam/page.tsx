@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useEffectEvent, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { useAuth } from "@/lib/auth/context"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -31,14 +30,29 @@ import {
 } from "lucide-react"
 import {
   getAssignmentCandidates, assignExam, unassignExam,
-  type AssignmentCandidateDto, type AssignmentResultDto,
+  type AssignmentCandidateDto, type AssignmentResultDto, type AssignExamPayload,
 } from "@/lib/api/exam-assignment"
 import { getExams } from "@/lib/api/exams"
 import { getBatches, type BatchDto } from "@/lib/api/batch"
 
+const PAGE_SIZE_EXAM = 20
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message
+  ) {
+    return error.message
+  }
+
+  return fallback
+}
+
 export default function AssignToExamPage() {
   const { language } = useI18n()
-  const { user } = useAuth()
   const isAr = language === "ar"
   const searchParams = useSearchParams()
 
@@ -96,9 +110,7 @@ export default function AssignToExamPage() {
 
   const filteredExamOptions = examItems
 
-  const PAGE_SIZE_EXAM = 20
-
-  async function loadExamsPage(search: string, page: number, replace: boolean) {
+  const loadExamsPage = useCallback(async (search: string, page: number, replace: boolean) => {
     setExamSearchLoading(true)
     try {
       const response = await getExams({ search: search || undefined, pageNumber: page, pageSize: PAGE_SIZE_EXAM })
@@ -115,40 +127,64 @@ export default function AssignToExamPage() {
     } finally {
       setExamSearchLoading(false)
     }
-  }
+  }, [])
+
+  const loadExamPageOnOpen = useEffectEvent(() => {
+    void loadExamsPage(examSearch, 1, true)
+  })
+
+  const scheduleExamSearch = useEffectEvent(() => {
+    if (!examDropdownOpen) return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      void loadExamsPage(examSearch, 1, true)
+    }, 300)
+    return () => window.clearTimeout(timeoutId)
+  })
+
+  const initializeDropdowns = useEffectEvent(() => {
+    const paramId = searchParams.get("examId")
+    let timeoutId: number | undefined
+    if (paramId) {
+      timeoutId = window.setTimeout(() => {
+        setSelectedExamId(paramId)
+        void loadExamsPage("", 1, true)
+      }, 0)
+    }
+    getBatches({ pageSize: 100 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
+
+    return () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+    }
+  })
 
   // When examItems loads and selectedExamId is set (URL param), resolve the label
   useEffect(() => {
     if (selectedExamId && !selectedExamObj && examItems.length > 0) {
       const found = examItems.find(e => String(e.id) === selectedExamId)
-      if (found) setSelectedExamObj(found)
+      if (found) {
+        const timeoutId = window.setTimeout(() => setSelectedExamObj(found), 0)
+        return () => window.clearTimeout(timeoutId)
+      }
     }
-  }, [examItems, selectedExamId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [examItems, selectedExamId, selectedExamObj])
 
   // Load first exam page when dropdown opens
   useEffect(() => {
     if (!examDropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
-  }, [examDropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+    const timeoutId = window.setTimeout(loadExamPageOnOpen, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [examDropdownOpen])
 
   // Debounced reload on search change while dropdown is open
   useEffect(() => {
-    if (!examDropdownOpen) return
-    const timer = setTimeout(() => {
-      loadExamsPage(examSearch, 1, true)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [examSearch]) // eslint-disable-line react-hooks/exhaustive-deps
+    return scheduleExamSearch()
+  }, [examSearch])
 
   // ── Load dropdowns ─────────────────────────────────────────
   useEffect(() => {
-    const paramId = searchParams.get("examId")
-    if (paramId) {
-      setSelectedExamId(paramId)
-      loadExamsPage("", 1, true)
-    }
-    getBatches({ pageSize: 100 }).then((r) => setBatches(r.items)).catch(() => setBatches([]))
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    return initializeDropdowns()
+  }, [])
 
   // ── Load candidates ────────────────────────────────────────
   const loadCandidates = useCallback(async () => {
@@ -168,14 +204,19 @@ export default function AssignToExamPage() {
       setCandidates(data.items)
       setTotalCount(data.totalCount)
       setTotalPages(data.totalPages)
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل تحميل المرشحين" : "Failed to load candidates"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل تحميل المرشحين" : "Failed to load candidates"))
     } finally {
       setLoading(false)
     }
   }, [isReady, selectedExamId, scheduleFrom, scheduleTo, selectedBatchId, search, statusFilter, page, pageSize, isAr])
 
-  useEffect(() => { loadCandidates() }, [loadCandidates])
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadCandidates()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadCandidates])
 
   useEffect(() => {
     const t = setTimeout(() => setPage(1), 300)
@@ -183,13 +224,17 @@ export default function AssignToExamPage() {
   }, [search, statusFilter])
 
   // Reset selection when exam/schedule changes
-  useEffect(() => { setSelected(new Set()) }, [selectedExamId, scheduleFrom, scheduleTo, selectedBatchId])
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setSelected(new Set()), 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [selectedExamId, scheduleFrom, scheduleTo, selectedBatchId])
 
   // ── Selection helpers ──────────────────────────────────────
   const toggleOne = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }
@@ -228,7 +273,7 @@ export default function AssignToExamPage() {
       let res: AssignmentResultDto
 
       if (confirmAction === "assign") {
-        const payload: any = { examId, scheduleFrom, scheduleTo }
+        const payload: AssignExamPayload = { examId, scheduleFrom, scheduleTo }
         if (confirmMode === "all") {
           // Batch mode or filter-all
           if (selectedBatchId !== "all") {
@@ -259,15 +304,14 @@ export default function AssignToExamPage() {
             : (isAr ? `تم إلغاء تعيين ${res.successCount} مرشح(ين)` : `${res.successCount} candidate(s) unassigned`),
         )
       }
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت العملية" : "Operation failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشلت العملية" : "Operation failed"))
     } finally {
       setActionLoading(false)
     }
   }
 
   // ── Get confirm count/label ────────────────────────────────
-  const confirmCount = confirmMode === "all" ? totalCount : selected.size
   const confirmLabel = confirmAction === "assign"
     ? (isAr ? "تعيين" : "Assign")
     : (isAr ? "إلغاء التعيين" : "Unassign")

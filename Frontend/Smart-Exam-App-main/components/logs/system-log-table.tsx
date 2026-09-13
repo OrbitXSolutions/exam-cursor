@@ -79,7 +79,8 @@ export function SystemLogTable({
   }, [fetchLogs, page, pageSize, search, levelFilter, dateFrom, dateTo])
 
   useEffect(() => {
-    loadLogs()
+    const timeout = setTimeout(loadLogs, 0)
+    return () => clearTimeout(timeout)
   }, [loadLogs])
 
   // Auto-refresh every 30 seconds

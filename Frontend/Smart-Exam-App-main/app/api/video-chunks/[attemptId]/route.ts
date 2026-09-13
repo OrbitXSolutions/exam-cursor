@@ -30,7 +30,7 @@ export async function GET(
 
     const data = await response.json().catch(() => ({}));
     return NextResponse.json(data, { status: response.status });
-  } catch (error) {
+  } catch {
     console.error("[VideoChunks Proxy] Request failed");
     return NextResponse.json(
       { error: "Failed to fetch video chunks" },

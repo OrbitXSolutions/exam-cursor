@@ -235,7 +235,6 @@ builder.Services.AddScoped<IGradingService, GradingService>();
 builder.Services.AddScoped<IAiGradingService, AiGradingService>();
 builder.Services.AddScoped<IAiProctorService, AiProctorService>();
 builder.Services.AddScoped<IExamResultService, ExamResultService>();
-builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IProctorService, ProctorService>();
 builder.Services.AddScoped<IExamProctorService, ExamProctorService>();
 builder.Services.AddScoped<IIdentityVerificationService, IdentityVerificationService>();
@@ -413,8 +412,11 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider(
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            [".jpg"] = "image/jpeg", [".jpeg"] = "image/jpeg", [".png"] = "image/png",
-            [".webp"] = "image/webp", [".ico"] = "image/x-icon"
+            [".jpg"] = "image/jpeg",
+            [".jpeg"] = "image/jpeg",
+            [".png"] = "image/png",
+            [".webp"] = "image/webp",
+            [".ico"] = "image/x-icon"
         }),
     OnPrepareResponse = context => context.Context.Response.Headers.XContentTypeOptions = "nosniff"
 });

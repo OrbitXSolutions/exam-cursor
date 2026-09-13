@@ -3,8 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { useAuth } from "@/lib/auth/context"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -37,9 +36,22 @@ import {
   exportBatchCandidates, type BatchDto,
 } from "@/lib/api/batch"
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message
+  ) {
+    return error.message
+  }
+
+  return fallback
+}
+
 export default function BatchPage() {
   const { language } = useI18n()
-  const { user } = useAuth()
   const router = useRouter()
   const isAr = language === "ar"
 
@@ -77,8 +89,8 @@ export default function BatchPage() {
       setBatches(data.items)
       setTotalCount(data.totalCount)
       setTotalPages(data.totalPages)
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل في تحميل الدفعات" : "Failed to load batches"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل في تحميل الدفعات" : "Failed to load batches"))
     } finally {
       setLoading(false)
     }
@@ -89,7 +101,12 @@ export default function BatchPage() {
     setPage(1)
   }
 
-  useEffect(() => { loadBatches() }, [loadBatches])
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadBatches()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadBatches])
 
   // Debounced search
   useEffect(() => {
@@ -137,8 +154,8 @@ export default function BatchPage() {
       }
       setFormOpen(false)
       loadBatches()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت العملية" : "Operation failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشلت العملية" : "Operation failed"))
     } finally {
       setFormLoading(false)
     }
@@ -153,8 +170,8 @@ export default function BatchPage() {
       setDeleteOpen(false)
       setDeleteTarget(null)
       loadBatches()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل الحذف" : "Delete failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل الحذف" : "Delete failed"))
     } finally {
       setDeleteLoading(false)
     }
@@ -169,8 +186,8 @@ export default function BatchPage() {
           : (isAr ? "تم تفعيل الدفعة" : "Batch activated"),
       )
       loadBatches()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل تغيير الحالة" : "Status change failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل تغيير الحالة" : "Status change failed"))
     }
   }
 
@@ -179,8 +196,8 @@ export default function BatchPage() {
     try {
       await exportBatchCandidates(batchId)
       toast.success(isAr ? "تم التصدير بنجاح" : "Export successful")
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل التصدير" : "Export failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل التصدير" : "Export failed"))
     } finally {
       setExportLoading(null)
     }

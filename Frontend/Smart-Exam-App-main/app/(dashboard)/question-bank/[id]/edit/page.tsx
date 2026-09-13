@@ -73,7 +73,7 @@ export default function EditQuestionPage() {
   const [existingAttachments, setExistingAttachments] = useState<QuestionAttachment[]>([])
   const [newImage, setNewImage] = useState<File | null>(null)
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null)
-  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [, setIsUploadingImage] = useState(false)
   const imageInputRef = useRef<HTMLInputElement>(null)
 
   // Answer key state for essay/subjective questions
@@ -82,22 +82,14 @@ export default function EditQuestionPage() {
     rubricTextAr: "",
   })
 
-  useEffect(() => {
-    if (questionId === "create" || !isValidId) {
-      return
-    }
-    fetchData()
-  }, [questionId])
-
   const fetchData = async () => {
     try {
-      const [questionRes, typesRes, subjectsRes] = await Promise.all([
+      const [questionRes, typesRes] = await Promise.all([
         getQuestionById(Number(questionId)),
         getQuestionTypes(),
-        getQuestionSubjects({ pageSize: 100 }),
       ])
 
-      const q = (questionRes as any)?.data || questionRes
+      const q = questionRes
       if (q && q.id) {
         setQuestion(q)
         setFormData({
@@ -120,7 +112,7 @@ export default function EditQuestionPage() {
         }
         if (q.options) {
           setOptions(
-            q.options.map((opt: any) => ({
+            q.options.map((opt) => ({
               id: String(opt.id),
               textEn: opt.textEn || opt.text || "",
               textAr: opt.textAr || "",
@@ -137,34 +129,30 @@ export default function EditQuestionPage() {
         if (q.attachments && q.attachments.length > 0) {
           setExistingAttachments(q.attachments)
         }
-        // Fetch topics for the question's subject
-        if (q.subjectId) {
-          try {
-            const topicsRes = await getQuestionTopics({ subjectId: q.subjectId, pageSize: 100 })
-            setTopics(topicsRes?.items || [])
-          } catch { setTopics([]) }
-        }
+        const [subject, topic] = await Promise.all([
+          getQuestionSubjectById(q.subjectId),
+          q.topicId ? getQuestionTopicById(q.topicId) : Promise.resolve(null),
+        ])
+        setInitialSubjectLabel(language === "ar" ? subject?.nameAr || "" : subject?.nameEn || "")
+        setInitialTopicLabel(language === "ar" ? topic?.nameAr || "" : topic?.nameEn || "")
       }
 
-      const typesList = (typesRes as any)?.items || typesRes
-      if (Array.isArray(typesList)) {
-        setTypes(typesList)
-      } else if (typesList?.items) {
-        setTypes(typesList.items)
-      }
+      setTypes(typesRes.items)
 
-      const subjectsList = (subjectsRes as any)?.items || subjectsRes
-      if (Array.isArray(subjectsList)) {
-        setSubjects(subjectsList)
-      } else if (subjectsList?.items) {
-        setSubjects(subjectsList.items)
-      }
-    } catch (error) {
+    } catch {
       console.error("[v0] Failed to fetch data")
       toast.error(localizeText("Failed to load question data", "فشل تحميل بيانات السؤال", language))
     }
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    if (questionId === "create" || !isValidId) {
+      return
+    }
+    const timer = setTimeout(() => fetchData(), 0)
+    return () => clearTimeout(timer)
+  }, [questionId])
 
   const addOption = () => {
     setOptions([
@@ -259,6 +247,8 @@ export default function EditQuestionPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!question) return
+
     if (!formData.bodyEn.trim()) {
       toast.error(localizeText("Question body (English) is required", "نص السؤال (بالإنجليزية) مطلوب", language))
       return
@@ -291,10 +281,16 @@ export default function EditQuestionPage() {
     setIsSaving(true)
 
     try {
-      const payload: any = {
+      const payload: Parameters<typeof updateQuestion>[1] & {
+        answerKey?: {
+          rubricTextEn: string | null
+          rubricTextAr: string | null
+        }
+      } = {
         bodyEn: formData.bodyEn,
         bodyAr: formData.bodyAr || formData.bodyEn,
         questionTypeId: Number(formData.questionTypeId),
+        questionCategoryId: question.questionCategoryId,
         subjectId: Number(formData.subjectId),
         topicId: formData.topicId ? Number(formData.topicId) : undefined,
         points: formData.points,
@@ -313,7 +309,7 @@ export default function EditQuestionPage() {
 
       const response = await updateQuestion(Number(questionId), payload)
 
-      const isSuccess = response && (response as any).success !== false
+      const isSuccess = Boolean(response)
 
       // Upload new image if selected
       if (isSuccess && newImage) {
@@ -341,7 +337,7 @@ export default function EditQuestionPage() {
               })
             }
           }
-        } catch (imgErr) {
+        } catch {
           console.warn('Image upload failed')
           toast.warning(localizeText('Question updated but image upload failed.', 'تم تحديث السؤال لكن فشل رفع الصورة.', language))
         } finally {
@@ -372,7 +368,7 @@ export default function EditQuestionPage() {
                     const result = await res.json()
                     uploadedPath = result.file?.url || result.file?.path || result.filePath || null
                   }
-                } catch (err) {
+                } catch {
                   console.warn('Option image upload failed')
                 }
               }
@@ -403,7 +399,7 @@ export default function EditQuestionPage() {
               body: JSON.stringify(bulkPayload),
             })
           }
-        } catch (optErr) {
+        } catch {
           console.warn('Option update failed')
         }
       }
@@ -412,9 +408,9 @@ export default function EditQuestionPage() {
         toast.success(localizeText("Question updated successfully", "تم تحديث السؤال بنجاح", language))
         router.push(`/question-bank/${questionId}`)
       } else {
-        toast.error((response as any)?.message || localizeText("Failed to update question", "فشل تحديث السؤال", language))
+        toast.error(localizeText("Failed to update question", "فشل تحديث السؤال", language))
       }
-    } catch (error) {
+    } catch {
       console.error("[v0] Update error")
       toast.error(localizeText("Failed to update question", "فشل تحديث السؤال", language))
     }

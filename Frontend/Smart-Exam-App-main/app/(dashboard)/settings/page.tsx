@@ -21,10 +21,6 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState<SystemSettings | null>(null)
 
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
   async function loadSettings() {
     try {
       const data = await getSystemSettings()
@@ -35,6 +31,10 @@ export default function SettingsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(loadSettings)
+  }, [])
 
   async function handleSave() {
     if (!settings) return

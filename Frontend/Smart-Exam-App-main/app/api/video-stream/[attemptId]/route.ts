@@ -64,7 +64,7 @@ export async function GET(
       status: response.status,
       headers,
     });
-  } catch (error) {
+  } catch {
     console.error("[VideoStream Proxy] Request failed");
     return NextResponse.json(
       { error: "Failed to stream video" },

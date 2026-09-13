@@ -6,7 +6,6 @@ import { Sheet, X, GripHorizontal, Maximize2, Minimize2 } from "lucide-react"
 import { createUniver, LocaleType } from "@univerjs/presets"
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core"
 import sheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US"
-// @ts-ignore - CSS module imported at runtime
 import "@univerjs/preset-sheets-core/lib/index.css"
 
 // ============================================
@@ -43,7 +42,6 @@ interface ExamSpreadsheetProps {
 
 export function ExamSpreadsheet({ onClose }: ExamSpreadsheetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const univerRef = useRef<ReturnType<typeof createUniver> | null>(null)
   const dragRef = useRef<HTMLDivElement>(null)
 
   const [isMaximized, setIsMaximized] = useState(false)
@@ -68,11 +66,9 @@ export function ExamSpreadsheet({ onClose }: ExamSpreadsheetProps) {
     })
 
     univerAPI.createWorkbook({ sheets: {} })
-    univerRef.current = { univerAPI } as any
 
     return () => {
       univerAPI.dispose()
-      univerRef.current = null
     }
   }, [])
 

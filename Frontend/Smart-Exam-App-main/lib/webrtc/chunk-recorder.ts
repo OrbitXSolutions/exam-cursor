@@ -83,9 +83,11 @@ export class ChunkRecorder {
       this.isRecording = true;
       this.callbacks.onRecordingStarted?.();
       console.log(`[ChunkRecorder] Started recording (${mimeType})`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[ChunkRecorder] Failed to start");
-      this.callbacks.onError?.(error?.message || "Failed to start recording");
+      this.callbacks.onError?.(
+        error instanceof Error ? error.message : "Failed to start recording",
+      );
     }
   }
 
@@ -170,7 +172,7 @@ export class ChunkRecorder {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        await response.json().catch(() => ({}));
         console.error(
           `[ChunkRecorder] Upload chunk ${chunkIndex} failed:`,
           response.status,
@@ -182,7 +184,7 @@ export class ChunkRecorder {
         `[ChunkRecorder] Chunk ${chunkIndex} uploaded (${(blob.size / 1024).toFixed(1)}KB)`,
       );
       return true;
-    } catch (error) {
+    } catch {
       console.error(`[ChunkRecorder] Upload chunk ${chunkIndex} error`);
       return false;
     }

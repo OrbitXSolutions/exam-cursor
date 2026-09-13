@@ -13,7 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -50,7 +49,6 @@ import {
   Users,
   UserPlus,
   Share2,
-  ExternalLink,
   Rocket,
   ChevronLeft,
   ChevronRight,
@@ -145,8 +143,8 @@ export default function ExamsListPage() {
       // Pass exam data via sessionStorage to avoid extra API call on the next page
       sessionStorage.setItem("publishedExam", JSON.stringify({ ...exam, isPublished: true }))
       router.push(`/exams/${exam.id}/published`)
-    } catch (error: any) {
-      const msg = error?.message || (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : (language === "ar" ? "فشل في نشر الاختبار" : "Failed to publish exam")
       if (exam.accessPolicyStatus === "Assigned") {
         setAssignFirstExam(exam)
         setAssignFirstDialogOpen(true)
@@ -166,7 +164,7 @@ export default function ExamsListPage() {
       await unpublishExam(exam.id)
       toast.success(t("exams.archiveSuccess") || "Exam archived successfully")
       fetchExams()
-    } catch (error) {
+    } catch {
       toast.error(t("exams.archiveError") || "Failed to archive exam")
     } finally {
       setActionLoading(null)
@@ -182,10 +180,11 @@ export default function ExamsListPage() {
       setDeleteDialogOpen(false)
       setExamToDelete(null)
       fetchExams()
-    } catch (error: any) {
+    } catch (error: unknown) {
       setDeleteDialogOpen(false)
       setExamToDelete(null)
-      const msg = error?.response?.data?.message || error?.message || (language === "ar" ? "فشل في حذف الاختبار" : "Failed to delete exam")
+      const errorDetails = error as { response?: { data?: { message?: string } }; message?: string }
+      const msg = errorDetails.response?.data?.message || errorDetails.message || (language === "ar" ? "فشل في حذف الاختبار" : "Failed to delete exam")
       setErrorDialogTitle(language === "ar" ? "لا يمكن الحذف" : "Cannot Delete")
       setErrorMessage(msg)
       setErrorDialogOpen(true)

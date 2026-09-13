@@ -40,8 +40,6 @@ import {
   LineChart,
   Pie,
   PieChart,
-  RadialBar,
-  RadialBarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -54,7 +52,7 @@ import { AlertTriangle as AlertTriangleIcon, ShieldAlert, XCircle, Lock } from "
 
 export default function DashboardPage() {
   const { t, language } = useI18n()
-  const { user, hasRole } = useAuth()
+  const { hasRole } = useAuth()
   const [stats, setStats] = useState({
     totalExams: 0,
     activeExams: 0,
@@ -64,6 +62,7 @@ export default function DashboardPage() {
     openIncidents: 0,
     attemptsOverTime: [] as { date: string; count: number }[],
     riskDistribution: [] as { level: string; count: number }[],
+    passRateByExam: [] as { examTitle: string; passRate: number }[],
   })
   const [upcomingExams, setUpcomingExams] = useState<Exam[]>([])
   const [incidentCases, setIncidentCases] = useState<{ id: number; titleEn?: string; titleAr?: string; candidateName?: string; severityName?: string }[]>([])

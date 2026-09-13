@@ -7,6 +7,21 @@ import type {
   PagedResult,
 } from "@/lib/types";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isCandidateVerificationSubmitResult(
+  value: unknown,
+): value is CandidateVerificationSubmitResult {
+  return (
+    isRecord(value) &&
+    typeof value.verificationId === "number" &&
+    typeof value.status === "string" &&
+    typeof value.message === "string"
+  );
+}
+
 // Backend IncidentCaseListDto (camelCase from API)
 interface IncidentCaseListDto {
   id: number;
@@ -150,7 +165,7 @@ export async function getIncidents(params?: {
       items: items.map(mapToIncident),
       totalCount: raw?.totalCount ?? 0,
     };
-  } catch (err) {
+  } catch {
     console.warn("[Proctor] getIncidents failed");
     return { items: [], totalCount: 0 };
   }
@@ -197,7 +212,6 @@ export async function getLiveSessions(
     const items = raw?.items ?? [];
     return items.map(mapToLiveSession);
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
     console.error("[Proctor] getLiveSessions failed");
     throw err; // let caller show toast instead of silently returning []
   }
@@ -228,8 +242,7 @@ export async function getTriageRecommendations(
       TriageRecommendation[] | { data?: TriageRecommendation[] }
     >(`/Proctor/triage?top=${top}&includeSample=${includeSample}`);
     if (Array.isArray(raw)) return raw;
-    if (raw && typeof raw === "object" && Array.isArray((raw as any).data))
-      return (raw as any).data;
+    if (Array.isArray(raw.data)) return raw.data;
     if (raw && typeof raw === "object") {
       const record = raw as Record<string, unknown>;
       const items = (record.items ??
@@ -239,7 +252,7 @@ export async function getTriageRecommendations(
       if (Array.isArray(items)) return items;
     }
     return [];
-  } catch (err) {
+  } catch {
     console.warn("[Proctor] getTriageRecommendations failed");
     return [];
   }
@@ -310,7 +323,6 @@ interface ProctorSessionDetailDto {
   riskLevel?: string;
   modeName?: string;
   heartbeatMissedCount?: number;
-  endedAt?: string;
   identityVerification?: {
     status: string;
     faceMatchScore?: number;
@@ -684,14 +696,14 @@ export interface AiReportBehaviorAnalysis {
 
 export interface AiReportViolationItem {
   type?: string;
-  count?: number;
+  count: number;
   severity?: string;
   impact?: string;
 }
 
 export interface AiReportViolationAnalysis {
-  totalViolations?: number;
-  countableViolations?: number;
+  totalViolations: number;
+  countableViolations: number;
   thresholdStatus?: string;
   violationBreakdown?: AiReportViolationItem[];
   violationTrend?: string;
@@ -739,7 +751,7 @@ export async function getAiProctorAnalysis(
   sessionId: string,
   lang: string = "en",
 ): Promise<AiProctorAnalysis> {
-  const res = await apiClient.get(
+  const res = await apiClient.get<AiProctorAnalysis>(
     `/Proctor/session/${sessionId}/ai-analysis?lang=${lang}`,
   );
   return res;
@@ -778,8 +790,8 @@ export async function uploadProctorSnapshot(
     try {
       await apiClient.uploadFile(`/Proctor/snapshot/${attemptId}`, file);
       return { success: true };
-    } catch (err: any) {
-      lastError = err?.message ?? String(err);
+    } catch (err: unknown) {
+      lastError = err instanceof Error ? err.message : String(err);
       console.warn(
         `[Proctor] Snapshot upload attempt ${attempt + 1}/${maxRetries + 1} failed:`,
       );
@@ -835,7 +847,7 @@ export async function getIdentityVerifications(params?: {
         totalPages: 0,
       }
     );
-  } catch (err) {
+  } catch {
     console.warn("[Proctor] getIdentityVerifications failed");
     return {
       items: [],
@@ -858,7 +870,7 @@ export async function getIdentityVerificationDetail(
     return await apiClient.get<IdentityVerificationDetail>(
       `/proctor/authentication/verifications/${id}`,
     );
-  } catch (err) {
+  } catch {
     console.warn("[Proctor] getIdentityVerificationDetail failed");
     return null;
   }
@@ -952,7 +964,7 @@ export async function submitCandidateVerification(
   });
 
   const responseText = await res.text();
-  let result: any;
+  let result: unknown;
   try {
     result = JSON.parse(responseText);
   } catch {
@@ -963,10 +975,18 @@ export async function submitCandidateVerification(
     );
   }
 
-  if (result.success && result.data) {
+  if (
+    isRecord(result) &&
+    result.success &&
+    isCandidateVerificationSubmitResult(result.data)
+  ) {
     return result.data;
   }
-  throw new Error(result.message || "Verification submission failed");
+  throw new Error(
+    isRecord(result) && typeof result.message === "string"
+      ? result.message
+      : "Verification submission failed",
+  );
 }
 
 // ============ CANDIDATE SESSION STATUS (POLLING) ============
@@ -1145,7 +1165,7 @@ export async function getIncidentCase(
       `/Incident/case/${caseId}`,
     );
     return res ?? null;
-  } catch (err) {
+  } catch {
     console.warn("[Incident] getIncidentCase failed");
     return null;
   }
@@ -1160,7 +1180,7 @@ export async function getIncidentByAttempt(
       `/Incident/case/by-attempt/${attemptId}`,
     );
     return res ?? null;
-  } catch (err) {
+  } catch {
     return null;
   }
 }
@@ -1170,10 +1190,10 @@ export async function getIncidentTimeline(
   caseId: number,
 ): Promise<IncidentTimelineEventDto[]> {
   try {
-    const res = await apiClient.get<IncidentTimelineEventDto[]>(
-      `/Incident/case/${caseId}/timeline`,
-    );
-    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+    const res = await apiClient.get<
+      IncidentTimelineEventDto[] | { data?: IncidentTimelineEventDto[] }
+    >(`/Incident/case/${caseId}/timeline`);
+    return Array.isArray(res) ? res : (res.data ?? []);
   } catch {
     return [];
   }
@@ -1184,10 +1204,10 @@ export async function getIncidentEvidence(
   caseId: number,
 ): Promise<IncidentEvidenceLinkDto[]> {
   try {
-    const res = await apiClient.get<IncidentEvidenceLinkDto[]>(
-      `/Incident/case/${caseId}/evidence`,
-    );
-    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+    const res = await apiClient.get<
+      IncidentEvidenceLinkDto[] | { data?: IncidentEvidenceLinkDto[] }
+    >(`/Incident/case/${caseId}/evidence`);
+    return Array.isArray(res) ? res : (res.data ?? []);
   } catch {
     return [];
   }
@@ -1221,10 +1241,10 @@ export async function getIncidentDecisions(
   caseId: number,
 ): Promise<IncidentDecisionDto[]> {
   try {
-    const res = await apiClient.get<IncidentDecisionDto[]>(
-      `/Incident/case/${caseId}/decisions`,
-    );
-    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+    const res = await apiClient.get<
+      IncidentDecisionDto[] | { data?: IncidentDecisionDto[] }
+    >(`/Incident/case/${caseId}/decisions`);
+    return Array.isArray(res) ? res : (res.data ?? []);
   } catch {
     return [];
   }
@@ -1247,10 +1267,10 @@ export async function getIncidentComments(
   caseId: number,
 ): Promise<IncidentCommentDto[]> {
   try {
-    const res = await apiClient.get<IncidentCommentDto[]>(
-      `/Incident/case/${caseId}/comments`,
-    );
-    return Array.isArray(res) ? res : ((res as any)?.data ?? []);
+    const res = await apiClient.get<
+      IncidentCommentDto[] | { data?: IncidentCommentDto[] }
+    >(`/Incident/case/${caseId}/comments`);
+    return Array.isArray(res) ? res : (res.data ?? []);
   } catch {
     return [];
   }
@@ -1497,13 +1517,13 @@ export async function getAttemptEvents(
   attemptId: number,
 ): Promise<AttemptEventDto[]> {
   try {
-    const res = await apiClient.get<{ data: AttemptEventDto[] }>(
-      `/Attempt/${attemptId}/events`,
-    );
-    const events = (res as any)?.data ?? res ?? [];
-    return (Array.isArray(events) ? events : []).map((e: any) => ({
-      ...e,
-      eventTypeName: getEventTypeName(e.eventType),
+    const res = await apiClient.get<
+      AttemptEventDto[] | { data?: AttemptEventDto[] }
+    >(`/Attempt/${attemptId}/events`);
+    const events = Array.isArray(res) ? res : (res.data ?? []);
+    return events.map((event) => ({
+      ...event,
+      eventTypeName: getEventTypeName(event.eventType),
     }));
   } catch {
     return [];

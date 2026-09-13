@@ -62,16 +62,6 @@ export function ScreenshotsSection() {
     return () => observer.disconnect()
   }, [])
 
-  // Auto-advance slides
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isAnimating) {
-        nextSlide()
-      }
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [isAnimating])
-
   const nextSlide = () => {
     setIsAnimating(true)
     setCurrentIndex((prev) => (prev + 1) % screenshots.length)
@@ -83,6 +73,16 @@ export function ScreenshotsSection() {
     setCurrentIndex((prev) => (prev - 1 + screenshots.length) % screenshots.length)
     setTimeout(() => setIsAnimating(false), 500)
   }
+
+  // Auto-advance slides
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isAnimating) {
+        nextSlide()
+      }
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [isAnimating])
 
   const CurrentComponent = screenshots[currentIndex].component
 

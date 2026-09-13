@@ -64,12 +64,11 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
   const [currentTime, setCurrentTime] = useState(0)
   const [totalDuration, setTotalDuration] = useState(0)
   const [loadingProgress, setLoadingProgress] = useState(0) // 0-100
+  const [appendedChunks, setAppendedChunks] = useState(0)
 
   const tokenRef = useRef<string>("")
   const mediaSourceRef = useRef<MediaSource | null>(null)
   const sourceBufferRef = useRef<SourceBuffer | null>(null)
-  const appendedChunksRef = useRef<number>(0)
-  const allBufferedRef = useRef(false)
 
   // Build chunk URL
   const getChunkUrl = useCallback(
@@ -96,8 +95,8 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         const json = await res.json()
         const data: ChunkListResponse = json.data || json
         setChunkData(data)
-      } catch (err: any) {
-        setError(err?.message || "Failed to load video chunks")
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load video chunks")
       } finally {
         setLoading(false)
       }
@@ -116,7 +115,10 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
       chunkData.totalChunks > 0
     ) {
       const estimated = (chunkData.totalChunks * chunkData.chunkDurationMs) / 1000
-      setTotalDuration((prev) => (prev > 0 ? prev : estimated))
+      const timeout = setTimeout(() => {
+        setTotalDuration((prev) => (prev > 0 ? prev : estimated))
+      }, 0)
+      return () => clearTimeout(timeout)
     }
   }, [chunkData])
 
@@ -128,24 +130,28 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     if (!chunkData || chunkData.totalChunks === 0) return
     const video = videoRef.current
     if (!video) return
+    const activeChunkData = chunkData
+    const activeVideo = video
 
     let aborted = false
 
     if (!("MediaSource" in window)) {
-      setError("Your browser does not support MediaSource Extensions (MSE). Please use Chrome, Edge, or Firefox.")
-      return
+      const timeout = setTimeout(() => {
+        setError("Your browser does not support MediaSource Extensions (MSE). Please use Chrome, Edge, or Firefox.")
+      }, 0)
+      return () => clearTimeout(timeout)
     }
 
     // If the backend stored the original recording mimeType, try that first
-    const storedMime = chunkData.mimeType
+    const storedMime = activeChunkData.mimeType
     const codecPriority = storedMime
       ? [storedMime, ...PLAYBACK_CODECS.filter(c => c !== storedMime)]
       : PLAYBACK_CODECS
     const supportedCodecs = codecPriority.filter(c => MediaSource.isTypeSupported(c))
 
     if (supportedCodecs.length === 0) {
-      setError("No supported WebM codec found for MSE playback.")
-      return
+      const timeout = setTimeout(() => setError("No supported WebM codec found for MSE playback."), 0)
+      return () => clearTimeout(timeout)
     }
 
     function waitForUpdateEnd(sb: SourceBuffer): Promise<void> {
@@ -185,11 +191,10 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
       return new Promise(resolve => {
         const ms = new MediaSource()
         mediaSourceRef.current = ms
-        appendedChunksRef.current = 0
-        allBufferedRef.current = false
+        setAppendedChunks(0)
 
         const objectUrl = URL.createObjectURL(ms)
-        video.src = objectUrl
+        activeVideo.src = objectUrl
 
         ms.addEventListener("sourceopen", async () => {
           try {
@@ -206,7 +211,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
             // Validate codec by appending chunk 0 (the EBML initialization segment).
             // A SourceBuffer error here means codec mismatch — try the next one.
             let res0: Response | null = null
-            try { res0 = await fetch(getChunkUrl(chunkData.chunks[0].filename)) } catch {}
+            try { res0 = await fetch(getChunkUrl(activeChunkData.chunks[0].filename)) } catch {}
             if (!res0 || !res0.ok || aborted) { resolve(false); return }
 
             let buf0: ArrayBuffer | null = null
@@ -224,15 +229,15 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
               return
             }
 
-            appendedChunksRef.current = 1
-            setLoadingProgress(Math.round((1 / chunkData.chunks.length) * 100))
+            setAppendedChunks(1)
+            setLoadingProgress(Math.round((1 / activeChunkData.chunks.length) * 100))
 
             // Codec confirmed — feed remaining chunks
-            for (let i = 1; i < chunkData.chunks.length; i++) {
+            for (let i = 1; i < activeChunkData.chunks.length; i++) {
               if (aborted || ms.readyState !== "open") break
 
               let res: Response | null = null
-              try { res = await fetch(getChunkUrl(chunkData.chunks[i].filename)) } catch {}
+              try { res = await fetch(getChunkUrl(activeChunkData.chunks[i].filename)) } catch {}
               if (!res || !res.ok || aborted || ms.readyState !== "open") continue
 
               let buf: ArrayBuffer | null = null
@@ -243,27 +248,26 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
               if (aborted || ms.readyState !== "open") break
 
               await appendChunk(sb, buf) // non-init chunk errors are non-fatal
-              appendedChunksRef.current = i + 1
-              setLoadingProgress(Math.round(((i + 1) / chunkData.chunks.length) * 100))
+              setAppendedChunks(i + 1)
+              setLoadingProgress(Math.round(((i + 1) / activeChunkData.chunks.length) * 100))
             }
 
             if (aborted) { resolve(true); return }
 
-            allBufferedRef.current = true
             if (ms.readyState === "open") try { ms.endOfStream() } catch {}
 
-            if (video.duration && isFinite(video.duration)) {
-              setTotalDuration(video.duration)
+            if (activeVideo.duration && isFinite(activeVideo.duration)) {
+              setTotalDuration(activeVideo.duration)
             } else {
               const onDuration = () => {
-                if (video.duration && isFinite(video.duration)) setTotalDuration(video.duration)
-                video.removeEventListener("durationchange", onDuration)
+                if (activeVideo.duration && isFinite(activeVideo.duration)) setTotalDuration(activeVideo.duration)
+                activeVideo.removeEventListener("durationchange", onDuration)
               }
-              video.addEventListener("durationchange", onDuration)
+              activeVideo.addEventListener("durationchange", onDuration)
             }
 
             resolve(true)
-          } catch (err: unknown) {
+          } catch {
             if (!aborted) console.error("[MSE] Unexpected error with codec", codec)
             resolve(false)
           }
@@ -278,7 +282,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         if (success) return
         // Clean up before trying next codec
         if (!aborted) {
-          video.src = ""
+          activeVideo.src = ""
           mediaSourceRef.current = null
           sourceBufferRef.current = null
         }
@@ -294,7 +298,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
       aborted = true
       mediaSourceRef.current = null
       sourceBufferRef.current = null
-      if (video) video.src = ""
+      activeVideo.src = ""
     }
   }, [chunkData, getChunkUrl])
 
@@ -468,7 +472,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
       </div>
 
       {/* Loading overlay while chunks are being buffered */}
-      {!allBufferedRef.current && loadingProgress > 0 && loadingProgress < 100 && (
+      {loadingProgress > 0 && loadingProgress < 100 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white gap-2 pointer-events-none">
           <LoadingSpinner size="lg" />
           <p className="text-sm">Buffering chunks... {loadingProgress}%</p>
@@ -527,7 +531,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
 
           {/* Chunk progress indicator */}
           <span className="text-xs tabular-nums ms-1.5 px-1.5 py-0.5 rounded bg-white/15 select-none">
-            {appendedChunksRef.current}/{chunkData.totalChunks}
+            {appendedChunks}/{chunkData.totalChunks}
           </span>
 
           {/* Spacer */}

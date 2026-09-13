@@ -40,7 +40,7 @@ import {
 } from "@/lib/api/lookups"
 
 function SubjectsContent() {
-  const { t, language } = useI18n()
+  const { language } = useI18n()
 
   const [subjects, setSubjects] = useState<QuestionSubject[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,12 +64,15 @@ function SubjectsContent() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    getQuestionSubjects({
-      pageNumber: currentPage,
-      pageSize,
-      search: searchQuery.trim() || undefined,
-    })
+    Promise.resolve()
+      .then(() => {
+        setLoading(true)
+        return getQuestionSubjects({
+          pageNumber: currentPage,
+          pageSize,
+          search: searchQuery.trim() || undefined,
+        })
+      })
       .then((result) => {
         if (!cancelled) {
           setSubjects(result.items || [])

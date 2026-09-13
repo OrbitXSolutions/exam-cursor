@@ -8,7 +8,6 @@ import { getAttemptIdForCandidate } from "@/lib/api/results"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -65,7 +64,7 @@ export default function ExamReviewPage() {
           return
         }
         setSession(data)
-      } catch (err) {
+      } catch {
         console.error("Failed to load review")
         setError(language === "ar" ? "فشل في تحميل المراجعة" : "Failed to load review")
       } finally {

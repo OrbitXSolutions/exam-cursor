@@ -21,7 +21,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +33,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
-import { ArrowLeft, CheckCircle2, Clock, User, Save, Send, FileText, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
+import { ArrowLeft, CheckCircle2, User, Save, Send, FileText, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 
 interface GradeState {
   points: number
@@ -62,12 +61,6 @@ export default function GradeSubmissionPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiSuggestion, setAiSuggestion] = useState<AiGradeSuggestion | null>(null)
 
-  useEffect(() => {
-    if (!Number.isNaN(attemptId)) {
-      loadSession()
-    }
-  }, [attemptId])
-
   async function loadSession() {
     try {
       setLoading(true)
@@ -93,13 +86,19 @@ export default function GradeSubmissionPage() {
         })
         setGrades(initialGrades)
       }
-    } catch (error) {
+    } catch {
       toast.error(t("grading.failedToLoad"))
       setSession(null)
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!Number.isNaN(attemptId)) {
+      void Promise.resolve().then(loadSession)
+    }
+  }, [attemptId])
 
   const manualQuestions: GradedAnswerItem[] =
     session?.answers.filter((a) => a.isManuallyGraded) || []
@@ -130,7 +129,7 @@ export default function GradeSubmissionPage() {
       })
       setGrades((prev) => new Map(prev).set(currentQuestion.questionId, { ...currentGrade, saved: true }))
       toast.success(t("grading.gradeSaved"))
-    } catch (error) {
+    } catch {
       toast.error(t("grading.failedToSaveGrade"))
     } finally {
       setSaving(false)
@@ -150,7 +149,7 @@ export default function GradeSubmissionPage() {
         },
       })
       router.push("/grading")
-    } catch (error) {
+    } catch {
       toast.error(t("grading.failedToFinalize"))
     } finally {
       setFinalizing(false)
@@ -188,14 +187,7 @@ export default function GradeSubmissionPage() {
   const progress = manualQuestions.length > 0 ? (gradedCount / manualQuestions.length) * 100 : 100
   const allGraded = manualQuestions.length === 0 || gradedCount === manualQuestions.length
 
-  function formatDateTime(dateString: string | null) {
-    if (!dateString) return "-"
-    return new Date(dateString).toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
-      timeZone: "Asia/Dubai",
-      dateStyle: "medium",
-      timeStyle: "short",
-    })
-  }
+
 
   if (loading || !session) {
     return (

@@ -9,23 +9,23 @@ import { getMyResultReview, type CandidateResultReview, type ReviewQuestionDto }
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { 
-  ArrowLeft, ArrowRight, CheckCircle2, XCircle, AlertCircle, FileText, 
+  ArrowLeft, ArrowRight, CheckCircle2, XCircle, AlertCircle,
   ChevronLeft, ChevronRight, Trophy
 } from "lucide-react"
 
 // Helper function to get localized field
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 // Question type mapping for display names (supports various backend naming conventions)
@@ -77,16 +77,12 @@ function getQuestionTypeDisplayName(questionTypeName: string, language: string):
 export default function ReviewPage() {
   const { attemptId: attemptIdParam } = useParams<{ attemptId: string }>()
   const attemptId = Number.parseInt(attemptIdParam, 10)
-  const router = useRouter()
+  useRouter()
   const { t, language, dir } = useI18n()
   const [review, setReview] = useState<CandidateResultReview | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-
-  useEffect(() => {
-    loadReview()
-  }, [attemptId])
 
   async function loadReview() {
     try {
@@ -95,13 +91,21 @@ export default function ReviewPage() {
       
       const data = await getMyResultReview(attemptId)
       setReview(data)
-    } catch (err) {
+    } catch {
       console.error("[v0] Error loading review")
       setError(t("results.reviewNotAllowed"))
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const loadReviewTimer = window.setTimeout(() => {
+      void loadReview()
+    }, 0)
+
+    return () => window.clearTimeout(loadReviewTimer)
+  }, [attemptId])
 
   if (loading) {
     return (

@@ -154,7 +154,7 @@ export async function getCandidateResultList(
     []) as CandidateResultListItem[];
   const summary = (inner?.summary ??
     inner?.Summary ??
-    {}) as CandidateResultListSummary;
+    {}) as Partial<CandidateResultListSummary> & { TotalCandidates?: number };
   const list = Array.isArray(items) ? items : [];
 
   return {
@@ -172,7 +172,7 @@ export async function getCandidateResultList(
       list.length) as number,
     summary: {
       totalCandidates: (summary?.totalCandidates ??
-        (summary as Record<string, unknown>)?.TotalCandidates ??
+        summary.TotalCandidates ??
         list.length) as number,
     },
   };
@@ -222,7 +222,7 @@ export async function getAttemptIdForCandidate(
       if (Array.isArray(gradingItems) && gradingItems.length > 0) {
         return gradingItems[0].attemptId ?? gradingItems[0].id ?? null;
       }
-    } catch (err) {
+    } catch {
       console.warn("[getAttemptIdForCandidate] Grading lookup failed");
     }
 
@@ -269,7 +269,7 @@ export async function getAttemptIdForCandidate(
     }
 
     return null;
-  } catch (err) {
+  } catch {
     console.warn("[getAttemptIdForCandidate] Failed");
     return null;
   }

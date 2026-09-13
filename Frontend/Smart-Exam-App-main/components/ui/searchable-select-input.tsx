@@ -68,72 +68,9 @@ export function SearchableSelectInput({
   const [hasNextPage, setHasNextPage] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [selectedLabel, setSelectedLabel] = useState<string>("")
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
-
-  // Seed selectedLabel from initialLabel on mount (edit-page pre-population)
-  useEffect(() => {
-    if (initialLabel && value && !selectedLabel) {
-      setSelectedLabel(initialLabel)
-    }
-  // Only run when initialLabel/value become available — not on every render
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLabel, value])
-
-  // Derive display label from current items whenever value changes
-  useEffect(() => {
-    if (!value) {
-      setSelectedLabel("")
-      return
-    }
-    const found = items.find((item) => String(item.id) === String(value))
-    if (found) {
-      setSelectedLabel(language === "ar" ? found.nameAr : found.nameEn)
-    }
-    // If not in current list (e.g., initial load) keep whatever was set before
-  }, [value, items, language])
-
-  // Reset and reload when resetOn changes (e.g., Subject changes → Topics reset)
-  const prevResetOn = useRef(resetOn)
-  useEffect(() => {
-    if (prevResetOn.current === resetOn) return
-    prevResetOn.current = resetOn
-
-    setItems([])
-    setPage(1)
-    setHasNextPage(false)
-    setSearch("")
-    setSelectedLabel("")
-  }, [resetOn])
-
-  // Fetch page 1 when search changes (debounced)
-  // Guard: skip entirely when disabled (avoids spurious fetches with invalid params on mount)
-  useEffect(() => {
-    if (disabled) return
-    if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    debounceTimer.current = setTimeout(() => {
-      loadPage(1, search, true)
-    }, DEBOUNCE_MS)
-
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, disabled])
-
-  // Load initial list when popover opens (if not already loaded)
-  useEffect(() => {
-    if (open && items.length === 0 && !isLoading) {
-      loadPage(1, search, true)
-    }
-    // Focus search input when popover opens
-    if (open) {
-      setTimeout(() => searchInputRef.current?.focus(), 50)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
 
   const loadPage = useCallback(
     async (pageNum: number, searchTerm: string, replace: boolean) => {
@@ -162,17 +99,58 @@ export function SearchableSelectInput({
     [fetchFn],
   )
 
+  // Reset and reload when resetOn changes (e.g., Subject changes → Topics reset)
+  const prevResetOn = useRef(resetOn)
+  useEffect(() => {
+    if (prevResetOn.current === resetOn) return
+    prevResetOn.current = resetOn
+
+    setItems([])
+    setPage(1)
+    setHasNextPage(false)
+    setSearch("")
+  }, [resetOn])
+
+  // Fetch page 1 when search changes (debounced)
+  // Guard: skip entirely when disabled (avoids spurious fetches with invalid params on mount)
+  useEffect(() => {
+    if (disabled) return
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => {
+      loadPage(1, search, true)
+    }, DEBOUNCE_MS)
+
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    }
+  }, [search, disabled, loadPage])
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen)
+    if (nextOpen && items.length === 0 && !isLoading) {
+      void loadPage(1, search, true)
+    }
+    if (nextOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 50)
+    }
+  }
+
   const handleLoadMore = () => {
     loadPage(page + 1, search, false)
   }
 
   const handleSelect = (item: SearchableSelectItem) => {
     const label = language === "ar" ? item.nameAr : item.nameEn
-    setSelectedLabel(label)
     onChange(String(item.id), label)
     setOpen(false)
   }
 
+  const selectedItem = items.find((item) => String(item.id) === String(value))
+  const selectedLabel = value
+    ? selectedItem
+      ? language === "ar" ? selectedItem.nameAr : selectedItem.nameEn
+      : initialLabel ?? ""
+    : ""
   const displayLabel =
     value && selectedLabel
       ? selectedLabel
@@ -181,7 +159,7 @@ export function SearchableSelectInput({
   const hasValue = Boolean(value && selectedLabel)
 
   return (
-    <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
+    <Popover open={open} onOpenChange={disabled ? undefined : handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={id}

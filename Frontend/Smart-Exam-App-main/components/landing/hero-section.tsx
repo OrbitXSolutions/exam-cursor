@@ -10,7 +10,8 @@ export function HeroSection() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const animationFrame = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(animationFrame)
   }, [])
 
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useEffectEvent } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
 import { apiClient } from "@/lib/api-client"
@@ -104,22 +104,34 @@ export default function ShareExamPage() {
   const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<number, string>>({})
   const [dynamicFieldErrors, setDynamicFieldErrors] = useState<Record<number, string>>({})
 
+  const handleExamInfoLoaded = useEffectEvent((info: PublicExamInfo | null) => {
+    if (info) {
+      setExamInfo(info)
+    } else {
+      setError(
+        isRTL
+          ? "رابط غير صالح أو منتهي الصلاحية"
+          : "Invalid or expired share link",
+      )
+    }
+    setLoading(false)
+  })
+
   // Load exam info on mount
   useEffect(() => {
     if (!token) return
-    setLoading(true)
-    fetchPublicExamInfo(token).then((info) => {
-      if (info) {
-        setExamInfo(info)
-      } else {
-        setError(
-          isRTL
-            ? "رابط غير صالح أو منتهي الصلاحية"
-            : "Invalid or expired share link",
-        )
-      }
-      setLoading(false)
+
+    let active = true
+    queueMicrotask(() => {
+      if (active) setLoading(true)
     })
+    fetchPublicExamInfo(token).then((info) => {
+      if (active) handleExamInfoLoaded(info)
+    })
+
+    return () => {
+      active = false
+    }
   }, [token])
 
   // Handle walk-in registration and authentication

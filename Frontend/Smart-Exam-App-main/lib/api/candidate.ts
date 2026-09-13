@@ -314,6 +314,9 @@ export interface ExamSettings {
   preventCopyPaste?: boolean;
   preventScreenCapture?: boolean;
   browserLockdown?: boolean;
+  enableScreenMonitoring: boolean;
+  screenMonitoringMode: number;
+  screenShareGracePeriod: number;
 }
 
 // Section structure for tab-based exam layout
@@ -701,7 +704,7 @@ export async function getMyResults(): Promise<CandidateResultDto[]> {
     const items = Array.isArray(response) ? response : (response?.data ?? []);
     console.log("[v0] Results loaded:", items?.length ?? 0);
     return Array.isArray(items) ? items : [];
-  } catch (err) {
+  } catch {
     console.warn("[v0] getMyResults failed");
     return [];
   }
@@ -763,7 +766,7 @@ export async function logAttemptEvent(
       metadataJson: event.metadataJson,
     });
     return true;
-  } catch (err) {
+  } catch {
     console.warn("[v0] Failed to log attempt event");
     return false;
   }
@@ -987,6 +990,7 @@ export const MOCK_EXAM_PREVIEW: ExamPreview = {
     preventScreenCapture: false,
     requireFullscreen: true,
     browserLockdown: false,
+    enableScreenMonitoring: false,
     maxViolationWarnings: 0,
   },
   eligibility: {

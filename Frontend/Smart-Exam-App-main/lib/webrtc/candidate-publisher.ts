@@ -101,7 +101,7 @@ export class CandidatePublisher {
             await this.createAndSendOffer();
           }
         },
-        onPeerLeft: (event) => {
+        onPeerLeft: () => {
           console.log("[WebRTC Publisher] Proctor left");
           this.proctorConnectionId = null;
         },
@@ -121,7 +121,7 @@ export class CandidatePublisher {
                 `[WebRTC Publisher] Cannot set answer: pc=${!!this.pc}, remoteDesc already set=${!!this.pc?.remoteDescription}`,
               );
             }
-          } catch (error) {
+          } catch {
             console.error(
               "[WebRTC Publisher] Error setting remote description:",
             );
@@ -138,7 +138,7 @@ export class CandidatePublisher {
                 `[WebRTC Publisher] Cannot add ICE: pc=${!!this.pc}, hasRemoteDesc=${!!this.pc?.remoteDescription}`,
               );
             }
-          } catch (error) {
+          } catch {
             console.error(
               "[WebRTC Publisher] Error adding ICE candidate:",
             );
@@ -207,7 +207,7 @@ export class CandidatePublisher {
         `%c[WebRTC Publisher] ✅ Ready, waiting for proctor to join room attempt_${this.attemptId}...`,
         "color: #4caf50; font-weight: bold",
       );
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Publisher] Start failed");
       this.setStatus("failed");
     }
@@ -242,7 +242,7 @@ export class CandidatePublisher {
             JSON.stringify(event.candidate.toJSON()),
             this.proctorConnectionId ?? undefined,
           )
-          .catch((e) =>
+          .catch(() =>
             console.error("[WebRTC Publisher] Error sending ICE"),
           );
       }
@@ -338,7 +338,7 @@ export class CandidatePublisher {
         `%c[WebRTC Publisher] \u2705 Offer sent successfully`,
         "color: #4caf50; font-weight: bold",
       );
-    } catch (error) {
+    } catch {
       console.error(
         "%c[WebRTC Publisher] \u274c Error creating/sending offer:",
         "color: red; font-weight: bold",
@@ -354,7 +354,7 @@ export class CandidatePublisher {
       const offer = await this.pc.createOffer({ iceRestart: true });
       await this.pc.setLocalDescription(offer);
       await this.signaling.sendOffer(offer.sdp!);
-    } catch (error) {
+    } catch {
       console.error(
         "[WebRTC Publisher] ICE restart failed, trying hard reset:",
       );
@@ -396,7 +396,7 @@ export class CandidatePublisher {
       await this.signaling?.connect();
       this.createPeerConnection();
       this.reconnectAttempts = 0;
-    } catch (error) {
+    } catch {
       console.error("[WebRTC Publisher] Reconnect failed");
       this.attemptReconnect();
     }

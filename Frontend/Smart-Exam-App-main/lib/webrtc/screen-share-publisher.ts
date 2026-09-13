@@ -71,8 +71,7 @@ export class ScreenSharePublisher {
           } as MediaTrackConstraints,
           audio: false,
         });
-      } catch (err: unknown) {
-        const error = err as Error;
+      } catch {
         console.warn("[Screen Publisher] Screen share denied");
         this.setStatus("denied");
         return false;
@@ -119,7 +118,7 @@ export class ScreenSharePublisher {
                 new RTCSessionDescription({ type: "answer", sdp: event.sdp }),
               );
             }
-          } catch (error) {
+          } catch {
             console.error(
               "[Screen Publisher] Error setting remote description:",
             );
@@ -131,10 +130,8 @@ export class ScreenSharePublisher {
               const candidate = JSON.parse(event.candidate);
               await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
             }
-          } catch (error) {
-            console.error(
-              "[Screen Publisher] Error adding ICE candidate:",
-            );
+          } catch {
+            console.error("[Screen Publisher] Error adding ICE candidate:");
           }
         },
         onReconnecting: () => {
@@ -256,9 +253,7 @@ export class ScreenSharePublisher {
             JSON.stringify(event.candidate.toJSON()),
             this.proctorConnectionId ?? undefined,
           )
-          .catch((e) =>
-            console.error("[Screen Publisher] Error sending ICE"),
-          );
+          .catch(() => console.error("[Screen Publisher] Error sending ICE"));
       }
     };
 
@@ -305,7 +300,7 @@ export class ScreenSharePublisher {
         `%c[Screen Publisher] ✅ Screen offer sent`,
         "color: #4caf50; font-weight: bold",
       );
-    } catch (error) {
+    } catch {
       console.error("[Screen Publisher] Error creating/sending offer");
     }
   }
@@ -317,7 +312,7 @@ export class ScreenSharePublisher {
       const offer = await this.pc.createOffer({ iceRestart: true });
       await this.pc.setLocalDescription(offer);
       await this.signaling.sendScreenOffer(offer.sdp!);
-    } catch (error) {
+    } catch {
       console.error("[Screen Publisher] ICE restart failed");
       await this.resetPeerConnection();
     }

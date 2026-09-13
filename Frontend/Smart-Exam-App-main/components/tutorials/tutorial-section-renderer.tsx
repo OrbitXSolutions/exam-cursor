@@ -14,7 +14,6 @@ import {
   ArrowLeft,
   FileText,
   PlayCircle,
-  Video,
   ChevronRight,
   Circle,
 } from "lucide-react"
@@ -23,7 +22,6 @@ import type {
   TutorialSection,
   TutorialStep,
   TutorialExample,
-  TutorialField,
 } from "@/lib/tutorials/tutorial-data"
 
 // ─── Rich Text Parser ─────────────────────────
@@ -323,7 +321,7 @@ function RichText({ text, className }: { text: string; className?: string }) {
 
 // ─── Step Renderer ─────────────────────────────
 function StepCard({ step, stepIndex, language }: { step: TutorialStep; stepIndex: number; language: string }) {
-  const isRTL = language === "ar"
+
   const title = language === "ar" ? step.titleAr : step.titleEn
   const description = language === "ar" ? step.descriptionAr : step.descriptionEn
   const tip = language === "ar" ? step.tipAr : step.tipEn

@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { ExamType, SectionSourceType, type Exam, type ExamBuilderDto, type BuilderSectionDto, type SaveBuilderSectionDto, type SaveExamBuilderRequest } from "@/lib/types"
+import { ExamType, SectionSourceType, type Exam, type ExamBuilderDto, type SaveExamBuilderRequest } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,7 +39,6 @@ import {
   BookOpen,
   Hash,
   Trash2,
-  Plus,
   FolderTree,
   CheckCircle2,
   Search,
@@ -53,8 +52,15 @@ interface ExamSetupContentProps {
   examId?: string
 }
 
+interface CreateExamResponse {
+  success?: boolean
+  message?: string
+  data?: { id?: number | string }
+  id?: number | string
+}
+
 export function ExamSetupContent({ examId }: ExamSetupContentProps) {
-  const { t, language, dir, isRTL } = useI18n()
+  const { t, language, dir } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -122,15 +128,8 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     estimatedTotalPoints: number
     totalPoolPoints: number
   }>>([])
-  const [loadedBuilderData, setLoadedBuilderData] = useState<ExamBuilderDto | null>(null)
+  const [, setLoadedBuilderData] = useState<ExamBuilderDto | null>(null)
   const [examTotalPoints, setExamTotalPoints] = useState<number>(0)
-
-  // Load exam data in edit mode
-  useEffect(() => {
-    if (isEditMode && examId) {
-      loadExamData()
-    }
-  }, [examId])
 
   async function loadExamData() {
     try {
@@ -168,6 +167,13 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     }
   }
 
+  // Load exam data in edit mode
+  useEffect(() => {
+    if (!isEditMode || !examId) return
+    const timeout = setTimeout(loadExamData, 0)
+    return () => clearTimeout(timeout)
+  }, [examId, isEditMode])
+
   function updateField(field: string, value: string | number | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setError(null)
@@ -194,7 +200,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       }
       setSubjectPage(page)
       setSubjectTotalPages(response.totalPages ?? 0)
-    } catch (err) {
+    } catch {
       console.error("Failed to load subjects")
     } finally {
       setSubjectsLoading(false)
@@ -231,7 +237,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         next.set(subjectId, { page, search, loading: false, totalPages: response.totalPages ?? 0 })
         return next
       })
-    } catch (err) {
+    } catch {
       console.error(`Failed to load topics for subject ${subjectId}`)
       setTopicsPageMeta(prev => {
         const next = new Map(prev)
@@ -265,7 +271,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       const data = { count: result.count, totalPoints: result.totalPoints }
       setQuestionsCount(prev => new Map(prev).set(key, data))
       return data
-    } catch (err) {
+    } catch {
       console.error("Failed to fetch questions count")
       return { count: 0, totalPoints: 0 }
     }
@@ -325,21 +331,23 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
           }
         }
       }
-    } catch (err) {
+    } catch {
       // If no builder data exists, that's okay - it's a fresh exam
       console.log("No existing builder data or error loading")
     } finally {
       setBuilderLoading(false)
     }
-  }, [examId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [examId])
 
   // Load subjects and builder data when switching to builder tab
   useEffect(() => {
-    if (currentTab === "builder" && isEditMode) {
-      loadSubjectsPage("", 1, true)
-      loadBuilderData()
-    }
-  }, [currentTab, isEditMode, loadBuilderData]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (currentTab !== "builder" || !isEditMode) return
+    const timeout = setTimeout(() => {
+      void loadSubjectsPage("", 1, true)
+      void loadBuilderData()
+    }, 0)
+    return () => clearTimeout(timeout)
+  }, [currentTab, isEditMode, loadBuilderData])
 
   // Toggle subject selection
   const toggleSubject = async (subjectId: number, checked: boolean) => {
@@ -603,7 +611,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
         toast.success(t("exams.updateSuccess") || "Exam updated successfully")
       } else {
         // Create new exam
-        const response = await apiClient.post("/Assessment/exams", baseBody) as any
+        const response = await apiClient.post<CreateExamResponse>("/Assessment/exams", baseBody)
 
         if (response?.success === false) {
           setError(response.message || localizeText("Failed to create exam", "فشل إنشاء الاختبار", language))

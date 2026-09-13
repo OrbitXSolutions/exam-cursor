@@ -71,7 +71,7 @@ export function FAQSection() {
             </span>
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Everything you need to know about SmartExam. Can't find what you're looking for? Contact our team.
+            Everything you need to know about SmartExam. Can&apos;t find what you&apos;re looking for? Contact our team.
           </p>
         </div>
 

@@ -14,8 +14,6 @@ import {
   ArrowLeft,
   Monitor,
   MonitorOff,
-  User,
-  Calendar,
   AlertTriangle,
   Maximize2,
   Info,
@@ -127,7 +125,7 @@ export default function ScreenStreamPage() {
         } else {
           setAttemptEvents([])
         }
-      } catch (err) {
+      } catch {
         console.error("Failed to load proctor data")
         setError(language === "ar" ? "فشل في تحميل بيانات المراقبة" : "Failed to load proctoring data")
       } finally {
@@ -161,7 +159,7 @@ export default function ScreenStreamPage() {
       )
 
       setScreenSnapshots(screenOnly.length > 0 ? screenOnly : snapshotList)
-    } catch (err) {
+    } catch {
       console.warn("Failed to load snapshots")
       setScreenSnapshots([])
     }
@@ -172,7 +170,7 @@ export default function ScreenStreamPage() {
       const res = await apiClient.get<unknown>(`/Attempt/${attemptId}/events`)
       const eventList = normalizeList<AttemptEvent>(res)
       setAttemptEvents(eventList)
-    } catch (err) {
+    } catch {
       console.warn("Failed to load attempt events")
       setAttemptEvents([])
     }

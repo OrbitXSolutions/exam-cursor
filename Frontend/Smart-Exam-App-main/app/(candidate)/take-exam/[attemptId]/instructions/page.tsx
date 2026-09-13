@@ -12,8 +12,6 @@ import {
   startExam,
   type ExamPreview,
   MOCK_EXAM_PREVIEW,
-  logAttemptEvent,
-  AttemptEventType,
 } from "@/lib/api/candidate"
 import { updateSessionDeviceInfo } from "@/lib/api/proctoring"
 import { Button } from "@/components/ui/button"
@@ -25,14 +23,15 @@ import { toast } from "sonner"
 import { ArrowLeft, ArrowRight, PlayCircle, Clock, FileText, AlertTriangle, Shield, Monitor, Camera, Wifi, Award, XCircle, CheckCircle2, RefreshCw } from "lucide-react"
 
 // Helper function to get localized field
-function getLocalizedField<T extends Record<string, unknown>>(
+function getLocalizedField<T extends object>(
   obj: T,
   fieldBase: string,
   language: string
 ): string {
   const field = language === "ar" ? `${fieldBase}Ar` : `${fieldBase}En`
   const fallback = language === "ar" ? `${fieldBase}En` : `${fieldBase}Ar`
-  return (obj[field] as string) || (obj[fallback] as string) || ""
+  const record = obj as Record<string, unknown>
+  return String(record[field] || record[fallback] || "")
 }
 
 const EXAM_LANGUAGE_KEY = "examLanguage"
@@ -147,17 +146,6 @@ export default function ExamInstructionsPage() {
     setReadyCheck(prev => ({ ...prev, screenSharePermission, checking: false }))
   }
 
-  useEffect(() => {
-    loadExamPreview()
-  }, [examId])
-
-  // Run ready checks when exam preview is loaded
-  useEffect(() => {
-    if (examPreview && !readyCheckComplete) {
-      runReadyChecks()
-    }
-  }, [examPreview])
-
   const translateReason = (reason?: string | null) =>
     reason ? translateServerMessage(reason, language) : t("common.errorOccurred")
 
@@ -170,7 +158,7 @@ export default function ExamInstructionsPage() {
       // Single API call to get exam preview with eligibility
       const preview = await getExamPreview(examId)
       setExamPreview(preview)
-    } catch (error) {
+    } catch {
       console.log("[v0] API error, using mock data")
       // Fallback to mock data
       setExamPreview({ ...MOCK_EXAM_PREVIEW, examId })
@@ -178,6 +166,25 @@ export default function ExamInstructionsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const loadPreviewTimer = window.setTimeout(() => {
+      void loadExamPreview()
+    }, 0)
+
+    return () => window.clearTimeout(loadPreviewTimer)
+  }, [examId])
+
+  // Run ready checks when exam preview is loaded
+  useEffect(() => {
+    if (!examPreview || readyCheckComplete) return
+
+    const readyCheckTimer = window.setTimeout(() => {
+      void runReadyChecks()
+    }, 0)
+
+    return () => window.clearTimeout(readyCheckTimer)
+  }, [examPreview])
 
   async function handleStartExam() {
     if (!agreed) {
@@ -229,7 +236,7 @@ export default function ExamInstructionsPage() {
           operatingSystem: os.trim(),
           screenResolution: `${screen.width}x${screen.height}`,
         })
-      } catch (e) { console.warn("[v0] Device info collection failed") }
+      } catch { console.warn("[v0] Device info collection failed") }
       
       // Request fullscreen before navigating to exam page (only if required)
       if (examPreview?.accessPolicy.requireFullscreen) {
@@ -248,7 +255,7 @@ export default function ExamInstructionsPage() {
           } else if (docEl.msRequestFullscreen) {
             await docEl.msRequestFullscreen()
           }
-        } catch (fsError) {
+        } catch {
           console.log("[v0] Fullscreen request failed")
           // Continue even if fullscreen fails - exam page will try again
         }

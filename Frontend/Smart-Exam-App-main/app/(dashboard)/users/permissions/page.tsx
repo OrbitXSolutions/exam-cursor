@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Search, ShieldCheck, Save, Loader2, Check, X, Filter } from "lucide-react"
+import { Search, ShieldCheck, Loader2, Check, X, Filter } from "lucide-react"
 import { toast } from "sonner"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
@@ -77,7 +77,7 @@ export default function UserPermissionsPage() {
   }, [search, roleFilter, deptFilter, language])
 
   useEffect(() => {
-    loadUsers()
+    void Promise.resolve().then(loadUsers)
   }, [roleFilter, deptFilter])
 
   // Debounced search
@@ -106,7 +106,7 @@ export default function UserPermissionsPage() {
       const next = new Map(prev)
       const existing = next.get(user.id) || {
         userId: user.id,
-        userName: getLocalizedField(user as any, "fullName", language),
+        userName: getLocalizedField(user, "fullName", language),
       }
       existing.newRole = newRole
       existing.oldRole = currentRole
@@ -136,7 +136,7 @@ export default function UserPermissionsPage() {
       const next = new Map(prev)
       const existing = next.get(user.id) || {
         userId: user.id,
-        userName: getLocalizedField(user as any, "fullName", language),
+        userName: getLocalizedField(user, "fullName", language),
       }
       existing.newDeptId = newDeptId
       existing.oldDeptId = currentDeptId
@@ -184,7 +184,7 @@ export default function UserPermissionsPage() {
 
       // Reload users to reflect changes
       await loadUsers()
-    } catch (err) {
+    } catch {
       toast.error(
         language === "ar"
           ? `فشل تحديث صلاحيات "${change.userName}"`
@@ -383,10 +383,10 @@ export default function UserPermissionsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-sm">
-                              {getLocalizedField(user as any, "fullName", language).charAt(0).toUpperCase()}
+                              {getLocalizedField(user, "fullName", language).charAt(0).toUpperCase()}
                             </div>
                             <span className="font-medium text-sm">
-                              {getLocalizedField(user as any, "fullName", language)}
+                              {getLocalizedField(user, "fullName", language)}
                             </span>
                           </div>
                         </TableCell>

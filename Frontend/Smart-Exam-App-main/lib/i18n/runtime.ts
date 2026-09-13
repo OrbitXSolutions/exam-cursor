@@ -167,7 +167,6 @@ const entityMap: Record<string, string> = {
   report: "التقرير",
   review: "المراجعة",
   reason: "السبب",
-  certificate: "الشهادة",
   journey: "الرحلة",
   journeys: "الرحلات",
   journeyes: "الرحلات",

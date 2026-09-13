@@ -54,7 +54,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function ExamConfigurationPage() {
   const { id } = useParams<{ id: string }>()
   const { t, language, dir, isRTL } = useI18n()
-  const router = useRouter()
+  useRouter()
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -67,7 +67,7 @@ export default function ExamConfigurationPage() {
   const [savingInstruction, setSavingInstruction] = useState(false)
   
   // Access Policy State
-  const [accessPolicy, setAccessPolicy] = useState<ExamAccessPolicy | null>(null)
+  const [, setAccessPolicy] = useState<ExamAccessPolicy | null>(null)
   const [accessPolicyForm, setAccessPolicyForm] = useState({
     isPublic: false,
     accessCode: "",
@@ -118,10 +118,6 @@ export default function ExamConfigurationPage() {
   // Result Message State
   const [resultMessage, setResultMessage] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    loadData()
-  }, [id])
 
   async function loadData() {
     try {
@@ -180,6 +176,11 @@ export default function ExamConfigurationPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => loadData(), 0)
+    return () => clearTimeout(timer)
+  }, [id])
 
   // Load walk-in fields on demand (e.g. when user enables walk-in mid-session)
   async function loadWalkInFields() {

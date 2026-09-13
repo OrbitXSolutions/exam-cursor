@@ -82,14 +82,17 @@ function TopicsContent() {
   // Load topics with server-side pagination
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
     const subjectId = filterSubjectId !== "all" ? Number(filterSubjectId) : undefined
-    getQuestionTopics({
-      pageNumber: currentPage,
-      pageSize,
-      search: searchQuery.trim() || undefined,
-      subjectId,
-    })
+    Promise.resolve()
+      .then(() => {
+        setLoading(true)
+        return getQuestionTopics({
+          pageNumber: currentPage,
+          pageSize,
+          search: searchQuery.trim() || undefined,
+          subjectId,
+        })
+      })
       .then((result) => {
         if (!cancelled) {
           setTopics(result.items || [])

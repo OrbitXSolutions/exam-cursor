@@ -83,7 +83,7 @@ export default function DashboardLayout({
     if (matched && !matched.roles.includes(user.role)) {
       router.replace("/unauthorized")
     }
-  }, [pathname, user, isLoading, isAuthenticated, router]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pathname, user, isLoading, isAuthenticated, router])
 
   if (isLoading && !isPublicPath) {
     return <FullPageLoader />

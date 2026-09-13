@@ -36,7 +36,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu dir={dir}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9">
           {theme === "light" ? (
@@ -49,7 +49,7 @@ export function ThemeToggle() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48" dir={dir}>
+      <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>
           {localizeText("Appearance", "المظهر", language)}
         </DropdownMenuLabel>

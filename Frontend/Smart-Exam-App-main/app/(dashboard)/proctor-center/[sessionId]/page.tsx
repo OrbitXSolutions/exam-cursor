@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
 import { translateServerMessage } from "@/lib/i18n/runtime"
-import { getSessionDetails, refreshSessionData, reviewIncident, flagSession, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
+import { getSessionDetails, refreshSessionData, reviewIncident, sendWarning, terminateSession, getAttemptEvents, getEventTypeName, isViolationEvent, getEventSeverity, getAiProctorAnalysis, translateViolationType, translateSeverity, type AttemptEventDto, type AiProctorAnalysis } from "@/lib/api/proctoring"
 import { addTimeToAttempt } from "@/lib/api/attempt-control"
 import type { LiveSession, Incident } from "@/lib/types/proctoring"
 import { ProctorViewer, type ViewerStatus } from "@/lib/webrtc/proctor-viewer"
@@ -31,7 +31,6 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import {
   ArrowLeft,
-  Flag,
   MessageSquare,
   XCircle,
   AlertTriangle,
@@ -148,7 +147,7 @@ export default function SessionDetailPage() {
             // Detect session ended from polling (server already closed the session)
             if (data.session.status !== "Active" && !sessionEnded) {
               const reason = data.session.status === "Completed" ? "Submitted"
-                : data.session.status === "Cancelled" ? "Terminated"
+                : data.session.status === "Terminated" ? "Terminated"
                 : "Expired"
               setSessionEnded({ reason: reason as "Submitted" | "Expired" | "Terminated" })
               setHasRemoteStream(false)
@@ -302,7 +301,7 @@ export default function SessionDetailPage() {
       })
 
       viewerRef.current = viewer
-      viewer.connect().catch((e) => console.error("[ProctorPage] WebRTC connect failed (non-fatal)"))
+      viewer.connect().catch(() => console.error("[ProctorPage] WebRTC connect failed (non-fatal)"))
 
       // Screen share viewer (only if exam has screen monitoring enabled)
       if (cfg.enableScreenMonitoring) {
@@ -329,9 +328,9 @@ export default function SessionDetailPage() {
           },
         })
         screenViewerRef.current = screenViewer
-        screenViewer.connect().catch((e) => console.error("[ProctorPage] Screen viewer connect failed (non-fatal)"))
+        screenViewer.connect().catch(() => console.error("[ProctorPage] Screen viewer connect failed (non-fatal)"))
       }
-    }).catch((e) => {
+    }).catch(() => {
       console.warn("[ProctorPage] Video config fetch failed (non-fatal)")
     })
 
@@ -368,13 +367,15 @@ export default function SessionDetailPage() {
 
   // Detect session end from polling/refresh (status changed to non-Active)
   useEffect(() => {
-    if (session && session.status !== "Active" && !sessionEnded) {
+    if (!session || session.status === "Active" || sessionEnded) return
+    const timer = setTimeout(() => {
       const reason = session.status === "Terminated" ? "Terminated" : "Submitted"
       setSessionEnded({ reason })
       setHasRemoteStream(false)
       viewerRef.current?.disconnect()
-    }
-  }, [session?.status])
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [session, sessionEnded])
 
   async function loadSession(isRefresh = false) {
     try {
@@ -388,7 +389,7 @@ export default function SessionDetailPage() {
       // Detect if session is already ended (e.g. candidate submitted while proctor was away)
       if (data.session?.status && data.session.status !== "Active" && !sessionEnded) {
         const reason = data.session.status === "Completed" ? "Submitted"
-          : data.session.status === "Cancelled" ? "Terminated"
+          : data.session.status === "Terminated" ? "Terminated"
           : "Expired"
         setSessionEnded({ reason: reason as "Submitted" | "Expired" | "Terminated" })
       }
@@ -398,7 +399,7 @@ export default function SessionDetailPage() {
         const attemptEvents = await getAttemptEvents(data.session.attemptId)
         setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
       }
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToLoadSession"))
       if (!isRefresh) router.push("/proctor-center")
     } finally {
@@ -415,19 +416,8 @@ export default function SessionDetailPage() {
       setSelectedIncident(null)
       setReviewNotes("")
       await loadSession(true)
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToReviewIncident"))
-    }
-  }
-
-  async function handleToggleFlag() {
-    if (!session) return
-    try {
-      await flagSession(session.id, !session.flagged)
-      toast.success(session.flagged ? t("proctor.unflagged") : t("proctor.flagged"))
-      await loadSession(true)
-    } catch (error) {
-      toast.error(t("proctor.failedToUpdateFlag"))
     }
   }
 
@@ -488,7 +478,7 @@ export default function SessionDetailPage() {
       setAddTimeReason("")
       // Refresh session data to show updated time
       await loadSession(true)
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToAddTime"))
     } finally {
       setAddTimeLoading(false)
@@ -503,8 +493,10 @@ export default function SessionDetailPage() {
       const analysis = await getAiProctorAnalysis(session.id)
       setAiAnalysis(analysis)
       toast.success(t("proctor.aiAnalysisGenerated"))
-    } catch (error: any) {
-      const msg = error?.message || t("proctor.failedToGenerateAi")
+    } catch (error: unknown) {
+      const msg = error instanceof Error && error.message
+        ? error.message
+        : t("proctor.failedToGenerateAi")
       setAiAnalysisError(msg)
       toast.error(msg)
     } finally {
@@ -1556,11 +1548,11 @@ export default function SessionDetailPage() {
                         )}
                         {aiAnalysis.violationAnalysis.violationBreakdown && aiAnalysis.violationAnalysis.violationBreakdown.length > 0 && (
                           <div className="space-y-1 mt-1">
-                            {aiAnalysis.violationAnalysis.violationBreakdown.map((v: any, i: number) => (
+                            {aiAnalysis.violationAnalysis.violationBreakdown.map((v, i) => (
                               <div key={i} className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                                <span className="text-[11px]">{translateViolationType(v.type, locale)}</span>
+                                <span className="text-[11px]">{translateViolationType(v.type ?? "", locale)}</span>
                                 <div className="flex items-center gap-1.5">
-                                  <Badge variant="outline" className="text-[9px] h-4">{translateSeverity(v.severity, locale)}</Badge>
+                                  <Badge variant="outline" className="text-[9px] h-4">{translateSeverity(v.severity ?? "", locale)}</Badge>
                                   <span className="text-[10px] font-medium">x{v.count}</span>
                                 </div>
                               </div>

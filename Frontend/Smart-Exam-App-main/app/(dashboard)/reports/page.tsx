@@ -30,7 +30,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts"
-import { Users, Target, TrendingUp, Award, Search, Download, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react"
+import { Users, Target, TrendingUp, Award, Search, Download, CheckCircle2, XCircle, ChevronDown } from "lucide-react"
 
 export default function ReportsPage() {
   const { t, locale } = useI18n()
@@ -75,13 +75,13 @@ export default function ReportsPage() {
 
   // Load exams on mount
   useEffect(() => {
-    loadExamsPage("", 1, true)
+    void Promise.resolve().then(() => loadExamsPage("", 1, true))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reload when dropdown opens
   useEffect(() => {
     if (!dropdownOpen) return
-    loadExamsPage(examSearch, 1, true)
+    void Promise.resolve().then(() => loadExamsPage(examSearch, 1, true))
   }, [dropdownOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced reload on search change
@@ -114,14 +114,23 @@ export default function ReportsPage() {
   }
 
   useEffect(() => {
-    if (!selectedExamId) { setDashboard(null); return; }
-    getResultDashboard(selectedExamId).then((dash) => setDashboard(dash || null))
+    void Promise.resolve().then(() => {
+      if (!selectedExamId) {
+        setDashboard(null)
+        return
+      }
+      return getResultDashboard(selectedExamId).then((dash) => setDashboard(dash || null))
+    })
   }, [selectedExamId])
 
   useEffect(() => {
-    if (!selectedExamId) { setCandidates([]); setLoading(false); return; }
-    setLoading(true)
     const handler = setTimeout(() => {
+      if (!selectedExamId) {
+        setCandidates([])
+        setLoading(false)
+        return
+      }
+      setLoading(true)
       getExamResults(selectedExamId, {
         pageSize: 100,
         search: searchQuery.trim() || undefined,
@@ -261,29 +270,21 @@ export default function ReportsPage() {
           title={t("reports.totalCandidates")}
           value={dashboard?.totalCandidates ?? 0}
           icon={Users}
-          iconColor="text-blue-500"
-          iconBgColor="bg-blue-500/10"
         />
         <StatCard
           title={t("reports.averageScore")}
           value={`${dashboard ? Math.round(dashboard.averageScore) : 0}%`}
           icon={Target}
-          iconColor="text-primary"
-          iconBgColor="bg-primary/10"
         />
         <StatCard
           title={t("reports.passRate")}
           value={`${dashboard ? Math.round(dashboard.passRate) : 0}%`}
           icon={TrendingUp}
-          iconColor="text-emerald-500"
-          iconBgColor="bg-emerald-500/10"
         />
         <StatCard
           title={t("reports.highestScore")}
           value={`${dashboard ? Math.round(dashboard.highestScore) : 0}%`}
           icon={Award}
-          iconColor="text-amber-500"
-          iconBgColor="bg-amber-500/10"
         />
       </div>
 

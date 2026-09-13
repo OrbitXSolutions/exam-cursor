@@ -7,9 +7,6 @@ import {
   getIncidents,
   reviewIncident,
   createIncidentCase,
-  INCIDENT_SEVERITY_LABELS,
-  INCIDENT_STATUS_LABELS,
-  INCIDENT_OUTCOME_LABELS,
 } from "@/lib/api/proctoring"
 import type { Incident } from "@/lib/types/proctoring"
 import { Button } from "@/components/ui/button"
@@ -36,7 +33,7 @@ import { toast } from "sonner"
 import { ArrowLeft, Search, AlertTriangle, CheckCircle2, Clock, Eye, Plus, FileText } from "lucide-react"
 
 export default function IncidentsPage() {
-  const { t, dir, locale } = useI18n()
+  const { t, locale } = useI18n()
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
@@ -88,7 +85,7 @@ export default function IncidentsPage() {
       })
       setIncidents(data.items)
       setTotalCount(data.totalCount ?? data.items.length)
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToLoadIncidents"))
     } finally {
       setLoading(false)
@@ -104,7 +101,7 @@ export default function IncidentsPage() {
       setSelectedIncident(null)
       setReviewNotes("")
       loadIncidents()
-    } catch (error) {
+    } catch {
       toast.error(t("proctor.failedToReviewIncident"))
     }
   }
@@ -127,8 +124,8 @@ export default function IncidentsPage() {
       setCreateDialogOpen(false)
       setNewIncident({ attemptId: "", severity: "2", titleEn: "", summaryEn: "" })
       loadIncidents()
-    } catch (error: any) {
-      toast.error(error?.message || t("proctor.failedToCreateIncident"))
+    } catch (error: unknown) {
+      toast.error(error instanceof Error && error.message ? error.message : t("proctor.failedToCreateIncident"))
     } finally {
       setCreateLoading(false)
     }

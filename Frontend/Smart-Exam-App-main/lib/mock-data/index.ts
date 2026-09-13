@@ -13,11 +13,11 @@ import type {
   ProctorSession,
   IncidentCase,
   AuditLog,
-  ExamSchedule,
 } from "@/lib/types";
 import {
   DifficultyLevel,
   AttemptStatus,
+  ExamType,
   GradingStatus,
   ProctorMode,
   ProctorDecisionStatus,
@@ -110,15 +110,28 @@ export const mockQuestionTypes: QuestionType[] = [
 export const mockQuestions: Question[] = [
   {
     id: 1,
+    bodyEn: "What is the capital of France?",
+    bodyAr: "What is the capital of France?",
     body: "What is the capital of France?",
     questionTypeId: 1,
+    questionTypeNameEn: "MCQ Single",
+    questionTypeNameAr: "MCQ Single",
     questionTypeName: "MCQ Single",
     questionCategoryId: 4,
+    questionCategoryNameEn: "History",
+    questionCategoryNameAr: "History",
     questionCategoryName: "History",
+    subjectId: 4,
+    subjectNameEn: "History",
+    subjectNameAr: "History",
+    topicId: null,
+    topicNameEn: null,
+    topicNameAr: null,
     points: 2,
     difficultyLevel: DifficultyLevel.Easy,
     difficultyLevelName: "Easy",
     isActive: true,
+    isCalculatorAllowed: false,
     createdDate: "2024-01-01T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
@@ -126,6 +139,8 @@ export const mockQuestions: Question[] = [
       {
         id: 1,
         questionId: 1,
+        textEn: "Paris",
+        textAr: "Paris",
         text: "Paris",
         isCorrect: true,
         order: 0,
@@ -135,6 +150,8 @@ export const mockQuestions: Question[] = [
       {
         id: 2,
         questionId: 1,
+        textEn: "London",
+        textAr: "London",
         text: "London",
         isCorrect: false,
         order: 1,
@@ -144,6 +161,8 @@ export const mockQuestions: Question[] = [
       {
         id: 3,
         questionId: 1,
+        textEn: "Berlin",
+        textAr: "Berlin",
         text: "Berlin",
         isCorrect: false,
         order: 2,
@@ -153,6 +172,8 @@ export const mockQuestions: Question[] = [
       {
         id: 4,
         questionId: 1,
+        textEn: "Madrid",
+        textAr: "Madrid",
         text: "Madrid",
         isCorrect: false,
         order: 3,
@@ -166,15 +187,28 @@ export const mockQuestions: Question[] = [
   },
   {
     id: 2,
+    bodyEn: "Solve: 2x + 5 = 15. What is x?",
+    bodyAr: "Solve: 2x + 5 = 15. What is x?",
     body: "Solve: 2x + 5 = 15. What is x?",
     questionTypeId: 1,
+    questionTypeNameEn: "MCQ Single",
+    questionTypeNameAr: "MCQ Single",
     questionTypeName: "MCQ Single",
     questionCategoryId: 1,
+    questionCategoryNameEn: "Mathematics",
+    questionCategoryNameAr: "Mathematics",
     questionCategoryName: "Mathematics",
+    subjectId: 1,
+    subjectNameEn: "Mathematics",
+    subjectNameAr: "Mathematics",
+    topicId: null,
+    topicNameEn: null,
+    topicNameAr: null,
     points: 3,
     difficultyLevel: DifficultyLevel.Medium,
     difficultyLevelName: "Medium",
     isActive: true,
+    isCalculatorAllowed: false,
     createdDate: "2024-01-02T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
@@ -182,6 +216,8 @@ export const mockQuestions: Question[] = [
       {
         id: 5,
         questionId: 2,
+        textEn: "5",
+        textAr: "5",
         text: "5",
         isCorrect: true,
         order: 0,
@@ -191,6 +227,8 @@ export const mockQuestions: Question[] = [
       {
         id: 6,
         questionId: 2,
+        textEn: "10",
+        textAr: "10",
         text: "10",
         isCorrect: false,
         order: 1,
@@ -200,6 +238,8 @@ export const mockQuestions: Question[] = [
       {
         id: 7,
         questionId: 2,
+        textEn: "7.5",
+        textAr: "7.5",
         text: "7.5",
         isCorrect: false,
         order: 2,
@@ -209,6 +249,8 @@ export const mockQuestions: Question[] = [
       {
         id: 8,
         questionId: 2,
+        textEn: "3",
+        textAr: "3",
         text: "3",
         isCorrect: false,
         order: 3,
@@ -222,15 +264,28 @@ export const mockQuestions: Question[] = [
   },
   {
     id: 3,
+    bodyEn: "The Earth revolves around the Sun.",
+    bodyAr: "The Earth revolves around the Sun.",
     body: "The Earth revolves around the Sun.",
     questionTypeId: 3,
+    questionTypeNameEn: "True/False",
+    questionTypeNameAr: "True/False",
     questionTypeName: "True/False",
     questionCategoryId: 2,
+    questionCategoryNameEn: "Science",
+    questionCategoryNameAr: "Science",
     questionCategoryName: "Science",
+    subjectId: 2,
+    subjectNameEn: "Science",
+    subjectNameAr: "Science",
+    topicId: null,
+    topicNameEn: null,
+    topicNameAr: null,
     points: 1,
     difficultyLevel: DifficultyLevel.Easy,
     difficultyLevelName: "Easy",
     isActive: true,
+    isCalculatorAllowed: false,
     createdDate: "2024-01-03T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
@@ -238,6 +293,8 @@ export const mockQuestions: Question[] = [
       {
         id: 9,
         questionId: 3,
+        textEn: "True",
+        textAr: "True",
         text: "True",
         isCorrect: true,
         order: 0,
@@ -247,6 +304,8 @@ export const mockQuestions: Question[] = [
       {
         id: 10,
         questionId: 3,
+        textEn: "False",
+        textAr: "False",
         text: "False",
         isCorrect: false,
         order: 1,
@@ -260,15 +319,30 @@ export const mockQuestions: Question[] = [
   },
   {
     id: 4,
+    bodyEn:
+      "Explain the concept of Object-Oriented Programming and its four main principles.",
+    bodyAr:
+      "Explain the concept of Object-Oriented Programming and its four main principles.",
     body: "Explain the concept of Object-Oriented Programming and its four main principles.",
     questionTypeId: 5,
+    questionTypeNameEn: "Essay",
+    questionTypeNameAr: "Essay",
     questionTypeName: "Essay",
     questionCategoryId: 5,
+    questionCategoryNameEn: "Computer Science",
+    questionCategoryNameAr: "Computer Science",
     questionCategoryName: "Computer Science",
+    subjectId: 5,
+    subjectNameEn: "Computer Science",
+    subjectNameAr: "Computer Science",
+    topicId: null,
+    topicNameEn: null,
+    topicNameAr: null,
     points: 10,
     difficultyLevel: DifficultyLevel.Hard,
     difficultyLevelName: "Hard",
     isActive: true,
+    isCalculatorAllowed: false,
     createdDate: "2024-01-04T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
@@ -279,15 +353,28 @@ export const mockQuestions: Question[] = [
   },
   {
     id: 5,
+    bodyEn: "What is the chemical symbol for water?",
+    bodyAr: "What is the chemical symbol for water?",
     body: "What is the chemical symbol for water?",
     questionTypeId: 1,
+    questionTypeNameEn: "MCQ Single",
+    questionTypeNameAr: "MCQ Single",
     questionTypeName: "MCQ Single",
     questionCategoryId: 2,
+    questionCategoryNameEn: "Science",
+    questionCategoryNameAr: "Science",
     questionCategoryName: "Science",
+    subjectId: 2,
+    subjectNameEn: "Science",
+    subjectNameAr: "Science",
+    topicId: null,
+    topicNameEn: null,
+    topicNameAr: null,
     points: 2,
     difficultyLevel: DifficultyLevel.Easy,
     difficultyLevelName: "Easy",
     isActive: true,
+    isCalculatorAllowed: false,
     createdDate: "2024-01-05T00:00:00Z",
     updatedDate: null,
     isDeleted: false,
@@ -295,6 +382,8 @@ export const mockQuestions: Question[] = [
       {
         id: 11,
         questionId: 5,
+        textEn: "H2O",
+        textAr: "H2O",
         text: "H2O",
         isCorrect: true,
         order: 0,
@@ -304,6 +393,8 @@ export const mockQuestions: Question[] = [
       {
         id: 12,
         questionId: 5,
+        textEn: "CO2",
+        textAr: "CO2",
         text: "CO2",
         isCorrect: false,
         order: 1,
@@ -313,6 +404,8 @@ export const mockQuestions: Question[] = [
       {
         id: 13,
         questionId: 5,
+        textEn: "NaCl",
+        textAr: "NaCl",
         text: "NaCl",
         isCorrect: false,
         order: 2,
@@ -322,6 +415,8 @@ export const mockQuestions: Question[] = [
       {
         id: 14,
         questionId: 5,
+        textEn: "O2",
+        textAr: "O2",
         text: "O2",
         isCorrect: false,
         order: 3,
@@ -348,8 +443,10 @@ export const mockSections: ExamSection[] = [
     durationMinutes: 30,
     totalPointsOverride: null,
     createdDate: "2024-01-01T00:00:00Z",
+    topicsCount: 0,
     questionsCount: 10,
     totalPoints: 20,
+    topics: [],
     questions: [],
   },
   {
@@ -363,14 +460,27 @@ export const mockSections: ExamSection[] = [
     durationMinutes: 45,
     totalPointsOverride: null,
     createdDate: "2024-01-01T00:00:00Z",
+    topicsCount: 0,
     questionsCount: 5,
     totalPoints: 30,
+    topics: [],
     questions: [],
   },
 ];
 
 // Exam Schedules
-export const mockSchedules: ExamSchedule[] = [
+interface MockExamSchedule {
+  id: number;
+  examId: number;
+  startAt: string;
+  endAt: string;
+  location: string;
+  capacity: number;
+  registeredCount: number;
+  isActive: boolean;
+}
+
+export const mockSchedules: MockExamSchedule[] = [
   {
     id: 1,
     examId: 1,
@@ -404,9 +514,46 @@ export const mockSchedules: ExamSchedule[] = [
 ];
 
 // Exams
+const mockExamPolicyDefaults = {
+  departmentId: 0,
+  showResults: false,
+  allowReview: false,
+  showCorrectAnswers: false,
+  requireProctoring: false,
+  requireIdVerification: false,
+  requireWebcam: false,
+  enableScreenMonitoring: false,
+  screenMonitoringMode: 0,
+  screenShareGracePeriod: 20,
+  preventCopyPaste: false,
+  preventScreenCapture: false,
+  requireFullscreen: false,
+  browserLockdown: false,
+  maxViolationWarnings: 3,
+} satisfies Pick<
+  Exam,
+  | "departmentId"
+  | "showResults"
+  | "allowReview"
+  | "showCorrectAnswers"
+  | "requireProctoring"
+  | "requireIdVerification"
+  | "requireWebcam"
+  | "enableScreenMonitoring"
+  | "screenMonitoringMode"
+  | "screenShareGracePeriod"
+  | "preventCopyPaste"
+  | "preventScreenCapture"
+  | "requireFullscreen"
+  | "browserLockdown"
+  | "maxViolationWarnings"
+>;
+
 export const mockExams: Exam[] = [
   {
+    ...mockExamPolicyDefaults,
     id: 1,
+    examType: ExamType.Fixed,
     title: "Final Mathematics Exam",
     code: "MATH-001",
     status: "Published",
@@ -454,12 +601,15 @@ export const mockExams: Exam[] = [
       isPublic: false,
       accessCode: "MATH2024",
       restrictToAssignedCandidates: true,
+      isWalkIn: false,
       createdDate: "2024-01-01T00:00:00Z",
       updatedDate: null,
     },
   },
   {
+    ...mockExamPolicyDefaults,
     id: 2,
+    examType: ExamType.Fixed,
     title: "Science Mid-Term Exam",
     code: "SCI-002",
     status: "Published",
@@ -490,12 +640,15 @@ export const mockExams: Exam[] = [
       isPublic: true,
       accessCode: null,
       restrictToAssignedCandidates: false,
+      isWalkIn: false,
       createdDate: "2024-01-15T00:00:00Z",
       updatedDate: null,
     },
   },
   {
+    ...mockExamPolicyDefaults,
     id: 3,
+    examType: ExamType.Flex,
     title: "Computer Science Quiz",
     code: "CS-003",
     status: "Draft",
@@ -520,10 +673,12 @@ export const mockExams: Exam[] = [
     totalPoints: 20,
     sections: [],
     instructions: [],
-    accessPolicy: undefined,
+    accessPolicy: null,
   },
   {
+    ...mockExamPolicyDefaults,
     id: 4,
+    examType: ExamType.Fixed,
     title: "English Proficiency Test",
     code: "ENG-004",
     status: "Archived",
@@ -548,7 +703,7 @@ export const mockExams: Exam[] = [
     totalPoints: 100,
     sections: [],
     instructions: [],
-    accessPolicy: undefined,
+    accessPolicy: null,
   },
 ];
 

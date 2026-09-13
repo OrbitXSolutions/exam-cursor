@@ -66,10 +66,12 @@ export function ExamShareDialog({
 
   // Load existing share link when dialog opens
   useEffect(() => {
-    if (open && examId) {
+    if (!open || !examId) return
+    const timeout = setTimeout(() => {
       setCopied(false)
-      loadShareLink()
-    }
+      void loadShareLink()
+    }, 0)
+    return () => clearTimeout(timeout)
   }, [open, examId, loadShareLink])
 
   async function handleGenerate() {
@@ -80,9 +82,9 @@ export function ExamShareDialog({
       toast.success(
         isRTL ? "تم إنشاء رابط المشاركة" : "Share link generated",
       )
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error?.message ||
+        (error instanceof Error ? error.message : "") ||
           (isRTL ? "فشل في إنشاء الرابط" : "Failed to generate link"),
       )
     }
@@ -95,9 +97,9 @@ export function ExamShareDialog({
       await revokeShareLink(examId)
       setShareLink(null)
       toast.success(isRTL ? "تم إلغاء الرابط" : "Share link revoked")
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error?.message ||
+        (error instanceof Error ? error.message : "") ||
           (isRTL ? "فشل في إلغاء الرابط" : "Failed to revoke link"),
       )
     }

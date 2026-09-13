@@ -28,9 +28,13 @@ export interface ProctorAssignmentResultDto {
 
 // ── API calls ─────────────────────────────────────────────────
 
-export async function getExamProctors(examId: number): Promise<ExamProctorPageDto> {
-  const raw = await apiClient.get<{ data: ExamProctorPageDto }>(`/ExamProctor/${examId}`);
-  const data = (raw as any)?.data ?? raw;
+export async function getExamProctors(
+  examId: number,
+): Promise<ExamProctorPageDto> {
+  const raw = await apiClient.get<
+    ExamProctorPageDto | { data?: ExamProctorPageDto }
+  >(`/ExamProctor/${examId}`);
+  const data = "data" in raw ? (raw.data ?? raw) : raw;
   return data as ExamProctorPageDto;
 }
 
@@ -38,11 +42,13 @@ export async function assignProctors(
   examId: number,
   proctorIds: string[],
 ): Promise<ProctorAssignmentResultDto> {
-  const raw = await apiClient.post<{ data: ProctorAssignmentResultDto }>("/ExamProctor/assign", {
+  const raw = await apiClient.post<
+    ProctorAssignmentResultDto | { data?: ProctorAssignmentResultDto }
+  >("/ExamProctor/assign", {
     examId,
     proctorIds,
   });
-  const data = (raw as any)?.data ?? raw;
+  const data = "data" in raw ? (raw.data ?? raw) : raw;
   return data as ProctorAssignmentResultDto;
 }
 
@@ -50,10 +56,12 @@ export async function unassignProctors(
   examId: number,
   proctorIds: string[],
 ): Promise<ProctorAssignmentResultDto> {
-  const raw = await apiClient.post<{ data: ProctorAssignmentResultDto }>("/ExamProctor/unassign", {
+  const raw = await apiClient.post<
+    ProctorAssignmentResultDto | { data?: ProctorAssignmentResultDto }
+  >("/ExamProctor/unassign", {
     examId,
     proctorIds,
   });
-  const data = (raw as any)?.data ?? raw;
+  const data = "data" in raw ? (raw.data ?? raw) : raw;
   return data as ProctorAssignmentResultDto;
 }

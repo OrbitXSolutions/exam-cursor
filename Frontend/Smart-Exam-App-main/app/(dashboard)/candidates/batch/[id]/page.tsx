@@ -3,12 +3,10 @@
 import { useEffect, useState, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { useAuth } from "@/lib/auth/context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
@@ -24,7 +22,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { toast } from "sonner"
 import {
   ArrowLeft, Users, UserPlus, UserMinus, Download, Search, Loader2,
-  FolderTree, Calendar, User,
+  FolderTree, Calendar,
 } from "lucide-react"
 import {
   getBatchById, addCandidatesToBatch, removeCandidatesFromBatch,
@@ -32,11 +30,24 @@ import {
 } from "@/lib/api/batch"
 import { getCandidates, type CandidateDto } from "@/lib/api/candidate-admin"
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    error.message
+  ) {
+    return error.message
+  }
+
+  return fallback
+}
+
 export default function BatchDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { language } = useI18n()
-  const { user } = useAuth()
   const isAr = language === "ar"
   const batchId = Number(params.id)
 
@@ -72,14 +83,19 @@ export default function BatchDetailPage() {
     try {
       const data = await getBatchById(batchId)
       setBatch(data)
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل في تحميل بيانات الدفعة" : "Failed to load batch"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل في تحميل بيانات الدفعة" : "Failed to load batch"))
     } finally {
       setLoading(false)
     }
   }, [batchId, isAr])
 
-  useEffect(() => { loadBatch() }, [loadBatch])
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadBatch()
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [loadBatch])
 
   // ── Load available candidates for add dialog ───────────────
   const loadAvailable = useCallback(async () => {
@@ -121,7 +137,8 @@ export default function BatchDetailPage() {
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }
@@ -139,8 +156,8 @@ export default function BatchDetailPage() {
       setAddOpen(false)
       setSelectedIds(new Set())
       loadBatch()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت الإضافة" : "Add failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشلت الإضافة" : "Add failed"))
     } finally {
       setAddLoading(false)
     }
@@ -155,8 +172,8 @@ export default function BatchDetailPage() {
       setRemoveOpen(false)
       setRemoveTarget(null)
       loadBatch()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت الإزالة" : "Remove failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشلت الإزالة" : "Remove failed"))
     } finally {
       setRemoveLoading(false)
     }
@@ -175,8 +192,8 @@ export default function BatchDetailPage() {
       setBulkRemoveOpen(false)
       setBulkSelected(new Set())
       loadBatch()
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشلت الإزالة" : "Remove failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشلت الإزالة" : "Remove failed"))
     } finally {
       setBulkRemoveLoading(false)
     }
@@ -185,7 +202,8 @@ export default function BatchDetailPage() {
   const toggleBulk = (id: string) => {
     setBulkSelected((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }
@@ -203,8 +221,8 @@ export default function BatchDetailPage() {
     try {
       await exportBatchCandidates(batchId)
       toast.success(isAr ? "تم التصدير بنجاح" : "Export successful")
-    } catch (e: any) {
-      toast.error(e.message || (isAr ? "فشل التصدير" : "Export failed"))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, isAr ? "فشل التصدير" : "Export failed"))
     } finally {
       setExportLoading(false)
     }

@@ -110,7 +110,7 @@ export function ProctorShowcase() {
     }
   }
 
-  const activeFeature = proctorFeatures.find((f) => f.id === activeTab)
+  proctorFeatures.find((f) => f.id === activeTab)
 
   return (
     <section ref={sectionRef} id="features" className="py-24 bg-slate-50">

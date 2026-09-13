@@ -8,8 +8,6 @@ import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/i18n/context"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   ChevronLeft,
   ChevronRight,
@@ -42,7 +40,7 @@ interface TutorialLayoutProps {
 
 export function TutorialLayout({ children, currentModuleSlug }: TutorialLayoutProps) {
   const { language, isRTL } = useI18n()
-  const pathname = usePathname()
+  usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null)
 

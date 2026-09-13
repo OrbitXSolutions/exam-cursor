@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { User, AuditLog } from "@/lib/types";
+import { UserRole, type User, type AuditLog } from "@/lib/types";
 
 // Backend UserDto shape (camelCase from API)
 interface UserDto {
@@ -19,12 +19,16 @@ interface UserDto {
 
 function mapUserDtoToUser(dto: UserDto): User {
   const name = dto.fullName ?? dto.displayName ?? "";
+  const role = dto.roles?.[0];
+  if (!Object.values(UserRole).includes(role as UserRole)) {
+    throw new Error("User has an invalid role");
+  }
   return {
     id: dto.id,
     email: dto.email,
     fullNameEn: name,
     fullNameAr: name,
-    role: dto.roles?.[0] ?? "",
+    role: role as UserRole,
     isActive: !dto.isBlocked && dto.status !== "Inactive",
     createdDate: dto.createdDate,
     departmentId: dto.departmentId ?? null,
@@ -156,6 +160,7 @@ export async function deleteUser(id: string): Promise<void> {
 export async function resetUserPassword(
   id: string,
 ): Promise<{ temporaryPassword: string }> {
+  void id;
   // Backend may not have this endpoint - throw or call if exists
   throw new Error("Password reset not available via API.");
 }
@@ -175,6 +180,31 @@ interface AuditLogListDto {
   beforeJson?: string;
   afterJson?: string;
   metadataJson?: string;
+}
+
+interface AuditLogDetailDto {
+  id: number;
+  actorId?: string | null;
+  actorDisplayName?: string | null;
+  actorType?: number;
+  actorTypeName?: string | null;
+  action?: string;
+  entityName?: string;
+  entityId?: string;
+  correlationId?: string | null;
+  source?: number;
+  sourceName?: string | null;
+  channel?: number;
+  channelName?: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  beforeJson?: string | null;
+  afterJson?: string | null;
+  metadataJson?: string | null;
+  outcomeName?: string;
+  errorMessage?: string | null;
+  occurredAt?: string;
+  durationMs?: number | null;
 }
 
 const ACTOR_TYPE_MAP: Record<number, string> = {
@@ -254,7 +284,7 @@ export async function getAuditLogs(params?: {
 export async function getAuditLogDetail(
   id: number,
 ): Promise<import("@/lib/types").AuditLogDetail> {
-  const raw = await apiClient.get<any>(`/Audit/log/${id}`);
+  const raw = await apiClient.get<AuditLogDetailDto>(`/Audit/log/${id}`);
   return {
     id: raw.id,
     actorId: raw.actorId ?? null,

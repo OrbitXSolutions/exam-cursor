@@ -113,7 +113,6 @@ export interface ExamDetailsResultInfoDto {
   isFinalized: boolean;
   isPublished: boolean;
   gradingSessionId?: number;
-  certificateId?: number;
 }
 
 export interface CandidateExamDetailsDto {
