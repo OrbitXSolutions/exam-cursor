@@ -87,6 +87,8 @@ const exactMessageMap: Record<string, string> = {
   "Attempt is not in progress": "المحاولة ليست قيد التنفيذ.",
   "Exam not found": "الاختبار غير موجود.",
   "Question not found": "السؤال غير موجود.",
+  "Question cannot be deleted because it has already been used in an exam.":
+    "لا يمكن حذف السؤال لأنه استُخدم بالفعل في اختبار.",
   "Rule not found": "القاعدة غير موجودة.",
   "Evidence not found": "الدليل غير موجود.",
   "Evidence not yet uploaded": "لم يتم رفع الدليل بعد.",

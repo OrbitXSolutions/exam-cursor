@@ -86,10 +86,12 @@ public class QuestionBankController : ControllerBase
     [HttpDelete("questions/{id}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> DeleteQuestion(int id)
     {
         var result = await _questionBankService.DeleteQuestionAsync(id);
-        return result.Success ? Ok(result) : NotFound(result);
+        if (result.Success) return Ok(result);
+        return result.Message == "Question not found" ? NotFound(result) : Conflict(result);
     }
 
     /// <summary>

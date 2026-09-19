@@ -80,9 +80,13 @@ export default function QuestionDetailPage() {
       await deleteQuestion(numericId)
       toast.success(localizeText("Question deleted successfully", "تم حذف السؤال بنجاح", language))
       router.push("/question-bank")
-    } catch {
+    } catch (error) {
       console.error("[v0] Failed to delete question")
-      toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : localizeText("Failed to delete question", "فشل حذف السؤال", language),
+      )
     }
     setIsDeleting(false)
   }

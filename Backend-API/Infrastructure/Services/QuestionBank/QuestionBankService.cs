@@ -1,5 +1,6 @@
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Smart_Core.Application.DTOs.Assessment;
 using Smart_Core.Application.DTOs.Common;
@@ -478,9 +479,29 @@ public class QuestionBankService : IQuestionBankService
             return ApiResponse<bool>.FailureResponse("Question not found");
         }
 
+        var hasBeenUsed = await _context.ExamQuestions.IgnoreQueryFilters().AnyAsync(x => x.QuestionId == id)
+            || await _context.AttemptQuestions.IgnoreQueryFilters().AnyAsync(x => x.QuestionId == id)
+            || await _context.GradedAnswers.IgnoreQueryFilters().AnyAsync(x => x.QuestionId == id)
+            || await _context.QuestionPerformanceReports.IgnoreQueryFilters().AnyAsync(x => x.QuestionId == id);
+
+        if (hasBeenUsed)
+        {
+            return ApiResponse<bool>.FailureResponse(
+                "Question cannot be deleted because it has already been used in an exam.");
+        }
+
         // Hard delete - cascade will handle options, attachments, and answer key
         _context.Questions.Remove(entity);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 547 })
+        {
+            // A question can become referenced after the checks above but before deletion.
+            return ApiResponse<bool>.FailureResponse(
+                "Question cannot be deleted because it has already been used in an exam.");
+        }
         InvalidateQuestionCache();
 
         return ApiResponse<bool>.SuccessResponse(true, "Question deleted successfully");

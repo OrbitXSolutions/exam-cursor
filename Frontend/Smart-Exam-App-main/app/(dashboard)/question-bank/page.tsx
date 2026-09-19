@@ -163,8 +163,12 @@ export default function QuestionBankPage() {
       } else {
         toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
       }
-    } catch {
-      toast.error(localizeText("Failed to delete question", "فشل حذف السؤال", language))
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : localizeText("Failed to delete question", "فشل حذف السؤال", language),
+      )
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)
