@@ -1,0 +1,5148 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:51:15.846Z",
+  "checks": [
+    {
+      "name": "D32 Examiner can load authorized grading exam choices",
+      "passed": false,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T11:51:33.152Z"
+    },
+    {
+      "name": "No-department Admin dropdown fails closed",
+      "passed": false,
+      "detail": {
+        "count": 73
+      },
+      "at": "2026-09-19T11:51:34.544Z"
+    },
+    {
+      "name": "Same-department examiner reads QA grading list",
+      "passed": true,
+      "at": "2026-09-19T11:51:37.170Z"
+    },
+    {
+      "name": "No-department examiner grading list fails closed",
+      "passed": false,
+      "detail": {
+        "total": 11
+      },
+      "at": "2026-09-19T11:51:39.356Z"
+    },
+    {
+      "name": "No-department manual queue list fails closed",
+      "passed": false,
+      "detail": {
+        "total": 3
+      },
+      "at": "2026-09-19T11:51:41.281Z"
+    },
+    {
+      "name": "Foreign examiner cannot initiate protected attempt grading",
+      "passed": false,
+      "at": "2026-09-19T11:51:42.945Z"
+    },
+    {
+      "name": "Foreign examiner cannot read cached detail",
+      "passed": false,
+      "at": "2026-09-19T11:51:44.513Z"
+    },
+    {
+      "name": "No-department examiner cannot read cached detail",
+      "passed": false,
+      "at": "2026-09-19T11:51:44.976Z"
+    },
+    {
+      "name": "Same-department examiner retains detail",
+      "passed": true,
+      "at": "2026-09-19T11:51:45.441Z"
+    },
+    {
+      "name": "Foreign examiner cannot read cached attempt-detail",
+      "passed": false,
+      "at": "2026-09-19T11:51:46.373Z"
+    },
+    {
+      "name": "No-department examiner cannot read cached attempt-detail",
+      "passed": false,
+      "at": "2026-09-19T11:51:46.845Z"
+    },
+    {
+      "name": "Same-department examiner retains attempt-detail",
+      "passed": true,
+      "at": "2026-09-19T11:51:47.312Z"
+    },
+    {
+      "name": "Foreign examiner cannot read cached manual-queue",
+      "passed": false,
+      "at": "2026-09-19T11:51:48.302Z"
+    },
+    {
+      "name": "No-department examiner cannot read cached manual-queue",
+      "passed": false,
+      "at": "2026-09-19T11:51:48.765Z"
+    },
+    {
+      "name": "Same-department examiner retains manual-queue",
+      "passed": true,
+      "at": "2026-09-19T11:51:49.229Z"
+    },
+    {
+      "name": "Foreign examiner cannot read cached stats",
+      "passed": true,
+      "at": "2026-09-19T11:51:52.031Z"
+    },
+    {
+      "name": "No-department examiner cannot read cached stats",
+      "passed": false,
+      "at": "2026-09-19T11:51:53.632Z"
+    },
+    {
+      "name": "Same-department examiner retains stats",
+      "passed": true,
+      "at": "2026-09-19T11:51:55.234Z"
+    },
+    {
+      "name": "Foreign examiner cannot read cached question-stats",
+      "passed": true,
+      "at": "2026-09-19T11:51:57.810Z"
+    },
+    {
+      "name": "No-department examiner cannot read cached question-stats",
+      "passed": false,
+      "at": "2026-09-19T11:51:59.424Z"
+    },
+    {
+      "name": "Same-department examiner retains question-stats",
+      "passed": true,
+      "at": "2026-09-19T11:52:01.047Z"
+    },
+    {
+      "name": "Foreign AI suggestion is denied before answer inspection",
+      "passed": false,
+      "at": "2026-09-19T11:52:01.591Z"
+    },
+    {
+      "name": "Foreign examiner cannot submit manual grade",
+      "passed": false,
+      "at": "2026-09-19T11:52:02.296Z"
+    },
+    {
+      "name": "Foreign manual grade does not persist",
+      "passed": false,
+      "at": "2026-09-19T11:52:02.779Z"
+    },
+    {
+      "name": "Foreign examiner cannot bulk grade",
+      "passed": false,
+      "at": "2026-09-19T11:52:03.492Z"
+    },
+    {
+      "name": "Foreign examiner cannot regrade",
+      "passed": false,
+      "at": "2026-09-19T11:52:04.693Z"
+    },
+    {
+      "name": "Foreign examiner cannot finalize grading",
+      "passed": false,
+      "at": "2026-09-19T11:52:07.761Z"
+    },
+    {
+      "name": "Sibling candidate cannot read warmed owner grading result",
+      "passed": true,
+      "at": "2026-09-19T11:52:09.888Z"
+    },
+    {
+      "name": "Sibling candidate cannot read grading completion",
+      "passed": false,
+      "at": "2026-09-19T11:52:10.832Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:51:17.079Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:17.0758793+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:51:16.3878478+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:17.0758793+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:51:16.3878478+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1231.76
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:21.369Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.d34.nodept.admin@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 D34 No Department Admin",
+        "role": "Admin"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:51:20.1825445+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "6a89227e-52df-4c14-98c0-6c1a65754339",
+          "email": "qa26.d34.nodept.admin@example.test",
+          "displayName": "QA26 D34 No Department Admin",
+          "fullName": "QA26 D34 No Department Admin",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T15:51:18.7800518+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:51:20.1825445+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "6a89227e-52df-4c14-98c0-6c1a65754339",
+            "email": "qa26.d34.nodept.admin@example.test",
+            "displayName": "QA26 D34 No Department Admin",
+            "fullName": "QA26 D34 No Department Admin",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T15:51:18.7800518+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4287.8
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:25.617Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.d34.nodept.examiner@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 D34 No Department Examiner",
+        "role": "Examiner"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:51:24.4552749+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "7f74cbae-a96d-4e78-b016-2cf30b6e24b1",
+          "email": "qa26.d34.nodept.examiner@example.test",
+          "displayName": "QA26 D34 No Department Examiner",
+          "fullName": "QA26 D34 No Department Examiner",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Examiner"
+          ],
+          "createdDate": "2026-09-19T15:51:23.0551775+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:51:24.4552749+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "7f74cbae-a96d-4e78-b016-2cf30b6e24b1",
+            "email": "qa26.d34.nodept.examiner@example.test",
+            "displayName": "QA26 D34 No Department Examiner",
+            "fullName": "QA26 D34 No Department Examiner",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner"
+            ],
+            "createdDate": "2026-09-19T15:51:23.0551775+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4247.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:26.850Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.examiner1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:26.8494986+04:00",
+          "user": {
+            "id": "09dfd644-e962-4802-a43b-5dcf7f489999",
+            "email": "qa26.eng.examiner1@example.test",
+            "displayName": "QA26 Engineering Examiner 1",
+            "fullName": "QA26 Engineering Examiner 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner"
+            ],
+            "createdDate": "2026-09-19T14:46:23.83318+04:00",
+            "lastLoginDate": "2026-09-19T15:51:26.1388838+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:26.8494986+04:00",
+            "user": {
+              "id": "09dfd644-e962-4802-a43b-5dcf7f489999",
+              "email": "qa26.eng.examiner1@example.test",
+              "displayName": "QA26 Engineering Examiner 1",
+              "fullName": "QA26 Engineering Examiner 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Examiner"
+              ],
+              "createdDate": "2026-09-19T14:46:23.83318+04:00",
+              "lastLoginDate": "2026-09-19T15:51:26.1388838+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1231.05
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:28.076Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.examiner1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:28.0756231+04:00",
+          "user": {
+            "id": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "email": "qa26.ops.examiner1@example.test",
+            "displayName": "QA26 Operations Examiner 1",
+            "fullName": "QA26 Operations Examiner 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner"
+            ],
+            "createdDate": "2026-09-19T14:47:13.3780855+04:00",
+            "lastLoginDate": "2026-09-19T15:51:27.3717095+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:28.0756231+04:00",
+            "user": {
+              "id": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+              "email": "qa26.ops.examiner1@example.test",
+              "displayName": "QA26 Operations Examiner 1",
+              "fullName": "QA26 Operations Examiner 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Examiner"
+              ],
+              "createdDate": "2026-09-19T14:47:13.3780855+04:00",
+              "lastLoginDate": "2026-09-19T15:51:27.3717095+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1225.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:29.294Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.d34.nodept.examiner@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:29.2948266+04:00",
+          "user": {
+            "id": "7f74cbae-a96d-4e78-b016-2cf30b6e24b1",
+            "email": "qa26.d34.nodept.examiner@example.test",
+            "displayName": "QA26 D34 No Department Examiner",
+            "fullName": "QA26 D34 No Department Examiner",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner"
+            ],
+            "createdDate": "2026-09-19T15:51:23.0551775+04:00",
+            "lastLoginDate": "2026-09-19T15:51:28.5947926+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:29.2948266+04:00",
+            "user": {
+              "id": "7f74cbae-a96d-4e78-b016-2cf30b6e24b1",
+              "email": "qa26.d34.nodept.examiner@example.test",
+              "displayName": "QA26 D34 No Department Examiner",
+              "fullName": "QA26 D34 No Department Examiner",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Examiner"
+              ],
+              "createdDate": "2026-09-19T15:51:23.0551775+04:00",
+              "lastLoginDate": "2026-09-19T15:51:28.5947926+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1217.54
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:30.496Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.d34.nodept.admin@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:30.4962207+04:00",
+          "user": {
+            "id": "6a89227e-52df-4c14-98c0-6c1a65754339",
+            "email": "qa26.d34.nodept.admin@example.test",
+            "displayName": "QA26 D34 No Department Admin",
+            "fullName": "QA26 D34 No Department Admin",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T15:51:18.7800518+04:00",
+            "lastLoginDate": "2026-09-19T15:51:29.804975+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:30.4962207+04:00",
+            "user": {
+              "id": "6a89227e-52df-4c14-98c0-6c1a65754339",
+              "email": "qa26.d34.nodept.admin@example.test",
+              "displayName": "QA26 D34 No Department Admin",
+              "fullName": "QA26 D34 No Department Admin",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T15:51:18.7800518+04:00",
+              "lastLoginDate": "2026-09-19T15:51:29.804975+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1201.01
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:31.717Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:31.7168398+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T15:51:31.0100802+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:31.7168398+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T15:51:31.0100802+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1219.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:32.919Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:32.9184582+04:00",
+          "user": {
+            "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "email": "qa26.eng.candidate1@example.test",
+            "displayName": "QA26 Engineering Candidate 1",
+            "fullName": "QA26 Updated Candidate",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+            "lastLoginDate": "2026-09-19T15:51:32.2309721+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:32.9184582+04:00",
+            "user": {
+              "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "email": "qa26.eng.candidate1@example.test",
+              "displayName": "QA26 Engineering Candidate 1",
+              "fullName": "QA26 Updated Candidate",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+              "lastLoginDate": "2026-09-19T15:51:32.2309721+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1201.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:33.151Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams/dropdown",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 231.79
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:34.543Z",
+      "identity": "qa26.d34.nodept.admin@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams/dropdown",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 131,
+            "titleEn": "QA26 Historical Question Integrity 1789818529790",
+            "titleAr": "اختبار ثبات السؤال التاريخي"
+          },
+          {
+            "id": 130,
+            "titleEn": "QA26 Completion Subjective grading lifecycle",
+            "titleAr": "اكتمال QA26 Subjective grading lifecycle"
+          },
+          {
+            "id": 129,
+            "titleEn": "QA26 Completion Fresh fixed window",
+            "titleAr": "اكتمال QA26 Fresh fixed window"
+          },
+          {
+            "id": 128,
+            "titleEn": "QA26 Completion Objective matrix",
+            "titleAr": "اكتمال QA26 Objective matrix"
+          },
+          {
+            "id": 127,
+            "titleEn": "QA26 Completion One minute expiry",
+            "titleAr": "اكتمال QA26 One minute expiry"
+          },
+          {
+            "id": 126,
+            "titleEn": "QA26 Objective Clone Draft",
+            "titleAr": "نسخة الاختبار QA26"
+          },
+          {
+            "id": 125,
+            "titleEn": "QA26 Expired Window",
+            "titleAr": "اختبار QA26 expired"
+          },
+          {
+            "id": 124,
+            "titleEn": "QA26 Future Window",
+            "titleAr": "اختبار QA26 future"
+          },
+          {
+            "id": 123,
+            "titleEn": "QA26 Browser Operational Readiness",
+            "titleAr": "اختبار جاهزية التشغيل"
+          },
+          {
+            "id": 122,
+            "titleEn": "QA26 Operations Isolated Exam",
+            "titleAr": "اختبار QA26 ops"
+          },
+          {
+            "id": 121,
+            "titleEn": "QA26 Fifty Candidate Load",
+            "titleAr": "اختبار QA26 load"
+          },
+          {
+            "id": 120,
+            "titleEn": "QA26 Strict Proctored Identity",
+            "titleAr": "اختبار QA26 strict"
+          },
+          {
+            "id": 119,
+            "titleEn": "QA26 Walk In Registration",
+            "titleAr": "اختبار QA26 walkin"
+          },
+          {
+            "id": 118,
+            "titleEn": "QA26 Random Topic Pool",
+            "titleAr": "اختبار QA26 pooled"
+          },
+          {
+            "id": 117,
+            "titleEn": "QA26 Fixed Assigned Code",
+            "titleAr": "اختبار QA26 fixed-code"
+          },
+          {
+            "id": 116,
+            "titleEn": "QA26 Objective Immediate Review",
+            "titleAr": "اختبار QA26 auto"
+          },
+          {
+            "id": 115,
+            "titleEn": "QA26 Complete Lifecycle",
+            "titleAr": "اختبار QA26 lifecycle"
+          },
+          {
+            "id": 114,
+            "titleEn": "QA-E2E-20260913170004 Acceptance Exam",
+            "titleAr": "QA-E2E-20260913170004 Exam AR"
+          },
+          {
+            "id": 113,
+            "titleEn": "history 3",
+            "titleAr": "history 3"
+          },
+          {
+            "id": 112,
+            "titleEn": "HISTORY PART 2",
+            "titleAr": "HISTORY PART 2"
+          },
+          {
+            "id": 111,
+            "titleEn": "History Exam",
+            "titleAr": "امتحان التاريخ"
+          },
+          {
+            "id": 110,
+            "titleEn": "sss",
+            "titleAr": "ss"
+          },
+          {
+            "id": 109,
+            "titleEn": "Fixed ",
+            "titleAr": "Fixed "
+          },
+          {
+            "id": 107,
+            "titleEn": "Walk in 3 ",
+            "titleAr": "Walk in 3 "
+          },
+          {
+            "id": 106,
+            "titleEn": "Test 1 June assign",
+            "titleAr": "Test 1 June assign"
+          },
+          {
+            "id": 105,
+            "titleEn": "Test 2 walk",
+            "titleAr": "Test 2 walk"
+          },
+          {
+            "id": 104,
+            "titleEn": "Test 1 June walk-in ",
+            "titleAr": "Test 1 June walk-in "
+          },
+          {
+            "id": 103,
+            "titleEn": "Test 1 June ",
+            "titleAr": "Test 1 June "
+          },
+          {
+            "id": 102,
+            "titleEn": "rteft",
+            "titleAr": "rteft"
+          },
+          {
+            "id": 101,
+            "titleEn": "test not",
+            "titleAr": "test not"
+          },
+          {
+            "id": 100,
+            "titleEn": "dd",
+            "titleAr": "dd"
+          },
+          {
+            "id": 99,
+            "titleEn": "Exam for Walk in",
+            "titleAr": "Exam for Walk in"
+          },
+          {
+            "id": 96,
+            "titleEn": "BD Basics",
+            "titleAr": "قواعد البيانات الاساسية"
+          },
+          {
+            "id": 95,
+            "titleEn": "Test1",
+            "titleAr": "ewqr"
+          },
+          {
+            "id": 92,
+            "titleEn": "7 march exam",
+            "titleAr": "7 march exam"
+          },
+          {
+            "id": 91,
+            "titleEn": "Fixed test 3 ",
+            "titleAr": "Fixed test 3 "
+          },
+          {
+            "id": 90,
+            "titleEn": "Fixed 2",
+            "titleAr": "Fixed 2"
+          },
+          {
+            "id": 88,
+            "titleEn": "test warning 1",
+            "titleAr": "test warning"
+          },
+          {
+            "id": 87,
+            "titleEn": "Pic exam",
+            "titleAr": "Pic exam"
+          },
+          {
+            "id": 86,
+            "titleEn": "Fixed time",
+            "titleAr": "Fixed time"
+          },
+          {
+            "id": 83,
+            "titleEn": "Exam test walk-in",
+            "titleAr": "Exam test walk-in"
+          },
+          {
+            "id": 82,
+            "titleEn": "Exam Test 3 MAY Assigned",
+            "titleAr": "Exam Test 3 MAY Assigned"
+          },
+          {
+            "id": 79,
+            "titleEn": "Exam Test 3 MAY 2026",
+            "titleAr": "Exam Test 3 MAY 2026"
+          },
+          {
+            "id": 78,
+            "titleEn": "Operating Systems Basics Exam PART 2",
+            "titleAr": "Operating Systems Basics Exam PART 2"
+          },
+          {
+            "id": 77,
+            "titleEn": "EXAM DEMO",
+            "titleAr": "EXAM DEMO"
+          },
+          {
+            "id": 76,
+            "titleEn": "exam 21 ",
+            "titleAr": "exam 21 "
+          },
+          {
+            "id": 75,
+            "titleEn": "what",
+            "titleAr": "what"
+          },
+          {
+            "id": 74,
+            "titleEn": "test assign",
+            "titleAr": "test assign"
+          },
+          {
+            "id": 72,
+            "titleEn": "test walk in",
+            "titleAr": "test walk in"
+          },
+          {
+            "id": 71,
+            "titleEn": "exam 6 april",
+            "titleAr": "exam 6 april"
+          },
+          {
+            "id": 70,
+            "titleEn": "mcq questions",
+            "titleAr": "mcq questions"
+          },
+          {
+            "id": 69,
+            "titleEn": "subjective questions",
+            "titleAr": "اسئلة مقالية"
+          },
+          {
+            "id": 67,
+            "titleEn": "Test Technical",
+            "titleAr": "تست تجريبي"
+          },
+          {
+            "id": 66,
+            "titleEn": " MCQ Exam Demo1",
+            "titleAr": " MCQ Exam Demo1"
+          },
+          {
+            "id": 65,
+            "titleEn": "EXAM april assign",
+            "titleAr": "EXAM april assign"
+          },
+          {
+            "id": 64,
+            "titleEn": "Exam 2 APRIL",
+            "titleAr": "Exam 2 APRIL"
+          },
+          {
+            "id": 63,
+            "titleEn": "Assign Exam",
+            "titleAr": "ضصثق"
+          },
+          {
+            "id": 62,
+            "titleEn": "Test assign",
+            "titleAr": "Test assign"
+          },
+          {
+            "id": 61,
+            "titleEn": "test 3 ",
+            "titleAr": "test 3 "
+          },
+          {
+            "id": 59,
+            "titleEn": "Test 2",
+            "titleAr": "Test 2"
+          },
+          {
+            "id": 58,
+            "titleEn": "test no Proctor",
+            "titleAr": "test no Proctor"
+          },
+          {
+            "id": 57,
+            "titleEn": "test Mob",
+            "titleAr": "test Mob"
+          },
+          {
+            "id": 56,
+            "titleEn": "gggggg",
+            "titleAr": "gggggg"
+          },
+          {
+            "id": 55,
+            "titleEn": "Introduction to Operating Systems Exam",
+            "titleAr": "اختبار مقدمة في أنظمة التشغيل"
+          },
+          {
+            "id": 54,
+            "titleEn": "Operating Systems Basics Exam",
+            "titleAr": "Operating Systems Basics Exam"
+          },
+          {
+            "id": 53,
+            "titleEn": "test3",
+            "titleAr": "test3"
+          },
+          {
+            "id": 52,
+            "titleEn": "test 2",
+            "titleAr": "test 2"
+          },
+          {
+            "id": 51,
+            "titleEn": "test excel",
+            "titleAr": "test excel"
+          },
+          {
+            "id": 50,
+            "titleEn": "SYSTEM OPERATING 2",
+            "titleAr": "SYSTEM OPERATING 2"
+          },
+          {
+            "id": 48,
+            "titleEn": "EXAM DEMO 6",
+            "titleAr": "الاختبار 6"
+          },
+          {
+            "id": 45,
+            "titleEn": "ex demo",
+            "titleAr": "اختبار"
+          },
+          {
+            "id": 44,
+            "titleEn": "Exam Demo3",
+            "titleAr": "Exam Demo3"
+          },
+          {
+            "id": 39,
+            "titleEn": "Networking Basics",
+            "titleAr": "اساسيات الشبكات"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 131,
+              "titleEn": "QA26 Historical Question Integrity 1789818529790",
+              "titleAr": "اختبار ثبات السؤال التاريخي"
+            },
+            {
+              "id": 130,
+              "titleEn": "QA26 Completion Subjective grading lifecycle",
+              "titleAr": "اكتمال QA26 Subjective grading lifecycle"
+            },
+            {
+              "id": 129,
+              "titleEn": "QA26 Completion Fresh fixed window",
+              "titleAr": "اكتمال QA26 Fresh fixed window"
+            },
+            {
+              "id": 128,
+              "titleEn": "QA26 Completion Objective matrix",
+              "titleAr": "اكتمال QA26 Objective matrix"
+            },
+            {
+              "id": 127,
+              "titleEn": "QA26 Completion One minute expiry",
+              "titleAr": "اكتمال QA26 One minute expiry"
+            },
+            {
+              "id": 126,
+              "titleEn": "QA26 Objective Clone Draft",
+              "titleAr": "نسخة الاختبار QA26"
+            },
+            {
+              "id": 125,
+              "titleEn": "QA26 Expired Window",
+              "titleAr": "اختبار QA26 expired"
+            },
+            {
+              "id": 124,
+              "titleEn": "QA26 Future Window",
+              "titleAr": "اختبار QA26 future"
+            },
+            {
+              "id": 123,
+              "titleEn": "QA26 Browser Operational Readiness",
+              "titleAr": "اختبار جاهزية التشغيل"
+            },
+            {
+              "id": 122,
+              "titleEn": "QA26 Operations Isolated Exam",
+              "titleAr": "اختبار QA26 ops"
+            },
+            {
+              "id": 121,
+              "titleEn": "QA26 Fifty Candidate Load",
+              "titleAr": "اختبار QA26 load"
+            },
+            {
+              "id": 120,
+              "titleEn": "QA26 Strict Proctored Identity",
+              "titleAr": "اختبار QA26 strict"
+            },
+            {
+              "id": 119,
+              "titleEn": "QA26 Walk In Registration",
+              "titleAr": "اختبار QA26 walkin"
+            },
+            {
+              "id": 118,
+              "titleEn": "QA26 Random Topic Pool",
+              "titleAr": "اختبار QA26 pooled"
+            },
+            {
+              "id": 117,
+              "titleEn": "QA26 Fixed Assigned Code",
+              "titleAr": "اختبار QA26 fixed-code"
+            },
+            {
+              "id": 116,
+              "titleEn": "QA26 Objective Immediate Review",
+              "titleAr": "اختبار QA26 auto"
+            },
+            {
+              "id": 115,
+              "titleEn": "QA26 Complete Lifecycle",
+              "titleAr": "اختبار QA26 lifecycle"
+            },
+            {
+              "id": 114,
+              "titleEn": "QA-E2E-20260913170004 Acceptance Exam",
+              "titleAr": "QA-E2E-20260913170004 Exam AR"
+            },
+            {
+              "id": 113,
+              "titleEn": "history 3",
+              "titleAr": "history 3"
+            },
+            {
+              "id": 112,
+              "titleEn": "HISTORY PART 2",
+              "titleAr": "HISTORY PART 2"
+            },
+            {
+              "id": 111,
+              "titleEn": "History Exam",
+              "titleAr": "امتحان التاريخ"
+            },
+            {
+              "id": 110,
+              "titleEn": "sss",
+              "titleAr": "ss"
+            },
+            {
+              "id": 109,
+              "titleEn": "Fixed ",
+              "titleAr": "Fixed "
+            },
+            {
+              "id": 107,
+              "titleEn": "Walk in 3 ",
+              "titleAr": "Walk in 3 "
+            },
+            {
+              "id": 106,
+              "titleEn": "Test 1 June assign",
+              "titleAr": "Test 1 June assign"
+            },
+            {
+              "id": 105,
+              "titleEn": "Test 2 walk",
+              "titleAr": "Test 2 walk"
+            },
+            {
+              "id": 104,
+              "titleEn": "Test 1 June walk-in ",
+              "titleAr": "Test 1 June walk-in "
+            },
+            {
+              "id": 103,
+              "titleEn": "Test 1 June ",
+              "titleAr": "Test 1 June "
+            },
+            {
+              "id": 102,
+              "titleEn": "rteft",
+              "titleAr": "rteft"
+            },
+            {
+              "id": 101,
+              "titleEn": "test not",
+              "titleAr": "test not"
+            },
+            {
+              "id": 100,
+              "titleEn": "dd",
+              "titleAr": "dd"
+            },
+            {
+              "id": 99,
+              "titleEn": "Exam for Walk in",
+              "titleAr": "Exam for Walk in"
+            },
+            {
+              "id": 96,
+              "titleEn": "BD Basics",
+              "titleAr": "قواعد البيانات الاساسية"
+            },
+            {
+              "id": 95,
+              "titleEn": "Test1",
+              "titleAr": "ewqr"
+            },
+            {
+              "id": 92,
+              "titleEn": "7 march exam",
+              "titleAr": "7 march exam"
+            },
+            {
+              "id": 91,
+              "titleEn": "Fixed test 3 ",
+              "titleAr": "Fixed test 3 "
+            },
+            {
+              "id": 90,
+              "titleEn": "Fixed 2",
+              "titleAr": "Fixed 2"
+            },
+            {
+              "id": 88,
+              "titleEn": "test warning 1",
+              "titleAr": "test warning"
+            },
+            {
+              "id": 87,
+              "titleEn": "Pic exam",
+              "titleAr": "Pic exam"
+            },
+            {
+              "id": 86,
+              "titleEn": "Fixed time",
+              "titleAr": "Fixed time"
+            },
+            {
+              "id": 83,
+              "titleEn": "Exam test walk-in",
+              "titleAr": "Exam test walk-in"
+            },
+            {
+              "id": 82,
+              "titleEn": "Exam Test 3 MAY Assigned",
+              "titleAr": "Exam Test 3 MAY Assigned"
+            },
+            {
+              "id": 79,
+              "titleEn": "Exam Test 3 MAY 2026",
+              "titleAr": "Exam Test 3 MAY 2026"
+            },
+            {
+              "id": 78,
+              "titleEn": "Operating Systems Basics Exam PART 2",
+              "titleAr": "Operating Systems Basics Exam PART 2"
+            },
+            {
+              "id": 77,
+              "titleEn": "EXAM DEMO",
+              "titleAr": "EXAM DEMO"
+            },
+            {
+              "id": 76,
+              "titleEn": "exam 21 ",
+              "titleAr": "exam 21 "
+            },
+            {
+              "id": 75,
+              "titleEn": "what",
+              "titleAr": "what"
+            },
+            {
+              "id": 74,
+              "titleEn": "test assign",
+              "titleAr": "test assign"
+            },
+            {
+              "id": 72,
+              "titleEn": "test walk in",
+              "titleAr": "test walk in"
+            },
+            {
+              "id": 71,
+              "titleEn": "exam 6 april",
+              "titleAr": "exam 6 april"
+            },
+            {
+              "id": 70,
+              "titleEn": "mcq questions",
+              "titleAr": "mcq questions"
+            },
+            {
+              "id": 69,
+              "titleEn": "subjective questions",
+              "titleAr": "اسئلة مقالية"
+            },
+            {
+              "id": 67,
+              "titleEn": "Test Technical",
+              "titleAr": "تست تجريبي"
+            },
+            {
+              "id": 66,
+              "titleEn": " MCQ Exam Demo1",
+              "titleAr": " MCQ Exam Demo1"
+            },
+            {
+              "id": 65,
+              "titleEn": "EXAM april assign",
+              "titleAr": "EXAM april assign"
+            },
+            {
+              "id": 64,
+              "titleEn": "Exam 2 APRIL",
+              "titleAr": "Exam 2 APRIL"
+            },
+            {
+              "id": 63,
+              "titleEn": "Assign Exam",
+              "titleAr": "ضصثق"
+            },
+            {
+              "id": 62,
+              "titleEn": "Test assign",
+              "titleAr": "Test assign"
+            },
+            {
+              "id": 61,
+              "titleEn": "test 3 ",
+              "titleAr": "test 3 "
+            },
+            {
+              "id": 59,
+              "titleEn": "Test 2",
+              "titleAr": "Test 2"
+            },
+            {
+              "id": 58,
+              "titleEn": "test no Proctor",
+              "titleAr": "test no Proctor"
+            },
+            {
+              "id": 57,
+              "titleEn": "test Mob",
+              "titleAr": "test Mob"
+            },
+            {
+              "id": 56,
+              "titleEn": "gggggg",
+              "titleAr": "gggggg"
+            },
+            {
+              "id": 55,
+              "titleEn": "Introduction to Operating Systems Exam",
+              "titleAr": "اختبار مقدمة في أنظمة التشغيل"
+            },
+            {
+              "id": 54,
+              "titleEn": "Operating Systems Basics Exam",
+              "titleAr": "Operating Systems Basics Exam"
+            },
+            {
+              "id": 53,
+              "titleEn": "test3",
+              "titleAr": "test3"
+            },
+            {
+              "id": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2"
+            },
+            {
+              "id": 51,
+              "titleEn": "test excel",
+              "titleAr": "test excel"
+            },
+            {
+              "id": 50,
+              "titleEn": "SYSTEM OPERATING 2",
+              "titleAr": "SYSTEM OPERATING 2"
+            },
+            {
+              "id": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6"
+            },
+            {
+              "id": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار"
+            },
+            {
+              "id": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3"
+            },
+            {
+              "id": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1390.29
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:37.169Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading?pageSize=100&search=QA26",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 88,
+              "attemptId": 210,
+              "examId": 131,
+              "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+              "examTitleAr": "اختبار ثبات السؤال التاريخي",
+              "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "candidateName": "QA26 Protocol Regression a",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 10,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 87,
+              "attemptId": 208,
+              "examId": 130,
+              "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+              "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            },
+            {
+              "id": 86,
+              "attemptId": 207,
+              "examId": 129,
+              "examTitleEn": "QA26 Completion Fresh fixed window",
+              "examTitleAr": "اكتمال QA26 Fresh fixed window",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 20,
+              "maxPossibleScore": 20,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:45:32.6443259+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 85,
+              "attemptId": 205,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 84,
+              "attemptId": 204,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 83,
+              "attemptId": 203,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 82,
+              "attemptId": 193,
+              "examId": 123,
+              "examTitleEn": "QA26 Browser Operational Readiness",
+              "examTitleAr": "اختبار جاهزية التشغيل",
+              "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "candidateName": "QA26 Updated Candidate",
+              "candidateRollNo": null,
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 56,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 0,
+              "isResultFinalized": false
+            },
+            {
+              "id": 81,
+              "attemptId": 200,
+              "examId": 119,
+              "examTitleEn": "QA26 Walk In Registration",
+              "examTitleAr": "اختبار QA26 walkin",
+              "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+              "candidateName": "QA26 Browser Walk In",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 20,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:43:48.8279234+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 80,
+              "attemptId": 196,
+              "examId": 116,
+              "examTitleEn": "QA26 Objective Immediate Review",
+              "examTitleAr": "اختبار QA26 auto",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 18,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:43:38.2883965+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 79,
+              "attemptId": 201,
+              "examId": 121,
+              "examTitleEn": "QA26 Fifty Candidate Load",
+              "examTitleAr": "اختبار QA26 load",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:43:32.2257326+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 78,
+              "attemptId": 195,
+              "examId": 115,
+              "examTitleEn": "QA26 Complete Lifecycle",
+              "examTitleAr": "اختبار QA26 lifecycle",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 11,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 88,
+                "attemptId": 210,
+                "examId": 131,
+                "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+                "examTitleAr": "اختبار ثبات السؤال التاريخي",
+                "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+                "candidateName": "QA26 Protocol Regression a",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 10,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 87,
+                "attemptId": 208,
+                "examId": 130,
+                "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+                "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              },
+              {
+                "id": 86,
+                "attemptId": 207,
+                "examId": 129,
+                "examTitleEn": "QA26 Completion Fresh fixed window",
+                "examTitleAr": "اكتمال QA26 Fresh fixed window",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 20,
+                "maxPossibleScore": 20,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:45:32.6443259+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 85,
+                "attemptId": 205,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 84,
+                "attemptId": 204,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 83,
+                "attemptId": 203,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 82,
+                "attemptId": 193,
+                "examId": 123,
+                "examTitleEn": "QA26 Browser Operational Readiness",
+                "examTitleAr": "اختبار جاهزية التشغيل",
+                "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+                "candidateName": "QA26 Updated Candidate",
+                "candidateRollNo": null,
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 56,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 0,
+                "isResultFinalized": false
+              },
+              {
+                "id": 81,
+                "attemptId": 200,
+                "examId": 119,
+                "examTitleEn": "QA26 Walk In Registration",
+                "examTitleAr": "اختبار QA26 walkin",
+                "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+                "candidateName": "QA26 Browser Walk In",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 20,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:43:48.8279234+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 80,
+                "attemptId": 196,
+                "examId": 116,
+                "examTitleEn": "QA26 Objective Immediate Review",
+                "examTitleAr": "اختبار QA26 auto",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 18,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:43:38.2883965+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 79,
+                "attemptId": 201,
+                "examId": 121,
+                "examTitleEn": "QA26 Fifty Candidate Load",
+                "examTitleAr": "اختبار QA26 load",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:43:32.2257326+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 78,
+                "attemptId": 195,
+                "examId": 115,
+                "examTitleEn": "QA26 Complete Lifecycle",
+                "examTitleAr": "اختبار QA26 lifecycle",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 11,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2623.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:39.354Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading?pageSize=100&search=QA26",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 88,
+              "attemptId": 210,
+              "examId": 131,
+              "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+              "examTitleAr": "اختبار ثبات السؤال التاريخي",
+              "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "candidateName": "QA26 Protocol Regression a",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 10,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 87,
+              "attemptId": 208,
+              "examId": 130,
+              "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+              "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            },
+            {
+              "id": 86,
+              "attemptId": 207,
+              "examId": 129,
+              "examTitleEn": "QA26 Completion Fresh fixed window",
+              "examTitleAr": "اكتمال QA26 Fresh fixed window",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 20,
+              "maxPossibleScore": 20,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:45:32.6443259+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 85,
+              "attemptId": 205,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 84,
+              "attemptId": 204,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 83,
+              "attemptId": 203,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 82,
+              "attemptId": 193,
+              "examId": 123,
+              "examTitleEn": "QA26 Browser Operational Readiness",
+              "examTitleAr": "اختبار جاهزية التشغيل",
+              "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "candidateName": "QA26 Updated Candidate",
+              "candidateRollNo": null,
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 56,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 0,
+              "isResultFinalized": false
+            },
+            {
+              "id": 81,
+              "attemptId": 200,
+              "examId": 119,
+              "examTitleEn": "QA26 Walk In Registration",
+              "examTitleAr": "اختبار QA26 walkin",
+              "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+              "candidateName": "QA26 Browser Walk In",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 20,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:43:48.8279234+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 80,
+              "attemptId": 196,
+              "examId": 116,
+              "examTitleEn": "QA26 Objective Immediate Review",
+              "examTitleAr": "اختبار QA26 auto",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 18,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:43:38.2883965+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 79,
+              "attemptId": 201,
+              "examId": 121,
+              "examTitleEn": "QA26 Fifty Candidate Load",
+              "examTitleAr": "اختبار QA26 load",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:43:32.2257326+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 78,
+              "attemptId": 195,
+              "examId": 115,
+              "examTitleEn": "QA26 Complete Lifecycle",
+              "examTitleAr": "اختبار QA26 lifecycle",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 11,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 88,
+                "attemptId": 210,
+                "examId": 131,
+                "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+                "examTitleAr": "اختبار ثبات السؤال التاريخي",
+                "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+                "candidateName": "QA26 Protocol Regression a",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 10,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 87,
+                "attemptId": 208,
+                "examId": 130,
+                "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+                "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              },
+              {
+                "id": 86,
+                "attemptId": 207,
+                "examId": 129,
+                "examTitleEn": "QA26 Completion Fresh fixed window",
+                "examTitleAr": "اكتمال QA26 Fresh fixed window",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 20,
+                "maxPossibleScore": 20,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:45:32.6443259+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 85,
+                "attemptId": 205,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 84,
+                "attemptId": 204,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 83,
+                "attemptId": 203,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 82,
+                "attemptId": 193,
+                "examId": 123,
+                "examTitleEn": "QA26 Browser Operational Readiness",
+                "examTitleAr": "اختبار جاهزية التشغيل",
+                "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+                "candidateName": "QA26 Updated Candidate",
+                "candidateRollNo": null,
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 56,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 0,
+                "isResultFinalized": false
+              },
+              {
+                "id": 81,
+                "attemptId": 200,
+                "examId": 119,
+                "examTitleEn": "QA26 Walk In Registration",
+                "examTitleAr": "اختبار QA26 walkin",
+                "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+                "candidateName": "QA26 Browser Walk In",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 20,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:43:48.8279234+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 80,
+                "attemptId": 196,
+                "examId": 116,
+                "examTitleEn": "QA26 Objective Immediate Review",
+                "examTitleAr": "اختبار QA26 auto",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 18,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:43:38.2883965+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 79,
+                "attemptId": 201,
+                "examId": 121,
+                "examTitleEn": "QA26 Fifty Candidate Load",
+                "examTitleAr": "اختبار QA26 load",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:43:32.2257326+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 78,
+                "attemptId": 195,
+                "examId": 115,
+                "examTitleEn": "QA26 Complete Lifecycle",
+                "examTitleAr": "اختبار QA26 lifecycle",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 11,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2183.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:41.280Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/manual-required?pageSize=100&search=QA26",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 87,
+              "attemptId": 208,
+              "examId": 130,
+              "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+              "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            },
+            {
+              "id": 82,
+              "attemptId": 193,
+              "examId": 123,
+              "examTitleEn": "QA26 Browser Operational Readiness",
+              "examTitleAr": "اختبار جاهزية التشغيل",
+              "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "candidateName": "QA26 Updated Candidate",
+              "candidateRollNo": null,
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 56,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 0,
+              "isResultFinalized": false
+            },
+            {
+              "id": 78,
+              "attemptId": 195,
+              "examId": 115,
+              "examTitleEn": "QA26 Complete Lifecycle",
+              "examTitleAr": "اختبار QA26 lifecycle",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 3,
+              "statusName": "ManualRequired",
+              "totalScore": null,
+              "maxPossibleScore": 50,
+              "isPassed": null,
+              "gradedAt": null,
+              "manualGradingRequired": 1,
+              "isResultFinalized": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 3,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 87,
+                "attemptId": 208,
+                "examId": 130,
+                "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+                "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              },
+              {
+                "id": 82,
+                "attemptId": 193,
+                "examId": 123,
+                "examTitleEn": "QA26 Browser Operational Readiness",
+                "examTitleAr": "اختبار جاهزية التشغيل",
+                "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+                "candidateName": "QA26 Updated Candidate",
+                "candidateRollNo": null,
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 56,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 0,
+                "isResultFinalized": false
+              },
+              {
+                "id": 78,
+                "attemptId": 195,
+                "examId": 115,
+                "examTitleEn": "QA26 Complete Lifecycle",
+                "examTitleAr": "اختبار QA26 lifecycle",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 3,
+                "statusName": "ManualRequired",
+                "totalScore": null,
+                "maxPossibleScore": 50,
+                "isPassed": null,
+                "gradedAt": null,
+                "manualGradingRequired": 1,
+                "isResultFinalized": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 3,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1922.93
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:42.944Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/initiate",
+      "request": {
+        "attemptId": 191
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "gradingSessionId": 89,
+          "attemptId": 191,
+          "status": 2,
+          "statusName": "AutoGraded",
+          "autoGradedCount": 2,
+          "manualGradingRequired": 0,
+          "partialScore": 0,
+          "message": "All questions auto-graded successfully."
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "gradingSessionId": 89,
+            "attemptId": 191,
+            "status": 2,
+            "statusName": "AutoGraded",
+            "autoGradedCount": 2,
+            "manualGradingRequired": 0,
+            "partialScore": 0,
+            "message": "All questions auto-graded successfully."
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1660.99
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:43.415Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/attempt/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 468.3
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:44.047Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/89",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 630.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:44.511Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 462.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:44.975Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 461.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:45.439Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 461.86
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:45.905Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/attempt/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 463.05
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:46.371Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 464.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:46.843Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 468.08
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:47.311Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 463.72
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:47.839Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/89/manual-queue",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 524.42
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:48.301Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89/manual-queue",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 460.24
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:48.763Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89/manual-queue",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 459.42
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:49.227Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/89/manual-queue",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 460.07
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:50.652Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "totalAttempts": 1,
+          "gradedAttempts": 0,
+          "pendingGrading": 0,
+          "manualGradingRequired": 0,
+          "passedCount": 0,
+          "failedCount": 0,
+          "averageScore": 0,
+          "highestScore": 0,
+          "lowestScore": 0,
+          "passRate": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "totalAttempts": 1,
+            "gradedAttempts": 0,
+            "pendingGrading": 0,
+            "manualGradingRequired": 0,
+            "passedCount": 0,
+            "failedCount": 0,
+            "averageScore": 0,
+            "highestScore": 0,
+            "lowestScore": 0,
+            "passRate": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1420.98
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:52.030Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this exam's grading stats",
+          "data": null,
+          "errors": [],
+          "traceId": "5a4b4d83d36b408e7032746fb7b567b6"
+        },
+        "ms": 1375.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:53.630Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "totalAttempts": 1,
+          "gradedAttempts": 0,
+          "pendingGrading": 0,
+          "manualGradingRequired": 0,
+          "passedCount": 0,
+          "failedCount": 0,
+          "averageScore": 0,
+          "highestScore": 0,
+          "lowestScore": 0,
+          "passRate": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "totalAttempts": 1,
+            "gradedAttempts": 0,
+            "pendingGrading": 0,
+            "manualGradingRequired": 0,
+            "passedCount": 0,
+            "failedCount": 0,
+            "averageScore": 0,
+            "highestScore": 0,
+            "lowestScore": 0,
+            "passRate": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1597.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:55.233Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "totalAttempts": 1,
+          "gradedAttempts": 0,
+          "pendingGrading": 0,
+          "manualGradingRequired": 0,
+          "passedCount": 0,
+          "failedCount": 0,
+          "averageScore": 0,
+          "highestScore": 0,
+          "lowestScore": 0,
+          "passRate": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "totalAttempts": 1,
+            "gradedAttempts": 0,
+            "pendingGrading": 0,
+            "manualGradingRequired": 0,
+            "passedCount": 0,
+            "failedCount": 0,
+            "averageScore": 0,
+            "highestScore": 0,
+            "lowestScore": 0,
+            "passRate": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1598.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:56.435Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120/questions",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "questionId": 131,
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Single",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          },
+          {
+            "questionId": 134,
+            "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "TrueFalse",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            },
+            {
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1199.12
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:57.809Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120/questions",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this exam's grading stats",
+          "data": null,
+          "errors": [],
+          "traceId": "58b13b5207b75757fb905b0e7fe35a49"
+        },
+        "ms": 1371.82
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:59.423Z",
+      "identity": "qa26.d34.nodept.examiner@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120/questions",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "questionId": 131,
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Single",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          },
+          {
+            "questionId": 134,
+            "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "TrueFalse",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            },
+            {
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1610.48
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:01.046Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/120/questions",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "questionId": 131,
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Single",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          },
+          {
+            "questionId": 134,
+            "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "TrueFalse",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            },
+            {
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1620.32
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:01.589Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/ai-suggest",
+      "request": {
+        "gradingSessionId": 89,
+        "questionId": 131
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "suggestedScore": 0,
+          "suggestedComment": "No answer was provided by the candidate.",
+          "confidence": 100,
+          "model": "gpt-4o"
+        },
+        "body": {
+          "success": true,
+          "message": "No answer to grade",
+          "data": {
+            "suggestedScore": 0,
+            "suggestedComment": "No answer was provided by the candidate.",
+            "confidence": 100,
+            "model": "gpt-4o"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 540.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:02.294Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/manual-grade",
+      "request": {
+        "gradingSessionId": 89,
+        "questionId": 131,
+        "score": 2,
+        "isCorrect": false,
+        "graderComment": "QA26 forbidden manual probe"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "gradedAnswerId": 760,
+          "questionId": 131,
+          "score": 2,
+          "isCorrect": false,
+          "success": true,
+          "message": "Grade submitted successfully"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "gradedAnswerId": 760,
+            "questionId": 131,
+            "score": 2,
+            "isCorrect": false,
+            "success": true,
+            "message": "Grade submitted successfully"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 701.51
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:02.777Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/89",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 89,
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+          "graderName": "QA26 Operations Examiner 1",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+          "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+          "totalQuestions": 2,
+          "gradedQuestions": 2,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 760,
+              "gradingSessionId": 89,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 2,
+              "isCorrect": false,
+              "isManuallyGraded": true,
+              "graderComment": "QA26 forbidden manual probe",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 761,
+              "gradingSessionId": 89,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 89,
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "gradedBy": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+            "graderName": "QA26 Operations Examiner 1",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:51:42.0052513+04:00",
+            "createdDate": "2026-09-19T15:51:42.0052513+04:00",
+            "totalQuestions": 2,
+            "gradedQuestions": 2,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 760,
+                "gradingSessionId": 89,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 2,
+                "isCorrect": false,
+                "isManuallyGraded": true,
+                "graderComment": "QA26 forbidden manual probe",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 761,
+                "gradingSessionId": 89,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 479.7
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:03.490Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/manual-grade/bulk",
+      "request": {
+        "gradingSessionId": 89,
+        "grades": [
+          {
+            "questionId": 131,
+            "score": 3,
+            "isCorrect": false,
+            "graderComment": "QA26 forbidden bulk probe"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "gradedAnswerId": 760,
+            "questionId": 131,
+            "score": 3,
+            "isCorrect": false,
+            "success": true,
+            "message": "Saved"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "All grades submitted successfully",
+          "data": [
+            {
+              "gradedAnswerId": 760,
+              "questionId": 131,
+              "score": 3,
+              "isCorrect": false,
+              "success": true,
+              "message": "Saved"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 709.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:04.692Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/regrade",
+      "request": {
+        "gradingSessionId": 89,
+        "questionId": 131,
+        "newScore": 4,
+        "isCorrect": false,
+        "comment": "QA26 forbidden regrade probe",
+        "reason": "Authorization regression"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "gradedAnswerId": 760,
+          "previousScore": 3,
+          "newScore": 4,
+          "newTotalScore": 4,
+          "newIsPassed": false,
+          "message": "Answer re-graded successfully"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "gradedAnswerId": 760,
+            "previousScore": 3,
+            "newScore": 4,
+            "newTotalScore": 4,
+            "newIsPassed": false,
+            "message": "Answer re-graded successfully"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1197.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:07.759Z",
+      "identity": "qa26.ops.examiner1@example.test",
+      "method": "POST",
+      "route": "/api/Grading/complete",
+      "request": {
+        "gradingSessionId": 89
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "gradingSessionId": 89,
+          "attemptId": 191,
+          "totalScore": 4,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:52:05.2331288+04:00",
+          "status": 4,
+          "message": "Grading completed. Candidate FAILED."
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "gradingSessionId": 89,
+            "attemptId": 191,
+            "totalScore": 4,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:52:05.2331288+04:00",
+            "status": 4,
+            "message": "Grading completed. Candidate FAILED."
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3063.72
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:08.913Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Grading/regrade",
+      "request": {
+        "gradingSessionId": 89,
+        "questionId": 131,
+        "newScore": 0,
+        "isCorrect": false,
+        "comment": "QA26 restored baseline score",
+        "reason": "Cleanup after authorization test"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "gradedAnswerId": 760,
+          "previousScore": 4,
+          "newScore": 0,
+          "newTotalScore": 0,
+          "newIsPassed": false,
+          "message": "Answer re-graded successfully"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "gradedAnswerId": 760,
+            "previousScore": 4,
+            "newScore": 0,
+            "newTotalScore": 0,
+            "newIsPassed": false,
+            "message": "Answer re-graded successfully"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1150.2
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:09.424Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Grading/my-result/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 191,
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "totalScore": 0,
+          "maxPossibleScore": 20,
+          "passScore": 10,
+          "isPassed": false,
+          "percentage": 0,
+          "gradedAt": "2026-09-19T15:52:08.2251727+04:00",
+          "status": 4,
+          "statusName": "Completed",
+          "isGradingComplete": true,
+          "questionResults": [
+            {
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "pointsEarned": 0,
+              "maxPoints": 10,
+              "isCorrect": false,
+              "feedback": "QA26 restored baseline score"
+            },
+            {
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "pointsEarned": 0,
+              "maxPoints": 10,
+              "isCorrect": false,
+              "feedback": "Unanswered"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 191,
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "totalScore": 0,
+            "maxPossibleScore": 20,
+            "passScore": 10,
+            "isPassed": false,
+            "percentage": 0,
+            "gradedAt": "2026-09-19T15:52:08.2251727+04:00",
+            "status": 4,
+            "statusName": "Completed",
+            "isGradingComplete": true,
+            "questionResults": [
+              {
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "pointsEarned": 0,
+                "maxPoints": 10,
+                "isCorrect": false,
+                "feedback": "QA26 restored baseline score"
+              },
+              {
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "pointsEarned": 0,
+                "maxPoints": 10,
+                "isCorrect": false,
+                "feedback": "Unanswered"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 508.85
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:09.886Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/my-result/191",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this result",
+          "data": null,
+          "errors": [],
+          "traceId": "7e569ea64f4fe1acb164dbc6e3883c2c"
+        },
+        "ms": 460.59
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:10.362Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Grading/is-complete/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 472.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:10.830Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/is-complete/191",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 465.72
+      }
+    },
+    {
+      "at": "2026-09-19T11:52:10.834Z",
+      "fixture": {
+        "attemptId": 191,
+        "sessionId": 89,
+        "examId": 120,
+        "questionId": 131
+      }
+    }
+  ]
+}

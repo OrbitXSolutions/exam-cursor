@@ -1,0 +1,3771 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP and SignalR WebSocket connections. SDP and ICE are synthetic payloads; no camera/screen media capture or playback is established.",
+  "startedAt": "2026-09-19T11:19:36.390Z",
+  "checks": [
+    {
+      "name": "Proctor can read reserved session 187",
+      "passed": true,
+      "at": "2026-09-19T11:19:45.742Z"
+    },
+    {
+      "name": "Proctor can read reserved session 188",
+      "passed": true,
+      "at": "2026-09-19T11:19:49.867Z"
+    },
+    {
+      "name": "Proctor sees candidate room membership 187",
+      "passed": true,
+      "at": "2026-09-19T11:19:52.602Z"
+    },
+    {
+      "name": "Proctor sees candidate room membership 188",
+      "passed": true,
+      "at": "2026-09-19T11:19:54.202Z"
+    },
+    {
+      "name": "Candidate cannot join sibling camera room",
+      "passed": true,
+      "detail": {
+        "method": "JoinAttemptRoom",
+        "error": "An unexpected error occurred invoking 'JoinAttemptRoom' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:54.436Z"
+    },
+    {
+      "name": "Candidate cannot join sibling screen room",
+      "passed": true,
+      "detail": {
+        "method": "JoinScreenRoom",
+        "error": "An unexpected error occurred invoking 'JoinScreenRoom' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:54.665Z"
+    },
+    {
+      "name": "Candidate cannot claim proctor role",
+      "passed": true,
+      "detail": {
+        "method": "JoinAttemptRoom",
+        "error": "An unexpected error occurred invoking 'JoinAttemptRoom' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:54.894Z"
+    },
+    {
+      "name": "Foreign proctor camera room denied",
+      "passed": true,
+      "detail": {
+        "method": "JoinAttemptRoom",
+        "error": "An unexpected error occurred invoking 'JoinAttemptRoom' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:55.582Z"
+    },
+    {
+      "name": "Foreign proctor screen room denied",
+      "passed": true,
+      "detail": {
+        "method": "JoinScreenRoom",
+        "error": "An unexpected error occurred invoking 'JoinScreenRoom' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:56.271Z"
+    },
+    {
+      "name": "Unjoined foreign signal denied",
+      "passed": true,
+      "detail": {
+        "method": "SendWarningToCandidate",
+        "error": "An unexpected error occurred invoking 'SendWarningToCandidate' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:56.964Z"
+    },
+    {
+      "name": "Candidate privileged warning denied",
+      "passed": true,
+      "detail": {
+        "method": "SendWarningToCandidate",
+        "error": "An unexpected error occurred invoking 'SendWarningToCandidate' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:57.203Z"
+    },
+    {
+      "name": "Candidate privileged termination denied",
+      "passed": true,
+      "detail": {
+        "method": "SendTerminationToCandidate",
+        "error": "An unexpected error occurred invoking 'SendTerminationToCandidate' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:57.442Z"
+    },
+    {
+      "name": "Candidate time-extension signal denied",
+      "passed": true,
+      "detail": {
+        "method": "NotifyTimeExtended",
+        "error": "An unexpected error occurred invoking 'NotifyTimeExtended' on the server. HubException: Not authorized for this attempt or role."
+      },
+      "at": "2026-09-19T11:19:57.680Z"
+    },
+    {
+      "name": "Already connected blocked candidate cannot signal",
+      "passed": false,
+      "detail": {
+        "method": "SendOffer"
+      },
+      "at": "2026-09-19T11:20:00.484Z"
+    },
+    {
+      "name": "Camera SDP offer routed candidate to proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 237,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "sdp": "QA26 simulated camera SDP",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:03.083Z"
+    },
+    {
+      "name": "Camera SDP answer routed to correct candidate",
+      "passed": true,
+      "detail": {
+        "latencyMs": 466,
+        "payload": {
+          "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+          "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+          "sdp": "QA26 simulated answer",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:03.552Z"
+    },
+    {
+      "name": "Camera ICE routed to proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 237,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "candidate": "QA26 simulated ICE",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:03.792Z"
+    },
+    {
+      "name": "Screen SDP offer routed to proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 233,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "sdp": "QA26 simulated screen SDP",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:04.027Z"
+    },
+    {
+      "name": "Screen SDP answer routed to candidate",
+      "passed": true,
+      "detail": {
+        "latencyMs": 463,
+        "payload": {
+          "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+          "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+          "sdp": "QA26 simulated screen answer",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:04.494Z"
+    },
+    {
+      "name": "Screen ICE routed to proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 241,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "candidate": "QA26 screen ICE",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:04.790Z"
+    },
+    {
+      "name": "Targeting sibling connection does not deliver other attempt signaling",
+      "passed": true,
+      "at": "2026-09-19T11:20:05.564Z"
+    },
+    {
+      "name": "Proctor renegotiation reaches candidate",
+      "passed": true,
+      "detail": {
+        "latencyMs": 471,
+        "payload": {
+          "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+          "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:06.039Z"
+    },
+    {
+      "name": "Candidate connection status reaches proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 242,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "status": "connected",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:06.284Z"
+    },
+    {
+      "name": "Candidate screen status reaches proctor",
+      "passed": true,
+      "detail": {
+        "latencyMs": 239,
+        "payload": {
+          "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+          "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "status": "started",
+          "attemptId": 187
+        }
+      },
+      "at": "2026-09-19T11:20:06.586Z"
+    },
+    {
+      "name": "HTTP proctor warning delivered over WebSocket",
+      "passed": true,
+      "detail": {
+        "latencyMs": 2845,
+        "payload": {
+          "fromConnectionId": "",
+          "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+          "message": "QA26 protocol warning 1789816806588",
+          "attemptId": 187,
+          "isLastWarning": false
+        }
+      },
+      "at": "2026-09-19T11:20:09.435Z"
+    },
+    {
+      "name": "Warning mutation succeeds",
+      "passed": true,
+      "at": "2026-09-19T11:20:09.436Z"
+    },
+    {
+      "name": "Warning fallback persists until candidate poll",
+      "passed": true,
+      "at": "2026-09-19T11:20:10.159Z"
+    },
+    {
+      "name": "Consumed warning clears from fallback",
+      "passed": true,
+      "at": "2026-09-19T11:20:10.626Z"
+    },
+    {
+      "name": "Warning event remains in audit history",
+      "passed": true,
+      "at": "2026-09-19T11:20:12.737Z"
+    },
+    {
+      "name": "HTTP add-time delivered over WebSocket",
+      "passed": false,
+      "detail": {
+        "latencyMs": null
+      },
+      "at": "2026-09-19T11:20:19.664Z"
+    },
+    {
+      "name": "Add-time accepted",
+      "passed": false,
+      "at": "2026-09-19T11:20:19.666Z"
+    },
+    {
+      "name": "Time extension persists exact60seconds in expiry",
+      "passed": false,
+      "detail": {
+        "before": "2026-09-19T17:15:58.1468109+04:00",
+        "after": "2026-09-19T17:15:58.1468109+04:00"
+      },
+      "at": "2026-09-19T11:20:20.133Z"
+    },
+    {
+      "name": "Foreign proctor add-time denied without mutation",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "before": "2026-09-19T17:15:58.1468109+04:00",
+        "after": "2026-09-19T17:15:58.1468109+04:00"
+      },
+      "at": "2026-09-19T11:20:21.541Z"
+    },
+    {
+      "name": "Candidate heartbeat persisted 187",
+      "passed": true,
+      "at": "2026-09-19T11:20:25.754Z"
+    },
+    {
+      "name": "Candidate heartbeat persisted 188",
+      "passed": true,
+      "at": "2026-09-19T11:20:30.191Z"
+    },
+    {
+      "name": "Candidate violation reaches live proctor",
+      "passed": false,
+      "detail": {
+        "latencyMs": null
+      },
+      "at": "2026-09-19T11:20:35.715Z"
+    },
+    {
+      "name": "Violation stored and appears after reload",
+      "passed": false,
+      "at": "2026-09-19T11:20:35.716Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:19:37.814Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:19:37.8107837+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:19:37.1208834+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:19:37.8107837+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:19:37.1208834+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1422.02
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:39.014Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:19:39.0136438+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T15:19:38.3248955+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:19:39.0136438+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T15:19:38.3248955+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1198.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:39.066Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.b@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:19:39.0156488+04:00",
+          "user": {
+            "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "email": "qa26.import.b@example.test",
+            "displayName": "QA26 Import B",
+            "fullName": "QA26 Import B",
+            "fullNameAr": "استيراد باء",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+            "lastLoginDate": "2026-09-19T15:19:38.3206529+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:19:39.0156488+04:00",
+            "user": {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "email": "qa26.import.b@example.test",
+              "displayName": "QA26 Import B",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+              "lastLoginDate": "2026-09-19T15:19:38.3206529+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1250.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:40.248Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:19:40.2475315+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T15:19:39.5632845+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:19:40.2475315+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T15:19:39.5632845+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1180.68
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:41.455Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:19:41.4555963+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T15:19:40.7551533+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:19:41.4555963+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T15:19:40.7551533+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1207.1
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:42.652Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/187/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 187,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "startedAtUtc": "2026-09-19T15:15:58.1468109+04:00",
+          "expiresAtUtc": "2026-09-19T17:15:58.1468109+04:00",
+          "remainingSeconds": 6975,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 5,
+          "answeredQuestions": 1,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": true,
+            "screenMonitoringMode": 1,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 295,
+              "order": 1,
+              "titleEn": "QA26 Knowledge",
+              "titleAr": "المعرفة QA26",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 50,
+              "totalQuestions": 5,
+              "answeredQuestions": 1,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 1998,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": {
+                    "attemptAnswerId": 553,
+                    "questionId": 131,
+                    "selectedOptionIds": [
+                      376
+                    ],
+                    "textAnswer": null,
+                    "answeredAt": "2026-09-19T15:17:28.0438556+04:00"
+                  }
+                },
+                {
+                  "attemptQuestionId": 1999,
+                  "questionId": 132,
+                  "order": 2,
+                  "points": 10,
+                  "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Multi",
+                  "questionTypeId": 2,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 379,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 380,
+                      "textEn": "3",
+                      "textAr": "خيار 3",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 381,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2000,
+                  "questionId": 133,
+                  "order": 3,
+                  "points": 10,
+                  "bodyEn": "QA26 Equal Multi: Select even numbers",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Multi",
+                  "questionTypeId": 2,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 382,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 383,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 384,
+                      "textEn": "3",
+                      "textAr": "خيار 3",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2001,
+                  "questionId": 134,
+                  "order": 4,
+                  "points": 10,
+                  "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "TrueFalse",
+                  "questionTypeId": 3,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 385,
+                      "textEn": "True",
+                      "textAr": "خيار True",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 386,
+                      "textEn": "False",
+                      "textAr": "خيار False",
+                      "order": 2,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2002,
+                  "questionId": 135,
+                  "order": 5,
+                  "points": 10,
+                  "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "Subjective",
+                  "questionTypeId": 5,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [],
+                  "attachments": [],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 1998,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": {
+                "attemptAnswerId": 553,
+                "questionId": 131,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:17:28.0438556+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 1999,
+              "questionId": 132,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2000,
+              "questionId": 133,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2001,
+              "questionId": 134,
+              "order": 4,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2002,
+              "questionId": 135,
+              "order": 5,
+              "points": 10,
+              "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [],
+              "attachments": [],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 187,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "startedAtUtc": "2026-09-19T15:15:58.1468109+04:00",
+            "expiresAtUtc": "2026-09-19T17:15:58.1468109+04:00",
+            "remainingSeconds": 6975,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 5,
+            "answeredQuestions": 1,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": true,
+              "screenMonitoringMode": 1,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 295,
+                "order": 1,
+                "titleEn": "QA26 Knowledge",
+                "titleAr": "المعرفة QA26",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 50,
+                "totalQuestions": 5,
+                "answeredQuestions": 1,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 1998,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": {
+                      "attemptAnswerId": 553,
+                      "questionId": 131,
+                      "selectedOptionIds": [
+                        376
+                      ],
+                      "textAnswer": null,
+                      "answeredAt": "2026-09-19T15:17:28.0438556+04:00"
+                    }
+                  },
+                  {
+                    "attemptQuestionId": 1999,
+                    "questionId": 132,
+                    "order": 2,
+                    "points": 10,
+                    "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Multi",
+                    "questionTypeId": 2,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 379,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 380,
+                        "textEn": "3",
+                        "textAr": "خيار 3",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 381,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2000,
+                    "questionId": 133,
+                    "order": 3,
+                    "points": 10,
+                    "bodyEn": "QA26 Equal Multi: Select even numbers",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Multi",
+                    "questionTypeId": 2,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 382,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 383,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 384,
+                        "textEn": "3",
+                        "textAr": "خيار 3",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2001,
+                    "questionId": 134,
+                    "order": 4,
+                    "points": 10,
+                    "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "TrueFalse",
+                    "questionTypeId": 3,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 385,
+                        "textEn": "True",
+                        "textAr": "خيار True",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 386,
+                        "textEn": "False",
+                        "textAr": "خيار False",
+                        "order": 2,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2002,
+                    "questionId": 135,
+                    "order": 5,
+                    "points": 10,
+                    "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "Subjective",
+                    "questionTypeId": 5,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [],
+                    "attachments": [],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 1998,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": {
+                  "attemptAnswerId": 553,
+                  "questionId": 131,
+                  "selectedOptionIds": [
+                    376
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:17:28.0438556+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 1999,
+                "questionId": 132,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2000,
+                "questionId": 133,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2001,
+                "questionId": 134,
+                "order": 4,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2002,
+                "questionId": 135,
+                "order": 5,
+                "points": 10,
+                "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [],
+                "attachments": [],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1195.91
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:42.653Z",
+      "fixture": {
+        "email": "qa26.import.a@example.test",
+        "attemptId": 187,
+        "sessionState": 2
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:45.741Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/139",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 139,
+          "attemptId": 187,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "candidateName": "QA26 Import A",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T15:15:58.1468109+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:15:58.1468109+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 6973,
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "attemptStatus": "InProgress",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.import.a@example.test",
+          "candidateNameAr": "استيراد ألف",
+          "candidateRollNo": "QA26-IMP-A",
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": "+971501111111",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T15:15:58.1468109+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "3m 46s",
+          "sessionDurationMinutes": 3.8,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 139,
+            "attemptId": 187,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "candidateName": "QA26 Import A",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T15:15:58.1468109+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:15:58.1468109+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 6973,
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "attemptStatus": "InProgress",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.import.a@example.test",
+            "candidateNameAr": "استيراد ألف",
+            "candidateRollNo": "QA26-IMP-A",
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": "+971501111111",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T15:15:58.1468109+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "3m 46s",
+            "sessionDurationMinutes": 3.8,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3087.59
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:46.901Z",
+      "identity": "qa26.import.b@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/188/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 188,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "startedAtUtc": "2026-09-19T15:17:32.0931378+04:00",
+          "expiresAtUtc": "2026-09-19T17:17:32.0931378+04:00",
+          "remainingSeconds": 7065,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 5,
+          "answeredQuestions": 1,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": true,
+            "screenMonitoringMode": 1,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 295,
+              "order": 1,
+              "titleEn": "QA26 Knowledge",
+              "titleAr": "المعرفة QA26",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 50,
+              "totalQuestions": 5,
+              "answeredQuestions": 1,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2003,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": {
+                    "attemptAnswerId": 554,
+                    "questionId": 131,
+                    "selectedOptionIds": [
+                      376
+                    ],
+                    "textAnswer": null,
+                    "answeredAt": "2026-09-19T15:17:38.6176067+04:00"
+                  }
+                },
+                {
+                  "attemptQuestionId": 2004,
+                  "questionId": 132,
+                  "order": 2,
+                  "points": 10,
+                  "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Multi",
+                  "questionTypeId": 2,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 379,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 380,
+                      "textEn": "3",
+                      "textAr": "خيار 3",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 381,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2005,
+                  "questionId": 133,
+                  "order": 3,
+                  "points": 10,
+                  "bodyEn": "QA26 Equal Multi: Select even numbers",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Multi",
+                  "questionTypeId": 2,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 382,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 383,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 384,
+                      "textEn": "3",
+                      "textAr": "خيار 3",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2006,
+                  "questionId": 134,
+                  "order": 4,
+                  "points": 10,
+                  "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "TrueFalse",
+                  "questionTypeId": 3,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 385,
+                      "textEn": "True",
+                      "textAr": "خيار True",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 386,
+                      "textEn": "False",
+                      "textAr": "خيار False",
+                      "order": 2,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                },
+                {
+                  "attemptQuestionId": 2007,
+                  "questionId": 135,
+                  "order": 5,
+                  "points": 10,
+                  "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "Subjective",
+                  "questionTypeId": 5,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 295,
+                  "topicId": null,
+                  "options": [],
+                  "attachments": [],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2003,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": {
+                "attemptAnswerId": 554,
+                "questionId": 131,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:17:38.6176067+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2004,
+              "questionId": 132,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2005,
+              "questionId": 133,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2006,
+              "questionId": 134,
+              "order": 4,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2007,
+              "questionId": 135,
+              "order": 5,
+              "points": 10,
+              "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "isCalculatorAllowed": false,
+              "sectionId": 295,
+              "topicId": null,
+              "options": [],
+              "attachments": [],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 188,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "startedAtUtc": "2026-09-19T15:17:32.0931378+04:00",
+            "expiresAtUtc": "2026-09-19T17:17:32.0931378+04:00",
+            "remainingSeconds": 7065,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 5,
+            "answeredQuestions": 1,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": true,
+              "screenMonitoringMode": 1,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 295,
+                "order": 1,
+                "titleEn": "QA26 Knowledge",
+                "titleAr": "المعرفة QA26",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 50,
+                "totalQuestions": 5,
+                "answeredQuestions": 1,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2003,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": {
+                      "attemptAnswerId": 554,
+                      "questionId": 131,
+                      "selectedOptionIds": [
+                        376
+                      ],
+                      "textAnswer": null,
+                      "answeredAt": "2026-09-19T15:17:38.6176067+04:00"
+                    }
+                  },
+                  {
+                    "attemptQuestionId": 2004,
+                    "questionId": 132,
+                    "order": 2,
+                    "points": 10,
+                    "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Multi",
+                    "questionTypeId": 2,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 379,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 380,
+                        "textEn": "3",
+                        "textAr": "خيار 3",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 381,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2005,
+                    "questionId": 133,
+                    "order": 3,
+                    "points": 10,
+                    "bodyEn": "QA26 Equal Multi: Select even numbers",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Multi",
+                    "questionTypeId": 2,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 382,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 383,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 384,
+                        "textEn": "3",
+                        "textAr": "خيار 3",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2006,
+                    "questionId": 134,
+                    "order": 4,
+                    "points": 10,
+                    "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "TrueFalse",
+                    "questionTypeId": 3,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 385,
+                        "textEn": "True",
+                        "textAr": "خيار True",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 386,
+                        "textEn": "False",
+                        "textAr": "خيار False",
+                        "order": 2,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  },
+                  {
+                    "attemptQuestionId": 2007,
+                    "questionId": 135,
+                    "order": 5,
+                    "points": 10,
+                    "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "Subjective",
+                    "questionTypeId": 5,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 295,
+                    "topicId": null,
+                    "options": [],
+                    "attachments": [],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2003,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": {
+                  "attemptAnswerId": 554,
+                  "questionId": 131,
+                  "selectedOptionIds": [
+                    376
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:17:38.6176067+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2004,
+                "questionId": 132,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2005,
+                "questionId": 133,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2006,
+                "questionId": 134,
+                "order": 4,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2007,
+                "questionId": 135,
+                "order": 5,
+                "points": 10,
+                "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "isCalculatorAllowed": false,
+                "sectionId": 295,
+                "topicId": null,
+                "options": [],
+                "attachments": [],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1157.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:46.902Z",
+      "fixture": {
+        "email": "qa26.import.b@example.test",
+        "attemptId": 188,
+        "sessionState": 2
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:49.865Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/140",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 140,
+          "attemptId": 188,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T15:17:32.0931378+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:17:32.0931378+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 7063,
+          "expiresAt": "2026-09-19T17:17:32.0931378+04:00",
+          "attemptStatus": "InProgress",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.import.b@example.test",
+          "candidateNameAr": "استيراد باء",
+          "candidateRollNo": "QA26-IMP-B",
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": "+971502222222",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T15:17:32.0931378+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "2m 16s",
+          "sessionDurationMinutes": 2.3,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 140,
+            "attemptId": 188,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T15:17:32.0931378+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:17:32.0931378+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 7063,
+            "expiresAt": "2026-09-19T17:17:32.0931378+04:00",
+            "attemptStatus": "InProgress",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.import.b@example.test",
+            "candidateNameAr": "استيراد باء",
+            "candidateRollNo": "QA26-IMP-B",
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": "+971502222222",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T15:17:32.0931378+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "2m 16s",
+            "sessionDurationMinutes": 2.3,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2962.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:50.736Z",
+      "signalR": "authorized-proctor",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T11:19:50.967Z",
+      "signalR": "foreign-proctor",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T11:19:52.136Z",
+      "signalR": "qa26.import.a@example.test",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T11:19:52.368Z",
+      "signalR": "authorized-proctor",
+      "event": "PeerJoined",
+      "payload": {
+        "userId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "connectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "role": "candidate",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:52.600Z",
+      "signalR": "authorized-proctor",
+      "event": "ScreenPeerJoined",
+      "payload": {
+        "userId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "connectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "role": "candidate",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:53.741Z",
+      "signalR": "qa26.import.b@example.test",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T11:19:53.970Z",
+      "signalR": "authorized-proctor",
+      "event": "PeerJoined",
+      "payload": {
+        "userId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+        "connectionId": "TiKpixJPDwWuymV0aYhUUg",
+        "role": "candidate",
+        "attemptId": 188
+      }
+    },
+    {
+      "at": "2026-09-19T11:19:54.200Z",
+      "signalR": "authorized-proctor",
+      "event": "ScreenPeerJoined",
+      "payload": {
+        "userId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+        "connectionId": "TiKpixJPDwWuymV0aYhUUg",
+        "role": "candidate",
+        "attemptId": 188
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:00.246Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/062a0b10-77eb-4689-861c-6b9d84dcce6e/block",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User blocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2564.22
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:00.482Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveOffer",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "sdp": "QA26 blocked account signal",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:02.368Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/062a0b10-77eb-4689-861c-6b9d84dcce6e/unblock",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User unblocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1882.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:02.604Z",
+      "signalR": "authorized-proctor",
+      "event": "PeerJoined",
+      "payload": {
+        "userId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "connectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "role": "candidate",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:02.842Z",
+      "signalR": "authorized-proctor",
+      "event": "ScreenPeerJoined",
+      "payload": {
+        "userId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "connectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "role": "candidate",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:03.081Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveOffer",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "sdp": "QA26 simulated camera SDP",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:03.551Z",
+      "signalR": "qa26.import.a@example.test",
+      "event": "ReceiveAnswer",
+      "payload": {
+        "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+        "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+        "sdp": "QA26 simulated answer",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:03.791Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveIceCandidate",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "candidate": "QA26 simulated ICE",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:04.026Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveScreenOffer",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "sdp": "QA26 simulated screen SDP",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:04.492Z",
+      "signalR": "qa26.import.a@example.test",
+      "event": "ReceiveScreenAnswer",
+      "payload": {
+        "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+        "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+        "sdp": "QA26 simulated screen answer",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:04.736Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveScreenIceCandidate",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "candidate": "QA26 screen ICE",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:06.036Z",
+      "signalR": "qa26.import.a@example.test",
+      "event": "RenegotiationRequested",
+      "payload": {
+        "fromConnectionId": "Xhs9JlUorqCtacFleuSi2Q",
+        "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:06.282Z",
+      "signalR": "authorized-proctor",
+      "event": "ConnectionStatusChanged",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "status": "connected",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:06.524Z",
+      "signalR": "authorized-proctor",
+      "event": "ScreenShareStatusChanged",
+      "payload": {
+        "fromConnectionId": "jHB0qzpReYCg_ramDIZ45g",
+        "fromUserId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "status": "started",
+        "attemptId": 187
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:09.431Z",
+      "signalR": "authorized-proctor",
+      "event": "ReceiveWarning",
+      "payload": {
+        "fromConnectionId": "",
+        "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+        "message": "QA26 protocol warning 1789816806588",
+        "attemptId": 187,
+        "isLastWarning": false
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:09.433Z",
+      "signalR": "qa26.import.a@example.test",
+      "event": "ReceiveWarning",
+      "payload": {
+        "fromConnectionId": "",
+        "fromUserId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+        "message": "QA26 protocol warning 1789816806588",
+        "attemptId": 187,
+        "isLastWarning": false
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:09.434Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/session/139/warning",
+      "request": {
+        "message": "QA26 protocol warning 1789816806588"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Warning sent to candidate",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2846.07
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:10.158Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/candidate-status/187",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "hasWarning": true,
+          "warningMessage": "QA26 protocol warning 1789816806588",
+          "isTerminated": false,
+          "terminationReason": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "hasWarning": true,
+            "warningMessage": "QA26 protocol warning 1789816806588",
+            "isTerminated": false,
+            "terminationReason": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 719.98
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:10.625Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/candidate-status/187",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "hasWarning": false,
+          "warningMessage": null,
+          "isTerminated": false,
+          "terminationReason": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "hasWarning": false,
+            "warningMessage": null,
+            "isTerminated": false,
+            "terminationReason": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 464.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:12.735Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/139/events",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 69,
+            "proctorSessionId": 139,
+            "eventType": 59,
+            "eventTypeName": "ProctorWarning",
+            "severity": 3,
+            "severityLabel": "High",
+            "isViolation": false,
+            "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789816806588\"}",
+            "occurredAt": "2026-09-19T15:20:08.6958439+04:00",
+            "sequenceNumber": 1
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 69,
+              "proctorSessionId": 139,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789816806588\"}",
+              "occurredAt": "2026-09-19T15:20:08.6958439+04:00",
+              "sequenceNumber": 1
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2107.36
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:14.171Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/187/timer",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 187,
+          "serverTime": "2026-09-19T15:20:14.1703431+04:00",
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "remainingSeconds": 0,
+          "status": 4,
+          "isExpired": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 187,
+            "serverTime": "2026-09-19T15:20:14.1703431+04:00",
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "remainingSeconds": 0,
+            "status": 4,
+            "isExpired": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1433.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:14.643Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/attempt-control/add-time",
+      "request": {
+        "attemptId": 187,
+        "extraMinutes": 1,
+        "reason": "QA26 protocol time extension"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Cannot add time to an attempt with status 'Expired'. Only InProgress or Resumed attempts can receive extra time.",
+          "data": null,
+          "errors": [],
+          "traceId": "1dd89ca8d96eba6ca2e3ad52873aaed9"
+        },
+        "ms": 471.16
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:20.131Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/187/timer",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 187,
+          "serverTime": "2026-09-19T15:20:20.1320654+04:00",
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "remainingSeconds": 6938,
+          "status": 4,
+          "isExpired": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 187,
+            "serverTime": "2026-09-19T15:20:20.1320654+04:00",
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "remainingSeconds": 6938,
+            "status": 4,
+            "isExpired": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 464.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:20.600Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/187/timer",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 187,
+          "serverTime": "2026-09-19T15:20:20.600607+04:00",
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "remainingSeconds": 6937,
+          "status": 4,
+          "isExpired": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 187,
+            "serverTime": "2026-09-19T15:20:20.600607+04:00",
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "remainingSeconds": 6937,
+            "status": 4,
+            "isExpired": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 466.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:21.064Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/attempt-control/add-time",
+      "request": {
+        "attemptId": 187,
+        "extraMinutes": 1,
+        "reason": "QA26 cross-department denied probe"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Cannot add time to an attempt with status 'Expired'. Only InProgress or Resumed attempts can receive extra time.",
+          "data": null,
+          "errors": [],
+          "traceId": "7595ac6de4c94ff33d2620b42c372df7"
+        },
+        "ms": 463.19
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:21.539Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/187/timer",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 187,
+          "serverTime": "2026-09-19T15:20:21.5399685+04:00",
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "remainingSeconds": 6936,
+          "status": 4,
+          "isExpired": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 187,
+            "serverTime": "2026-09-19T15:20:21.5399685+04:00",
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "remainingSeconds": 6936,
+            "status": 4,
+            "isExpired": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 473.29
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:22.723Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 139,
+        "clientTimestamp": "2026-09-19T11:20:21.542Z",
+        "metadataJson": "{\"source\":\"QA26 simulated\"}"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T15:20:22.0235773+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T15:20:22.0235773+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1181.07
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:25.752Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/139",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 139,
+          "attemptId": 187,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "candidateName": "QA26 Import A",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T15:15:58.1468109+04:00",
+          "endedAt": "2026-09-19T15:20:13.218738+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 2,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:20:22.0235773+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+          "attemptStatus": "Expired",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [
+            {
+              "id": 70,
+              "proctorSessionId": 139,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 simulated\"}",
+              "occurredAt": "2026-09-19T15:20:22.0235773+04:00",
+              "sequenceNumber": 2
+            },
+            {
+              "id": 69,
+              "proctorSessionId": 139,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789816806588\"}",
+              "occurredAt": "2026-09-19T15:20:08.6958439+04:00",
+              "sequenceNumber": 1
+            }
+          ],
+          "candidateEmail": "qa26.import.a@example.test",
+          "candidateNameAr": "استيراد ألف",
+          "candidateRollNo": "QA26-IMP-A",
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": "+971501111111",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T15:15:58.1468109+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "4m 15s",
+          "sessionDurationMinutes": 4.3,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 139,
+            "attemptId": 187,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "candidateName": "QA26 Import A",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T15:15:58.1468109+04:00",
+            "endedAt": "2026-09-19T15:20:13.218738+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 2,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:20:22.0235773+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T17:15:58.1468109+04:00",
+            "attemptStatus": "Expired",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [
+              {
+                "id": 70,
+                "proctorSessionId": 139,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 simulated\"}",
+                "occurredAt": "2026-09-19T15:20:22.0235773+04:00",
+                "sequenceNumber": 2
+              },
+              {
+                "id": 69,
+                "proctorSessionId": 139,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789816806588\"}",
+                "occurredAt": "2026-09-19T15:20:08.6958439+04:00",
+                "sequenceNumber": 1
+              }
+            ],
+            "candidateEmail": "qa26.import.a@example.test",
+            "candidateNameAr": "استيراد ألف",
+            "candidateRollNo": "QA26-IMP-A",
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": "+971501111111",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T15:15:58.1468109+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "4m 15s",
+            "sessionDurationMinutes": 4.3,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3027.55
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:27.163Z",
+      "identity": "qa26.import.b@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 140,
+        "clientTimestamp": "2026-09-19T11:20:25.755Z",
+        "metadataJson": "{\"source\":\"QA26 simulated\"}"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T15:20:26.2236774+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": true,
+          "warningMessage": "Exam expired: disconnect time exceeded allowed limit.",
+          "isExpired": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T15:20:26.2236774+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": true,
+            "warningMessage": "Exam expired: disconnect time exceeded allowed limit.",
+            "isExpired": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1407.54
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:30.189Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/140",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 140,
+          "attemptId": 188,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T15:17:32.0931378+04:00",
+          "endedAt": "2026-09-19T15:20:26.2236774+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:17:32.0931378+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T17:17:32.0931378+04:00",
+          "attemptStatus": "Expired",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.import.b@example.test",
+          "candidateNameAr": "استيراد باء",
+          "candidateRollNo": "QA26-IMP-B",
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": "+971502222222",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T15:17:32.0931378+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "2m 54s",
+          "sessionDurationMinutes": 2.9,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 140,
+            "attemptId": 188,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T15:17:32.0931378+04:00",
+            "endedAt": "2026-09-19T15:20:26.2236774+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:17:32.0931378+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T17:17:32.0931378+04:00",
+            "attemptStatus": "Expired",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.import.b@example.test",
+            "candidateNameAr": "استيراد باء",
+            "candidateRollNo": "QA26-IMP-B",
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": "+971502222222",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T15:17:32.0931378+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "2m 54s",
+            "sessionDurationMinutes": 2.9,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3024.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:30.684Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/event",
+      "request": {
+        "proctorSessionId": 139,
+        "eventType": 2,
+        "severity": 2,
+        "metadataJson": "{\"source\":\"QA26 tab 1789816830192\"}"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Session is not active",
+          "data": null,
+          "errors": [],
+          "traceId": "58c7bd53f92218b5efea47f35168c6d4"
+        },
+        "ms": 491.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:20:37.825Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/session/139/warning",
+      "request": {
+        "message": "QA26 offline warning 1789816835718"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Session is not active (current status: Completed). The candidate may have already submitted or the exam has ended.",
+          "data": false,
+          "errors": [],
+          "traceId": "c6da0a57cdab5ad6a3dfce826777c4d2"
+        },
+        "ms": 2107.17
+      }
+    }
+  ]
+}

@@ -1,0 +1,340 @@
+{
+  "classification": "Synthetic mux diagnostic only; no HTTP or browser execution",
+  "original": {
+    "file": "synthetic-vp8-opus-attempt-368.webm",
+    "bytes": 230170,
+    "clusters": 9,
+    "blocks": 521,
+    "backwardsCount": 39,
+    "firstBackwards": [
+      {
+        "previous": {
+          "track": 2,
+          "timestampMs": 201,
+          "offset": 10599,
+          "cluster": 713
+        },
+        "current": {
+          "track": 1,
+          "timestampMs": 200,
+          "offset": 10668,
+          "cluster": 713
+        }
+      },
+      {
+        "previous": {
+          "track": 2,
+          "timestampMs": 401,
+          "offset": 13917,
+          "cluster": 713
+        },
+        "current": {
+          "track": 1,
+          "timestampMs": 400,
+          "offset": 14016,
+          "cluster": 713
+        }
+      },
+      {
+        "previous": {
+          "track": 2,
+          "timestampMs": 601,
+          "offset": 17781,
+          "cluster": 713
+        },
+        "current": {
+          "track": 1,
+          "timestampMs": 600,
+          "offset": 17882,
+          "cluster": 713
+        }
+      },
+      {
+        "previous": {
+          "track": 2,
+          "timestampMs": 801,
+          "offset": 22358,
+          "cluster": 713
+        },
+        "current": {
+          "track": 1,
+          "timestampMs": 800,
+          "offset": 22470,
+          "cluster": 713
+        }
+      },
+      {
+        "previous": {
+          "track": 2,
+          "timestampMs": 1001,
+          "offset": 27514,
+          "cluster": 27390
+        },
+        "current": {
+          "track": 1,
+          "timestampMs": 1000,
+          "offset": 27626,
+          "cluster": 27390
+        }
+      }
+    ],
+    "firstBlocks": [
+      {
+        "track": 2,
+        "timestampMs": 0,
+        "offset": 723,
+        "cluster": 713
+      },
+      {
+        "track": 1,
+        "timestampMs": 0,
+        "offset": 839,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 21,
+        "offset": 8277,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 41,
+        "offset": 8358,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 61,
+        "offset": 8431,
+        "cluster": 713
+      },
+      {
+        "track": 1,
+        "timestampMs": 67,
+        "offset": 8504,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 81,
+        "offset": 9335,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 101,
+        "offset": 9407,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 121,
+        "offset": 9479,
+        "cluster": 713
+      },
+      {
+        "track": 1,
+        "timestampMs": 133,
+        "offset": 9549,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 141,
+        "offset": 10386,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 161,
+        "offset": 10458,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 181,
+        "offset": 10528,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 201,
+        "offset": 10599,
+        "cluster": 713
+      },
+      {
+        "track": 1,
+        "timestampMs": 200,
+        "offset": 10668,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 221,
+        "offset": 11486,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 241,
+        "offset": 11554,
+        "cluster": 713
+      },
+      {
+        "track": 2,
+        "timestampMs": 261,
+        "offset": 11625,
+        "cluster": 713
+      }
+    ]
+  },
+  "variants": [
+    {
+      "name": "audio-preload-minus7ms",
+      "status": 4294967262,
+      "error": "[webm @ 000002596c210b40] Value -7000.000000 for parameter 'audio_preload' out of range [0 - 2.14748e+09]\r\n[webm @ 000002596c210b40] Error setting option audio_preload to value -7000.\r\n[out#0/webm @ 000002596c210a00] Could not write header (incorrect codec parameters ?): Result too large\r\n"
+    },
+    {
+      "name": "video-dts-minus7ms",
+      "args": [
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-nostdin",
+        "-n",
+        "-i",
+        "C:\\_OrbitX Projects\\Build4 IT\\new-exam.worktrees\\production-readiness-final-test\\docs\\qa-2026-09-19\\harness\\phase12-video-assets\\synthetic-vp8-opus-attempt-368.webm",
+        "-map",
+        "0:v:0",
+        "-map",
+        "0:a:0",
+        "-c",
+        "copy",
+        "-bsf:v",
+        "setts=dts=DTS-7",
+        "-cluster_time_limit",
+        "1000",
+        "-f",
+        "webm",
+        "C:\\_OrbitX Projects\\Build4 IT\\new-exam.worktrees\\production-readiness-final-test\\docs\\qa-2026-09-19\\harness\\phase12-video-assets\\synthetic-vp8-opus-attempt-368-video-dts-minus7ms.webm"
+      ],
+      "file": "synthetic-vp8-opus-attempt-368-video-dts-minus7ms.webm",
+      "bytes": 230169,
+      "clusters": 9,
+      "blocks": 521,
+      "backwardsCount": 0,
+      "firstBackwards": [],
+      "firstBlocks": [
+        {
+          "track": 1,
+          "timestampMs": 7,
+          "offset": 723,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 7,
+          "offset": 8161,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 28,
+          "offset": 8277,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 48,
+          "offset": 8358,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 68,
+          "offset": 8431,
+          "cluster": 713
+        },
+        {
+          "track": 1,
+          "timestampMs": 74,
+          "offset": 8504,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 88,
+          "offset": 9335,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 108,
+          "offset": 9407,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 128,
+          "offset": 9479,
+          "cluster": 713
+        },
+        {
+          "track": 1,
+          "timestampMs": 140,
+          "offset": 9549,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 148,
+          "offset": 10386,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 168,
+          "offset": 10458,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 188,
+          "offset": 10528,
+          "cluster": 713
+        },
+        {
+          "track": 1,
+          "timestampMs": 207,
+          "offset": 10599,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 208,
+          "offset": 11417,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 228,
+          "offset": 11486,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 248,
+          "offset": 11554,
+          "cluster": 713
+        },
+        {
+          "track": 2,
+          "timestampMs": 268,
+          "offset": 11625,
+          "cluster": 713
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T13:14:06.682Z",
+  "checks": [
+    {
+      "name": "All 50 distinct simulated candidate accounts authenticated",
+      "passed": false,
+      "detail": {
+        "actual": 49,
+        "expected": 50
+      },
+      "at": "2026-09-19T13:15:17.712Z"
+    }
+  ],
+  "events": []
+}

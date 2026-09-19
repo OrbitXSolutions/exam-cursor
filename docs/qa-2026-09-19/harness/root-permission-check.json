@@ -1,0 +1,141 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:33:34.424Z",
+  "checks": [],
+  "events": [
+    {
+      "at": "2026-09-19T12:33:35.675Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:33:35.6702886+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:33:34.9703444+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:33:35.6702886+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:33:34.9703444+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1248.66
+      }
+    },
+    {
+      "at": "2026-09-19T12:33:37.045Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/4c4eb16d-93d3-41d9-8881-d4d741212885",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:32:38.7286008+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+          "email": "qa26.browser.proctor@example.test",
+          "displayName": "QA26 Browser Proctor",
+          "fullName": "QA26 Browser Proctor",
+          "fullNameAr": "مراقب اختبار المتصفح المؤكد",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:47:51.6401512+04:00",
+          "lastLoginDate": "2026-09-19T14:49:31.407072+04:00",
+          "departmentId": 7,
+          "departmentNameEn": "QA26 Browser Lab Verified",
+          "departmentNameAr": "مختبر اختبار المتصفح",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:32:38.7286008+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+            "email": "qa26.browser.proctor@example.test",
+            "displayName": "QA26 Browser Proctor",
+            "fullName": "QA26 Browser Proctor",
+            "fullNameAr": "مراقب اختبار المتصفح المؤكد",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:51.6401512+04:00",
+            "lastLoginDate": "2026-09-19T14:49:31.407072+04:00",
+            "departmentId": 7,
+            "departmentNameEn": "QA26 Browser Lab Verified",
+            "departmentNameAr": "مختبر اختبار المتصفح",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1369.24
+      }
+    }
+  ]
+}

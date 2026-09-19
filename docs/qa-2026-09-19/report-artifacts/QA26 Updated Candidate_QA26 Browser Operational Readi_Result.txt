@@ -1,0 +1,59 @@
+Smart Exam System
+Candidate Result Report
+QA26 Browser Operational Readiness
+CANDIDATE INFORMATION
+Name:
+QA26 Updated Candidate
+Candidate ID:
+8896951a-8184-4fb6-a2ad-bd99cfdb2570
+Attempt ID:
+193
+Graded At:
+September 19, 2026 at 03:55 PM
+Grading Status:
+Completed
+SCORE SUMMARY PASSED
+TOTAL SCORE
+42.00 / 56
+PERCENTAGE
+75.0%
+PASS SCORE
+30
+QUESTIONS
+6 / 6
+75.0% of total marks achieved  ·  Pass required: 30 pts
+Question & Answer Details 6 Questions
+# Question Type Candidate's Answer  ([+] Correct  [-] Wrong) Correct Answer Score Result Metho
+d
+1 QA26 Single: Which number is prime? MCQ_Sin
+gle
+[+] 2 2 10 / 10 Correct Auto
+2 QA26 Weighted Multi: Select prime
+numbers
+MCQ_Mul
+ti
+[+] 2 2 7 / 10 Incorrect Auto
+3 QA26 Equal Multi: Select even numbers MCQ_Mul
+ti
+[+] 2 2 5 / 10 Incorrect Auto
+4 QA26 TrueFalse: 2 + 2 = 4 TrueFalse [+] True True 10 / 10 Correct Auto
+Generated: Sep 19, 2026, 04:19 PM QA26 Updated Candidate  ·  Attempt #193  ·  QA26 Browser Operational Readiness Page 1 of 2
+# Question Type Candidate's Answer  ([+] Correct  [-] Wrong) Correct Answer Score Result Metho
+d
+5 QA26 Subjective: Explain two ways to
+protect exam integrity
+Subjectiv
+e
+Use least-privilege access for question banks and
+monitor suspicious activity. Verify saved answers
+after reconnect.
+Award 5 points for verified
+identity, 5 for monitoring with a
+documented review process.
+8 / 10 Correct Manual
+6 QA26 Browser: Select secure
+operational practices.
+MCQ_Mul
+ti
+[+] Verify restore procedures Verify restore procedures 2 / 6 Incorrect Auto
+Generated: Sep 19, 2026, 04:19 PM QA26 Updated Candidate  ·  Attempt #193  ·  QA26 Browser Operational Readiness Page 2 of 2

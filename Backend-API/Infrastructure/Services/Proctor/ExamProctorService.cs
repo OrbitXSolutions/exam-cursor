@@ -10,6 +10,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Proctor;
 
@@ -19,6 +20,7 @@ public class ExamProctorService : IExamProctorService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICacheService _cache;
     private readonly ILogger<ExamProctorService> _logger;
+    private readonly ResourceAuthorizationService _authorization;
 
     private const string CachePrefix = "exam-proctors:";
 
@@ -26,18 +28,22 @@ public class ExamProctorService : IExamProctorService
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
         ICacheService cache,
-        ILogger<ExamProctorService> logger)
+        ILogger<ExamProctorService> logger,
+        ResourceAuthorizationService authorization)
     {
         _db = db;
         _userManager = userManager;
         _cache = cache;
         _logger = logger;
+        _authorization = authorization;
     }
 
     // ── Get all proctors (assigned + available) for an exam ───
     public async Task<ApiResponse<ExamProctorPageDto>> GetExamProctorsAsync(int examId)
     {
-        var cacheKey = $"{CachePrefix}{examId}";
+        if (!await _authorization.CanAccessExamAsync(examId))
+            return ApiResponse<ExamProctorPageDto>.FailureResponse("Exam not found.");
+        var cacheKey = $"{CachePrefix}{examId}:{await _authorization.GetCurrentScopeCacheKeyAsync()}";
         if (_cache.TryGet<ExamProctorPageDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<ExamProctorPageDto>.SuccessResponse(cached);
 
@@ -66,6 +72,8 @@ public class ExamProctorService : IExamProctorService
         foreach (var u in activeProctors)
         {
             var isAssigned = assignedIds.Contains(u.Id);
+            if (!isAssigned && !await _authorization.CanAccessUserAsync(u.Id))
+                continue;
             var item = new ExamProctorItemDto
             {
                 Id = u.Id,
@@ -101,8 +109,14 @@ public class ExamProctorService : IExamProctorService
     public async Task<ApiResponse<ProctorAssignmentResultDto>> AssignAsync(
         AssignProctorToExamDto dto, string assignedBy)
     {
+        if (!await _authorization.CanAccessExamForUserAsync(dto.ExamId, assignedBy))
+            return ApiResponse<ProctorAssignmentResultDto>.FailureResponse("Exam not found.");
         if (dto.ProctorIds == null || dto.ProctorIds.Count == 0)
             return ApiResponse<ProctorAssignmentResultDto>.FailureResponse("No proctor IDs provided.");
+
+        foreach (var proctorId in dto.ProctorIds.Distinct())
+            if (!await _authorization.CanAccessUserForUserAsync(proctorId, assignedBy))
+                return ApiResponse<ProctorAssignmentResultDto>.FailureResponse("Proctor not found.");
 
         var exam = await _db.Exams.AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == dto.ExamId && !e.IsDeleted);
@@ -156,7 +170,7 @@ public class ExamProctorService : IExamProctorService
         if (success > 0)
         {
             await _db.SaveChangesAsync();
-            _cache.Remove($"{CachePrefix}{dto.ExamId}");
+            _cache.RemoveByPrefix($"{CachePrefix}{dto.ExamId}:");
         }
 
         _logger.LogInformation(
@@ -178,6 +192,8 @@ public class ExamProctorService : IExamProctorService
     public async Task<ApiResponse<ProctorAssignmentResultDto>> UnassignAsync(
         UnassignProctorFromExamDto dto)
     {
+        if (!await _authorization.CanAccessExamAsync(dto.ExamId))
+            return ApiResponse<ProctorAssignmentResultDto>.FailureResponse("Exam not found.");
         if (dto.ProctorIds == null || dto.ProctorIds.Count == 0)
             return ApiResponse<ProctorAssignmentResultDto>.FailureResponse("No proctor IDs provided.");
 
@@ -199,7 +215,7 @@ public class ExamProctorService : IExamProctorService
         if (success > 0)
         {
             await _db.SaveChangesAsync();
-            _cache.Remove($"{CachePrefix}{dto.ExamId}");
+            _cache.RemoveByPrefix($"{CachePrefix}{dto.ExamId}:");
         }
 
         _logger.LogInformation(

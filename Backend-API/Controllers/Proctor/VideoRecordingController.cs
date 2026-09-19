@@ -119,6 +119,9 @@ public class VideoRecordingController : ControllerBase
 
         if (chunk == null || chunk.Length == 0)
             return BadRequest(ApiResponse<object>.FailureResponse("No chunk data provided"));
+        // The retrieval API accepts six-digit, non-negative chunk filenames.
+        if (chunkIndex < 0 || chunkIndex > 999999)
+            return BadRequest(ApiResponse<object>.FailureResponse("Chunk index must be between 0 and 999999"));
 
         try
         {
@@ -354,7 +357,7 @@ public class VideoRecordingController : ControllerBase
                     {
                         e.Id,
                         timestamp = e.UploadedAt ?? e.StartAt,
-                        url = "/media/" + e.FilePath
+                        url = "/api/Proctor/evidence/" + e.Id + "/download"
                     })
                     .ToListAsync();
             }

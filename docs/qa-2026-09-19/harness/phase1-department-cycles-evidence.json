@@ -1,0 +1,685 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:48:43.927Z",
+  "checks": [
+    {
+      "name": "Department with assigned users cannot be deleted",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Cannot delete department with assigned users. Please reassign users first.",
+        "data": false,
+        "errors": [],
+        "traceId": "c6d826acc20815f07c0d59277f7737fc"
+      },
+      "at": "2026-09-19T10:48:46.824Z"
+    },
+    {
+      "name": "Inactive department state persists",
+      "passed": true,
+      "at": "2026-09-19T10:48:47.750Z"
+    },
+    {
+      "name": "Inactive department omitted from active dropdown list",
+      "passed": true,
+      "at": "2026-09-19T10:48:48.230Z"
+    },
+    {
+      "name": "Assignment to inactive department rejected",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Cannot assign user to an inactive department.",
+        "data": false,
+        "errors": [],
+        "traceId": "767d65aa73cdb464413fdaa0991415d0"
+      },
+      "at": "2026-09-19T10:48:48.694Z"
+    },
+    {
+      "name": "Creating user in inactive department follows assign-user validation",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "User created successfully.",
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:48:52.6877741+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "56b03e29-0731-42ca-a89c-7abf3f2f5ea6",
+          "email": "qa26.inactive.department@example.test",
+          "displayName": "QA26 Inactive Department Fixture",
+          "fullName": "QA26 Inactive Department Fixture",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:48:51.3042841+04:00",
+          "lastLoginDate": null,
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T10:48:53.839Z"
+    },
+    {
+      "name": "User update to inactive department follows assign-user validation",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "User updated successfully.",
+        "data": {
+          "phoneNumber": "+971501234567",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:48:57.0581434+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "email": "qa26.eng.candidate1@example.test",
+          "displayName": "QA26 Engineering Candidate 1",
+          "fullName": "QA26 Updated Candidate",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+          "lastLoginDate": "2026-09-19T14:48:24.3041112+04:00",
+          "departmentId": 9,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T10:48:57.518Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:48:45.152Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:48:45.148115+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:48:44.4640641+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:48:45.148115+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:48:44.4640641+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1222.93
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:46.358Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:48:46.3578217+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T14:48:45.6646015+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:48:46.3578217+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T14:48:45.6646015+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1203.59
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:46.823Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Departments/9",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Cannot delete department with assigned users. Please reassign users first.",
+          "data": false,
+          "errors": [],
+          "traceId": "c6d826acc20815f07c0d59277f7737fc"
+        },
+        "ms": 464.46
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:47.288Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/9/deactivate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Department deactivated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 463.57
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:47.749Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Departments/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "nameEn": "QA26 Operations",
+          "nameAr": "اختبار QA26 العمليات",
+          "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+          "descriptionAr": "بيانات اختبار القبول",
+          "code": "QA26_OPS",
+          "isActive": false,
+          "userCount": 7,
+          "createdDate": "2026-09-19T14:46:57.3151048+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "nameEn": "QA26 Operations",
+            "nameAr": "اختبار QA26 العمليات",
+            "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+            "descriptionAr": "بيانات اختبار القبول",
+            "code": "QA26_OPS",
+            "isActive": false,
+            "userCount": 7,
+            "createdDate": "2026-09-19T14:46:57.3151048+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 460.13
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:48.230Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Departments?search=QA26&includeInactive=false&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 7,
+              "nameEn": "QA26 Browser Lab Verified",
+              "nameAr": "مختبر اختبار المتصفح",
+              "code": "QA26UI",
+              "isActive": true,
+              "userCount": 1
+            },
+            {
+              "id": 8,
+              "nameEn": "QA26 Engineering",
+              "nameAr": "اختبار QA26 الهندسة",
+              "code": "QA26_ENG",
+              "isActive": true,
+              "userCount": 7
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 2,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 7,
+                "nameEn": "QA26 Browser Lab Verified",
+                "nameAr": "مختبر اختبار المتصفح",
+                "code": "QA26UI",
+                "isActive": true,
+                "userCount": 1
+              },
+              {
+                "id": 8,
+                "nameEn": "QA26 Engineering",
+                "nameAr": "اختبار QA26 الهندسة",
+                "code": "QA26_ENG",
+                "isActive": true,
+                "userCount": 7
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 2,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 479.24
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:48.694Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+        "departmentId": 9
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Cannot assign user to an inactive department.",
+          "data": false,
+          "errors": [],
+          "traceId": "767d65aa73cdb464413fdaa0991415d0"
+        },
+        "ms": 462.36
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:49.875Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:48:49.8750452+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T14:48:49.1922516+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:48:49.8750452+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T14:48:49.1922516+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1179.92
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:49.875Z",
+      "observation": "Existing member login while department inactive. Expected policy requires product decision; not asserted as failure.",
+      "allowed": true
+    },
+    {
+      "at": "2026-09-19T10:48:53.838Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.inactive.department@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 Inactive Department Fixture",
+        "role": "Candidate",
+        "departmentId": 9
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:48:52.6877741+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "56b03e29-0731-42ca-a89c-7abf3f2f5ea6",
+          "email": "qa26.inactive.department@example.test",
+          "displayName": "QA26 Inactive Department Fixture",
+          "fullName": "QA26 Inactive Department Fixture",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:48:51.3042841+04:00",
+          "lastLoginDate": null,
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:48:52.6877741+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "56b03e29-0731-42ca-a89c-7abf3f2f5ea6",
+            "email": "qa26.inactive.department@example.test",
+            "displayName": "QA26 Inactive Department Fixture",
+            "fullName": "QA26 Inactive Department Fixture",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:48:51.3042841+04:00",
+            "lastLoginDate": null,
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3962.47
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:55.448Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Users/56b03e29-0731-42ca-a89c-7abf3f2f5ea6",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1608.91
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:57.517Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+      "request": {
+        "departmentId": 9
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971501234567",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:48:57.0581434+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "email": "qa26.eng.candidate1@example.test",
+          "displayName": "QA26 Engineering Candidate 1",
+          "fullName": "QA26 Updated Candidate",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+          "lastLoginDate": "2026-09-19T14:48:24.3041112+04:00",
+          "departmentId": 9,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": "+971501234567",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:48:57.0581434+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "email": "qa26.eng.candidate1@example.test",
+            "displayName": "QA26 Engineering Candidate 1",
+            "fullName": "QA26 Updated Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+            "lastLoginDate": "2026-09-19T14:48:24.3041112+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2068.05
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:59.359Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+      "request": {
+        "departmentId": 8
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Update failed.",
+          "data": null,
+          "errors": [
+            "Optimistic concurrency failure, object has been modified."
+          ],
+          "traceId": "224abf6becd1c73239a35a473ba47e6a"
+        },
+        "ms": 1840.24
+      }
+    },
+    {
+      "at": "2026-09-19T10:48:59.828Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/9/activate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Department activated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 468.56
+      }
+    }
+  ]
+}

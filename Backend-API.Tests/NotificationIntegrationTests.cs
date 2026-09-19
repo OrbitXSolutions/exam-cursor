@@ -31,6 +31,13 @@ namespace Backend_API.Tests;
 
 public sealed class NotificationIntegrationTests
 {
+    private sealed class AssignmentActor : ICurrentUserService
+    {
+        public string UserId => "operator";
+        public string? Email => null;
+        public bool IsAuthenticated => true;
+    }
+
     [SqlServerFact]
     public async Task WorkerSelectsEachEmailTemplateAndCredentialFreeSmsEventWithoutDecryptingUnusedPassword()
     {
@@ -329,8 +336,20 @@ public sealed class NotificationIntegrationTests
         var (candidate, exam) = await SeedAsync(db);
         db.NotificationTemplates.Add(Template());
         await db.SaveChangesAsync();
-        var service = new ExamAssignmentService(db, null!, NotificationService(db),
-            NullLogger<ExamAssignmentService>.Instance, new CacheService());
+        await using var identityServices = fixture.IdentityServices();
+        await using var identityScope = identityServices.CreateAsyncScope();
+        var userManager = identityScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = identityScope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+        foreach (var name in new[] { "SuperAdmin", "Candidate" })
+            if (!await roleManager.RoleExistsAsync(name))
+                Assert.True((await roleManager.CreateAsync(new ApplicationRole { Name = name })).Succeeded);
+        var actor = new ApplicationUser { Id = "operator", UserName = "operator" };
+        Assert.True((await userManager.CreateAsync(actor)).Succeeded);
+        Assert.True((await userManager.AddToRoleAsync(actor, "SuperAdmin")).Succeeded);
+        Assert.True((await userManager.AddToRoleAsync((await userManager.FindByIdAsync(candidate.Id))!, "Candidate")).Succeeded);
+        var service = new ExamAssignmentService(db, roleManager, NotificationService(db),
+            NullLogger<ExamAssignmentService>.Instance, new CacheService(),
+            new ResourceAuthorizationService(db, userManager, new AssignmentActor()));
         var request = new AssignExamDto
         {
             ExamId = exam.Id,

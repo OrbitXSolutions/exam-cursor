@@ -1,0 +1,235 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T13:01:32.252Z",
+  "checks": [
+    {
+      "name": "pageSize=0",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T13:01:33.999Z"
+    },
+    {
+      "name": "pageNumber=-1",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T13:01:34.469Z"
+    },
+    {
+      "name": "pageNumber=2147483647&pageSize=2",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T13:01:34.940Z"
+    },
+    {
+      "name": "pageNumber=1&pageSize=1",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "count": 1
+      },
+      "at": "2026-09-19T13:01:36.773Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T13:01:33.512Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T18:01:33.5091209+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T17:01:32.8087188+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T18:01:33.5091209+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T17:01:32.8087188+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1258.75
+      }
+    },
+    {
+      "at": "2026-09-19T13:01:33.998Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Media?pageSize=0",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageSize": [
+              "The field pageSize must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-fdc1c80eb5a5c8858e94f606efdb33b6-d49dc436a46203a0-00"
+        },
+        "ms": 485.36
+      }
+    },
+    {
+      "at": "2026-09-19T13:01:34.468Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Media?pageNumber=-1",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageNumber": [
+              "The field pageNumber must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-e2b3b5627c72ed19beb344ab976fd208-2a625cf75cc8330a-00"
+        },
+        "ms": 468.17
+      }
+    },
+    {
+      "at": "2026-09-19T13:01:34.939Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Media?pageNumber=2147483647&pageSize=2",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "message": "Requested page exceeds the supported range."
+        },
+        "ms": 469
+      }
+    },
+    {
+      "at": "2026-09-19T13:01:36.772Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Media?pageNumber=1&pageSize=1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": "5b9968b3-9c76-495f-a175-5a7f6d7452bd",
+              "originalFileName": "QA26-synthetic-snapshot-1789817686988.png",
+              "storedFileName": "490dc9c0-068b-4e22-8f4f-26681883282b.png",
+              "extension": ".png",
+              "contentType": "image/png",
+              "sizeInBytes": 68,
+              "sizeFormatted": "68 B",
+              "mediaType": "Image",
+              "storageProvider": "Local",
+              "path": "proctor-snapshots/2026/09/490dc9c0-068b-4e22-8f4f-26681883282b.png",
+              "url": "/api/Media/5b9968b3-9c76-495f-a175-5a7f6d7452bd/view",
+              "folder": "proctor-snapshots",
+              "createdDate": "2026-09-19T15:34:47.7240031+04:00"
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 1,
+          "totalCount": 414,
+          "totalPages": 414,
+          "hasPreviousPage": false,
+          "hasNextPage": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": "5b9968b3-9c76-495f-a175-5a7f6d7452bd",
+                "originalFileName": "QA26-synthetic-snapshot-1789817686988.png",
+                "storedFileName": "490dc9c0-068b-4e22-8f4f-26681883282b.png",
+                "extension": ".png",
+                "contentType": "image/png",
+                "sizeInBytes": 68,
+                "sizeFormatted": "68 B",
+                "mediaType": "Image",
+                "storageProvider": "Local",
+                "path": "proctor-snapshots/2026/09/490dc9c0-068b-4e22-8f4f-26681883282b.png",
+                "url": "/api/Media/5b9968b3-9c76-495f-a175-5a7f6d7452bd/view",
+                "folder": "proctor-snapshots",
+                "createdDate": "2026-09-19T15:34:47.7240031+04:00"
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 1,
+            "totalCount": 414,
+            "totalPages": 414,
+            "hasPreviousPage": false,
+            "hasNextPage": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1831.36
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -151,11 +153,12 @@ export default function CandidateVideoPage() {
       const imageEvidence = evidenceList.filter(
         (e) =>
           e.type === 3 ||
+          e.type === 4 ||
           e.typeName?.toLowerCase().includes("image") ||
           e.typeName?.toLowerCase().includes("photo")
       )
 
-      const snapshotList: ProctorSnapshot[] = (imageEvidence.length > 0 ? imageEvidence : evidenceList).map((e) => ({
+      const snapshotList: ProctorSnapshot[] = imageEvidence.map((e) => ({
         id: e.id,
         sessionId,
         capturedAt: e.startAt ?? e.uploadedAt ?? e.endAt ?? new Date().toISOString(),
@@ -390,7 +393,7 @@ export default function CandidateVideoPage() {
                         {selectedImage ? (
                           <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
                             {selectedImage.fileUrl ? (
-                              <img
+                              <EvidenceImage
                                 src={selectedImage.fileUrl}
                                 alt={`Screen ${selectedImage.id}`}
                                 className="w-full h-full object-contain"
@@ -438,7 +441,7 @@ export default function CandidateVideoPage() {
                               }`}
                             >
                               {snapshot.fileUrl ? (
-                                <img
+                                <EvidenceImage
                                   src={snapshot.fileUrl}
                                   alt={`Screen ${snapshot.id}`}
                                   className="w-full h-full object-cover"

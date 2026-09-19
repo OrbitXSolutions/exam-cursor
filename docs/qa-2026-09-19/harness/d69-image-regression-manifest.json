@@ -1,0 +1,31 @@
+{
+  "classification": "SYNTHETIC IMAGE: locally drawn test pattern and text; no physical capture.",
+  "createdAt": "2026-09-19T14:43:19.935Z",
+  "type4": "Source inspected only; no implemented normal upload/download integration for type4 used.",
+  "examId": 144,
+  "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+  "candidateEmail": "qa26.eng.candidate3@example.test",
+  "imageSha256": "6684ab6cb0269e028756e6d7f92e1ca385bbd2c492b2f84f1f919204abebed1c",
+  "imageBytes": 4522,
+  "attemptId": 369,
+  "sessionId": 321,
+  "uploadRequestedAt": "2026-09-19T14:44:09.647Z",
+  "evidenceId": 704,
+  "submitted": {
+    "resultId": 0,
+    "examId": 144,
+    "examTitleEn": "QA26 D69 Synthetic Image Regression",
+    "examTitleAr": "اختبار صورة اصطناعية QA26",
+    "attemptNumber": 1,
+    "submittedAt": "2026-09-19T18:44:19.4886418+04:00",
+    "totalScore": null,
+    "maxPossibleScore": null,
+    "percentage": null,
+    "isPassed": null,
+    "gradeLabel": null,
+    "allowReview": true,
+    "showCorrectAnswers": true
+  },
+  "completedAt": "2026-09-19T14:44:20.666Z",
+  "browserUrl": "/proctor-center/video/0d70f96e-612a-4bc1-81c9-091201b1a23c?attemptId=369"
+}

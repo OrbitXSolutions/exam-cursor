@@ -1,0 +1,231 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:27:35.116Z",
+  "checks": [
+    {
+      "name": "browser metadata save preserves both explanations",
+      "passed": false,
+      "detail": {
+        "explanationEn": null,
+        "explanationAr": null
+      },
+      "at": "2026-09-19T11:27:37.509Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:27:36.364Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:27:36.3593144+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:27:35.6589008+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:27:36.3593144+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:27:35.6589008+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1246.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:27:37.508Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/156",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 156,
+          "bodyEn": "QA26 D24 preserve explanation after metadata edit",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 436,
+              "questionId": 156,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+            },
+            {
+              "id": 437,
+              "questionId": 156,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+            },
+            {
+              "id": 463,
+              "questionId": 156,
+              "textEn": "D browser replacement",
+              "textAr": "D browser replacement",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:16:59.4541811+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 156,
+            "bodyEn": "QA26 D24 preserve explanation after metadata edit",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 436,
+                "questionId": 156,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+              },
+              {
+                "id": 437,
+                "questionId": 156,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+              },
+              {
+                "id": 463,
+                "questionId": 156,
+                "textEn": "D browser replacement",
+                "textAr": "D browser replacement",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:16:59.4541811+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1143.66
+      }
+    }
+  ]
+}

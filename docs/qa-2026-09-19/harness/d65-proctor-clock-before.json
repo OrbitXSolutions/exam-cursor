@@ -1,0 +1,1319 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:03:25.988Z",
+  "checks": [
+    {
+      "name": "Fixture identifies this candidate and a persisted exam/attempt/session",
+      "passed": true,
+      "detail": {
+        "examId": 142,
+        "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+        "candidateEmail": "qa26.eng.candidate3@example.test",
+        "request": {
+          "examType": 0,
+          "titleEn": "QA26 D65 Proctor Remaining Clock",
+          "titleAr": "اختبار وقت المراقب QA26",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T14:02:28.495Z",
+          "endAt": "2026-09-19T15:03:28.495Z",
+          "durationMinutes": 10,
+          "maxAttempts": 1,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": true,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 0,
+          "departmentId": 8
+        },
+        "createdAt": "2026-09-19T14:03:32.505Z",
+        "attemptId": 364,
+        "expiresAt": "2026-09-19T18:13:55.7191685+04:00",
+        "sessionId": 316
+      },
+      "at": "2026-09-19T14:03:59.560Z"
+    },
+    {
+      "name": "Fresh ordinary attempt has positive authoritative time",
+      "passed": true,
+      "detail": {
+        "timer": {
+          "attemptId": 364,
+          "serverTime": "2026-09-19T18:04:01.8863723+04:00",
+          "expiresAt": "2026-09-19T18:13:55.7191685+04:00",
+          "remainingSeconds": 593,
+          "status": 1,
+          "isExpired": false
+        },
+        "row": {
+          "id": 316,
+          "attemptId": 364,
+          "examId": 142,
+          "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+          "endedAt": null,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "riskScore": 0,
+          "decisionStatus": null,
+          "requiresReview": true,
+          "isFlagged": false,
+          "isSample": false,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "latestSnapshotUrl": null,
+          "snapshotCount": 0,
+          "lastSnapshotAt": null,
+          "ipAddress": "::1",
+          "userAgent": "node",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "deviceFingerprint": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null
+        },
+        "mapped": {
+          "id": "316",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "examTitle": "QA26 D65 Proctor Remaining Clock",
+          "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+          "timeRemaining": 0,
+          "status": "Active",
+          "incidentCount": 0,
+          "flagged": false,
+          "lastActivity": "2026-09-19T18:03:55.7191685+04:00",
+          "isSample": false,
+          "snapshotCount": 0,
+          "riskScore": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10
+        }
+      },
+      "at": "2026-09-19T14:04:04.582Z"
+    },
+    {
+      "name": "D65 reproduced: positive candidate timer maps to zero-minute proctor card",
+      "passed": true,
+      "detail": {
+        "authoritativeSeconds": 593,
+        "backendListSeconds": null,
+        "mappedMinutes": 0
+      },
+      "at": "2026-09-19T14:04:04.583Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:03:27.267Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:03:27.2639007+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T18:03:26.5552726+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:03:27.2639007+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T18:03:26.5552726+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1277.34
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:28.494Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:03:28.4944258+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T18:03:27.8027349+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:03:28.4944258+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T18:03:27.8027349+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1226.05
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:32.504Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 D65 Proctor Remaining Clock",
+        "titleAr": "اختبار وقت المراقب QA26",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T14:02:28.495Z",
+        "endAt": "2026-09-19T15:03:28.495Z",
+        "durationMinutes": 10,
+        "maxAttempts": 1,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 5,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0,
+        "departmentId": 8
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 142,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 D65 Proctor Remaining Clock",
+          "titleAr": "اختبار وقت المراقب QA26",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T14:02:28.495+00:00",
+          "endAt": "2026-09-19T15:03:28.495+00:00",
+          "durationMinutes": 10,
+          "maxAttempts": 1,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": true,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T18:03:31.077271+04:00",
+          "updatedDate": null,
+          "sectionsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [],
+          "instructions": [],
+          "accessPolicy": {
+            "id": 123,
+            "examId": 142,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T18:03:31.321013+04:00",
+            "updatedDate": null
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 142,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 D65 Proctor Remaining Clock",
+            "titleAr": "اختبار وقت المراقب QA26",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T14:02:28.495+00:00",
+            "endAt": "2026-09-19T15:03:28.495+00:00",
+            "durationMinutes": 10,
+            "maxAttempts": 1,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 5,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": true,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T18:03:31.077271+04:00",
+            "updatedDate": null,
+            "sectionsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [],
+            "instructions": [],
+            "accessPolicy": {
+              "id": 123,
+              "examId": 142,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T18:03:31.321013+04:00",
+              "updatedDate": null
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4008.88
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:36.067Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/142/sections",
+      "request": {
+        "titleEn": "Clock regression",
+        "titleAr": "اختبار الساعة",
+        "order": 1
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 329,
+          "examId": 142,
+          "titleEn": "Clock regression",
+          "titleAr": "اختبار الساعة",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "order": 1,
+          "durationMinutes": null,
+          "totalPointsOverride": null,
+          "createdDate": "2026-09-19T18:03:34.6270979+04:00",
+          "topicsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sourceType": null,
+          "questionSubjectId": null,
+          "questionTopicId": null,
+          "pickCount": 0,
+          "subjectNameEn": null,
+          "subjectNameAr": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "topics": [],
+          "questions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 329,
+            "examId": 142,
+            "titleEn": "Clock regression",
+            "titleAr": "اختبار الساعة",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "order": 1,
+            "durationMinutes": null,
+            "totalPointsOverride": null,
+            "createdDate": "2026-09-19T18:03:34.6270979+04:00",
+            "topicsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sourceType": null,
+            "questionSubjectId": null,
+            "questionTopicId": null,
+            "pickCount": 0,
+            "subjectNameEn": null,
+            "subjectNameAr": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "topics": [],
+            "questions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3561.53
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:41.468Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/329/questions/bulk",
+      "request": {
+        "questionIds": [
+          131
+        ],
+        "useOriginalPoints": true,
+        "markAsRequired": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 91,
+            "examId": 142,
+            "examSectionId": 329,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T18:03:39.7814571+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 91,
+              "examId": 142,
+              "examSectionId": 329,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T18:03:39.7814571+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5400.38
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:43.777Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Assessment/exams/142/access-policy",
+      "request": {
+        "isPublic": false,
+        "restrictToAssignedCandidates": true,
+        "isWalkIn": false,
+        "accessCode": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 123,
+          "examId": 142,
+          "isPublic": false,
+          "accessCode": null,
+          "restrictToAssignedCandidates": true,
+          "isWalkIn": false,
+          "createdDate": "2026-09-19T18:03:31.321013+04:00",
+          "updatedDate": "2026-09-19T18:03:43.5444606+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Access policy updated successfully",
+          "data": {
+            "id": 123,
+            "examId": 142,
+            "isPublic": false,
+            "accessCode": null,
+            "restrictToAssignedCandidates": true,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T18:03:31.321013+04:00",
+            "updatedDate": "2026-09-19T18:03:43.5444606+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2308.06
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:48.648Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/142/publish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam published successfully. Notifications queued.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4870.6
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:54.082Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 142,
+        "candidateIds": [
+          "0d70f96e-612a-4bc1-81c9-091201b1a23c"
+        ],
+        "scheduleFrom": "2026-09-19T14:02:28.495Z",
+        "scheduleTo": "2026-09-19T15:03:28.495Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5432.85
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:58.581Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/142/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 364,
+          "examId": 142,
+          "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+          "examTitleAr": "اختبار وقت المراقب QA26",
+          "startedAtUtc": "2026-09-19T18:03:55.7191685+04:00",
+          "expiresAtUtc": "2026-09-19T18:13:55.7191685+04:00",
+          "remainingSeconds": 597,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 1,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 329,
+              "order": 1,
+              "titleEn": "Clock regression",
+              "titleAr": "اختبار الساعة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2688,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 329,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2688,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 329,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 364,
+            "examId": 142,
+            "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+            "examTitleAr": "اختبار وقت المراقب QA26",
+            "startedAtUtc": "2026-09-19T18:03:55.7191685+04:00",
+            "expiresAtUtc": "2026-09-19T18:13:55.7191685+04:00",
+            "remainingSeconds": 597,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 1,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 329,
+                "order": 1,
+                "titleEn": "Clock regression",
+                "titleAr": "اختبار الساعة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2688,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 329,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2688,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 329,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4498.87
+      }
+    },
+    {
+      "at": "2026-09-19T14:03:59.558Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/364",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 316,
+          "attemptId": 364,
+          "examId": 142,
+          "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T18:03:55.7191685+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": null,
+          "expiresAt": null,
+          "attemptStatus": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": null,
+          "candidatePhone": null,
+          "examTitleAr": "اختبار وقت المراقب QA26",
+          "examDurationMinutes": 10,
+          "examPassScore": 5,
+          "examMaxAttempts": 1,
+          "examTotalQuestions": 0,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 0,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": null,
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 0,
+          "sessionDuration": "3s",
+          "sessionDurationMinutes": 0.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 316,
+            "attemptId": 364,
+            "examId": 142,
+            "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T18:03:55.7191685+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": null,
+            "expiresAt": null,
+            "attemptStatus": null,
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": null,
+            "candidatePhone": null,
+            "examTitleAr": "اختبار وقت المراقب QA26",
+            "examDurationMinutes": 10,
+            "examPassScore": 5,
+            "examMaxAttempts": 1,
+            "examTotalQuestions": 0,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 0,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": null,
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 0,
+            "sessionDuration": "3s",
+            "sessionDurationMinutes": 0.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 973.31
+      }
+    },
+    {
+      "at": "2026-09-19T14:04:00.964Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 316,
+        "clientTimestamp": "2026-09-19T14:03:59.562Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T18:04:00.2655044+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T18:04:00.2655044+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1401.66
+      }
+    },
+    {
+      "at": "2026-09-19T14:04:01.886Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/364/timer",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 364,
+          "serverTime": "2026-09-19T18:04:01.8863723+04:00",
+          "expiresAt": "2026-09-19T18:13:55.7191685+04:00",
+          "remainingSeconds": 593,
+          "status": 1,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 364,
+            "serverTime": "2026-09-19T18:04:01.8863723+04:00",
+            "expiresAt": "2026-09-19T18:13:55.7191685+04:00",
+            "remainingSeconds": 593,
+            "status": 1,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 919.74
+      }
+    },
+    {
+      "at": "2026-09-19T14:04:04.234Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/sessions?ExamId=142&Status=1&IncludeSamples=false",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 316,
+              "attemptId": 364,
+              "examId": 142,
+              "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "mode": 1,
+              "modeName": "Soft",
+              "status": 1,
+              "statusName": "Active",
+              "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+              "endedAt": null,
+              "totalViolations": 0,
+              "countableViolationCount": 0,
+              "maxViolationWarnings": 10,
+              "riskScore": 0,
+              "decisionStatus": null,
+              "requiresReview": true,
+              "isFlagged": false,
+              "isSample": false,
+              "isTerminatedByProctor": false,
+              "terminationReason": null,
+              "latestSnapshotUrl": null,
+              "snapshotCount": 0,
+              "lastSnapshotAt": null,
+              "ipAddress": "::1",
+              "userAgent": "node",
+              "browserName": "Unknown",
+              "browserVersion": "",
+              "operatingSystem": "Unknown",
+              "screenResolution": null,
+              "deviceFingerprint": null,
+              "attemptIpAddress": null,
+              "attemptDeviceInfo": null,
+              "faceScore": null,
+              "eyeScore": null,
+              "behaviorScore": null,
+              "environmentScore": null
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 316,
+                "attemptId": 364,
+                "examId": 142,
+                "examTitleEn": "QA26 D65 Proctor Remaining Clock",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "mode": 1,
+                "modeName": "Soft",
+                "status": 1,
+                "statusName": "Active",
+                "startedAt": "2026-09-19T18:03:55.7191685+04:00",
+                "endedAt": null,
+                "totalViolations": 0,
+                "countableViolationCount": 0,
+                "maxViolationWarnings": 10,
+                "riskScore": 0,
+                "decisionStatus": null,
+                "requiresReview": true,
+                "isFlagged": false,
+                "isSample": false,
+                "isTerminatedByProctor": false,
+                "terminationReason": null,
+                "latestSnapshotUrl": null,
+                "snapshotCount": 0,
+                "lastSnapshotAt": null,
+                "ipAddress": "::1",
+                "userAgent": "node",
+                "browserName": "Unknown",
+                "browserVersion": "",
+                "operatingSystem": "Unknown",
+                "screenResolution": null,
+                "deviceFingerprint": null,
+                "attemptIpAddress": null,
+                "attemptDeviceInfo": null,
+                "faceScore": null,
+                "eyeScore": null,
+                "behaviorScore": null,
+                "environmentScore": null
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2345.76
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+import {adminClient,Client,Evidence,must,privateConfig} from './client.mjs';
+const stage=process.argv[2]??'before',e=new Evidence(`d53-source-publication-${stage}`),admin=await adminClient(e);
+const eng=new Client({evidence:e}),ops=new Client({evidence:e});must(await eng.login('qa26.eng.admin1@example.test',privateConfig().password),'eng login');must(await ops.login('qa26.ops.admin1@example.test',privateConfig().password),'ops login');
+const base={examType:0,titleEn:`QA26 D53 source ${stage} ${Date.now()}`,titleAr:`اختبار العزل ${Date.now()}`,startAt:new Date(Date.now()-60000).toISOString(),endAt:new Date(Date.now()+3600000).toISOString(),durationMinutes:30,maxAttempts:1,passScore:1,isActive:true,showResults:true,allowReview:true,showCorrectAnswers:true};
+const exam=must(await eng.post('/api/Assessment/exams',base),'create'),section=must(await eng.post(`/api/Assessment/exams/${exam.id}/sections`,{titleEn:'Source',titleAr:'قسم',order:1}),'section');
+const mixed=await eng.post(`/api/Assessment/sections/${section.id}/questions/bulk`,{questionIds:[131,136]}),state=must(await eng.get(`/api/Assessment/sections/${section.id}/questions`),'mixed read');
+e.check('Mixed bank selection denied atomically',!mixed.ok&&state.length===0,{response:mixed.body,state});
+for(const q of state)await eng.delete(`/api/Assessment/exam-questions/${q.id}`);
+must(await eng.post(`/api/Assessment/sections/${section.id}/questions`,{questionId:132,order:10}),'own question');
+must(await eng.put(`/api/Assessment/exams/${exam.id}/access-policy`,{isPublic:false,restrictToAssignedCandidates:true}),'private access');
+must(await eng.post(`/api/Assessment/exams/${exam.id}/instructions`,{contentEn:'Test independently',contentAr:'تعليمات',order:1}),'instructions');
+const publish=await ops.post(`/api/Assessment/exams/${exam.id}/publish`),published=must(await eng.get(`/api/Assessment/exams/${exam.id}`),'publication state');
+e.check('Foreign publication of otherwise valid draft denied without state change',!publish.ok&&!published.isPublished,{response:publish.body,published:published.isPublished});
+must(await eng.post(`/api/Assessment/exams/${exam.id}/unpublish`),'draft');
+const pool=await eng.put(`/api/Assessment/exams/${exam.id}/builder`,{sourceType:1,sections:[{sourceType:1,questionSubjectId:24,pickCount:1,order:10}]}),builder=must(await eng.get(`/api/Assessment/exams/${exam.id}/builder`),'pool read');
+e.check('Foreign dynamic source pool denied before replacement',!pool.ok&&!builder.sections.some(s=>s.questionSubjectId===24),{response:pool.body,builder});
+await admin.delete(`/api/Assessment/exams/${exam.id}`);
+console.log(JSON.stringify({examId:exam.id,checks:e.checks.length,passed:e.checks.filter(c=>c.passed).length}));

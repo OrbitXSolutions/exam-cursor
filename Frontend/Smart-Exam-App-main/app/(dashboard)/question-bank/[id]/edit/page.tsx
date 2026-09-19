@@ -289,6 +289,8 @@ export default function EditQuestionPage() {
       } = {
         bodyEn: formData.bodyEn,
         bodyAr: formData.bodyAr || formData.bodyEn,
+        explanationEn: question.explanationEn,
+        explanationAr: question.explanationAr,
         questionTypeId: Number(formData.questionTypeId),
         questionCategoryId: question.questionCategoryId,
         subjectId: Number(formData.subjectId),
@@ -306,6 +308,34 @@ export default function EditQuestionPage() {
           rubricTextAr: answerKey.rubricTextAr || null,
         }
       }
+
+      // Persist the total and complete option list together, including additions/removals.
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+      payload.options = isEssayType ? [] : await Promise.all(options.map(async (opt) => {
+        let attachmentPath = opt.attachmentPath || null
+        if (opt.imageFile) {
+          const fd = new FormData()
+          fd.append('file', opt.imageFile)
+          const upload = await fetch('/api/proxy/Media/upload?folder=QuestionAttachments', {
+            method: 'POST',
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            body: fd,
+          })
+          if (!upload.ok) throw new Error('Option image upload failed')
+          const result = await upload.json()
+          attachmentPath = result.file?.url || result.file?.path || result.filePath || null
+          if (!attachmentPath) throw new Error('Option image upload returned no file path')
+        }
+        return {
+          id: opt.originalId ?? 0,
+          textEn: opt.textEn,
+          textAr: opt.textAr || opt.textEn,
+          isCorrect: opt.isCorrect,
+          points: isMCQMulti && opt.points != null ? opt.points : null,
+          order: opt.order,
+          attachmentPath,
+        }
+      }))
 
       const response = await updateQuestion(Number(questionId), payload)
 
@@ -342,65 +372,6 @@ export default function EditQuestionPage() {
           toast.warning(localizeText('Question updated but image upload failed.', 'تم تحديث السؤال لكن فشل رفع الصورة.', language))
         } finally {
           setIsUploadingImage(false)
-        }
-      }
-
-      // Upload option images and bulk update options
-      if (isSuccess && !isEssayType && options.length > 0) {
-        try {
-          const apiBase = '/api/proxy'
-          const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
-
-          // Upload new option images
-          const updatedOptions = await Promise.all(
-            options.map(async (opt) => {
-              let uploadedPath: string | null = opt.attachmentPath || null
-              if (opt.imageFile) {
-                try {
-                  const fd = new FormData()
-                  fd.append('file', opt.imageFile)
-                  const res = await fetch(`${apiBase}/Media/upload?folder=QuestionAttachments`, {
-                    method: 'POST',
-                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-                    body: fd,
-                  })
-                  if (res.ok) {
-                    const result = await res.json()
-                    uploadedPath = result.file?.url || result.file?.path || result.filePath || null
-                  }
-                } catch {
-                  console.warn('Option image upload failed')
-                }
-              }
-              return { ...opt, attachmentPath: uploadedPath }
-            })
-          )
-
-          // Bulk update options with attachmentPath
-          const bulkPayload = updatedOptions
-            .filter(opt => opt.originalId)
-            .map(opt => ({
-              id: opt.originalId!,
-              textEn: opt.textEn,
-              textAr: opt.textAr || opt.textEn,
-              isCorrect: opt.isCorrect,
-              points: isMCQMulti && opt.points != null ? opt.points : null,
-              order: opt.order,
-              attachmentPath: opt.attachmentPath || null,
-            }))
-
-          if (bulkPayload.length > 0) {
-            await fetch(`${apiBase}/QuestionBank/questions/${questionId}/options/bulk`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-              },
-              body: JSON.stringify(bulkPayload),
-            })
-          }
-        } catch {
-          console.warn('Option update failed')
         }
       }
 

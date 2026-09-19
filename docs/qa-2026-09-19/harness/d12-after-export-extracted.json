@@ -1,0 +1,13 @@
+{
+  "HeaderOnly": true,
+  "Strings": [
+    "Full Name",
+    "Full Name (Arabic)",
+    "Email",
+    "Roll No",
+    "Mobile",
+    "Status",
+    "Added At"
+  ],
+  "ContainsProtectedCandidate": false
+}

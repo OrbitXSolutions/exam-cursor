@@ -1,0 +1,1880 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:04:10.046Z",
+  "checks": [
+    {
+      "name": "lifecycle Engineering proctor assignment persisted (publish auto-assignment explains previous skip)",
+      "passed": true,
+      "detail": {
+        "assignedCount": 8
+      },
+      "at": "2026-09-19T11:04:14.916Z"
+    },
+    {
+      "name": "fixed-code Engineering proctor assignment persisted (publish auto-assignment explains previous skip)",
+      "passed": true,
+      "detail": {
+        "assignedCount": 8
+      },
+      "at": "2026-09-19T11:04:16.134Z"
+    },
+    {
+      "name": "strict Engineering proctor assignment persisted (publish auto-assignment explains previous skip)",
+      "passed": true,
+      "detail": {
+        "assignedCount": 8
+      },
+      "at": "2026-09-19T11:04:17.322Z"
+    },
+    {
+      "name": "load Engineering proctor assignment persisted (publish auto-assignment explains previous skip)",
+      "passed": true,
+      "detail": {
+        "assignedCount": 8
+      },
+      "at": "2026-09-19T11:04:18.490Z"
+    },
+    {
+      "name": "Public walk-in share exposes both configured field types",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": {
+          "examId": 119,
+          "titleEn": "QA26 Walk In Registration",
+          "titleAr": "اختبار QA26 walkin",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "durationMinutes": 120,
+          "maxAttempts": 1,
+          "expiresAt": "2026-09-20T11:00:20.015+00:00",
+          "organizationName": "Cloudora Tech",
+          "organizationLogoUrl": "/organization/logo.jpg",
+          "isWalkIn": true,
+          "walkInFields": [
+            {
+              "id": 21,
+              "examId": 119,
+              "labelEn": "QA26 Organization",
+              "labelAr": "جهة العمل QA26",
+              "fieldType": 1,
+              "isRequired": true,
+              "displayOrder": 1
+            },
+            {
+              "id": 22,
+              "examId": 119,
+              "labelEn": "QA26 Experience Years",
+              "labelAr": "سنوات الخبرة QA26",
+              "fieldType": 2,
+              "isRequired": false,
+              "displayOrder": 2
+            }
+          ]
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:04:20.923Z"
+    },
+    {
+      "name": "Candidate can be unassigned before exam start",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "1 candidate(s) unassigned successfully.",
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:04:22.167Z"
+    },
+    {
+      "name": "Candidate reassignment before start succeeds",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "1 candidate(s) assigned successfully.",
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:04:24.530Z"
+    },
+    {
+      "name": "Draft exam assignment rejected",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Only published exams can be assigned.",
+        "data": null,
+        "errors": [],
+        "traceId": "fe3172596d3b1993b89bd1593b4de659"
+      },
+      "at": "2026-09-19T11:04:25.004Z"
+    },
+    {
+      "name": "Unpublish persists draft visibility",
+      "passed": true,
+      "at": "2026-09-19T11:04:27.183Z"
+    },
+    {
+      "name": "Republish restores published visibility",
+      "passed": true,
+      "at": "2026-09-19T11:04:31.537Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:04:12.235Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:04:12.2314785+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:04:10.706508+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:04:12.2314785+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:04:10.706508+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2186.06
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:13.624Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:04:13.6245793+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T15:04:12.8047634+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:04:13.6245793+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T15:04:12.8047634+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1386.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:14.915Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617589+04:00"
+            },
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617857+04:00"
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617859+04:00"
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617862+04:00"
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617864+04:00"
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.061787+04:00"
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617873+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617589+04:00"
+              },
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617857+04:00"
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617859+04:00"
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617862+04:00"
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617864+04:00"
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.061787+04:00"
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617873+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1289.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:16.133Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/117",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 117,
+          "examTitleEn": "QA26 Fixed Assigned Code",
+          "examTitleAr": "اختبار QA26 fixed-code",
+          "assignedProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172934+04:00"
+            },
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172939+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172941+04:00"
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172944+04:00"
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172946+04:00"
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172949+04:00"
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172951+04:00"
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:05.5172954+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 117,
+            "examTitleEn": "QA26 Fixed Assigned Code",
+            "examTitleAr": "اختبار QA26 fixed-code",
+            "assignedProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172934+04:00"
+              },
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172939+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172941+04:00"
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172944+04:00"
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172946+04:00"
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172949+04:00"
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172951+04:00"
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:05.5172954+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1216.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:17.321Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/120",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examTitleEn": "QA26 Strict Proctored Identity",
+          "examTitleAr": "اختبار QA26 strict",
+          "assignedProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.160788+04:00"
+            },
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607884+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607888+04:00"
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.160789+04:00"
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607893+04:00"
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607896+04:00"
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607899+04:00"
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:01:57.1607901+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examTitleEn": "QA26 Strict Proctored Identity",
+            "examTitleAr": "اختبار QA26 strict",
+            "assignedProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.160788+04:00"
+              },
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607884+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607888+04:00"
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.160789+04:00"
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607893+04:00"
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607896+04:00"
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607899+04:00"
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:01:57.1607901+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1185.46
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:18.489Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/121",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 121,
+          "examTitleEn": "QA26 Fifty Candidate Load",
+          "examTitleAr": "اختبار QA26 load",
+          "assignedProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029243+04:00"
+            },
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029247+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029249+04:00"
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029253+04:00"
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029255+04:00"
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029258+04:00"
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.702926+04:00"
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:02:16.7029262+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 121,
+            "examTitleEn": "QA26 Fifty Candidate Load",
+            "examTitleAr": "اختبار QA26 load",
+            "assignedProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029243+04:00"
+              },
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029247+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029249+04:00"
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029253+04:00"
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029255+04:00"
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029258+04:00"
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.702926+04:00"
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:02:16.7029262+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1166.7
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:19.237Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/119/walkin-fields",
+      "request": {
+        "labelEn": "QA26 Organization",
+        "labelAr": "جهة العمل QA26",
+        "fieldType": 1,
+        "isRequired": true,
+        "displayOrder": 1
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 21,
+          "examId": 119,
+          "labelEn": "QA26 Organization",
+          "labelAr": "جهة العمل QA26",
+          "fieldType": 1,
+          "isRequired": true,
+          "displayOrder": 1
+        },
+        "body": {
+          "success": true,
+          "message": "Field created successfully",
+          "data": {
+            "id": 21,
+            "examId": 119,
+            "labelEn": "QA26 Organization",
+            "labelAr": "جهة العمل QA26",
+            "fieldType": 1,
+            "isRequired": true,
+            "displayOrder": 1
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 745.65
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:19.939Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/119/walkin-fields",
+      "request": {
+        "labelEn": "QA26 Experience Years",
+        "labelAr": "سنوات الخبرة QA26",
+        "fieldType": 2,
+        "isRequired": false,
+        "displayOrder": 2
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 22,
+          "examId": 119,
+          "labelEn": "QA26 Experience Years",
+          "labelAr": "سنوات الخبرة QA26",
+          "fieldType": 2,
+          "isRequired": false,
+          "displayOrder": 2
+        },
+        "body": {
+          "success": true,
+          "message": "Field created successfully",
+          "data": {
+            "id": 22,
+            "examId": 119,
+            "labelEn": "QA26 Experience Years",
+            "labelAr": "سنوات الخبرة QA26",
+            "fieldType": 2,
+            "isRequired": false,
+            "displayOrder": 2
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 701.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:20.922Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 119,
+          "titleEn": "QA26 Walk In Registration",
+          "titleAr": "اختبار QA26 walkin",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "durationMinutes": 120,
+          "maxAttempts": 1,
+          "expiresAt": "2026-09-20T11:00:20.015+00:00",
+          "organizationName": "Cloudora Tech",
+          "organizationLogoUrl": "/organization/logo.jpg",
+          "isWalkIn": true,
+          "walkInFields": [
+            {
+              "id": 21,
+              "examId": 119,
+              "labelEn": "QA26 Organization",
+              "labelAr": "جهة العمل QA26",
+              "fieldType": 1,
+              "isRequired": true,
+              "displayOrder": 1
+            },
+            {
+              "id": 22,
+              "examId": 119,
+              "labelEn": "QA26 Experience Years",
+              "labelAr": "سنوات الخبرة QA26",
+              "fieldType": 2,
+              "isRequired": false,
+              "displayOrder": 2
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 119,
+            "titleEn": "QA26 Walk In Registration",
+            "titleAr": "اختبار QA26 walkin",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "durationMinutes": 120,
+            "maxAttempts": 1,
+            "expiresAt": "2026-09-20T11:00:20.015+00:00",
+            "organizationName": "Cloudora Tech",
+            "organizationLogoUrl": "/organization/logo.jpg",
+            "isWalkIn": true,
+            "walkInFields": [
+              {
+                "id": 21,
+                "examId": 119,
+                "labelEn": "QA26 Organization",
+                "labelAr": "جهة العمل QA26",
+                "fieldType": 1,
+                "isRequired": true,
+                "displayOrder": 1
+              },
+              {
+                "id": 22,
+                "examId": 119,
+                "labelEn": "QA26 Experience Years",
+                "labelAr": "سنوات الخبرة QA26",
+                "fieldType": 2,
+                "isRequired": false,
+                "displayOrder": 2
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 981.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:22.166Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "0d70f96e-612a-4bc1-81c9-091201b1a23c"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1241.8
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:24.529Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T10:55:20.015Z",
+        "scheduleTo": "2026-09-20T11:00:20.015Z",
+        "candidateIds": [
+          "0d70f96e-612a-4bc1-81c9-091201b1a23c"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2361.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:25.003Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 126,
+        "scheduleFrom": "2026-09-19T10:55:20.015Z",
+        "scheduleTo": "2026-09-20T11:00:20.015Z",
+        "candidateIds": [
+          "0d70f96e-612a-4bc1-81c9-091201b1a23c"
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Only published exams can be assigned.",
+          "data": null,
+          "errors": [],
+          "traceId": "fe3172596d3b1993b89bd1593b4de659"
+        },
+        "ms": 472.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:25.739Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/116/unpublish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam unpublished successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 734.65
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:27.181Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams/116",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 116,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 Objective Immediate Review",
+          "titleAr": "اختبار QA26 auto",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T10:55:20.015+00:00",
+          "endAt": "2026-09-20T11:00:20.015+00:00",
+          "durationMinutes": 60,
+          "maxAttempts": 2,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 25,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": false,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T15:00:39.5092445+04:00",
+          "updatedDate": "2026-09-19T15:04:25.5018437+04:00",
+          "sectionsCount": 1,
+          "questionsCount": 4,
+          "totalPoints": 40,
+          "sections": [
+            {
+              "id": 296,
+              "examId": 116,
+              "titleEn": "QA26 Knowledge",
+              "titleAr": "المعرفة QA26",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "order": 1,
+              "durationMinutes": null,
+              "totalPointsOverride": null,
+              "createdDate": "2026-09-19T15:00:43.5501582+04:00",
+              "topicsCount": 0,
+              "questionsCount": 4,
+              "totalPoints": 40,
+              "sourceType": null,
+              "questionSubjectId": null,
+              "questionTopicId": null,
+              "pickCount": 0,
+              "subjectNameEn": null,
+              "subjectNameAr": null,
+              "topicNameEn": null,
+              "topicNameAr": null,
+              "topics": [],
+              "questions": [
+                {
+                  "id": 24,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889542+04:00",
+                  "questionBodyEn": "QA26 Single: Which number is prime?",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Single",
+                  "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 25,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 132,
+                  "order": 2,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889556+04:00",
+                  "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Multi",
+                  "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 26,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 133,
+                  "order": 3,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889558+04:00",
+                  "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Multi",
+                  "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 27,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 134,
+                  "order": 4,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.288956+04:00",
+                  "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "TrueFalse",
+                  "questionTypeNameAr": "صح/خطأ",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                }
+              ]
+            }
+          ],
+          "instructions": [
+            {
+              "id": 74,
+              "examId": 116,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+              "order": 1,
+              "createdDate": "2026-09-19T15:00:47.7111673+04:00"
+            }
+          ],
+          "accessPolicy": {
+            "id": 97,
+            "examId": 116,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:00:39.7551388+04:00",
+            "updatedDate": "2026-09-19T15:00:46.7584462+04:00"
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 116,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 Objective Immediate Review",
+            "titleAr": "اختبار QA26 auto",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 25,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": false,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T15:00:39.5092445+04:00",
+            "updatedDate": "2026-09-19T15:04:25.5018437+04:00",
+            "sectionsCount": 1,
+            "questionsCount": 4,
+            "totalPoints": 40,
+            "sections": [
+              {
+                "id": 296,
+                "examId": 116,
+                "titleEn": "QA26 Knowledge",
+                "titleAr": "المعرفة QA26",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "order": 1,
+                "durationMinutes": null,
+                "totalPointsOverride": null,
+                "createdDate": "2026-09-19T15:00:43.5501582+04:00",
+                "topicsCount": 0,
+                "questionsCount": 4,
+                "totalPoints": 40,
+                "sourceType": null,
+                "questionSubjectId": null,
+                "questionTopicId": null,
+                "pickCount": 0,
+                "subjectNameEn": null,
+                "subjectNameAr": null,
+                "topicNameEn": null,
+                "topicNameAr": null,
+                "topics": [],
+                "questions": [
+                  {
+                    "id": 24,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889542+04:00",
+                    "questionBodyEn": "QA26 Single: Which number is prime?",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Single",
+                    "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 25,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 132,
+                    "order": 2,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889556+04:00",
+                    "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Multi",
+                    "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 26,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 133,
+                    "order": 3,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889558+04:00",
+                    "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Multi",
+                    "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 27,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 134,
+                    "order": 4,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.288956+04:00",
+                    "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "TrueFalse",
+                    "questionTypeNameAr": "صح/خطأ",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  }
+                ]
+              }
+            ],
+            "instructions": [
+              {
+                "id": 74,
+                "examId": 116,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+                "order": 1,
+                "createdDate": "2026-09-19T15:00:47.7111673+04:00"
+              }
+            ],
+            "accessPolicy": {
+              "id": 97,
+              "examId": 116,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T15:00:39.7551388+04:00",
+              "updatedDate": "2026-09-19T15:00:46.7584462+04:00"
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1440.97
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:30.017Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/116/publish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam published successfully. Notifications queued.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2832.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:31.537Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams/116",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 116,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 Objective Immediate Review",
+          "titleAr": "اختبار QA26 auto",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T10:55:20.015+00:00",
+          "endAt": "2026-09-20T11:00:20.015+00:00",
+          "durationMinutes": 60,
+          "maxAttempts": 2,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 25,
+          "isPublished": true,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": false,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T15:00:39.5092445+04:00",
+          "updatedDate": "2026-09-19T15:04:27.6601348+04:00",
+          "sectionsCount": 1,
+          "questionsCount": 4,
+          "totalPoints": 40,
+          "sections": [
+            {
+              "id": 296,
+              "examId": 116,
+              "titleEn": "QA26 Knowledge",
+              "titleAr": "المعرفة QA26",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "order": 1,
+              "durationMinutes": null,
+              "totalPointsOverride": null,
+              "createdDate": "2026-09-19T15:00:43.5501582+04:00",
+              "topicsCount": 0,
+              "questionsCount": 4,
+              "totalPoints": 40,
+              "sourceType": null,
+              "questionSubjectId": null,
+              "questionTopicId": null,
+              "pickCount": 0,
+              "subjectNameEn": null,
+              "subjectNameAr": null,
+              "topicNameEn": null,
+              "topicNameAr": null,
+              "topics": [],
+              "questions": [
+                {
+                  "id": 24,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889542+04:00",
+                  "questionBodyEn": "QA26 Single: Which number is prime?",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Single",
+                  "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 25,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 132,
+                  "order": 2,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889556+04:00",
+                  "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Multi",
+                  "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 26,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 133,
+                  "order": 3,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.2889558+04:00",
+                  "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Multi",
+                  "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                },
+                {
+                  "id": 27,
+                  "examId": 116,
+                  "examSectionId": 296,
+                  "examTopicId": null,
+                  "questionId": 134,
+                  "order": 4,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:00:45.288956+04:00",
+                  "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "TrueFalse",
+                  "questionTypeNameAr": "صح/خطأ",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                }
+              ]
+            }
+          ],
+          "instructions": [
+            {
+              "id": 74,
+              "examId": 116,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+              "order": 1,
+              "createdDate": "2026-09-19T15:00:47.7111673+04:00"
+            }
+          ],
+          "accessPolicy": {
+            "id": 97,
+            "examId": 116,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:00:39.7551388+04:00",
+            "updatedDate": "2026-09-19T15:00:46.7584462+04:00"
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 116,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 Objective Immediate Review",
+            "titleAr": "اختبار QA26 auto",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 25,
+            "isPublished": true,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": false,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T15:00:39.5092445+04:00",
+            "updatedDate": "2026-09-19T15:04:27.6601348+04:00",
+            "sectionsCount": 1,
+            "questionsCount": 4,
+            "totalPoints": 40,
+            "sections": [
+              {
+                "id": 296,
+                "examId": 116,
+                "titleEn": "QA26 Knowledge",
+                "titleAr": "المعرفة QA26",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "order": 1,
+                "durationMinutes": null,
+                "totalPointsOverride": null,
+                "createdDate": "2026-09-19T15:00:43.5501582+04:00",
+                "topicsCount": 0,
+                "questionsCount": 4,
+                "totalPoints": 40,
+                "sourceType": null,
+                "questionSubjectId": null,
+                "questionTopicId": null,
+                "pickCount": 0,
+                "subjectNameEn": null,
+                "subjectNameAr": null,
+                "topicNameEn": null,
+                "topicNameAr": null,
+                "topics": [],
+                "questions": [
+                  {
+                    "id": 24,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889542+04:00",
+                    "questionBodyEn": "QA26 Single: Which number is prime?",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Single",
+                    "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 25,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 132,
+                    "order": 2,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889556+04:00",
+                    "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Multi",
+                    "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 26,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 133,
+                    "order": 3,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.2889558+04:00",
+                    "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Multi",
+                    "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  },
+                  {
+                    "id": 27,
+                    "examId": 116,
+                    "examSectionId": 296,
+                    "examTopicId": null,
+                    "questionId": 134,
+                    "order": 4,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:00:45.288956+04:00",
+                    "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "TrueFalse",
+                    "questionTypeNameAr": "صح/خطأ",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  }
+                ]
+              }
+            ],
+            "instructions": [
+              {
+                "id": 74,
+                "examId": 116,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+                "order": 1,
+                "createdDate": "2026-09-19T15:00:47.7111673+04:00"
+              }
+            ],
+            "accessPolicy": {
+              "id": 97,
+              "examId": 116,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T15:00:39.7551388+04:00",
+              "updatedDate": "2026-09-19T15:00:46.7584462+04:00"
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1518.73
+      }
+    }
+  ]
+}

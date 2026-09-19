@@ -1,0 +1,13 @@
+{
+  "DatabaseMigrationCount": 42,
+  "SchemaSourceDiffPaths": [],
+  "Head": "2b890607988668f261fedfbf7ebf227742a637d6",
+  "Scope": "Read-only migration-history query and Git source comparisons; no schema/migration operation performed; full SQL DDL fingerprint was not captured at session start",
+  "BranchMatchesInitial": true,
+  "SourceMigrationCount": 42,
+  "MigrationIdsMatch": true,
+  "Branch": "acceptance/production-readiness",
+  "CheckedUtc": "2026-09-19T18:44:16.8221255+04:00",
+  "HeadMatchesInitial": true,
+  "SchemaSourceStatusIncludingUntracked": []
+}

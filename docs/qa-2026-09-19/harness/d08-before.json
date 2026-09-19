@@ -1,0 +1,4986 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:04:37.762Z",
+  "checks": [
+    {
+      "name": "create rejects no-options",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:04:40.962Z"
+    },
+    {
+      "name": "create rejects no-correct",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:04:43.596Z"
+    },
+    {
+      "name": "create rejects two-correct",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:04:46.214Z"
+    },
+    {
+      "name": "create rejects truefalse-extra",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:04:48.801Z"
+    },
+    {
+      "name": "create rejects multi-no-correct",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:04:51.373Z"
+    },
+    {
+      "name": "reject individual weight mismatch",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "Option updated successfully"
+      },
+      "at": "2026-09-19T11:04:54.675Z"
+    },
+    {
+      "name": "individual weight mismatch rejection preserves persisted complete question",
+      "passed": false,
+      "at": "2026-09-19T11:04:55.853Z"
+    },
+    {
+      "name": "reject bulk weight mismatch",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:05:00.320Z"
+    },
+    {
+      "name": "bulk weight mismatch rejection preserves persisted complete question",
+      "passed": false,
+      "at": "2026-09-19T11:05:01.490Z"
+    },
+    {
+      "name": "reject adding unbalanced weight",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "message": "Option added successfully"
+      },
+      "at": "2026-09-19T11:05:04.784Z"
+    },
+    {
+      "name": "adding unbalanced weight rejection preserves persisted complete question",
+      "passed": false,
+      "at": "2026-09-19T11:05:05.953Z"
+    },
+    {
+      "name": "reject deleting scored option",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "Option deleted successfully"
+      },
+      "at": "2026-09-19T11:05:09.239Z"
+    },
+    {
+      "name": "deleting scored option rejection preserves persisted complete question",
+      "passed": false,
+      "at": "2026-09-19T11:05:10.410Z"
+    },
+    {
+      "name": "reject foreign bulk option id",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:05:14.161Z"
+    },
+    {
+      "name": "foreign bulk option id rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:05:15.336Z"
+    },
+    {
+      "name": "reject duplicate bulk option id",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "Operation successful"
+      },
+      "at": "2026-09-19T11:05:19.332Z"
+    },
+    {
+      "name": "duplicate bulk option id rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:05:20.503Z"
+    },
+    {
+      "name": "individual edit cannot remove sole correct answer",
+      "passed": false,
+      "at": "2026-09-19T11:05:23.790Z"
+    },
+    {
+      "name": "invalid single answer edit preserves state",
+      "passed": false,
+      "at": "2026-09-19T11:05:24.962Z"
+    },
+    {
+      "name": "atomic update accepts new total and matching option weights",
+      "passed": false,
+      "at": "2026-09-19T11:05:30.850Z"
+    },
+    {
+      "name": "atomic update preserves retained option IDs",
+      "passed": true,
+      "at": "2026-09-19T11:05:30.852Z"
+    },
+    {
+      "name": "atomic update removes omitted option and adds new option",
+      "passed": false,
+      "at": "2026-09-19T11:05:30.853Z"
+    },
+    {
+      "name": "atomic update response excludes removed options",
+      "passed": false,
+      "at": "2026-09-19T11:05:30.854Z"
+    },
+    {
+      "name": "invalid atomic sum rejected",
+      "passed": false,
+      "at": "2026-09-19T11:05:32.973Z"
+    },
+    {
+      "name": "invalid atomic sum preserves total body and all options",
+      "passed": false,
+      "at": "2026-09-19T11:05:34.149Z"
+    },
+    {
+      "name": "metadata-only request remains supported when stored options valid",
+      "passed": true,
+      "at": "2026-09-19T11:05:37.449Z"
+    },
+    {
+      "name": "legacy null-weight multi remains supported",
+      "passed": true,
+      "at": "2026-09-19T11:05:40.036Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:04:39.048Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:04:39.042573+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:04:38.3295286+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:04:39.042573+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:04:38.3295286+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1283.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:40.961Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before invalid no-options",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": []
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 142,
+          "bodyEn": "QA26 D08 before invalid no-options",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:39.7704427+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 142,
+            "bodyEn": "QA26 D08 before invalid no-options",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:39.7704427+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1912.01
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:43.595Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before invalid no-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 143,
+          "bodyEn": "QA26 D08 before invalid no-correct",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:41.6693669+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 400,
+              "questionId": 143,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:41.6693693+04:00"
+            },
+            {
+              "id": 401,
+              "questionId": 143,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:41.6693706+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 143,
+            "bodyEn": "QA26 D08 before invalid no-correct",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:41.6693669+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 400,
+                "questionId": 143,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:41.6693693+04:00"
+              },
+              {
+                "id": 401,
+                "questionId": 143,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:41.6693706+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2631.91
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:46.213Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before invalid two-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 144,
+          "bodyEn": "QA26 D08 before invalid two-correct",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:44.3219685+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 402,
+              "questionId": 144,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:44.3219715+04:00"
+            },
+            {
+              "id": 403,
+              "questionId": 144,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:44.3219726+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 144,
+            "bodyEn": "QA26 D08 before invalid two-correct",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:44.3219685+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 402,
+                "questionId": 144,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:44.3219715+04:00"
+              },
+              {
+                "id": 403,
+                "questionId": 144,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:44.3219726+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2617.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:48.800Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before invalid truefalse-extra",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 3,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "T",
+            "textAr": "خيار T",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "F",
+            "textAr": "خيار F",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "Other",
+            "textAr": "خيار Other",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 145,
+          "bodyEn": "QA26 D08 before invalid truefalse-extra",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 3,
+          "questionTypeNameEn": "TrueFalse",
+          "questionTypeNameAr": "صح/خطأ",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:46.9141694+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 404,
+              "questionId": 145,
+              "textEn": "T",
+              "textAr": "خيار T",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:46.9141723+04:00"
+            },
+            {
+              "id": 405,
+              "questionId": 145,
+              "textEn": "F",
+              "textAr": "خيار F",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:46.9141735+04:00"
+            },
+            {
+              "id": 406,
+              "questionId": 145,
+              "textEn": "Other",
+              "textAr": "خيار Other",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:46.9141736+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 145,
+            "bodyEn": "QA26 D08 before invalid truefalse-extra",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 3,
+            "questionTypeNameEn": "TrueFalse",
+            "questionTypeNameAr": "صح/خطأ",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:46.9141694+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 404,
+                "questionId": 145,
+                "textEn": "T",
+                "textAr": "خيار T",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:46.9141723+04:00"
+              },
+              {
+                "id": 405,
+                "questionId": 145,
+                "textEn": "F",
+                "textAr": "خيار F",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:46.9141735+04:00"
+              },
+              {
+                "id": 406,
+                "questionId": 145,
+                "textEn": "Other",
+                "textAr": "خيار Other",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:46.9141736+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2585.32
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:51.372Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before invalid multi-no-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 146,
+          "bodyEn": "QA26 D08 before invalid multi-no-correct",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:49.5036239+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 407,
+              "questionId": 146,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:49.5036267+04:00"
+            },
+            {
+              "id": 408,
+              "questionId": 146,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:49.5036276+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 146,
+            "bodyEn": "QA26 D08 before invalid multi-no-correct",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:49.5036239+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 407,
+                "questionId": 146,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:49.5036267+04:00"
+              },
+              {
+                "id": 408,
+                "questionId": 146,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:49.5036276+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2570.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:53.963Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before individual weight mismatch",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 147,
+          "bodyEn": "QA26 D08 before individual weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:52.0742979+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 409,
+              "questionId": 147,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+            },
+            {
+              "id": 410,
+              "questionId": 147,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.0743018+04:00"
+            },
+            {
+              "id": 411,
+              "questionId": 147,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.074302+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 147,
+            "bodyEn": "QA26 D08 before individual weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:52.0742979+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 409,
+                "questionId": 147,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+              },
+              {
+                "id": 410,
+                "questionId": 147,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.0743018+04:00"
+              },
+              {
+                "id": 411,
+                "questionId": 147,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.074302+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2588.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:54.674Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/409",
+      "request": {
+        "id": 409,
+        "textEn": "A",
+        "textAr": "خيار A",
+        "isCorrect": true,
+        "points": 7,
+        "order": 0,
+        "attachmentPath": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 409,
+          "questionId": 147,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 7,
+          "order": 0,
+          "attachmentPath": null,
+          "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Option updated successfully",
+          "data": {
+            "id": 409,
+            "questionId": 147,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 7,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 709.53
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:55.852Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/147",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 147,
+          "bodyEn": "QA26 D08 before individual weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:52.0742979+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 409,
+              "questionId": 147,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 7,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+            },
+            {
+              "id": 410,
+              "questionId": 147,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.0743018+04:00"
+            },
+            {
+              "id": 411,
+              "questionId": 147,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:52.074302+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 147,
+            "bodyEn": "QA26 D08 before individual weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:52.0742979+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 409,
+                "questionId": 147,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 7,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.0743005+04:00"
+              },
+              {
+                "id": 410,
+                "questionId": 147,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.0743018+04:00"
+              },
+              {
+                "id": 411,
+                "questionId": 147,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:52.074302+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1176.1
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:58.432Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before bulk weight mismatch",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 148,
+          "bodyEn": "QA26 D08 before bulk weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:56.5606494+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 412,
+              "questionId": 148,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+            },
+            {
+              "id": 413,
+              "questionId": 148,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+            },
+            {
+              "id": 414,
+              "questionId": 148,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 148,
+            "bodyEn": "QA26 D08 before bulk weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:56.5606494+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 412,
+                "questionId": 148,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+              },
+              {
+                "id": 413,
+                "questionId": 148,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+              },
+              {
+                "id": 414,
+                "questionId": 148,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2578.38
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:00.319Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/148/options/bulk",
+      "request": [
+        {
+          "id": 412,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 7,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 413,
+          "textEn": "B",
+          "textAr": "خيار B",
+          "isCorrect": true,
+          "points": 4,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 414,
+          "textEn": "C",
+          "textAr": "خيار C",
+          "isCorrect": false,
+          "points": 0,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 412,
+            "questionId": 148,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 7,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+          },
+          {
+            "id": 413,
+            "questionId": 148,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+          },
+          {
+            "id": 414,
+            "questionId": 148,
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 412,
+              "questionId": 148,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 7,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+            },
+            {
+              "id": 413,
+              "questionId": 148,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+            },
+            {
+              "id": 414,
+              "questionId": 148,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1885.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:01.489Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/148",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 148,
+          "bodyEn": "QA26 D08 before bulk weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:04:56.5606494+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 412,
+              "questionId": 148,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 7,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+            },
+            {
+              "id": 413,
+              "questionId": 148,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+            },
+            {
+              "id": 414,
+              "questionId": 148,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 148,
+            "bodyEn": "QA26 D08 before bulk weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:04:56.5606494+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 412,
+                "questionId": 148,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 7,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606522+04:00"
+              },
+              {
+                "id": 413,
+                "questionId": 148,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606532+04:00"
+              },
+              {
+                "id": 414,
+                "questionId": 148,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:04:56.5606534+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1168.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:04.074Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before adding unbalanced weight",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 149,
+          "bodyEn": "QA26 D08 before adding unbalanced weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:02.1983411+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 415,
+              "questionId": 149,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983441+04:00"
+            },
+            {
+              "id": 416,
+              "questionId": 149,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983452+04:00"
+            },
+            {
+              "id": 417,
+              "questionId": 149,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983453+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 149,
+            "bodyEn": "QA26 D08 before adding unbalanced weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:02.1983411+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 415,
+                "questionId": 149,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983441+04:00"
+              },
+              {
+                "id": 416,
+                "questionId": 149,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983452+04:00"
+              },
+              {
+                "id": 417,
+                "questionId": 149,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983453+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2582.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:04.783Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions/149/options",
+      "request": {
+        "textEn": "D",
+        "textAr": "خيار D",
+        "isCorrect": true,
+        "points": 1,
+        "order": 0
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 418,
+          "questionId": 149,
+          "textEn": "D",
+          "textAr": "خيار D",
+          "isCorrect": true,
+          "points": 1,
+          "order": 0,
+          "attachmentPath": null,
+          "createdDate": "2026-09-19T15:05:04.5447247+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Option added successfully",
+          "data": {
+            "id": 418,
+            "questionId": 149,
+            "textEn": "D",
+            "textAr": "خيار D",
+            "isCorrect": true,
+            "points": 1,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:04.5447247+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 708.34
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:05.952Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/149",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 149,
+          "bodyEn": "QA26 D08 before adding unbalanced weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:02.1983411+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 415,
+              "questionId": 149,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983441+04:00"
+            },
+            {
+              "id": 416,
+              "questionId": 149,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983452+04:00"
+            },
+            {
+              "id": 417,
+              "questionId": 149,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:02.1983453+04:00"
+            },
+            {
+              "id": 418,
+              "questionId": 149,
+              "textEn": "D",
+              "textAr": "خيار D",
+              "isCorrect": true,
+              "points": 1,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:04.5447247+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 149,
+            "bodyEn": "QA26 D08 before adding unbalanced weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:02.1983411+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 415,
+                "questionId": 149,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983441+04:00"
+              },
+              {
+                "id": 416,
+                "questionId": 149,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983452+04:00"
+              },
+              {
+                "id": 417,
+                "questionId": 149,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:02.1983453+04:00"
+              },
+              {
+                "id": 418,
+                "questionId": 149,
+                "textEn": "D",
+                "textAr": "خيار D",
+                "isCorrect": true,
+                "points": 1,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:04.5447247+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1166.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:08.528Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before deleting scored option",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 150,
+          "bodyEn": "QA26 D08 before deleting scored option",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:06.6534501+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 419,
+              "questionId": 150,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:06.6534527+04:00"
+            },
+            {
+              "id": 420,
+              "questionId": 150,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:06.6534537+04:00"
+            },
+            {
+              "id": 421,
+              "questionId": 150,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:06.6534539+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 150,
+            "bodyEn": "QA26 D08 before deleting scored option",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:06.6534501+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 419,
+                "questionId": 150,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:06.6534527+04:00"
+              },
+              {
+                "id": 420,
+                "questionId": 150,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:06.6534537+04:00"
+              },
+              {
+                "id": 421,
+                "questionId": 150,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:06.6534539+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2574.19
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:09.238Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/options/419",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Option deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 709.15
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:10.409Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/150",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 150,
+          "bodyEn": "QA26 D08 before deleting scored option",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:06.6534501+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 420,
+              "questionId": 150,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:06.6534537+04:00"
+            },
+            {
+              "id": 421,
+              "questionId": 150,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:06.6534539+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 150,
+            "bodyEn": "QA26 D08 before deleting scored option",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:06.6534501+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 420,
+                "questionId": 150,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:06.6534537+04:00"
+              },
+              {
+                "id": 421,
+                "questionId": 150,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:06.6534539+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1168.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:12.983Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before foreign bulk option id",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 151,
+          "bodyEn": "QA26 D08 before foreign bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:11.1099967+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 422,
+              "questionId": 151,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+            },
+            {
+              "id": 423,
+              "questionId": 151,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+            },
+            {
+              "id": 424,
+              "questionId": 151,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 151,
+            "bodyEn": "QA26 D08 before foreign bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:11.1099967+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 422,
+                "questionId": 151,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+              },
+              {
+                "id": 423,
+                "questionId": 151,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+              },
+              {
+                "id": 424,
+                "questionId": 151,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2571.91
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:14.160Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/151/options/bulk",
+      "request": [
+        {
+          "id": 2147483647,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 422,
+            "questionId": 151,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+          },
+          {
+            "id": 423,
+            "questionId": 151,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+          },
+          {
+            "id": 424,
+            "questionId": 151,
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 422,
+              "questionId": 151,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+            },
+            {
+              "id": 423,
+              "questionId": 151,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+            },
+            {
+              "id": 424,
+              "questionId": 151,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1175.69
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:15.334Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/151",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 151,
+          "bodyEn": "QA26 D08 before foreign bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:11.1099967+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 422,
+              "questionId": 151,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+            },
+            {
+              "id": 423,
+              "questionId": 151,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+            },
+            {
+              "id": 424,
+              "questionId": 151,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 151,
+            "bodyEn": "QA26 D08 before foreign bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:11.1099967+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 422,
+                "questionId": 151,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1099994+04:00"
+              },
+              {
+                "id": 423,
+                "questionId": 151,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1100005+04:00"
+              },
+              {
+                "id": 424,
+                "questionId": 151,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:11.1100006+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1171.41
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:17.920Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before duplicate bulk option id",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 152,
+          "bodyEn": "QA26 D08 before duplicate bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:16.0434513+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 425,
+              "questionId": 152,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+            },
+            {
+              "id": 426,
+              "questionId": 152,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+            },
+            {
+              "id": 427,
+              "questionId": 152,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 152,
+            "bodyEn": "QA26 D08 before duplicate bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:16.0434513+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 425,
+                "questionId": 152,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+              },
+              {
+                "id": 426,
+                "questionId": 152,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+              },
+              {
+                "id": 427,
+                "questionId": 152,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2581.15
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:19.331Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/152/options/bulk",
+      "request": [
+        {
+          "id": 425,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 425,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 425,
+            "questionId": 152,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+          },
+          {
+            "id": 426,
+            "questionId": 152,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+          },
+          {
+            "id": 427,
+            "questionId": 152,
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 425,
+              "questionId": 152,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+            },
+            {
+              "id": 426,
+              "questionId": 152,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+            },
+            {
+              "id": 427,
+              "questionId": 152,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1408.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:20.502Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/152",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 152,
+          "bodyEn": "QA26 D08 before duplicate bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:16.0434513+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 425,
+              "questionId": 152,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+            },
+            {
+              "id": 426,
+              "questionId": 152,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+            },
+            {
+              "id": 427,
+              "questionId": 152,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 152,
+            "bodyEn": "QA26 D08 before duplicate bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:16.0434513+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 425,
+                "questionId": 152,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434546+04:00"
+              },
+              {
+                "id": 426,
+                "questionId": 152,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434559+04:00"
+              },
+              {
+                "id": 427,
+                "questionId": 152,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:16.0434561+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1168.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:23.082Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before single-key-change",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 153,
+          "bodyEn": "QA26 D08 before single-key-change",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:21.2081942+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 428,
+              "questionId": 153,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+            },
+            {
+              "id": 429,
+              "questionId": 153,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:21.2081981+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 153,
+            "bodyEn": "QA26 D08 before single-key-change",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:21.2081942+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 428,
+                "questionId": 153,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+              },
+              {
+                "id": 429,
+                "questionId": 153,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:21.2081981+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2576.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:23.788Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/428",
+      "request": {
+        "id": 428,
+        "textEn": "A",
+        "textAr": "خيار A",
+        "isCorrect": false,
+        "points": null,
+        "order": 0,
+        "attachmentPath": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 428,
+          "questionId": 153,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": false,
+          "points": null,
+          "order": 0,
+          "attachmentPath": null,
+          "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Option updated successfully",
+          "data": {
+            "id": 428,
+            "questionId": 153,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": false,
+            "points": null,
+            "order": 0,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 705.09
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:24.961Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/153",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 153,
+          "bodyEn": "QA26 D08 before single-key-change",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:21.2081942+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 428,
+              "questionId": 153,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+            },
+            {
+              "id": 429,
+              "questionId": 153,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:21.2081981+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 153,
+            "bodyEn": "QA26 D08 before single-key-change",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:21.2081942+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 428,
+                "questionId": 153,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:21.2081969+04:00"
+              },
+              {
+                "id": 429,
+                "questionId": 153,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:21.2081981+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1170.04
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:27.534Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before atomic-total-and-options",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "QA26 D08 before atomic-total-and-options",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "QA26 D08 before atomic-total-and-options",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2570.36
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:29.669Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/154",
+      "request": {
+        "bodyEn": "QA26 D08 before changed",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 20,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "id": 430,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 12,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 431,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 8,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 0,
+            "textEn": "new wrong choice",
+            "textAr": "خيار new wrong choice",
+            "isCorrect": false,
+            "points": 0,
+            "order": 2
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "QA26 D08 before changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "QA26 D08 before changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2133.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:30.848Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/154",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "QA26 D08 before changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "QA26 D08 before changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1177.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:32.972Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/154",
+      "request": {
+        "bodyEn": "SHOULD NOT SAVE",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 99,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "id": 430,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 431,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 432,
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0,
+            "attachmentPath": null
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "SHOULD NOT SAVE",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 99,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "SHOULD NOT SAVE",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 99,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2115.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:34.147Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/154",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "SHOULD NOT SAVE",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 99,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "SHOULD NOT SAVE",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 99,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1173.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:35.320Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/154",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "SHOULD NOT SAVE",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 99,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "SHOULD NOT SAVE",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 99,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1169.2
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:37.447Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/154",
+      "request": {
+        "bodyEn": "SHOULD NOT SAVE",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 99,
+        "difficultyLevel": 2,
+        "isActive": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 154,
+          "bodyEn": "SHOULD NOT SAVE",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 99,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 430,
+              "questionId": 154,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+            },
+            {
+              "id": 431,
+              "questionId": 154,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+            },
+            {
+              "id": 432,
+              "questionId": 154,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 154,
+            "bodyEn": "SHOULD NOT SAVE",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 99,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:25.6674028+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 430,
+                "questionId": 154,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674055+04:00"
+              },
+              {
+                "id": 431,
+                "questionId": 154,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674067+04:00"
+              },
+              {
+                "id": 432,
+                "questionId": 154,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:25.6674068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2125.56
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:40.034Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before legacy-null-weight",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 155,
+          "bodyEn": "QA26 D08 before legacy-null-weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:05:38.1601767+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 433,
+              "questionId": 155,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:38.1601792+04:00"
+            },
+            {
+              "id": 434,
+              "questionId": 155,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:38.1601831+04:00"
+            },
+            {
+              "id": 435,
+              "questionId": 155,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:05:38.1601834+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 155,
+            "bodyEn": "QA26 D08 before legacy-null-weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:05:38.1601767+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 433,
+                "questionId": 155,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:38.1601792+04:00"
+              },
+              {
+                "id": 434,
+                "questionId": 155,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:38.1601831+04:00"
+              },
+              {
+                "id": 435,
+                "questionId": 155,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:05:38.1601834+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2582.8
+      }
+    },
+    {
+      "at": "2026-09-19T11:05:40.512Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 before subjective-empty",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 4,
+        "subjectId": 23,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": []
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question type not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e49791575fadca6a51787403bbfc9967"
+        },
+        "ms": 473.91
+      }
+    }
+  ]
+}

@@ -1,0 +1,565 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP and SignalR/WebSocket application workload; no physical cameras, microphones, screen sharing or browser render workload",
+  "count": 50,
+  "rounds": 12,
+  "examId": 121,
+  "startedAt": "2026-09-19T13:52:47.143Z",
+  "users": [
+    {
+      "n": 2,
+      "id": "29274eb9-aaa3-4139-98eb-b9f511fecb16",
+      "email": "qa26.load.02@example.test"
+    },
+    {
+      "n": 1,
+      "id": "1a8ca1bb-f854-4bf4-8f06-b4991be70cb2",
+      "email": "qa26.load.01@example.test"
+    },
+    {
+      "n": 5,
+      "id": "ad880258-e6af-4ac6-9a0f-edd4d3e21e97",
+      "email": "qa26.load.05@example.test"
+    },
+    {
+      "n": 4,
+      "id": "ddced67f-333a-47dc-b816-ed820bccf962",
+      "email": "qa26.load.04@example.test"
+    },
+    {
+      "n": 3,
+      "id": "0f9974ec-f993-4f7a-bae6-6b0749c89c44",
+      "email": "qa26.load.03@example.test"
+    },
+    {
+      "n": 6,
+      "id": "cdc93b30-0fc1-4c9e-888d-d59866e514fe",
+      "email": "qa26.load.06@example.test"
+    },
+    {
+      "n": 7,
+      "id": "74a5b70f-54ac-400a-9b9f-7ad6bd726b0c",
+      "email": "qa26.load.07@example.test"
+    },
+    {
+      "n": 9,
+      "id": "f9848b01-303e-4ac5-b730-bab03159987f",
+      "email": "qa26.load.09@example.test"
+    },
+    {
+      "n": 8,
+      "id": "579f70c3-dc1e-4d94-a5b4-efd02618fd2b",
+      "email": "qa26.load.08@example.test"
+    },
+    {
+      "n": 10,
+      "id": "a2e8eb3e-3d0b-4081-9bec-e1a6fa72af91",
+      "email": "qa26.load.10@example.test"
+    },
+    {
+      "n": 11,
+      "id": "36958044-e7c6-459a-a5bd-ca6099d023a1",
+      "email": "qa26.load.11@example.test"
+    },
+    {
+      "n": 12,
+      "id": "03bda7ab-9cae-4bca-9ad7-1c2c8ea3716a",
+      "email": "qa26.load.12@example.test"
+    },
+    {
+      "n": 13,
+      "id": "44dd6095-a1e7-4de4-82cc-1275d6e58fdf",
+      "email": "qa26.load.13@example.test"
+    },
+    {
+      "n": 14,
+      "id": "743a8ad0-f4bc-4832-bc68-6221f5e32a7e",
+      "email": "qa26.load.14@example.test"
+    },
+    {
+      "n": 15,
+      "id": "1b7314b1-43a8-4834-8a4e-880477df57d3",
+      "email": "qa26.load.15@example.test"
+    },
+    {
+      "n": 16,
+      "id": "c1fb8c01-193b-4321-86a9-4945ff10a6e4",
+      "email": "qa26.load.16@example.test"
+    },
+    {
+      "n": 17,
+      "id": "27e01913-7719-405b-bfb1-47d54c545e15",
+      "email": "qa26.load.17@example.test"
+    },
+    {
+      "n": 18,
+      "id": "7f32a92a-751c-4149-9f55-a82c9464f6dd",
+      "email": "qa26.load.18@example.test"
+    },
+    {
+      "n": 19,
+      "id": "f9bd96c7-3740-452b-9959-09a5db5d1048",
+      "email": "qa26.load.19@example.test"
+    },
+    {
+      "n": 20,
+      "id": "1f163ee7-05e7-4f3a-b550-0e2195d45260",
+      "email": "qa26.load.20@example.test"
+    },
+    {
+      "n": 21,
+      "id": "fc73e2f9-694c-473f-a737-6e59ec0ee420",
+      "email": "qa26.load.21@example.test"
+    },
+    {
+      "n": 22,
+      "id": "160bb238-9218-4bcd-a767-23c3924f28a1",
+      "email": "qa26.load.22@example.test"
+    },
+    {
+      "n": 23,
+      "id": "61084e70-d82f-4043-be16-2a024664a114",
+      "email": "qa26.load.23@example.test"
+    },
+    {
+      "n": 24,
+      "id": "8103cc49-a4eb-4035-93ab-54a5d79972de",
+      "email": "qa26.load.24@example.test"
+    },
+    {
+      "n": 25,
+      "id": "9925ccde-8dca-43a5-ae80-52a6ae81f1ee",
+      "email": "qa26.load.25@example.test"
+    },
+    {
+      "n": 26,
+      "id": "def69d91-1214-4f42-850c-d08f51c2859a",
+      "email": "qa26.load.26@example.test"
+    },
+    {
+      "n": 27,
+      "id": "a9ad60c1-b296-48e4-9826-e2e5e0ba7f8c",
+      "email": "qa26.load.27@example.test"
+    },
+    {
+      "n": 29,
+      "id": "f3e53732-9ed4-4df3-8f36-dd38a242489d",
+      "email": "qa26.load.29@example.test"
+    },
+    {
+      "n": 28,
+      "id": "56ee89bd-1eb7-4ac6-af49-d1731690f4b1",
+      "email": "qa26.load.28@example.test"
+    },
+    {
+      "n": 30,
+      "id": "904a1e2b-af65-4d18-9628-2525acdb211e",
+      "email": "qa26.load.30@example.test"
+    },
+    {
+      "n": 31,
+      "id": "43e7e21d-cf45-40a7-9f23-e4cd46d8f122",
+      "email": "qa26.load.31@example.test"
+    },
+    {
+      "n": 32,
+      "id": "cde9880a-2be5-4666-884b-d5893f41f53e",
+      "email": "qa26.load.32@example.test"
+    },
+    {
+      "n": 33,
+      "id": "184fe049-6812-439d-a8c9-10e97ff8b2df",
+      "email": "qa26.load.33@example.test"
+    },
+    {
+      "n": 34,
+      "id": "6484ad78-6c9b-4dde-87fb-83aecee972b5",
+      "email": "qa26.load.34@example.test"
+    },
+    {
+      "n": 35,
+      "id": "57dec14d-9ff2-45e1-b354-7bdf900c4621",
+      "email": "qa26.load.35@example.test"
+    },
+    {
+      "n": 36,
+      "id": "0a38aaaf-fa62-4cfe-a3af-a410d7debfbc",
+      "email": "qa26.load.36@example.test"
+    },
+    {
+      "n": 37,
+      "id": "de52ba5b-0664-4934-b42e-0de1068fc305",
+      "email": "qa26.load.37@example.test"
+    },
+    {
+      "n": 39,
+      "id": "aaacdb09-0f33-43ab-acac-5494f9bb09ee",
+      "email": "qa26.load.39@example.test"
+    },
+    {
+      "n": 38,
+      "id": "b9fd3564-4e79-499a-bc51-1df7c72672ca",
+      "email": "qa26.load.38@example.test"
+    },
+    {
+      "n": 40,
+      "id": "c0d0aeb1-232c-430f-8e66-2c8f5734ec72",
+      "email": "qa26.load.40@example.test"
+    },
+    {
+      "n": 41,
+      "id": "7226cd74-8db8-45d9-930b-fb7ecfc0fed3",
+      "email": "qa26.load.41@example.test"
+    },
+    {
+      "n": 42,
+      "id": "c9149bd8-85bf-4045-8093-bf8decf94c7b",
+      "email": "qa26.load.42@example.test"
+    },
+    {
+      "n": 43,
+      "id": "b954182d-ad12-4b6b-ab71-9f0974b3b09b",
+      "email": "qa26.load.43@example.test"
+    },
+    {
+      "n": 44,
+      "id": "225e4549-b9d1-40a2-8273-aed94ac002e6",
+      "email": "qa26.load.44@example.test"
+    },
+    {
+      "n": 45,
+      "id": "74df1052-1d31-4c53-a440-b39cdcfe9461",
+      "email": "qa26.load.45@example.test"
+    },
+    {
+      "n": 46,
+      "id": "d5430b12-65bc-44f3-9c9c-d73519e88441",
+      "email": "qa26.load.46@example.test"
+    },
+    {
+      "n": 47,
+      "id": "35fc9603-a06a-48ea-ae9c-3acc8a45a04d",
+      "email": "qa26.load.47@example.test"
+    },
+    {
+      "n": 48,
+      "id": "3ed7845f-538c-4b65-931f-971838e7ef8e",
+      "email": "qa26.load.48@example.test"
+    },
+    {
+      "n": 49,
+      "id": "10d58911-d7d7-4882-8be0-e3c1d1de95fd",
+      "email": "qa26.load.49@example.test"
+    },
+    {
+      "n": 50,
+      "id": "98839b6c-1d7d-4e28-9ee7-25c1e8316768",
+      "email": "qa26.load.50@example.test"
+    }
+  ],
+  "attempts": [
+    {
+      "n": 2,
+      "attemptId": 317,
+      "proctorSessionId": 266
+    },
+    {
+      "n": 5,
+      "attemptId": 316,
+      "proctorSessionId": 267
+    },
+    {
+      "n": 4,
+      "attemptId": 318,
+      "proctorSessionId": 269
+    },
+    {
+      "n": 3,
+      "attemptId": 314,
+      "proctorSessionId": 270
+    },
+    {
+      "n": 1,
+      "attemptId": 315,
+      "proctorSessionId": 268
+    },
+    {
+      "n": 6,
+      "attemptId": 319,
+      "proctorSessionId": 271
+    },
+    {
+      "n": 8,
+      "attemptId": 320,
+      "proctorSessionId": 272
+    },
+    {
+      "n": 9,
+      "attemptId": 322,
+      "proctorSessionId": 274
+    },
+    {
+      "n": 7,
+      "attemptId": 321,
+      "proctorSessionId": 273
+    },
+    {
+      "n": 10,
+      "attemptId": 323,
+      "proctorSessionId": 275
+    },
+    {
+      "n": 11,
+      "attemptId": 328,
+      "proctorSessionId": 278
+    },
+    {
+      "n": 14,
+      "attemptId": 326,
+      "proctorSessionId": 279
+    },
+    {
+      "n": 12,
+      "attemptId": 325,
+      "proctorSessionId": 276
+    },
+    {
+      "n": 15,
+      "attemptId": 327,
+      "proctorSessionId": 280
+    },
+    {
+      "n": 13,
+      "attemptId": 324,
+      "proctorSessionId": 277
+    },
+    {
+      "n": 16,
+      "attemptId": 329,
+      "proctorSessionId": 281
+    },
+    {
+      "n": 17,
+      "attemptId": 330,
+      "proctorSessionId": 282
+    },
+    {
+      "n": 19,
+      "attemptId": 332,
+      "proctorSessionId": 284
+    },
+    {
+      "n": 18,
+      "attemptId": 331,
+      "proctorSessionId": 283
+    },
+    {
+      "n": 20,
+      "attemptId": 333,
+      "proctorSessionId": 285
+    },
+    {
+      "n": 22,
+      "attemptId": 335,
+      "proctorSessionId": 286
+    },
+    {
+      "n": 23,
+      "attemptId": 337,
+      "proctorSessionId": 290
+    },
+    {
+      "n": 24,
+      "attemptId": 338,
+      "proctorSessionId": 287
+    },
+    {
+      "n": 21,
+      "attemptId": 336,
+      "proctorSessionId": 289
+    },
+    {
+      "n": 25,
+      "attemptId": 334,
+      "proctorSessionId": 288
+    },
+    {
+      "n": 29,
+      "attemptId": 341,
+      "proctorSessionId": 291
+    },
+    {
+      "n": 26,
+      "attemptId": 339,
+      "proctorSessionId": 292
+    },
+    {
+      "n": 27,
+      "attemptId": 340,
+      "proctorSessionId": 293
+    },
+    {
+      "n": 30,
+      "attemptId": 343,
+      "proctorSessionId": 294
+    },
+    {
+      "n": 28,
+      "attemptId": 342,
+      "proctorSessionId": 295
+    },
+    {
+      "n": 31,
+      "attemptId": 346,
+      "proctorSessionId": 296
+    },
+    {
+      "n": 35,
+      "attemptId": 348,
+      "proctorSessionId": 297
+    },
+    {
+      "n": 33,
+      "attemptId": 344,
+      "proctorSessionId": 300
+    },
+    {
+      "n": 32,
+      "attemptId": 347,
+      "proctorSessionId": 299
+    },
+    {
+      "n": 34,
+      "attemptId": 345,
+      "proctorSessionId": 298
+    },
+    {
+      "n": 36,
+      "attemptId": 350,
+      "proctorSessionId": 302
+    },
+    {
+      "n": 37,
+      "attemptId": 349,
+      "proctorSessionId": 301
+    },
+    {
+      "n": 39,
+      "attemptId": 351,
+      "proctorSessionId": 303
+    },
+    {
+      "n": 40,
+      "attemptId": 352,
+      "proctorSessionId": 304
+    },
+    {
+      "n": 38,
+      "attemptId": 353,
+      "proctorSessionId": 305
+    },
+    {
+      "n": 44,
+      "attemptId": 354,
+      "proctorSessionId": 310
+    },
+    {
+      "n": 41,
+      "attemptId": 357,
+      "proctorSessionId": 309
+    },
+    {
+      "n": 45,
+      "attemptId": 358,
+      "proctorSessionId": 308
+    },
+    {
+      "n": 43,
+      "attemptId": 356,
+      "proctorSessionId": 307
+    },
+    {
+      "n": 42,
+      "attemptId": 355,
+      "proctorSessionId": 306
+    },
+    {
+      "n": 47,
+      "attemptId": 360,
+      "proctorSessionId": 311
+    },
+    {
+      "n": 46,
+      "attemptId": 359,
+      "proctorSessionId": 312
+    },
+    {
+      "n": 48,
+      "attemptId": 361,
+      "proctorSessionId": 313
+    },
+    {
+      "n": 49,
+      "attemptId": 362,
+      "proctorSessionId": 314
+    },
+    {
+      "n": 50,
+      "attemptId": 363,
+      "proctorSessionId": 315
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "start": {
+      "count": 50,
+      "p50Ms": 6017.29,
+      "p95Ms": 8598.79,
+      "p99Ms": 10462.27,
+      "maxMs": 10462.27
+    },
+    "saveAnswers": {
+      "count": 600,
+      "p50Ms": 2125.73,
+      "p95Ms": 3992.05,
+      "p99Ms": 6757.13,
+      "maxMs": 6768.39
+    },
+    "heartbeat": {
+      "count": 600,
+      "p50Ms": 1385.57,
+      "p95Ms": 1511.81,
+      "p99Ms": 1568.55,
+      "maxMs": 2318.08
+    },
+    "timer": {
+      "count": 600,
+      "p50Ms": 923.65,
+      "p95Ms": 1039.48,
+      "p99Ms": 1848.88,
+      "maxMs": 2791.43
+    },
+    "liveMonitoring": {
+      "count": 12,
+      "p50Ms": 2380.45,
+      "p95Ms": 2715.12,
+      "p99Ms": 2715.12,
+      "maxMs": 2715.12
+    },
+    "reloadSession": {
+      "count": 50,
+      "p50Ms": 1389.09,
+      "p95Ms": 1586.18,
+      "p99Ms": 1593.6,
+      "maxMs": 1593.6
+    },
+    "submit": {
+      "count": 50,
+      "p50Ms": 2081.82,
+      "p95Ms": 2288.71,
+      "p99Ms": 3946.83,
+      "maxMs": 3946.83
+    }
+  },
+  "barrierAt": "2026-09-19T13:54:36.591Z",
+  "completedAt": "2026-09-19T13:58:10.825Z"
+}

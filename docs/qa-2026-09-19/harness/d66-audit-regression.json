@@ -1,0 +1,1037 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:07:36.855Z",
+  "checks": [
+    {
+      "name": "Addtime effect persisted on candidate expiry",
+      "passed": false,
+      "detail": {
+        "before": "2026-09-19T18:08:40.6019764+04:00",
+        "after": "2026-09-19T18:08:40.6019764+04:00"
+      },
+      "at": "2026-09-19T14:07:46.908Z"
+    },
+    {
+      "name": "AttemptControl.AddTime immediate persisted audit row",
+      "passed": false,
+      "detail": {
+        "items": [],
+        "pageNumber": 1,
+        "pageSize": 20,
+        "totalCount": 0,
+        "totalPages": 0,
+        "hasPreviousPage": false,
+        "hasNextPage": false
+      },
+      "at": "2026-09-19T14:07:47.868Z"
+    },
+    {
+      "name": "Forceend persists terminal status7",
+      "passed": false,
+      "detail": {
+        "status": 1,
+        "response": {
+          "success": false,
+          "message": "Cannot force-end an attempt with status 'Started'. Only InProgress, Paused, or Resumed attempts can be force-ended.",
+          "data": null,
+          "errors": [],
+          "traceId": "b8e9e8e1abd5c5a13a92d25a356d3eba"
+        }
+      },
+      "at": "2026-09-19T14:07:51.641Z"
+    },
+    {
+      "name": "Attempt.ForceSubmitted immediate persisted audit row",
+      "passed": false,
+      "detail": {
+        "items": [],
+        "pageNumber": 1,
+        "pageSize": 20,
+        "totalCount": 0,
+        "totalPages": 0,
+        "hasPreviousPage": false,
+        "hasNextPage": false
+      },
+      "at": "2026-09-19T14:07:52.567Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:07:38.105Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:07:38.1012399+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T18:07:37.4064081+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:07:38.1012399+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T18:07:37.4064081+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1246.45
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:39.309Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate2@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:07:39.308965+04:00",
+          "user": {
+            "id": "00eef960-7a2f-4785-90d0-fd93732ee99c",
+            "email": "qa26.eng.candidate2@example.test",
+            "displayName": "QA26 Engineering Candidate 2",
+            "fullName": "QA26 Engineering Candidate 2",
+            "fullNameAr": "اختبار الهندسة 2",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:43.7334919+04:00",
+            "lastLoginDate": "2026-09-19T18:07:38.6163286+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:07:39.308965+04:00",
+            "user": {
+              "id": "00eef960-7a2f-4785-90d0-fd93732ee99c",
+              "email": "qa26.eng.candidate2@example.test",
+              "displayName": "QA26 Engineering Candidate 2",
+              "fullName": "QA26 Engineering Candidate 2",
+              "fullNameAr": "اختبار الهندسة 2",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:43.7334919+04:00",
+              "lastLoginDate": "2026-09-19T18:07:38.6163286+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1203.64
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:43.602Z",
+      "identity": "qa26.eng.candidate2@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/141/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 365,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "startedAtUtc": "2026-09-19T18:07:40.6019764+04:00",
+          "expiresAtUtc": "2026-09-19T18:08:40.6019764+04:00",
+          "remainingSeconds": 57,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 328,
+              "order": 1,
+              "titleEn": "Lifecycle",
+              "titleAr": "دورة حياة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2689,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 328,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2689,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 328,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 365,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "startedAtUtc": "2026-09-19T18:07:40.6019764+04:00",
+            "expiresAtUtc": "2026-09-19T18:08:40.6019764+04:00",
+            "remainingSeconds": 57,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 328,
+                "order": 1,
+                "titleEn": "Lifecycle",
+                "titleAr": "دورة حياة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2689,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 328,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2689,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 328,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4292.14
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:45.469Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/attempt-control/add-time",
+      "request": {
+        "attemptId": 365,
+        "extraMinutes": 2,
+        "reason": "QA26 D66 persisted ordinary proctor audit"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Cannot add time to an attempt with status 'Started'. Only InProgress or Resumed attempts can receive extra time.",
+          "data": null,
+          "errors": [],
+          "traceId": "a883d0f8add426e4bc55c41c271a59b2"
+        },
+        "ms": 1865.91
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:46.907Z",
+      "identity": "qa26.eng.candidate2@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/365/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 365,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "startedAtUtc": "2026-09-19T18:07:40.6019764+04:00",
+          "expiresAtUtc": "2026-09-19T18:08:40.6019764+04:00",
+          "remainingSeconds": 53,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 328,
+              "order": 1,
+              "titleEn": "Lifecycle",
+              "titleAr": "دورة حياة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2689,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 328,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2689,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 328,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 365,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "startedAtUtc": "2026-09-19T18:07:40.6019764+04:00",
+            "expiresAtUtc": "2026-09-19T18:08:40.6019764+04:00",
+            "remainingSeconds": 53,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 328,
+                "order": 1,
+                "titleEn": "Lifecycle",
+                "titleAr": "دورة حياة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2689,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 328,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2689,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 328,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1437.32
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:47.867Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Audit/logs?EntityName=Attempt&EntityId=365&Action=AttemptControl.AddTime&PageSize=20",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 20,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 20,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 958.17
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:49.738Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/attempt-control/force-end",
+      "request": {
+        "attemptId": 365,
+        "reason": "QA26 D66 persisted ordinary proctor audit"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Cannot force-end an attempt with status 'Started'. Only InProgress, Paused, or Resumed attempts can be force-ended.",
+          "data": null,
+          "errors": [],
+          "traceId": "b8e9e8e1abd5c5a13a92d25a356d3eba"
+        },
+        "ms": 1869.06
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:51.640Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/365/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 7855,
+              "attemptId": 365,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":1}",
+              "occurredAt": "2026-09-19T18:07:40.6019764+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [],
+          "id": 365,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "candidateId": "00eef960-7a2f-4785-90d0-fd93732ee99c",
+          "candidateName": "QA26 Engineering Candidate 2",
+          "startedAt": "2026-09-19T18:07:40.6019764+04:00",
+          "submittedAt": null,
+          "expiresAt": "2026-09-19T18:08:40.6019764+04:00",
+          "status": 1,
+          "statusName": "Started",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "remainingSeconds": 48,
+          "createdDate": "2026-09-19T18:07:40.6019764+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 7855,
+                "attemptId": 365,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":1}",
+                "occurredAt": "2026-09-19T18:07:40.6019764+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [],
+            "id": 365,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "candidateId": "00eef960-7a2f-4785-90d0-fd93732ee99c",
+            "candidateName": "QA26 Engineering Candidate 2",
+            "startedAt": "2026-09-19T18:07:40.6019764+04:00",
+            "submittedAt": null,
+            "expiresAt": "2026-09-19T18:08:40.6019764+04:00",
+            "status": 1,
+            "statusName": "Started",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "remainingSeconds": 48,
+            "createdDate": "2026-09-19T18:07:40.6019764+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1900.75
+      }
+    },
+    {
+      "at": "2026-09-19T14:07:52.567Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Audit/logs?EntityName=Attempt&EntityId=365&Action=Attempt.ForceSubmitted&PageSize=20",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 20,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 20,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 924.56
+      }
+    }
+  ]
+}

@@ -120,6 +120,9 @@ public class UpdateQuestionDto
     public bool IsActive { get; set; }
     public bool IsCalculatorAllowed { get; set; }
 
+    // When supplied, replace the option list together with the question in one save.
+    // Omission preserves the existing options for metadata-only clients.
+    public List<UpdateQuestionOptionDto>? Options { get; set; }
     public UpdateQuestionAnswerKeyDto? AnswerKey { get; set; }
 }
 

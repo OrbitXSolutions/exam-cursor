@@ -1,0 +1,1722 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:10:14.394Z",
+  "checks": [
+    {
+      "name": "XLSX import inserts2 valid rows and rejects invalid email",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Import complete: 2 inserted, 1 skipped.",
+        "data": {
+          "totalRows": 3,
+          "insertedCount": 2,
+          "skippedCount": 1,
+          "errors": [
+            {
+              "row": 4,
+              "email": "not-an-email",
+              "reasons": [
+                "Invalid email format."
+              ]
+            }
+          ],
+          "createdAccounts": [
+            {
+              "row": 2,
+              "fullName": "QA26 Import A",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "temporaryPassword": "[REDACTED]"
+            },
+            {
+              "row": 3,
+              "fullName": "QA26 Import B",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "temporaryPassword": "[REDACTED]"
+            }
+          ]
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:10:25.118Z"
+    },
+    {
+      "name": "qa26.import.a@example.test imported role/department/password work",
+      "passed": true,
+      "detail": {
+        "user": {
+          "phoneNumber": "+971501111111",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:10:21.8057913+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": null,
+          "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "email": "qa26.import.a@example.test",
+          "displayName": "QA26 Import A",
+          "fullName": "QA26 Import A",
+          "fullNameAr": "استيراد ألف",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "loginStatus": 200
+      },
+      "at": "2026-09-19T11:10:27.735Z"
+    },
+    {
+      "name": "qa26.import.b@example.test imported role/department/password work",
+      "passed": true,
+      "detail": {
+        "user": {
+          "phoneNumber": "+971502222222",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:10:24.4167974+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": null,
+          "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "email": "qa26.import.b@example.test",
+          "displayName": "QA26 Import B",
+          "fullName": "QA26 Import B",
+          "fullNameAr": "استيراد باء",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "loginStatus": 200
+      },
+      "at": "2026-09-19T11:10:30.376Z"
+    },
+    {
+      "name": "Duplicate import inserts zero with row errors",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Import complete: 0 inserted, 3 skipped.",
+        "data": {
+          "totalRows": 3,
+          "insertedCount": 0,
+          "skippedCount": 3,
+          "errors": [
+            {
+              "row": 2,
+              "email": "qa26.import.a@example.test",
+              "reasons": [
+                "Email already exists.",
+                "RollNo already exists."
+              ]
+            },
+            {
+              "row": 3,
+              "email": "qa26.import.b@example.test",
+              "reasons": [
+                "Email already exists.",
+                "RollNo already exists."
+              ]
+            },
+            {
+              "row": 4,
+              "email": "not-an-email",
+              "reasons": [
+                "Invalid email format."
+              ]
+            }
+          ],
+          "createdAccounts": []
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:10:32.252Z"
+    },
+    {
+      "name": "Unsupported CSV format rejected explicitly",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Only .xlsx or .xls files are accepted.",
+        "data": null,
+        "errors": [],
+        "traceId": "77539f17af0bb92eed1ba18d993603de"
+      },
+      "at": "2026-09-19T11:10:32.490Z"
+    },
+    {
+      "name": "Batch contains2 imported candidates after add",
+      "passed": true,
+      "detail": {
+        "totalRequested": 2,
+        "affectedCount": 2,
+        "skippedCount": 0,
+        "errors": []
+      },
+      "at": "2026-09-19T11:10:35.648Z"
+    },
+    {
+      "name": "Duplicate batch membership does not duplicate records",
+      "passed": true,
+      "detail": {
+        "totalRequested": 2,
+        "affectedCount": 0,
+        "skippedCount": 2,
+        "errors": []
+      },
+      "at": "2026-09-19T11:10:37.758Z"
+    },
+    {
+      "name": "Batch membership removal persists",
+      "passed": true,
+      "at": "2026-09-19T11:10:39.666Z"
+    },
+    {
+      "name": "Batch rename persists",
+      "passed": true,
+      "at": "2026-09-19T11:10:42.992Z"
+    },
+    {
+      "name": "Batch assignment schedules both imported candidates",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "2 candidate(s) assigned successfully.",
+        "data": {
+          "totalTargeted": 2,
+          "successCount": 2,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:10:45.957Z"
+    },
+    {
+      "name": "batch-export.xlsx produces XLSX binary",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 6757
+      },
+      "at": "2026-09-19T11:10:48.785Z"
+    },
+    {
+      "name": "candidate-export.xlsx produces XLSX binary",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 6751
+      },
+      "at": "2026-09-19T11:10:52.419Z"
+    },
+    {
+      "name": "candidate-template.xlsx produces XLSX binary",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 6611
+      },
+      "at": "2026-09-19T11:10:52.658Z"
+    },
+    {
+      "name": "Operations admin cannot read Engineering cohort",
+      "passed": false,
+      "at": "2026-09-19T11:10:54.798Z"
+    },
+    {
+      "name": "Inactive batch status persists",
+      "passed": true,
+      "at": "2026-09-19T11:10:56.428Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:10:15.650Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:15.6453809+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:10:14.9517605+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:15.6453809+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:10:14.9517605+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1253.25
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:16.854Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:16.8534562+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T15:10:16.1642483+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:16.8534562+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T15:10:16.1642483+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1203.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:25.117Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Candidates/import",
+      "request": {
+        "filename": "qa26-import.xlsx",
+        "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "bytes": 3865
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRows": 3,
+          "insertedCount": 2,
+          "skippedCount": 1,
+          "errors": [
+            {
+              "row": 4,
+              "email": "not-an-email",
+              "reasons": [
+                "Invalid email format."
+              ]
+            }
+          ],
+          "createdAccounts": [
+            {
+              "row": 2,
+              "fullName": "QA26 Import A",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "temporaryPassword": "[REDACTED]"
+            },
+            {
+              "row": 3,
+              "fullName": "QA26 Import B",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "temporaryPassword": "[REDACTED]"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Import complete: 2 inserted, 1 skipped.",
+          "data": {
+            "totalRows": 3,
+            "insertedCount": 2,
+            "skippedCount": 1,
+            "errors": [
+              {
+                "row": 4,
+                "email": "not-an-email",
+                "reasons": [
+                  "Invalid email format."
+                ]
+              }
+            ],
+            "createdAccounts": [
+              {
+                "row": 2,
+                "fullName": "QA26 Import A",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "temporaryPassword": "[REDACTED]"
+              },
+              {
+                "row": 3,
+                "fullName": "QA26 Import B",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "temporaryPassword": "[REDACTED]"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 8261.7919
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:26.516Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.import.a@example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971501111111",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:10:21.8057913+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": null,
+          "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "email": "qa26.import.a@example.test",
+          "displayName": "QA26 Import A",
+          "fullName": "QA26 Import A",
+          "fullNameAr": "استيراد ألف",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971501111111",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:10:21.8057913+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "updatedBy": null,
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1395.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:27.734Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:27.7335656+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T15:10:27.0315165+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:27.7335656+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T15:10:27.0315165+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1217.09
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:29.143Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.import.b@example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971502222222",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:10:24.4167974+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": null,
+          "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "email": "qa26.import.b@example.test",
+          "displayName": "QA26 Import B",
+          "fullName": "QA26 Import B",
+          "fullNameAr": "استيراد باء",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971502222222",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:10:24.4167974+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "updatedBy": null,
+            "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "email": "qa26.import.b@example.test",
+            "displayName": "QA26 Import B",
+            "fullName": "QA26 Import B",
+            "fullNameAr": "استيراد باء",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1407.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:30.375Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.b@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:30.3742886+04:00",
+          "user": {
+            "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "email": "qa26.import.b@example.test",
+            "displayName": "QA26 Import B",
+            "fullName": "QA26 Import B",
+            "fullNameAr": "استيراد باء",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+            "lastLoginDate": "2026-09-19T15:10:29.6645406+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:30.3742886+04:00",
+            "user": {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "email": "qa26.import.b@example.test",
+              "displayName": "QA26 Import B",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+              "lastLoginDate": "2026-09-19T15:10:29.6645406+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1230.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:32.252Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Candidates/import",
+      "request": {
+        "filename": "qa26-import.xlsx",
+        "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "bytes": 3865
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRows": 3,
+          "insertedCount": 0,
+          "skippedCount": 3,
+          "errors": [
+            {
+              "row": 2,
+              "email": "qa26.import.a@example.test",
+              "reasons": [
+                "Email already exists.",
+                "RollNo already exists."
+              ]
+            },
+            {
+              "row": 3,
+              "email": "qa26.import.b@example.test",
+              "reasons": [
+                "Email already exists.",
+                "RollNo already exists."
+              ]
+            },
+            {
+              "row": 4,
+              "email": "not-an-email",
+              "reasons": [
+                "Invalid email format."
+              ]
+            }
+          ],
+          "createdAccounts": []
+        },
+        "body": {
+          "success": true,
+          "message": "Import complete: 0 inserted, 3 skipped.",
+          "data": {
+            "totalRows": 3,
+            "insertedCount": 0,
+            "skippedCount": 3,
+            "errors": [
+              {
+                "row": 2,
+                "email": "qa26.import.a@example.test",
+                "reasons": [
+                  "Email already exists.",
+                  "RollNo already exists."
+                ]
+              },
+              {
+                "row": 3,
+                "email": "qa26.import.b@example.test",
+                "reasons": [
+                  "Email already exists.",
+                  "RollNo already exists."
+                ]
+              },
+              {
+                "row": 4,
+                "email": "not-an-email",
+                "reasons": [
+                  "Invalid email format."
+                ]
+              }
+            ],
+            "createdAccounts": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1875.206000000002
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:32.490Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Candidates/import",
+      "request": {
+        "filename": "qa26-import.csv",
+        "contentType": "text/csv",
+        "bytes": 61
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Only .xlsx or .xls files are accepted.",
+          "data": null,
+          "errors": [],
+          "traceId": "77539f17af0bb92eed1ba18d993603de"
+        },
+        "ms": 236.45190000000002
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:33.215Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches",
+      "request": {
+        "name": "QA26 Imported Cohort",
+        "description": "Two realistic imported candidates",
+        "isActive": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort",
+          "description": "Two realistic imported candidates",
+          "isActive": true,
+          "candidateCount": 0,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": null
+        },
+        "body": {
+          "success": true,
+          "message": "Batch created successfully.",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort",
+            "description": "Two realistic imported candidates",
+            "isActive": true,
+            "candidateCount": 0,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 724.21
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:34.656Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/9/candidates",
+      "request": {
+        "candidateIds": [
+          "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "936ba850-29c7-4898-b4e1-f1c6bf510a2d"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 2,
+          "affectedCount": 2,
+          "skippedCount": 0,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "2 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 2,
+            "affectedCount": 2,
+            "skippedCount": 0,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1439.2
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:35.647Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort",
+          "description": "Two realistic imported candidates",
+          "isActive": true,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "mobile": "+971502222222",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4064113+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            },
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort",
+            "description": "Two realistic imported candidates",
+            "isActive": true,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "fullName": "QA26 Import B",
+                "fullNameAr": "استيراد باء",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "mobile": "+971502222222",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4064113+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              },
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 990.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:36.817Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/9/candidates",
+      "request": {
+        "candidateIds": [
+          "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "936ba850-29c7-4898-b4e1-f1c6bf510a2d"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 2,
+          "affectedCount": 0,
+          "skippedCount": 2,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 2,
+            "affectedCount": 0,
+            "skippedCount": 2,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1167.7
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:37.757Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort",
+          "description": "Two realistic imported candidates",
+          "isActive": true,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "mobile": "+971502222222",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4064113+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            },
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort",
+            "description": "Two realistic imported candidates",
+            "isActive": true,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "fullName": "QA26 Import B",
+                "fullNameAr": "استيراد باء",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "mobile": "+971502222222",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4064113+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              },
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 939.82
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:38.717Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/Batches/9/candidates",
+      "request": {
+        "candidateIds": [
+          "936ba850-29c7-4898-b4e1-f1c6bf510a2d"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 1,
+          "skippedCount": 0,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) removed from batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 1,
+            "skippedCount": 0,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 957.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:39.665Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort",
+          "description": "Two realistic imported candidates",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort",
+            "description": "Two realistic imported candidates",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 947.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:41.081Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/9/candidates",
+      "request": {
+        "candidateIds": [
+          "936ba850-29c7-4898-b4e1-f1c6bf510a2d"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 1,
+          "skippedCount": 0,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 1,
+            "skippedCount": 0,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1414.16
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:42.051Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Batches/9",
+      "request": {
+        "name": "QA26 Imported Cohort Updated",
+        "description": "Bilingual import and batch QA"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort Updated",
+          "description": "Bilingual import and batch QA",
+          "isActive": true,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": null
+        },
+        "body": {
+          "success": true,
+          "message": "Batch updated successfully.",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort Updated",
+            "description": "Bilingual import and batch QA",
+            "isActive": true,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 968.41
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:42.991Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort Updated",
+          "description": "Bilingual import and batch QA",
+          "isActive": true,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "mobile": "+971502222222",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            },
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort Updated",
+            "description": "Bilingual import and batch QA",
+            "isActive": true,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "fullName": "QA26 Import B",
+                "fullNameAr": "استيراد باء",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "mobile": "+971502222222",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              },
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 939.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:45.956Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "batchId": 9,
+        "scheduleFrom": "2026-09-19T11:09:42.993Z",
+        "scheduleTo": "2026-09-20T11:10:42.993Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 2,
+          "successCount": 2,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "2 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 2,
+            "successCount": 2,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2962.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:53.871Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:53.870872+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:10:53.1777661+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:53.870872+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T15:10:53.1777661+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1212.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:54.797Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort Updated",
+          "description": "Bilingual import and batch QA",
+          "isActive": true,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "mobile": "+971502222222",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            },
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort Updated",
+            "description": "Bilingual import and batch QA",
+            "isActive": true,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "fullName": "QA26 Import B",
+                "fullNameAr": "استيراد باء",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "mobile": "+971502222222",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              },
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 925.15
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:55.501Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/9/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Batch deactivated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 701.57
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.427Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "name": "QA26 Imported Cohort Updated",
+          "description": "Bilingual import and batch QA",
+          "isActive": false,
+          "candidateCount": 2,
+          "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "email": "qa26.import.b@example.test",
+              "rollNo": "QA26-IMP-B",
+              "mobile": "+971502222222",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            },
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "email": "qa26.import.a@example.test",
+              "rollNo": "QA26-IMP-A",
+              "mobile": "+971501111111",
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "name": "QA26 Imported Cohort Updated",
+            "description": "Bilingual import and batch QA",
+            "isActive": false,
+            "candidateCount": 2,
+            "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "fullName": "QA26 Import B",
+                "fullNameAr": "استيراد باء",
+                "email": "qa26.import.b@example.test",
+                "rollNo": "QA26-IMP-B",
+                "mobile": "+971502222222",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:40.8424106+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              },
+              {
+                "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "fullName": "QA26 Import A",
+                "fullNameAr": "استيراد ألف",
+                "email": "qa26.import.a@example.test",
+                "rollNo": "QA26-IMP-A",
+                "mobile": "+971501111111",
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:10:34.4041127+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 925.31
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:57.151Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/9/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Batch activated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 722.51
+      }
+    }
+  ]
+}

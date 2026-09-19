@@ -69,6 +69,10 @@ public class UserService : IUserService
       departmentId = currentDepartmentId.Value;
     }
 
+    if (departmentId.HasValue && !await _context.Departments
+        .AnyAsync(d => d.Id == departmentId.Value && d.IsActive))
+      return ApiResponse<UserDetailDto>.FailureResponse("Department not found or inactive.");
+
     // Check if email already exists
     var existingUser = await _userManager.FindByEmailAsync(dto.Email);
     if (existingUser != null)
@@ -187,12 +191,12 @@ public class UserService : IUserService
    .Take(filter.PageSize)
   .ToListAsync();
 
+      var rolesByUser = await GetRoleNamesByUserAsync(users.Select(u => u.Id));
       var userDtos = new List<UserDto>();
       foreach (var user in users)
       {
-        var roles = await _userManager.GetRolesAsync(user);
         var userDto = user.Adapt<UserDto>();
-        userDto.Roles = roles.ToList();
+        userDto.Roles = rolesByUser.GetValueOrDefault(user.Id) ?? new List<string>();
         userDto.Status = user.Status.ToString();
         userDto.DepartmentId = user.DepartmentId;
         userDto.DepartmentNameEn = user.Department?.NameEn;
@@ -261,12 +265,12 @@ public class UserService : IUserService
         .Take(filter.PageSize)
         .ToListAsync();
 
+      var rolesByUser = await GetRoleNamesByUserAsync(users.Select(u => u.Id));
       var userDtos = new List<UserDto>();
       foreach (var user in users)
       {
-        var roles = await _userManager.GetRolesAsync(user);
         var userDto = user.Adapt<UserDto>();
-        userDto.Roles = roles.ToList();
+        userDto.Roles = rolesByUser.GetValueOrDefault(user.Id) ?? new List<string>();
         userDto.Status = user.Status.ToString();
         userDto.DepartmentId = user.DepartmentId;
         userDto.DepartmentNameEn = user.Department?.NameEn;
@@ -283,6 +287,21 @@ public class UserService : IUserService
         TotalCount = totalCount
       });
     }, CacheKeys.VeryLong);
+  }
+
+  private async Task<Dictionary<string, List<string>>> GetRoleNamesByUserAsync(IEnumerable<string> userIds)
+  {
+    var ids = userIds.Distinct().ToList();
+    if (ids.Count == 0) return new Dictionary<string, List<string>>();
+
+    // Restrict the single role query to users already selected by the scoped page query.
+    var memberships = await _context.Set<IdentityUserRole<string>>()
+      .Where(ur => ids.Contains(ur.UserId))
+      .Join(_context.Roles, ur => ur.RoleId, r => r.Id,
+        (ur, r) => new { ur.UserId, RoleName = r.Name! })
+      .ToListAsync();
+    return memberships.GroupBy(m => m.UserId)
+      .ToDictionary(g => g.Key, g => g.Select(m => m.RoleName).ToList());
   }
 
   public async Task<ApiResponse<UserDetailDto>> GetUserByIdAsync(string userId)
@@ -376,9 +395,6 @@ public class UserService : IUserService
       return ApiResponse<UserDetailDto>.FailureResponse("Cannot modify the SuperAdmin user.");
     }
 
-    user.DisplayName = dto.DisplayName ?? user.DisplayName;
-    user.FullName = dto.FullName ?? user.FullName;
-    user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
     if (!await _resourceAuthorization.IsCurrentUserSuperAdminAsync())
     {
       var currentDepartmentId = await _resourceAuthorization.GetCurrentUserDepartmentIdAsync();
@@ -389,6 +405,14 @@ public class UserService : IUserService
         return ApiResponse<UserDetailDto>.FailureResponse("Department not found.");
     }
 
+    if (!dto.ClearDepartment && dto.DepartmentId.HasValue && !await _context.Departments
+        .AnyAsync(d => d.Id == dto.DepartmentId.Value && d.IsActive))
+      return ApiResponse<UserDetailDto>.FailureResponse("Department not found or inactive.");
+
+    user.DisplayName = dto.DisplayName ?? user.DisplayName;
+    user.FullName = dto.FullName ?? user.FullName;
+    user.FullNameAr = dto.FullNameAr ?? user.FullNameAr;
+    user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
     if (dto.ClearDepartment)
       user.DepartmentId = null;
     else if (dto.DepartmentId.HasValue)

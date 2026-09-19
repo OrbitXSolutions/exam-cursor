@@ -1,0 +1,2394 @@
+{
+  "classification": "SIMULATED TEST: actual API and persisted state",
+  "checks": [
+    {
+      "name": "none cannot list foreign /api/Lookups/question-subjects",
+      "passed": false,
+      "detail": {
+        "count": 1
+      },
+      "at": "2026-09-19T11:03:34.508Z"
+    },
+    {
+      "name": "none cannot read foreign /api/Lookups/question-subjects",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T11:03:35.932Z"
+    },
+    {
+      "name": "none cannot list foreign /api/Lookups/question-topics",
+      "passed": false,
+      "detail": {
+        "count": 1
+      },
+      "at": "2026-09-19T11:03:37.597Z"
+    },
+    {
+      "name": "none cannot read foreign /api/Lookups/question-topics",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T11:03:39.044Z"
+    },
+    {
+      "name": "none subject update denied before persistence",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "persisted": "QA26 Scope 1789815803720 changed none"
+      },
+      "at": "2026-09-19T11:03:42.387Z"
+    },
+    {
+      "name": "none topic update denied before persistence",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "persisted": "QA26 Scope 1789815803720 changed topic none"
+      },
+      "at": "2026-09-19T11:03:47.539Z"
+    },
+    {
+      "name": "none topic create denied without hidden record",
+      "passed": false,
+      "detail": {
+        "status": 201,
+        "found": [
+          37
+        ]
+      },
+      "at": "2026-09-19T11:03:52.924Z"
+    },
+    {
+      "name": "none foreign topic delete denied and row remains",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "exists": false
+      },
+      "at": "2026-09-19T11:03:57.384Z"
+    },
+    {
+      "name": "none foreign subject delete denied and row remains",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "exists": false
+      },
+      "at": "2026-09-19T11:04:00.216Z"
+    },
+    {
+      "name": "ops cannot list foreign /api/Lookups/question-subjects",
+      "passed": true,
+      "detail": {
+        "count": 0
+      },
+      "at": "2026-09-19T11:04:01.889Z"
+    },
+    {
+      "name": "ops cannot read foreign /api/Lookups/question-subjects",
+      "passed": true,
+      "detail": {
+        "status": 404
+      },
+      "at": "2026-09-19T11:04:03.294Z"
+    },
+    {
+      "name": "ops cannot list foreign /api/Lookups/question-topics",
+      "passed": true,
+      "detail": {
+        "count": 0
+      },
+      "at": "2026-09-19T11:04:04.969Z"
+    },
+    {
+      "name": "ops cannot read foreign /api/Lookups/question-topics",
+      "passed": true,
+      "detail": {
+        "status": 404
+      },
+      "at": "2026-09-19T11:04:06.375Z"
+    },
+    {
+      "name": "ops subject update denied before persistence",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "persisted": "QA26 Scope 1789815803720"
+      },
+      "at": "2026-09-19T11:04:09.411Z"
+    },
+    {
+      "name": "ops topic update denied before persistence",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "persisted": "QA26 Scope 1789815803720 topic"
+      },
+      "at": "2026-09-19T11:04:14.520Z"
+    },
+    {
+      "name": "ops topic create denied without hidden record",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "found": []
+      },
+      "at": "2026-09-19T11:04:19.303Z"
+    },
+    {
+      "name": "ops foreign topic delete denied and row remains",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "exists": false
+      },
+      "at": "2026-09-19T11:04:22.905Z"
+    },
+    {
+      "name": "ops foreign subject delete denied and row remains",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "exists": false
+      },
+      "at": "2026-09-19T11:04:25.754Z"
+    },
+    {
+      "name": "Owning department still reads subject/topic",
+      "passed": true,
+      "at": "2026-09-19T11:04:28.597Z"
+    },
+    {
+      "name": "Owning department still updates topic persistently",
+      "passed": true,
+      "at": "2026-09-19T11:04:32.232Z"
+    },
+    {
+      "name": "No department subject create denied without record",
+      "passed": true,
+      "at": "2026-09-19T11:04:34.090Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:03:20.262Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:20.2521236+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:03:19.5603021+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:20.2521236+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:03:19.5603021+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1270.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:22.470Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:22.4699155+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T15:03:21.7754416+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:22.4699155+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T15:03:21.7754416+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2194.36
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:23.720Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:23.7201519+04:00",
+          "user": {
+            "id": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+            "email": "qa26.ops.instructor1@example.test",
+            "displayName": "QA26 Operations Instructor 1",
+            "fullName": "QA26 Operations Instructor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:47:06.7413514+04:00",
+            "lastLoginDate": "2026-09-19T15:03:23.0160114+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:23.7201519+04:00",
+            "user": {
+              "id": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+              "email": "qa26.ops.instructor1@example.test",
+              "displayName": "QA26 Operations Instructor 1",
+              "fullName": "QA26 Operations Instructor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:47:06.7413514+04:00",
+              "lastLoginDate": "2026-09-19T15:03:23.0160114+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1249.39
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:27.986Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.lookup.1789815803720@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 Scope 1789815803720",
+        "role": "Instructor"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:03:26.8138959+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "0e10d3e1-9b1d-41ba-b4a5-3fb5b673bde7",
+          "email": "qa26.lookup.1789815803720@example.test",
+          "displayName": "QA26 Scope 1789815803720",
+          "fullName": "QA26 Scope 1789815803720",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Instructor"
+          ],
+          "createdDate": "2026-09-19T15:03:25.4112208+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:03:26.8138959+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "0e10d3e1-9b1d-41ba-b4a5-3fb5b673bde7",
+            "email": "qa26.lookup.1789815803720@example.test",
+            "displayName": "QA26 Scope 1789815803720",
+            "fullName": "QA26 Scope 1789815803720",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T15:03:25.4112208+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4265.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:29.212Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.lookup.1789815803720@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:29.2119473+04:00",
+          "user": {
+            "id": "0e10d3e1-9b1d-41ba-b4a5-3fb5b673bde7",
+            "email": "qa26.lookup.1789815803720@example.test",
+            "displayName": "QA26 Scope 1789815803720",
+            "fullName": "QA26 Scope 1789815803720",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T15:03:25.4112208+04:00",
+            "lastLoginDate": "2026-09-19T15:03:28.5115512+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:29.2119473+04:00",
+            "user": {
+              "id": "0e10d3e1-9b1d-41ba-b4a5-3fb5b673bde7",
+              "email": "qa26.lookup.1789815803720@example.test",
+              "displayName": "QA26 Scope 1789815803720",
+              "fullName": "QA26 Scope 1789815803720",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T15:03:25.4112208+04:00",
+              "lastLoginDate": "2026-09-19T15:03:28.5115512+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1225.11
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:30.645Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-subjects",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720",
+        "nameAr": "QA26 Scope 1789815803720 عربي"
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 0,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject created successfully",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 0,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1431.32
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:32.774Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-topics",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 topic",
+        "nameAr": "QA26 Scope 1789815803720 موضوع",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic created successfully",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2127.91
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:34.507Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects?search=QA26%20Scope%201789815803720",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 25,
+              "nameEn": "QA26 Scope 1789815803720",
+              "nameAr": "QA26 Scope 1789815803720 عربي",
+              "departmentId": 8,
+              "departmentNameEn": "QA26 Engineering",
+              "departmentNameAr": "اختبار QA26 الهندسة",
+              "topicsCount": 1,
+              "createdDate": "2026-09-19T15:03:30.405349+04:00",
+              "updatedDate": null,
+              "isDeleted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 25,
+                "nameEn": "QA26 Scope 1789815803720",
+                "nameAr": "QA26 Scope 1789815803720 عربي",
+                "departmentId": 8,
+                "departmentNameEn": "QA26 Engineering",
+                "departmentNameAr": "اختبار QA26 الهندسة",
+                "topicsCount": 1,
+                "createdDate": "2026-09-19T15:03:30.405349+04:00",
+                "updatedDate": null,
+                "isDeleted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1730.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:35.930Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1421.67
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:37.595Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics?search=QA26%20Scope%201789815803720",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 36,
+              "nameEn": "QA26 Scope 1789815803720 topic",
+              "nameAr": "QA26 Scope 1789815803720 موضوع",
+              "subjectId": 25,
+              "subjectNameEn": "QA26 Scope 1789815803720",
+              "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+              "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+              "updatedDate": null,
+              "isDeleted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 36,
+                "nameEn": "QA26 Scope 1789815803720 topic",
+                "nameAr": "QA26 Scope 1789815803720 موضوع",
+                "subjectId": 25,
+                "subjectNameEn": "QA26 Scope 1789815803720",
+                "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+                "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+                "updatedDate": null,
+                "isDeleted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1662.24
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:39.043Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1445.96
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:41.215Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/25",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 changed none",
+        "nameAr": "QA26 Scope 1789815803720 تغيير"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720 changed none",
+          "nameAr": "QA26 Scope 1789815803720 تغيير",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:03:40.977704+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject updated successfully",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720 changed none",
+            "nameAr": "QA26 Scope 1789815803720 تغيير",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:03:40.977704+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2169.96
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:42.386Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720 changed none",
+          "nameAr": "QA26 Scope 1789815803720 تغيير",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:03:40.977704+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720 changed none",
+            "nameAr": "QA26 Scope 1789815803720 تغيير",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:03:40.977704+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1170.29
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:44.259Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/25",
+      "request": {
+        "id": 25,
+        "nameEn": "QA26 Scope 1789815803720",
+        "nameAr": "QA26 Scope 1789815803720 عربي",
+        "departmentId": 8,
+        "departmentNameEn": "QA26 Engineering",
+        "departmentNameAr": "اختبار QA26 الهندسة",
+        "topicsCount": 0,
+        "createdDate": "2026-09-19T15:03:30.405349+04:00",
+        "updatedDate": null,
+        "isDeleted": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:03:44.0245105+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject updated successfully",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:03:44.0245105+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1871.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:46.369Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/36",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 changed topic none",
+        "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 changed topic none",
+          "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:03:46.130533+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 changed topic none",
+            "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:03:46.130533+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2109.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:47.538Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 changed topic none",
+          "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:03:46.130533+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 changed topic none",
+            "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:03:46.130533+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1168.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:49.409Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/36",
+      "request": {
+        "id": 36,
+        "nameEn": "QA26 Scope 1789815803720 topic",
+        "nameAr": "QA26 Scope 1789815803720 موضوع",
+        "subjectId": 25,
+        "subjectNameEn": "QA26 Scope 1789815803720",
+        "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+        "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+        "updatedDate": null,
+        "isDeleted": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:03:49.1736521+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:03:49.1736521+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1869.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:51.520Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-topics",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 unauthorized none",
+        "nameAr": "QA26 Scope 1789815803720 unauthorized none عربي",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 37,
+          "nameEn": "QA26 Scope 1789815803720 unauthorized none",
+          "nameAr": "QA26 Scope 1789815803720 unauthorized none عربي",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:51.2843486+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic created successfully",
+          "data": {
+            "id": 37,
+            "nameEn": "QA26 Scope 1789815803720 unauthorized none",
+            "nameAr": "QA26 Scope 1789815803720 unauthorized none عربي",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:51.2843486+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2108.83
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:52.923Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics?search=QA26%20Scope%201789815803720%20unauthorized%20none",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 37,
+              "nameEn": "QA26 Scope 1789815803720 unauthorized none",
+              "nameAr": "QA26 Scope 1789815803720 unauthorized none عربي",
+              "subjectId": 25,
+              "subjectNameEn": "QA26 Scope 1789815803720",
+              "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+              "createdDate": "2026-09-19T15:03:51.2843486+04:00",
+              "updatedDate": null,
+              "isDeleted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 37,
+                "nameEn": "QA26 Scope 1789815803720 unauthorized none",
+                "nameAr": "QA26 Scope 1789815803720 unauthorized none عربي",
+                "subjectId": 25,
+                "subjectNameEn": "QA26 Scope 1789815803720",
+                "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+                "createdDate": "2026-09-19T15:03:51.2843486+04:00",
+                "updatedDate": null,
+                "isDeleted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1402.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:53.870Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-topics/37",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question topic deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 945.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:55.973Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-topics",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 delete none",
+        "nameAr": "QA26 Scope 1789815803720 حذف none",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 38,
+          "nameEn": "QA26 Scope 1789815803720 delete none",
+          "nameAr": "QA26 Scope 1789815803720 حذف none",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:55.7363865+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic created successfully",
+          "data": {
+            "id": 38,
+            "nameEn": "QA26 Scope 1789815803720 delete none",
+            "nameAr": "QA26 Scope 1789815803720 حذف none",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:55.7363865+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2102.09
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:56.913Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-topics/38",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question topic deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 939.76
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:57.383Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/38",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question topic not found",
+          "data": null,
+          "errors": [],
+          "traceId": "965dd9aef6ce22bf78154af23543b742"
+        },
+        "ms": 468.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:58.790Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-subjects",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 delete subject none",
+        "nameAr": "QA26 Scope 1789815803720 حذف قسم none"
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 26,
+          "nameEn": "QA26 Scope 1789815803720 delete subject none",
+          "nameAr": "QA26 Scope 1789815803720 حذف قسم none",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 0,
+          "createdDate": "2026-09-19T15:03:58.5543731+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject created successfully",
+          "data": {
+            "id": 26,
+            "nameEn": "QA26 Scope 1789815803720 delete subject none",
+            "nameAr": "QA26 Scope 1789815803720 حذف قسم none",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 0,
+            "createdDate": "2026-09-19T15:03:58.5543731+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1405.52
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:59.746Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-subjects/26",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question subject deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 954.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:00.214Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/26",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "9b14188f1ee6bfe3020222c2943fa9a6"
+        },
+        "ms": 467.2
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:01.888Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects?search=QA26%20Scope%201789815803720",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1671.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:03.294Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this subject",
+          "data": null,
+          "errors": [],
+          "traceId": "d380fe8f05c5db27daf9864988efe831"
+        },
+        "ms": 1403.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:04.968Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics?search=QA26%20Scope%201789815803720",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1672.92
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:06.374Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this topic",
+          "data": null,
+          "errors": [],
+          "traceId": "420a96de893bc57dd80efe5063320433"
+        },
+        "ms": 1403.67
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:07.932Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/25",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 changed ops",
+        "nameAr": "QA26 Scope 1789815803720 تغيير"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this subject",
+          "data": null,
+          "errors": [],
+          "traceId": "8b3c3acc2da5b5c0c28a2d8e488cd944"
+        },
+        "ms": 1556.69
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:09.410Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:03:44.0245105+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:03:44.0245105+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1476.56
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:11.571Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/25",
+      "request": {
+        "id": 25,
+        "nameEn": "QA26 Scope 1789815803720",
+        "nameAr": "QA26 Scope 1789815803720 عربي",
+        "departmentId": 8,
+        "departmentNameEn": "QA26 Engineering",
+        "departmentNameAr": "اختبار QA26 الهندسة",
+        "topicsCount": 0,
+        "createdDate": "2026-09-19T15:03:30.405349+04:00",
+        "updatedDate": null,
+        "isDeleted": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject updated successfully",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2159.11
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:13.211Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/36",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 changed topic ops",
+        "nameAr": "QA26 Scope 1789815803720 تغيير موضوع",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this topic",
+          "data": null,
+          "errors": [],
+          "traceId": "575f9f43bf7096a801eb07dddfb9d2d6"
+        },
+        "ms": 1638.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:14.519Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:03:49.1736521+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:03:49.1736521+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1307.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:16.472Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/36",
+      "request": {
+        "id": 36,
+        "nameEn": "QA26 Scope 1789815803720 topic",
+        "nameAr": "QA26 Scope 1789815803720 موضوع",
+        "subjectId": 25,
+        "subjectNameEn": "QA26 Scope 1789815803720",
+        "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+        "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+        "updatedDate": null,
+        "isDeleted": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:04:16.2333234+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:04:16.2333234+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1951.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:17.894Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-topics",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 unauthorized ops",
+        "nameAr": "QA26 Scope 1789815803720 unauthorized ops عربي",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this subject",
+          "data": null,
+          "errors": [],
+          "traceId": "abdaaae068dbccb5935d8ff5dff853f9"
+        },
+        "ms": 1420.31
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:19.302Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics?search=QA26%20Scope%201789815803720%20unauthorized%20ops",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1406.94
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:21.472Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-topics",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 delete ops",
+        "nameAr": "QA26 Scope 1789815803720 حذف ops",
+        "subjectId": 25
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 39,
+          "nameEn": "QA26 Scope 1789815803720 delete ops",
+          "nameAr": "QA26 Scope 1789815803720 حذف ops",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:04:21.2075941+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic created successfully",
+          "data": {
+            "id": 39,
+            "nameEn": "QA26 Scope 1789815803720 delete ops",
+            "nameAr": "QA26 Scope 1789815803720 حذف ops",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:04:21.2075941+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2168.42
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:22.424Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-topics/39",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question topic deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 950.68
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:22.904Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/39",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question topic not found",
+          "data": null,
+          "errors": [],
+          "traceId": "5115fd008428d4600e86922062a4f58a"
+        },
+        "ms": 479.51
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:24.321Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-subjects",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 delete subject ops",
+        "nameAr": "QA26 Scope 1789815803720 حذف قسم ops"
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 27,
+          "nameEn": "QA26 Scope 1789815803720 delete subject ops",
+          "nameAr": "QA26 Scope 1789815803720 حذف قسم ops",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 0,
+          "createdDate": "2026-09-19T15:04:24.0796889+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject created successfully",
+          "data": {
+            "id": 27,
+            "nameEn": "QA26 Scope 1789815803720 delete subject ops",
+            "nameAr": "QA26 Scope 1789815803720 حذف قسم ops",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 0,
+            "createdDate": "2026-09-19T15:04:24.0796889+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1415.21
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:25.282Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-subjects/27",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question subject deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 958.37
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:25.753Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/27",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "49cd1ab87a93e28601810f67a725a2b2"
+        },
+        "ms": 470.37
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:27.189Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1433.38
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:28.596Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 topic",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:04:16.2333234+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 topic",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:04:16.2333234+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1406.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:30.792Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/36",
+      "request": {
+        "id": 36,
+        "nameEn": "QA26 Scope 1789815803720 own update",
+        "nameAr": "QA26 Scope 1789815803720 موضوع",
+        "subjectId": 25,
+        "subjectNameEn": "QA26 Scope 1789815803720",
+        "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+        "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+        "updatedDate": null,
+        "isDeleted": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 own update",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 own update",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2193.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:32.231Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 own update",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 own update",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1437.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:32.699Z",
+      "identity": "qa26.lookup.1789815803720@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-subjects",
+      "request": {
+        "nameEn": "QA26 Scope 1789815803720 no dept",
+        "nameAr": "QA26 Scope 1789815803720 بدون قسم"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You must be assigned to a department to create a subject",
+          "data": null,
+          "errors": [],
+          "traceId": "6f9a92504fdfa638922fb4e8e5cdaedf"
+        },
+        "ms": 465.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:34.089Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects?search=QA26%20Scope%201789815803720%20no%20dept",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1389.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:35.282Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 36,
+          "nameEn": "QA26 Scope 1789815803720 own update",
+          "nameAr": "QA26 Scope 1789815803720 موضوع",
+          "subjectId": 25,
+          "subjectNameEn": "QA26 Scope 1789815803720",
+          "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+          "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+          "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 36,
+            "nameEn": "QA26 Scope 1789815803720 own update",
+            "nameAr": "QA26 Scope 1789815803720 موضوع",
+            "subjectId": 25,
+            "subjectNameEn": "QA26 Scope 1789815803720",
+            "subjectNameAr": "QA26 Scope 1789815803720 عربي",
+            "createdDate": "2026-09-19T15:03:32.5350141+04:00",
+            "updatedDate": "2026-09-19T15:04:30.5320805+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1190.61
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:36.256Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-topics/36",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question topic deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 973.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:36.728Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/37",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question topic not found",
+          "data": null,
+          "errors": [],
+          "traceId": "04dbbd1ff9c85c5bdfd19925272bc1f1"
+        },
+        "ms": 470.31
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:37.204Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/38",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question topic not found",
+          "data": null,
+          "errors": [],
+          "traceId": "d93cd0f9878668e9bc7934f53c6de076"
+        },
+        "ms": 474.53
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:37.669Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/39",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question topic not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e07980f86db75fc8edb7c7e1dad7ebe7"
+        },
+        "ms": 463.53
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:38.864Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 25,
+          "nameEn": "QA26 Scope 1789815803720",
+          "nameAr": "QA26 Scope 1789815803720 عربي",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 0,
+          "createdDate": "2026-09-19T15:03:30.405349+04:00",
+          "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 25,
+            "nameEn": "QA26 Scope 1789815803720",
+            "nameAr": "QA26 Scope 1789815803720 عربي",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 0,
+            "createdDate": "2026-09-19T15:03:30.405349+04:00",
+            "updatedDate": "2026-09-19T15:04:11.2931684+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1194.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:39.820Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-subjects/25",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question subject deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 954.48
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:40.290Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/26",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "ea6ded97d512dcd0afbb849927a680f9"
+        },
+        "ms": 468.67
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:40.761Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/27",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "57a712f554a8f22804d504b0b3eb791e"
+        },
+        "ms": 469.82
+      }
+    },
+    {
+      "at": "2026-09-19T11:04:42.639Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Users/0e10d3e1-9b1d-41ba-b4a5-3fb5b673bde7",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1876.34
+      }
+    }
+  ]
+}

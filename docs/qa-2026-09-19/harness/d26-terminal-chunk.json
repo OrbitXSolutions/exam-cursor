@@ -1,0 +1,396 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:43:03.934Z",
+  "checks": [
+    {
+      "name": "fixture is already submitted",
+      "passed": true,
+      "detail": {
+        "status": 3
+      },
+      "at": "2026-09-19T11:43:08.900Z"
+    },
+    {
+      "name": "submitted candidate can flush final chunk",
+      "passed": true,
+      "at": "2026-09-19T11:43:10.102Z"
+    },
+    {
+      "name": "final chunk appears in persisted listing",
+      "passed": true,
+      "at": "2026-09-19T11:43:11.515Z"
+    },
+    {
+      "name": "stored final chunk bytes roundtrip exactly",
+      "passed": true,
+      "at": "2026-09-19T11:43:12.923Z"
+    },
+    {
+      "name": "chunk flush cannot reopen submitted attempt",
+      "passed": true,
+      "detail": {
+        "status": 3
+      },
+      "at": "2026-09-19T11:43:14.574Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:43:05.178Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:43:05.1743707+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:43:04.4760127+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:43:05.1743707+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:43:04.4760127+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1242.86
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:07.195Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.b@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:43:07.194278+04:00",
+          "user": {
+            "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "email": "qa26.import.b@example.test",
+            "displayName": "QA26 Import B",
+            "fullName": "QA26 Import B",
+            "fullNameAr": "استيراد باء",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+            "lastLoginDate": "2026-09-19T15:43:06.4535498+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:43:07.194278+04:00",
+            "user": {
+              "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "email": "qa26.import.b@example.test",
+              "displayName": "QA26 Import B",
+              "fullName": "QA26 Import B",
+              "fullNameAr": "استيراد باء",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:23.0165256+04:00",
+              "lastLoginDate": "2026-09-19T15:43:06.4535498+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2015.35
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:08.899Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/195",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 195,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "startedAt": "2026-09-19T15:23:45.5709594+04:00",
+          "submittedAt": "2026-09-19T15:25:52.4837161+04:00",
+          "expiresAt": "2026-09-19T17:23:45.5709594+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 2,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 5,
+          "answeredQuestions": 1,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T15:23:45.5709594+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 195,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "startedAt": "2026-09-19T15:23:45.5709594+04:00",
+            "submittedAt": "2026-09-19T15:25:52.4837161+04:00",
+            "expiresAt": "2026-09-19T17:23:45.5709594+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 2,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 5,
+            "answeredQuestions": 1,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T15:23:45.5709594+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1702.32
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:09.380Z",
+      "identity": "qa26.import.b@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/video-config",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "enableLiveVideo": true,
+          "enableVideoRecording": true,
+          "enableSmartMonitoring": true,
+          "enableScreenMonitoring": true,
+          "stunServers": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "enableLiveVideo": true,
+            "enableVideoRecording": true,
+            "enableSmartMonitoring": true,
+            "enableScreenMonitoring": true,
+            "stunServers": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 479.09
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:10.101Z",
+      "action": "synthetic post-submit chunk upload",
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "Chunk uploaded",
+        "data": {
+          "chunkIndex": 900001,
+          "size": 80,
+          "stored": true
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "bytes": 80
+    },
+    {
+      "at": "2026-09-19T11:43:11.514Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Proctor/video-chunks/195",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 195,
+          "totalChunks": 1,
+          "totalSizeBytes": 80,
+          "chunkDurationMs": 3000,
+          "chunks": [
+            {
+              "index": 0,
+              "filename": "chunk_900001.webm",
+              "sizeBytes": 80
+            }
+          ],
+          "mimeType": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 195,
+            "totalChunks": 1,
+            "totalSizeBytes": 80,
+            "chunkDurationMs": 3000,
+            "chunks": [
+              {
+                "index": 0,
+                "filename": "chunk_900001.webm",
+                "sizeBytes": 80
+              }
+            ],
+            "mimeType": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1411.29
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:14.573Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/195",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 195,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "startedAt": "2026-09-19T15:23:45.5709594+04:00",
+          "submittedAt": "2026-09-19T15:25:52.4837161+04:00",
+          "expiresAt": "2026-09-19T17:23:45.5709594+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 2,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 5,
+          "answeredQuestions": 1,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T15:23:45.5709594+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 195,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "startedAt": "2026-09-19T15:23:45.5709594+04:00",
+            "submittedAt": "2026-09-19T15:25:52.4837161+04:00",
+            "expiresAt": "2026-09-19T17:23:45.5709594+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 2,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 5,
+            "answeredQuestions": 1,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T15:23:45.5709594+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1649.57
+      }
+    }
+  ]
+}

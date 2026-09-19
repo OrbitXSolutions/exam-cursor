@@ -1,0 +1,1364 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:12:37.610Z",
+  "checks": [
+    {
+      "name": "Foreign question detail denied after D09",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "You do not have access to this question",
+        "data": null,
+        "errors": [],
+        "traceId": "d2e909d06bc967e47f4995bec9780c90"
+      },
+      "at": "2026-09-19T11:12:42.696Z"
+    },
+    {
+      "name": "Foreign question/options denied after D09",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question not found",
+        "data": null,
+        "errors": [],
+        "traceId": "df74efa8b7653a9a7028ea8f1d2c86aa"
+      },
+      "at": "2026-09-19T11:12:44.113Z"
+    },
+    {
+      "name": "Foreign question/attachments denied after D09",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question not found",
+        "data": null,
+        "errors": [],
+        "traceId": "bb61261d7a21bdd50d9616d9004d95f0"
+      },
+      "at": "2026-09-19T11:12:45.523Z"
+    },
+    {
+      "name": "Foreign option update denied",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Option not found",
+        "data": null,
+        "errors": [],
+        "traceId": "f70a60ea0237114e0757a3a43998b046"
+      },
+      "at": "2026-09-19T11:12:47.166Z"
+    },
+    {
+      "name": "Foreign toggle denied",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question not found",
+        "data": false,
+        "errors": [],
+        "traceId": "e1fd5a0028604611375146cd1751c75b"
+      },
+      "at": "2026-09-19T11:12:48.574Z"
+    },
+    {
+      "name": "Rejected foreign mutations preserve option text and active state",
+      "passed": true,
+      "at": "2026-09-19T11:12:49.756Z"
+    },
+    {
+      "name": "Foreign creation rejected before persistence",
+      "passed": true,
+      "detail": {
+        "response": {
+          "success": false,
+          "message": "Subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "a226f9b3af3b02edc510f11f1d5ad585"
+        },
+        "persistedCount": 0
+      },
+      "at": "2026-09-19T11:12:52.660Z"
+    },
+    {
+      "name": "Own question cannot be moved to foreign subject",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question or subject not found",
+        "data": null,
+        "errors": [],
+        "traceId": "ccafb537047eab0ec54ee3c3d90d8a28"
+      },
+      "at": "2026-09-19T11:12:56.192Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/QuestionBank/questions?search=QA26&pageSize=100",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:13:00.262Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/QuestionBank/questions/131",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "You do not have access to this question",
+        "data": null,
+        "errors": [],
+        "traceId": "960d7c6bd2611eb3161e1d344d9f3e78"
+      },
+      "at": "2026-09-19T11:13:01.661Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/QuestionBank/questions/131/options",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question not found",
+        "data": null,
+        "errors": [],
+        "traceId": "b0ecf57a693dc042fc875af1bcc0bb98"
+      },
+      "at": "2026-09-19T11:13:02.822Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/QuestionBank/questions/131/attachments",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Question not found",
+        "data": null,
+        "errors": [],
+        "traceId": "7d52826b9bcb15f775eb1bd9d07ad8c4"
+      },
+      "at": "2026-09-19T11:13:03.990Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/QuestionBank/questions/count",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": {
+          "count": 0,
+          "totalPoints": 0,
+          "subjectId": null,
+          "topicId": null
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:13:05.387Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/Lookups/question-subjects/23",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "You do not have access to this subject",
+        "data": null,
+        "errors": [],
+        "traceId": "2b08a4b73ec069b6b9f1858a56f16470"
+      },
+      "at": "2026-09-19T11:13:06.784Z"
+    },
+    {
+      "name": "No-department access fails closed: /api/Lookups/question-topics/34",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "You do not have access to this topic",
+        "data": null,
+        "errors": [],
+        "traceId": "8dfccc7cf5abb6de1313218e776f3bd2"
+      },
+      "at": "2026-09-19T11:13:08.183Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:12:38.884Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:12:38.8799696+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:12:38.1687322+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:12:38.8799696+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:12:38.1687322+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1271.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:40.115Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:12:40.1148908+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T15:12:39.4135253+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:12:40.1148908+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T15:12:39.4135253+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1227.55
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:41.286Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 136,
+          "bodyEn": "QA26 Operations isolated question",
+          "bodyAr": "اختبار QA26",
+          "explanationEn": "Acceptance QA expected answer",
+          "explanationAr": "الإجابة المتوقعة للاختبار",
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 24,
+          "subjectNameEn": "QA26 ops Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 ops",
+          "topicId": 35,
+          "topicNameEn": "QA26 ops Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 ops",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T14:54:14.4813837+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 387,
+              "questionId": 136,
+              "textEn": "2",
+              "textAr": "خيار 2",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+            },
+            {
+              "id": 388,
+              "questionId": 136,
+              "textEn": "4",
+              "textAr": "خيار 4",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+            },
+            {
+              "id": 389,
+              "questionId": 136,
+              "textEn": "6",
+              "textAr": "خيار 6",
+              "isCorrect": false,
+              "points": null,
+              "order": 3,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 136,
+            "bodyEn": "QA26 Operations isolated question",
+            "bodyAr": "اختبار QA26",
+            "explanationEn": "Acceptance QA expected answer",
+            "explanationAr": "الإجابة المتوقعة للاختبار",
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 24,
+            "subjectNameEn": "QA26 ops Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 ops",
+            "topicId": 35,
+            "topicNameEn": "QA26 ops Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 ops",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T14:54:14.4813837+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 387,
+                "questionId": 136,
+                "textEn": "2",
+                "textAr": "خيار 2",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+              },
+              {
+                "id": 388,
+                "questionId": 136,
+                "textEn": "4",
+                "textAr": "خيار 4",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+              },
+              {
+                "id": 389,
+                "questionId": 136,
+                "textEn": "6",
+                "textAr": "خيار 6",
+                "isCorrect": false,
+                "points": null,
+                "order": 3,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1170.9
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:42.695Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this question",
+          "data": null,
+          "errors": [],
+          "traceId": "d2e909d06bc967e47f4995bec9780c90"
+        },
+        "ms": 1408.3
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:44.112Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136/options",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "df74efa8b7653a9a7028ea8f1d2c86aa"
+        },
+        "ms": 1415.41
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:45.522Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136/attachments",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "bb61261d7a21bdd50d9616d9004d95f0"
+        },
+        "ms": 1408.02
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:47.165Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/387",
+      "request": {
+        "id": 387,
+        "questionId": 136,
+        "textEn": "QA26 UNAUTHORIZED MUTATION",
+        "textAr": "خيار 2",
+        "isCorrect": true,
+        "points": null,
+        "order": 1,
+        "attachmentPath": null,
+        "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+      },
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Option not found",
+          "data": null,
+          "errors": [],
+          "traceId": "f70a60ea0237114e0757a3a43998b046"
+        },
+        "ms": 1640.58
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:48.574Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PATCH",
+      "route": "/api/QuestionBank/questions/136/toggle-status",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": false,
+          "errors": [],
+          "traceId": "e1fd5a0028604611375146cd1751c75b"
+        },
+        "ms": 1407.25
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:49.755Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 136,
+          "bodyEn": "QA26 Operations isolated question",
+          "bodyAr": "اختبار QA26",
+          "explanationEn": "Acceptance QA expected answer",
+          "explanationAr": "الإجابة المتوقعة للاختبار",
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 24,
+          "subjectNameEn": "QA26 ops Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 ops",
+          "topicId": 35,
+          "topicNameEn": "QA26 ops Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 ops",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T14:54:14.4813837+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 387,
+              "questionId": 136,
+              "textEn": "2",
+              "textAr": "خيار 2",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+            },
+            {
+              "id": 388,
+              "questionId": 136,
+              "textEn": "4",
+              "textAr": "خيار 4",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+            },
+            {
+              "id": 389,
+              "questionId": 136,
+              "textEn": "6",
+              "textAr": "خيار 6",
+              "isCorrect": false,
+              "points": null,
+              "order": 3,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 136,
+            "bodyEn": "QA26 Operations isolated question",
+            "bodyAr": "اختبار QA26",
+            "explanationEn": "Acceptance QA expected answer",
+            "explanationAr": "الإجابة المتوقعة للاختبار",
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 24,
+            "subjectNameEn": "QA26 ops Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 ops",
+            "topicId": 35,
+            "topicNameEn": "QA26 ops Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 ops",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T14:54:14.4813837+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 387,
+                "questionId": 136,
+                "textEn": "2",
+                "textAr": "خيار 2",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+              },
+              {
+                "id": 388,
+                "questionId": 136,
+                "textEn": "4",
+                "textAr": "خيار 4",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+              },
+              {
+                "id": 389,
+                "questionId": 136,
+                "textEn": "6",
+                "textAr": "خيار 6",
+                "isCorrect": false,
+                "points": null,
+                "order": 3,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1180.4
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:51.178Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 Scope Regression 1789816369757",
+        "bodyAr": "QA26 Scope Regression 1789816369757",
+        "subjectId": 24,
+        "topicId": 35,
+        "questionTypeId": 1,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "id": 387,
+            "questionId": 136,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true,
+            "points": null,
+            "order": 1,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+          },
+          {
+            "id": 388,
+            "questionId": 136,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": false,
+            "points": null,
+            "order": 2,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+          },
+          {
+            "id": 389,
+            "questionId": 136,
+            "textEn": "6",
+            "textAr": "خيار 6",
+            "isCorrect": false,
+            "points": null,
+            "order": 3,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "a226f9b3af3b02edc510f11f1d5ad585"
+        },
+        "ms": 1421.12
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:52.659Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions?search=QA26%20Scope%20Regression%201789816369757&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1479.97
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:55.004Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/131",
+      "request": {
+        "id": 131,
+        "bodyEn": "QA26 Single: Which number is prime?",
+        "bodyAr": "اختبار QA26",
+        "explanationEn": "Acceptance QA expected answer",
+        "explanationAr": "الإجابة المتوقعة للاختبار",
+        "questionTypeId": 1,
+        "questionTypeNameEn": "MCQ_Single",
+        "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+        "questionCategoryId": null,
+        "questionCategoryNameEn": "",
+        "questionCategoryNameAr": "",
+        "subjectId": 24,
+        "subjectNameEn": "QA26 eng Foundations",
+        "subjectNameAr": "أساسيات اختبار QA26 eng",
+        "topicId": 35,
+        "topicNameEn": "QA26 eng Applied Knowledge",
+        "topicNameAr": "تطبيق المعرفة QA26 eng",
+        "points": 10,
+        "difficultyLevel": 2,
+        "difficultyLevelName": "Medium",
+        "isActive": true,
+        "isCalculatorAllowed": false,
+        "createdDate": "2026-09-19T14:52:28.8861773+04:00",
+        "updatedDate": null,
+        "isDeleted": false,
+        "options": [
+          {
+            "id": 376,
+            "questionId": 131,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true,
+            "points": null,
+            "order": 1,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:52:28.8861798+04:00"
+          },
+          {
+            "id": 377,
+            "questionId": 131,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": false,
+            "points": null,
+            "order": 2,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:52:28.8861811+04:00"
+          },
+          {
+            "id": 378,
+            "questionId": 131,
+            "textEn": "6",
+            "textAr": "خيار 6",
+            "isCorrect": false,
+            "points": null,
+            "order": 3,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:52:28.8861813+04:00"
+          }
+        ],
+        "attachments": [
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          }
+        ],
+        "answerKey": null,
+        "key": "single",
+        "expected": "2 gives 10; other selection gives 0",
+        "department": "eng"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question or subject not found",
+          "data": null,
+          "errors": [],
+          "traceId": "ccafb537047eab0ec54ee3c3d90d8a28"
+        },
+        "ms": 2343.31
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:56.191Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 131,
+          "bodyEn": "QA26 Single: Which number is prime?",
+          "bodyAr": "اختبار QA26",
+          "explanationEn": "Acceptance QA expected answer",
+          "explanationAr": "الإجابة المتوقعة للاختبار",
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T14:52:28.8861773+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 376,
+              "questionId": 131,
+              "textEn": "2",
+              "textAr": "خيار 2",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861798+04:00"
+            },
+            {
+              "id": 377,
+              "questionId": 131,
+              "textEn": "4",
+              "textAr": "خيار 4",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861811+04:00"
+            },
+            {
+              "id": 378,
+              "questionId": 131,
+              "textEn": "6",
+              "textAr": "خيار 6",
+              "isCorrect": false,
+              "points": null,
+              "order": 3,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861813+04:00"
+            }
+          ],
+          "attachments": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 131,
+            "bodyEn": "QA26 Single: Which number is prime?",
+            "bodyAr": "اختبار QA26",
+            "explanationEn": "Acceptance QA expected answer",
+            "explanationAr": "الإجابة المتوقعة للاختبار",
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T14:52:28.8861773+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 376,
+                "questionId": 131,
+                "textEn": "2",
+                "textAr": "خيار 2",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861798+04:00"
+              },
+              {
+                "id": 377,
+                "questionId": 131,
+                "textEn": "4",
+                "textAr": "خيار 4",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861811+04:00"
+              },
+              {
+                "id": 378,
+                "questionId": 131,
+                "textEn": "6",
+                "textAr": "خيار 6",
+                "isCorrect": false,
+                "points": null,
+                "order": 3,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861813+04:00"
+              }
+            ],
+            "attachments": [
+              {
+                "id": 11,
+                "questionId": 131,
+                "fileName": "qa26-reference.png",
+                "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                "fileType": "Image",
+                "fileSize": 68,
+                "isPrimary": true,
+                "createdDate": "2026-09-19T14:56:59.657869+04:00"
+              }
+            ],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1186.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:57.374Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/remove-user/9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User removed from department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1180.82
+      }
+    },
+    {
+      "at": "2026-09-19T11:12:58.606Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:12:58.6068755+04:00",
+          "user": {
+            "id": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+            "email": "qa26.ops.instructor1@example.test",
+            "displayName": "QA26 Operations Instructor 1",
+            "fullName": "QA26 Operations Instructor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:47:06.7413514+04:00",
+            "lastLoginDate": "2026-09-19T15:12:57.9024387+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:12:58.6068755+04:00",
+            "user": {
+              "id": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+              "email": "qa26.ops.instructor1@example.test",
+              "displayName": "QA26 Operations Instructor 1",
+              "fullName": "QA26 Operations Instructor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:47:06.7413514+04:00",
+              "lastLoginDate": "2026-09-19T15:12:57.9024387+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1230.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:00.261Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions?search=QA26&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1653.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:01.660Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this question",
+          "data": null,
+          "errors": [],
+          "traceId": "960d7c6bd2611eb3161e1d344d9f3e78"
+        },
+        "ms": 1397.67
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:02.821Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/options",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "b0ecf57a693dc042fc875af1bcc0bb98"
+        },
+        "ms": 1159.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:03.989Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "7d52826b9bcb15f775eb1bd9d07ad8c4"
+        },
+        "ms": 1165.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:05.386Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/count",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "count": 0,
+          "totalPoints": 0,
+          "subjectId": null,
+          "topicId": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "count": 0,
+            "totalPoints": 0,
+            "subjectId": null,
+            "topicId": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1395.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:06.783Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-subjects/23",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this subject",
+          "data": null,
+          "errors": [],
+          "traceId": "2b08a4b73ec069b6b9f1858a56f16470"
+        },
+        "ms": 1395.79
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:08.182Z",
+      "identity": "qa26.ops.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/34",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "You do not have access to this topic",
+          "data": null,
+          "errors": [],
+          "traceId": "8dfccc7cf5abb6de1313218e776f3bd2"
+        },
+        "ms": 1396.76
+      }
+    },
+    {
+      "at": "2026-09-19T11:13:09.592Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+        "departmentId": 9
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User assigned to department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1407.17
+      }
+    }
+  ]
+}

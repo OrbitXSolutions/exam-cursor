@@ -7,6 +7,7 @@ interface UserDto {
   email: string;
   displayName?: string;
   fullName?: string;
+  fullNameAr?: string;
   isBlocked: boolean;
   status: string;
   emailConfirmed: boolean;
@@ -27,7 +28,7 @@ function mapUserDtoToUser(dto: UserDto): User {
     id: dto.id,
     email: dto.email,
     fullNameEn: name,
-    fullNameAr: name,
+    fullNameAr: dto.fullNameAr ?? name,
     role: role as UserRole,
     isActive: !dto.isBlocked && dto.status !== "Inactive",
     createdDate: dto.createdDate,
@@ -146,11 +147,16 @@ export async function updateUser(
     isActive?: boolean;
   },
 ): Promise<User> {
-  const body: { fullName?: string; displayName?: string } = {};
+  const body: { fullName?: string; fullNameAr?: string } = {};
   if (data.fullNameEn != null) body.fullName = data.fullNameEn;
-  if (data.fullNameAr != null) body.displayName = data.fullNameAr;
+  if (data.fullNameAr != null) body.fullNameAr = data.fullNameAr;
   const raw = await apiClient.put<UserDto>(`/Users/${id}`, body);
-  return mapUserDtoToUser(raw);
+  const updated = mapUserDtoToUser(raw);
+  if (data.isActive != null && data.isActive !== updated.isActive) {
+    await apiClient.post(`/Users/${id}/${data.isActive ? "activate" : "deactivate"}`);
+    return getUserById(id);
+  }
+  return updated;
 }
 
 export async function deleteUser(id: string): Promise<void> {

@@ -1,0 +1,63 @@
+{
+  "classification": "Read-only application log review during the completed simulated50-candidate workload",
+  "start": "2026-09-19T13:52:47.143Z",
+  "end": "2026-09-19T13:58:10.825Z",
+  "matchingLogRecords": 3788,
+  "errorLogRecords": 1,
+  "errorLines": [
+    "2026-09-19 17:55:14.692 +04:00 [ERR] [Node:RO0ODY] [Env:Development] [Trace:0HNOMAH5HL2A0:00000009] [User:] [Notification:] [Event:] [Channel:] Failed to write audit log for action AttemptControl.AddTime on Attempt:317"
+  ],
+  "metrics": {
+    "start": {
+      "count": 50,
+      "p50Ms": 6017.29,
+      "p95Ms": 8598.79,
+      "p99Ms": 10462.27,
+      "maxMs": 10462.27
+    },
+    "saveAnswers": {
+      "count": 600,
+      "p50Ms": 2125.73,
+      "p95Ms": 3992.05,
+      "p99Ms": 6757.13,
+      "maxMs": 6768.39
+    },
+    "heartbeat": {
+      "count": 600,
+      "p50Ms": 1385.57,
+      "p95Ms": 1511.81,
+      "p99Ms": 1568.55,
+      "maxMs": 2318.08
+    },
+    "timer": {
+      "count": 600,
+      "p50Ms": 923.65,
+      "p95Ms": 1039.48,
+      "p99Ms": 1848.88,
+      "maxMs": 2791.43
+    },
+    "liveMonitoring": {
+      "count": 12,
+      "p50Ms": 2380.45,
+      "p95Ms": 2715.12,
+      "p99Ms": 2715.12,
+      "maxMs": 2715.12
+    },
+    "reloadSession": {
+      "count": 50,
+      "p50Ms": 1389.09,
+      "p95Ms": 1586.18,
+      "p99Ms": 1593.6,
+      "maxMs": 1593.6
+    },
+    "submit": {
+      "count": 50,
+      "p50Ms": 2081.82,
+      "p95Ms": 2288.71,
+      "p99Ms": 3946.83,
+      "maxMs": 3946.83
+    }
+  },
+  "attempts": 50,
+  "activeBarrier": "2026-09-19T13:54:36.591Z"
+}

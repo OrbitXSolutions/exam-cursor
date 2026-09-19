@@ -1,0 +1,1145 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:56:56.480Z",
+  "checks": [
+    {
+      "name": "Uploaded image attached and primary flag persists",
+      "passed": true,
+      "detail": [
+        {
+          "id": 11,
+          "questionId": 131,
+          "fileName": "qa26-reference.png",
+          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+          "fileType": "Image",
+          "fileSize": 68,
+          "isPrimary": true,
+          "createdDate": "2026-09-19T14:56:59.657869+04:00"
+        }
+      ],
+      "at": "2026-09-19T10:57:00.630Z"
+    },
+    {
+      "name": "Attached image bytes can be fetched for authorized instructor",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:57:00.639Z"
+    },
+    {
+      "name": "PDF media upload accepted",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "File uploaded successfully",
+        "file": {
+          "id": "60fd2312-754d-4655-a93d-8ca1ab72b630",
+          "originalFileName": "qa26-test-reference.pdf",
+          "storedFileName": "17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "extension": ".pdf",
+          "contentType": "application/pdf",
+          "sizeInBytes": 124,
+          "sizeFormatted": "124 B",
+          "mediaType": "Pdf",
+          "storageProvider": "Local",
+          "path": "questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "url": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "folder": "questions",
+          "createdDate": "2026-09-19T14:57:00.8914195+04:00"
+        },
+        "errors": []
+      },
+      "at": "2026-09-19T10:57:01.167Z"
+    },
+    {
+      "name": "Only latest requested primary attachment remains primary",
+      "passed": true,
+      "detail": [
+        {
+          "id": 12,
+          "questionId": 131,
+          "fileName": "qa26-test-reference.pdf",
+          "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "fileType": "PDF",
+          "fileSize": 124,
+          "isPrimary": true,
+          "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+        },
+        {
+          "id": 11,
+          "questionId": 131,
+          "fileName": "qa26-reference.png",
+          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+          "fileType": "Image",
+          "fileSize": 68,
+          "isPrimary": false,
+          "createdDate": "2026-09-19T14:56:59.657869+04:00"
+        }
+      ],
+      "at": "2026-09-19T10:57:03.298Z"
+    },
+    {
+      "name": "Attachment rename persists",
+      "passed": true,
+      "at": "2026-09-19T10:57:06.129Z"
+    },
+    {
+      "name": "Deleted attachment removed from question",
+      "passed": true,
+      "at": "2026-09-19T10:57:07.539Z"
+    },
+    {
+      "name": "Subject rename updates question presentation",
+      "passed": true,
+      "at": "2026-09-19T10:57:11.751Z"
+    },
+    {
+      "name": "Topic rename persists",
+      "passed": true,
+      "at": "2026-09-19T10:57:17.328Z"
+    },
+    {
+      "name": "Topic with questions cannot be deleted",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Cannot delete topic that is used by questions.",
+        "data": false,
+        "errors": [],
+        "traceId": "3c4b3cf7f257a77a5f3c5388402c9ca5"
+      },
+      "at": "2026-09-19T10:57:20.122Z"
+    },
+    {
+      "name": "Subject with questions/topics cannot be deleted",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Cannot delete subject with existing topics. Please delete topics first.",
+        "data": false,
+        "errors": [],
+        "traceId": "e7e4835ff58c947031bfb54d9c82304f"
+      },
+      "at": "2026-09-19T10:57:20.595Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:56:57.723Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:56:57.720063+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:56:57.0260786+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:56:57.720063+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:56:57.0260786+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1241.23
+      }
+    },
+    {
+      "at": "2026-09-19T10:56:58.933Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:56:58.9336462+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T14:56:58.2402567+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:56:58.9336462+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T14:56:58.2402567+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1208.79
+      }
+    },
+    {
+      "at": "2026-09-19T10:56:59.920Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "request": {
+        "questionId": 131,
+        "fileName": "qa26-reference.png",
+        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+        "fileType": "Image",
+        "fileSize": 68,
+        "isPrimary": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "questionId": 131,
+          "fileName": "qa26-reference.png",
+          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+          "fileType": "Image",
+          "fileSize": 68,
+          "isPrimary": true,
+          "createdDate": "2026-09-19T14:56:59.657869+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Attachment added successfully",
+          "data": {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 985.83
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:00.630Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 708.93
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:01.167Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=questions",
+      "request": {
+        "filename": "qa26-test-reference.pdf",
+        "contentType": "application/pdf",
+        "bytes": 124
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "success": true,
+          "message": "File uploaded successfully",
+          "file": {
+            "id": "60fd2312-754d-4655-a93d-8ca1ab72b630",
+            "originalFileName": "qa26-test-reference.pdf",
+            "storedFileName": "17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "extension": ".pdf",
+            "contentType": "application/pdf",
+            "sizeInBytes": 124,
+            "sizeFormatted": "124 B",
+            "mediaType": "Pdf",
+            "storageProvider": "Local",
+            "path": "questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "url": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "folder": "questions",
+            "createdDate": "2026-09-19T14:57:00.8914195+04:00"
+          },
+          "errors": []
+        },
+        "ms": 526.2404999999999
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:02.588Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "request": {
+        "questionId": 131,
+        "fileName": "qa26-test-reference.pdf",
+        "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+        "fileType": "PDF",
+        "fileSize": 124,
+        "isPrimary": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 12,
+          "questionId": 131,
+          "fileName": "qa26-test-reference.pdf",
+          "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "fileType": "PDF",
+          "fileSize": 124,
+          "isPrimary": true,
+          "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Attachment added successfully",
+          "data": {
+            "id": 12,
+            "questionId": 131,
+            "fileName": "qa26-test-reference.pdf",
+            "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "fileType": "PDF",
+            "fileSize": 124,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1419.58
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:03.297Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 12,
+            "questionId": 131,
+            "fileName": "qa26-test-reference.pdf",
+            "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "fileType": "PDF",
+            "fileSize": 124,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+          },
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": false,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 12,
+              "questionId": 131,
+              "fileName": "qa26-test-reference.pdf",
+              "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+              "fileType": "PDF",
+              "fileSize": 124,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+            },
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": false,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 708.54
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:04.703Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PATCH",
+      "route": "/api/QuestionBank/attachments/11/set-primary",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Primary attachment set successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1405.06
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:05.420Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/attachments/12",
+      "request": {
+        "id": 12,
+        "questionId": 131,
+        "fileName": "QA26 PDF renamed",
+        "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+        "fileType": "PDF",
+        "fileSize": 124,
+        "isPrimary": false,
+        "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 12,
+          "questionId": 131,
+          "fileName": "QA26 PDF renamed",
+          "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+          "fileType": "PDF",
+          "fileSize": 124,
+          "isPrimary": false,
+          "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Attachment updated successfully",
+          "data": {
+            "id": 12,
+            "questionId": 131,
+            "fileName": "QA26 PDF renamed",
+            "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "fileType": "PDF",
+            "fileSize": 124,
+            "isPrimary": false,
+            "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 715.92
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:06.129Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          },
+          {
+            "id": 12,
+            "questionId": 131,
+            "fileName": "QA26 PDF renamed",
+            "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+            "fileType": "PDF",
+            "fileSize": 124,
+            "isPrimary": false,
+            "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            },
+            {
+              "id": 12,
+              "questionId": 131,
+              "fileName": "QA26 PDF renamed",
+              "filePath": "/media/questions/2026/09/17706598-ec2c-4eb4-b1f8-6521be7ad362.pdf",
+              "fileType": "PDF",
+              "fileSize": 124,
+              "isPrimary": false,
+              "createdDate": "2026-09-19T14:57:01.8699626+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 707.67
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:06.839Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/attachments/12",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Attachment deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 709
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:07.539Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 698.7
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:08.237Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131/attachments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 11,
+            "questionId": 131,
+            "fileName": "qa26-reference.png",
+            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+            "fileType": "Image",
+            "fileSize": 68,
+            "isPrimary": true,
+            "createdDate": "2026-09-19T14:56:59.657869+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 697.32
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:10.361Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/23",
+      "request": {
+        "nameEn": "QA26 eng Foundations Updated",
+        "nameAr": "أساسيات اختبار QA26 eng"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 23,
+          "nameEn": "QA26 eng Foundations Updated",
+          "nameAr": "أساسيات اختبار QA26 eng",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T14:52:19.3683945+04:00",
+          "updatedDate": "2026-09-19T14:57:10.1121846+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject updated successfully",
+          "data": {
+            "id": 23,
+            "nameEn": "QA26 eng Foundations Updated",
+            "nameAr": "أساسيات اختبار QA26 eng",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T14:52:19.3683945+04:00",
+            "updatedDate": "2026-09-19T14:57:10.1121846+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2122.69
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:11.751Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/131",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 131,
+          "bodyEn": "QA26 Single: Which number is prime?",
+          "bodyAr": "اختبار QA26",
+          "explanationEn": "Acceptance QA expected answer",
+          "explanationAr": "الإجابة المتوقعة للاختبار",
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations Updated",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T14:52:28.8861773+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 376,
+              "questionId": 131,
+              "textEn": "2",
+              "textAr": "خيار 2",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861798+04:00"
+            },
+            {
+              "id": 377,
+              "questionId": 131,
+              "textEn": "4",
+              "textAr": "خيار 4",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861811+04:00"
+            },
+            {
+              "id": 378,
+              "questionId": 131,
+              "textEn": "6",
+              "textAr": "خيار 6",
+              "isCorrect": false,
+              "points": null,
+              "order": 3,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:52:28.8861813+04:00"
+            }
+          ],
+          "attachments": [
+            {
+              "id": 11,
+              "questionId": 131,
+              "fileName": "qa26-reference.png",
+              "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+              "fileType": "Image",
+              "fileSize": 68,
+              "isPrimary": true,
+              "createdDate": "2026-09-19T14:56:59.657869+04:00"
+            }
+          ],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 131,
+            "bodyEn": "QA26 Single: Which number is prime?",
+            "bodyAr": "اختبار QA26",
+            "explanationEn": "Acceptance QA expected answer",
+            "explanationAr": "الإجابة المتوقعة للاختبار",
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations Updated",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T14:52:28.8861773+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 376,
+                "questionId": 131,
+                "textEn": "2",
+                "textAr": "خيار 2",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861798+04:00"
+              },
+              {
+                "id": 377,
+                "questionId": 131,
+                "textEn": "4",
+                "textAr": "خيار 4",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861811+04:00"
+              },
+              {
+                "id": 378,
+                "questionId": 131,
+                "textEn": "6",
+                "textAr": "خيار 6",
+                "isCorrect": false,
+                "points": null,
+                "order": 3,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T14:52:28.8861813+04:00"
+              }
+            ],
+            "attachments": [
+              {
+                "id": 11,
+                "questionId": 131,
+                "fileName": "qa26-reference.png",
+                "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                "fileType": "Image",
+                "fileSize": 68,
+                "isPrimary": true,
+                "createdDate": "2026-09-19T14:56:59.657869+04:00"
+              }
+            ],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1388.64
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:13.841Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-subjects/23",
+      "request": {
+        "nameEn": "QA26 eng Foundations",
+        "nameAr": "أساسيات اختبار QA26 eng"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 23,
+          "nameEn": "QA26 eng Foundations",
+          "nameAr": "أساسيات اختبار QA26 eng",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 1,
+          "createdDate": "2026-09-19T14:52:19.3683945+04:00",
+          "updatedDate": "2026-09-19T14:57:13.6015514+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject updated successfully",
+          "data": {
+            "id": 23,
+            "nameEn": "QA26 eng Foundations",
+            "nameAr": "أساسيات اختبار QA26 eng",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 1,
+            "createdDate": "2026-09-19T14:52:19.3683945+04:00",
+            "updatedDate": "2026-09-19T14:57:13.6015514+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2089.16
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:15.940Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/34",
+      "request": {
+        "nameEn": "QA26 eng Applied Knowledge Updated",
+        "nameAr": "تطبيق المعرفة QA26 eng",
+        "subjectId": 23
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 34,
+          "nameEn": "QA26 eng Applied Knowledge Updated",
+          "nameAr": "تطبيق المعرفة QA26 eng",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+          "updatedDate": "2026-09-19T14:57:15.7033403+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 34,
+            "nameEn": "QA26 eng Applied Knowledge Updated",
+            "nameAr": "تطبيق المعرفة QA26 eng",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+            "updatedDate": "2026-09-19T14:57:15.7033403+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2098.02
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:17.327Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Lookups/question-topics/34",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 34,
+          "nameEn": "QA26 eng Applied Knowledge Updated",
+          "nameAr": "تطبيق المعرفة QA26 eng",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+          "updatedDate": "2026-09-19T14:57:15.7033403+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 34,
+            "nameEn": "QA26 eng Applied Knowledge Updated",
+            "nameAr": "تطبيق المعرفة QA26 eng",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+            "updatedDate": "2026-09-19T14:57:15.7033403+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1386.42
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:19.418Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/Lookups/question-topics/34",
+      "request": {
+        "nameEn": "QA26 eng Applied Knowledge",
+        "nameAr": "تطبيق المعرفة QA26 eng",
+        "subjectId": 23
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 34,
+          "nameEn": "QA26 eng Applied Knowledge",
+          "nameAr": "تطبيق المعرفة QA26 eng",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+          "updatedDate": "2026-09-19T14:57:19.1845086+04:00",
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question topic updated successfully",
+          "data": {
+            "id": 34,
+            "nameEn": "QA26 eng Applied Knowledge",
+            "nameAr": "تطبيق المعرفة QA26 eng",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "createdDate": "2026-09-19T14:52:21.2617938+04:00",
+            "updatedDate": "2026-09-19T14:57:19.1845086+04:00",
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2089.75
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:20.121Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-topics/34",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Cannot delete topic that is used by questions.",
+          "data": false,
+          "errors": [],
+          "traceId": "3c4b3cf7f257a77a5f3c5388402c9ca5"
+        },
+        "ms": 702.19
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:20.594Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "DELETE",
+      "route": "/api/Lookups/question-subjects/23",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Cannot delete subject with existing topics. Please delete topics first.",
+          "data": false,
+          "errors": [],
+          "traceId": "e7e4835ff58c947031bfb54d9c82304f"
+        },
+        "ms": 471.31
+      }
+    }
+  ]
+}

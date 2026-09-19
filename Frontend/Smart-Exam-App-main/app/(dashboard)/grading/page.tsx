@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
-import { getManualGradingRequired, getGradingSessions, finalizeResult, GradingStatus, type GradingSessionListItem } from "@/lib/api/grading"
-import { getExamListForDropdown, type ExamDropdownItem } from "@/lib/api/exams"
+import { useAuth } from "@/lib/auth/context"
+import { UserRole } from "@/lib/types"
+import { getManualGradingRequired, getGradingSessions, getGradingExamChoices, finalizeResult, GradingStatus, type GradingSessionListItem } from "@/lib/api/grading"
+import type { ExamDropdownItem } from "@/lib/api/exams"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -31,6 +33,8 @@ type ListFilter = "pending" | "all"
 export default function GradingPage() {
   const { t, dir, language } = useI18n()
   const router = useRouter()
+  const { hasRole } = useAuth()
+  const canManageResults = hasRole([UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor])
   const [submissions, setSubmissions] = useState<GradingSessionListItem[]>([])
   const [exams, setExams] = useState<ExamDropdownItem[]>([])
   const [totalCount, setTotalCount] = useState(0)
@@ -86,7 +90,7 @@ export default function GradingPage() {
 
   // Load exam dropdown options once
   useEffect(() => {
-    getExamListForDropdown()
+    getGradingExamChoices()
       .then((list) => setExams(Array.isArray(list) ? list : []))
       .catch(() => setExams([]))
   }, [])
@@ -159,7 +163,7 @@ export default function GradingPage() {
               <p className="text-2xl font-bold">
                 {submissions.reduce((acc, s) => acc + (s.manualGradingRequired ?? 0), 0)}
               </p>
-              <p className="text-sm text-muted-foreground">{t("grading.questionsToGrade")}</p>
+              <p className="text-sm text-muted-foreground">{t("grading.questionsToGrade")} {language === "ar" ? "(هذه الصفحة)" : "(this page)"}</p>
             </div>
           </CardContent>
         </Card>
@@ -169,8 +173,8 @@ export default function GradingPage() {
               <Clock className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{exams.length}</p>
-              <p className="text-sm text-muted-foreground">{t("grading.examsWithPending")}</p>
+              <p className="text-2xl font-bold">{new Set(submissions.filter(s => s.manualGradingRequired > 0).map(s => s.examId)).size}</p>
+              <p className="text-sm text-muted-foreground">{t("grading.examsWithPending")} {language === "ar" ? "(هذه الصفحة)" : "(this page)"}</p>
             </div>
           </CardContent>
         </Card>
@@ -296,7 +300,7 @@ export default function GradingPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {isCompleted && (
+                            {isCompleted && canManageResults && (
                               <Button
                                 variant="outline"
                                 size="sm"

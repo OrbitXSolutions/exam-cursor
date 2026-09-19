@@ -551,7 +551,11 @@ export default function AssignToExamPage() {
                     {candidates.map((c, idx) => (
                       <TableRow key={c.id} className="cursor-pointer" onClick={() => toggleOne(c.id)}>
                         <TableCell>
-                          <Checkbox checked={selected.has(c.id)} onCheckedChange={() => toggleOne(c.id)} />
+                          <Checkbox
+                            checked={selected.has(c.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            onCheckedChange={() => toggleOne(c.id)}
+                          />
                         </TableCell>
                         <TableCell className="font-mono text-muted-foreground">
                           {(page - 1) * pageSize + idx + 1}

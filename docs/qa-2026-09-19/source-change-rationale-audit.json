@@ -1,0 +1,367 @@
+{
+  "capturedAt": "2026-09-19T14:35:22.058Z",
+  "head": "2b890607988668f261fedfbf7ebf227742a637d6",
+  "productionFiles": 71,
+  "mappedFiles": 71,
+  "missing": [],
+  "extra": [],
+  "duplicates": [],
+  "rows": [
+    {
+      "group": "Administration and settings",
+      "file": "Backend-API/Application/DTOs/Users/UserDtos.cs",
+      "reason": "D05: carry Arabic full name independently in list/detail/update contracts so the UI does not substitute the English/display name."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Backend-API/Application/Validators/Users/UserValidators.cs",
+      "reason": "D05: bound the newly carried Arabic name to the persisted name length."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Backend-API/Application/Validators/Notification/NotificationValidators.cs",
+      "reason": "D07: reject notification settings/template/test-send values outside supported enums, lengths and worker bounds before invalid persistence or server errors."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Backend-API/Application/Validators/Settings/SystemSettingsValidators.cs",
+      "reason": "D07: reject invalid upload/session/password limits and unsupported default proctor modes."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Backend-API/Infrastructure/Services/UserService.cs",
+      "reason": "D03/D05/D61: validate the target active department before mutation, persist FullNameAr, and replace serial per-user role lookups with one query scoped to the selected users."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/departments/page.tsx",
+      "reason": "D01: load the full department before opening Edit because the list omits descriptions and previously overwrote them with empty strings."
+    },
+    {
+      "group": "Administration and settings",
+      "file": "Frontend/Smart-Exam-App-main/lib/api/admin.ts",
+      "reason": "D05/D06: map/send FullNameAr separately and use the existing activate/deactivate route for status changes. This does not fix the separate ordinary role-edit defect."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Application/DTOs/QuestionBank/QuestionDtos.cs",
+      "reason": "D08: accept an optional complete option list alongside a question update so points and options can be validated/saved atomically; omission preserves metadata-only clients."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Application/Validators/QuestionBank/QuestionOptionRules.cs",
+      "reason": "D08: centralize choice-count, correct-key, nonnegative weight and weighted-total invariants for creation and edits."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Application/Validators/QuestionBank/QuestionValidators.cs",
+      "reason": "D08: apply the common option invariants and nested option validation before create/update persistence."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/QuestionBank/QuestionBankService.cs",
+      "reason": "D08/D09: enforce question/subject scope before writes, validate option ownership and invariants, update total/options together, and prevent deleted or foreign options leaking into ordinary operations."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/Lookups/LookupsService.cs",
+      "reason": "D09: scope subject/topic lookup reads and mutations to the actor department and validate related ownership before saving."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/Assessment/AssessmentService.cs",
+      "reason": "D11/D53: restrict automatic proctor assignment to the exam department; make department scope mandatory; check nested exam/section/question/instruction/policy/source resources and their linked bank ownership before reads and writes. D59 soft-delete uniqueness remains unresolved."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/Batch/BatchService.cs",
+      "reason": "D12/D14: apply actor/candidate scope to cohort members, exports and assignment-related operations. This does not supply the unresolved cohort metadata ownership model."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/ExamAssignment/ExamAssignmentService.cs",
+      "reason": "D14: scope candidate/exam lists and assignment mutations, validate explicit selections atomically, and reject inactive or inaccessible cohort membership."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Backend-API/Infrastructure/Services/Proctor/ExamProctorService.cs",
+      "reason": "D52: protect legacy roster/assign/unassign operations, restrict available proctors, and include actor scope in roster cache keys/invalidation while preserving authorized explicit grants."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/question-bank/[id]/edit/page.tsx",
+      "reason": "D08/D24: submit question total and complete options in one update, retain both explanations, and surface option-image upload failures rather than continuing with a partial save."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Frontend/Smart-Exam-App-main/lib/types/api-params.ts",
+      "reason": "D08/D24: type the optional atomic option list and bilingual explanations in the frontend update contract."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Frontend/Smart-Exam-App-main/components/exam/exam-setup-content.tsx",
+      "reason": "D10: provide and require the active-department selector for SuperAdmin exam creation, matching the existing backend contract."
+    },
+    {
+      "group": "Question bank, authoring and assignment",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/candidates/assign-to-exam/page.tsx",
+      "reason": "D13: stop the checkbox click from bubbling to the row and toggling the same candidate twice."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Application/Validators/Assessment/WalkInAnswerValidation.cs",
+      "reason": "D17: validate configured required/custom fields, duplicate/unknown field IDs, lengths and finite numeric values before walk-in user creation."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Application/Validators/Candidate/CandidateAnswerValidation.cs",
+      "reason": "D15: reject duplicate/foreign/deleted choices and invalid answer shapes while retaining the intentional empty-answer clear operation."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Domain/Common/AnswerContent.cs",
+      "reason": "D21/D46: share a content predicate so an empty persisted answer row is not treated as an answered question by candidate/proctor/report paths."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Domain/Common/AttemptOptionOrder.cs",
+      "reason": "D28: derive a stable per-attempt/question/option ordering key so repeat session reads do not reshuffle."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Infrastructure/Services/Authorization/CandidateIdentityPolicy.cs",
+      "reason": "D16: share the latest approved identity requirement between the current and legacy start paths. Synthetic workflow verification does not establish physical identity accuracy."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Infrastructure/Services/Authorization/CandidateAssignmentPolicy.cs",
+      "reason": "D55: share the active, nondeleted assignment requirement for restricted-exam admission. Source is loaded; post-fix runtime verification remains NOT VERIFIED."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Infrastructure/Services/Assessment/ExamShareService.cs",
+      "reason": "D17/D27: validate walk-in fields and active account eligibility, and prevent public share selection/registration from minting staff or mixed-role credentials. The wider existing-candidate identity model remains unresolved."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Infrastructure/Services/Attempt/AttemptService.cs",
+      "reason": "D15/D16/D21/D23/D28/D33/D43/D55/D62/D63: align legacy admission, answer content/validation, stable options, terminal-state handling and result visibility; lock the active attempt by primary key under existing candidate serialization; close proctor sessions with terminal attempts. Verification limits remain per finding."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Backend-API/Infrastructure/Services/Candidate/CandidateService.cs",
+      "reason": "D15/D16/D17/D21/D23/D28/D42/D43/D55/D62/D63: align current candidate admission/answer/terminal paths, preserve stable option order and saved attempt maxima, enforce result visibility, narrow the start lock, and close terminal proctor sessions. D55 remains runtime-unverified."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Frontend/Smart-Exam-App-main/app/(candidate)/take-exam/[attemptId]/exam-page.tsx",
+      "reason": "D21/D26: count real answer content, enqueue/retry pending saves, flush before manual submission, prevent overlapping submits, and keep monitoring/retry alive until the server accepts submission. Pending edits remain memory-only."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Frontend/Smart-Exam-App-main/app/(candidate)/take-exam/[attemptId]/question-renderer.tsx",
+      "reason": "D28: render the server-provided per-attempt option sequence instead of sorting it back into author order."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Frontend/Smart-Exam-App-main/lib/exam/answer-save-queue.ts",
+      "reason": "D26: retain and serialize pending answer writes, retry failures, and expose a flush result so submission cannot silently discard an unsaved open-tab edit."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Frontend/Smart-Exam-App-main/lib/i18n/translations.ts",
+      "reason": "D26/D40: explain retry/unsaved-submit behavior in English/Arabic and correct grading finalization copy to describe later publication and regrading."
+    },
+    {
+      "group": "Candidate admission, answers and lifecycle",
+      "file": "Frontend/Smart-Exam-App-main/components/exam/exam-calculator.tsx",
+      "reason": "D67: constrain floating-panel width/height, enable vertical scrolling and clamp resize position so expanded Financial/PV controls remain accessible at the tested viewport. Calculation formulas are unchanged."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Services/AuthService.cs",
+      "reason": "D04: reject login for deleted or nonactive accounts rather than checking only the Inactive enum value."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Program.cs",
+      "reason": "D04/D51: recheck authoritative account eligibility and compare current roles after JWT validation so old issued claims are not treated as current administration state. D51 post-fix runtime closure is absent."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Hubs/ProctorHub.cs",
+      "reason": "D19/D51: recheck account eligibility for an existing socket invocation and abort stale-role invocations. This does not prove proactive eviction of an idle recipient or peer media."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Services/Authorization/ResourceAuthorizationService.cs",
+      "reason": "D22: prevent candidate-only roles from obtaining staff-like session/evidence access solely through department shortcuts."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Controllers/Attempt/AttemptController.cs",
+      "reason": "D25: allow the Proctor role to reach the existing scoped attempt-events service so authorized proctors can view the events already collected."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Services/AttemptControl/AttemptControlService.cs",
+      "reason": "D18/D66: scope attempt lists and control targets to the acting user; await AddTime/ForceEnd audit writes within the request scope instead of capturing its DbContext in fire-and-forget tasks."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Application/DTOs/Proctor/ProctorDtos.cs",
+      "reason": "D65: carry RemainingSeconds on the live session-list DTO so frontend cards can display the authoritative remaining time."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Services/Proctor/ProctorService.cs",
+      "reason": "D21/D29/D54/D57/D63/D65: count actual answer content, return authorized image URLs, validate evidence confirmation ownership/positive size, exclude terminal parent attempts from live views, and compute remaining time for Started/InProgress/Paused/Resumed versus terminal states."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Backend-API/Infrastructure/Services/Proctor/AiProctorService.cs",
+      "reason": "D21: use real answer content for activity/progress inputs rather than counting empty persisted answer rows. This is not AI model-quality acceptance."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/[sessionId]/page.tsx",
+      "reason": "D20/D25/D29/D31: show pass score in points, refresh the actual attempt-event stream, derive displayed event totals/latest activity from that stream, and load snapshots with authenticated evidence rendering. Risk-model aggregation is not redefined."
+    },
+    {
+      "group": "Account and live proctor behavior",
+      "file": "Frontend/Smart-Exam-App-main/lib/api/proctoring.ts",
+      "reason": "D25/D65: propagate event fetch errors instead of fabricating an empty list and map server remaining seconds to nonnegative rounded-up minutes rather than hardcoded zero."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Controllers/Proctor/ProctorEvidenceFileController.cs",
+      "reason": "D29/D54: supply an authenticated image evidence download route with ownership checks, supported image types and private/no-store response headers."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Controllers/Proctor/VideoRecordingController.cs",
+      "reason": "D29/D30: reject negative/out-of-range chunk indexes and use authenticated evidence URLs instead of public static snapshot paths."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Controllers/MediaController.cs",
+      "reason": "D29/D60: make protected media responses private/no-store with nosniff and reject invalid/overflowing pagination before server errors."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Infrastructure/Services/MediaStorageService.cs",
+      "reason": "D29/D58: scope private snapshot access/listing, return authenticated snapshot URLs, and require permitted uploader/actor scope for deletion."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Infrastructure/Storage/PublicMediaFileProvider.cs",
+      "reason": "D29: exclude private snapshot/chunk roots and reject Windows short-name/path aliases that could bypass the public-file filter."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Infrastructure/Services/CandidateExamDetails/CandidateExamDetailsService.cs",
+      "reason": "D29: replace public snapshot paths with the authenticated evidence download route in candidate detail responses."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Backend-API/Infrastructure/Services/Incident/IncidentService.cs",
+      "reason": "D44/D54: apply consistent case/child/write scope, validate linked attempt/session/evidence/reviewer references, preserve the explicitly internal system path, invalidate affected views, and expose eligible image preview URLs."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/components/proctor/evidence-image.tsx",
+      "reason": "D29/D54: fetch authorized evidence bytes and render/revoke local object URLs; provide the corresponding authenticated View-link behavior. Incident link opening remains unverified where the tool blocked it."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/candidates/exam-details/page.tsx",
+      "reason": "D29: use authenticated EvidenceImage for protected candidate snapshot display."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/page.tsx",
+      "reason": "D29: use authenticated EvidenceImage for protected proctor card snapshots."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/stream/[candidateId]/page.tsx",
+      "reason": "D29: use authenticated EvidenceImage for protected stream-page snapshots."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/video/[candidateId]/page.tsx",
+      "reason": "D29/D69: render protected image snapshots with authenticated EvidenceImage, and map only filtered image evidence into Screenshots. Removing the fallback to all evidence prevents finalized video files from appearing as broken screenshot cards when no images exist."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/results/ai-report/[examId]/[candidateId]/page.tsx",
+      "reason": "D29: use authenticated EvidenceImage for protected evidence thumbnails in AI reports."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/proctor-center/incidents/[id]/page.tsx",
+      "reason": "D54: use the authenticated EvidenceLink instead of navigating directly to protected bytes without request credentials. API/link visibility is verified; tool-blocked opening is not."
+    },
+    {
+      "group": "Evidence files, incidents and playback",
+      "file": "Frontend/Smart-Exam-App-main/components/ui/video-chunk-player.tsx",
+      "reason": "D68: bind time/play/pause/end/duration handlers directly to the rendered video instead of a mount-only effect that ran before the loading branch created the element; keep timer, seek position and Play/Pause state synchronized with actual playback. Add a semantic Play/Pause label and concise stage-specific failures with structured console diagnostics; remove the temporary 50 ms tracing delay. Corrected synthetic media already proved real decoding; this repairs the separately confirmed frozen UI, with real-browser play/pause/end at 8.021 seconds, replay, seek to 1.5 seconds, forward-to-end and back-to-zero verified. No codec, API, capture or buffering algorithm changed."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Backend-API/Application/DTOs/Grading/GradingDtos.cs",
+      "reason": "D38/D43: expose an explicit IsGraded flag for saved zero/no-comment grades and permit nullable correctness when result policy withholds correctness."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Backend-API/Controllers/Grading/GradingController.cs",
+      "reason": "D32: provide the grading-specific exam dropdown to authorized Examiner users through the existing scoped assessment service."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Backend-API/Infrastructure/Services/Grading/GradingService.cs",
+      "reason": "D34/D37/D38/D39/D43: enforce actor-aware grading scope including background submissions, allow ForceSubmitted grading, include AutoGraded detail, map explicit saved-grade state, and honor candidate review/correct-answer visibility."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Backend-API/Infrastructure/Services/Grading/AiGradingService.cs",
+      "reason": "D34: authorize the grading session/attempt before AI suggestion work. This does not validate an external AI provider or suggestion quality."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Backend-API/Infrastructure/Services/ExamResult/ExamResultService.cs",
+      "reason": "D43/D46: check publication/ShowResults before candidate result/history/summary reads, and include AutoGraded sessions, actual attempted pooled questions/maxima and content-based unanswered counts in analytics."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/grading/page.tsx",
+      "reason": "D32/D40: use the authorized grading dropdown, show accurate current-page pending metrics, and hide result-finalization actions from roles that cannot manage results."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/grading/[submissionId]/page.tsx",
+      "reason": "D35/D38/D40: compute the displayed automatic-only subtotal, recognize a saved zero via IsGraded, and gate the result action by the existing management roles."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/lib/api/grading.ts",
+      "reason": "D32/D38/D45: type and consume the grading-specific dropdown, explicit IsGraded marker and full CorrectOptions list already supplied for reports."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/results/review/[examId]/[candidateId]/page.tsx",
+      "reason": "D41: display localized selected option text in View All rather than raw IDs, retaining fallback behavior when text is unavailable."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/lib/export/candidate-report.ts",
+      "reason": "D45/D47: export every correct option from CorrectOptions and size wrapped XLSX rows from their content so long essays/rubrics are not clipped."
+    },
+    {
+      "group": "Grading, results and exports",
+      "file": "Frontend/Smart-Exam-App-main/app/(dashboard)/reports/page.tsx",
+      "reason": "D48/D49/D56: label raw mean/highest values as points, quote/escape every CSV field including localized dates, and prefix formula-like candidate strings to preserve text interpretation. Native spreadsheet execution remains separate."
+    }
+  ],
+  "updatedAt": "2026-09-19T14:51:57.631Z"
+}

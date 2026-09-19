@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.ExamAssignment;
 
@@ -21,19 +22,22 @@ public class ExamAssignmentService : IExamAssignmentService
     private readonly INotificationService _notificationService;
     private readonly ILogger<ExamAssignmentService> _logger;
     private readonly ICacheService _cache;
+    private readonly ResourceAuthorizationService _authorization;
 
     public ExamAssignmentService(
         ApplicationDbContext db,
         RoleManager<ApplicationRole> roleManager,
         INotificationService notificationService,
         ILogger<ExamAssignmentService> logger,
-        ICacheService cache)
+        ICacheService cache,
+        ResourceAuthorizationService authorization)
     {
         _db = db;
         _roleManager = roleManager;
         _notificationService = notificationService;
         _logger = logger;
         _cache = cache;
+        _authorization = authorization;
     }
 
     // ── Candidate list with computed flags ─────────────────────
@@ -45,7 +49,10 @@ public class ExamAssignmentService : IExamAssignmentService
             return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.FailureResponse("ExamId is required.");
         if (filter.ScheduleFrom >= filter.ScheduleTo)
             return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.FailureResponse("ScheduleTo must be after ScheduleFrom.");
-        var cacheKey = CacheKeys.ExamAssignmentCandidates(filter.ExamId, JsonSerializer.Serialize(filter));
+        if (!await _authorization.CanAccessExamAsync(filter.ExamId))
+            return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.FailureResponse("Exam not found.");
+        var scopeKey = await _authorization.GetCurrentScopeCacheKeyAsync();
+        var cacheKey = CacheKeys.ExamAssignmentCandidates(filter.ExamId, scopeKey + JsonSerializer.Serialize(filter));
         if (_cache.TryGet<PaginatedResponse<AssignmentCandidateDto>>(cacheKey, out var cachedPage) && cachedPage != null)
             return ApiResponse<PaginatedResponse<AssignmentCandidateDto>>.SuccessResponse(cachedPage);
         // Get candidate role IDs
@@ -61,12 +68,13 @@ public class ExamAssignmentService : IExamAssignmentService
 
         var query = _db.Users
             .Where(u => candidateUserIds.Contains(u.Id) && !u.IsDeleted);
+        query = await _authorization.ScopeUsersAsync(query);
 
         // Filter by batch
         if (filter.BatchId.HasValue && filter.BatchId > 0)
         {
             var batchCandidateIds = await _db.BatchCandidates
-                .Where(bc => bc.BatchId == filter.BatchId.Value)
+                .Where(bc => bc.BatchId == filter.BatchId.Value && !bc.Batch.IsDeleted)
                 .Select(bc => bc.CandidateId)
                 .ToListAsync();
             query = query.Where(u => batchCandidateIds.Contains(u.Id));
@@ -152,14 +160,23 @@ public class ExamAssignmentService : IExamAssignmentService
         if (dto.ScheduleFrom >= dto.ScheduleTo)
             return ApiResponse<AssignmentResultDto>.FailureResponse("ScheduleTo must be after ScheduleFrom.");
 
+        if (!await _authorization.CanAccessExamAsync(dto.ExamId))
+            return ApiResponse<AssignmentResultDto>.FailureResponse("Exam not found.");
+
         var exam = await _db.Exams.FirstOrDefaultAsync(e => e.Id == dto.ExamId && !e.IsDeleted);
         if (exam == null)
             return ApiResponse<AssignmentResultDto>.FailureResponse("Exam not found.");
         if (!exam.IsPublished)
             return ApiResponse<AssignmentResultDto>.FailureResponse("Only published exams can be assigned.");
 
+        if (dto.CandidateIds is not { Count: > 0 } && dto.BatchId is > 0 &&
+            !await _db.Batches.AnyAsync(b => b.Id == dto.BatchId.Value && !b.IsDeleted && b.IsActive))
+            return ApiResponse<AssignmentResultDto>.FailureResponse("Batch not found or inactive.");
+
         // Resolve target candidate IDs
         var targetIds = await ResolveTargetCandidateIds(dto);
+        if (dto.CandidateIds is { Count: > 0 } && dto.CandidateIds.Distinct().Except(targetIds).Any())
+            return ApiResponse<AssignmentResultDto>.FailureResponse("Candidate not found.");
         if (targetIds.Count == 0)
             return ApiResponse<AssignmentResultDto>.FailureResponse("No candidates matched the criteria.");
 
@@ -266,6 +283,13 @@ public class ExamAssignmentService : IExamAssignmentService
         if (dto.CandidateIds.Count == 0)
             return ApiResponse<AssignmentResultDto>.FailureResponse("No candidates specified.");
 
+        if (!await _authorization.CanAccessExamAsync(dto.ExamId))
+            return ApiResponse<AssignmentResultDto>.FailureResponse("Exam not found.");
+        var visibleCandidateIds = await (await GetAccessibleCandidatesAsync())
+            .Where(u => dto.CandidateIds.Contains(u.Id)).Select(u => u.Id).ToListAsync();
+        if (dto.CandidateIds.Distinct().Except(visibleCandidateIds).Any())
+            return ApiResponse<AssignmentResultDto>.FailureResponse("Candidate not found.");
+
         var assignments = await _db.ExamAssignments
             .Where(a => a.ExamId == dto.ExamId && a.IsActive && !a.IsDeleted
                         && dto.CandidateIds.Contains(a.CandidateId))
@@ -323,17 +347,17 @@ public class ExamAssignmentService : IExamAssignmentService
     // ── Helper: resolve target candidates from DTO ─────────────
     private async Task<List<string>> ResolveTargetCandidateIds(AssignExamDto dto)
     {
+        var accessibleCandidates = await GetAccessibleCandidatesAsync();
         // Explicit list
         if (dto.CandidateIds != null && dto.CandidateIds.Count > 0)
-            return dto.CandidateIds.Distinct().ToList();
+            return await accessibleCandidates.Where(u => dto.CandidateIds.Contains(u.Id)).Select(u => u.Id).ToListAsync();
 
         // Batch
         if (dto.BatchId.HasValue && dto.BatchId > 0)
         {
-            return await _db.BatchCandidates
-                .Where(bc => bc.BatchId == dto.BatchId.Value)
-                .Select(bc => bc.CandidateId)
-                .Distinct()
+            return await accessibleCandidates
+                .Where(u => _db.BatchCandidates.Any(bc => bc.BatchId == dto.BatchId.Value && bc.CandidateId == u.Id))
+                .Select(u => u.Id)
                 .ToListAsync();
         }
 
@@ -348,7 +372,7 @@ public class ExamAssignmentService : IExamAssignmentService
                 .Select(ur => ur.UserId)
                 .ToListAsync();
 
-            var query = _db.Users.Where(u => roleUserIds.Contains(u.Id) && !u.IsDeleted);
+            var query = accessibleCandidates.Where(u => roleUserIds.Contains(u.Id));
 
             if (!string.IsNullOrWhiteSpace(dto.Search))
             {
@@ -372,5 +396,12 @@ public class ExamAssignmentService : IExamAssignmentService
         }
 
         return new List<string>();
+    }
+
+    private async Task<IQueryable<ApplicationUser>> GetAccessibleCandidatesAsync()
+    {
+        var candidates = _db.Users.Where(u => !u.IsDeleted && _db.UserRoles.Any(ur =>
+            ur.UserId == u.Id && _db.Roles.Any(r => r.Id == ur.RoleId && r.Name == AppRoles.Candidate)));
+        return await _authorization.ScopeUsersAsync(candidates);
     }
 }

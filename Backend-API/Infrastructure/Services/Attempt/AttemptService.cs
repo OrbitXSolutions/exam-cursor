@@ -15,6 +15,7 @@ using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Domain.Common;
 using Smart_Core.Infrastructure.Services.Authorization;
+using Smart_Core.Application.Validators.Candidate;
 
 namespace Smart_Core.Infrastructure.Services.Attempt;
 
@@ -137,6 +138,13 @@ public class AttemptService : IAttemptService
       return ApiResponse<AttemptSessionDto>.FailureResponse("Exam is not published");
     }
 
+    if (!await CandidateAssignmentPolicy.CanStartAsync(_context, exam.Id,
+            exam.AccessPolicy?.RestrictToAssignedCandidates == true, candidateId))
+      return ApiResponse<AttemptSessionDto>.FailureResponse(CandidateAssignmentPolicy.DeniedMessage);
+
+    if (!await CandidateIdentityPolicy.CanStartAsync(_context, exam.RequireIdVerification, candidateId))
+      return ApiResponse<AttemptSessionDto>.FailureResponse(CandidateIdentityPolicy.DeniedMessage);
+
     await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
     // Lock an existing parent row even for a candidate's first attempt. Serializable
     // reads of an empty attempt range allow competing readers to deadlock on insert.
@@ -159,6 +167,11 @@ public class AttemptService : IAttemptService
           $"Exam has ended. It ended at {exam.EndAt.Value:yyyy-MM-dd HH:mm} UTC");
     }
 
+    if (exam.ExamType == ExamType.Fixed && exam.StartAt.HasValue &&
+        now > exam.StartAt.Value.AddMinutes(ExamDefaults.FixedStartGraceMinutes))
+      return ApiResponse<AttemptSessionDto>.FailureResponse(
+          $"The fixed exam start window has closed ({ExamDefaults.FixedStartGraceMinutes}-minute grace period).");
+
     // 4. Validate access code if required
     if (exam.AccessPolicy != null && !string.IsNullOrEmpty(exam.AccessPolicy.AccessCode))
     {
@@ -173,16 +186,26 @@ public class AttemptService : IAttemptService
       }
     }
 
-    // 5. Check for existing active attempt
-    var existingActiveAttempt = await _context.Set<Domain.Entities.Attempt.Attempt>()
+    // The parent candidate lock serializes starts across both entry points. Resolve
+    // the active ID first, then lock only that primary key rather than an update-
+    // locked composite scan that can contend with unrelated candidates' inserts.
+    var existingActiveId = await _context.Set<Domain.Entities.Attempt.Attempt>()
+      .Where(a => a.ExamId == dto.ExamId && a.CandidateId == candidateId &&
+        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed))
+      .Select(a => (int?)a.Id)
+      .FirstOrDefaultAsync();
+
+    var existingActiveAttempt = existingActiveId.HasValue
+      ? await _context.Set<Domain.Entities.Attempt.Attempt>()
       .FromSqlInterpolated(
-        $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [ExamId] = {dto.ExamId} AND [CandidateId] = {candidateId}")
+        $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {existingActiveId.Value}")
 .Include(a => a.Questions)
    .ThenInclude(aq => aq.Answers)
 .FirstOrDefaultAsync(a =>
   a.ExamId == dto.ExamId &&
  a.CandidateId == candidateId &&
-(a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
+(a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed))
+      : null;
 
     if (existingActiveAttempt != null)
     {
@@ -191,6 +214,7 @@ public class AttemptService : IAttemptService
       {
         existingActiveAttempt.Status = AttemptStatus.Expired;
         existingActiveAttempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+        await CloseActiveProctorSessionsAsync(existingActiveAttempt.Id, ProctorSessionStatus.Completed, now, candidateId);
         await _context.SaveChangesAsync();
         // Continue to create new attempt if allowed
       }
@@ -419,7 +443,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<AttemptSubmittedDto>.FailureResponse("Attempt has already been submitted");
     }
 
-    if (attempt.Status == AttemptStatus.Expired || attempt.Status == AttemptStatus.Cancelled)
+    if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
     {
       return ApiResponse<AttemptSubmittedDto>.FailureResponse($"Attempt is {attempt.Status}. Cannot submit.");
     }
@@ -430,9 +454,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       var expiredRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
         .Where(a => a.Id == attemptId
           && a.CandidateId == candidateId
-          && a.Status != AttemptStatus.Submitted
-          && a.Status != AttemptStatus.Expired
-          && a.Status != AttemptStatus.Cancelled
+          && (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
           && a.ExpiresAt.HasValue
           && a.ExpiresAt.Value < now)
         .ExecuteUpdateAsync(setters => setters
@@ -465,9 +487,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     var submittedRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
       .Where(a => a.Id == attemptId
         && a.CandidateId == candidateId
-        && a.Status != AttemptStatus.Submitted
-        && a.Status != AttemptStatus.Expired
-        && a.Status != AttemptStatus.Cancelled
+        && (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
         && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
       .ExecuteUpdateAsync(setters => setters
         .SetProperty(a => a.Status, AttemptStatus.Submitted)
@@ -533,7 +553,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     });
 
     var totalQuestions = attempt.Questions.Count;
-    var answeredQuestions = attempt.Questions.Count(q => q.Answers.Any());
+    var answeredQuestions = attempt.Questions.Count(q => q.Answers.Any(AnswerContent.HasContent));
 
     InvalidateAttemptCompletionCaches();
     return ApiResponse<AttemptSubmittedDto>.SuccessResponse(new AttemptSubmittedDto
@@ -719,6 +739,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     {
       attempt.Status = AttemptStatus.Expired;
       attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+      await CloseActiveProctorSessionsAsync(attempt.Id, ProctorSessionStatus.Completed, now, candidateId);
       await _context.SaveChangesAsync();
       await answerTransaction.CommitAsync();
       InvalidateAttemptCompletionCaches();
@@ -851,6 +872,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     {
       attempt.Status = AttemptStatus.Expired;
       attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+      await CloseActiveProctorSessionsAsync(attempt.Id, ProctorSessionStatus.Completed, now, candidateId);
       await _context.SaveChangesAsync();
       await answerTransaction.CommitAsync();
       InvalidateAttemptCompletionCaches();
@@ -1395,7 +1417,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed,
       TotalQuestions = attempt.Questions.Count,
-      AnsweredQuestions = attempt.Questions.Count(q => q.Answers.Any()),
+      AnsweredQuestions = attempt.Questions.Count(q => q.Answers.Any(AnswerContent.HasContent)),
       RemainingSeconds = CalculateRemainingSeconds(attempt),
       CreatedDate = attempt.CreatedDate,
       Events = attempt.Events.Select(e => new AttemptEventDto
@@ -1499,10 +1521,6 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
         !await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
       return ApiResponse<List<AttemptListDto>>.FailureResponse("Attempt not found");
 
-    var cacheKey = CacheKeys.AttemptsByExamCandidate(examId, candidateId);
-    if (_cache.TryGet<List<AttemptListDto>>(cacheKey, out var cachedCea) && cachedCea != null)
-      return ApiResponse<List<AttemptListDto>>.SuccessResponse(cachedCea);
-
     var attempts = await _context.Set<Domain.Entities.Attempt.Attempt>()
             .Include(a => a.Exam)
             .Include(a => a.Candidate)
@@ -1511,7 +1529,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
            .ToListAsync();
 
     var result = attempts.Select(MapToAttemptListDto).ToList();
-    _cache.Set(cacheKey, result, CacheKeys.Thirty);
+    await ApplyCandidateResultVisibilityAsync(result, candidateId);
     return ApiResponse<List<AttemptListDto>>.SuccessResponse(result);
   }
 
@@ -1522,7 +1540,26 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       return ApiResponse<PaginatedResponse<AttemptListDto>>.FailureResponse("Attempt not found");
 
     searchDto.CandidateId = candidateId;
-    return await GetAttemptsAsync(searchDto);
+    var result = await GetAttemptsAsync(searchDto);
+    if (result.Success && result.Data != null)
+      await ApplyCandidateResultVisibilityAsync(result.Data.Items, candidateId);
+    return result;
+  }
+
+  private async Task ApplyCandidateResultVisibilityAsync(IEnumerable<AttemptListDto> attempts, string candidateId)
+  {
+    var items = attempts.ToList();
+    var attemptIds = items.Select(a => a.Id).ToList();
+    var visibleResults = await _context.Set<Domain.Entities.ExamResult.Result>()
+        .Where(r => attemptIds.Contains(r.AttemptId) && r.CandidateId == candidateId &&
+                    r.IsPublishedToCandidate && r.Exam.ShowResults)
+        .ToDictionaryAsync(r => r.AttemptId);
+    foreach (var item in items)
+    {
+      visibleResults.TryGetValue(item.Id, out var result);
+      item.TotalScore = result?.TotalScore;
+      item.IsPassed = result?.IsPassed;
+    }
   }
 
   #endregion
@@ -1564,6 +1601,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       CreatedBy = adminUserId
     };
     _context.Set<AttemptEvent>().Add(cancelEvent);
+
+    await CloseActiveProctorSessionsAsync(attempt.Id, ProctorSessionStatus.Cancelled, now, adminUserId);
 
     await _context.SaveChangesAsync();
 
@@ -1614,6 +1653,8 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
     };
     _context.Set<AttemptEvent>().Add(submitEvent);
 
+    await CloseActiveProctorSessionsAsync(attempt.Id, ProctorSessionStatus.Completed, now, adminUserId);
+
     await _context.SaveChangesAsync();
 
     InvalidateAttemptCompletionCaches();
@@ -1623,7 +1664,7 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
       SubmittedAt = now,
       Status = AttemptStatus.Submitted,
       TotalQuestions = attempt.Questions.Count,
-      AnsweredQuestions = attempt.Questions.Count(q => q.Answers.Any()),
+      AnsweredQuestions = attempt.Questions.Count(q => q.Answers.Any(AnswerContent.HasContent)),
       Message = "Attempt force submitted by admin"
     });
   }
@@ -1631,6 +1672,21 @@ await BuildAttemptSessionDto(attempt, attempt.Exam));
   #endregion
 
   #region Private Helper Methods
+
+  private async Task CloseActiveProctorSessionsAsync(
+    int attemptId, ProctorSessionStatus status, DateTimeOffset endedAt, string userId)
+  {
+    var sessions = await _context.Set<ProctorSession>()
+      .Where(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active)
+      .ToListAsync();
+    foreach (var session in sessions)
+    {
+      session.Status = status;
+      session.EndedAt = endedAt;
+      session.UpdatedDate = endedAt;
+      session.UpdatedBy = userId;
+    }
+  }
 
   /// <summary>
   /// Checks if a candidate has exceeded the disconnect budget.
@@ -1744,6 +1800,9 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       Domain.Entities.QuestionBank.Question question,
       string questionTypeName)
   {
+    var commonError = CandidateAnswerValidation.Validate(question, dto.SelectedOptionIds, dto.TextAnswer);
+    if (commonError != null) return (false, commonError);
+
     // MCQ single choice
     if (questionTypeName.Contains("mcq") && questionTypeName.Contains("single"))
     {
@@ -1839,7 +1898,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       var optionsList = aq.Question.Options.ToList();
       if (exam.ShuffleOptions)
       {
-        optionsList = optionsList.OrderBy(_ => Guid.NewGuid()).ToList();
+        optionsList = optionsList.OrderBy(o => AttemptOptionOrder.Key(aq.AttemptId, aq.QuestionId, o.Id), StringComparer.Ordinal).ToList();
       }
       else
       {
@@ -1855,7 +1914,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
         AttachmentPath = o.AttachmentPath
       }).ToList();
 
-      var currentAnswer = aq.Answers.FirstOrDefault();
+      var currentAnswer = aq.Answers.FirstOrDefault(AnswerContent.HasContent);
 
       questions.Add(new AttemptQuestionDto
       {
@@ -1942,7 +2001,7 @@ attempt.Status == AttemptStatus.Cancelled || attempt.Status == AttemptStatus.Ter
       TotalScore = attempt.TotalScore,
       IsPassed = attempt.IsPassed,
       TotalQuestions = attempt.Questions?.Count ?? 0,
-      AnsweredQuestions = attempt.Questions?.Count(q => q.Answers.Any()) ?? 0,
+      AnsweredQuestions = attempt.Questions?.Count(q => q.Answers.Any(AnswerContent.HasContent)) ?? 0,
       RemainingSeconds = CalculateRemainingSeconds(attempt),
       CreatedDate = attempt.CreatedDate
     };

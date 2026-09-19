@@ -1,0 +1,432 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:52:23.066Z",
+  "checks": [
+    {
+      "name": "Invalid query rejected without server failure: /api/Assessment/exams?pageSize=101",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "PageSize": [
+              "Page size cannot exceed 100"
+            ]
+          },
+          "traceId": "00-a9e6c5b7f88be2f893d04503bfd2f617-81bd0dde22ffb7c4-00"
+        }
+      },
+      "at": "2026-09-19T12:52:24.793Z"
+    },
+    {
+      "name": "Invalid query rejected without server failure: /api/Assessment/exams?pageNumber=-1",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "PageNumber": [
+              "Page number must be greater than 0"
+            ]
+          },
+          "traceId": "00-94f28cafc5a18035a441ecb7fa9c3919-41c3b8b1e1e6a824-00"
+        }
+      },
+      "at": "2026-09-19T12:52:25.258Z"
+    },
+    {
+      "name": "Invalid query rejected without server failure: /api/Assessment/exams?examType=99",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "ExamType": [
+              "The value '99' is invalid."
+            ]
+          },
+          "traceId": "00-ff86fded13fc776a0640064db5e25082-f04285594895237c-00"
+        }
+      },
+      "at": "2026-09-19T12:52:25.726Z"
+    },
+    {
+      "name": "Invalid query rejected without server failure: /api/Media?pageSize=-1",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageSize": [
+              "The field pageSize must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-58852a8623d964ba5a4a5f5824ad5b87-1641a132c47be735-00"
+        }
+      },
+      "at": "2026-09-19T12:52:26.192Z"
+    },
+    {
+      "name": "Invalid query rejected without server failure: /api/Media?pageNumber=0",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageNumber": [
+              "The field pageNumber must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-8af4dc7727452c1a4bac4a8bf01f44bc-4631b18df45f6d34-00"
+        }
+      },
+      "at": "2026-09-19T12:52:26.657Z"
+    },
+    {
+      "name": "Search treats payload as data: ' OR 1=1--",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "total": 0
+      },
+      "at": "2026-09-19T12:52:28.571Z"
+    },
+    {
+      "name": "Search treats payload as data: <img src=x onerror=alert(1)>",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "total": 0
+      },
+      "at": "2026-09-19T12:52:30.424Z"
+    },
+    {
+      "name": "Search treats payload as data: QA26 عربية 🧪",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "total": 0
+      },
+      "at": "2026-09-19T12:52:32.274Z"
+    },
+    {
+      "name": "Malformed request application/json rejected before mutation",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": "{\"type\":\"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\"title\":\"One or more validation errors occurred.\",\"status\":400,\"errors\":{\"dto\":[\"The dto field is required.\"],\"$.titleEn\":[\"Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. Path: $.titleEn | LineNumber: 0 | BytePositionInLine: 11.\"]},\"traceId\":\"00-4663641c915853e5eb656af70066a6d6-9ff6821dd97b7246-00\"}"
+      },
+      "at": "2026-09-19T12:52:32.737Z"
+    },
+    {
+      "name": "Malformed request application/xml rejected before mutation",
+      "passed": true,
+      "detail": {
+        "status": 415,
+        "body": "{\"type\":\"https://tools.ietf.org/html/rfc9110#section-15.5.16\",\"title\":\"Unsupported Media Type\",\"status\":415,\"traceId\":\"00-4c3d05c5cdcd2c0e19ce1d085b34d651-ad45d049bd652e0f-00\"}"
+      },
+      "at": "2026-09-19T12:52:33.205Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:52:24.314Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:52:24.311263+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:52:23.6165401+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:52:24.311263+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:52:23.6165401+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1245.41
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:24.792Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?pageSize=101",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "PageSize": [
+              "Page size cannot exceed 100"
+            ]
+          },
+          "traceId": "00-a9e6c5b7f88be2f893d04503bfd2f617-81bd0dde22ffb7c4-00"
+        },
+        "ms": 477.22
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:25.257Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?pageNumber=-1",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "PageNumber": [
+              "Page number must be greater than 0"
+            ]
+          },
+          "traceId": "00-94f28cafc5a18035a441ecb7fa9c3919-41c3b8b1e1e6a824-00"
+        },
+        "ms": 463.83
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:25.725Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?examType=99",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "ExamType": [
+              "The value '99' is invalid."
+            ]
+          },
+          "traceId": "00-ff86fded13fc776a0640064db5e25082-f04285594895237c-00"
+        },
+        "ms": 466.99
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:26.191Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Media?pageSize=-1",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageSize": [
+              "The field pageSize must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-58852a8623d964ba5a4a5f5824ad5b87-1641a132c47be735-00"
+        },
+        "ms": 465.08
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:26.657Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Media?pageNumber=0",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "pageNumber": [
+              "The field pageNumber must be between 1 and 2147483647."
+            ]
+          },
+          "traceId": "00-8af4dc7727452c1a4bac4a8bf01f44bc-4631b18df45f6d34-00"
+        },
+        "ms": 463.43
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:28.570Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?search='%20OR%201%3D1--",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1912.17
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:30.424Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?search=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1852.13
+      }
+    },
+    {
+      "at": "2026-09-19T12:52:32.274Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/exams?search=QA26%20%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9%20%F0%9F%A7%AA",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1849.37
+      }
+    }
+  ]
+}

@@ -1,0 +1,428 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:10:24.698Z",
+  "checks": [],
+  "events": [
+    {
+      "at": "2026-09-19T11:10:25.961Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:25.9549964+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:10:25.2517556+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:25.9549964+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:10:25.2517556+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1260.53
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:27.362Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Assessment/exams/123",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 123,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 Browser Operational Readiness",
+          "titleAr": "اختبار جاهزية التشغيل",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "startAt": "2026-09-19T10:00:00+04:00",
+          "endAt": "2026-09-21T23:59:00+04:00",
+          "durationMinutes": 60,
+          "maxAttempts": 2,
+          "shuffleQuestions": true,
+          "shuffleOptions": true,
+          "passScore": 30,
+          "isPublished": true,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": true,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": true,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 0,
+          "createdDate": "2026-09-19T15:02:24.1269086+04:00",
+          "updatedDate": "2026-09-19T15:09:43.6070587+04:00",
+          "sectionsCount": 1,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [
+            {
+              "id": 307,
+              "examId": 123,
+              "titleEn": "QA26 eng Foundations",
+              "titleAr": "أساسيات اختبار QA26 eng",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "order": 1,
+              "durationMinutes": null,
+              "totalPointsOverride": null,
+              "createdDate": "2026-09-19T15:08:03.9050827+04:00",
+              "topicsCount": 0,
+              "questionsCount": 0,
+              "totalPoints": 0,
+              "sourceType": null,
+              "questionSubjectId": null,
+              "questionTopicId": null,
+              "pickCount": 0,
+              "subjectNameEn": null,
+              "subjectNameAr": null,
+              "topicNameEn": null,
+              "topicNameAr": null,
+              "topics": [],
+              "questions": []
+            }
+          ],
+          "instructions": [
+            {
+              "id": 84,
+              "examId": 123,
+              "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+              "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب.",
+              "order": 1,
+              "createdDate": "2026-09-19T15:06:18.0294264+04:00"
+            }
+          ],
+          "accessPolicy": {
+            "id": 104,
+            "examId": 123,
+            "isPublic": false,
+            "accessCode": "QA26LIVE",
+            "restrictToAssignedCandidates": true,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:02:24.3822322+04:00",
+            "updatedDate": "2026-09-19T15:06:39.7807661+04:00"
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 123,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 Browser Operational Readiness",
+            "titleAr": "اختبار جاهزية التشغيل",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "startAt": "2026-09-19T10:00:00+04:00",
+            "endAt": "2026-09-21T23:59:00+04:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "shuffleQuestions": true,
+            "shuffleOptions": true,
+            "passScore": 30,
+            "isPublished": true,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": true,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": true,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 0,
+            "createdDate": "2026-09-19T15:02:24.1269086+04:00",
+            "updatedDate": "2026-09-19T15:09:43.6070587+04:00",
+            "sectionsCount": 1,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [
+              {
+                "id": 307,
+                "examId": 123,
+                "titleEn": "QA26 eng Foundations",
+                "titleAr": "أساسيات اختبار QA26 eng",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "order": 1,
+                "durationMinutes": null,
+                "totalPointsOverride": null,
+                "createdDate": "2026-09-19T15:08:03.9050827+04:00",
+                "topicsCount": 0,
+                "questionsCount": 0,
+                "totalPoints": 0,
+                "sourceType": null,
+                "questionSubjectId": null,
+                "questionTopicId": null,
+                "pickCount": 0,
+                "subjectNameEn": null,
+                "subjectNameAr": null,
+                "topicNameEn": null,
+                "topicNameAr": null,
+                "topics": [],
+                "questions": []
+              }
+            ],
+            "instructions": [
+              {
+                "id": 84,
+                "examId": 123,
+                "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+                "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب.",
+                "order": 1,
+                "createdDate": "2026-09-19T15:06:18.0294264+04:00"
+              }
+            ],
+            "accessPolicy": {
+              "id": 104,
+              "examId": 123,
+              "isPublic": false,
+              "accessCode": "QA26LIVE",
+              "restrictToAssignedCandidates": true,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T15:02:24.3822322+04:00",
+              "updatedDate": "2026-09-19T15:06:39.7807661+04:00"
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1400.52
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:28.524Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamProctor/123",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:09:44.5857426+04:00"
+            }
+          ],
+          "availableProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:09:44.5857426+04:00"
+              }
+            ],
+            "availableProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1160.99
+      }
+    }
+  ]
+}

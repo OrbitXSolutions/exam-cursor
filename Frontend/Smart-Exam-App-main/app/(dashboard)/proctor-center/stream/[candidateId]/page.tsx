@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -304,7 +306,7 @@ export default function ScreenStreamPage() {
                         {selectedImage ? (
                           <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
                             {selectedImage.fileUrl ? (
-                              <img
+                              <EvidenceImage
                                 src={selectedImage.fileUrl}
                                 alt={`Screen ${selectedImage.id}`}
                                 className="w-full h-full object-contain"
@@ -352,7 +354,7 @@ export default function ScreenStreamPage() {
                               }`}
                             >
                               {snapshot.fileUrl ? (
-                                <img
+                                <EvidenceImage
                                   src={snapshot.fileUrl}
                                   alt={`Screen ${snapshot.id}`}
                                   className="w-full h-full object-cover"

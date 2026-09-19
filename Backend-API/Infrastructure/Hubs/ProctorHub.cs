@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Smart_Core.Domain.Constants;
+using Smart_Core.Domain.Entities;
 using Smart_Core.Infrastructure.Data;
 
 namespace Smart_Core.Infrastructure.Hubs;
@@ -499,6 +501,26 @@ public class ProctorHub : Hub
         if (string.IsNullOrEmpty(userId) || Context.User?.Identity?.IsAuthenticated != true)
             return null;
 
+        // A connected socket outlives JWT authentication. Re-check account eligibility
+        // before the candidate and SuperAdmin shortcuts as well as staff access.
+        var user = await _db.Users
+            .Where(u => u.Id == userId && !u.IsDeleted && !u.IsBlocked && u.Status == UserStatus.Active)
+            .Select(u => new { u.DepartmentId }).FirstOrDefaultAsync();
+        if (user == null)
+            return null;
+
+        var currentRoles = await (from userRole in _db.UserRoles
+                                  join role in _db.Roles on userRole.RoleId equals role.Id
+                                  where userRole.UserId == userId && role.Name != null
+                                  select role.Name!).ToListAsync();
+        var tokenRoles = Context.User.FindAll(ClaimTypes.Role)
+            .Select(claim => claim.Value).ToHashSet(StringComparer.Ordinal);
+        if (!tokenRoles.SetEquals(currentRoles))
+        {
+            Context.Abort();
+            return null;
+        }
+
         var attempt = await _db.Attempts
             .Where(a => a.Id == attemptId && !a.IsDeleted && !a.Exam.IsDeleted)
             .Select(a => new { a.CandidateId, a.ExamId, a.Exam.DepartmentId })
@@ -516,10 +538,6 @@ public class ProctorHub : Hub
             return null;
 
         // Match ResourceAuthorizationService's department OR explicit-proctor entitlement.
-        var user = await _db.Users.Where(u => u.Id == userId && !u.IsDeleted)
-            .Select(u => new { u.DepartmentId }).FirstOrDefaultAsync();
-        if (user == null)
-            return null;
         return (user.DepartmentId.HasValue && user.DepartmentId == attempt.DepartmentId) ||
             await _db.ExamProctors.AnyAsync(ep =>
                 ep.ExamId == attempt.ExamId && ep.ProctorId == userId && !ep.IsDeleted)

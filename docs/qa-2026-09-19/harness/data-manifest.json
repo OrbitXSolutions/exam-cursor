@@ -1,0 +1,153 @@
+{
+  "departments": [
+    {
+      "id": 8,
+      "nameEn": "QA26 Engineering",
+      "nameAr": "اختبار QA26 الهندسة",
+      "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+      "descriptionAr": "بيانات اختبار القبول",
+      "code": "QA26_ENG",
+      "isActive": true,
+      "userCount": 0,
+      "createdDate": "2026-09-19T14:46:07.7190649+04:00",
+      "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+      "key": "eng"
+    },
+    {
+      "id": 9,
+      "nameEn": "QA26 Operations",
+      "nameAr": "اختبار QA26 العمليات",
+      "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+      "descriptionAr": "بيانات اختبار القبول",
+      "code": "QA26_OPS",
+      "isActive": true,
+      "userCount": 0,
+      "createdDate": "2026-09-19T14:46:57.3151048+04:00",
+      "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+      "key": "ops"
+    }
+  ],
+  "users": [
+    {
+      "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+      "email": "qa26.eng.admin1@example.test",
+      "role": "Admin",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 1
+    },
+    {
+      "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+      "email": "qa26.eng.instructor1@example.test",
+      "role": "Instructor",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 1
+    },
+    {
+      "id": "09dfd644-e962-4802-a43b-5dcf7f489999",
+      "email": "qa26.eng.examiner1@example.test",
+      "role": "Examiner",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 1
+    },
+    {
+      "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+      "email": "qa26.eng.proctor1@example.test",
+      "role": "Proctor",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 1
+    },
+    {
+      "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+      "email": "qa26.eng.candidate1@example.test",
+      "role": "Candidate",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 1
+    },
+    {
+      "id": "00eef960-7a2f-4785-90d0-fd93732ee99c",
+      "email": "qa26.eng.candidate2@example.test",
+      "role": "Candidate",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 2
+    },
+    {
+      "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "email": "qa26.eng.candidate3@example.test",
+      "role": "Candidate",
+      "departmentId": 8,
+      "key": "eng",
+      "n": 3
+    },
+    {
+      "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+      "email": "qa26.ops.admin1@example.test",
+      "role": "Admin",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 1
+    },
+    {
+      "id": "9b49a8a0-4f26-49a2-96db-85fb18203ef6",
+      "email": "qa26.ops.instructor1@example.test",
+      "role": "Instructor",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 1
+    },
+    {
+      "id": "206a72ca-5603-4d4b-b9e9-797d3f75168e",
+      "email": "qa26.ops.examiner1@example.test",
+      "role": "Examiner",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 1
+    },
+    {
+      "id": "17116732-f707-49f1-922e-3b2e09750f08",
+      "email": "qa26.ops.proctor1@example.test",
+      "role": "Proctor",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 1
+    },
+    {
+      "id": "8d6aa077-68e2-48af-b396-6ebd8a958747",
+      "email": "qa26.ops.candidate1@example.test",
+      "role": "Candidate",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 1
+    },
+    {
+      "id": "8761efdd-15c1-499c-8228-f1338c3ac78f",
+      "email": "qa26.ops.candidate2@example.test",
+      "role": "Candidate",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 2
+    },
+    {
+      "id": "51d84676-824f-4b02-926f-c5c99976b8fa",
+      "email": "qa26.ops.candidate3@example.test",
+      "role": "Candidate",
+      "departmentId": 9,
+      "key": "ops",
+      "n": 3
+    }
+  ],
+  "deletedFixtures": [
+    {
+      "id": "f4ff8f17-a9e7-491c-b783-95d407eb58b5",
+      "email": "qa26.deleted.fixture@example.test"
+    },
+    {
+      "departmentId": 10
+    }
+  ]
+}

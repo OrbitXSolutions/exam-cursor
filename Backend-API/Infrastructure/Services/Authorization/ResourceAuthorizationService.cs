@@ -163,6 +163,8 @@ public class ResourceAuthorizationService
 
         if (attempt.CandidateId == userId)
             return true;
+        if (IsCandidateOnly(await GetUserRolesAsync(userId)))
+            return false;
 
         return await CanAccessExamForUserAsync(attempt.ExamId, userId);
     }
@@ -184,6 +186,8 @@ public class ResourceAuthorizationService
 
         if (result.CandidateId == userId)
             return true;
+        if (IsCandidateOnly(await GetUserRolesAsync(userId)))
+            return false;
 
         return await CanAccessExamForUserAsync(result.ExamId, userId);
     }
@@ -205,6 +209,8 @@ public class ResourceAuthorizationService
 
         if (session.CandidateId == userId)
             return true;
+        if (IsCandidateOnly(await GetUserRolesAsync(userId)))
+            return false;
 
         return await CanAccessExamForUserAsync(session.ExamId, userId);
     }

@@ -1,0 +1,750 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:45:45.655Z",
+  "checks": [
+    {
+      "name": "Mixed bank selection denied atomically",
+      "passed": false,
+      "detail": {
+        "response": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 79,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            },
+            {
+              "id": 80,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 136,
+              "order": 2,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.357973+04:00",
+              "questionBodyEn": "QA26 Operations isolated question",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "state": [
+          {
+            "id": 79,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          },
+          {
+            "id": 80,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 136,
+            "order": 2,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.357973+04:00",
+            "questionBodyEn": "QA26 Operations isolated question",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ]
+      },
+      "at": "2026-09-19T12:45:56.774Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:45:46.896Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:45:46.8914552+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:45:46.1927113+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:45:46.8914552+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:45:46.1927113+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1239.07
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:48.095Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:45:48.0942645+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:45:47.3971755+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:45:48.0942645+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:45:47.3971755+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1197.36
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:49.306Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:45:49.3061601+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:45:48.6092078+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:45:49.3061601+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:45:48.6092078+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1210.31
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:53.032Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 D53 source before 1789821949307",
+        "titleAr": "اختبار العزل 1789821949307",
+        "startAt": "2026-09-19T12:44:49.307Z",
+        "endAt": "2026-09-19T13:45:49.307Z",
+        "durationMinutes": 30,
+        "maxAttempts": 1,
+        "passScore": 1,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 136,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 D53 source before 1789821949307",
+          "titleAr": "اختبار العزل 1789821949307",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "startAt": "2026-09-19T12:44:49.307+00:00",
+          "endAt": "2026-09-19T13:45:49.307+00:00",
+          "durationMinutes": 30,
+          "maxAttempts": 1,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 1,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": false,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T16:45:51.625118+04:00",
+          "updatedDate": null,
+          "sectionsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [],
+          "instructions": [],
+          "accessPolicy": {
+            "id": 117,
+            "examId": 136,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T16:45:51.8612596+04:00",
+            "updatedDate": null
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 136,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 D53 source before 1789821949307",
+            "titleAr": "اختبار العزل 1789821949307",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "startAt": "2026-09-19T12:44:49.307+00:00",
+            "endAt": "2026-09-19T13:45:49.307+00:00",
+            "durationMinutes": 30,
+            "maxAttempts": 1,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 1,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": false,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T16:45:51.625118+04:00",
+            "updatedDate": null,
+            "sectionsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [],
+            "instructions": [],
+            "accessPolicy": {
+              "id": 117,
+              "examId": 136,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T16:45:51.8612596+04:00",
+              "updatedDate": null
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3724.64
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:54.197Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/136/sections",
+      "request": {
+        "titleEn": "Source",
+        "titleAr": "قسم",
+        "order": 1
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 321,
+          "examId": 136,
+          "titleEn": "Source",
+          "titleAr": "قسم",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "order": 1,
+          "durationMinutes": null,
+          "totalPointsOverride": null,
+          "createdDate": "2026-09-19T16:45:53.7311358+04:00",
+          "topicsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sourceType": null,
+          "questionSubjectId": null,
+          "questionTopicId": null,
+          "pickCount": 0,
+          "subjectNameEn": null,
+          "subjectNameAr": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "topics": [],
+          "questions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 321,
+            "examId": 136,
+            "titleEn": "Source",
+            "titleAr": "قسم",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "order": 1,
+            "durationMinutes": null,
+            "totalPointsOverride": null,
+            "createdDate": "2026-09-19T16:45:53.7311358+04:00",
+            "topicsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sourceType": null,
+            "questionSubjectId": null,
+            "questionTopicId": null,
+            "pickCount": 0,
+            "subjectNameEn": null,
+            "subjectNameAr": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "topics": [],
+            "questions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1164.98
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:56.073Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/321/questions/bulk",
+      "request": {
+        "questionIds": [
+          131,
+          136
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 79,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          },
+          {
+            "id": 80,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 136,
+            "order": 2,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.357973+04:00",
+            "questionBodyEn": "QA26 Operations isolated question",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 79,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            },
+            {
+              "id": 80,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 136,
+              "order": 2,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.357973+04:00",
+              "questionBodyEn": "QA26 Operations isolated question",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1875.16
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:56.774Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assessment/sections/321/questions",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 79,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          },
+          {
+            "id": 80,
+            "examId": 136,
+            "examSectionId": 321,
+            "examTopicId": null,
+            "questionId": 136,
+            "order": 2,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T16:45:55.357973+04:00",
+            "questionBodyEn": "QA26 Operations isolated question",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 79,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.3579716+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            },
+            {
+              "id": 80,
+              "examId": 136,
+              "examSectionId": 321,
+              "examTopicId": null,
+              "questionId": 136,
+              "order": 2,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T16:45:55.357973+04:00",
+              "questionBodyEn": "QA26 Operations isolated question",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 699.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:57.485Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/Assessment/exam-questions/79",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question removed from exam successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 709.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:58.187Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/Assessment/exam-questions/80",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question removed from exam successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 700.85
+      }
+    },
+    {
+      "at": "2026-09-19T12:45:59.578Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/321/questions",
+      "request": {
+        "questionId": 131,
+        "order": 1
+      },
+      "response": {
+        "status": 500,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "An internal server error occurred. Please try again later.",
+          "data": null,
+          "errors": [],
+          "traceId": "85cf6ebbc583e56287a0a6180a272fdd"
+        },
+        "ms": 1390.9
+      }
+    }
+  ]
+}

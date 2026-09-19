@@ -1,0 +1,405 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:34:04.365Z",
+  "checks": [
+    {
+      "name": "Uploader owns the final attempt fixture",
+      "passed": true,
+      "detail": {
+        "id": "44799c41-8cfd-4ab8-a90b-13632121949a"
+      },
+      "at": "2026-09-19T14:34:07.804Z"
+    },
+    {
+      "name": "Stored bytes are exactly the recognized original before replacement",
+      "passed": true,
+      "detail": {
+        "hash": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+        "bytes": 230170
+      },
+      "at": "2026-09-19T14:34:10.142Z"
+    },
+    {
+      "name": "Recognized own chunk0 replacement stored fully",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Chunk uploaded",
+        "data": {
+          "chunkIndex": 0,
+          "size": 230169,
+          "stored": true
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T14:34:11.091Z"
+    },
+    {
+      "name": "Corrected stored bytes exactly match ordered remux",
+      "passed": true,
+      "detail": {
+        "sha256": "1b4a27e475a7356f5f218237893709542543d137574c5a3b4ff0b480580f12d1",
+        "bytes": 230169
+      },
+      "at": "2026-09-19T14:34:13.430Z"
+    },
+    {
+      "name": "Corrected recording version accepted exactly once",
+      "passed": true,
+      "detail": {
+        "attemptId": 368,
+        "chunkCount": 1,
+        "status": "processing"
+      },
+      "at": "2026-09-19T14:34:14.367Z"
+    },
+    {
+      "name": "One successor recording version references corrected byte size",
+      "passed": true,
+      "detail": {
+        "evidenceId": 703,
+        "attemptId": 368,
+        "videoUrl": null,
+        "chunksUrl": "/api/Proctor/video-chunks/368",
+        "contentType": "video/webm",
+        "fileSize": 230169,
+        "duration": 1480,
+        "startAt": "2026-09-19T18:09:33.6056203+04:00",
+        "endAt": "2026-09-19T18:34:14.605486+04:00",
+        "expiresAt": "2026-10-19T18:34:14.8384294+04:00",
+        "retentionDays": 0,
+        "retentionMessage": null,
+        "candidateName": "44799c41-8cfd-4ab8-a90b-13632121949a",
+        "examTitle": "QA26 Final Browser Lifecycle",
+        "events": [
+          {
+            "id": 4107,
+            "eventType": "ProctorWarning",
+            "severity": 3,
+            "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+            "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}"
+          }
+        ],
+        "screenshots": []
+      },
+      "at": "2026-09-19T14:34:18.079Z"
+    },
+    {
+      "name": "Still exactly one VP8/Opus chunk with corrected size",
+      "passed": true,
+      "detail": {
+        "attemptId": 368,
+        "totalChunks": 1,
+        "totalSizeBytes": 230169,
+        "chunkDurationMs": 3000,
+        "chunks": [
+          {
+            "index": 0,
+            "filename": "chunk_000000.webm",
+            "sizeBytes": 230169
+          }
+        ],
+        "mimeType": "video/webm; codecs=\"vp8, opus\""
+      },
+      "at": "2026-09-19T14:34:20.376Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:34:05.632Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:34:05.6286073+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T18:34:04.9179564+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:34:05.6286073+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T18:34:04.9179564+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1256.18
+      }
+    },
+    {
+      "at": "2026-09-19T14:34:07.803Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.final.lifecycle@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:34:07.802519+04:00",
+          "user": {
+            "id": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "email": "qa26.final.lifecycle@example.test",
+            "displayName": "QA26 Final Lifecycle Candidate",
+            "fullName": "QA26 Final Lifecycle Candidate",
+            "fullNameAr": "مرشح دورة الحياة النهائية QA26",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T18:07:21.3239552+04:00",
+            "lastLoginDate": "2026-09-19T18:34:07.1028596+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:34:07.802519+04:00",
+            "user": {
+              "id": "44799c41-8cfd-4ab8-a90b-13632121949a",
+              "email": "qa26.final.lifecycle@example.test",
+              "displayName": "QA26 Final Lifecycle Candidate",
+              "fullName": "QA26 Final Lifecycle Candidate",
+              "fullNameAr": "مرشح دورة الحياة النهائية QA26",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T18:07:21.3239552+04:00",
+              "lastLoginDate": "2026-09-19T18:34:07.1028596+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2170.11
+      }
+    },
+    {
+      "at": "2026-09-19T14:34:11.090Z",
+      "route": "/api/Proctor/video-chunk/368",
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "Chunk uploaded",
+        "data": {
+          "chunkIndex": 0,
+          "size": 230169,
+          "stored": true
+        },
+        "errors": [],
+        "traceId": null
+      }
+    },
+    {
+      "at": "2026-09-19T14:34:14.367Z",
+      "identity": "qa26.final.lifecycle@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/video-finalize/368",
+      "response": {
+        "status": 202,
+        "ok": true,
+        "data": {
+          "attemptId": 368,
+          "chunkCount": 1,
+          "status": "processing"
+        },
+        "body": {
+          "success": true,
+          "message": "Video finalization accepted â€” processing in background",
+          "data": {
+            "attemptId": 368,
+            "chunkCount": 1,
+            "status": "processing"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 935.87
+      }
+    },
+    {
+      "at": "2026-09-19T14:34:18.078Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/video-recording/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "evidenceId": 703,
+          "attemptId": 368,
+          "videoUrl": null,
+          "chunksUrl": "/api/Proctor/video-chunks/368",
+          "contentType": "video/webm",
+          "fileSize": 230169,
+          "duration": 1480,
+          "startAt": "2026-09-19T18:09:33.6056203+04:00",
+          "endAt": "2026-09-19T18:34:14.605486+04:00",
+          "expiresAt": "2026-10-19T18:34:14.8384294+04:00",
+          "retentionDays": 0,
+          "retentionMessage": null,
+          "candidateName": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "examTitle": "QA26 Final Browser Lifecycle",
+          "events": [
+            {
+              "id": 4107,
+              "eventType": "ProctorWarning",
+              "severity": 3,
+              "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}"
+            }
+          ],
+          "screenshots": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "evidenceId": 703,
+            "attemptId": 368,
+            "videoUrl": null,
+            "chunksUrl": "/api/Proctor/video-chunks/368",
+            "contentType": "video/webm",
+            "fileSize": 230169,
+            "duration": 1480,
+            "startAt": "2026-09-19T18:09:33.6056203+04:00",
+            "endAt": "2026-09-19T18:34:14.605486+04:00",
+            "expiresAt": "2026-10-19T18:34:14.8384294+04:00",
+            "retentionDays": 0,
+            "retentionMessage": null,
+            "candidateName": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "examTitle": "QA26 Final Browser Lifecycle",
+            "events": [
+              {
+                "id": 4107,
+                "eventType": "ProctorWarning",
+                "severity": 3,
+                "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}"
+              }
+            ],
+            "screenshots": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3710.23
+      }
+    },
+    {
+      "at": "2026-09-19T14:34:20.376Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/video-chunks/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 368,
+          "totalChunks": 1,
+          "totalSizeBytes": 230169,
+          "chunkDurationMs": 3000,
+          "chunks": [
+            {
+              "index": 0,
+              "filename": "chunk_000000.webm",
+              "sizeBytes": 230169
+            }
+          ],
+          "mimeType": "video/webm; codecs=\"vp8, opus\""
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 368,
+            "totalChunks": 1,
+            "totalSizeBytes": 230169,
+            "chunkDurationMs": 3000,
+            "chunks": [
+              {
+                "index": 0,
+                "filename": "chunk_000000.webm",
+                "sizeBytes": 230169
+              }
+            ],
+            "mimeType": "video/webm; codecs=\"vp8, opus\""
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2296.33
+      }
+    }
+  ]
+}

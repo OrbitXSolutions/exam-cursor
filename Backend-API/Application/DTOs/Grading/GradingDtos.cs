@@ -129,6 +129,8 @@ public class GradedAnswerDto
     public decimal Score { get; set; }
     public bool IsCorrect { get; set; }
     public bool IsManuallyGraded { get; set; }
+    /// <summary>Whether a grade has been recorded, including an explicit zero with no comment.</summary>
+    public bool IsGraded { get; set; }
     public string? GraderComment { get; set; }
 
     // For display - correct answers (admin only)
@@ -350,7 +352,7 @@ public class CandidateQuestionResultDto
 
     public decimal PointsEarned { get; set; }
     public decimal MaxPoints { get; set; }
-    public bool IsCorrect { get; set; }
+    public bool? IsCorrect { get; set; }
     public string? Feedback { get; set; } // GraderComment if allowed
 }
 

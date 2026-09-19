@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
@@ -131,9 +133,13 @@ export default function SessionDetailPage() {
         sessionPollRef.current = undefined
       }
       // One-time sync fetch on reconnect
-      refreshSessionData(sessionId).then((data) => {
+      refreshSessionData(sessionId).then(async (data) => {
         setSession(data.session)
         setScreenshots(data.screenshots)
+        if (data.session.attemptId) {
+          const attemptEvents = await getAttemptEvents(data.session.attemptId)
+          setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
+        }
       }).catch(() => {})
     } else {
       // SignalR is disconnected — start 15s fallback polling
@@ -144,6 +150,10 @@ export default function SessionDetailPage() {
             const data = await refreshSessionData(sessionId)
             setSession(data.session)
             setScreenshots(data.screenshots)
+            if (data.session.attemptId) {
+              const attemptEvents = await getAttemptEvents(data.session.attemptId)
+              setEvents(attemptEvents.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()))
+            }
             // Detect session ended from polling (server already closed the session)
             if (data.session.status !== "Active" && !sessionEnded) {
               const reason = data.session.status === "Completed" ? "Submitted"
@@ -539,6 +549,11 @@ export default function SessionDetailPage() {
     return null
   }
 
+  const loggedViolationCount = events.filter((event) => isViolationEvent(event.eventType)).length
+  const latestActivity = events.reduce((latest, event) =>
+    new Date(event.occurredAt).getTime() > new Date(latest).getTime() ? event.occurredAt : latest,
+  session.lastActivity)
+
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
@@ -659,7 +674,7 @@ export default function SessionDetailPage() {
                   {!hasRemoteStream && !sessionEnded && (
                     <>
                       {screenshots.length > 0 ? (
-                        <img
+                        <EvidenceImage
                           src={screenshots[0].url}
                           alt="Latest snapshot"
                           className="w-full h-full object-cover cursor-pointer"
@@ -811,7 +826,7 @@ export default function SessionDetailPage() {
                       onClick={() => setPreviewImage(ss)}
                     >
                       <div className="aspect-video bg-muted rounded-lg overflow-hidden border group-hover:ring-2 group-hover:ring-primary/50 transition-all">
-                        <img
+                        <EvidenceImage
                           src={ss.url}
                           alt="Screenshot"
                           className="w-full h-full object-cover"
@@ -1003,7 +1018,7 @@ export default function SessionDetailPage() {
                 <span className="text-muted-foreground">{t("proctor.lastActivity")}</span>
                 <div className="flex items-center gap-1 text-emerald-600">
                   <Activity className="h-3 w-3" />
-                  <span className="text-xs">{formatDateTime(session.lastActivity)}</span>
+                  <span className="text-xs">{formatDateTime(latestActivity)}</span>
                 </div>
               </div>
               {session.heartbeatMissedCount != null && session.heartbeatMissedCount > 0 && (
@@ -1121,7 +1136,7 @@ export default function SessionDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("proctor.totalViolations")}</span>
-                <Badge variant="secondary">{session.totalViolations ?? 0}</Badge>
+                <Badge variant="secondary">{loggedViolationCount}</Badge>
               </div>
               {session.maxViolationWarnings != null && session.maxViolationWarnings > 0 && (
                 <div className="pt-2">
@@ -1257,7 +1272,7 @@ export default function SessionDetailPage() {
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground text-xs">{t("proctor.passScore")}</span>
-                  <span className="text-xs font-medium">{session.examPassScore}%</span>
+                  <span className="text-xs font-medium">{session.examPassScore} {locale === "ar" ? "نقطة" : "points"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground text-xs">{t("proctor.maxAttempts")}</span>
@@ -1949,7 +1964,7 @@ export default function SessionDetailPage() {
           </DialogHeader>
           {previewImage && (
             <div className="rounded-lg overflow-hidden bg-muted">
-              <img
+              <EvidenceImage
                 src={previewImage.url}
                 alt="Screenshot preview"
                 className="w-full h-auto"

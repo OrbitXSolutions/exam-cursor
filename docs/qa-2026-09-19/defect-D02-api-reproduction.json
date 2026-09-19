@@ -1,0 +1,14 @@
+[
+  {
+    "Scenario": "original",
+    "Status": 200,
+    "Success": true,
+    "Message": "Login successful."
+  },
+  {
+    "Scenario": "displayed-temporary",
+    "Status": 400,
+    "Success": false,
+    "Message": "Invalid email or password."
+  }
+]

@@ -1,0 +1,12 @@
+{"kind":"host","logicalProcessors":32,"freeMemoryMb":9525.51,"utc":"2026-09-19T13:01:21.6871842Z","classification":"ACTUAL HOST RESOURCE MEASUREMENT during separately identified simulated API/SignalR load","totalMemoryMb":32384.11}
+{"name":"api","pid":44596,"privateMemoryMb":120.61,"handleCount":804,"threadCount":50,"workingSetMb":233.82,"cpuTotalSeconds":8.375,"kind":"process","utc":"2026-09-19T13:01:22.2930389Z","hostCpuPercent":null}
+{"name":"next","pid":36296,"privateMemoryMb":4161.39,"handleCount":532,"threadCount":47,"workingSetMb":1862.55,"cpuTotalSeconds":201.640625,"kind":"process","utc":"2026-09-19T13:01:23.9670733Z","hostCpuPercent":null}
+{"name":"api","pid":44596,"privateMemoryMb":121.99,"handleCount":813,"threadCount":50,"workingSetMb":233.8,"cpuTotalSeconds":8.421875,"kind":"process","utc":"2026-09-19T13:01:29.5478117Z","hostCpuPercent":0.02}
+{"name":"next","pid":36296,"privateMemoryMb":4161.39,"handleCount":532,"threadCount":47,"workingSetMb":1862.55,"cpuTotalSeconds":201.640625,"kind":"process","utc":"2026-09-19T13:01:30.1558397Z","hostCpuPercent":0.0}
+{"name":"api","pid":44596,"privateMemoryMb":122.94,"handleCount":822,"threadCount":51,"workingSetMb":235.52,"cpuTotalSeconds":8.71875,"kind":"process","utc":"2026-09-19T13:01:35.6624691Z","hostCpuPercent":0.152}
+{"name":"next","pid":36296,"privateMemoryMb":4161.39,"handleCount":532,"threadCount":47,"workingSetMb":1862.55,"cpuTotalSeconds":201.640625,"kind":"process","utc":"2026-09-19T13:01:36.1858131Z","hostCpuPercent":0.0}
+{"name":"api","pid":44596,"privateMemoryMb":120.7,"handleCount":811,"threadCount":49,"workingSetMb":235.05,"cpuTotalSeconds":8.90625,"kind":"process","utc":"2026-09-19T13:01:41.7315649Z","hostCpuPercent":0.097}
+{"name":"next","pid":36296,"privateMemoryMb":4161.39,"handleCount":532,"threadCount":47,"workingSetMb":1862.55,"cpuTotalSeconds":201.640625,"kind":"process","utc":"2026-09-19T13:01:42.3384305Z","hostCpuPercent":0.0}
+{"name":"api","pid":44596,"privateMemoryMb":120.8,"handleCount":811,"threadCount":48,"workingSetMb":235.03,"cpuTotalSeconds":8.921875,"kind":"process","utc":"2026-09-19T13:01:47.8721119Z","hostCpuPercent":0.008}
+{"name":"next","pid":36296,"privateMemoryMb":4161.39,"handleCount":532,"threadCount":47,"workingSetMb":1862.55,"cpuTotalSeconds":201.640625,"kind":"process","utc":"2026-09-19T13:01:48.4175508Z","hostCpuPercent":0.0}
+{"utc":"2026-09-19T13:01:53.9779788Z","kind":"end"}

@@ -1,0 +1,246 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:10:43.367Z",
+  "checks": [
+    {
+      "name": "D11 Ops Proctor denied newly published Engineering exam",
+      "passed": true,
+      "detail": {
+        "success": false,
+        "message": "Exam not found",
+        "data": null,
+        "errors": [],
+        "traceId": "e5d63795b79d2d368e6af3e1dd9acee0"
+      },
+      "at": "2026-09-19T11:10:48.713Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:10:44.632Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:44.6278895+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:10:43.9325322+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:44.6278895+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:10:43.9325322+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1262.16
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:45.592Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Assessment/exams/123/builder",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 123,
+          "sourceType": 1,
+          "selectedSubjectIds": [
+            23
+          ],
+          "sections": [
+            {
+              "id": 307,
+              "sourceType": 1,
+              "questionSubjectId": 23,
+              "questionTopicId": null,
+              "titleEn": "QA26 eng Foundations",
+              "titleAr": "أساسيات اختبار QA26 eng",
+              "durationMinutes": null,
+              "pickCount": 6,
+              "order": 1,
+              "availableQuestionsCount": 6,
+              "estimatedTotalPoints": 56,
+              "subjectNameEn": "QA26 eng Foundations",
+              "subjectNameAr": "أساسيات اختبار QA26 eng",
+              "topicNameEn": null,
+              "topicNameAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 123,
+            "sourceType": 1,
+            "selectedSubjectIds": [
+              23
+            ],
+            "sections": [
+              {
+                "id": 307,
+                "sourceType": 1,
+                "questionSubjectId": 23,
+                "questionTopicId": null,
+                "titleEn": "QA26 eng Foundations",
+                "titleAr": "أساسيات اختبار QA26 eng",
+                "durationMinutes": null,
+                "pickCount": 6,
+                "order": 1,
+                "availableQuestionsCount": 6,
+                "estimatedTotalPoints": 56,
+                "subjectNameEn": "QA26 eng Foundations",
+                "subjectNameAr": "أساسيات اختبار QA26 eng",
+                "topicNameEn": null,
+                "topicNameAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 959.26
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:46.816Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:46.8161369+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T15:10:46.1214871+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:46.8161369+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T15:10:46.1214871+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1221.76
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:48.712Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/live/exam/123",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e5d63795b79d2d368e6af3e1dd9acee0"
+        },
+        "ms": 1895.5
+      }
+    }
+  ]
+}

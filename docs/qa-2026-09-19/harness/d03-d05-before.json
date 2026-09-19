@@ -1,0 +1,2010 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:52:03.420Z",
+  "checks": [
+    {
+      "name": "D05 Arabic full name is returned independently from English",
+      "passed": false,
+      "detail": {
+        "fullName": "QA26 User Regression"
+      },
+      "at": "2026-09-19T10:52:13.335Z"
+    },
+    {
+      "name": "D03 create rejects missing department",
+      "passed": false,
+      "detail": {
+        "status": 500,
+        "message": "An internal server error occurred. Please try again later."
+      },
+      "at": "2026-09-19T10:52:15.011Z"
+    },
+    {
+      "name": "D03 rejected missing create left no persisted user",
+      "passed": true,
+      "at": "2026-09-19T10:52:15.246Z"
+    },
+    {
+      "name": "D03 update rejects missing department",
+      "passed": false,
+      "detail": {
+        "status": 500,
+        "message": "An internal server error occurred. Please try again later."
+      },
+      "at": "2026-09-19T10:52:18.320Z"
+    },
+    {
+      "name": "D03 rejected missing update preserves department and name",
+      "passed": true,
+      "detail": {
+        "previousDepartment": 11,
+        "afterDepartment": 11,
+        "fullName": "QA26 User Regression"
+      },
+      "at": "2026-09-19T10:52:19.501Z"
+    },
+    {
+      "name": "D03 create rejects inactive department",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "User created successfully."
+      },
+      "at": "2026-09-19T10:52:23.574Z"
+    },
+    {
+      "name": "D03 rejected inactive create left no persisted user",
+      "passed": false,
+      "at": "2026-09-19T10:52:24.752Z"
+    },
+    {
+      "name": "D03 update rejects inactive department",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "User updated successfully."
+      },
+      "at": "2026-09-19T10:52:28.035Z"
+    },
+    {
+      "name": "D03 rejected inactive update preserves department and name",
+      "passed": false,
+      "detail": {
+        "previousDepartment": 11,
+        "afterDepartment": 12,
+        "fullName": "SHOULD NOT SAVE inactive"
+      },
+      "at": "2026-09-19T10:52:29.379Z"
+    },
+    {
+      "name": "D03 create rejects deleted department",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "User created successfully."
+      },
+      "at": "2026-09-19T10:52:35.374Z"
+    },
+    {
+      "name": "D03 rejected deleted create left no persisted user",
+      "passed": false,
+      "at": "2026-09-19T10:52:36.526Z"
+    },
+    {
+      "name": "D03 update rejects deleted department",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "message": "User updated successfully."
+      },
+      "at": "2026-09-19T10:52:39.765Z"
+    },
+    {
+      "name": "D03 rejected deleted update preserves department and name",
+      "passed": false,
+      "detail": {
+        "previousDepartment": 11,
+        "afterDepartment": 13,
+        "fullName": "SHOULD NOT SAVE deleted"
+      },
+      "at": "2026-09-19T10:52:40.926Z"
+    },
+    {
+      "name": "D05 Arabic update persists after new GET and leaves English independent",
+      "passed": false,
+      "detail": {
+        "fullName": "QA26 User Regression"
+      },
+      "at": "2026-09-19T10:52:46.267Z"
+    },
+    {
+      "name": "D05 overlong Arabic name rejected before database write",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:48.346Z"
+    },
+    {
+      "name": "D03 explicit clear-department still works",
+      "passed": true,
+      "at": "2026-09-19T10:52:52.565Z"
+    },
+    {
+      "name": "D03 clear-department persists",
+      "passed": true,
+      "at": "2026-09-19T10:52:53.743Z"
+    },
+    {
+      "name": "D03 valid active department update persists",
+      "passed": true,
+      "at": "2026-09-19T10:52:56.995Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:52:04.660Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:52:04.6566345+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:52:03.9597084+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:52:04.6566345+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:52:03.9597084+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1238.91
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:05.594Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments",
+      "request": {
+        "nameEn": "QA26 User Regression active",
+        "nameAr": "اختبار المستخدم active",
+        "code": "QA26USRACTIVE",
+        "isActive": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "nameEn": "QA26 User Regression active",
+          "nameAr": "اختبار المستخدم active",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "code": "QA26USRACTIVE",
+          "isActive": true,
+          "userCount": 0,
+          "createdDate": "2026-09-19T14:52:05.3579933+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Department created successfully.",
+          "data": {
+            "id": 11,
+            "nameEn": "QA26 User Regression active",
+            "nameAr": "اختبار المستخدم active",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "code": "QA26USRACTIVE",
+            "isActive": true,
+            "userCount": 0,
+            "createdDate": "2026-09-19T14:52:05.3579933+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 932.91
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:06.529Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments",
+      "request": {
+        "nameEn": "QA26 User Regression inactive",
+        "nameAr": "اختبار المستخدم inactive",
+        "code": "QA26USRINACTIVE",
+        "isActive": false
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 12,
+          "nameEn": "QA26 User Regression inactive",
+          "nameAr": "اختبار المستخدم inactive",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "code": "QA26USRINACTIVE",
+          "isActive": false,
+          "userCount": 0,
+          "createdDate": "2026-09-19T14:52:06.2942132+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Department created successfully.",
+          "data": {
+            "id": 12,
+            "nameEn": "QA26 User Regression inactive",
+            "nameAr": "اختبار المستخدم inactive",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "code": "QA26USRINACTIVE",
+            "isActive": false,
+            "userCount": 0,
+            "createdDate": "2026-09-19T14:52:06.2942132+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 934.06
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:07.466Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments",
+      "request": {
+        "nameEn": "QA26 User Regression deleted",
+        "nameAr": "اختبار المستخدم deleted",
+        "code": "QA26USRDELETED",
+        "isActive": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 13,
+          "nameEn": "QA26 User Regression deleted",
+          "nameAr": "اختبار المستخدم deleted",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "code": "QA26USRDELETED",
+          "isActive": true,
+          "userCount": 0,
+          "createdDate": "2026-09-19T14:52:07.2307054+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Department created successfully.",
+          "data": {
+            "id": 13,
+            "nameEn": "QA26 User Regression deleted",
+            "nameAr": "اختبار المستخدم deleted",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "code": "QA26USRDELETED",
+            "isActive": true,
+            "userCount": 0,
+            "createdDate": "2026-09-19T14:52:07.2307054+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 936.88
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:08.181Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Departments/13",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Department deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 713.81
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:12.162Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.user-regression@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 User Regression",
+        "fullNameAr": "مستخدم اختبار الانحدار",
+        "role": "Proctor",
+        "departmentId": 11
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3980.56
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:13.334Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1169.73
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:15.010Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.user-before-missing@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 before missing",
+        "fullNameAr": "اختبار منع قسم غير صالح",
+        "role": "Proctor",
+        "departmentId": 2147483647
+      },
+      "response": {
+        "status": 500,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "An internal server error occurred. Please try again later.",
+          "data": null,
+          "errors": [],
+          "traceId": "45632491463a6399fef378e666bd1aa9"
+        },
+        "ms": 1673.48
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:15.246Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.user-before-missing%40example.test",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "fe44ea823b2e56e7a63155dba9c1f5ed"
+        },
+        "ms": 233.45
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:16.434Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1186.96
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:18.319Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 2147483647,
+        "fullName": "SHOULD NOT SAVE missing"
+      },
+      "response": {
+        "status": 500,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "An internal server error occurred. Please try again later.",
+          "data": null,
+          "errors": [],
+          "traceId": "ff9fc5211926bf1a89479b2d8a1c0ddf"
+        },
+        "ms": 1884.11
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:19.500Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1179.24
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:23.573Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.user-before-inactive@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 before inactive",
+        "fullNameAr": "اختبار منع قسم غير صالح",
+        "role": "Proctor",
+        "departmentId": 12
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:22.3852737+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+          "email": "qa26.user-before-inactive@example.test",
+          "displayName": "QA26 before inactive",
+          "fullName": "QA26 before inactive",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:20.9700957+04:00",
+          "lastLoginDate": null,
+          "departmentId": 12,
+          "departmentNameEn": "QA26 User Regression inactive",
+          "departmentNameAr": "اختبار المستخدم inactive",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:22.3852737+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+            "email": "qa26.user-before-inactive@example.test",
+            "displayName": "QA26 before inactive",
+            "fullName": "QA26 before inactive",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:20.9700957+04:00",
+            "lastLoginDate": null,
+            "departmentId": 12,
+            "departmentNameEn": "QA26 User Regression inactive",
+            "departmentNameAr": "اختبار المستخدم inactive",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4069.69
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:24.751Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.user-before-inactive%40example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:22.3852737+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+          "email": "qa26.user-before-inactive@example.test",
+          "displayName": "QA26 before inactive",
+          "fullName": "QA26 before inactive",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:20.9700957+04:00",
+          "lastLoginDate": null,
+          "departmentId": 12,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:22.3852737+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+            "email": "qa26.user-before-inactive@example.test",
+            "displayName": "QA26 before inactive",
+            "fullName": "QA26 before inactive",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:20.9700957+04:00",
+            "lastLoginDate": null,
+            "departmentId": 12,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1176.08
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:25.925Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:11.0057399+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1172.53
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:28.034Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 12,
+        "fullName": "SHOULD NOT SAVE inactive"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:27.5692749+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "SHOULD NOT SAVE inactive",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 12,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:27.5692749+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "SHOULD NOT SAVE inactive",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 12,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2107.7
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:29.194Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:27.5692749+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "SHOULD NOT SAVE inactive",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 12,
+          "departmentNameEn": "QA26 User Regression inactive",
+          "departmentNameAr": "اختبار المستخدم inactive",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:27.5692749+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "SHOULD NOT SAVE inactive",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 12,
+            "departmentNameEn": "QA26 User Regression inactive",
+            "departmentNameAr": "اختبار المستخدم inactive",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1157.57
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:31.428Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 11,
+        "fullName": "QA26 User Regression"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:30.9710691+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:30.9710691+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2047.97
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:35.373Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.user-before-deleted@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 before deleted",
+        "fullNameAr": "اختبار منع قسم غير صالح",
+        "role": "Proctor",
+        "departmentId": 13
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:34.2379782+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+          "email": "qa26.user-before-deleted@example.test",
+          "displayName": "QA26 before deleted",
+          "fullName": "QA26 before deleted",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:32.8642315+04:00",
+          "lastLoginDate": null,
+          "departmentId": 13,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:34.2379782+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+            "email": "qa26.user-before-deleted@example.test",
+            "displayName": "QA26 before deleted",
+            "fullName": "QA26 before deleted",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:32.8642315+04:00",
+            "lastLoginDate": null,
+            "departmentId": 13,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3943.06
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:36.524Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.user-before-deleted%40example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:34.2379782+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+          "email": "qa26.user-before-deleted@example.test",
+          "displayName": "QA26 before deleted",
+          "fullName": "QA26 before deleted",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:32.8642315+04:00",
+          "lastLoginDate": null,
+          "departmentId": 13,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:34.2379782+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+            "email": "qa26.user-before-deleted@example.test",
+            "displayName": "QA26 before deleted",
+            "fullName": "QA26 before deleted",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:32.8642315+04:00",
+            "lastLoginDate": null,
+            "departmentId": 13,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1149.54
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:37.685Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:30.9710691+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:30.9710691+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1157.28
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:39.764Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 13,
+        "fullName": "SHOULD NOT SAVE deleted"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:39.3039475+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "SHOULD NOT SAVE deleted",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 13,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:39.3039475+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "SHOULD NOT SAVE deleted",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 13,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2078.03
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:40.925Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:39.3039475+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "SHOULD NOT SAVE deleted",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 13,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:39.3039475+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "SHOULD NOT SAVE deleted",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 13,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1158.67
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:43.037Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 11,
+        "fullName": "QA26 User Regression"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:42.5636619+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:42.5636619+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2108.94
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:45.108Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "fullName": "QA26 User Regression",
+        "fullNameAr": "اسم عربي معدل"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:44.6476228+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:44.6476228+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2070.97
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:46.265Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:44.6476228+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:44.6476228+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1155.67
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:48.344Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "fullNameAr": "ععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععععع"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:47.8835491+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:47.8835491+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2075.6
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:50.411Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "fullNameAr": "مستخدم اختبار الانحدار"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:49.9463476+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:49.9463476+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2064.55
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:52.564Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "clearDepartment": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:52.0800418+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:52.0800418+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2151.19
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:53.743Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:52.0800418+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:52.0800418+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1175.71
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:55.857Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "request": {
+        "departmentId": 11
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:55.400115+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:55.400115+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2112.63
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:56.993Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:55.400115+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+          "email": "qa26.user-regression@example.test",
+          "displayName": "QA26 User Regression",
+          "fullName": "QA26 User Regression",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Proctor"
+          ],
+          "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+          "lastLoginDate": null,
+          "departmentId": 11,
+          "departmentNameEn": "QA26 User Regression active",
+          "departmentNameAr": "اختبار المستخدم active",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:55.400115+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+            "email": "qa26.user-regression@example.test",
+            "displayName": "QA26 User Regression",
+            "fullName": "QA26 User Regression",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:52:09.6156434+04:00",
+            "lastLoginDate": null,
+            "departmentId": 11,
+            "departmentNameEn": "QA26 User Regression active",
+            "departmentNameAr": "اختبار المستخدم active",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1135.89
+      }
+    }
+  ]
+}

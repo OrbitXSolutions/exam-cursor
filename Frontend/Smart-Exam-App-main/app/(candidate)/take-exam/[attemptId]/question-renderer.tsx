@@ -150,8 +150,8 @@ function MCQSingleChoice({
     })
   }
 
-  // Sort options by order
-  const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
+  // The session API supplies the persisted per-attempt option sequence.
+  const sortedOptions = question.options
 
   const dir = language === "ar" ? "rtl" : "ltr"
 
@@ -226,7 +226,7 @@ function MCQMultipleChoice({
   }
 
   // Sort options by order
-  const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
+  const sortedOptions = question.options
 
   const dir = language === "ar" ? "rtl" : "ltr"
 
@@ -296,7 +296,7 @@ function TrueFalse({
   }
 
   // Sort options by order
-  const sortedOptions = [...question.options].sort((a, b) => a.order - b.order)
+  const sortedOptions = question.options
 
   const dir = language === "ar" ? "rtl" : "ltr"
 

@@ -10,6 +10,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.Batch;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Batch;
 
@@ -19,17 +20,20 @@ public class BatchService : IBatchService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly ICacheService _cache;
+    private readonly ResourceAuthorizationService _authorization;
 
     public BatchService(
         ApplicationDbContext db,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        ICacheService cache)
+        ICacheService cache,
+        ResourceAuthorizationService authorization)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
         _cache = cache;
+        _authorization = authorization;
     }
 
     private void InvalidateBatchCache()
@@ -40,7 +44,9 @@ public class BatchService : IBatchService
     // ── List ───────────────────────────────────────────────────
     public async Task<ApiResponse<PaginatedResponse<BatchListDto>>> GetBatchesAsync(BatchFilterDto filter)
     {
-        var cacheKey = $"{CacheKeys.BatchesPrefix}{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
+        var scopeKey = await _authorization.GetCurrentScopeCacheKeyAsync();
+        var visibleUserIds = (await _authorization.ScopeUsersAsync(_db.Users)).Select(u => u.Id);
+        var cacheKey = $"{CacheKeys.BatchesPrefix}{scopeKey}:{filter.Search?.ToLower() ?? ""}:{filter.Status?.ToLower() ?? ""}:{filter.SortBy?.ToLower() ?? ""}:{filter.SortDir?.ToLower() ?? ""}:{filter.PageNumber}:{filter.PageSize}";
         return await _cache.GetOrCreateAsync(cacheKey, async () =>
         {
             var query = _db.Batches.Where(b => !b.IsDeleted);
@@ -70,15 +76,15 @@ public class BatchService : IBatchService
             {
                 ("name", "asc") => query.OrderBy(b => b.Name),
                 ("name", _) => query.OrderByDescending(b => b.Name),
-                ("candidatecount", "asc") => query.OrderBy(b => b.BatchCandidates.Count),
-                ("candidatecount", _) => query.OrderByDescending(b => b.BatchCandidates.Count),
+                ("candidatecount", "asc") => query.OrderBy(b => b.BatchCandidates.Count(bc => visibleUserIds.Contains(bc.CandidateId))),
+                ("candidatecount", _) => query.OrderByDescending(b => b.BatchCandidates.Count(bc => visibleUserIds.Contains(bc.CandidateId))),
                 ("isactive", "asc") => query.OrderBy(b => b.IsActive),
                 ("isactive", _) => query.OrderByDescending(b => b.IsActive),
                 _ => query.OrderByDescending(b => b.CreatedDate),
             };
 
             var batches = await query
-                .Include(b => b.BatchCandidates)
+                .Include(b => b.BatchCandidates.Where(bc => visibleUserIds.Contains(bc.CandidateId)))
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
@@ -117,8 +123,9 @@ public class BatchService : IBatchService
     // ── Get by ID (with candidates) ───────────────────────────
     public async Task<ApiResponse<BatchDetailDto>> GetBatchByIdAsync(int id)
     {
+        var visibleUserIds = (await _authorization.ScopeUsersAsync(_db.Users)).Select(u => u.Id);
         var batch = await _db.Batches
-            .Include(b => b.BatchCandidates)
+            .Include(b => b.BatchCandidates.Where(bc => visibleUserIds.Contains(bc.CandidateId)))
                 .ThenInclude(bc => bc.Candidate)
             .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
 
@@ -206,8 +213,9 @@ public class BatchService : IBatchService
     // ── Update ────────────────────────────────────────────────
     public async Task<ApiResponse<BatchListDto>> UpdateBatchAsync(int id, UpdateBatchDto dto, string updatedBy)
     {
+        var visibleUserIds = (await _authorization.ScopeUsersAsync(_db.Users)).Select(u => u.Id);
         var batch = await _db.Batches
-            .Include(b => b.BatchCandidates)
+            .Include(b => b.BatchCandidates.Where(bc => visibleUserIds.Contains(bc.CandidateId)))
             .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
 
         if (batch == null)
@@ -293,6 +301,8 @@ public class BatchService : IBatchService
             .Where(ur => ur.RoleId == candidateRole.Id)
             .Select(ur => ur.UserId)
             .ToListAsync();
+        var visibleCandidateIds = await (await _authorization.ScopeUsersAsync(_db.Users))
+            .Where(u => candidateUserIds.Contains(u.Id)).Select(u => u.Id).ToHashSetAsync();
 
         // Existing members of this batch
         var existingIds = await _db.BatchCandidates
@@ -307,9 +317,9 @@ public class BatchService : IBatchService
 
         foreach (var candidateId in dto.CandidateIds.Distinct())
         {
-            if (!candidateUserIds.Contains(candidateId))
+            if (!visibleCandidateIds.Contains(candidateId))
             {
-                result.Errors.Add($"User {candidateId} is not a candidate.");
+                result.Errors.Add($"Candidate {candidateId} not found.");
                 result.SkippedCount++;
                 continue;
             }
@@ -344,8 +354,9 @@ public class BatchService : IBatchService
         if (batch == null)
             return ApiResponse<BatchCandidateChangeResultDto>.FailureResponse("Batch not found.");
 
+        var visibleUserIds = (await _authorization.ScopeUsersAsync(_db.Users)).Select(u => u.Id);
         var toRemove = await _db.BatchCandidates
-            .Where(bc => bc.BatchId == batchId && dto.CandidateIds.Contains(bc.CandidateId))
+            .Where(bc => bc.BatchId == batchId && dto.CandidateIds.Contains(bc.CandidateId) && visibleUserIds.Contains(bc.CandidateId))
             .ToListAsync();
 
         var result = new BatchCandidateChangeResultDto
@@ -366,8 +377,9 @@ public class BatchService : IBatchService
     // ── Export batch members to Excel ─────────────────────────
     public async Task<byte[]> ExportBatchCandidatesAsync(int batchId)
     {
+        var visibleUserIds = (await _authorization.ScopeUsersAsync(_db.Users)).Select(u => u.Id);
         var batch = await _db.Batches
-            .Include(b => b.BatchCandidates)
+            .Include(b => b.BatchCandidates.Where(bc => visibleUserIds.Contains(bc.CandidateId)))
                 .ThenInclude(bc => bc.Candidate)
             .FirstOrDefaultAsync(b => b.Id == batchId && !b.IsDeleted);
 

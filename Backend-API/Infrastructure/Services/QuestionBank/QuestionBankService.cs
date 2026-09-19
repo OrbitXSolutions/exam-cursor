@@ -7,6 +7,7 @@ using Smart_Core.Application.DTOs.Common;
 using Smart_Core.Application.DTOs.QuestionBank;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.QuestionBank;
+using Smart_Core.Application.Validators.QuestionBank;
 using Smart_Core.Domain.Constants;
 using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Entities.QuestionBank;
@@ -52,6 +53,26 @@ public class QuestionBankService : IQuestionBankService
         return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin);
     }
 
+    private async Task<bool> CanAccessSubjectAsync(int subjectId)
+    {
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
+        var departmentId = isSuperAdmin ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
+        if (!isSuperAdmin && !departmentId.HasValue) return false;
+        return await _context.QuestionSubjects.AnyAsync(subject => subject.Id == subjectId &&
+            (isSuperAdmin || subject.DepartmentId == departmentId));
+    }
+
+    private async Task<bool> CanAccessQuestionAsync(int questionId, bool includeDeleted = false)
+    {
+        var isSuperAdmin = await IsCurrentUserSuperAdminAsync();
+        var departmentId = isSuperAdmin ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
+        if (!isSuperAdmin && !departmentId.HasValue) return false;
+        var questions = _context.Questions.AsQueryable();
+        if (includeDeleted) questions = questions.IgnoreQueryFilters();
+        return await questions.AnyAsync(question => question.Id == questionId &&
+            (isSuperAdmin || question.Subject.DepartmentId == departmentId));
+    }
+
     #region Questions
 
     public async Task<ApiResponse<PaginatedResponse<QuestionListDto>>> GetAllQuestionsAsync(QuestionSearchDto searchDto)
@@ -83,9 +104,11 @@ public class QuestionBankService : IQuestionBankService
             }
 
             // Department isolation: filter questions via Subject.DepartmentId (SuperDev sees all)
-            if (!isSuperAdmin && resolvedDeptId.HasValue)
+            if (!isSuperAdmin)
             {
-                query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
+                query = resolvedDeptId.HasValue
+                    ? query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value)
+                    : query.Where(_ => false);
             }
 
             // Search filter (searches both English and Arabic)
@@ -199,7 +222,7 @@ public class QuestionBankService : IQuestionBankService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && entity.Subject != null && entity.Subject.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || entity.Subject == null || entity.Subject.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionDto>.FailureResponse("You do not have access to this question");
             }
@@ -230,7 +253,7 @@ public class QuestionBankService : IQuestionBankService
             IsCalculatorAllowed = entity.IsCalculatorAllowed,
             CreatedDate = entity.CreatedDate,
             IsDeleted = entity.IsDeleted,
-            Options = entity.Options.Select(o => new QuestionOptionDto
+            Options = entity.Options.Where(o => !o.IsDeleted).Select(o => new QuestionOptionDto
             {
                 Id = o.Id,
                 QuestionId = o.QuestionId,
@@ -264,6 +287,15 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<QuestionDto>> CreateQuestionAsync(CreateQuestionDto dto, string createdBy)
     {
+        if (!await CanAccessSubjectAsync(dto.SubjectId))
+            return ApiResponse<QuestionDto>.FailureResponse("Subject not found");
+
+        if (dto.Options is null)
+            return ApiResponse<QuestionDto>.FailureResponse("Options are required.");
+        var optionsError = QuestionOptionRules.Validate(dto.QuestionTypeId, dto.Points,
+            dto.Options.Select(o => (o.IsCorrect, o.Points)));
+        if (optionsError != null) return ApiResponse<QuestionDto>.FailureResponse(optionsError);
+
         // Validate QuestionType exists
         var questionTypeExists = await _context.QuestionTypes.AnyAsync(x => x.Id == dto.QuestionTypeId);
         if (!questionTypeExists)
@@ -363,8 +395,12 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<QuestionDto>> UpdateQuestionAsync(int id, UpdateQuestionDto dto, string updatedBy)
     {
+        if (!await CanAccessQuestionAsync(id) || !await CanAccessSubjectAsync(dto.SubjectId))
+            return ApiResponse<QuestionDto>.FailureResponse("Question or subject not found");
+
         var entity = await _context.Questions
             .Include(x => x.AnswerKey)
+            .Include(x => x.Options)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity == null)
@@ -404,6 +440,37 @@ public class QuestionBankService : IQuestionBankService
             if (!topicBelongsToSubject)
             {
                 return ApiResponse<QuestionDto>.FailureResponse("Topic does not belong to the selected subject");
+            }
+        }
+
+        if (dto.Options != null)
+        {
+            var idsError = ValidateOptionIds(dto.Options, entity.Options);
+            if (idsError != null) return ApiResponse<QuestionDto>.FailureResponse(idsError);
+        }
+        var optionsError = QuestionOptionRules.Validate(dto.QuestionTypeId, dto.Points,
+            dto.Options != null
+                ? dto.Options.Select(o => (o.IsCorrect, o.Points))
+                : entity.Options.Select(o => (o.IsCorrect, o.Points)));
+        if (optionsError != null) return ApiResponse<QuestionDto>.FailureResponse(optionsError);
+
+        if (dto.Options != null)
+        {
+            var retainedIds = dto.Options.Where(o => o.Id > 0).Select(o => o.Id).ToHashSet();
+            foreach (var removed in entity.Options.Where(o => !retainedIds.Contains(o.Id)))
+            {
+                removed.IsDeleted = true;
+                removed.DeletedBy = updatedBy;
+            }
+            foreach (var option in dto.Options)
+            {
+                var target = option.Id == 0 ? null : entity.Options.First(o => o.Id == option.Id);
+                if (target == null)
+                {
+                    target = new QuestionOption { CreatedBy = updatedBy };
+                    entity.Options.Add(target);
+                }
+                ApplyOption(target, option, updatedBy);
             }
         }
 
@@ -467,6 +534,9 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<bool>> DeleteQuestionAsync(int id)
     {
+        if (!await CanAccessQuestionAsync(id, includeDeleted: true))
+            return ApiResponse<bool>.FailureResponse("Question not found");
+
         var entity = await _context.Questions
     .IgnoreQueryFilters()
             .Include(x => x.Options)
@@ -509,6 +579,9 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<bool>> ToggleQuestionStatusAsync(int id, string updatedBy)
     {
+        if (!await CanAccessQuestionAsync(id))
+            return ApiResponse<bool>.FailureResponse("Question not found");
+
         var entity = await _context.Questions.FindAsync(id);
 
         if (entity == null)
@@ -537,10 +610,9 @@ public class QuestionBankService : IQuestionBankService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue)
-            {
-                query = query.Where(q => q.Subject.DepartmentId == userDepartmentId.Value);
-            }
+            query = userDepartmentId.HasValue
+                ? query.Where(q => q.Subject.DepartmentId == userDepartmentId.Value)
+                : query.Where(_ => false);
         }
 
         if (subjectId.HasValue)
@@ -569,9 +641,33 @@ public class QuestionBankService : IQuestionBankService
 
     #region Question Options
 
+    private static string? ValidateOptionIds(IEnumerable<UpdateQuestionOptionDto> changes,
+        IEnumerable<QuestionOption> existing)
+    {
+        var items = changes.ToList();
+        var existingIds = existing.Select(o => o.Id).ToHashSet();
+        if (items.Any(o => o.Id < 0 || (o.Id > 0 && !existingIds.Contains(o.Id))))
+            return "Option not found in this question.";
+        if (items.Where(o => o.Id > 0).GroupBy(o => o.Id).Any(g => g.Count() > 1))
+            return "An option may only be updated once per request.";
+        return null;
+    }
+
+    private static void ApplyOption(QuestionOption target, UpdateQuestionOptionDto value, string updatedBy)
+    {
+        target.TextEn = value.TextEn;
+        target.TextAr = value.TextAr;
+        target.IsCorrect = value.IsCorrect;
+        target.Points = value.Points;
+        target.Order = value.Order;
+        target.AttachmentPath = value.AttachmentPath;
+        target.UpdatedBy = updatedBy;
+        target.UpdatedDate = UaeTimeHelper.NowUae;
+    }
+
     public async Task<ApiResponse<List<QuestionOptionDto>>> GetQuestionOptionsAsync(int questionId)
     {
-        var questionExists = await _context.Questions.AnyAsync(x => x.Id == questionId);
+        var questionExists = await CanAccessQuestionAsync(questionId);
         if (!questionExists)
         {
             return ApiResponse<List<QuestionOptionDto>>.FailureResponse("Question not found");
@@ -600,11 +696,16 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<QuestionOptionDto>> AddQuestionOptionAsync(int questionId, CreateQuestionOptionDto dto, string createdBy)
     {
-        var questionExists = await _context.Questions.AnyAsync(x => x.Id == questionId);
+        var questionExists = await CanAccessQuestionAsync(questionId);
         if (!questionExists)
         {
             return ApiResponse<QuestionOptionDto>.FailureResponse("Question not found");
         }
+
+        var question = await _context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == questionId);
+        var error = QuestionOptionRules.Validate(question.QuestionTypeId, question.Points,
+            question.Options.Select(o => (o.IsCorrect, o.Points)).Append((dto.IsCorrect, dto.Points)));
+        if (error != null) return ApiResponse<QuestionOptionDto>.FailureResponse(error);
 
         var entity = new QuestionOption
         {
@@ -643,10 +744,15 @@ public class QuestionBankService : IQuestionBankService
     {
         var entity = await _context.QuestionOptions.FindAsync(optionId);
 
-        if (entity == null)
+        if (entity == null || !await CanAccessQuestionAsync(entity.QuestionId))
         {
             return ApiResponse<QuestionOptionDto>.FailureResponse("Option not found");
         }
+
+        var question = await _context.Questions.Include(q => q.Options).FirstAsync(q => q.Id == entity.QuestionId);
+        var error = QuestionOptionRules.Validate(question.QuestionTypeId, question.Points,
+            question.Options.Select(o => o.Id == optionId ? (dto.IsCorrect, dto.Points) : (o.IsCorrect, o.Points)));
+        if (error != null) return ApiResponse<QuestionOptionDto>.FailureResponse(error);
 
         entity.TextEn = dto.TextEn;
         entity.TextAr = dto.TextAr;
@@ -682,10 +788,17 @@ public class QuestionBankService : IQuestionBankService
        .IgnoreQueryFilters()
   .FirstOrDefaultAsync(x => x.Id == optionId);
 
-        if (entity == null)
+        if (entity == null || !await CanAccessQuestionAsync(entity.QuestionId, includeDeleted: true))
         {
             return ApiResponse<bool>.FailureResponse("Option not found");
         }
+
+        var question = await _context.Questions.IgnoreQueryFilters().FirstAsync(q => q.Id == entity.QuestionId);
+        var remaining = await _context.QuestionOptions.Where(o => o.QuestionId == entity.QuestionId && o.Id != optionId)
+            .Select(o => new { o.IsCorrect, o.Points }).ToListAsync();
+        var error = QuestionOptionRules.Validate(question.QuestionTypeId, question.Points,
+            remaining.Select(o => (o.IsCorrect, o.Points)));
+        if (error != null) return ApiResponse<bool>.FailureResponse(error);
 
         _context.QuestionOptions.Remove(entity);
         await _context.SaveChangesAsync();
@@ -696,7 +809,7 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<List<QuestionOptionDto>>> BulkUpdateQuestionOptionsAsync(BulkUpdateQuestionOptionsDto dto, string updatedBy)
     {
-        var questionExists = await _context.Questions.AnyAsync(x => x.Id == dto.QuestionId);
+        var questionExists = await CanAccessQuestionAsync(dto.QuestionId);
         if (!questionExists)
         {
             return ApiResponse<List<QuestionOptionDto>>.FailureResponse("Question not found");
@@ -706,6 +819,27 @@ public class QuestionBankService : IQuestionBankService
         var existingOptions = await _context.QuestionOptions
          .Where(x => x.QuestionId == dto.QuestionId)
  .ToListAsync();
+
+        if (dto.Options is null || dto.Options.Count == 0)
+            return ApiResponse<List<QuestionOptionDto>>.FailureResponse("At least one option is required.");
+        var idsError = ValidateOptionIds(dto.Options, existingOptions);
+        if (idsError != null) return ApiResponse<List<QuestionOptionDto>>.FailureResponse(idsError);
+        var optionValidator = new UpdateQuestionOptionDtoValidator();
+        foreach (var option in dto.Options)
+        {
+            var validation = optionValidator.Validate(option);
+            if (!validation.IsValid)
+                return ApiResponse<List<QuestionOptionDto>>.FailureResponse("Invalid option.",
+                    validation.Errors.Select(e => e.ErrorMessage).ToList());
+        }
+        var question = await _context.Questions.FirstAsync(q => q.Id == dto.QuestionId);
+        var proposed = existingOptions.Select(option =>
+        {
+            var update = dto.Options.FirstOrDefault(o => o.Id == option.Id);
+            return update == null ? (option.IsCorrect, option.Points) : (update.IsCorrect, update.Points);
+        }).Concat(dto.Options.Where(o => o.Id == 0).Select(o => (o.IsCorrect, o.Points)));
+        var error = QuestionOptionRules.Validate(question.QuestionTypeId, question.Points, proposed);
+        if (error != null) return ApiResponse<List<QuestionOptionDto>>.FailureResponse(error);
 
         foreach (var optionDto in dto.Options)
         {
@@ -753,7 +887,7 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<List<QuestionAttachmentDto>>> GetQuestionAttachmentsAsync(int questionId)
     {
-        var questionExists = await _context.Questions.AnyAsync(x => x.Id == questionId);
+        var questionExists = await CanAccessQuestionAsync(questionId);
         if (!questionExists)
         {
             return ApiResponse<List<QuestionAttachmentDto>>.FailureResponse("Question not found");
@@ -770,7 +904,7 @@ public class QuestionBankService : IQuestionBankService
 
     public async Task<ApiResponse<QuestionAttachmentDto>> AddQuestionAttachmentAsync(CreateQuestionAttachmentDto dto, string createdBy)
     {
-        var questionExists = await _context.Questions.AnyAsync(x => x.Id == dto.QuestionId);
+        var questionExists = await CanAccessQuestionAsync(dto.QuestionId);
         if (!questionExists)
         {
             return ApiResponse<QuestionAttachmentDto>.FailureResponse("Question not found");
@@ -814,7 +948,7 @@ public class QuestionBankService : IQuestionBankService
     {
         var entity = await _context.QuestionAttachments.FindAsync(attachmentId);
 
-        if (entity == null)
+        if (entity == null || !await CanAccessQuestionAsync(entity.QuestionId))
         {
             return ApiResponse<QuestionAttachmentDto>.FailureResponse("Attachment not found");
         }
@@ -854,7 +988,7 @@ public class QuestionBankService : IQuestionBankService
         .IgnoreQueryFilters()
  .FirstOrDefaultAsync(x => x.Id == attachmentId);
 
-        if (entity == null)
+        if (entity == null || !await CanAccessQuestionAsync(entity.QuestionId, includeDeleted: true))
         {
             return ApiResponse<bool>.FailureResponse("Attachment not found");
         }
@@ -870,7 +1004,7 @@ public class QuestionBankService : IQuestionBankService
     {
         var entity = await _context.QuestionAttachments.FindAsync(attachmentId);
 
-        if (entity == null)
+        if (entity == null || !await CanAccessQuestionAsync(entity.QuestionId))
         {
             return ApiResponse<bool>.FailureResponse("Attachment not found");
         }

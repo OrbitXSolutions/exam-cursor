@@ -91,11 +91,20 @@ export function ExamCalculator({ onClose }: ExamCalculatorProps) {
   // Dragging state — use lazy initializer to avoid SSR crash (window not available on server)
   const [position, setPosition] = useState(() => {
     if (typeof window === "undefined") return { x: 100, y: 80 }
-    return { x: Math.max(0, window.innerWidth - 420), y: 80 }
+    return { x: Math.max(0, window.innerWidth - 420), y: Math.min(80, Math.max(0, window.innerHeight - 100)) }
   })
   const [isDragging, setIsDragging] = useState(false)
   const dragOffset = useRef({ x: 0, y: 0 })
   const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const keepPanelInView = () => setPosition(current => ({
+      x: Math.max(0, Math.min(current.x, window.innerWidth - Math.min(370, window.innerWidth))),
+      y: Math.max(0, Math.min(current.y, window.innerHeight - 100)),
+    }))
+    window.addEventListener("resize", keepPanelInView)
+    return () => window.removeEventListener("resize", keepPanelInView)
+  }, [])
 
   // Drag handlers — mouse
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -442,7 +451,10 @@ export function ExamCalculator({ onClose }: ExamCalculatorProps) {
       style={{ position: "fixed", left: position.x, top: position.y, zIndex: 9998 }}
       className="select-none"
     >
-      <Card className="w-[370px] shadow-2xl border-2 border-primary/20 overflow-hidden">
+      <Card
+        style={{ maxHeight: `calc(100dvh - ${position.y}px - 8px)` }}
+        className="w-[370px] max-w-[100vw] shadow-2xl border-2 border-primary/20 overflow-y-auto overscroll-contain"
+      >
         {/* Title bar — draggable */}
         <div
           className="flex items-center justify-between px-3 py-2 bg-primary/5 border-b cursor-move"

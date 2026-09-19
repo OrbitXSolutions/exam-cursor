@@ -1,0 +1,10 @@
+{
+  "PreviousLauncherPid": 4344,
+  "StartUtc": "2026-09-19T11:59:12.760414Z",
+  "PreviousListenerPid": 31492,
+  "EndUtc": "2026-09-19T11:59:48.7048598Z",
+  "StopToProbeUpperBoundSeconds": 36.705,
+  "NewLauncherPid": 52480,
+  "NewListenerPid": 33864,
+  "ExecSessionId": 55335
+}

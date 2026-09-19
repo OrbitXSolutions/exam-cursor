@@ -1,0 +1,852 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:40:14.903Z",
+  "checks": [
+    {
+      "name": "Public selection requires proof of ownership before authenticating an existing candidate",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+        "shareExamId": 119
+      },
+      "at": "2026-09-19T12:40:20.644Z"
+    },
+    {
+      "name": "Share authentication is scoped away from unrelated exam result130",
+      "passed": false,
+      "detail": {
+        "shareExamId": 119,
+        "unrelatedExamId": 130,
+        "unrelatedAttemptId": 208,
+        "totalScore": 50,
+        "status": 200
+      },
+      "at": "2026-09-19T12:40:21.109Z"
+    },
+    {
+      "name": "Anonymous share identity cannot refresh into an unrestricted persistent account session",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "roles": [
+          "Candidate"
+        ]
+      },
+      "at": "2026-09-19T12:40:22.270Z"
+    },
+    {
+      "name": "Walk-in registration of an existing candidate email requires ownership proof",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e"
+      },
+      "at": "2026-09-19T12:40:25.113Z"
+    },
+    {
+      "name": "Existing-email walk-in token cannot read unrelated exam130 results",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "examId": 130,
+        "totalScore": 50
+      },
+      "at": "2026-09-19T12:40:25.801Z"
+    },
+    {
+      "name": "Impersonation probes did not change target persisted roles/profile",
+      "passed": true,
+      "at": "2026-09-19T12:40:27.170Z"
+    },
+    {
+      "name": "JWT modified role with original signature rejected",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:40:28.355Z"
+    },
+    {
+      "name": "JWT unsigned alg-none rejected",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:40:28.357Z"
+    },
+    {
+      "name": "JWT malformed JWT rejected",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:40:28.361Z"
+    },
+    {
+      "name": "Invalid refresh secret rejected",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:40:28.594Z"
+    },
+    {
+      "name": "Logout invalidates refresh credential",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:40:29.981Z"
+    },
+    {
+      "name": "Walk-in accounts cannot authenticate using a globally shared default password",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "roles": [
+          "Candidate"
+        ]
+      },
+      "at": "2026-09-19T12:40:31.178Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:40:16.131Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:16.1273856+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:40:15.4315161+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:16.1273856+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:40:15.4315161+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1225.38
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:17.500Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.import.a@example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971501111111",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:29:55.7675221+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "email": "qa26.import.a@example.test",
+          "displayName": "QA26 Import A",
+          "fullName": "QA26 Import A",
+          "fullNameAr": "استيراد ألف",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+          "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971501111111",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:29:55.7675221+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1367.86
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:18.799Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_/candidates?search=qa26.import.a",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "rollNo": "QA26-IMP-A",
+            "hasExhaustedAttempts": false,
+            "statusMessage": null
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "rollNo": "QA26-IMP-A",
+              "hasExhaustedAttempts": false,
+              "statusMessage": null
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1298.26
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:18.800Z",
+      "observation": "Anonymous share-link lookup exposes matching candidate IDs/names/roll numbers",
+      "matching": [
+        {
+          "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "fullName": "QA26 Import A",
+          "fullNameAr": "استيراد ألف",
+          "rollNo": "QA26-IMP-A",
+          "hasExhaustedAttempts": false,
+          "statusMessage": null
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T12:40:20.644Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_/select-candidate",
+      "request": {
+        "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:20.6424195+04:00",
+          "examId": 119,
+          "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "candidateName": "QA26 Import A"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:20.6424195+04:00",
+            "examId": 119,
+            "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "candidateName": "QA26 Import A"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1843.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:21.108Z",
+      "identity": "SIMULATED anonymous public selection of QA imported A",
+      "method": "GET",
+      "route": "/api/Candidate/results/my-result/208",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 62,
+          "examId": 130,
+          "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+          "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T15:45:53.4759433+04:00",
+          "totalScore": 50,
+          "maxPossibleScore": 50,
+          "percentage": 100,
+          "isPassed": true,
+          "gradeLabel": "A",
+          "allowReview": true,
+          "showCorrectAnswers": true
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "resultId": 62,
+            "examId": 130,
+            "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+            "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+            "attemptNumber": 1,
+            "submittedAt": "2026-09-19T15:45:53.4759433+04:00",
+            "totalScore": 50,
+            "maxPossibleScore": 50,
+            "percentage": 100,
+            "isPassed": true,
+            "gradeLabel": "A",
+            "allowReview": true,
+            "showCorrectAnswers": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 462.96
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:22.269Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/refresh-token",
+      "request": {
+        "accessToken": "[REDACTED]",
+        "refreshToken": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:22.2689062+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Token refreshed successfully.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:22.2689062+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1159.79
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:25.112Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_/register",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "fullName": "QA26 simulated impersonation name",
+        "phoneNumber": "+971509999993",
+        "dynamicFields": [
+          {
+            "fieldId": 21,
+            "value": "QA26 adversarial existing-email registration"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:25.1120057+04:00",
+          "examId": 119,
+          "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "candidateName": "QA26 Import A"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:25.1120057+04:00",
+            "examId": 119,
+            "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "candidateName": "QA26 Import A"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2841.91
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:25.800Z",
+      "identity": "SIMULATED anonymous existing-email walk-in login",
+      "method": "GET",
+      "route": "/api/ExamResult/my-result/208",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 62,
+          "examId": 130,
+          "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+          "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+          "attemptNumber": 1,
+          "totalScore": 50,
+          "maxPossibleScore": 50,
+          "passScore": 25,
+          "percentage": 100,
+          "isPassed": true,
+          "gradeLabel": "A",
+          "finalizedAt": "2026-09-19T16:08:56.572366+04:00",
+          "attemptStartedAt": "2026-09-19T15:45:46.2562717+04:00",
+          "attemptSubmittedAt": "2026-09-19T15:45:53.4759433+04:00",
+          "questionResults": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "resultId": 62,
+            "examId": 130,
+            "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+            "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+            "attemptNumber": 1,
+            "totalScore": 50,
+            "maxPossibleScore": 50,
+            "passScore": 25,
+            "percentage": 100,
+            "isPassed": true,
+            "gradeLabel": "A",
+            "finalizedAt": "2026-09-19T16:08:56.572366+04:00",
+            "attemptStartedAt": "2026-09-19T15:45:46.2562717+04:00",
+            "attemptSubmittedAt": "2026-09-19T15:45:53.4759433+04:00",
+            "questionResults": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 685.94
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:27.169Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/062a0b10-77eb-4689-861c-6b9d84dcce6e",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971501111111",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:40:24.1635498+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "email": "qa26.import.a@example.test",
+          "displayName": "QA26 Import A",
+          "fullName": "QA26 Import A",
+          "fullNameAr": "استيراد ألف",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+          "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971501111111",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:40:24.1635498+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:29:55.3155501+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1368.1
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:28.351Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:28.3510601+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:40:27.6669983+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:28.3510601+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T16:40:27.6669983+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1180.71
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:28.354Z",
+      "identity": "QA26 modified role with original signature",
+      "method": "GET",
+      "route": "/api/Users?pageSize=1",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 2.33
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:28.356Z",
+      "identity": "QA26 unsigned alg-none",
+      "method": "GET",
+      "route": "/api/Users?pageSize=1",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 0.98
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:28.360Z",
+      "identity": "QA26 malformed JWT",
+      "method": "GET",
+      "route": "/api/Users?pageSize=1",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 2.69
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:28.594Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/refresh-token",
+      "request": {
+        "accessToken": "[REDACTED]",
+        "refreshToken": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Invalid or expired refresh token.",
+          "data": null,
+          "errors": [],
+          "traceId": "f6d50f0e67f172bc073f398e7e66edb3"
+        },
+        "ms": 231.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:29.749Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "POST",
+      "route": "/api/Auth/logout",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Logged out successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1154.2
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:29.981Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/refresh-token",
+      "request": {
+        "accessToken": "[REDACTED]",
+        "refreshToken": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Invalid or expired refresh token.",
+          "data": null,
+          "errors": [],
+          "traceId": "081cbc9f53db6c1fbcccea352d4ac5a8"
+        },
+        "ms": 230.66
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:31.177Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.walkin.fixed.valid@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:31.1770271+04:00",
+          "user": {
+            "id": "e0786e9b-5338-48c9-a978-e23e03b446b8",
+            "email": "qa26.walkin.fixed.valid@example.test",
+            "displayName": "QA26 Valid Dynamic",
+            "fullName": "QA26 Valid Dynamic",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:33:55.0796279+04:00",
+            "lastLoginDate": "2026-09-19T16:40:30.4839789+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:31.1770271+04:00",
+            "user": {
+              "id": "e0786e9b-5338-48c9-a978-e23e03b446b8",
+              "email": "qa26.walkin.fixed.valid@example.test",
+              "displayName": "QA26 Valid Dynamic",
+              "fullName": "QA26 Valid Dynamic",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:33:55.0796279+04:00",
+              "lastLoginDate": "2026-09-19T16:40:30.4839789+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1194.49
+      }
+    }
+  ]
+}

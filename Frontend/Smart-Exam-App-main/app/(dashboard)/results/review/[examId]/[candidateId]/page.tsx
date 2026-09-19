@@ -374,7 +374,9 @@ export default function ExamReviewPage() {
                       </p>
                       <div className="text-sm text-muted-foreground">
                         <span className="font-medium">{language === "ar" ? "الإجابة: " : "Answer: "}</span>
-                        {answer.textAnswer || (answer.selectedOptionIds?.join(", ")) || (language === "ar" ? "لا إجابة" : "No answer")}
+                        {answer.textAnswer || answer.selectedOptions?.map((option) =>
+                          getLocalizedText(option.textEn, option.textAr, language)
+                        ).join(", ") || answer.selectedOptionIds?.join(", ") || (language === "ar" ? "لا إجابة" : "No answer")}
                       </div>
                       {answer.graderComment && (
                         <div className="mt-2 text-sm text-blue-600 dark:text-blue-400">

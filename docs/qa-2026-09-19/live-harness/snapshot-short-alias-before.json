@@ -1,0 +1,7 @@
+{
+  "classification": "Actual anonymous HTTP read; observed filesystem short-name alias",
+  "route": "/media/PROCTO~1/2026/09/490dc9c0-068b-4e22-8f4f-26681883282b.png",
+  "status": 200,
+  "bytes": 68,
+  "sha256": "fe02f0a8bbce52bc90abed628e370bc03a6cc822412660a3bbb2cd27246dab21"
+}

@@ -23,8 +23,10 @@ public sealed class PublicMediaFileProvider : IFileProvider, IDisposable
         var segments = subpath.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);
         if (!PublicExtensions.Contains(Path.GetExtension(subpath)) ||
             segments.Any(segment => segment is "." or ".." || segment.EndsWith('.') ||
-                segment.EndsWith(' ') || segment.Contains(':')) ||
-            (segments.Length > 0 && segments[0].Equals("video-chunks", StringComparison.OrdinalIgnoreCase)))
+                segment.EndsWith(' ') || segment.Contains(':') ||
+                System.Text.RegularExpressions.Regex.IsMatch(segment, @"^[^~]{1,6}~[0-9]+(?:\.[^.]*)?$")) ||
+            (segments.Length > 0 && (segments[0].Equals("video-chunks", StringComparison.OrdinalIgnoreCase) ||
+                segments[0].Equals("proctor-snapshots", StringComparison.OrdinalIgnoreCase))))
             return new NotFoundFileInfo(subpath);
         return _inner.GetFileInfo(subpath);
     }

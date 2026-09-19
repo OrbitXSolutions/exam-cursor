@@ -1,0 +1,3187 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T13:46:18.888Z",
+  "checks": [
+    {
+      "name": "Fresh active attempt appears in live list",
+      "passed": true,
+      "at": "2026-09-19T13:46:51.469Z"
+    },
+    {
+      "name": "Fresh cancellation atomically closes proctor session",
+      "passed": true,
+      "detail": {
+        "attemptStatus": 5,
+        "sessionStatus": 3,
+        "endedAt": "2026-09-19T17:46:54.0303215+04:00"
+      },
+      "at": "2026-09-19T13:47:01.068Z"
+    },
+    {
+      "name": "Actual1minute candidate session expiry closes proctor session",
+      "passed": true,
+      "detail": {
+        "response": {
+          "success": false,
+          "message": "Attempt is Expired. Cannot resume.",
+          "data": null,
+          "errors": [],
+          "traceId": "860a9bb63d54022878e46a9f2f4a5e3e"
+        },
+        "attemptStatus": 4,
+        "sessionStatus": 2,
+        "endedAt": "2026-09-19T17:48:10.7445093+04:00"
+      },
+      "at": "2026-09-19T13:48:17.743Z"
+    },
+    {
+      "name": "Terminal attempts absent from active session list and monitoring",
+      "passed": true,
+      "detail": {
+        "activeCount": 0,
+        "liveCount": 0
+      },
+      "at": "2026-09-19T13:48:27.035Z"
+    },
+    {
+      "name": "Dashboard active count0 retains both historical sessions",
+      "passed": true,
+      "detail": {
+        "examId": 141,
+        "examTitleEn": "QA26 D63 Session Lifecycle",
+        "totalSessions": 2,
+        "activeSessions": 0,
+        "completedSessions": 1,
+        "highRiskCount": 0,
+        "pendingReviewCount": 2,
+        "clearedCount": 0,
+        "invalidatedCount": 0,
+        "averageRiskScore": 0,
+        "topViolations": [],
+        "riskDistribution": [
+          {
+            "range": "0-20 (Low)",
+            "count": 2,
+            "percentage": 100
+          },
+          {
+            "range": "21-50 (Medium)",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "51-75 (High)",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "76-100 (Critical)",
+            "count": 0,
+            "percentage": 0
+          }
+        ]
+      },
+      "at": "2026-09-19T13:48:27.038Z"
+    },
+    {
+      "name": "Unfiltered history retains cancelled and expired sessions",
+      "passed": true,
+      "detail": [
+        {
+          "attemptId": 313,
+          "status": 2
+        },
+        {
+          "attemptId": 312,
+          "status": 3
+        }
+      ],
+      "at": "2026-09-19T13:48:27.041Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T13:46:21.062Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T18:46:21.057079+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T17:46:20.3552051+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T18:46:21.057079+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T17:46:20.3552051+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2171.99
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:22.277Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T18:46:22.2766901+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T17:46:21.571874+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T18:46:22.2766901+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T17:46:21.571874+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1214.44
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:26.261Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 D63 Session Lifecycle",
+        "titleAr": "دورة حياة جلسة QA26",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T13:45:22.278Z",
+        "endAt": "2026-09-19T14:46:22.278Z",
+        "durationMinutes": 1,
+        "maxAttempts": 2,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 5,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 141,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 D63 Session Lifecycle",
+          "titleAr": "دورة حياة جلسة QA26",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T13:45:22.278+00:00",
+          "endAt": "2026-09-19T14:46:22.278+00:00",
+          "durationMinutes": 1,
+          "maxAttempts": 2,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": true,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T17:46:24.8330156+04:00",
+          "updatedDate": null,
+          "sectionsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [],
+          "instructions": [],
+          "accessPolicy": {
+            "id": 122,
+            "examId": 141,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T17:46:25.0952785+04:00",
+            "updatedDate": null
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 141,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 D63 Session Lifecycle",
+            "titleAr": "دورة حياة جلسة QA26",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T13:45:22.278+00:00",
+            "endAt": "2026-09-19T14:46:22.278+00:00",
+            "durationMinutes": 1,
+            "maxAttempts": 2,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 5,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": true,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T17:46:24.8330156+04:00",
+            "updatedDate": null,
+            "sectionsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [],
+            "instructions": [],
+            "accessPolicy": {
+              "id": 122,
+              "examId": 141,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T17:46:25.0952785+04:00",
+              "updatedDate": null
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3982.96
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:29.756Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/141/sections",
+      "request": {
+        "titleEn": "Lifecycle",
+        "titleAr": "دورة حياة",
+        "order": 1
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 328,
+          "examId": 141,
+          "titleEn": "Lifecycle",
+          "titleAr": "دورة حياة",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "order": 1,
+          "durationMinutes": null,
+          "totalPointsOverride": null,
+          "createdDate": "2026-09-19T17:46:28.3468629+04:00",
+          "topicsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sourceType": null,
+          "questionSubjectId": null,
+          "questionTopicId": null,
+          "pickCount": 0,
+          "subjectNameEn": null,
+          "subjectNameAr": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "topics": [],
+          "questions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 328,
+            "examId": 141,
+            "titleEn": "Lifecycle",
+            "titleAr": "دورة حياة",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "order": 1,
+            "durationMinutes": null,
+            "totalPointsOverride": null,
+            "createdDate": "2026-09-19T17:46:28.3468629+04:00",
+            "topicsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sourceType": null,
+            "questionSubjectId": null,
+            "questionTopicId": null,
+            "pickCount": 0,
+            "subjectNameEn": null,
+            "subjectNameAr": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "topics": [],
+            "questions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3492.41
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:34.903Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/328/questions/bulk",
+      "request": {
+        "questionIds": [
+          131
+        ],
+        "useOriginalPoints": true,
+        "markAsRequired": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 90,
+            "examId": 141,
+            "examSectionId": 328,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T17:46:33.2676964+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 90,
+              "examId": 141,
+              "examSectionId": 328,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T17:46:33.2676964+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5147.04
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:37.222Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Assessment/exams/141/access-policy",
+      "request": {
+        "isPublic": true,
+        "restrictToAssignedCandidates": false,
+        "isWalkIn": false,
+        "accessCode": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 122,
+          "examId": 141,
+          "isPublic": true,
+          "accessCode": null,
+          "restrictToAssignedCandidates": false,
+          "isWalkIn": false,
+          "createdDate": "2026-09-19T17:46:25.0952785+04:00",
+          "updatedDate": "2026-09-19T17:46:36.9850623+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Access policy updated successfully",
+          "data": {
+            "id": 122,
+            "examId": 141,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T17:46:25.0952785+04:00",
+            "updatedDate": "2026-09-19T17:46:36.9850623+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2317.95
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:43.880Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/141/publish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam published successfully. Notifications queued.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 6657.43
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:48.051Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/141/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 312,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "startedAtUtc": "2026-09-19T17:46:45.0795589+04:00",
+          "expiresAtUtc": "2026-09-19T17:47:45.0795589+04:00",
+          "remainingSeconds": 57,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 328,
+              "order": 1,
+              "titleEn": "Lifecycle",
+              "titleAr": "دورة حياة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2486,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 328,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2486,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 328,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 312,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "startedAtUtc": "2026-09-19T17:46:45.0795589+04:00",
+            "expiresAtUtc": "2026-09-19T17:47:45.0795589+04:00",
+            "remainingSeconds": 57,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 328,
+                "order": 1,
+                "titleEn": "Lifecycle",
+                "titleAr": "دورة حياة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2486,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 328,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2486,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 328,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4169.94
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:49.015Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/312",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 264,
+          "attemptId": 312,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T17:46:45.0795589+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": null,
+          "expiresAt": null,
+          "attemptStatus": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": null,
+          "candidatePhone": null,
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "examDurationMinutes": 1,
+          "examPassScore": 5,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 0,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 0,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": null,
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 0,
+          "sessionDuration": "3s",
+          "sessionDurationMinutes": 0.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 264,
+            "attemptId": 312,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T17:46:45.0795589+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": null,
+            "expiresAt": null,
+            "attemptStatus": null,
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": null,
+            "candidatePhone": null,
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "examDurationMinutes": 1,
+            "examPassScore": 5,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 0,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 0,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": null,
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 0,
+            "sessionDuration": "3s",
+            "sessionDurationMinutes": 0.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 963.44
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:51.468Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/sessions?ExamId=141&Status=1&IncludeSamples=false",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 264,
+              "attemptId": 312,
+              "examId": 141,
+              "examTitleEn": "QA26 D63 Session Lifecycle",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "mode": 1,
+              "modeName": "Soft",
+              "status": 1,
+              "statusName": "Active",
+              "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+              "endedAt": null,
+              "totalViolations": 0,
+              "countableViolationCount": 0,
+              "maxViolationWarnings": 10,
+              "riskScore": 0,
+              "decisionStatus": null,
+              "requiresReview": true,
+              "isFlagged": false,
+              "isSample": false,
+              "isTerminatedByProctor": false,
+              "terminationReason": null,
+              "latestSnapshotUrl": null,
+              "snapshotCount": 0,
+              "lastSnapshotAt": null,
+              "ipAddress": "::1",
+              "userAgent": "node",
+              "browserName": "Unknown",
+              "browserVersion": "",
+              "operatingSystem": "Unknown",
+              "screenResolution": null,
+              "deviceFingerprint": null,
+              "attemptIpAddress": null,
+              "attemptDeviceInfo": null,
+              "faceScore": null,
+              "eyeScore": null,
+              "behaviorScore": null,
+              "environmentScore": null
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 264,
+                "attemptId": 312,
+                "examId": 141,
+                "examTitleEn": "QA26 D63 Session Lifecycle",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "mode": 1,
+                "modeName": "Soft",
+                "status": 1,
+                "statusName": "Active",
+                "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+                "endedAt": null,
+                "totalViolations": 0,
+                "countableViolationCount": 0,
+                "maxViolationWarnings": 10,
+                "riskScore": 0,
+                "decisionStatus": null,
+                "requiresReview": true,
+                "isFlagged": false,
+                "isSample": false,
+                "isTerminatedByProctor": false,
+                "terminationReason": null,
+                "latestSnapshotUrl": null,
+                "snapshotCount": 0,
+                "lastSnapshotAt": null,
+                "ipAddress": "::1",
+                "userAgent": "node",
+                "browserName": "Unknown",
+                "browserVersion": "",
+                "operatingSystem": "Unknown",
+                "screenResolution": null,
+                "deviceFingerprint": null,
+                "attemptIpAddress": null,
+                "attemptDeviceInfo": null,
+                "faceScore": null,
+                "eyeScore": null,
+                "behaviorScore": null,
+                "environmentScore": null
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2452.01
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:54.977Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Attempt/cancel",
+      "request": {
+        "attemptId": 312,
+        "reason": "QA26 D63 normal lifecycle regression"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Attempt cancelled successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3506.18
+      }
+    },
+    {
+      "at": "2026-09-19T13:46:57.561Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/312/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 5349,
+              "attemptId": 312,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":1}",
+              "occurredAt": "2026-09-19T17:46:45.0795589+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 5350,
+              "attemptId": 312,
+              "eventType": 7,
+              "eventTypeName": "TimedOut",
+              "metadataJson": "{\"reason\":\"QA26 D63 normal lifecycle regression\",\"cancelledBy\":\"398bb878-5ebd-49c3-8e65-8376d46183a9\"}",
+              "occurredAt": "2026-09-19T17:46:54.0303215+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [],
+          "id": 312,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+          "submittedAt": null,
+          "expiresAt": "2026-09-19T17:47:45.0795589+04:00",
+          "status": 5,
+          "statusName": "Cancelled",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T17:46:45.0795589+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 5349,
+                "attemptId": 312,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":1}",
+                "occurredAt": "2026-09-19T17:46:45.0795589+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 5350,
+                "attemptId": 312,
+                "eventType": 7,
+                "eventTypeName": "TimedOut",
+                "metadataJson": "{\"reason\":\"QA26 D63 normal lifecycle regression\",\"cancelledBy\":\"398bb878-5ebd-49c3-8e65-8376d46183a9\"}",
+                "occurredAt": "2026-09-19T17:46:54.0303215+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [],
+            "id": 312,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+            "submittedAt": null,
+            "expiresAt": "2026-09-19T17:47:45.0795589+04:00",
+            "status": 5,
+            "statusName": "Cancelled",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T17:46:45.0795589+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2583.28
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:01.067Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/264",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 264,
+          "attemptId": 312,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 3,
+          "statusName": "Cancelled",
+          "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+          "endedAt": "2026-09-19T17:46:54.0303215+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T17:46:45.0795589+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": null,
+          "expiresAt": "2026-09-19T17:47:45.0795589+04:00",
+          "attemptStatus": "Cancelled",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": null,
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "examDurationMinutes": 1,
+          "examPassScore": 5,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 1,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T17:46:45.0795589+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 1,
+          "sessionDuration": "8s",
+          "sessionDurationMinutes": 0.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 264,
+            "attemptId": 312,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 3,
+            "statusName": "Cancelled",
+            "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+            "endedAt": "2026-09-19T17:46:54.0303215+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T17:46:45.0795589+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": null,
+            "expiresAt": "2026-09-19T17:47:45.0795589+04:00",
+            "attemptStatus": "Cancelled",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": null,
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "examDurationMinutes": 1,
+            "examPassScore": 5,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 1,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T17:46:45.0795589+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 1,
+            "sessionDuration": "8s",
+            "sessionDurationMinutes": 0.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3505.27
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:05.013Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/141/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 313,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "startedAtUtc": "2026-09-19T17:47:02.2353377+04:00",
+          "expiresAtUtc": "2026-09-19T17:48:02.2353377+04:00",
+          "remainingSeconds": 57,
+          "status": 1,
+          "attemptNumber": 2,
+          "maxAttempts": 2,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 328,
+              "order": 1,
+              "titleEn": "Lifecycle",
+              "titleAr": "دورة حياة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2487,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 328,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2487,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 328,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 313,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "startedAtUtc": "2026-09-19T17:47:02.2353377+04:00",
+            "expiresAtUtc": "2026-09-19T17:48:02.2353377+04:00",
+            "remainingSeconds": 57,
+            "status": 1,
+            "attemptNumber": 2,
+            "maxAttempts": 2,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 328,
+                "order": 1,
+                "titleEn": "Lifecycle",
+                "titleAr": "دورة حياة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2487,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 328,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2487,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 328,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3944.96
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:05.967Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/313",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 265,
+          "attemptId": 313,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T17:47:02.2353377+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": null,
+          "expiresAt": null,
+          "attemptStatus": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": null,
+          "candidatePhone": null,
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "examDurationMinutes": 1,
+          "examPassScore": 5,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 0,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 0,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": null,
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 0,
+          "sessionDuration": "3s",
+          "sessionDurationMinutes": 0.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 265,
+            "attemptId": 313,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T17:47:02.2353377+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": null,
+            "expiresAt": null,
+            "attemptStatus": null,
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": null,
+            "candidatePhone": null,
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "examDurationMinutes": 1,
+            "examPassScore": 5,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 0,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 0,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": null,
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 0,
+            "sessionDuration": "3s",
+            "sessionDurationMinutes": 0.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 951.28
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:07.392Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:05.968Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:06.6712746+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:06.6712746+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1424.65
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:13.801Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:12.397Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:13.1102549+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:13.1102549+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1403.97
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:20.201Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:18.803Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:19.5014638+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:19.5014638+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1398.36
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:26.611Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:25.214Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:25.9147623+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:25.9147623+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1396.91
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:33.014Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:31.625Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:32.3236522+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:32.3236522+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1388.25
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:39.420Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:38.028Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:38.7232391+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:38.7232391+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1391.9
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:45.816Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:44.425Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:45.1213128+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:45.1213128+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1390.84
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:52.213Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:50.823Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:51.5228081+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:51.5228081+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1390.83
+      }
+    },
+    {
+      "at": "2026-09-19T13:47:58.611Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:47:57.219Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:47:57.9191223+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:47:57.9191223+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1391.85
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:05.002Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 265,
+        "clientTimestamp": "2026-09-19T13:48:03.613Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T17:48:04.3095064+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T17:48:04.3095064+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1388.79
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:11.684Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/313/session",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Attempt is Expired. Cannot resume.",
+          "data": null,
+          "errors": [],
+          "traceId": "860a9bb63d54022878e46a9f2f4a5e3e"
+        },
+        "ms": 1665.87
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:14.235Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Attempt/313/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 5351,
+              "attemptId": 313,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":2}",
+              "occurredAt": "2026-09-19T17:47:02.2353377+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [],
+          "id": 313,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+          "submittedAt": null,
+          "expiresAt": "2026-09-19T17:48:02.2353377+04:00",
+          "status": 4,
+          "statusName": "Expired",
+          "expiryReason": 1,
+          "expiryReasonName": "TimerExpiredWhileActive",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 2,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T17:47:02.2353377+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 5351,
+                "attemptId": 313,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":2}",
+                "occurredAt": "2026-09-19T17:47:02.2353377+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [],
+            "id": 313,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+            "submittedAt": null,
+            "expiresAt": "2026-09-19T17:48:02.2353377+04:00",
+            "status": 4,
+            "statusName": "Expired",
+            "expiryReason": 1,
+            "expiryReasonName": "TimerExpiredWhileActive",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 2,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T17:47:02.2353377+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2550.07
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:17.741Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/265",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 265,
+          "attemptId": 313,
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+          "endedAt": "2026-09-19T17:48:10.7445093+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 10,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T17:48:04.3095064+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T17:48:02.2353377+04:00",
+          "attemptStatus": "Expired",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [
+            {
+              "id": 2282,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:48:04.3095064+04:00",
+              "sequenceNumber": 10
+            },
+            {
+              "id": 2281,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:57.9191223+04:00",
+              "sequenceNumber": 9
+            },
+            {
+              "id": 2280,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:51.5228081+04:00",
+              "sequenceNumber": 8
+            },
+            {
+              "id": 2279,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:45.1213128+04:00",
+              "sequenceNumber": 7
+            },
+            {
+              "id": 2278,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:38.7232391+04:00",
+              "sequenceNumber": 6
+            },
+            {
+              "id": 2277,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:32.3236522+04:00",
+              "sequenceNumber": 5
+            },
+            {
+              "id": 2276,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:25.9147623+04:00",
+              "sequenceNumber": 4
+            },
+            {
+              "id": 2275,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:19.5014638+04:00",
+              "sequenceNumber": 3
+            },
+            {
+              "id": 2274,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:13.1102549+04:00",
+              "sequenceNumber": 2
+            },
+            {
+              "id": 2273,
+              "proctorSessionId": 265,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T17:47:06.6712746+04:00",
+              "sequenceNumber": 1
+            }
+          ],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": null,
+          "examTitleAr": "دورة حياة جلسة QA26",
+          "examDurationMinutes": 1,
+          "examPassScore": 5,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 1,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 2,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": "2026-09-19T17:47:02.2353377+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 1,
+          "sessionDuration": "1m 8s",
+          "sessionDurationMinutes": 1.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 265,
+            "attemptId": 313,
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+            "endedAt": "2026-09-19T17:48:10.7445093+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 10,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T17:48:04.3095064+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T17:48:02.2353377+04:00",
+            "attemptStatus": "Expired",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [
+              {
+                "id": 2282,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:48:04.3095064+04:00",
+                "sequenceNumber": 10
+              },
+              {
+                "id": 2281,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:57.9191223+04:00",
+                "sequenceNumber": 9
+              },
+              {
+                "id": 2280,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:51.5228081+04:00",
+                "sequenceNumber": 8
+              },
+              {
+                "id": 2279,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:45.1213128+04:00",
+                "sequenceNumber": 7
+              },
+              {
+                "id": 2278,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:38.7232391+04:00",
+                "sequenceNumber": 6
+              },
+              {
+                "id": 2277,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:32.3236522+04:00",
+                "sequenceNumber": 5
+              },
+              {
+                "id": 2276,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:25.9147623+04:00",
+                "sequenceNumber": 4
+              },
+              {
+                "id": 2275,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:19.5014638+04:00",
+                "sequenceNumber": 3
+              },
+              {
+                "id": 2274,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:13.1102549+04:00",
+                "sequenceNumber": 2
+              },
+              {
+                "id": 2273,
+                "proctorSessionId": 265,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T17:47:06.6712746+04:00",
+                "sequenceNumber": 1
+              }
+            ],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": null,
+            "examTitleAr": "دورة حياة جلسة QA26",
+            "examDurationMinutes": 1,
+            "examPassScore": 5,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 1,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 2,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": "2026-09-19T17:47:02.2353377+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 1,
+            "sessionDuration": "1m 8s",
+            "sessionDurationMinutes": 1.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3505.56
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:20.050Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/sessions?ExamId=141&Status=1&IncludeSamples=false",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2306.17
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:22.177Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/live/exam/141",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2125.74
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:24.532Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/dashboard/exam/141",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 141,
+          "examTitleEn": "QA26 D63 Session Lifecycle",
+          "totalSessions": 2,
+          "activeSessions": 0,
+          "completedSessions": 1,
+          "highRiskCount": 0,
+          "pendingReviewCount": 2,
+          "clearedCount": 0,
+          "invalidatedCount": 0,
+          "averageRiskScore": 0,
+          "topViolations": [],
+          "riskDistribution": [
+            {
+              "range": "0-20 (Low)",
+              "count": 2,
+              "percentage": 100
+            },
+            {
+              "range": "21-50 (Medium)",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "51-75 (High)",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "76-100 (Critical)",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 141,
+            "examTitleEn": "QA26 D63 Session Lifecycle",
+            "totalSessions": 2,
+            "activeSessions": 0,
+            "completedSessions": 1,
+            "highRiskCount": 0,
+            "pendingReviewCount": 2,
+            "clearedCount": 0,
+            "invalidatedCount": 0,
+            "averageRiskScore": 0,
+            "topViolations": [],
+            "riskDistribution": [
+              {
+                "range": "0-20 (Low)",
+                "count": 2,
+                "percentage": 100
+              },
+              {
+                "range": "21-50 (Medium)",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "51-75 (High)",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "76-100 (Critical)",
+                "count": 0,
+                "percentage": 0
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2353.6
+      }
+    },
+    {
+      "at": "2026-09-19T13:48:27.033Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/sessions?ExamId=141&IncludeSamples=false",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 265,
+              "attemptId": 313,
+              "examId": 141,
+              "examTitleEn": "QA26 D63 Session Lifecycle",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "mode": 1,
+              "modeName": "Soft",
+              "status": 2,
+              "statusName": "Completed",
+              "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+              "endedAt": "2026-09-19T17:48:10.7445093+04:00",
+              "totalViolations": 0,
+              "countableViolationCount": 0,
+              "maxViolationWarnings": 10,
+              "riskScore": 0,
+              "decisionStatus": null,
+              "requiresReview": true,
+              "isFlagged": false,
+              "isSample": false,
+              "isTerminatedByProctor": false,
+              "terminationReason": null,
+              "latestSnapshotUrl": null,
+              "snapshotCount": 0,
+              "lastSnapshotAt": null,
+              "ipAddress": "::1",
+              "userAgent": "node",
+              "browserName": "Unknown",
+              "browserVersion": "",
+              "operatingSystem": "Unknown",
+              "screenResolution": null,
+              "deviceFingerprint": null,
+              "attemptIpAddress": null,
+              "attemptDeviceInfo": null,
+              "faceScore": null,
+              "eyeScore": null,
+              "behaviorScore": null,
+              "environmentScore": null
+            },
+            {
+              "id": 264,
+              "attemptId": 312,
+              "examId": 141,
+              "examTitleEn": "QA26 D63 Session Lifecycle",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "mode": 1,
+              "modeName": "Soft",
+              "status": 3,
+              "statusName": "Cancelled",
+              "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+              "endedAt": "2026-09-19T17:46:54.0303215+04:00",
+              "totalViolations": 0,
+              "countableViolationCount": 0,
+              "maxViolationWarnings": 10,
+              "riskScore": 0,
+              "decisionStatus": null,
+              "requiresReview": true,
+              "isFlagged": false,
+              "isSample": false,
+              "isTerminatedByProctor": false,
+              "terminationReason": null,
+              "latestSnapshotUrl": null,
+              "snapshotCount": 0,
+              "lastSnapshotAt": null,
+              "ipAddress": "::1",
+              "userAgent": "node",
+              "browserName": "Unknown",
+              "browserVersion": "",
+              "operatingSystem": "Unknown",
+              "screenResolution": null,
+              "deviceFingerprint": null,
+              "attemptIpAddress": null,
+              "attemptDeviceInfo": null,
+              "faceScore": null,
+              "eyeScore": null,
+              "behaviorScore": null,
+              "environmentScore": null
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 2,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 265,
+                "attemptId": 313,
+                "examId": 141,
+                "examTitleEn": "QA26 D63 Session Lifecycle",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "mode": 1,
+                "modeName": "Soft",
+                "status": 2,
+                "statusName": "Completed",
+                "startedAt": "2026-09-19T17:47:02.2353377+04:00",
+                "endedAt": "2026-09-19T17:48:10.7445093+04:00",
+                "totalViolations": 0,
+                "countableViolationCount": 0,
+                "maxViolationWarnings": 10,
+                "riskScore": 0,
+                "decisionStatus": null,
+                "requiresReview": true,
+                "isFlagged": false,
+                "isSample": false,
+                "isTerminatedByProctor": false,
+                "terminationReason": null,
+                "latestSnapshotUrl": null,
+                "snapshotCount": 0,
+                "lastSnapshotAt": null,
+                "ipAddress": "::1",
+                "userAgent": "node",
+                "browserName": "Unknown",
+                "browserVersion": "",
+                "operatingSystem": "Unknown",
+                "screenResolution": null,
+                "deviceFingerprint": null,
+                "attemptIpAddress": null,
+                "attemptDeviceInfo": null,
+                "faceScore": null,
+                "eyeScore": null,
+                "behaviorScore": null,
+                "environmentScore": null
+              },
+              {
+                "id": 264,
+                "attemptId": 312,
+                "examId": 141,
+                "examTitleEn": "QA26 D63 Session Lifecycle",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "mode": 1,
+                "modeName": "Soft",
+                "status": 3,
+                "statusName": "Cancelled",
+                "startedAt": "2026-09-19T17:46:45.0795589+04:00",
+                "endedAt": "2026-09-19T17:46:54.0303215+04:00",
+                "totalViolations": 0,
+                "countableViolationCount": 0,
+                "maxViolationWarnings": 10,
+                "riskScore": 0,
+                "decisionStatus": null,
+                "requiresReview": true,
+                "isFlagged": false,
+                "isSample": false,
+                "isTerminatedByProctor": false,
+                "terminationReason": null,
+                "latestSnapshotUrl": null,
+                "snapshotCount": 0,
+                "lastSnapshotAt": null,
+                "ipAddress": "::1",
+                "userAgent": "node",
+                "browserName": "Unknown",
+                "browserVersion": "",
+                "operatingSystem": "Unknown",
+                "screenResolution": null,
+                "deviceFingerprint": null,
+                "attemptIpAddress": null,
+                "attemptDeviceInfo": null,
+                "faceScore": null,
+                "eyeScore": null,
+                "behaviorScore": null,
+                "environmentScore": null
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 2,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2499.81
+      }
+    }
+  ]
+}

@@ -1,0 +1,477 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:19:20.828Z",
+  "checks": [
+    {
+      "name": "D39 grading preserves authoritative force-submitted attempt status",
+      "passed": true,
+      "detail": {
+        "status": 7
+      },
+      "at": "2026-09-19T12:19:23.750Z"
+    },
+    {
+      "name": "D39 completed grading retains independently expected10/40",
+      "passed": true,
+      "detail": {
+        "status": 4,
+        "score": 10,
+        "max": 40
+      },
+      "at": "2026-09-19T12:19:25.609Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:19:22.100Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:19:22.0962254+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:19:21.402353+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:19:22.0962254+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:19:21.402353+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1268.74
+      }
+    },
+    {
+      "at": "2026-09-19T12:19:23.749Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/206",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 206,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "startedAt": "2026-09-19T15:44:55.4771863+04:00",
+          "submittedAt": "2026-09-19T15:45:04.3050371+04:00",
+          "expiresAt": "2026-09-19T16:44:55.4771863+04:00",
+          "status": 7,
+          "statusName": "ForceSubmitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 2,
+          "totalScore": 10,
+          "isPassed": false,
+          "totalQuestions": 4,
+          "answeredQuestions": 1,
+          "remainingSeconds": 1531,
+          "createdDate": "2026-09-19T15:44:55.4771863+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 206,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "startedAt": "2026-09-19T15:44:55.4771863+04:00",
+            "submittedAt": "2026-09-19T15:45:04.3050371+04:00",
+            "expiresAt": "2026-09-19T16:44:55.4771863+04:00",
+            "status": 7,
+            "statusName": "ForceSubmitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 2,
+            "totalScore": 10,
+            "isPassed": false,
+            "totalQuestions": 4,
+            "answeredQuestions": 1,
+            "remainingSeconds": 1531,
+            "createdDate": "2026-09-19T15:44:55.4771863+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1648.69
+      }
+    },
+    {
+      "at": "2026-09-19T12:19:25.608Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/attempt/206",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 95,
+          "attemptId": 206,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+          "candidateName": "QA26 Import B",
+          "gradedBy": "09dfd644-e962-4802-a43b-5dcf7f489999",
+          "graderName": "QA26 Engineering Examiner 1",
+          "status": 4,
+          "statusName": "Completed",
+          "totalScore": 10,
+          "maxPossibleScore": 40,
+          "passScore": 20,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+          "createdDate": "2026-09-19T16:08:26.4026278+04:00",
+          "totalQuestions": 4,
+          "gradedQuestions": 4,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 780,
+              "gradingSessionId": 95,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "selectedOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 781,
+              "gradingSessionId": 95,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 782,
+              "gradingSessionId": 95,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 783,
+              "gradingSessionId": 95,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 95,
+            "attemptId": 206,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+            "candidateName": "QA26 Import B",
+            "gradedBy": "09dfd644-e962-4802-a43b-5dcf7f489999",
+            "graderName": "QA26 Engineering Examiner 1",
+            "status": 4,
+            "statusName": "Completed",
+            "totalScore": 10,
+            "maxPossibleScore": 40,
+            "passScore": 20,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+            "createdDate": "2026-09-19T16:08:26.4026278+04:00",
+            "totalQuestions": 4,
+            "gradedQuestions": 4,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 780,
+                "gradingSessionId": 95,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 781,
+                "gradingSessionId": 95,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 782,
+                "gradingSessionId": 95,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 783,
+                "gradingSessionId": 95,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1856.93
+      }
+    }
+  ]
+}

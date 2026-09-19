@@ -1,0 +1,1581 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP adversarial media requests, synthetic bytes only",
+  "startedAt": "2026-09-19T12:40:23.076Z",
+  "checks": [
+    {
+      "name": "qa26.ops.admin1@example.test cannot alter another candidate evidence metadata",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "storedFileSize": 69
+      },
+      "at": "2026-09-19T12:40:34.479Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.b@example.test cannot alter another candidate evidence metadata",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "storedFileSize": 70
+      },
+      "at": "2026-09-19T12:40:38.124Z"
+    },
+    {
+      "name": "Negative evidence file size rejected without persistence",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "storedFileSize": -1
+      },
+      "at": "2026-09-19T12:40:41.770Z"
+    },
+    {
+      "name": "Invalid media/path rejected qa26-security/inert.html",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "File validation failed.",
+          "file": null,
+          "errors": [
+            "File type '.html' is not allowed. Allowed types: .jpg, .jpeg, .png, .gif, .webp, .bmp, .jpg, .jpeg, .png, .gif, .webp, .bmp, .pdf, .pdf",
+            "Content type 'text/html' is not allowed."
+          ]
+        }
+      },
+      "at": "2026-09-19T12:40:42.702Z"
+    },
+    {
+      "name": "Invalid media/path rejected qa26-security/inert.svg",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "File validation failed.",
+          "file": null,
+          "errors": [
+            "File type '.svg' is not allowed. Allowed types: .jpg, .jpeg, .png, .gif, .webp, .bmp, .jpg, .jpeg, .png, .gif, .webp, .bmp, .pdf, .pdf",
+            "Content type 'image/svg+xml' is not allowed."
+          ]
+        }
+      },
+      "at": "2026-09-19T12:40:42.933Z"
+    },
+    {
+      "name": "Invalid media/path rejected qa26-security/empty.png",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "No file provided.",
+          "file": null,
+          "errors": [
+            "File is empty or null."
+          ]
+        }
+      },
+      "at": "2026-09-19T12:40:43.163Z"
+    },
+    {
+      "name": "Invalid media/path rejected ../qa26-escape/safe.png",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "An error occurred while uploading the file.",
+          "file": null,
+          "errors": [
+            "Storage paths must be relative and stay within their configured directory. (Parameter 'relativePath')"
+          ]
+        }
+      },
+      "at": "2026-09-19T12:40:43.397Z"
+    },
+    {
+      "name": "Invalid media/path rejected qa26-security/../../qa26-escape/safe.png",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "An error occurred while uploading the file.",
+          "file": null,
+          "errors": [
+            "Storage paths must be relative and stay within their configured directory. (Parameter 'relativePath')"
+          ]
+        }
+      },
+      "at": "2026-09-19T12:40:43.628Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:40:24.325Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:24.3217685+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:40:23.6231281+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:24.3217685+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:40:23.6231281+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1246.59
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:25.549Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:25.5486908+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:40:24.8473292+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:25.5486908+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:40:24.8473292+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1223.25
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:26.767Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:26.7668586+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:40:26.0625734+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:26.7668586+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:40:26.0625734+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1217.45
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:27.997Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:27.9971795+04:00",
+          "user": {
+            "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "email": "qa26.protocol.1789817576996.a@example.test",
+            "displayName": "QA26 Protocol Regression a",
+            "fullName": "QA26 Protocol Regression a",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+            "lastLoginDate": "2026-09-19T16:40:27.2972578+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:27.9971795+04:00",
+            "user": {
+              "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "email": "qa26.protocol.1789817576996.a@example.test",
+              "displayName": "QA26 Protocol Regression a",
+              "fullName": "QA26 Protocol Regression a",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+              "lastLoginDate": "2026-09-19T16:40:27.2972578+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1229.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:29.217Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.b@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:40:29.2170074+04:00",
+          "user": {
+            "id": "8cdd75ac-351a-43ac-b89b-7c24ac77ece7",
+            "email": "qa26.protocol.1789817576996.b@example.test",
+            "displayName": "QA26 Protocol Regression b",
+            "fullName": "QA26 Protocol Regression b",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:33:10.9667859+04:00",
+            "lastLoginDate": "2026-09-19T16:40:28.5127732+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:40:29.2170074+04:00",
+            "user": {
+              "id": "8cdd75ac-351a-43ac-b89b-7c24ac77ece7",
+              "email": "qa26.protocol.1789817576996.b@example.test",
+              "displayName": "QA26 Protocol Regression b",
+              "fullName": "QA26 Protocol Regression b",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:33:10.9667859+04:00",
+              "lastLoginDate": "2026-09-19T16:40:28.5127732+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1219.08
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:31.506Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/evidence",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 701,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 1,
+            "typeName": "Video",
+            "fileName": "chunks_197",
+            "fileSize": 71,
+            "fileSizeFormatted": "71 B",
+            "contentType": "video/webm",
+            "startAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endAt": "2026-09-19T15:35:12.8167384+04:00",
+            "durationSeconds": 129,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+            "previewUrl": null,
+            "downloadUrl": null
+          },
+          {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 68,
+            "fileSizeFormatted": "68 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T15:34:48.0197202+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 701,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 1,
+              "typeName": "Video",
+              "fileName": "chunks_197",
+              "fileSize": 71,
+              "fileSizeFormatted": "71 B",
+              "contentType": "video/webm",
+              "startAt": "2026-09-19T15:33:03.6587839+04:00",
+              "endAt": "2026-09-19T15:35:12.8167384+04:00",
+              "durationSeconds": 129,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+              "previewUrl": null,
+              "downloadUrl": null
+            },
+            {
+              "id": 700,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 3,
+              "typeName": "Image",
+              "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+              "fileSize": 68,
+              "fileSizeFormatted": "68 B",
+              "contentType": "image/png",
+              "startAt": "2026-09-19T15:34:48.0197202+04:00",
+              "endAt": null,
+              "durationSeconds": null,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T15:34:48.0197202+04:00",
+              "previewUrl": "/api/Proctor/evidence/700/download",
+              "downloadUrl": "/api/Proctor/evidence/700/download"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2288.17
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:32.205Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=69",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": 69,
+          "fileSizeFormatted": "69 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:31.9674085+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 69,
+            "fileSizeFormatted": "69 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:31.9674085+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 698.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:34.478Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/evidence",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 701,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 1,
+            "typeName": "Video",
+            "fileName": "chunks_197",
+            "fileSize": 71,
+            "fileSizeFormatted": "71 B",
+            "contentType": "video/webm",
+            "startAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endAt": "2026-09-19T15:35:12.8167384+04:00",
+            "durationSeconds": 129,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+            "previewUrl": null,
+            "downloadUrl": null
+          },
+          {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 69,
+            "fileSizeFormatted": "69 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:31.9674085+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 701,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 1,
+              "typeName": "Video",
+              "fileName": "chunks_197",
+              "fileSize": 71,
+              "fileSizeFormatted": "71 B",
+              "contentType": "video/webm",
+              "startAt": "2026-09-19T15:33:03.6587839+04:00",
+              "endAt": "2026-09-19T15:35:12.8167384+04:00",
+              "durationSeconds": 129,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+              "previewUrl": null,
+              "downloadUrl": null
+            },
+            {
+              "id": 700,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 3,
+              "typeName": "Image",
+              "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+              "fileSize": 69,
+              "fileSizeFormatted": "69 B",
+              "contentType": "image/png",
+              "startAt": "2026-09-19T15:34:48.0197202+04:00",
+              "endAt": null,
+              "durationSeconds": null,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T16:40:31.9674085+04:00",
+              "previewUrl": "/api/Proctor/evidence/700/download",
+              "downloadUrl": "/api/Proctor/evidence/700/download"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2272.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:35.164Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=68",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": 68,
+          "fileSizeFormatted": "68 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:34.9344778+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 68,
+            "fileSizeFormatted": "68 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:34.9344778+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 684.84
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:35.851Z",
+      "identity": "qa26.protocol.1789817576996.b@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=70",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": 70,
+          "fileSizeFormatted": "70 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:35.6220671+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 70,
+            "fileSizeFormatted": "70 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:35.6220671+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 686.29
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:38.123Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/evidence",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 701,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 1,
+            "typeName": "Video",
+            "fileName": "chunks_197",
+            "fileSize": 71,
+            "fileSizeFormatted": "71 B",
+            "contentType": "video/webm",
+            "startAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endAt": "2026-09-19T15:35:12.8167384+04:00",
+            "durationSeconds": 129,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+            "previewUrl": null,
+            "downloadUrl": null
+          },
+          {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 70,
+            "fileSizeFormatted": "70 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:35.6220671+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 701,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 1,
+              "typeName": "Video",
+              "fileName": "chunks_197",
+              "fileSize": 71,
+              "fileSizeFormatted": "71 B",
+              "contentType": "video/webm",
+              "startAt": "2026-09-19T15:33:03.6587839+04:00",
+              "endAt": "2026-09-19T15:35:12.8167384+04:00",
+              "durationSeconds": 129,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+              "previewUrl": null,
+              "downloadUrl": null
+            },
+            {
+              "id": 700,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 3,
+              "typeName": "Image",
+              "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+              "fileSize": 70,
+              "fileSizeFormatted": "70 B",
+              "contentType": "image/png",
+              "startAt": "2026-09-19T15:34:48.0197202+04:00",
+              "endAt": null,
+              "durationSeconds": null,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T16:40:35.6220671+04:00",
+              "previewUrl": "/api/Proctor/evidence/700/download",
+              "downloadUrl": "/api/Proctor/evidence/700/download"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2271.5
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:38.809Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=68",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": 68,
+          "fileSizeFormatted": "68 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:38.5819428+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 68,
+            "fileSizeFormatted": "68 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:38.5819428+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 684.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:39.493Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=-1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": -1,
+          "fileSizeFormatted": "-1 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:39.2643348+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": -1,
+            "fileSizeFormatted": "-1 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:39.2643348+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 683.06
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:41.769Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/evidence",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 701,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 1,
+            "typeName": "Video",
+            "fileName": "chunks_197",
+            "fileSize": 71,
+            "fileSizeFormatted": "71 B",
+            "contentType": "video/webm",
+            "startAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endAt": "2026-09-19T15:35:12.8167384+04:00",
+            "durationSeconds": 129,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+            "previewUrl": null,
+            "downloadUrl": null
+          },
+          {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": -1,
+            "fileSizeFormatted": "-1 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:39.2643348+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 701,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 1,
+              "typeName": "Video",
+              "fileName": "chunks_197",
+              "fileSize": 71,
+              "fileSizeFormatted": "71 B",
+              "contentType": "video/webm",
+              "startAt": "2026-09-19T15:33:03.6587839+04:00",
+              "endAt": "2026-09-19T15:35:12.8167384+04:00",
+              "durationSeconds": 129,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T15:35:12.8168605+04:00",
+              "previewUrl": null,
+              "downloadUrl": null
+            },
+            {
+              "id": 700,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "type": 3,
+              "typeName": "Image",
+              "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+              "fileSize": -1,
+              "fileSizeFormatted": "-1 B",
+              "contentType": "image/png",
+              "startAt": "2026-09-19T15:34:48.0197202+04:00",
+              "endAt": null,
+              "durationSeconds": null,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T16:40:39.2643348+04:00",
+              "previewUrl": "/api/Proctor/evidence/700/download",
+              "downloadUrl": "/api/Proctor/evidence/700/download"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2275.95
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:42.457Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/evidence/700/confirm?fileSize=68",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 700,
+          "proctorSessionId": 149,
+          "attemptId": 197,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+          "fileSize": 68,
+          "fileSizeFormatted": "68 B",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T15:34:48.0197202+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T16:40:42.2271852+04:00",
+          "previewUrl": "/api/Proctor/evidence/700/download",
+          "downloadUrl": "/api/Proctor/evidence/700/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 700,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-synthetic-snapshot-1789817686988.png",
+            "fileSize": 68,
+            "fileSizeFormatted": "68 B",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T15:34:48.0197202+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T16:40:42.2271852+04:00",
+            "previewUrl": "/api/Proctor/evidence/700/download",
+            "downloadUrl": "/api/Proctor/evidence/700/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 685.44
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:42.701Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-security",
+      "request": {
+        "filename": "inert.html",
+        "contentType": "text/html",
+        "bytes": 28
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "success": false,
+          "message": "File validation failed.",
+          "file": null,
+          "errors": [
+            "File type '.html' is not allowed. Allowed types: .jpg, .jpeg, .png, .gif, .webp, .bmp, .jpg, .jpeg, .png, .gif, .webp, .bmp, .pdf, .pdf",
+            "Content type 'text/html' is not allowed."
+          ]
+        },
+        "ms": 243.0541000000012
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:42.932Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-security",
+      "request": {
+        "filename": "inert.svg",
+        "contentType": "image/svg+xml",
+        "bytes": 46
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "success": false,
+          "message": "File validation failed.",
+          "file": null,
+          "errors": [
+            "File type '.svg' is not allowed. Allowed types: .jpg, .jpeg, .png, .gif, .webp, .bmp, .jpg, .jpeg, .png, .gif, .webp, .bmp, .pdf, .pdf",
+            "Content type 'image/svg+xml' is not allowed."
+          ]
+        },
+        "ms": 229.3097999999991
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:43.162Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-security",
+      "request": {
+        "filename": "empty.png",
+        "contentType": "image/png",
+        "bytes": 0
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "success": false,
+          "message": "No file provided.",
+          "file": null,
+          "errors": [
+            "File is empty or null."
+          ]
+        },
+        "ms": 228.14329999999973
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:43.396Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=..%2Fqa26-escape",
+      "request": {
+        "filename": "safe.png",
+        "contentType": "image/png",
+        "bytes": 68
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "success": false,
+          "message": "An error occurred while uploading the file.",
+          "file": null,
+          "errors": [
+            "Storage paths must be relative and stay within their configured directory. (Parameter 'relativePath')"
+          ]
+        },
+        "ms": 232.72140000000218
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:43.627Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-security%2F..%2F..%2Fqa26-escape",
+      "request": {
+        "filename": "safe.png",
+        "contentType": "image/png",
+        "bytes": 68
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "success": false,
+          "message": "An error occurred while uploading the file.",
+          "file": null,
+          "errors": [
+            "Storage paths must be relative and stay within their configured directory. (Parameter 'relativePath')"
+          ]
+        },
+        "ms": 229.1447999999982
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:44.123Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-security",
+      "request": {
+        "filename": "inert.png",
+        "contentType": "image/png",
+        "bytes": 38
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "success": true,
+          "message": "File uploaded successfully",
+          "file": {
+            "id": "d55416c3-a5ff-4834-b08a-d53633a9926a",
+            "originalFileName": "inert.png",
+            "storedFileName": "72ffd7a2-1782-4863-bc43-167487a1c2a8.png",
+            "extension": ".png",
+            "contentType": "image/png",
+            "sizeInBytes": 38,
+            "sizeFormatted": "38 B",
+            "mediaType": "Image",
+            "storageProvider": "Local",
+            "path": "qa26-security/2026/09/72ffd7a2-1782-4863-bc43-167487a1c2a8.png",
+            "url": "/media/qa26-security/2026/09/72ffd7a2-1782-4863-bc43-167487a1c2a8.png",
+            "folder": "qa26-security",
+            "createdDate": "2026-09-19T16:40:43.8635665+04:00"
+          },
+          "errors": []
+        },
+        "ms": 494.07640000000174
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:44.369Z",
+      "hardeningObservation": "Image upload validates allowed extension/MIME, not actual image decoding; inert HTML text declared PNG accepted. Served image/png with nosniff, so no script execution or XSS claimed.",
+      "status": 200,
+      "contentType": "image/png",
+      "nosniff": "nosniff"
+    },
+    {
+      "at": "2026-09-19T12:40:45.763Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Media/d55416c3-a5ff-4834-b08a-d53633a9926a",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "success": true,
+          "message": "File deleted successfully."
+        },
+        "ms": 1393.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:49.702Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 media isolation disposable 1789821645763",
+        "bodyAr": "عزل وسائط السؤال",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "topicId": 34,
+        "points": 1,
+        "difficultyLevel": 1,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "Yes",
+            "textAr": "نعم",
+            "isCorrect": true,
+            "order": 1
+          },
+          {
+            "textEn": "No",
+            "textAr": "لا",
+            "isCorrect": false,
+            "order": 2
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 167,
+          "bodyEn": "QA26 media isolation disposable 1789821645763",
+          "bodyAr": "عزل وسائط السؤال",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 1,
+          "difficultyLevel": 1,
+          "difficultyLevelName": "Easy",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T16:40:47.8468467+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 466,
+              "questionId": 167,
+              "textEn": "Yes",
+              "textAr": "نعم",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T16:40:47.8470656+04:00"
+            },
+            {
+              "id": 467,
+              "questionId": 167,
+              "textEn": "No",
+              "textAr": "لا",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T16:40:47.8470687+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 167,
+            "bodyEn": "QA26 media isolation disposable 1789821645763",
+            "bodyAr": "عزل وسائط السؤال",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 1,
+            "difficultyLevel": 1,
+            "difficultyLevelName": "Easy",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T16:40:47.8468467+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 466,
+                "questionId": 167,
+                "textEn": "Yes",
+                "textAr": "نعم",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T16:40:47.8470656+04:00"
+              },
+              {
+                "id": 467,
+                "questionId": 167,
+                "textEn": "No",
+                "textAr": "لا",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T16:40:47.8470687+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3938.19
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:50.163Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST multipart",
+      "route": "/api/Media/upload?folder=qa26-question-bank",
+      "request": {
+        "filename": "QA26-department-image.png",
+        "contentType": "image/png",
+        "bytes": 68
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "success": true,
+          "message": "File uploaded successfully",
+          "file": {
+            "id": "f8b69fb2-e873-4dbf-99c7-38c5c5b8291e",
+            "originalFileName": "QA26-department-image.png",
+            "storedFileName": "2a331b8d-9adb-47b5-9abe-72d3624bfab7.png",
+            "extension": ".png",
+            "contentType": "image/png",
+            "sizeInBytes": 68,
+            "sizeFormatted": "68 B",
+            "mediaType": "Image",
+            "storageProvider": "Local",
+            "path": "qa26-question-bank/2026/09/2a331b8d-9adb-47b5-9abe-72d3624bfab7.png",
+            "url": "/media/qa26-question-bank/2026/09/2a331b8d-9adb-47b5-9abe-72d3624bfab7.png",
+            "folder": "qa26-question-bank",
+            "createdDate": "2026-09-19T16:40:49.9337099+04:00"
+          },
+          "errors": []
+        },
+        "ms": 459.89860000000044
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:50.400Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions/167/attachments",
+      "request": {
+        "fileName": "QA26-department-image.png",
+        "filePath": "/media/qa26-question-bank/2026/09/2a331b8d-9adb-47b5-9abe-72d3624bfab7.png",
+        "fileType": "image/png",
+        "fileSize": 68,
+        "isPrimary": true
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "FileType": [
+              "File type must be 'Image' or 'PDF'"
+            ],
+            "questionId": [
+              "Question ID is required"
+            ]
+          },
+          "traceId": "00-5c128869200bec2b956275f987f580f0-97a1aabbd6f7112f-00"
+        },
+        "ms": 236.35
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:51.767Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Media/f8b69fb2-e873-4dbf-99c7-38c5c5b8291e",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "success": true,
+          "message": "File deleted successfully."
+        },
+        "ms": 1366.25
+      }
+    },
+    {
+      "at": "2026-09-19T12:40:55.009Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/167",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3241.59
+      }
+    }
+  ]
+}

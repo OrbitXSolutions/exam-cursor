@@ -53,6 +53,8 @@ export interface CreateQuestionRequest {
 export interface UpdateQuestionRequest {
   bodyEn: string;
   bodyAr: string;
+  explanationEn?: string | null;
+  explanationAr?: string | null;
   questionTypeId: number;
   questionCategoryId: number;
   subjectId: number;
@@ -61,6 +63,15 @@ export interface UpdateQuestionRequest {
   difficultyLevel: DifficultyLevel;
   isActive: boolean;
   isCalculatorAllowed?: boolean;
+  options?: Array<{
+    id: number;
+    textEn: string;
+    textAr: string;
+    isCorrect: boolean;
+    points?: number | null;
+    order: number;
+    attachmentPath?: string | null;
+  }>;
 }
 
 // ============ EXAM ============

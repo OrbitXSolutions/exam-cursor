@@ -41,17 +41,15 @@ public class CreateQuestionDtoValidator : AbstractValidator<CreateQuestionDto>
         RuleForEach(x => x.Options)
           .SetValidator(new CreateQuestionOptionDtoValidator());
 
-        // Cross-validation: option points sum must equal question points for MCQ_Multi
-        When(x => x.QuestionTypeId == 2 && x.Options.Any(o => o.Points.HasValue), () =>
+        RuleFor(x => x.Options).NotNull();
+        RuleFor(x => x).Custom((dto, context) =>
         {
-            RuleFor(x => x)
-                .Must(x => Math.Abs(x.Options.Sum(o => o.Points ?? 0) - x.Points) < 0.01m)
-                .WithMessage("Sum of option points must equal the question total points");
-
-            RuleForEach(x => x.Options)
-                .Must(o => !o.Points.HasValue || o.Points.Value >= 0)
-                .WithMessage("Each option points must be 0 or greater");
+            if (dto.Options is null) return;
+            var error = QuestionOptionRules.Validate(dto.QuestionTypeId, dto.Points,
+                dto.Options.Select(o => (o.IsCorrect, o.Points)));
+            if (error != null) context.AddFailure("Options", error);
         });
+
     }
 }
 
@@ -59,6 +57,15 @@ public class UpdateQuestionDtoValidator : AbstractValidator<UpdateQuestionDto>
 {
     public UpdateQuestionDtoValidator()
     {
+        RuleForEach(x => x.Options).SetValidator(new UpdateQuestionOptionDtoValidator());
+        RuleFor(x => x).Custom((dto, context) =>
+        {
+            if (dto.Options is null) return;
+            var error = QuestionOptionRules.Validate(dto.QuestionTypeId, dto.Points,
+                dto.Options.Select(o => (o.IsCorrect, o.Points)));
+            if (error != null) context.AddFailure("Options", error);
+        });
+
         RuleFor(x => x.BodyEn)
  .NotEmpty().WithMessage("English question body is required")
             .MaximumLength(5000).WithMessage("English question body cannot exceed 5000 characters");

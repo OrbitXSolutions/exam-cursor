@@ -1,0 +1,61 @@
+Smart Exam System
+Candidate Result Report
+QA26 Final Browser Lifecycle
+CANDIDATE INFORMATION
+Name:
+QA26 Final Lifecycle Candidate
+Candidate ID:
+44799c41-8cfd-4ab8-a90b-13632121949a
+Attempt ID:
+368
+Graded At:
+September 19, 2026 at 06:18 PM
+Grading Status:
+Completed
+SCORE SUMMARY PASSED
+TOTAL SCORE
+47.00 / 50
+PERCENTAGE
+94.0%
+PASS SCORE
+30
+QUESTIONS
+5 / 5
+94.0% of total marks achieved  ·  Pass required: 30 pts
+Question & Answer Details 5 Questions
+# Question Type Candidate's Answer  ([+] Correct  [-] Wrong) Correct Answer Score Result Metho
+d
+1 QA26 Single: Which number is prime? MCQ_Sin
+gle
+[+] 2 2 10 / 10 Correct Auto
+2 QA26 Weighted Multi: Select prime
+numbers
+MCQ_Mul
+ti
+[+] 2
+[+] 3
+2, 3 10 / 10 Correct Auto
+3 QA26 Equal Multi: Select even numbers MCQ_Mul
+ti
+[+] 2
+[+] 4
+2, 4 10 / 10 Correct Auto
+4 QA26 TrueFalse: 2 + 2 = 4 TrueFalse [+] True True 10 / 10 Correct Auto
+Generated: Sep 19, 2026, 06:23 PM QA26 Final Lifecycle Candidate  ·  Attempt #368  ·  QA26 Final Browser Lifecycle Page 1 of 2
+# Question Type Candidate's Answer  ([+] Correct  [-] Wrong) Correct Answer Score Result Metho
+d
+5 QA26 Final: Explain two controls that
+protect exam integrity. Calculator and
+spreadsheet tools are available for this
+section.
+Subjectiv
+e
+Verify candidate identity before the exam and
+preserve an audit trail of proctor interventions.
+Restrict exam access to assigned candidates and
+persist answers during interruptions.
+Award 5 points for verified
+identity, 5 for monitoring with a
+documented review process.
+7 / 10 Correct Manual
+Generated: Sep 19, 2026, 06:23 PM QA26 Final Lifecycle Candidate  ·  Attempt #368  ·  QA26 Final Browser Lifecycle Page 2 of 2

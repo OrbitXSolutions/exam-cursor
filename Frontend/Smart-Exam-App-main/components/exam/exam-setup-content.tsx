@@ -47,6 +47,9 @@ import Link from "next/link"
 import { apiClient } from "@/lib/api-client"
 import { getExam, updateExam, getExamBuilder, saveExamBuilder, getQuestionsCount } from "@/lib/api/exams"
 import { getQuestionSubjects, getQuestionTopics, type QuestionSubject, type QuestionTopic } from "@/lib/api/lookups"
+import { useAuth } from "@/lib/auth/context"
+import { getDepartments } from "@/lib/api/departments"
+import { SearchableSelectInput } from "@/components/ui/searchable-select-input"
 
 interface ExamSetupContentProps {
   examId?: string
@@ -63,6 +66,9 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
   const { t, language, dir } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { user } = useAuth()
+  const isSuperAdmin = user?.role === "SuperAdmin"
+  const [departmentId, setDepartmentId] = useState<string>("")
 
   // Get tab from query string, default to "config"
   const currentTab = searchParams.get("tab") || "config"
@@ -547,6 +553,10 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
     setError(null)
 
     // Validation
+    if (!isEditMode && isSuperAdmin && !departmentId) {
+      setError(language === "ar" ? "يرجى اختيار القسم" : "Please select a department")
+      return
+    }
     if (!formData.titleEn.trim()) {
       setError(t("exams.errorTitleRequired"))
       return
@@ -572,6 +582,7 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
       setLoading(true)
 
       const baseBody = {
+        departmentId: !isEditMode && isSuperAdmin ? Number(departmentId) : undefined,
         examType: formData.examType,
         titleEn: formData.titleEn,
         titleAr: formData.titleAr || formData.titleEn,
@@ -704,6 +715,22 @@ export function ExamSetupContent({ examId }: ExamSetupContentProps) {
                 <CardDescription>{t("exams.basicInfoDesc")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {!isEditMode && isSuperAdmin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="examDepartment">{language === "ar" ? "القسم" : "Department"} *</Label>
+                    <SearchableSelectInput
+                      id="examDepartment"
+                      value={departmentId || null}
+                      onChange={(value) => setDepartmentId(value)}
+                      fetchFn={async (search, page) => {
+                        const result = await getDepartments({ search, pageNumber: page, pageSize: 20 })
+                        return { items: result.items, hasNextPage: page < result.totalPages }
+                      }}
+                      placeholder={language === "ar" ? "اختر القسم" : "Select department"}
+                      language={language}
+                    />
+                  </div>
+                )}
                 {/* Title */}
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   <div className={`space-y-2${language === "ar" ? " sm:order-2" : ""}`}>

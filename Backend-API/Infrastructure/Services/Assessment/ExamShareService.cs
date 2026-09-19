@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities.Assessment;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Application.Validators.Assessment;
 
 namespace Smart_Core.Infrastructure.Services.Assessment;
 
@@ -304,10 +305,15 @@ public class ExamShareService : IExamShareService
 
         // Validate candidate exists and is active
         var candidate = await _userManager.Users
-            .FirstOrDefaultAsync(u => u.Id == dto.CandidateId && !u.IsDeleted && !u.IsBlocked);
+            .FirstOrDefaultAsync(u => u.Id == dto.CandidateId && !u.IsDeleted && !u.IsBlocked && u.Status == UserStatus.Active);
 
         if (candidate == null)
             return ApiResponse<SelectCandidateResponseDto>.FailureResponse("Candidate not found or is blocked");
+
+        var roles = await _userManager.GetRolesAsync(candidate);
+        // A public exam link must never authenticate a staff account or mint staff claims.
+        if (!IsPublicCandidateAccount(roles))
+            return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This account requires authenticated sign-in");
 
         // Verify candidate is eligible (assigned if restricted)
         var accessPolicy = await _context.ExamAccessPolicies
@@ -331,10 +337,6 @@ public class ExamShareService : IExamShareService
                 "This candidate has already exhausted all attempts. No attempts left. Please select another candidate.");
 
         // Generate JWT token for candidate
-        var roles = await _userManager.GetRolesAsync(candidate);
-        if (!roles.Contains(AppRoles.Candidate))
-            roles.Add(AppRoles.Candidate);
-
         var accessToken = _tokenService.GenerateAccessToken(candidate, roles);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
@@ -370,6 +372,12 @@ public class ExamShareService : IExamShareService
         if (accessPolicy == null || !accessPolicy.IsWalkIn)
             return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This exam does not allow walk-in registration");
 
+        var registrationFields = await _context.WalkInRegistrationFields
+            .Where(f => f.ExamId == exam.Id && !f.IsDeleted).ToListAsync();
+        var fieldError = WalkInAnswerValidation.Validate(registrationFields, dto.DynamicFields);
+        if (fieldError != null)
+            return ApiResponse<SelectCandidateResponseDto>.FailureResponse(fieldError);
+
         // Normalize email
         var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
 
@@ -379,12 +387,12 @@ public class ExamShareService : IExamShareService
         if (existingUser != null)
         {
             // Reject if blocked or deleted
-            if (existingUser.IsBlocked || existingUser.IsDeleted)
+            if (existingUser.IsBlocked || existingUser.IsDeleted || existingUser.Status != UserStatus.Active)
                 return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This account has been blocked. Please contact support.");
 
             // Check they have the Candidate role
             var existingRoles = await _userManager.GetRolesAsync(existingUser);
-            if (!existingRoles.Contains(AppRoles.Candidate))
+            if (!IsPublicCandidateAccount(existingRoles))
                 return ApiResponse<SelectCandidateResponseDto>.FailureResponse("This email is already registered with a different account type. Please contact support.");
 
             // Check attempt limits
@@ -530,6 +538,9 @@ public class ExamShareService : IExamShareService
     }
 
     // ========== Helpers ==========
+
+    private static bool IsPublicCandidateAccount(IEnumerable<string> roles)
+        => roles.Contains(AppRoles.Candidate) && roles.All(role => role == AppRoles.Candidate);
 
     private async Task<ExamShareLink?> ValidateShareTokenAsync(string shareToken)
     {

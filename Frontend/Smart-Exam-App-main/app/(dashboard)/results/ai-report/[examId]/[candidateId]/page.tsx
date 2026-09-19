@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -1565,7 +1567,7 @@ export default function AIReportPage() {
                       onClick={() => selectedScreenshot && setSelectedScreenshot(null)}
                     >
                       {selectedScreenshot ? (
-                        <img
+                        <EvidenceImage
                           src={selectedScreenshot}
                           alt="Screen capture enlarged"
                           className="w-full h-full object-contain"
@@ -1593,7 +1595,7 @@ export default function AIReportPage() {
                           onClick={() => url && setSelectedScreenshot(url)}
                         >
                           {url ? (
-                            <img
+                            <EvidenceImage
                               src={url}
                               alt={`${language === "ar" ? "شاشة" : "Screen"} ${snap.id}`}
                               className="w-full aspect-video object-cover"

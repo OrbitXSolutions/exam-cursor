@@ -1,0 +1,14 @@
+{
+  "session": {
+    "status": 2,
+    "maxViolationWarnings": 0,
+    "countable": 0,
+    "totalViolations": 0,
+    "risk": 0,
+    "lastHeartbeatAt": "2026-09-19T15:20:51.8852709+04:00"
+  },
+  "exam": {
+    "id": 123,
+    "maxViolationWarnings": 0
+  }
+}

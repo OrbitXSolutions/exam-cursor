@@ -20,6 +20,7 @@ import { CandidatePublisher } from "@/lib/webrtc/candidate-publisher"
 import { ScreenSharePublisher, type ScreenShareStatus } from "@/lib/webrtc/screen-share-publisher"
 import { ChunkRecorder } from "@/lib/webrtc/chunk-recorder"
 import { getVideoConfig } from "@/lib/webrtc/video-config"
+import { AnswerSaveQueue } from "@/lib/exam/answer-save-queue"
 import { SmartMonitoring, type ViolationType } from "@/lib/ai/smart-monitoring"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -85,6 +86,10 @@ function createAudioContext(): AudioContext {
 }
 
 const EXAM_LANGUAGE_KEY = "examLanguage"
+
+function hasAnswerContent(answer?: SaveAnswerRequest): boolean {
+  return Boolean(answer?.selectedOptionIds?.length || answer?.textAnswer?.trim())
+}
 
 function isLastWarningMessage(message?: string | null): boolean {
   const value = message ?? ""
@@ -202,6 +207,40 @@ export default function ExamPage() {
   // Auto-save indicator state
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
   const saveStatusTimerRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const answerSaveQueueRef = useRef<AnswerSaveQueue<SaveAnswerRequest> | null>(null)
+  const submitInFlightRef = useRef(false)
+
+  useEffect(() => {
+    if (!session?.attemptId) return
+    const queue = new AnswerSaveQueue<SaveAnswerRequest>(
+      answer => saveAnswer(session.attemptId, answer),
+      ({ pendingQuestionIds, hasError }) => {
+        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
+        setSavingAnswers(new Set(pendingQuestionIds))
+        setSaveStatus(hasError ? "error" : pendingQuestionIds.length ? "saving" : "saved")
+        if (!pendingQuestionIds.length) {
+          saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
+        }
+      },
+    )
+    answerSaveQueueRef.current = queue
+    const retry = () => { void queue.flush() }
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      if (queue.hasPending) {
+        event.preventDefault()
+        event.returnValue = ""
+      }
+    }
+    window.addEventListener("online", retry)
+    window.addEventListener("beforeunload", warnBeforeLeaving)
+    return () => {
+      queue.stop()
+      if (answerSaveQueueRef.current === queue) answerSaveQueueRef.current = null
+      if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
+      window.removeEventListener("online", retry)
+      window.removeEventListener("beforeunload", warnBeforeLeaving)
+    }
+  }, [session?.attemptId])
 
   // Proctoring state
   const [webcamStatus, setWebcamStatus] = useState<"pending" | "active" | "denied" | "error">("pending")
@@ -251,7 +290,7 @@ export default function ExamPage() {
     : null
 
   const totalQuestions = session?.totalQuestions || 0
-  const answeredCount = Object.keys(answers).length
+  const answeredCount = Object.values(answers).filter(hasAnswerContent).length
   const progress = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0
 
   // For flat question list (no sections/topics)
@@ -1129,35 +1168,12 @@ export default function ExamPage() {
   }
 
   const handleAnswerChange = useCallback(
-    async (questionId: number, answer: SaveAnswerRequest) => {
+    (questionId: number, answer: SaveAnswerRequest) => {
+      if (submitInFlightRef.current) return
       setAnswers((prev) => ({ ...prev, [questionId]: answer }))
-
-      if (session) {
-        try {
-          setSavingAnswers(prev => new Set(prev).add(questionId))
-          setSaveStatus("saving")
-          await saveAnswer(session.attemptId, answer)
-
-          // Show saved indicator briefly
-          setSaveStatus("saved")
-          if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
-          saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 3000)
-
-        } catch {
-          console.error("[v0] Failed to save answer")
-          setSaveStatus("error")
-          if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current)
-          saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 5000)
-        } finally {
-          setSavingAnswers(prev => {
-            const newSet = new Set(prev)
-            newSet.delete(questionId)
-            return newSet
-          })
-        }
-      }
+      answerSaveQueueRef.current?.enqueue(answer)
     },
-    [session]
+    []
   )
 
   const handleToggleFlag = useCallback((questionId: number) => {
@@ -1340,6 +1356,7 @@ export default function ExamPage() {
 
   // Stop all background timers/intervals/webcam to prevent 400s on closed attempt
   function stopAllBackgroundActivity() {
+    answerSaveQueueRef.current?.stop()
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = undefined }
     if (sectionTimerRef.current) { clearInterval(sectionTimerRef.current); sectionTimerRef.current = undefined }
     if (syncTimerRef.current) { clearInterval(syncTimerRef.current); syncTimerRef.current = undefined }
@@ -1433,13 +1450,22 @@ export default function ExamPage() {
       eventType: AttemptEventType.TimedOut,
     }).catch(() => { })
 
-    await handleSubmit()
+    await handleSubmit(true)
   }
 
-  async function handleSubmit() {
-    if (!session) return
+  async function handleSubmit(timeExpired = false) {
+    if (!session || submitInFlightRef.current) return
+    submitInFlightRef.current = true
     try {
       setSubmitting(true)
+      if (answerSaveQueueRef.current && !await answerSaveQueueRef.current.flush()) {
+        if (!timeExpired) throw new Error(t("exam.saveBeforeSubmitFailed"))
+        // The server deadline remains authoritative; an expired attempt cannot accept late answers.
+        toast.error(t("exam.saveBeforeSubmitFailed"))
+      }
+
+      // Keep monitoring and retries alive if the submission request fails.
+      const result = await submitAttempt(session.attemptId)
 
       // Stop chunk recorder and flush pending uploads
       if (chunkRecorderRef.current) {
@@ -1461,7 +1487,7 @@ export default function ExamPage() {
         }
       }
 
-      // Stop all background calls BEFORE submit to prevent race conditions
+      // Stop background activity only after the server accepts the submission.
       stopAllBackgroundActivity()
 
       // Finalize video recording in background (fire-and-forget â€” never delays submit)
@@ -1485,8 +1511,6 @@ export default function ExamPage() {
         }
       }
 
-      const result = await submitAttempt(session.attemptId)
-
       toast.success(t("exam.submitted"))
 
       // If grading completed synchronously and result exists, go to score-card
@@ -1506,6 +1530,7 @@ export default function ExamPage() {
         toast.error(t("common.errorOccurred") || "Submission failed. Please try again.")
       }
     } finally {
+      submitInFlightRef.current = false
       setSubmitting(false)
       setSubmitDialogOpen(false)
     }
@@ -1581,7 +1606,7 @@ export default function ExamPage() {
     // Count answered questions in topics
     for (const topic of section.topics || []) {
       for (const question of topic.questions || []) {
-        if (answers[question.questionId]) {
+        if (hasAnswerContent(answers[question.questionId])) {
           count++
         }
       }
@@ -1589,7 +1614,7 @@ export default function ExamPage() {
 
     // Count answered section-level questions
     for (const question of section.questions || []) {
-      if (answers[question.questionId]) {
+      if (hasAnswerContent(answers[question.questionId])) {
         count++
       }
     }
@@ -1762,7 +1787,7 @@ export default function ExamPage() {
             {saveStatus === "error" && (
               <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                {t("exam.saveFailed")}
+                {t("exam.retryingSave")}
               </span>
             )}
 
@@ -2160,7 +2185,7 @@ export default function ExamPage() {
                       {/* Question number grid */}
                       <div className="flex flex-wrap gap-1 pt-1">
                         {sectionQuestions.map((q, i) => {
-                          const isAnswered = !!answers[q.questionId]
+                          const isAnswered = hasAnswerContent(answers[q.questionId])
                           const isQFlagged = flagged.has(q.questionId)
                           return (
                             <div
@@ -2195,7 +2220,7 @@ export default function ExamPage() {
                     </h3>
                     <div className="flex flex-wrap gap-1">
                       {flatQuestions.map((q, i) => {
-                        const isAnswered = !!answers[q.questionId]
+                        const isAnswered = hasAnswerContent(answers[q.questionId])
                         const isQFlagged = flagged.has(q.questionId)
                         const isCurrent = i === currentQuestionIndex
                         return (
@@ -2289,7 +2314,7 @@ export default function ExamPage() {
             <AlertDialogCancel disabled={submitting}>
               {t("common.cancel")}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit} disabled={submitting}>
+            <AlertDialogAction onClick={() => handleSubmit()} disabled={submitting}>
               {submitting ? <LoadingSpinner size="sm" /> : (t("exam.confirmAndSubmit") || t("common.submit"))}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -2552,7 +2577,7 @@ function SectionContent({
           <>
             {(section.topics || []).sort((a, b) => a.order - b.order).map((topic) => {
               const topicQuestions = (topic.questions || []).sort((a, b) => a.order - b.order)
-              const answeredInTopic = topicQuestions.filter(q => answers[q.questionId]).length
+              const answeredInTopic = topicQuestions.filter(q => hasAnswerContent(answers[q.questionId])).length
 
               return (
                 <div key={topic.topicId} className="space-y-4">

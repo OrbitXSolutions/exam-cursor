@@ -1,0 +1,227 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:24:30.523Z",
+  "checks": [
+    {
+      "name": "Fixture chunk list matches recorded upload",
+      "passed": true,
+      "detail": {
+        "attemptId": 368,
+        "totalChunks": 1,
+        "totalSizeBytes": 230170,
+        "chunkDurationMs": 3000,
+        "chunks": [
+          {
+            "index": 0,
+            "filename": "chunk_000000.webm",
+            "sizeBytes": 230170
+          }
+        ],
+        "mimeType": "video/webm; codecs=\"vp8, opus\""
+      },
+      "at": "2026-09-19T14:24:34.111Z"
+    },
+    {
+      "name": "backend chunk delivers exact uploaded WebM bytes",
+      "passed": true,
+      "detail": {
+        "name": "backend chunk",
+        "route": "/api/Proctor/video-chunks/368/chunk_000000.webm",
+        "status": 200,
+        "contentType": "video/webm",
+        "declaredBytes": "230170",
+        "actualBytes": 230170,
+        "sha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+        "elapsedMs": 2347,
+        "redirected": false
+      },
+      "at": "2026-09-19T14:24:36.460Z"
+    },
+    {
+      "name": "Frontend list returns expected exact fixture",
+      "passed": true,
+      "detail": {
+        "name": "frontend list",
+        "route": "/api/video-chunks/368",
+        "status": 200,
+        "contentType": "application/json",
+        "declaredBytes": null,
+        "actualBytes": 283,
+        "sha256": "54ae10b2360e444da4c6b0c3112f824d225c52b05007c5ae9131f13230ab5f65",
+        "elapsedMs": 2359,
+        "redirected": false,
+        "body": "{\"success\":true,\"message\":\"Operation successful\",\"data\":{\"attemptId\":368,\"totalChunks\":1,\"totalSizeBytes\":230170,\"chunkDurationMs\":3000,\"chunks\":[{\"index\":0,\"filename\":\"chunk_000000.webm\",\"sizeBytes\":230170}],\"mimeType\":\"video/webm; codecs=\\\"vp8, opus\\\"\"},\"errors\":[],\"traceId\":null}"
+      },
+      "at": "2026-09-19T14:24:38.820Z"
+    },
+    {
+      "name": "frontend chunk delivers exact uploaded WebM bytes",
+      "passed": true,
+      "detail": {
+        "name": "frontend chunk",
+        "route": "/api/video-chunks/368/chunk_000000.webm",
+        "status": 200,
+        "contentType": "video/webm",
+        "declaredBytes": "230170",
+        "actualBytes": 230170,
+        "sha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+        "elapsedMs": 2362,
+        "redirected": false
+      },
+      "at": "2026-09-19T14:24:41.183Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:24:31.772Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:24:31.7685698+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T18:24:31.0623255+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:24:31.7685698+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T18:24:31.0623255+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1245.83
+      }
+    },
+    {
+      "at": "2026-09-19T14:24:34.110Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/video-chunks/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 368,
+          "totalChunks": 1,
+          "totalSizeBytes": 230170,
+          "chunkDurationMs": 3000,
+          "chunks": [
+            {
+              "index": 0,
+              "filename": "chunk_000000.webm",
+              "sizeBytes": 230170
+            }
+          ],
+          "mimeType": "video/webm; codecs=\"vp8, opus\""
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 368,
+            "totalChunks": 1,
+            "totalSizeBytes": 230170,
+            "chunkDurationMs": 3000,
+            "chunks": [
+              {
+                "index": 0,
+                "filename": "chunk_000000.webm",
+                "sizeBytes": 230170
+              }
+            ],
+            "mimeType": "video/webm; codecs=\"vp8, opus\""
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2337.83
+      }
+    },
+    {
+      "at": "2026-09-19T14:24:36.459Z",
+      "name": "backend chunk",
+      "route": "/api/Proctor/video-chunks/368/chunk_000000.webm",
+      "status": 200,
+      "contentType": "video/webm",
+      "declaredBytes": "230170",
+      "actualBytes": 230170,
+      "sha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+      "elapsedMs": 2347,
+      "redirected": false
+    },
+    {
+      "at": "2026-09-19T14:24:38.819Z",
+      "name": "frontend list",
+      "route": "/api/video-chunks/368",
+      "status": 200,
+      "contentType": "application/json",
+      "declaredBytes": null,
+      "actualBytes": 283,
+      "sha256": "54ae10b2360e444da4c6b0c3112f824d225c52b05007c5ae9131f13230ab5f65",
+      "elapsedMs": 2359,
+      "redirected": false,
+      "body": "{\"success\":true,\"message\":\"Operation successful\",\"data\":{\"attemptId\":368,\"totalChunks\":1,\"totalSizeBytes\":230170,\"chunkDurationMs\":3000,\"chunks\":[{\"index\":0,\"filename\":\"chunk_000000.webm\",\"sizeBytes\":230170}],\"mimeType\":\"video/webm; codecs=\\\"vp8, opus\\\"\"},\"errors\":[],\"traceId\":null}"
+    },
+    {
+      "at": "2026-09-19T14:24:41.182Z",
+      "name": "frontend chunk",
+      "route": "/api/video-chunks/368/chunk_000000.webm",
+      "status": 200,
+      "contentType": "video/webm",
+      "declaredBytes": "230170",
+      "actualBytes": 230170,
+      "sha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+      "elapsedMs": 2362,
+      "redirected": false
+    }
+  ]
+}

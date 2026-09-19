@@ -1,0 +1,1763 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:47:17.921Z",
+  "checks": [
+    {
+      "name": "Attempt listing contains only final fixture candidate and exam",
+      "passed": true,
+      "detail": [
+        {
+          "id": 368,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+          "submittedAt": "2026-09-19T18:16:31.1486356+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": 47,
+          "isPassed": true
+        }
+      ],
+      "at": "2026-09-19T14:47:21.053Z"
+    },
+    {
+      "name": "Selected attempt belongs to final candidate and exam",
+      "passed": true,
+      "detail": {
+        "attemptId": 368
+      },
+      "at": "2026-09-19T14:47:21.054Z"
+    },
+    {
+      "name": "Detailed attempt identity matches final fixture",
+      "passed": true,
+      "detail": {
+        "attemptId": 368,
+        "examId": 143,
+        "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a"
+      },
+      "at": "2026-09-19T14:47:23.457Z"
+    },
+    {
+      "name": "Final browser completed by ordinary submission",
+      "passed": true,
+      "detail": {
+        "status": 3
+      },
+      "at": "2026-09-19T14:47:29.316Z"
+    },
+    {
+      "name": "Submitted question 131 retains independently expected correct selections",
+      "passed": true,
+      "detail": {
+        "attemptAnswerId": 1012,
+        "questionId": 131,
+        "questionBodyEn": "QA26 Single: Which number is prime?",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "MCQ_Single",
+        "points": 10,
+        "selectedOptionIds": [
+          376
+        ],
+        "textAnswer": null,
+        "isCorrect": true,
+        "score": 10,
+        "answeredAt": "2026-09-19T18:10:00.0309654+04:00"
+      },
+      "at": "2026-09-19T14:47:29.317Z"
+    },
+    {
+      "name": "Submitted question 132 retains independently expected correct selections",
+      "passed": true,
+      "detail": {
+        "attemptAnswerId": 1013,
+        "questionId": 132,
+        "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "MCQ_Multi",
+        "points": 10,
+        "selectedOptionIds": [
+          379,
+          380
+        ],
+        "textAnswer": null,
+        "isCorrect": true,
+        "score": 10,
+        "answeredAt": "2026-09-19T18:10:02.095095+04:00"
+      },
+      "at": "2026-09-19T14:47:29.318Z"
+    },
+    {
+      "name": "Submitted question 133 retains independently expected correct selections",
+      "passed": true,
+      "detail": {
+        "attemptAnswerId": 1014,
+        "questionId": 133,
+        "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "MCQ_Multi",
+        "points": 10,
+        "selectedOptionIds": [
+          382,
+          383
+        ],
+        "textAnswer": null,
+        "isCorrect": true,
+        "score": 10,
+        "answeredAt": "2026-09-19T18:10:04.1883818+04:00"
+      },
+      "at": "2026-09-19T14:47:29.319Z"
+    },
+    {
+      "name": "Submitted question 134 retains independently expected correct selections",
+      "passed": true,
+      "detail": {
+        "attemptAnswerId": 1015,
+        "questionId": 134,
+        "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "TrueFalse",
+        "points": 10,
+        "selectedOptionIds": [
+          385
+        ],
+        "textAnswer": null,
+        "isCorrect": true,
+        "score": 10,
+        "answeredAt": "2026-09-19T18:10:06.293292+04:00"
+      },
+      "at": "2026-09-19T14:47:29.320Z"
+    },
+    {
+      "name": "Submitted subjective answer is nonempty",
+      "passed": true,
+      "detail": {
+        "attemptAnswerId": 1016,
+        "questionId": 170,
+        "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+        "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+        "questionTypeName": "Subjective",
+        "points": 10,
+        "selectedOptionIds": null,
+        "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+        "isCorrect": null,
+        "score": null,
+        "answeredAt": "2026-09-19T18:10:08.3593436+04:00"
+      },
+      "at": "2026-09-19T14:47:29.320Z"
+    },
+    {
+      "name": "Grading belongs to final fixture",
+      "passed": true,
+      "detail": {
+        "id": 199,
+        "attemptId": 368
+      },
+      "at": "2026-09-19T14:47:29.321Z"
+    },
+    {
+      "name": "Four objective grades independently equal 10 each and total 40",
+      "passed": true,
+      "detail": [
+        {
+          "questionId": 131,
+          "score": 10,
+          "maxPoints": 10
+        },
+        {
+          "questionId": 132,
+          "score": 10,
+          "maxPoints": 10
+        },
+        {
+          "questionId": 133,
+          "score": 10,
+          "maxPoints": 10
+        },
+        {
+          "questionId": 134,
+          "score": 10,
+          "maxPoints": 10
+        }
+      ],
+      "at": "2026-09-19T14:47:29.322Z"
+    },
+    {
+      "name": "Browser examiner saved manual 7/10",
+      "passed": true,
+      "detail": {
+        "id": 1198,
+        "gradingSessionId": 199,
+        "questionId": 170,
+        "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+        "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+        "questionTypeName": "Subjective",
+        "questionTypeId": 5,
+        "maxPoints": 10,
+        "selectedOptionIds": null,
+        "selectedOptions": null,
+        "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+        "score": 7,
+        "isCorrect": true,
+        "isManuallyGraded": true,
+        "isGraded": true,
+        "graderComment": "Identity verification is clear; the monitoring and documented-review process needs more detail. Final QA rubric score: 7/10.",
+        "correctOptions": [],
+        "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+        "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+      },
+      "at": "2026-09-19T14:47:29.322Z"
+    },
+    {
+      "name": "Completed grading independently totals 40 + 7 = 47/50",
+      "passed": true,
+      "detail": {
+        "grading": {
+          "id": 199,
+          "attemptId": 368,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "gradedBy": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "graderName": "QA26 Final Lifecycle Candidate",
+          "status": 4,
+          "statusName": "Completed",
+          "totalScore": 47,
+          "maxPossibleScore": 50,
+          "passScore": 30,
+          "isPassed": true,
+          "gradedAt": "2026-09-19T18:18:15.2882393+04:00",
+          "createdDate": "2026-09-19T18:16:32.9757075+04:00",
+          "totalQuestions": 5,
+          "gradedQuestions": 5,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 1194,
+              "gradingSessionId": 199,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "selectedOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1195,
+              "gradingSessionId": 199,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                379,
+                380
+              ],
+              "selectedOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1196,
+              "gradingSessionId": 199,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                382,
+                383
+              ],
+              "selectedOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1197,
+              "gradingSessionId": 199,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "selectedOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1198,
+              "gradingSessionId": 199,
+              "questionId": 170,
+              "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+              "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+              "score": 7,
+              "isCorrect": true,
+              "isManuallyGraded": true,
+              "isGraded": true,
+              "graderComment": "Identity verification is clear; the monitoring and documented-review process needs more detail. Final QA rubric score: 7/10.",
+              "correctOptions": [],
+              "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+              "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+            }
+          ]
+        },
+        "attemptTotal": 47
+      },
+      "at": "2026-09-19T14:47:29.323Z"
+    },
+    {
+      "name": "Result belongs to final fixture",
+      "passed": true,
+      "detail": {
+        "resultId": 170,
+        "attemptId": 368
+      },
+      "at": "2026-09-19T14:47:29.324Z"
+    },
+    {
+      "name": "Final result independently equals 47/50, 94%, passed at 30 points",
+      "passed": true,
+      "detail": {
+        "id": 170,
+        "examId": 143,
+        "examTitleEn": "QA26 Final Browser Lifecycle",
+        "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+        "attemptId": 368,
+        "attemptNumber": 1,
+        "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+        "candidateName": "QA26 Final Lifecycle Candidate",
+        "candidateEmail": "qa26.final.lifecycle@example.test",
+        "totalScore": 47,
+        "maxPossibleScore": 50,
+        "passScore": 30,
+        "percentage": 94,
+        "isPassed": true,
+        "gradeLabel": "A",
+        "isPublishedToCandidate": true,
+        "publishedAt": "2026-09-19T18:20:51.2117705+04:00",
+        "finalizedAt": "2026-09-19T18:18:18.1174412+04:00",
+        "attemptStartedAt": "2026-09-19T18:09:33.6056203+04:00",
+        "attemptSubmittedAt": "2026-09-19T18:16:31.1486356+04:00"
+      },
+      "at": "2026-09-19T14:47:29.325Z"
+    },
+    {
+      "name": "Browser publication persisted",
+      "passed": true,
+      "detail": {
+        "id": 170,
+        "publishedAt": "2026-09-19T18:20:51.2117705+04:00"
+      },
+      "at": "2026-09-19T14:47:29.325Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:47:19.169Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:47:19.1659683+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T18:47:18.4643171+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:47:19.1659683+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T18:47:18.4643171+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1246.03
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:21.052Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt?examId=143&candidateId=44799c41-8cfd-4ab8-a90b-13632121949a&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 368,
+              "examId": 143,
+              "examTitleEn": "QA26 Final Browser Lifecycle",
+              "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+              "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+              "candidateName": "QA26 Final Lifecycle Candidate",
+              "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+              "submittedAt": "2026-09-19T18:16:31.1486356+04:00",
+              "status": 3,
+              "statusName": "Submitted",
+              "expiryReason": 0,
+              "expiryReasonName": "None",
+              "resumedFromAttemptId": null,
+              "attemptNumber": 1,
+              "totalScore": 47,
+              "isPassed": true
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 368,
+                "examId": 143,
+                "examTitleEn": "QA26 Final Browser Lifecycle",
+                "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+                "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+                "candidateName": "QA26 Final Lifecycle Candidate",
+                "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+                "submittedAt": "2026-09-19T18:16:31.1486356+04:00",
+                "status": 3,
+                "statusName": "Submitted",
+                "expiryReason": 0,
+                "expiryReasonName": "None",
+                "resumedFromAttemptId": null,
+                "attemptNumber": 1,
+                "totalScore": 47,
+                "isPassed": true
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1882.15
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:23.456Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/368/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 7859,
+              "attemptId": 368,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":1}",
+              "occurredAt": "2026-09-19T18:09:33.6056203+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7865,
+              "attemptId": 368,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":131}",
+              "occurredAt": "2026-09-19T18:10:00.0309654+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7866,
+              "attemptId": 368,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":132}",
+              "occurredAt": "2026-09-19T18:10:02.095095+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7867,
+              "attemptId": 368,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T18:10:04.1883818+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7868,
+              "attemptId": 368,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":134}",
+              "occurredAt": "2026-09-19T18:10:06.293292+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7869,
+              "attemptId": 368,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":170}",
+              "occurredAt": "2026-09-19T18:10:08.3593436+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7870,
+              "attemptId": 368,
+              "eventType": 15,
+              "eventTypeName": "TimeAdded",
+              "metadataJson": "{\"adminUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"extraMinutes\":1,\"extraSeconds\":60,\"reason\":\"QA26 final lifecycle one-minute extension verification\",\"newExpiresAt\":\"2026-09-19T18:40:33.6056203+04:00\"}",
+              "occurredAt": "2026-09-19T18:14:01.6139434+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7871,
+              "attemptId": 368,
+              "eventType": 4,
+              "eventTypeName": "TabSwitched",
+              "metadataJson": "{\"timestamp\":\"2026-09-19T14:15:54.959Z\",\"isMobile\":true}",
+              "occurredAt": "2026-09-19T18:15:55.7701906+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 7872,
+              "attemptId": 368,
+              "eventType": 6,
+              "eventTypeName": "Submitted",
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T18:16:31.1486356+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [
+            {
+              "attemptAnswerId": 1012,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T18:10:00.0309654+04:00"
+            },
+            {
+              "attemptAnswerId": 1013,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                379,
+                380
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T18:10:02.095095+04:00"
+            },
+            {
+              "attemptAnswerId": 1014,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                382,
+                383
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T18:10:04.1883818+04:00"
+            },
+            {
+              "attemptAnswerId": 1015,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "points": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T18:10:06.293292+04:00"
+            },
+            {
+              "attemptAnswerId": 1016,
+              "questionId": 170,
+              "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+              "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+              "questionTypeName": "Subjective",
+              "points": 10,
+              "selectedOptionIds": null,
+              "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+              "isCorrect": null,
+              "score": null,
+              "answeredAt": "2026-09-19T18:10:08.3593436+04:00"
+            }
+          ],
+          "id": 368,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+          "submittedAt": "2026-09-19T18:16:31.1486356+04:00",
+          "expiresAt": "2026-09-19T18:40:33.6056203+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": 47,
+          "isPassed": true,
+          "totalQuestions": 5,
+          "answeredQuestions": 5,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T18:09:33.6056203+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 7859,
+                "attemptId": 368,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":1}",
+                "occurredAt": "2026-09-19T18:09:33.6056203+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7865,
+                "attemptId": 368,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":131}",
+                "occurredAt": "2026-09-19T18:10:00.0309654+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7866,
+                "attemptId": 368,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":132}",
+                "occurredAt": "2026-09-19T18:10:02.095095+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7867,
+                "attemptId": 368,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T18:10:04.1883818+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7868,
+                "attemptId": 368,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":134}",
+                "occurredAt": "2026-09-19T18:10:06.293292+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7869,
+                "attemptId": 368,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":170}",
+                "occurredAt": "2026-09-19T18:10:08.3593436+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7870,
+                "attemptId": 368,
+                "eventType": 15,
+                "eventTypeName": "TimeAdded",
+                "metadataJson": "{\"adminUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"extraMinutes\":1,\"extraSeconds\":60,\"reason\":\"QA26 final lifecycle one-minute extension verification\",\"newExpiresAt\":\"2026-09-19T18:40:33.6056203+04:00\"}",
+                "occurredAt": "2026-09-19T18:14:01.6139434+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7871,
+                "attemptId": 368,
+                "eventType": 4,
+                "eventTypeName": "TabSwitched",
+                "metadataJson": "{\"timestamp\":\"2026-09-19T14:15:54.959Z\",\"isMobile\":true}",
+                "occurredAt": "2026-09-19T18:15:55.7701906+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 7872,
+                "attemptId": 368,
+                "eventType": 6,
+                "eventTypeName": "Submitted",
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T18:16:31.1486356+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [
+              {
+                "attemptAnswerId": 1012,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T18:10:00.0309654+04:00"
+              },
+              {
+                "attemptAnswerId": 1013,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  379,
+                  380
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T18:10:02.095095+04:00"
+              },
+              {
+                "attemptAnswerId": 1014,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  382,
+                  383
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T18:10:04.1883818+04:00"
+              },
+              {
+                "attemptAnswerId": 1015,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "points": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T18:10:06.293292+04:00"
+              },
+              {
+                "attemptAnswerId": 1016,
+                "questionId": 170,
+                "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+                "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+                "questionTypeName": "Subjective",
+                "points": 10,
+                "selectedOptionIds": null,
+                "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+                "isCorrect": null,
+                "score": null,
+                "answeredAt": "2026-09-19T18:10:08.3593436+04:00"
+              }
+            ],
+            "id": 368,
+            "examId": 143,
+            "examTitleEn": "QA26 Final Browser Lifecycle",
+            "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+            "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "candidateName": "QA26 Final Lifecycle Candidate",
+            "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+            "submittedAt": "2026-09-19T18:16:31.1486356+04:00",
+            "expiresAt": "2026-09-19T18:40:33.6056203+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": 47,
+            "isPassed": true,
+            "totalQuestions": 5,
+            "answeredQuestions": 5,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T18:09:33.6056203+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2401.83
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:25.338Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 320,
+          "attemptId": 368,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+          "endedAt": "2026-09-19T18:16:31.1486356+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Chrome",
+          "browserVersion": "153.0.0.0",
+          "operatingSystem": "Windows 10/11",
+          "screenResolution": "1707x1067",
+          "totalEvents": 1,
+          "totalViolations": 0,
+          "countableViolationCount": 1,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T18:09:33.6056203+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": null,
+          "attemptStatus": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [
+            {
+              "id": 4107,
+              "proctorSessionId": 320,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}",
+              "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+              "sequenceNumber": 1
+            }
+          ],
+          "candidateEmail": "qa26.final.lifecycle@example.test",
+          "candidateNameAr": "مرشح دورة الحياة النهائية QA26",
+          "candidateRollNo": null,
+          "candidateDepartment": null,
+          "candidatePhone": null,
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "examDurationMinutes": 30,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 0,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 0,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": null,
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 0,
+          "sessionDuration": "6m 57s",
+          "sessionDurationMinutes": 7,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 320,
+            "attemptId": 368,
+            "examId": 143,
+            "examTitleEn": "QA26 Final Browser Lifecycle",
+            "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "candidateName": "QA26 Final Lifecycle Candidate",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T18:09:33.6056203+04:00",
+            "endedAt": "2026-09-19T18:16:31.1486356+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Chrome",
+            "browserVersion": "153.0.0.0",
+            "operatingSystem": "Windows 10/11",
+            "screenResolution": "1707x1067",
+            "totalEvents": 1,
+            "totalViolations": 0,
+            "countableViolationCount": 1,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T18:09:33.6056203+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": null,
+            "attemptStatus": null,
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [
+              {
+                "id": 4107,
+                "proctorSessionId": 320,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}",
+                "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+                "sequenceNumber": 1
+              }
+            ],
+            "candidateEmail": "qa26.final.lifecycle@example.test",
+            "candidateNameAr": "مرشح دورة الحياة النهائية QA26",
+            "candidateRollNo": null,
+            "candidateDepartment": null,
+            "candidatePhone": null,
+            "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+            "examDurationMinutes": 30,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 0,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 0,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": null,
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 0,
+            "sessionDuration": "6m 57s",
+            "sessionDurationMinutes": 7,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1879.87
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:27.442Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/attempt/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 199,
+          "attemptId": 368,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "gradedBy": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "graderName": "QA26 Final Lifecycle Candidate",
+          "status": 4,
+          "statusName": "Completed",
+          "totalScore": 47,
+          "maxPossibleScore": 50,
+          "passScore": 30,
+          "isPassed": true,
+          "gradedAt": "2026-09-19T18:18:15.2882393+04:00",
+          "createdDate": "2026-09-19T18:16:32.9757075+04:00",
+          "totalQuestions": 5,
+          "gradedQuestions": 5,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 1194,
+              "gradingSessionId": 199,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "selectedOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1195,
+              "gradingSessionId": 199,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                379,
+                380
+              ],
+              "selectedOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1196,
+              "gradingSessionId": 199,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                382,
+                383
+              ],
+              "selectedOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1197,
+              "gradingSessionId": 199,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "selectedOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 1198,
+              "gradingSessionId": 199,
+              "questionId": 170,
+              "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+              "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+              "score": 7,
+              "isCorrect": true,
+              "isManuallyGraded": true,
+              "isGraded": true,
+              "graderComment": "Identity verification is clear; the monitoring and documented-review process needs more detail. Final QA rubric score: 7/10.",
+              "correctOptions": [],
+              "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+              "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 199,
+            "attemptId": 368,
+            "examId": 143,
+            "examTitleEn": "QA26 Final Browser Lifecycle",
+            "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+            "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "candidateName": "QA26 Final Lifecycle Candidate",
+            "gradedBy": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "graderName": "QA26 Final Lifecycle Candidate",
+            "status": 4,
+            "statusName": "Completed",
+            "totalScore": 47,
+            "maxPossibleScore": 50,
+            "passScore": 30,
+            "isPassed": true,
+            "gradedAt": "2026-09-19T18:18:15.2882393+04:00",
+            "createdDate": "2026-09-19T18:16:32.9757075+04:00",
+            "totalQuestions": 5,
+            "gradedQuestions": 5,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 1194,
+                "gradingSessionId": 199,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 1195,
+                "gradingSessionId": 199,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  379,
+                  380
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 1196,
+                "gradingSessionId": 199,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  382,
+                  383
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 1197,
+                "gradingSessionId": 199,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 1198,
+                "gradingSessionId": 199,
+                "questionId": 170,
+                "questionBodyEn": "QA26 Final: Explain two controls that protect exam integrity. Calculator and spreadsheet tools are available for this section.",
+                "questionBodyAr": "QA26 النهائي: اشرح إجراءين لحماية نزاهة الاختبار. تتوفر أدوات الحاسبة وجدول البيانات.",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": "Verify candidate identity before the exam and preserve an audit trail of proctor interventions. Restrict exam access to assigned candidates and persist answers during interruptions.",
+                "score": 7,
+                "isCorrect": true,
+                "isManuallyGraded": true,
+                "isGraded": true,
+                "graderComment": "Identity verification is clear; the monitoring and documented-review process needs more detail. Final QA rubric score: 7/10.",
+                "correctOptions": [],
+                "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+                "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2102.12
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:29.316Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamResult/attempt/368",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 170,
+          "examId": 143,
+          "examTitleEn": "QA26 Final Browser Lifecycle",
+          "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+          "attemptId": 368,
+          "attemptNumber": 1,
+          "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+          "candidateName": "QA26 Final Lifecycle Candidate",
+          "candidateEmail": "qa26.final.lifecycle@example.test",
+          "totalScore": 47,
+          "maxPossibleScore": 50,
+          "passScore": 30,
+          "percentage": 94,
+          "isPassed": true,
+          "gradeLabel": "A",
+          "isPublishedToCandidate": true,
+          "publishedAt": "2026-09-19T18:20:51.2117705+04:00",
+          "finalizedAt": "2026-09-19T18:18:18.1174412+04:00",
+          "attemptStartedAt": "2026-09-19T18:09:33.6056203+04:00",
+          "attemptSubmittedAt": "2026-09-19T18:16:31.1486356+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 170,
+            "examId": 143,
+            "examTitleEn": "QA26 Final Browser Lifecycle",
+            "examTitleAr": "اختبار دورة الحياة النهائية QA26",
+            "attemptId": 368,
+            "attemptNumber": 1,
+            "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+            "candidateName": "QA26 Final Lifecycle Candidate",
+            "candidateEmail": "qa26.final.lifecycle@example.test",
+            "totalScore": 47,
+            "maxPossibleScore": 50,
+            "passScore": 30,
+            "percentage": 94,
+            "isPassed": true,
+            "gradeLabel": "A",
+            "isPublishedToCandidate": true,
+            "publishedAt": "2026-09-19T18:20:51.2117705+04:00",
+            "finalizedAt": "2026-09-19T18:18:18.1174412+04:00",
+            "attemptStartedAt": "2026-09-19T18:09:33.6056203+04:00",
+            "attemptSubmittedAt": "2026-09-19T18:16:31.1486356+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1873.44
+      }
+    },
+    {
+      "at": "2026-09-19T14:47:29.327Z",
+      "summary": {
+        "at": "2026-09-19T14:47:29.326Z",
+        "evidenceFile": "phase12-final-checkpoint-2026-09-19T14-47-17-920Z.json",
+        "attemptId": 368,
+        "status": 3,
+        "proctorSessionId": 320,
+        "gradingSessionId": 199,
+        "gradingStatus": 4,
+        "resultId": 170,
+        "totalScore": 47,
+        "published": true,
+        "pending": [],
+        "state": "observed final stages",
+        "expected": {
+          "objective": 40,
+          "manual": 7,
+          "total": 47,
+          "maximum": 50,
+          "percentage": 94,
+          "passScore": 30
+        },
+        "limitation": "Candidate browser review/export and actual proctor UI effects require separate browser evidence."
+      }
+    }
+  ]
+}

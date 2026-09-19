@@ -1,0 +1,496 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:34:13.611Z",
+  "checks": [
+    {
+      "name": "D27 public selection rejects privileged non-Candidate user and mints no token",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "claims": {
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": [
+            "Admin",
+            "Candidate"
+          ]
+        },
+        "privilegedReadStatus": 200
+      },
+      "at": "2026-09-19T11:34:19.574Z"
+    },
+    {
+      "name": "QA target persisted role and department remain unchanged",
+      "passed": true,
+      "detail": {
+        "beforeRoles": [
+          "Admin"
+        ],
+        "afterRoles": [
+          "Admin"
+        ]
+      },
+      "at": "2026-09-19T11:34:20.957Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:34:14.874Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:34:14.8701691+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:34:14.1746528+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:34:14.8701691+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:34:14.1746528+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1260.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:34:16.284Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/6b29defc-204d-4a72-91d5-a95013b46a67",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:33:28.7812252+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+          "email": "qa26.ops.admin1@example.test",
+          "displayName": "QA26 Operations Admin 1",
+          "fullName": "QA26 Operations Admin 1",
+          "fullNameAr": "اختبار العمليات 1",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T14:47:00.110969+04:00",
+          "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:33:28.7812252+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1408.24
+      }
+    },
+    {
+      "at": "2026-09-19T11:34:18.126Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_/select-candidate",
+      "request": {
+        "candidateId": "6b29defc-204d-4a72-91d5-a95013b46a67"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:34:18.1266101+04:00",
+          "examId": 119,
+          "candidateId": "6b29defc-204d-4a72-91d5-a95013b46a67",
+          "candidateName": "QA26 Operations Admin 1"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:34:18.1266101+04:00",
+            "examId": 119,
+            "candidateId": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "candidateName": "QA26 Operations Admin 1"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1841.61
+      }
+    },
+    {
+      "at": "2026-09-19T11:34:19.573Z",
+      "identity": "QA26 public impersonation of QA Operations Admin only",
+      "method": "GET",
+      "route": "/api/Assessment/exams/122",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 122,
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "examType": 0,
+          "titleEn": "QA26 Operations Isolated Exam",
+          "titleAr": "اختبار QA26 ops",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T10:55:20.015+00:00",
+          "endAt": "2026-09-20T11:00:20.015+00:00",
+          "durationMinutes": 120,
+          "maxAttempts": 2,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isPublished": true,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": false,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T15:02:23.4315922+04:00",
+          "updatedDate": "2026-09-19T15:02:32.5344791+04:00",
+          "sectionsCount": 1,
+          "questionsCount": 1,
+          "totalPoints": 10,
+          "sections": [
+            {
+              "id": 302,
+              "examId": 122,
+              "titleEn": "QA26 Knowledge",
+              "titleAr": "المعرفة QA26",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "order": 1,
+              "durationMinutes": null,
+              "totalPointsOverride": null,
+              "createdDate": "2026-09-19T15:02:27.3858239+04:00",
+              "topicsCount": 0,
+              "questionsCount": 1,
+              "totalPoints": 10,
+              "sourceType": null,
+              "questionSubjectId": null,
+              "questionTopicId": null,
+              "pickCount": 0,
+              "subjectNameEn": null,
+              "subjectNameAr": null,
+              "topicNameEn": null,
+              "topicNameAr": null,
+              "topics": [],
+              "questions": [
+                {
+                  "id": 39,
+                  "examId": 122,
+                  "examSectionId": 302,
+                  "examTopicId": null,
+                  "questionId": 136,
+                  "order": 1,
+                  "points": 10,
+                  "isRequired": true,
+                  "createdDate": "2026-09-19T15:02:29.0044879+04:00",
+                  "questionBodyEn": "QA26 Operations isolated question",
+                  "questionBodyAr": "اختبار QA26",
+                  "questionTypeNameEn": "MCQ_Single",
+                  "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                  "difficultyLevelName": "Medium",
+                  "originalPoints": 10
+                }
+              ]
+            }
+          ],
+          "instructions": [
+            {
+              "id": 80,
+              "examId": 122,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+              "order": 1,
+              "createdDate": "2026-09-19T15:02:31.3496986+04:00"
+            }
+          ],
+          "accessPolicy": {
+            "id": 103,
+            "examId": 122,
+            "isPublic": false,
+            "accessCode": null,
+            "restrictToAssignedCandidates": true,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:02:23.664696+04:00",
+            "updatedDate": "2026-09-19T15:02:30.4135473+04:00"
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 122,
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "examType": 0,
+            "titleEn": "QA26 Operations Isolated Exam",
+            "titleAr": "اختبار QA26 ops",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 5,
+            "isPublished": true,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": false,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T15:02:23.4315922+04:00",
+            "updatedDate": "2026-09-19T15:02:32.5344791+04:00",
+            "sectionsCount": 1,
+            "questionsCount": 1,
+            "totalPoints": 10,
+            "sections": [
+              {
+                "id": 302,
+                "examId": 122,
+                "titleEn": "QA26 Knowledge",
+                "titleAr": "المعرفة QA26",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "order": 1,
+                "durationMinutes": null,
+                "totalPointsOverride": null,
+                "createdDate": "2026-09-19T15:02:27.3858239+04:00",
+                "topicsCount": 0,
+                "questionsCount": 1,
+                "totalPoints": 10,
+                "sourceType": null,
+                "questionSubjectId": null,
+                "questionTopicId": null,
+                "pickCount": 0,
+                "subjectNameEn": null,
+                "subjectNameAr": null,
+                "topicNameEn": null,
+                "topicNameAr": null,
+                "topics": [],
+                "questions": [
+                  {
+                    "id": 39,
+                    "examId": 122,
+                    "examSectionId": 302,
+                    "examTopicId": null,
+                    "questionId": 136,
+                    "order": 1,
+                    "points": 10,
+                    "isRequired": true,
+                    "createdDate": "2026-09-19T15:02:29.0044879+04:00",
+                    "questionBodyEn": "QA26 Operations isolated question",
+                    "questionBodyAr": "اختبار QA26",
+                    "questionTypeNameEn": "MCQ_Single",
+                    "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+                    "difficultyLevelName": "Medium",
+                    "originalPoints": 10
+                  }
+                ]
+              }
+            ],
+            "instructions": [
+              {
+                "id": 80,
+                "examId": 122,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار.",
+                "order": 1,
+                "createdDate": "2026-09-19T15:02:31.3496986+04:00"
+              }
+            ],
+            "accessPolicy": {
+              "id": 103,
+              "examId": 122,
+              "isPublic": false,
+              "accessCode": null,
+              "restrictToAssignedCandidates": true,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T15:02:23.664696+04:00",
+              "updatedDate": "2026-09-19T15:02:30.4135473+04:00"
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1445.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:34:20.956Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/6b29defc-204d-4a72-91d5-a95013b46a67",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+          "email": "qa26.ops.admin1@example.test",
+          "displayName": "QA26 Operations Admin 1",
+          "fullName": "QA26 Operations Admin 1",
+          "fullNameAr": "اختبار العمليات 1",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T14:47:00.110969+04:00",
+          "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1380.1
+      }
+    }
+  ]
+}

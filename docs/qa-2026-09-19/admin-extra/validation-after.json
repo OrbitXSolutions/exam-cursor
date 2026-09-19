@@ -1,0 +1,102 @@
+{
+  "classification": "SIMULATED TEST: real API responses and persisted state; no physical/browser verification",
+  "checks": [
+    {
+      "name": "Negative system limits returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Negative system limits leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Unknown proctor mode returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Unknown proctor mode leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Negative notification port/batch/delay returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Negative notification port/batch/delay leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "SMTP host exceeds SQL column returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "SMTP host exceeds SQL column leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Template English subject exceeds SQL column returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Template English subject exceeds SQL column leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Template Arabic subject exceeds SQL column returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Template Arabic subject exceeds SQL column leaves saved configuration unchanged",
+      "passed": true
+    },
+    {
+      "name": "Invalid log pagination returns400",
+      "passed": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Valid log pagination still succeeds",
+      "passed": true
+    },
+    {
+      "name": "Supported notification boundary values persist",
+      "passed": true
+    },
+    {
+      "name": "Both500-character bilingual template subjects persist",
+      "passed": true
+    },
+    {
+      "name": "Notification original restored",
+      "passed": true
+    },
+    {
+      "name": "Template original restored",
+      "passed": true
+    },
+    {
+      "name": "System config retained original including retention0",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,2552 @@
+{
+  "classification": "SIMULATED TEST: actual authenticated HTTP API calls and saved application state. No browser or physical capture.",
+  "startedAt": "2026-09-19T12:20:17.582Z",
+  "checks": [
+    {
+      "name": "Report score statistics match independently aggregated persisted results",
+      "passed": true,
+      "detail": {
+        "report": {
+          "id": 1,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "fromDate": null,
+          "toDate": null,
+          "totalAttempts": 5,
+          "totalSubmitted": 4,
+          "totalExpired": 0,
+          "totalPassed": 2,
+          "totalFailed": 3,
+          "averageScore": 18,
+          "highestScore": 40,
+          "lowestScore": 0,
+          "passRate": 40,
+          "totalFlaggedAttempts": null,
+          "averageRiskScore": null,
+          "generatedAt": "2026-09-19T16:20:30.5388288+04:00",
+          "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+        },
+        "expectedScores": [
+          10,
+          40,
+          0,
+          0,
+          40
+        ]
+      },
+      "at": "2026-09-19T12:20:31.287Z"
+    },
+    {
+      "name": "Report saved and reload returns same generated report",
+      "passed": true,
+      "at": "2026-09-19T12:20:33.165Z"
+    },
+    {
+      "name": "Dashboard totals and pass rate agree with persisted results",
+      "passed": true,
+      "detail": {
+        "examId": 128,
+        "examTitleEn": "QA26 Completion Objective matrix",
+        "totalCandidates": 3,
+        "totalAttempts": 5,
+        "gradedCount": 5,
+        "pendingGradingCount": 0,
+        "publishedCount": 5,
+        "unpublishedCount": 0,
+        "passedCount": 2,
+        "failedCount": 3,
+        "passRate": 40,
+        "averageScore": 18,
+        "highestScore": 40,
+        "lowestScore": 0,
+        "scoreDistribution": [
+          {
+            "range": "0-4",
+            "count": 2,
+            "percentage": 40
+          },
+          {
+            "range": "4-8",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "8-12",
+            "count": 1,
+            "percentage": 20
+          },
+          {
+            "range": "12-16",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "16-20",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "20-24",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "24-28",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "28-32",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "32-36",
+            "count": 0,
+            "percentage": 0
+          },
+          {
+            "range": "36-40",
+            "count": 0,
+            "percentage": 0
+          }
+        ]
+      },
+      "at": "2026-09-19T12:20:35.740Z"
+    },
+    {
+      "name": "Empty date range generates zero report safely",
+      "passed": true,
+      "at": "2026-09-19T12:20:38.307Z"
+    },
+    {
+      "name": "Reversed report date interval rejected",
+      "passed": true,
+      "at": "2026-09-19T12:20:41.096Z"
+    },
+    {
+      "name": "Question analysis contains all four questions and completed automatic attempts",
+      "passed": false,
+      "detail": [
+        {
+          "id": 2,
+          "examId": 128,
+          "questionId": 132,
+          "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Multi",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 3,
+          "examId": 128,
+          "questionId": 133,
+          "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Multi",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 4,
+          "examId": 128,
+          "questionId": 134,
+          "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "TrueFalse",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 1,
+          "examId": 128,
+          "questionId": 131,
+          "questionBodyEn": "QA26 Single: Which number is prime?",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Single",
+          "totalAnswers": 1,
+          "correctAnswers": 1,
+          "incorrectAnswers": 0,
+          "unansweredCount": 0,
+          "correctRate": 1,
+          "averageScore": 10,
+          "maxPoints": 10,
+          "difficultyIndex": 1,
+          "difficultyLabel": "Easy",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        }
+      ],
+      "at": "2026-09-19T12:20:45.168Z"
+    },
+    {
+      "name": "Question analysis counts known all-blank attempt as unanswered",
+      "passed": false,
+      "detail": [
+        {
+          "id": 2,
+          "examId": 128,
+          "questionId": 132,
+          "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Multi",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 3,
+          "examId": 128,
+          "questionId": 133,
+          "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Multi",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 4,
+          "examId": 128,
+          "questionId": 134,
+          "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "TrueFalse",
+          "totalAnswers": 1,
+          "correctAnswers": 0,
+          "incorrectAnswers": 1,
+          "unansweredCount": 0,
+          "correctRate": 0,
+          "averageScore": 0,
+          "maxPoints": 10,
+          "difficultyIndex": 0,
+          "difficultyLabel": "Very Hard",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        },
+        {
+          "id": 1,
+          "examId": 128,
+          "questionId": 131,
+          "questionBodyEn": "QA26 Single: Which number is prime?",
+          "questionBodyAr": "اختبار QA26",
+          "questionTypeName": "MCQ_Single",
+          "totalAnswers": 1,
+          "correctAnswers": 1,
+          "incorrectAnswers": 0,
+          "unansweredCount": 0,
+          "correctRate": 1,
+          "averageScore": 10,
+          "maxPoints": 10,
+          "difficultyIndex": 1,
+          "difficultyLabel": "Easy",
+          "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+        }
+      ],
+      "at": "2026-09-19T12:20:45.169Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot access department report /api/ExamResult/report/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:47.031Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot access department report /api/ExamResult/report/question-performance/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:48.887Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot access department report /api/ExamResult/dashboard/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:50.740Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot access department report /api/ExamResult/report/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:50.974Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot access department report /api/ExamResult/report/question-performance/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:51.208Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot access department report /api/ExamResult/dashboard/exam/128",
+      "passed": true,
+      "at": "2026-09-19T12:20:51.442Z"
+    },
+    {
+      "name": "Foreign administrator cannot generate report",
+      "passed": true,
+      "at": "2026-09-19T12:20:53.533Z"
+    },
+    {
+      "name": "Foreign administrator cannot generate question analysis",
+      "passed": true,
+      "at": "2026-09-19T12:20:55.618Z"
+    },
+    {
+      "name": "Export 1 persisted requested format",
+      "passed": true,
+      "at": "2026-09-19T12:21:11.454Z"
+    },
+    {
+      "name": "Foreign department cannot access export 1",
+      "passed": true,
+      "at": "2026-09-19T12:21:13.538Z"
+    },
+    {
+      "name": "Foreign department cannot cancel export 1",
+      "passed": true,
+      "at": "2026-09-19T12:21:15.628Z"
+    },
+    {
+      "name": "Export 2 persisted requested format",
+      "passed": true,
+      "at": "2026-09-19T12:21:17.484Z"
+    },
+    {
+      "name": "Foreign department cannot access export 2",
+      "passed": true,
+      "at": "2026-09-19T12:21:19.574Z"
+    },
+    {
+      "name": "Foreign department cannot cancel export 2",
+      "passed": true,
+      "at": "2026-09-19T12:21:21.658Z"
+    },
+    {
+      "name": "Export 3 persisted requested format",
+      "passed": true,
+      "at": "2026-09-19T12:21:23.512Z"
+    },
+    {
+      "name": "Foreign department cannot access export 3",
+      "passed": true,
+      "at": "2026-09-19T12:21:25.604Z"
+    },
+    {
+      "name": "Foreign department cannot cancel export 3",
+      "passed": true,
+      "at": "2026-09-19T12:21:27.696Z"
+    },
+    {
+      "name": "Export 4 persisted requested format",
+      "passed": true,
+      "at": "2026-09-19T12:21:29.552Z"
+    },
+    {
+      "name": "Foreign department cannot access export 4",
+      "passed": true,
+      "at": "2026-09-19T12:21:31.635Z"
+    },
+    {
+      "name": "Foreign department cannot cancel export 4",
+      "passed": true,
+      "at": "2026-09-19T12:21:33.722Z"
+    },
+    {
+      "name": "Invalid export enum rejected",
+      "passed": true,
+      "at": "2026-09-19T12:21:33.958Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:20:18.826Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:18.8223288+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:20:18.1362914+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:18.8223288+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:20:18.1362914+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1241.59
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:20.974Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:20.9737015+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:20:20.2721799+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:20.9737015+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:20:20.2721799+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2146.45
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:22.207Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:22.2068011+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:20:21.5028163+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:22.2068011+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:20:21.5028163+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1232.44
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:23.422Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:23.4218448+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T16:20:22.7221655+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:23.4218448+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T16:20:22.7221655+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1214.38
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:24.629Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:24.6292597+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T16:20:23.9291337+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:24.6292597+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T16:20:23.9291337+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1206.67
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:25.854Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:25.8539305+04:00",
+          "user": {
+            "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "email": "qa26.protocol.1789817576996.a@example.test",
+            "displayName": "QA26 Protocol Regression a",
+            "fullName": "QA26 Protocol Regression a",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+            "lastLoginDate": "2026-09-19T16:20:25.1417235+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:25.8539305+04:00",
+            "user": {
+              "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "email": "qa26.protocol.1789817576996.a@example.test",
+              "displayName": "QA26 Protocol Regression a",
+              "fullName": "QA26 Protocol Regression a",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+              "lastLoginDate": "2026-09-19T16:20:25.1417235+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1223.92
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:28.670Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/exam/128?pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 67,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "attemptId": 206,
+              "attemptNumber": 2,
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "totalScore": 10,
+              "maxPossibleScore": 40,
+              "percentage": 25,
+              "isPassed": false,
+              "gradeLabel": "F",
+              "isPublishedToCandidate": true,
+              "finalizedAt": "2026-09-19T16:09:01.2916088+04:00"
+            },
+            {
+              "id": 61,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "attemptId": 211,
+              "attemptNumber": 2,
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "percentage": 100,
+              "isPassed": true,
+              "gradeLabel": "A",
+              "isPublishedToCandidate": true,
+              "finalizedAt": "2026-09-19T15:52:38.5896481+04:00"
+            },
+            {
+              "id": 58,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "attemptId": 205,
+              "attemptNumber": 1,
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "percentage": 0,
+              "isPassed": false,
+              "gradeLabel": "F",
+              "isPublishedToCandidate": true,
+              "finalizedAt": "2026-09-19T15:44:54.9943843+04:00"
+            },
+            {
+              "id": 57,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "attemptId": 204,
+              "attemptNumber": 1,
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "percentage": 0,
+              "isPassed": false,
+              "gradeLabel": "F",
+              "isPublishedToCandidate": true,
+              "finalizedAt": "2026-09-19T15:44:39.4668827+04:00"
+            },
+            {
+              "id": 56,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "attemptId": 203,
+              "attemptNumber": 1,
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "percentage": 100,
+              "isPassed": true,
+              "gradeLabel": "A",
+              "isPublishedToCandidate": true,
+              "finalizedAt": "2026-09-19T15:44:32.9563241+04:00"
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 5,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 67,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "attemptId": 206,
+                "attemptNumber": 2,
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "totalScore": 10,
+                "maxPossibleScore": 40,
+                "percentage": 25,
+                "isPassed": false,
+                "gradeLabel": "F",
+                "isPublishedToCandidate": true,
+                "finalizedAt": "2026-09-19T16:09:01.2916088+04:00"
+              },
+              {
+                "id": 61,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "attemptId": 211,
+                "attemptNumber": 2,
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "percentage": 100,
+                "isPassed": true,
+                "gradeLabel": "A",
+                "isPublishedToCandidate": true,
+                "finalizedAt": "2026-09-19T15:52:38.5896481+04:00"
+              },
+              {
+                "id": 58,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "attemptId": 205,
+                "attemptNumber": 1,
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "percentage": 0,
+                "isPassed": false,
+                "gradeLabel": "F",
+                "isPublishedToCandidate": true,
+                "finalizedAt": "2026-09-19T15:44:54.9943843+04:00"
+              },
+              {
+                "id": 57,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "attemptId": 204,
+                "attemptNumber": 1,
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "percentage": 0,
+                "isPassed": false,
+                "gradeLabel": "F",
+                "isPublishedToCandidate": true,
+                "finalizedAt": "2026-09-19T15:44:39.4668827+04:00"
+              },
+              {
+                "id": 56,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "attemptId": 203,
+                "attemptNumber": 1,
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "percentage": 100,
+                "isPassed": true,
+                "gradeLabel": "A",
+                "isPublishedToCandidate": true,
+                "finalizedAt": "2026-09-19T15:44:32.9563241+04:00"
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 5,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2814.75
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:31.286Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/generate",
+      "request": {
+        "examId": 128
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 1,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "fromDate": null,
+          "toDate": null,
+          "totalAttempts": 5,
+          "totalSubmitted": 4,
+          "totalExpired": 0,
+          "totalPassed": 2,
+          "totalFailed": 3,
+          "averageScore": 18,
+          "highestScore": 40,
+          "lowestScore": 0,
+          "passRate": 40,
+          "totalFlaggedAttempts": null,
+          "averageRiskScore": null,
+          "generatedAt": "2026-09-19T16:20:30.5388288+04:00",
+          "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 1,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "fromDate": null,
+            "toDate": null,
+            "totalAttempts": 5,
+            "totalSubmitted": 4,
+            "totalExpired": 0,
+            "totalPassed": 2,
+            "totalFailed": 3,
+            "averageScore": 18,
+            "highestScore": 40,
+            "lowestScore": 0,
+            "passRate": 40,
+            "totalFlaggedAttempts": null,
+            "averageRiskScore": null,
+            "generatedAt": "2026-09-19T16:20:30.5388288+04:00",
+            "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2614.87
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:33.164Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/report/exam/128",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 1,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "fromDate": null,
+          "toDate": null,
+          "totalAttempts": 5,
+          "totalSubmitted": 4,
+          "totalExpired": 0,
+          "totalPassed": 2,
+          "totalFailed": 3,
+          "averageScore": 18,
+          "highestScore": 40,
+          "lowestScore": 0,
+          "passRate": 40,
+          "totalFlaggedAttempts": null,
+          "averageRiskScore": null,
+          "generatedAt": "2026-09-19T16:20:30.5388288+04:00",
+          "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 1,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "fromDate": null,
+            "toDate": null,
+            "totalAttempts": 5,
+            "totalSubmitted": 4,
+            "totalExpired": 0,
+            "totalPassed": 2,
+            "totalFailed": 3,
+            "averageScore": 18,
+            "highestScore": 40,
+            "lowestScore": 0,
+            "passRate": 40,
+            "totalFlaggedAttempts": null,
+            "averageRiskScore": null,
+            "generatedAt": "2026-09-19T16:20:30.5388288+04:00",
+            "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1876.5
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:35.739Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/dashboard/exam/128",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "totalCandidates": 3,
+          "totalAttempts": 5,
+          "gradedCount": 5,
+          "pendingGradingCount": 0,
+          "publishedCount": 5,
+          "unpublishedCount": 0,
+          "passedCount": 2,
+          "failedCount": 3,
+          "passRate": 40,
+          "averageScore": 18,
+          "highestScore": 40,
+          "lowestScore": 0,
+          "scoreDistribution": [
+            {
+              "range": "0-4",
+              "count": 2,
+              "percentage": 40
+            },
+            {
+              "range": "4-8",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "8-12",
+              "count": 1,
+              "percentage": 20
+            },
+            {
+              "range": "12-16",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "16-20",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "20-24",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "24-28",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "28-32",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "32-36",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "range": "36-40",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "totalCandidates": 3,
+            "totalAttempts": 5,
+            "gradedCount": 5,
+            "pendingGradingCount": 0,
+            "publishedCount": 5,
+            "unpublishedCount": 0,
+            "passedCount": 2,
+            "failedCount": 3,
+            "passRate": 40,
+            "averageScore": 18,
+            "highestScore": 40,
+            "lowestScore": 0,
+            "scoreDistribution": [
+              {
+                "range": "0-4",
+                "count": 2,
+                "percentage": 40
+              },
+              {
+                "range": "4-8",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "8-12",
+                "count": 1,
+                "percentage": 20
+              },
+              {
+                "range": "12-16",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "16-20",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "20-24",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "24-28",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "28-32",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "32-36",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "range": "36-40",
+                "count": 0,
+                "percentage": 0
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2573.93
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:38.306Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/generate",
+      "request": {
+        "examId": 128,
+        "fromDate": "2000-01-01T00:00:00Z",
+        "toDate": "2000-01-02T00:00:00Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 2,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "fromDate": "2000-01-01T00:00:00+00:00",
+          "toDate": "2000-01-02T00:00:00+00:00",
+          "totalAttempts": 0,
+          "totalSubmitted": 0,
+          "totalExpired": 0,
+          "totalPassed": 0,
+          "totalFailed": 0,
+          "averageScore": 0,
+          "highestScore": 0,
+          "lowestScore": 0,
+          "passRate": 0,
+          "totalFlaggedAttempts": null,
+          "averageRiskScore": null,
+          "generatedAt": "2026-09-19T16:20:37.5964975+04:00",
+          "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 2,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "fromDate": "2000-01-01T00:00:00+00:00",
+            "toDate": "2000-01-02T00:00:00+00:00",
+            "totalAttempts": 0,
+            "totalSubmitted": 0,
+            "totalExpired": 0,
+            "totalPassed": 0,
+            "totalFailed": 0,
+            "averageScore": 0,
+            "highestScore": 0,
+            "lowestScore": 0,
+            "passRate": 0,
+            "totalFlaggedAttempts": null,
+            "averageRiskScore": null,
+            "generatedAt": "2026-09-19T16:20:37.5964975+04:00",
+            "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2565.14
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:40.856Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/generate",
+      "request": {
+        "examId": 128
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 3,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "fromDate": null,
+          "toDate": null,
+          "totalAttempts": 5,
+          "totalSubmitted": 4,
+          "totalExpired": 0,
+          "totalPassed": 2,
+          "totalFailed": 3,
+          "averageScore": 18,
+          "highestScore": 40,
+          "lowestScore": 0,
+          "passRate": 40,
+          "totalFlaggedAttempts": null,
+          "averageRiskScore": null,
+          "generatedAt": "2026-09-19T16:20:40.160827+04:00",
+          "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 3,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "fromDate": null,
+            "toDate": null,
+            "totalAttempts": 5,
+            "totalSubmitted": 4,
+            "totalExpired": 0,
+            "totalPassed": 2,
+            "totalFailed": 3,
+            "averageScore": 18,
+            "highestScore": 40,
+            "lowestScore": 0,
+            "passRate": 40,
+            "totalFlaggedAttempts": null,
+            "averageRiskScore": null,
+            "generatedAt": "2026-09-19T16:20:40.160827+04:00",
+            "generatedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2547.99
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:41.095Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/generate",
+      "request": {
+        "examId": 128,
+        "fromDate": "2030-01-01T00:00:00Z",
+        "toDate": "2000-01-01T00:00:00Z"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "ToDate": [
+              "End date must be after or equal to start date"
+            ]
+          },
+          "traceId": "00-100652d02e2c1aedc92d6ebb55162d68-b4c4b5407f23a037-00"
+        },
+        "ms": 238.27
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:45.167Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/question-performance/generate",
+      "request": {
+        "examId": 128
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 2,
+            "examId": 128,
+            "questionId": 132,
+            "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Multi",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "unansweredCount": 0,
+            "correctRate": 0,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0,
+            "difficultyLabel": "Very Hard",
+            "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+          },
+          {
+            "id": 3,
+            "examId": 128,
+            "questionId": 133,
+            "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Multi",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "unansweredCount": 0,
+            "correctRate": 0,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0,
+            "difficultyLabel": "Very Hard",
+            "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+          },
+          {
+            "id": 4,
+            "examId": 128,
+            "questionId": 134,
+            "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "TrueFalse",
+            "totalAnswers": 1,
+            "correctAnswers": 0,
+            "incorrectAnswers": 1,
+            "unansweredCount": 0,
+            "correctRate": 0,
+            "averageScore": 0,
+            "maxPoints": 10,
+            "difficultyIndex": 0,
+            "difficultyLabel": "Very Hard",
+            "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+          },
+          {
+            "id": 1,
+            "examId": 128,
+            "questionId": 131,
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeName": "MCQ_Single",
+            "totalAnswers": 1,
+            "correctAnswers": 1,
+            "incorrectAnswers": 0,
+            "unansweredCount": 0,
+            "correctRate": 1,
+            "averageScore": 10,
+            "maxPoints": 10,
+            "difficultyIndex": 1,
+            "difficultyLabel": "Easy",
+            "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 2,
+              "examId": 128,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "unansweredCount": 0,
+              "correctRate": 0,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0,
+              "difficultyLabel": "Very Hard",
+              "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+            },
+            {
+              "id": 3,
+              "examId": 128,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "unansweredCount": 0,
+              "correctRate": 0,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0,
+              "difficultyLabel": "Very Hard",
+              "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+            },
+            {
+              "id": 4,
+              "examId": 128,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "totalAnswers": 1,
+              "correctAnswers": 0,
+              "incorrectAnswers": 1,
+              "unansweredCount": 0,
+              "correctRate": 0,
+              "averageScore": 0,
+              "maxPoints": 10,
+              "difficultyIndex": 0,
+              "difficultyLabel": "Very Hard",
+              "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+            },
+            {
+              "id": 1,
+              "examId": 128,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "totalAnswers": 1,
+              "correctAnswers": 1,
+              "incorrectAnswers": 0,
+              "unansweredCount": 0,
+              "correctRate": 1,
+              "averageScore": 10,
+              "maxPoints": 10,
+              "difficultyIndex": 1,
+              "difficultyLabel": "Easy",
+              "generatedAt": "2026-09-19T16:20:42.9854075+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4069.83
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:47.030Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/report/exam/128",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No report found. Generate a report first.",
+          "data": null,
+          "errors": [],
+          "traceId": "353850792e783bb6f443e01d70a95a43"
+        },
+        "ms": 1860.39
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:48.887Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/report/question-performance/exam/128",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e59659bf47db27826d7d209ff1a9926e"
+        },
+        "ms": 1854.9
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:50.739Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/dashboard/exam/128",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "cf8e28aba7e4df63850f78c80ae08626"
+        },
+        "ms": 1850.91
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:50.973Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/report/exam/128",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.61
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:51.208Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/report/question-performance/exam/128",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 233.15
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:51.441Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/dashboard/exam/128",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.29
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:53.533Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/generate",
+      "request": {
+        "examId": 128
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "ba5c2d9e1c24850f855961abc4a4b921"
+        },
+        "ms": 2089.52
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:55.617Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/report/question-performance/generate",
+      "request": {
+        "examId": 128
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e6bc0d8a4703d7cbcc738927778adbf4"
+        },
+        "ms": 2083.03
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:59.165Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 1,
+        "passedOnly": true,
+        "failedOnly": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 1,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 1,
+          "formatName": "Csv",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": true,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:20:57.4839779+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 1,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 1,
+            "formatName": "Csv",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": true,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:20:57.4839779+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3546.01
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:02.641Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 2,
+        "passedOnly": null,
+        "failedOnly": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 2,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 2,
+          "formatName": "Excel",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": true,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:01.0194503+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 2,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 2,
+            "formatName": "Excel",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": true,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:01.0194503+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3475.14
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:06.116Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 3,
+        "passedOnly": null,
+        "failedOnly": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 3,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 3,
+          "formatName": "Pdf",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:04.4955594+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 3,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 3,
+            "formatName": "Pdf",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:04.4955594+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3473.37
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:09.592Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 4,
+        "passedOnly": null,
+        "failedOnly": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 4,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 4,
+          "formatName": "Json",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:07.9699796+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 4,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 4,
+            "formatName": "Json",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:07.9699796+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3475.24
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:11.453Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 1,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 1,
+          "formatName": "Csv",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": true,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:20:57.4839779+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 1,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 1,
+            "formatName": "Csv",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": true,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:20:57.4839779+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1859.75
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:13.537Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/1",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e5f6630240b5aceddc2df4173f22215f"
+        },
+        "ms": 2081.86
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:15.627Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/1/cancel",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": false,
+          "errors": [],
+          "traceId": "9f8e0af401bc09f71497679937e6d09c"
+        },
+        "ms": 2088.42
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:17.483Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/2",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 2,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 2,
+          "formatName": "Excel",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": true,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:01.0194503+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 2,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 2,
+            "formatName": "Excel",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": true,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:01.0194503+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1854.58
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:19.573Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/2",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": null,
+          "errors": [],
+          "traceId": "c217dfe8318cb75410017daf67f99877"
+        },
+        "ms": 2087.88
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:21.657Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/2/cancel",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": false,
+          "errors": [],
+          "traceId": "e0bba6ceda5e89db2a65f8a27ddf6f16"
+        },
+        "ms": 2082.46
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:23.511Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/3",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 3,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 3,
+          "formatName": "Pdf",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:04.4955594+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 3,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 3,
+            "formatName": "Pdf",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:04.4955594+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1851.62
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:25.603Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/3",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": null,
+          "errors": [],
+          "traceId": "d7c931b04e5c1b5a6ddd0406b1c7604c"
+        },
+        "ms": 2089.92
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:27.695Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/3/cancel",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": false,
+          "errors": [],
+          "traceId": "e2086feabb6712f00bd6ced0192da5de"
+        },
+        "ms": 2089.72
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:29.551Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/4",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 4,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 4,
+          "formatName": "Json",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:07.9699796+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 4,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 4,
+            "formatName": "Json",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:07.9699796+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1853.06
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:31.634Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/4",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": null,
+          "errors": [],
+          "traceId": "a23ee530276bc2b1dc69b3b62612f61e"
+        },
+        "ms": 2081.7
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:33.721Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/4/cancel",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Export job not found",
+          "data": false,
+          "errors": [],
+          "traceId": "8192b57777755de3ac8e39480fbffa4f"
+        },
+        "ms": 2084.56
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:33.957Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 99
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Format": [
+              "Invalid export format"
+            ]
+          },
+          "traceId": "00-dccfc61180d6647f01105a3f956626ee-19a23a276e921276-00"
+        },
+        "ms": 233.31
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:37.434Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/request",
+      "request": {
+        "examId": 128,
+        "format": 1
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 5,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 1,
+          "formatName": "Csv",
+          "status": 1,
+          "statusName": "Pending",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:35.8115297+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 5,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 1,
+            "formatName": "Csv",
+            "status": 1,
+            "statusName": "Pending",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:35.8115297+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3475.88
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:39.523Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/export/5/cancel",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Export job cancelled",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2087.16
+      }
+    },
+    {
+      "at": "2026-09-19T12:21:41.385Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/export/5",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 5,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "format": 1,
+          "formatName": "Csv",
+          "status": 4,
+          "statusName": "Failed",
+          "fromDate": null,
+          "toDate": null,
+          "passedOnly": null,
+          "failedOnly": null,
+          "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "requestedAt": "2026-09-19T16:21:35.8115297+04:00",
+          "fileName": null,
+          "filePath": null,
+          "downloadUrl": null,
+          "fileSizeBytes": null,
+          "completedAt": null,
+          "errorMessage": "Cancelled by user"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 5,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "format": 1,
+            "formatName": "Csv",
+            "status": 4,
+            "statusName": "Failed",
+            "fromDate": null,
+            "toDate": null,
+            "passedOnly": null,
+            "failedOnly": null,
+            "requestedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "requestedAt": "2026-09-19T16:21:35.8115297+04:00",
+            "fileName": null,
+            "filePath": null,
+            "downloadUrl": null,
+            "fileSizeBytes": null,
+            "completedAt": null,
+            "errorMessage": "Cancelled by user"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1860.68
+      }
+    }
+  ]
+}

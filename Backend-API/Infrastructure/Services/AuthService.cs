@@ -100,7 +100,7 @@ ITokenService tokenService,
       return ApiResponse<TokenResponseDto>.FailureResponse("Your account has been blocked. Please contact support.");
     }
 
-    if (user.Status == UserStatus.Inactive)
+    if (user.IsDeleted || user.Status != UserStatus.Active)
     {
       return ApiResponse<TokenResponseDto>.FailureResponse("Your account is inactive.");
     }

@@ -1,0 +1,66 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:11:24.599Z",
+  "checks": [
+    {
+      "name": "batch-export.xlsx contains exactly2 expected candidate rows",
+      "passed": true,
+      "detail": {
+        "headers": [
+          "Full Name",
+          "Full Name (Arabic)",
+          "Email",
+          "Roll No",
+          "Mobile",
+          "Status",
+          "Added At",
+          null
+        ],
+        "emails": [
+          "qa26.import.a@example.test",
+          "qa26.import.b@example.test"
+        ]
+      },
+      "at": "2026-09-19T11:11:25.345Z"
+    },
+    {
+      "name": "candidate-export.xlsx contains exactly2 expected candidate rows",
+      "passed": true,
+      "detail": {
+        "headers": [
+          "FullName",
+          "FullNameAr",
+          "Email",
+          "RollNo",
+          "Mobile",
+          "Status",
+          "CreatedAt",
+          null
+        ],
+        "emails": [
+          "qa26.import.b@example.test",
+          "qa26.import.a@example.test"
+        ]
+      },
+      "at": "2026-09-19T11:11:25.403Z"
+    },
+    {
+      "name": "Import template contains documented required headers",
+      "passed": true,
+      "detail": {
+        "headers": [
+          "FullName",
+          "FullNameAr",
+          "Email",
+          "Password",
+          "RollNo",
+          "Mobile",
+          null,
+          null
+        ]
+      },
+      "at": "2026-09-19T11:11:25.458Z"
+    }
+  ],
+  "events": []
+}

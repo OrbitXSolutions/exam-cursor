@@ -1,0 +1,138 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:49:16.141Z",
+  "checks": [],
+  "events": [
+    {
+      "at": "2026-09-19T10:49:17.353Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:49:17.3506974+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:49:16.6715176+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:49:17.3506974+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:49:16.6715176+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1210.54
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:18.497Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User assigned to department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1142.26
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:18.957Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Departments/9",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 9,
+          "nameEn": "QA26 Operations",
+          "nameAr": "اختبار QA26 العمليات",
+          "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+          "descriptionAr": "بيانات اختبار القبول",
+          "code": "QA26_OPS",
+          "isActive": true,
+          "userCount": 7,
+          "createdDate": "2026-09-19T14:46:57.3151048+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 9,
+            "nameEn": "QA26 Operations",
+            "nameAr": "اختبار QA26 العمليات",
+            "descriptionEn": "Dedicated lifecycle acceptance QA 2026-09-19",
+            "descriptionAr": "بيانات اختبار القبول",
+            "code": "QA26_OPS",
+            "isActive": true,
+            "userCount": 7,
+            "createdDate": "2026-09-19T14:46:57.3151048+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 459.06
+      }
+    }
+  ]
+}

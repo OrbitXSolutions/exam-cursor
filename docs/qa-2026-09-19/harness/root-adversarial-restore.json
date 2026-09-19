@@ -1,0 +1,174 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T13:18:07.405Z",
+  "checks": [
+    {
+      "name": "Adversarial profile renamed to readable QA fixture",
+      "passed": true,
+      "detail": {
+        "phoneNumber": null,
+        "phoneNumberConfirmed": false,
+        "updatedDate": "2026-09-19T17:18:10.7587332+04:00",
+        "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+        "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+        "id": "8e5177b7-0163-4486-9996-b789c24da2a3",
+        "email": "qa26.csv.security@example.test",
+        "displayName": "=1+1",
+        "fullName": "QA26 CSV Security",
+        "fullNameAr": "اختبار أمن التقارير",
+        "isBlocked": false,
+        "status": "Active",
+        "emailConfirmed": true,
+        "roles": [
+          "Candidate"
+        ],
+        "createdDate": "2026-09-19T16:37:22.6669109+04:00",
+        "lastLoginDate": "2026-09-19T16:37:25.7339705+04:00",
+        "departmentId": 8,
+        "departmentNameEn": null,
+        "departmentNameAr": null,
+        "isProtected": false
+      },
+      "at": "2026-09-19T13:18:11.226Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T13:18:08.655Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T18:18:08.6512441+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T17:18:07.9555842+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T18:18:08.6512441+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T17:18:07.9555842+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1247.29
+      }
+    },
+    {
+      "at": "2026-09-19T13:18:11.225Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/8e5177b7-0163-4486-9996-b789c24da2a3",
+      "request": {
+        "fullName": "QA26 CSV Security"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T17:18:10.7587332+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "8e5177b7-0163-4486-9996-b789c24da2a3",
+          "email": "qa26.csv.security@example.test",
+          "displayName": "=1+1",
+          "fullName": "QA26 CSV Security",
+          "fullNameAr": "اختبار أمن التقارير",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:37:22.6669109+04:00",
+          "lastLoginDate": "2026-09-19T16:37:25.7339705+04:00",
+          "departmentId": 8,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User updated successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T17:18:10.7587332+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "8e5177b7-0163-4486-9996-b789c24da2a3",
+            "email": "qa26.csv.security@example.test",
+            "displayName": "=1+1",
+            "fullName": "QA26 CSV Security",
+            "fullNameAr": "اختبار أمن التقارير",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:37:22.6669109+04:00",
+            "lastLoginDate": "2026-09-19T16:37:25.7339705+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2569.64
+      }
+    }
+  ]
+}

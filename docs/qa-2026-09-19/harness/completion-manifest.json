@@ -1,0 +1,271 @@
+{
+  "exams": [
+    {
+      "id": 127,
+      "key": "One minute expiry",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 Completion One minute expiry",
+        "titleAr": "اكتمال QA26 One minute expiry",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T11:42:41.305Z",
+        "endAt": "2026-09-19T15:43:41.305Z",
+        "durationMinutes": 1,
+        "maxAttempts": 1,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 5,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "questionIds": [
+        131
+      ]
+    },
+    {
+      "id": 128,
+      "key": "Objective matrix",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 Completion Objective matrix",
+        "titleAr": "اكتمال QA26 Objective matrix",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T11:43:00.884Z",
+        "endAt": "2026-09-19T15:44:00.884Z",
+        "durationMinutes": 60,
+        "maxAttempts": 2,
+        "shuffleQuestions": false,
+        "shuffleOptions": true,
+        "passScore": 20,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "questionIds": [
+        131,
+        132,
+        133,
+        134
+      ]
+    },
+    {
+      "id": 129,
+      "key": "Fresh fixed window",
+      "request": {
+        "examType": 1,
+        "titleEn": "QA26 Completion Fresh fixed window",
+        "titleAr": "اكتمال QA26 Fresh fixed window",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T11:44:11.322Z",
+        "endAt": "2026-09-19T15:45:11.322Z",
+        "durationMinutes": 60,
+        "maxAttempts": 2,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 10,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "questionIds": [
+        131,
+        134
+      ]
+    },
+    {
+      "id": 130,
+      "key": "Subjective grading lifecycle",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 Completion Subjective grading lifecycle",
+        "titleAr": "اكتمال QA26 Subjective grading lifecycle",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T11:44:33.800Z",
+        "endAt": "2026-09-19T15:45:33.800Z",
+        "durationMinutes": 120,
+        "maxAttempts": 2,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 25,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "questionIds": [
+        131,
+        132,
+        133,
+        134,
+        135
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "key": "auto",
+      "role": "post-fix-scoring",
+      "examId": 116,
+      "attemptId": 196,
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "expectedScore": 18,
+      "expectedMax": 40,
+      "answers": [
+        {
+          "questionId": 131,
+          "selectedOptionIds": [
+            377
+          ]
+        },
+        {
+          "questionId": 132,
+          "selectedOptionIds": [
+            380
+          ]
+        },
+        {
+          "questionId": 133,
+          "selectedOptionIds": [
+            382
+          ]
+        },
+        {
+          "questionId": 134,
+          "selectedOptionIds": [
+            385
+          ]
+        }
+      ],
+      "status": 3
+    },
+    {
+      "examId": 127,
+      "attemptId": 202,
+      "proctorSessionId": 154,
+      "email": "qa26.eng.candidate3@example.test",
+      "role": "timer-expiry",
+      "expiresAtUtc": "2026-09-19T15:44:54.348401+04:00",
+      "status": 4,
+      "expectedScore": 10,
+      "expectedMax": 10
+    },
+    {
+      "examId": 128,
+      "attemptId": 203,
+      "proctorSessionId": 155,
+      "email": "qa26.import.a@example.test",
+      "role": "all-correct-concurrent",
+      "expiresAtUtc": "2026-09-19T16:44:13.2812144+04:00",
+      "expectedScore": 40,
+      "expectedMax": 40,
+      "status": 3
+    },
+    {
+      "examId": 128,
+      "attemptId": 204,
+      "proctorSessionId": 156,
+      "email": "qa26.import.b@example.test",
+      "role": "all-blank",
+      "expiresAtUtc": "2026-09-19T16:44:17.7108866+04:00",
+      "expectedScore": 0,
+      "status": 3
+    },
+    {
+      "examId": 128,
+      "attemptId": 205,
+      "proctorSessionId": 157,
+      "email": "qa26.eng.candidate3@example.test",
+      "role": "all-wrong",
+      "expiresAtUtc": "2026-09-19T16:44:39.9486367+04:00",
+      "expectedScore": 0,
+      "status": 3
+    },
+    {
+      "examId": 128,
+      "attemptId": 206,
+      "proctorSessionId": 158,
+      "email": "qa26.import.b@example.test",
+      "role": "retake-force-end",
+      "expiresAtUtc": "2026-09-19T16:44:55.4771863+04:00",
+      "expectedScore": 10,
+      "expectedMax": 40,
+      "status": 7
+    },
+    {
+      "examId": 129,
+      "attemptId": 207,
+      "proctorSessionId": 159,
+      "email": "qa26.import.a@example.test",
+      "role": "fixed-positive",
+      "expiresAtUtc": "2026-09-19T16:45:23.7086527+04:00",
+      "expectedScore": 20,
+      "status": 3
+    },
+    {
+      "examId": 130,
+      "attemptId": 208,
+      "proctorSessionId": 160,
+      "email": "qa26.import.a@example.test",
+      "role": "manual-pending",
+      "expiresAtUtc": "2026-09-19T17:45:46.2562717+04:00",
+      "expectedScore": 40,
+      "expectedMax": 50,
+      "status": 3,
+      "expectedAutoScore": 40,
+      "expectedManualScore": 10
+    }
+  ]
+}

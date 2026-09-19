@@ -434,7 +434,7 @@ public class CandidateExamDetailsService : ICandidateExamDetailsService
         DurationSeconds = e.DurationSeconds,
         IsUploaded = e.IsUploaded,
         PreviewUrl = !string.IsNullOrWhiteSpace(e.FilePath)
-            ? $"/media/{e.FilePath.TrimStart('/')}"
+            ? $"/api/Proctor/evidence/{e.Id}/download"
             : null
     };
 

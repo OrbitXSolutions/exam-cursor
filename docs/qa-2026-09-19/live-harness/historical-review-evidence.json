@@ -1,0 +1,284 @@
+{
+  "classification": "SIMULATED TEST: actual candidate result/review reads after isolated question mutation and original key restoration",
+  "startedAt": "2026-09-19T11:51:31.062Z",
+  "checks": [
+    {
+      "name": "Review selected-option correctness agrees with recorded grading correctness",
+      "passed": false,
+      "detail": {
+        "question": {
+          "questionId": 166,
+          "order": 1,
+          "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+          "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+          "questionTypeName": "MCQ_Single",
+          "points": 10,
+          "scoreEarned": null,
+          "selectedOptionIds": [
+            464
+          ],
+          "textAnswer": null,
+          "options": [
+            {
+              "id": 464,
+              "textEn": "Blue",
+              "textAr": "أزرق",
+              "wasSelected": true,
+              "isCorrect": true
+            },
+            {
+              "id": 465,
+              "textEn": "Red",
+              "textAr": "أحمر",
+              "wasSelected": false,
+              "isCorrect": false
+            }
+          ],
+          "isCorrect": null,
+          "feedback": null
+        },
+        "recordedGradedAnswer": {
+          "id": 759,
+          "gradingSessionId": 88,
+          "questionId": 166,
+          "questionBodyEn": "QA26 historical mutation 1789818529790: select the red option",
+          "questionBodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+          "questionTypeName": "MCQ_Single",
+          "questionTypeId": 1,
+          "maxPoints": 10,
+          "selectedOptionIds": [
+            464
+          ],
+          "selectedOptions": [
+            {
+              "id": 464,
+              "textEn": "Blue",
+              "textAr": "أزرق",
+              "isCorrect": false
+            }
+          ],
+          "textAnswer": null,
+          "score": 0,
+          "isCorrect": false,
+          "isManuallyGraded": false,
+          "graderComment": null,
+          "correctOptions": [
+            {
+              "id": 465,
+              "textEn": "Red",
+              "textAr": "أحمر"
+            }
+          ],
+          "modelAnswerEn": null,
+          "modelAnswerAr": null
+        }
+      },
+      "at": "2026-09-19T11:51:33.269Z"
+    },
+    {
+      "name": "Published auto-graded review includes recorded score and correctness",
+      "passed": false,
+      "detail": {
+        "reviewScore": null,
+        "reviewCorrect": null,
+        "gradedScore": 0,
+        "gradedCorrect": false
+      },
+      "at": "2026-09-19T11:51:33.271Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:51:32.313Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:51:32.3092478+04:00",
+          "user": {
+            "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "email": "qa26.protocol.1789817576996.a@example.test",
+            "displayName": "QA26 Protocol Regression a",
+            "fullName": "QA26 Protocol Regression a",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+            "lastLoginDate": "2026-09-19T15:51:31.6148117+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:51:32.3092478+04:00",
+            "user": {
+              "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "email": "qa26.protocol.1789817576996.a@example.test",
+              "displayName": "QA26 Protocol Regression a",
+              "fullName": "QA26 Protocol Regression a",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+              "lastLoginDate": "2026-09-19T15:51:31.6148117+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1248.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:33.267Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/results/my-result/210/review",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 60,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T15:49:22.5722+04:00",
+          "totalScore": 0,
+          "maxPossibleScore": 10,
+          "percentage": 0,
+          "isPassed": false,
+          "gradeLabel": "F",
+          "questions": [
+            {
+              "questionId": 166,
+              "order": 1,
+              "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+              "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "scoreEarned": null,
+              "selectedOptionIds": [
+                464
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 464,
+                  "textEn": "Blue",
+                  "textAr": "أزرق",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 465,
+                  "textEn": "Red",
+                  "textAr": "أحمر",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": null,
+              "feedback": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "resultId": 60,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "attemptNumber": 1,
+            "submittedAt": "2026-09-19T15:49:22.5722+04:00",
+            "totalScore": 0,
+            "maxPossibleScore": 10,
+            "percentage": 0,
+            "isPassed": false,
+            "gradeLabel": "F",
+            "questions": [
+              {
+                "questionId": 166,
+                "order": 1,
+                "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "scoreEarned": null,
+                "selectedOptionIds": [
+                  464
+                ],
+                "textAnswer": null,
+                "options": [
+                  {
+                    "id": 464,
+                    "textEn": "Blue",
+                    "textAr": "أزرق",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 465,
+                    "textEn": "Red",
+                    "textAr": "أحمر",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  }
+                ],
+                "isCorrect": null,
+                "feedback": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 953.12
+      }
+    },
+    {
+      "at": "2026-09-19T11:51:33.271Z",
+      "decisionRequired": "Question body and answer keys are mutable bank references. A remedy needs immutable versions/snapshots or an explicit restriction/correction policy for already-used questions. No schema or business-policy change made.",
+      "fixture": {
+        "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+        "createdAt": "2026-09-19T11:48:49.790Z",
+        "questionId": 166,
+        "examId": 131,
+        "attemptId": 210,
+        "mutationAccepted": true,
+        "gradingSessionId": 88,
+        "resultId": 60
+      }
+    }
+  ]
+}

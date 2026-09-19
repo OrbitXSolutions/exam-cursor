@@ -1,0 +1,1029 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:06:09.597Z",
+  "checks": [
+    {
+      "name": "D37 auto-only review has allfour10point correctgrades",
+      "passed": true,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": {
+          "resultId": 56,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T15:44:29.7383565+04:00",
+          "totalScore": 40,
+          "maxPossibleScore": 40,
+          "percentage": 100,
+          "isPassed": true,
+          "gradeLabel": "A",
+          "questions": [
+            {
+              "questionId": 131,
+              "order": 1,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": false,
+                  "isCorrect": false
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 132,
+              "order": 2,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                379,
+                380
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 133,
+              "order": 3,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                382,
+                383
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 134,
+              "order": 4,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            }
+          ]
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T12:06:13.284Z"
+    },
+    {
+      "name": "D38 persistedzero withoutcomment hasisGradedtrue",
+      "passed": true,
+      "detail": {
+        "id": 771,
+        "gradingSessionId": 92,
+        "questionId": 135,
+        "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "Subjective",
+        "questionTypeId": 5,
+        "maxPoints": 10,
+        "selectedOptionIds": null,
+        "selectedOptions": null,
+        "textAnswer": "QA26 zero-grade fixture: deliberately incomplete answer for saved zero/no comment verification.",
+        "score": 0,
+        "isCorrect": false,
+        "isManuallyGraded": true,
+        "isGraded": true,
+        "graderComment": null,
+        "correctOptions": [],
+        "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+        "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+      },
+      "at": "2026-09-19T12:06:16.295Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:06:10.864Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:06:10.8603341+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:06:10.1680882+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:06:10.8603341+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T16:06:10.1680882+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1264.7
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:12.146Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.examiner1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:06:12.1447168+04:00",
+          "user": {
+            "id": "09dfd644-e962-4802-a43b-5dcf7f489999",
+            "email": "qa26.eng.examiner1@example.test",
+            "displayName": "QA26 Engineering Examiner 1",
+            "fullName": "QA26 Engineering Examiner 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner"
+            ],
+            "createdDate": "2026-09-19T14:46:23.83318+04:00",
+            "lastLoginDate": "2026-09-19T16:06:11.4005035+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:06:12.1447168+04:00",
+            "user": {
+              "id": "09dfd644-e962-4802-a43b-5dcf7f489999",
+              "email": "qa26.eng.examiner1@example.test",
+              "displayName": "QA26 Engineering Examiner 1",
+              "fullName": "QA26 Engineering Examiner 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Examiner"
+              ],
+              "createdDate": "2026-09-19T14:46:23.83318+04:00",
+              "lastLoginDate": "2026-09-19T16:06:11.4005035+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1280.43
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:13.283Z",
+      "identity": "qa26.import.a@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/results/my-result/203/review",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 56,
+          "examId": 128,
+          "examTitleEn": "QA26 Completion Objective matrix",
+          "examTitleAr": "اكتمال QA26 Objective matrix",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T15:44:29.7383565+04:00",
+          "totalScore": 40,
+          "maxPossibleScore": 40,
+          "percentage": 100,
+          "isPassed": true,
+          "gradeLabel": "A",
+          "questions": [
+            {
+              "questionId": 131,
+              "order": 1,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": false,
+                  "isCorrect": false
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 132,
+              "order": 2,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                379,
+                380
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 133,
+              "order": 3,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                382,
+                383
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            },
+            {
+              "questionId": 134,
+              "order": 4,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "points": 10,
+              "scoreEarned": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "textAnswer": null,
+              "options": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "wasSelected": true,
+                  "isCorrect": true
+                },
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "wasSelected": false,
+                  "isCorrect": false
+                }
+              ],
+              "isCorrect": true,
+              "feedback": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "resultId": 56,
+            "examId": 128,
+            "examTitleEn": "QA26 Completion Objective matrix",
+            "examTitleAr": "اكتمال QA26 Objective matrix",
+            "attemptNumber": 1,
+            "submittedAt": "2026-09-19T15:44:29.7383565+04:00",
+            "totalScore": 40,
+            "maxPossibleScore": 40,
+            "percentage": 100,
+            "isPassed": true,
+            "gradeLabel": "A",
+            "questions": [
+              {
+                "questionId": 131,
+                "order": 1,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "scoreEarned": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  }
+                ],
+                "isCorrect": true,
+                "feedback": null
+              },
+              {
+                "questionId": 132,
+                "order": 2,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "scoreEarned": 10,
+                "selectedOptionIds": [
+                  379,
+                  380
+                ],
+                "textAnswer": null,
+                "options": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  }
+                ],
+                "isCorrect": true,
+                "feedback": null
+              },
+              {
+                "questionId": 133,
+                "order": 3,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "scoreEarned": 10,
+                "selectedOptionIds": [
+                  382,
+                  383
+                ],
+                "textAnswer": null,
+                "options": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  }
+                ],
+                "isCorrect": true,
+                "feedback": null
+              },
+              {
+                "questionId": 134,
+                "order": 4,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "points": 10,
+                "scoreEarned": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "options": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "wasSelected": true,
+                    "isCorrect": true
+                  },
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "wasSelected": false,
+                    "isCorrect": false
+                  }
+                ],
+                "isCorrect": true,
+                "feedback": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1136.65
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:16.293Z",
+      "identity": "qa26.eng.examiner1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/212",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 92,
+          "attemptId": 212,
+          "examId": 130,
+          "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+          "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+          "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "candidateName": "QA26 Import A",
+          "gradedBy": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+          "graderName": "QA26 Import A",
+          "status": 4,
+          "statusName": "Completed",
+          "totalScore": 0,
+          "maxPossibleScore": 50,
+          "passScore": 25,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T16:05:44.3533733+04:00",
+          "createdDate": "2026-09-19T15:57:40.3511699+04:00",
+          "totalQuestions": 5,
+          "gradedQuestions": 5,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 767,
+              "gradingSessionId": 92,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 768,
+              "gradingSessionId": 92,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 769,
+              "gradingSessionId": 92,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 770,
+              "gradingSessionId": 92,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": "Unanswered",
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 771,
+              "gradingSessionId": 92,
+              "questionId": 135,
+              "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": "QA26 zero-grade fixture: deliberately incomplete answer for saved zero/no comment verification.",
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": true,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [],
+              "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+              "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 92,
+            "attemptId": 212,
+            "examId": 130,
+            "examTitleEn": "QA26 Completion Subjective grading lifecycle",
+            "examTitleAr": "اكتمال QA26 Subjective grading lifecycle",
+            "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "candidateName": "QA26 Import A",
+            "gradedBy": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "graderName": "QA26 Import A",
+            "status": 4,
+            "statusName": "Completed",
+            "totalScore": 0,
+            "maxPossibleScore": 50,
+            "passScore": 25,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T16:05:44.3533733+04:00",
+            "createdDate": "2026-09-19T15:57:40.3511699+04:00",
+            "totalQuestions": 5,
+            "gradedQuestions": 5,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 767,
+                "gradingSessionId": 92,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 768,
+                "gradingSessionId": 92,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 769,
+                "gradingSessionId": 92,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 770,
+                "gradingSessionId": 92,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": "Unanswered",
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 771,
+                "gradingSessionId": 92,
+                "questionId": 135,
+                "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": "QA26 zero-grade fixture: deliberately incomplete answer for saved zero/no comment verification.",
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": true,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [],
+                "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+                "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3008.69
+      }
+    }
+  ]
+}

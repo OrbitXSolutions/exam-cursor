@@ -1,0 +1,203 @@
+{
+  "attempts": [
+    {
+      "examId": 115,
+      "key": "lifecycle",
+      "role": "live-protocol",
+      "email": "qa26.import.a@example.test",
+      "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+      "attemptId": 187,
+      "status": 1,
+      "questionIds": [
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "startedAtUtc": "2026-09-19T15:15:58.1468109+04:00",
+      "expiresAtUtc": "2026-09-19T17:15:58.1468109+04:00",
+      "proctorSessionId": 139
+    },
+    {
+      "examId": 115,
+      "key": "lifecycle",
+      "role": "live-protocol",
+      "email": "qa26.import.b@example.test",
+      "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+      "attemptId": 188,
+      "status": 1,
+      "questionIds": [
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "startedAtUtc": "2026-09-19T15:17:32.0931378+04:00",
+      "expiresAtUtc": "2026-09-19T17:17:32.0931378+04:00",
+      "proctorSessionId": 140
+    },
+    {
+      "examId": 116,
+      "key": "auto",
+      "role": "scenario",
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "attemptId": 189,
+      "status": 1,
+      "questionIds": [
+        131,
+        132,
+        133,
+        134
+      ],
+      "startedAtUtc": "2026-09-19T15:17:41.3990536+04:00",
+      "expiresAtUtc": "2026-09-19T16:17:41.3990536+04:00",
+      "expectedScore": 18,
+      "expectedMax": 40,
+      "answers": [
+        {
+          "questionId": 131,
+          "selectedOptionIds": [
+            377
+          ]
+        },
+        {
+          "questionId": 132,
+          "selectedOptionIds": [
+            380
+          ]
+        },
+        {
+          "questionId": 133,
+          "selectedOptionIds": [
+            382
+          ]
+        },
+        {
+          "questionId": 134,
+          "selectedOptionIds": [
+            385
+          ]
+        }
+      ]
+    },
+    {
+      "examId": 118,
+      "key": "pooled",
+      "role": "scenario",
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "attemptId": 190,
+      "status": 1,
+      "questionIds": [
+        132,
+        135,
+        133
+      ],
+      "startedAtUtc": "2026-09-19T15:17:57.6391885+04:00",
+      "expiresAtUtc": "2026-09-19T17:17:57.6391885+04:00"
+    },
+    {
+      "key": "strict",
+      "role": "prerequisite-probe",
+      "examId": 120,
+      "attemptId": 191,
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "status": 1
+    },
+    {
+      "examId": 119,
+      "key": "walkin",
+      "role": "walkin",
+      "email": "qa26.walkin.acceptance@example.test",
+      "candidateId": "6436a81d-4df6-4194-9cd0-de2efc6f58a5",
+      "attemptId": 192,
+      "status": 1,
+      "questionIds": [
+        131,
+        134
+      ],
+      "startedAtUtc": "2026-09-19T15:18:18.4821203+04:00",
+      "expiresAtUtc": "2026-09-19T17:18:18.4821203+04:00"
+    },
+    {
+      "examId": 115,
+      "key": "lifecycle",
+      "role": "live-protocol-replacement",
+      "email": "qa26.import.a@example.test",
+      "attemptId": 194,
+      "proctorSessionId": 146,
+      "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+      "status": 1
+    },
+    {
+      "examId": 115,
+      "key": "lifecycle",
+      "role": "live-protocol-replacement",
+      "email": "qa26.import.b@example.test",
+      "attemptId": 195,
+      "proctorSessionId": 147,
+      "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+      "status": 1
+    },
+    {
+      "key": "auto",
+      "role": "post-fix-scoring",
+      "examId": 116,
+      "attemptId": 196,
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "expectedScore": 18,
+      "expectedMax": 40,
+      "answers": [
+        {
+          "questionId": 131,
+          "selectedOptionIds": [
+            377
+          ]
+        },
+        {
+          "questionId": 132,
+          "selectedOptionIds": [
+            380
+          ]
+        },
+        {
+          "questionId": 133,
+          "selectedOptionIds": [
+            382
+          ]
+        },
+        {
+          "questionId": 134,
+          "selectedOptionIds": [
+            385
+          ]
+        }
+      ]
+    },
+    {
+      "key": "strict",
+      "role": "approved-ID-then-terminated-regression",
+      "examId": 120,
+      "attemptId": 191,
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "identityVerificationId": 11,
+      "status": 8
+    }
+  ],
+  "walkin": {
+    "candidateId": "6436a81d-4df6-4194-9cd0-de2efc6f58a5",
+    "attemptId": 192,
+    "email": "qa26.walkin.acceptance@example.test"
+  },
+  "errors": [],
+  "walkinRegression": {
+    "email": "qa26.walkin.fixed.valid@example.test",
+    "candidateId": "e0786e9b-5338-48c9-a978-e23e03b446b8"
+  }
+}

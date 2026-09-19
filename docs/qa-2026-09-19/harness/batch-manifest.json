@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+      "email": "qa26.import.a@example.test",
+      "departmentId": 8
+    },
+    {
+      "id": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+      "email": "qa26.import.b@example.test",
+      "departmentId": 8
+    }
+  ],
+  "batch": {
+    "id": 9,
+    "name": "QA26 Imported Cohort",
+    "description": "Two realistic imported candidates",
+    "isActive": true,
+    "candidateCount": 0,
+    "createdDate": "2026-09-19T15:10:32.9730524+04:00",
+    "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+    "createdByName": null
+  },
+  "exports": [
+    "batch-export.xlsx",
+    "candidate-export.xlsx",
+    "candidate-template.xlsx"
+  ]
+}

@@ -394,9 +394,11 @@ public class LookupsService : ILookupsService
             }
 
             // Department isolation: filter by user's department (SuperDev sees all)
-            if (!isSuperAdmin && resolvedDeptId.HasValue)
+            if (!isSuperAdmin)
             {
-                query = query.Where(x => x.DepartmentId == resolvedDeptId.Value);
+                query = resolvedDeptId.HasValue
+                    ? query.Where(x => x.DepartmentId == resolvedDeptId.Value)
+                    : query.Where(_ => false);
             }
 
             // Search filter
@@ -459,7 +461,7 @@ public class LookupsService : ILookupsService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || entity.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionSubjectDto>.FailureResponse("You do not have access to this subject");
             }
@@ -562,7 +564,7 @@ public class LookupsService : ILookupsService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && entity.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || entity.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionSubjectDto>.FailureResponse("You do not have access to this subject");
             }
@@ -625,6 +627,13 @@ public class LookupsService : ILookupsService
             return ApiResponse<bool>.FailureResponse("Question subject not found");
         }
 
+        if (!await IsCurrentUserSuperAdminAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (!userDepartmentId.HasValue || entity.DepartmentId != userDepartmentId.Value)
+                return ApiResponse<bool>.FailureResponse("Question subject not found");
+        }
+
         // Check if subject has topics
         if (entity.Topics.Any(t => !t.IsDeleted))
         {
@@ -674,9 +683,11 @@ public class LookupsService : ILookupsService
             }
 
             // Department isolation: filter topics via Subject.DepartmentId (SuperDev sees all)
-            if (!isSuperAdmin && resolvedDeptId.HasValue)
+            if (!isSuperAdmin)
             {
-                query = query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value);
+                query = resolvedDeptId.HasValue
+                    ? query.Where(x => x.Subject.DepartmentId == resolvedDeptId.Value)
+                    : query.Where(_ => false);
             }
 
             // Filter by subject
@@ -743,7 +754,7 @@ public class LookupsService : ILookupsService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || entity.Subject.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this topic");
             }
@@ -778,7 +789,7 @@ public class LookupsService : ILookupsService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && subject.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || subject.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this subject");
             }
@@ -848,7 +859,7 @@ public class LookupsService : ILookupsService
         if (!await IsCurrentUserSuperAdminAsync())
         {
             var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-            if (userDepartmentId.HasValue && entity.Subject.DepartmentId != userDepartmentId.Value)
+            if (!userDepartmentId.HasValue || entity.Subject.DepartmentId != userDepartmentId.Value)
             {
                 return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to this topic");
             }
@@ -868,7 +879,7 @@ public class LookupsService : ILookupsService
             if (!await IsCurrentUserSuperAdminAsync())
             {
                 var userDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-                if (userDeptId.HasValue && subject.DepartmentId != userDeptId.Value)
+                if (!userDeptId.HasValue || subject.DepartmentId != userDeptId.Value)
                 {
                     return ApiResponse<QuestionTopicDto>.FailureResponse("You do not have access to the target subject");
                 }
@@ -924,11 +935,19 @@ public class LookupsService : ILookupsService
     {
         var entity = await _context.QuestionTopics
             .IgnoreQueryFilters()
+            .Include(x => x.Subject)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity == null)
         {
             return ApiResponse<bool>.FailureResponse("Question topic not found");
+        }
+
+        if (!await IsCurrentUserSuperAdminAsync())
+        {
+            var userDepartmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+            if (!userDepartmentId.HasValue || entity.Subject.DepartmentId != userDepartmentId.Value)
+                return ApiResponse<bool>.FailureResponse("Question topic not found");
         }
 
         // Check if topic is used by questions

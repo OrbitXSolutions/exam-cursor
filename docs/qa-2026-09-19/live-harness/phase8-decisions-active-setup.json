@@ -1,0 +1,695 @@
+{
+  "classification": "SIMULATED TEST: authenticated REST and persisted state",
+  "startedAt": "2026-09-19T12:24:04.689Z",
+  "checks": [
+    {
+      "name": "Supported decision 1 saves and reloads",
+      "passed": false,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "6a2ede7a8a005ebb9130e442f4992f81"
+        }
+      },
+      "at": "2026-09-19T12:24:18.158Z"
+    },
+    {
+      "name": "Supported decision 2 saves and reloads",
+      "passed": false,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "52b2c7a8d314f9b92ad5ba53ab0b5e75"
+        }
+      },
+      "at": "2026-09-19T12:24:22.758Z"
+    },
+    {
+      "name": "Supported decision 3 saves and reloads",
+      "passed": false,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "f80b3019bf1b1fe69d7fa7433bcea0e9"
+        }
+      },
+      "at": "2026-09-19T12:24:27.357Z"
+    },
+    {
+      "name": "Supported decision 4 saves and reloads",
+      "passed": false,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "f0220fcbfd576b9e85df5debd3c46023"
+        }
+      },
+      "at": "2026-09-19T12:24:31.957Z"
+    },
+    {
+      "name": "Supported decision 5 saves and reloads",
+      "passed": false,
+      "detail": {
+        "status": 400,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "62effa5fbcb80b15894afd77c8117e99"
+        }
+      },
+      "at": "2026-09-19T12:24:36.571Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:24:05.934Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:24:05.9296328+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:24:05.2317281+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:24:05.9296328+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:24:05.2317281+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1242.32
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:07.157Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:24:07.1571362+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T16:24:06.4583089+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:24:07.1571362+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T16:24:06.4583089+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1222.48
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:08.369Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:24:08.3692594+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T16:24:07.6672477+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:24:08.3692594+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T16:24:07.6672477+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1210.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:09.589Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:24:09.5883232+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:24:08.8778059+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:24:09.5883232+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:24:08.8778059+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1218.74
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:11.199Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/197",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 197,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+          "submittedAt": null,
+          "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+          "status": 2,
+          "statusName": "InProgress",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 5,
+          "answeredQuestions": 1,
+          "remainingSeconds": 4192,
+          "createdDate": "2026-09-19T15:33:03.6587839+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 197,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+            "submittedAt": null,
+            "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+            "status": 2,
+            "statusName": "InProgress",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 5,
+            "answeredQuestions": 1,
+            "remainingSeconds": 4192,
+            "createdDate": "2026-09-19T15:33:03.6587839+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1609.52
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:11.200Z",
+      "fixture": {
+        "attemptId": 197,
+        "sessionId": 149,
+        "initialAttemptStatus": 2
+      },
+      "note": "Own protocol fixture. Synthetic proctor decisions, no physical incident."
+    },
+    {
+      "at": "2026-09-19T12:24:13.513Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "ab524bc38bf1d1b069cb44ee83eea945"
+        },
+        "ms": 2312.81
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:15.859Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 1,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": false
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "6a2ede7a8a005ebb9130e442f4992f81"
+        },
+        "ms": 2345.46
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:18.157Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "6a0e0e53c561934bb372479ce18bea7f"
+        },
+        "ms": 2297.16
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:20.458Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 2,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": false
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "52b2c7a8d314f9b92ad5ba53ab0b5e75"
+        },
+        "ms": 2298.52
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:22.757Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "a02fa1fa55a5d519c28ed2239390ca3f"
+        },
+        "ms": 2298.98
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:25.058Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 3,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": false
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "f80b3019bf1b1fe69d7fa7433bcea0e9"
+        },
+        "ms": 2299.15
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:27.356Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "3d38d029f5735c3a4d3712f13c9a8674"
+        },
+        "ms": 2297.74
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:29.657Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 4,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": false
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "f0220fcbfd576b9e85df5debd3c46023"
+        },
+        "ms": 2298.92
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:31.957Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "f3eec79254f0dd5e8ca3d506999a6f10"
+        },
+        "ms": 2299.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:34.261Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 5,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": false
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "62effa5fbcb80b15894afd77c8117e99"
+        },
+        "ms": 2303.36
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:36.569Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149/decision",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No decision found",
+          "data": null,
+          "errors": [],
+          "traceId": "4d4f51637657d539da17bf18735a3bda"
+        },
+        "ms": 2307.6
+      }
+    },
+    {
+      "at": "2026-09-19T12:24:38.923Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/decision",
+      "request": {
+        "proctorSessionId": 149,
+        "status": 2,
+        "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+        "finalize": true
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Decisions can only be made after attempt is submitted or expired",
+          "data": null,
+          "errors": [],
+          "traceId": "bcffe5bbe0a410a906b7e2ae63f745c9"
+        },
+        "ms": 2351.42
+      }
+    }
+  ]
+}

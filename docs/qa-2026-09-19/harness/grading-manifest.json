@@ -1,0 +1,282 @@
+{
+  "sessions": [
+    {
+      "key": "auto",
+      "role": "post-fix-scoring",
+      "examId": 116,
+      "attemptId": 196,
+      "email": "qa26.eng.candidate3@example.test",
+      "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "expectedScore": 18,
+      "expectedMax": 40,
+      "answers": [
+        {
+          "questionId": 131,
+          "selectedOptionIds": [
+            377
+          ]
+        },
+        {
+          "questionId": 132,
+          "selectedOptionIds": [
+            380
+          ]
+        },
+        {
+          "questionId": 133,
+          "selectedOptionIds": [
+            382
+          ]
+        },
+        {
+          "questionId": 134,
+          "selectedOptionIds": [
+            385
+          ]
+        }
+      ],
+      "status": 3,
+      "gradingSessionId": 80,
+      "score": 18,
+      "max": 40,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 127,
+      "attemptId": 202,
+      "proctorSessionId": 154,
+      "email": "qa26.eng.candidate3@example.test",
+      "role": "timer-expiry",
+      "expiresAtUtc": "2026-09-19T15:44:54.348401+04:00",
+      "status": 4,
+      "expectedScore": 10,
+      "expectedMax": 10,
+      "gradingSessionId": 90,
+      "score": 10,
+      "max": 10,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 128,
+      "attemptId": 203,
+      "proctorSessionId": 155,
+      "email": "qa26.import.a@example.test",
+      "role": "all-correct-concurrent",
+      "expiresAtUtc": "2026-09-19T16:44:13.2812144+04:00",
+      "expectedScore": 40,
+      "expectedMax": 40,
+      "status": 3,
+      "gradingSessionId": 83,
+      "score": 40,
+      "max": 40,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 128,
+      "attemptId": 204,
+      "proctorSessionId": 156,
+      "email": "qa26.import.b@example.test",
+      "role": "all-blank",
+      "expiresAtUtc": "2026-09-19T16:44:17.7108866+04:00",
+      "expectedScore": 0,
+      "status": 3,
+      "gradingSessionId": 84,
+      "score": 0,
+      "max": 40,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 128,
+      "attemptId": 205,
+      "proctorSessionId": 157,
+      "email": "qa26.eng.candidate3@example.test",
+      "role": "all-wrong",
+      "expiresAtUtc": "2026-09-19T16:44:39.9486367+04:00",
+      "expectedScore": 0,
+      "status": 3,
+      "gradingSessionId": 85,
+      "score": 0,
+      "max": 40,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 128,
+      "attemptId": 206,
+      "proctorSessionId": 158,
+      "email": "qa26.import.b@example.test",
+      "role": "retake-force-end",
+      "expiresAtUtc": "2026-09-19T16:44:55.4771863+04:00",
+      "expectedScore": 10,
+      "expectedMax": 40,
+      "status": 7,
+      "gradingFailure": {
+        "success": false,
+        "message": "Cannot grade attempt with status 'ForceSubmitted'. Attempt must be Submitted or Expired.",
+        "data": null,
+        "errors": [],
+        "traceId": "995bc2496728f00aa662adff95c901e3"
+      }
+    },
+    {
+      "examId": 129,
+      "attemptId": 207,
+      "proctorSessionId": 159,
+      "email": "qa26.import.a@example.test",
+      "role": "fixed-positive",
+      "expiresAtUtc": "2026-09-19T16:45:23.7086527+04:00",
+      "expectedScore": 20,
+      "status": 3,
+      "gradingSessionId": 86,
+      "score": 20,
+      "max": 20,
+      "gradingStatus": 2
+    },
+    {
+      "examId": 130,
+      "attemptId": 208,
+      "proctorSessionId": 160,
+      "email": "qa26.import.a@example.test",
+      "role": "manual-pending",
+      "expiresAtUtc": "2026-09-19T17:45:46.2562717+04:00",
+      "expectedScore": 40,
+      "expectedMax": 50,
+      "status": 3,
+      "expectedAutoScore": 40,
+      "expectedManualScore": 10,
+      "gradingSessionId": 87,
+      "score": null,
+      "max": 50,
+      "gradingStatus": 3
+    }
+  ],
+  "policyObservations": [
+    {
+      "attemptId": 211,
+      "weighted": {
+        "id": 764,
+        "gradingSessionId": 91,
+        "questionId": 132,
+        "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "MCQ_Multi",
+        "questionTypeId": 2,
+        "maxPoints": 10,
+        "selectedOptionIds": [
+          379,
+          380,
+          381
+        ],
+        "selectedOptions": [
+          {
+            "id": 381,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": false
+          },
+          {
+            "id": 379,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true
+          },
+          {
+            "id": 380,
+            "textEn": "3",
+            "textAr": "خيار 3",
+            "isCorrect": true
+          }
+        ],
+        "textAnswer": null,
+        "score": 10,
+        "isCorrect": true,
+        "isManuallyGraded": false,
+        "graderComment": null,
+        "correctOptions": [
+          {
+            "id": 379,
+            "textEn": "2",
+            "textAr": "خيار 2"
+          },
+          {
+            "id": 380,
+            "textEn": "3",
+            "textAr": "خيار 3"
+          }
+        ],
+        "modelAnswerEn": null,
+        "modelAnswerAr": null
+      },
+      "equal": {
+        "id": 765,
+        "gradingSessionId": 91,
+        "questionId": 133,
+        "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+        "questionBodyAr": "اختبار QA26",
+        "questionTypeName": "MCQ_Multi",
+        "questionTypeId": 2,
+        "maxPoints": 10,
+        "selectedOptionIds": [
+          382,
+          383,
+          384
+        ],
+        "selectedOptions": [
+          {
+            "id": 384,
+            "textEn": "3",
+            "textAr": "خيار 3",
+            "isCorrect": false
+          },
+          {
+            "id": 382,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true
+          },
+          {
+            "id": 383,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": true
+          }
+        ],
+        "textAnswer": null,
+        "score": 10,
+        "isCorrect": false,
+        "isManuallyGraded": false,
+        "graderComment": null,
+        "correctOptions": [
+          {
+            "id": 382,
+            "textEn": "2",
+            "textAr": "خيار 2"
+          },
+          {
+            "id": 383,
+            "textEn": "4",
+            "textAr": "خيار 4"
+          }
+        ],
+        "modelAnswerEn": null,
+        "modelAnswerAr": null
+      },
+      "totalScore": 40
+    },
+    {
+      "concurrentGrading": "No exclusive edit lock/optimistic conflict is exposed; last committed score/comment wins",
+      "responses": [
+        200,
+        200
+      ],
+      "persistedScore": 9
+    }
+  ],
+  "regradePendingResultUpdate": {
+    "attemptId": 208,
+    "gradingSessionId": 87,
+    "gradingScore": 50,
+    "resultId": 62,
+    "resultScore": 40,
+    "requiredNextAction": "Phase8 PUT ExamResult/update-from-regrade before verifying publication snapshot"
+  }
+}

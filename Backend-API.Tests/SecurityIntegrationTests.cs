@@ -389,6 +389,85 @@ public sealed class SecurityIntegrationTests
         await super.RejectAsync("JoinScreenRoom", int.MaxValue, "proctor");
     }
 
+    [SqlServerFact]
+    public async Task SharedExamAccessDoesNotGrantSiblingAttemptOrProctorSessionAccess()
+    {
+        await using var fixture = await SecurityDatabase.CreateAsync();
+        var seed = await fixture.SeedHubAsync();
+        await using var services = fixture.IdentityServices();
+        using var scope = services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var manager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var attempt = await db.Attempts.SingleAsync(a => a.Id == seed.AttemptId);
+        var session = new ProctorSession
+        {
+            AttemptId = attempt.Id, ExamId = attempt.ExamId, CandidateId = seed.Owner,
+            Mode = Smart_Core.Domain.Enums.ProctorMode.Soft
+        };
+        db.ProctorSessions.Add(session);
+        await db.SaveChangesAsync();
+        var authorization = new ResourceAuthorizationService(db, manager, new CurrentUser(seed.Sibling));
+        Assert.True(await authorization.CanAccessExamAsync(attempt.ExamId));
+        Assert.False(await authorization.CanAccessAttemptAsync(attempt.Id));
+        Assert.False(await authorization.CanAccessProctorSessionAsync(session.Id));
+        Assert.True(await authorization.CanAccessAttemptForUserAsync(attempt.Id, seed.Owner));
+        Assert.True(await authorization.CanAccessProctorSessionForUserAsync(session.Id, seed.Owner));
+        Assert.True(await authorization.CanAccessAttemptForUserAsync(attempt.Id, seed.SameDepartment));
+        Assert.True(await authorization.CanAccessProctorSessionForUserAsync(session.Id, seed.Assigned));
+        Assert.True(await authorization.CanAccessAttemptForUserAsync(attempt.Id, seed.SuperAdmin));
+        Assert.False(await authorization.CanAccessAttemptForUserAsync(attempt.Id, seed.CrossDepartment));
+    }
+
+    [SecurityHubFact]
+    public async Task HubRechecksAccountEligibilityForExistingCandidateAndStaffSockets()
+    {
+        await using var fixture = await SecurityDatabase.CreateAsync();
+        var seed = await fixture.SeedHubAsync();
+        await using var server = await HubServer.StartAsync(fixture);
+        foreach (var (userId, appRole, hubRole) in new[]
+        {
+            (seed.Owner, AppRoles.Candidate, "candidate"),
+            (seed.SameDepartment, AppRoles.Proctor, "proctor"),
+            (seed.SuperAdmin, AppRoles.SuperAdmin, "proctor")
+        })
+        {
+            await using var client = await server.ConnectAsync(userId, appRole);
+            foreach (var condition in new[] { "blocked", "inactive", "pending", "suspended", "deleted" })
+            {
+                await client.InvokeAsync("JoinAttemptRoom", seed.AttemptId, hubRole);
+                await client.InvokeAsync("JoinScreenRoom", seed.AttemptId, hubRole);
+                await using (var db = fixture.Database())
+                {
+                    var user = await db.Users.SingleAsync(u => u.Id == userId);
+                    user.IsBlocked = condition == "blocked";
+                    user.IsDeleted = condition == "deleted";
+                    user.Status = condition switch
+                    {
+                        "inactive" => UserStatus.Inactive,
+                        "pending" => UserStatus.Pending,
+                        "suspended" => UserStatus.Suspended,
+                        _ => UserStatus.Active
+                    };
+                    await db.SaveChangesAsync();
+                }
+                if (hubRole == "candidate")
+                    await client.RejectAsync("SendOffer", seed.AttemptId, condition);
+                else
+                    await client.RejectAsync("SendWarningToCandidate", seed.AttemptId, condition);
+                await client.RejectAsync("JoinAttemptRoom", seed.AttemptId, hubRole);
+                await client.RejectAsync("JoinScreenRoom", seed.AttemptId, hubRole);
+                await using (var db = fixture.Database())
+                {
+                    var user = await db.Users.SingleAsync(u => u.Id == userId);
+                    user.IsBlocked = false;
+                    user.IsDeleted = false;
+                    user.Status = UserStatus.Active;
+                    await db.SaveChangesAsync();
+                }
+            }
+        }
+    }
+
     private static IEnumerable<(string Method, object?[] Args)> AllCalls(int attempt, string target)
     {
         yield return ("SendOffer", [attempt, "sdp"]);

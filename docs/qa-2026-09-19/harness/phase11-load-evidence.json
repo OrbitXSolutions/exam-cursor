@@ -1,0 +1,1141 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T13:52:45.913Z",
+  "checks": [
+    {
+      "name": "All 50 distinct simulated candidate accounts authenticated",
+      "passed": true,
+      "detail": {
+        "actual": 50,
+        "expected": 50
+      },
+      "at": "2026-09-19T13:53:18.187Z"
+    },
+    {
+      "name": "Concurrency regression starts fresh attempts rather than resuming prior ramp",
+      "passed": true,
+      "detail": {
+        "fresh": 50,
+        "total": 50
+      },
+      "at": "2026-09-19T13:53:56.160Z"
+    },
+    {
+      "name": "50 persisted simultaneous active candidate attempts and proctor sessions",
+      "passed": true,
+      "detail": {
+        "actual": 50,
+        "expected": 50
+      },
+      "at": "2026-09-19T13:53:56.161Z"
+    },
+    {
+      "name": "50 candidate SignalR sockets joined plus live proctor",
+      "passed": true,
+      "at": "2026-09-19T13:54:36.590Z"
+    },
+    {
+      "name": "Round 1 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:54:46.677Z"
+    },
+    {
+      "name": "Round 2 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:55:03.177Z"
+    },
+    {
+      "name": "Warning during load persisted for candidate",
+      "passed": true,
+      "detail": {
+        "hasWarning": true,
+        "warningMessage": "QA26 simulated load warning",
+        "isTerminated": false,
+        "terminationReason": null
+      },
+      "at": "2026-09-19T13:55:10.510Z"
+    },
+    {
+      "name": "Time extension during load persisted for candidate",
+      "passed": true,
+      "detail": {
+        "before": 35887,
+        "after": 35943
+      },
+      "at": "2026-09-19T13:55:15.613Z"
+    },
+    {
+      "name": "Round 3 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:55:25.247Z"
+    },
+    {
+      "name": "Round 4 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:55:40.046Z"
+    },
+    {
+      "name": "Round 5 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:55:53.743Z"
+    },
+    {
+      "name": "Round 6 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:56:05.820Z"
+    },
+    {
+      "name": "Round 7 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:56:18.107Z"
+    },
+    {
+      "name": "Round 8 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:56:31.461Z"
+    },
+    {
+      "name": "Round 9 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:56:44.400Z"
+    },
+    {
+      "name": "Round 10 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:56:56.436Z"
+    },
+    {
+      "name": "Round 11 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:57:08.812Z"
+    },
+    {
+      "name": "Round 12 autosave/heartbeat/timer workload completes",
+      "passed": true,
+      "detail": [],
+      "at": "2026-09-19T13:57:20.949Z"
+    },
+    {
+      "name": "Candidate 3 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 314,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.869Z"
+    },
+    {
+      "name": "Candidate 2 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 317,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.871Z"
+    },
+    {
+      "name": "Candidate 9 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 322,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.875Z"
+    },
+    {
+      "name": "Candidate 1 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 315,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.878Z"
+    },
+    {
+      "name": "Candidate 10 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 323,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.879Z"
+    },
+    {
+      "name": "Candidate 5 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 316,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.884Z"
+    },
+    {
+      "name": "Candidate 4 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 318,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.888Z"
+    },
+    {
+      "name": "Candidate 6 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 319,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.890Z"
+    },
+    {
+      "name": "Candidate 7 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 321,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.891Z"
+    },
+    {
+      "name": "Candidate 8 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 320,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:29.897Z"
+    },
+    {
+      "name": "Candidate 11 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 328,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.260Z"
+    },
+    {
+      "name": "Candidate 14 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 326,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.262Z"
+    },
+    {
+      "name": "Candidate 15 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 327,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.266Z"
+    },
+    {
+      "name": "Candidate 16 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 329,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.268Z"
+    },
+    {
+      "name": "Candidate 13 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 324,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.270Z"
+    },
+    {
+      "name": "Candidate 12 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 325,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.272Z"
+    },
+    {
+      "name": "Candidate 18 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 331,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.275Z"
+    },
+    {
+      "name": "Candidate 17 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 330,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.279Z"
+    },
+    {
+      "name": "Candidate 19 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 332,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.282Z"
+    },
+    {
+      "name": "Candidate 20 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 333,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:31.287Z"
+    },
+    {
+      "name": "Candidate 21 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 336,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.634Z"
+    },
+    {
+      "name": "Candidate 23 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 337,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.648Z"
+    },
+    {
+      "name": "Candidate 22 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 335,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.650Z"
+    },
+    {
+      "name": "Candidate 28 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 342,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.654Z"
+    },
+    {
+      "name": "Candidate 24 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 338,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.656Z"
+    },
+    {
+      "name": "Candidate 27 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 340,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.657Z"
+    },
+    {
+      "name": "Candidate 26 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 339,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.659Z"
+    },
+    {
+      "name": "Candidate 25 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 334,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.661Z"
+    },
+    {
+      "name": "Candidate 29 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 341,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.670Z"
+    },
+    {
+      "name": "Candidate 30 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 343,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:32.687Z"
+    },
+    {
+      "name": "Candidate 31 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 346,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.005Z"
+    },
+    {
+      "name": "Candidate 33 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 344,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.025Z"
+    },
+    {
+      "name": "Candidate 34 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 345,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.028Z"
+    },
+    {
+      "name": "Candidate 35 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 348,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.030Z"
+    },
+    {
+      "name": "Candidate 39 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 351,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.040Z"
+    },
+    {
+      "name": "Candidate 32 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 347,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.043Z"
+    },
+    {
+      "name": "Candidate 36 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 350,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.046Z"
+    },
+    {
+      "name": "Candidate 37 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 349,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.052Z"
+    },
+    {
+      "name": "Candidate 38 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 353,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.056Z"
+    },
+    {
+      "name": "Candidate 40 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 352,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:34.080Z"
+    },
+    {
+      "name": "Candidate 41 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 357,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.380Z"
+    },
+    {
+      "name": "Candidate 42 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 355,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.398Z"
+    },
+    {
+      "name": "Candidate 43 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 356,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.407Z"
+    },
+    {
+      "name": "Candidate 44 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 354,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.411Z"
+    },
+    {
+      "name": "Candidate 45 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 358,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.428Z"
+    },
+    {
+      "name": "Candidate 46 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 359,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.433Z"
+    },
+    {
+      "name": "Candidate 47 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 360,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.435Z"
+    },
+    {
+      "name": "Candidate 49 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 362,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.439Z"
+    },
+    {
+      "name": "Candidate 48 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 361,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.448Z"
+    },
+    {
+      "name": "Candidate 50 final autosaves persisted",
+      "passed": true,
+      "detail": {
+        "attemptId": 363,
+        "answered": 4
+      },
+      "at": "2026-09-19T13:57:35.472Z"
+    },
+    {
+      "name": "Candidate received actual WebSocket warning under load",
+      "passed": true,
+      "at": "2026-09-19T13:57:35.473Z"
+    },
+    {
+      "name": "All 50 simulated candidate attempts submitted",
+      "passed": true,
+      "at": "2026-09-19T13:57:47.768Z"
+    },
+    {
+      "name": "Candidate 3 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 314,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:50.359Z"
+    },
+    {
+      "name": "Candidate 4 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 318,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:50.362Z"
+    },
+    {
+      "name": "Candidate 1 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 315,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:50.372Z"
+    },
+    {
+      "name": "Candidate 5 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 316,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:50.377Z"
+    },
+    {
+      "name": "Candidate 2 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 317,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:50.381Z"
+    },
+    {
+      "name": "Candidate 10 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 323,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:52.498Z"
+    },
+    {
+      "name": "Candidate 9 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 322,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:52.508Z"
+    },
+    {
+      "name": "Candidate 6 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 319,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:52.687Z"
+    },
+    {
+      "name": "Candidate 8 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 320,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:52.715Z"
+    },
+    {
+      "name": "Candidate 7 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 321,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:53.154Z"
+    },
+    {
+      "name": "Candidate 11 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 328,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:54.833Z"
+    },
+    {
+      "name": "Candidate 12 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 325,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:54.844Z"
+    },
+    {
+      "name": "Candidate 14 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 326,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:55.063Z"
+    },
+    {
+      "name": "Candidate 13 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 324,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:55.455Z"
+    },
+    {
+      "name": "Candidate 15 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 327,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:55.469Z"
+    },
+    {
+      "name": "Candidate 17 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 330,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:57.208Z"
+    },
+    {
+      "name": "Candidate 16 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 329,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:57.389Z"
+    },
+    {
+      "name": "Candidate 19 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 332,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:57.562Z"
+    },
+    {
+      "name": "Candidate 18 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 331,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:57.638Z"
+    },
+    {
+      "name": "Candidate 20 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 333,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:57.833Z"
+    },
+    {
+      "name": "Candidate 21 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 336,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:59.318Z"
+    },
+    {
+      "name": "Candidate 23 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 337,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:59.669Z"
+    },
+    {
+      "name": "Candidate 24 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 338,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:59.739Z"
+    },
+    {
+      "name": "Candidate 22 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 335,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:57:59.974Z"
+    },
+    {
+      "name": "Candidate 25 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 334,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:00.643Z"
+    },
+    {
+      "name": "Candidate 26 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 339,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:01.431Z"
+    },
+    {
+      "name": "Candidate 29 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 341,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:01.836Z"
+    },
+    {
+      "name": "Candidate 28 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 342,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:02.069Z"
+    },
+    {
+      "name": "Candidate 27 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 340,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:02.481Z"
+    },
+    {
+      "name": "Candidate 30 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 343,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:02.502Z"
+    },
+    {
+      "name": "Candidate 31 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 346,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:03.816Z"
+    },
+    {
+      "name": "Candidate 33 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 344,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:03.978Z"
+    },
+    {
+      "name": "Candidate 32 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 347,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:03.981Z"
+    },
+    {
+      "name": "Candidate 34 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 345,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:04.387Z"
+    },
+    {
+      "name": "Candidate 35 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 348,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:04.604Z"
+    },
+    {
+      "name": "Candidate 39 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 351,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:05.850Z"
+    },
+    {
+      "name": "Candidate 36 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 350,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:05.960Z"
+    },
+    {
+      "name": "Candidate 37 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 349,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:06.089Z"
+    },
+    {
+      "name": "Candidate 38 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 353,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:06.286Z"
+    },
+    {
+      "name": "Candidate 40 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 352,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:06.737Z"
+    },
+    {
+      "name": "Candidate 41 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 357,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:07.739Z"
+    },
+    {
+      "name": "Candidate 42 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 355,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:07.894Z"
+    },
+    {
+      "name": "Candidate 43 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 356,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:08.007Z"
+    },
+    {
+      "name": "Candidate 44 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 354,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:08.195Z"
+    },
+    {
+      "name": "Candidate 45 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 358,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:08.898Z"
+    },
+    {
+      "name": "Candidate 46 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 359,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:09.669Z"
+    },
+    {
+      "name": "Candidate 47 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 360,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:09.832Z"
+    },
+    {
+      "name": "Candidate 48 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 361,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:09.918Z"
+    },
+    {
+      "name": "Candidate 49 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 362,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:10.093Z"
+    },
+    {
+      "name": "Candidate 50 independent objective score is 40/40",
+      "passed": true,
+      "detail": {
+        "attemptId": 363,
+        "totalScore": 40,
+        "status": 3,
+        "answeredQuestions": 4
+      },
+      "at": "2026-09-19T13:58:10.819Z"
+    }
+  ],
+  "events": []
+}

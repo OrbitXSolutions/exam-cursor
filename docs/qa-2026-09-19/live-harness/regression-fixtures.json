@@ -1,0 +1,19 @@
+{
+  "examId": 115,
+  "candidates": [
+    {
+      "email": "qa26.protocol.1789817576996.a@example.test",
+      "userId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+      "attemptId": 197,
+      "proctorSessionId": 149
+    },
+    {
+      "email": "qa26.protocol.1789817576996.b@example.test",
+      "userId": "8cdd75ac-351a-43ac-b89b-7c24ac77ece7",
+      "attemptId": 198,
+      "proctorSessionId": 150
+    }
+  ],
+  "proctorEmail": "qa26.eng.proctor1@example.test",
+  "foreignProctorEmail": "qa26.ops.proctor1@example.test"
+}

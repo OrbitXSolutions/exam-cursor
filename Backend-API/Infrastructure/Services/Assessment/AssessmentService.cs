@@ -57,14 +57,9 @@ public class AssessmentService : IAssessmentService
   public async Task<ApiResponse<PaginatedResponse<ExamListDto>>> GetAllExamsAsync(ExamSearchDto searchDto)
   {
     // ── Resolve dept scope for cache key (pre-resolve to avoid duplicate async calls) ──
-    bool isSuperAdmin = false;
-    int? scopedDeptId = null;
-    if (searchDto.FilterByUserDepartment)
-    {
-      isSuperAdmin = await IsCurrentUserSuperAdminAsync();
-      if (!isSuperAdmin)
-        scopedDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
-    }
+    // Department scope is an authorization boundary, never a client-selectable filter.
+    bool isSuperAdmin = await IsCurrentUserSuperAdminAsync();
+    int? scopedDeptId = isSuperAdmin ? null : await _departmentService.GetCurrentUserDepartmentIdAsync();
     var deptScope = isSuperAdmin ? "all" : (scopedDeptId?.ToString() ?? "none");
     var cacheKey = $"{CacheKeys.ExamsPrefix}list:{deptScope}:{JsonSerializer.Serialize(searchDto)}";
     if (_cache.TryGet<PaginatedResponse<ExamListDto>>(cacheKey, out var cachedPage) && cachedPage != null)
@@ -79,7 +74,6 @@ public class AssessmentService : IAssessmentService
     }
 
     // Department-based access control (uses pre-resolved values)
-    if (searchDto.FilterByUserDepartment)
     {
       if (!isSuperAdmin)
       {
@@ -208,7 +202,8 @@ public class AssessmentService : IAssessmentService
       var userDeptId = await _departmentService.GetCurrentUserDepartmentIdAsync();
       if (userDeptId.HasValue)
         filterDeptId = userDeptId;
-      // When user has no department (e.g. some Admin accounts), still return all exams so dropdown works
+      else
+        return ApiResponse<List<ExamDropdownItemDto>>.SuccessResponse(new List<ExamDropdownItemDto>());
     }
 
     var cacheKey = CacheKeys.ExamDropdownByDept(filterDeptId);
@@ -405,6 +400,9 @@ public class AssessmentService : IAssessmentService
 ? dto.DepartmentId.Value
      : entity.DepartmentId;
 
+    if (!await HasAccessToExamAsync(newDepartmentId))
+      return ApiResponse<ExamDto>.FailureResponse("You do not have permission to move this exam to that department");
+
     // Check if published exam has attempts
     if (entity.IsPublished)
     {
@@ -481,6 +479,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<bool>> DeleteExamAsync(int id)
   {
+    if (!await CanAccessExamResourceAsync(id, includeDeleted: true))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.Exams
         .IgnoreQueryFilters()
   .FirstOrDefaultAsync(x => x.Id == id);
@@ -510,6 +511,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<bool>> PublishExamAsync(int id, string updatedBy)
   {
+    if (!await CanAccessExamResourceAsync(id))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var validationResult = await ValidateExamForPublishAsync(id);
 
     if (!validationResult.Success || !validationResult.Data!.IsValid)
@@ -532,10 +536,10 @@ public class AssessmentService : IAssessmentService
     await _context.SaveChangesAsync();
     InvalidateExamCache();
 
-    // Auto-assign all active Proctor-role users to this exam (if not already assigned or explicitly unassigned)
+    // Auto-assign active proctors from this exam's department, respecting explicit unassignments.
     try
     {
-      await AutoAssignAllProctorsAsync(id, updatedBy);
+      await AutoAssignAllProctorsAsync(id, entity.DepartmentId, updatedBy);
     }
     catch (Exception ex)
     {
@@ -558,6 +562,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<bool>> UnpublishExamAsync(int id, string updatedBy)
   {
+    if (!await CanAccessExamResourceAsync(id))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.Exams.FindAsync(id);
 
     if (entity == null)
@@ -577,6 +584,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<bool>> ToggleExamStatusAsync(int id, string updatedBy)
   {
+    if (!await CanAccessExamResourceAsync(id))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.Exams.FindAsync(id);
 
     if (entity == null)
@@ -656,6 +666,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<List<ExamSectionDto>>> GetExamSectionsAsync(int examId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<List<ExamSectionDto>>.FailureResponse("Exam not found or access denied");
+
     var cacheKey = CacheKeys.ExamSectionsByExam(examId);
     if (_cache.TryGet<List<ExamSectionDto>>(cacheKey, out var cachedSections) && cachedSections != null)
       return ApiResponse<List<ExamSectionDto>>.SuccessResponse(cachedSections);
@@ -680,6 +693,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<ExamSectionDto>> GetSectionByIdAsync(int sectionId)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<ExamSectionDto>.FailureResponse("Exam not found or access denied");
+
     var cacheKey = CacheKeys.ExamSectionById(sectionId);
     if (_cache.TryGet<ExamSectionDto>(cacheKey, out var cachedSection) && cachedSection != null)
       return ApiResponse<ExamSectionDto>.SuccessResponse(cachedSection);
@@ -700,6 +716,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<ExamSectionDto>> CreateSectionAsync(int examId, SaveExamSectionDto dto, string createdBy)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamSectionDto>.FailureResponse("Exam not found or access denied");
+
     var exam = await _context.Exams
       .FirstOrDefaultAsync(x => x.Id == examId);
 
@@ -759,6 +778,9 @@ public class AssessmentService : IAssessmentService
 
   public async Task<ApiResponse<ExamSectionDto>> UpdateSectionAsync(int sectionId, SaveExamSectionDto dto, string updatedBy)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<ExamSectionDto>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamSections
    .Include(x => x.Exam)
   .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -817,6 +839,9 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<bool>> DeleteSectionAsync(int sectionId)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamSections
  .Include(x => x.Exam)
       .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -844,6 +869,9 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<bool>> ReorderSectionsAsync(int examId, List<ReorderSectionDto> reorderDtos, string updatedBy)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -892,6 +920,9 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> GetSectionQuestionsAsync(int sectionId)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var cacheKey = CacheKeys.ExamSectionQuestions(sectionId);
     if (_cache.TryGet<List<ExamQuestionDto>>(cacheKey, out var cachedQuestions) && cachedQuestions != null)
       return ApiResponse<List<ExamQuestionDto>>.SuccessResponse(cachedQuestions);
@@ -914,6 +945,12 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<ExamQuestionDto>> AddQuestionToSectionAsync(int sectionId, AddExamQuestionDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(new[] { dto.QuestionId }))
+      return ApiResponse<ExamQuestionDto>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<ExamQuestionDto>.FailureResponse("Exam not found or access denied");
+
     var section = await _context.ExamSections
      .Include(x => x.Exam)
  .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -998,6 +1035,12 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> BulkAddQuestionsToSectionAsync(int sectionId, BulkAddQuestionsDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(dto.QuestionIds))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var section = await _context.ExamSections
          .Include(x => x.Exam)
       .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -1085,6 +1128,9 @@ x.Order == dto.Order &&
 
   public async Task<ApiResponse<ExamQuestionDto>> UpdateExamQuestionAsync(int examQuestionId, UpdateExamQuestionDto dto, string updatedBy)
   {
+    if (!await CanAccessExamQuestionResourceAsync(examQuestionId))
+      return ApiResponse<ExamQuestionDto>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamQuestions
                 .Include(x => x.ExamSection)
              .ThenInclude(s => s.Exam)
@@ -1136,6 +1182,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<bool>> RemoveQuestionFromExamAsync(int examQuestionId)
   {
+    if (!await CanAccessExamQuestionResourceAsync(examQuestionId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamQuestions
   .Include(x => x.ExamSection)
     .ThenInclude(s => s.Exam)
@@ -1164,6 +1213,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<bool>> ReorderQuestionsAsync(int sectionId, List<ReorderQuestionDto> reorderDtos, string updatedBy)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var sectionExists = await _context.ExamSections.AnyAsync(x => x.Id == sectionId);
     if (!sectionExists)
     {
@@ -1212,6 +1264,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<ExamAccessPolicyDto>> GetAccessPolicyAsync(int examId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamAccessPolicyDto>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -1237,6 +1292,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<ExamAccessPolicyDto>> SaveAccessPolicyAsync(int examId, SaveExamAccessPolicyDto dto, string userId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamAccessPolicyDto>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -1300,6 +1358,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<List<ExamInstructionDto>>> GetExamInstructionsAsync(int examId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<List<ExamInstructionDto>>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -1317,6 +1378,9 @@ warningMessage ?? "Exam question updated successfully");
 
   public async Task<ApiResponse<ExamInstructionDto>> CreateInstructionAsync(int examId, SaveExamInstructionDto dto, string createdBy)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamInstructionDto>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -1364,6 +1428,9 @@ entity.Adapt<ExamInstructionDto>(),
 
   public async Task<ApiResponse<ExamInstructionDto>> UpdateInstructionAsync(int instructionId, SaveExamInstructionDto dto, string updatedBy)
   {
+    if (!await CanAccessInstructionResourceAsync(instructionId))
+      return ApiResponse<ExamInstructionDto>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamInstructions.FindAsync(instructionId);
 
     if (entity == null)
@@ -1410,6 +1477,9 @@ entity.Adapt<ExamInstructionDto>(),
 
   public async Task<ApiResponse<bool>> DeleteInstructionAsync(int instructionId)
   {
+    if (!await CanAccessInstructionResourceAsync(instructionId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamInstructions
      .IgnoreQueryFilters()
         .FirstOrDefaultAsync(x => x.Id == instructionId);
@@ -1431,6 +1501,9 @@ entity.Adapt<ExamInstructionDto>(),
 
   public async Task<ApiResponse<bool>> ReorderInstructionsAsync(int examId, List<ReorderInstructionDto> reorderDtos, string updatedBy)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var examExists = await _context.Exams.AnyAsync(x => x.Id == examId);
     if (!examExists)
     {
@@ -1479,6 +1552,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<ExamValidationResultDto>> ValidateExamForPublishAsync(int examId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamValidationResultDto>.FailureResponse("Exam not found or access denied");
+
     var exam = await _context.Exams
    .Include(x => x.Sections.Where(s => !s.IsDeleted))
       .ThenInclude(s => s.Questions.Where(q => !q.IsDeleted))
@@ -1668,18 +1744,20 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
   #region Private Helpers
 
   /// <summary>
-  /// Auto-assigns all active Proctor-role users to the exam.
+  /// Auto-assigns active Proctor-role users from the exam's department.
   /// Skips proctors who already have an active assignment or were explicitly unassigned (IsDeleted=true).
   /// </summary>
-  private async Task AutoAssignAllProctorsAsync(int examId, string assignedBy)
+  private async Task AutoAssignAllProctorsAsync(int examId, int departmentId, string assignedBy)
   {
     var proctorUsers = await _userManager.GetUsersInRoleAsync(AppRoles.Proctor);
-    var activeProctors = proctorUsers.Where(u => !u.IsDeleted).ToList();
+    var activeProctors = proctorUsers.Where(u => !u.IsDeleted && !u.IsBlocked
+        && u.Status == UserStatus.Active && u.DepartmentId == departmentId).ToList();
 
     if (activeProctors.Count == 0) return;
 
     // Get ALL ExamProctor records for this exam (active + soft-deleted) to respect explicit unassignments
     var existingProctorIds = await _context.ExamProctors
+        .IgnoreQueryFilters()
         .Where(ep => ep.ExamId == examId)
         .Select(ep => ep.ProctorId)
         .ToHashSetAsync();
@@ -1701,7 +1779,7 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
     await _context.SaveChangesAsync();
 
     // Invalidate proctor cache for this exam
-    _cache.Remove($"exam-proctors:{examId}");
+    _cache.RemoveByPrefix($"exam-proctors:{examId}:");
 
     _logger.LogInformation(
         "Exam {ExamId}: auto-assigned {Count} proctor(s) on publish.", examId, newAssignments.Count);
@@ -1858,6 +1936,55 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   #region Private Helper Methods
 
+
+  private async Task<bool> CanAccessDepartmentResourceAsync(IQueryable<int?> departments)
+  {
+    var departmentId = await departments.FirstOrDefaultAsync();
+    return departmentId.HasValue && await HasAccessToExamAsync(departmentId.Value);
+  }
+
+  private Task<bool> CanAccessExamResourceAsync(int examId, bool includeDeleted = false)
+  {
+    var exams = includeDeleted ? _context.Exams.IgnoreQueryFilters() : _context.Exams.AsQueryable();
+    return CanAccessDepartmentResourceAsync(exams.Where(e => e.Id == examId).Select(e => (int?)e.DepartmentId));
+  }
+
+  private Task<bool> CanAccessSectionResourceAsync(int sectionId) =>
+    CanAccessDepartmentResourceAsync(_context.ExamSections.Where(s => s.Id == sectionId).Select(s => (int?)s.Exam.DepartmentId));
+
+  private Task<bool> CanAccessTopicResourceAsync(int topicId) =>
+    CanAccessDepartmentResourceAsync(_context.ExamTopics.Where(t => t.Id == topicId).Select(t => (int?)t.ExamSection.Exam.DepartmentId));
+
+  private Task<bool> CanAccessExamQuestionResourceAsync(int questionId) =>
+    CanAccessDepartmentResourceAsync(_context.ExamQuestions.Where(q => q.Id == questionId).Select(q => (int?)q.Exam.DepartmentId));
+
+  private Task<bool> CanAccessInstructionResourceAsync(int instructionId) =>
+    CanAccessDepartmentResourceAsync(_context.ExamInstructions.Where(i => i.Id == instructionId).Select(i => (int?)i.Exam.DepartmentId));
+
+  private async Task<IQueryable<Domain.Entities.QuestionBank.Question>> ScopeQuestionBankAsync()
+  {
+    var query = _context.Questions.AsQueryable();
+    if (await IsCurrentUserSuperAdminAsync()) return query;
+    var departmentId = await _departmentService.GetCurrentUserDepartmentIdAsync();
+    return departmentId.HasValue
+      ? query.Where(q => q.Subject.DepartmentId == departmentId.Value)
+      : query.Where(q => false);
+  }
+
+  private async Task<bool> CanAccessBankQuestionsAsync(IEnumerable<int> questionIds)
+  {
+    var ids = questionIds.Distinct().ToList();
+    var query = await ScopeQuestionBankAsync();
+    return await query.CountAsync(q => ids.Contains(q.Id)) == ids.Count;
+  }
+
+  private async Task<bool> CanAccessQuestionPoolAsync(int subjectId, int? topicId)
+  {
+    if (!await CanAccessDepartmentResourceAsync(_context.QuestionSubjects
+      .Where(s => s.Id == subjectId).Select(s => (int?)s.DepartmentId))) return false;
+    return !topicId.HasValue || await _context.QuestionTopics.AnyAsync(t => t.Id == topicId.Value && t.SubjectId == subjectId);
+  }
+
   private async Task<bool> IsCurrentUserSuperAdminAsync()
   {
     var userId = _currentUserService.UserId;
@@ -1888,6 +2015,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<List<ExamTopicDto>>> GetSectionTopicsAsync(int sectionId)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<List<ExamTopicDto>>.FailureResponse("Exam not found or access denied");
+
     var sectionExists = await _context.ExamSections.AnyAsync(x => x.Id == sectionId);
     if (!sectionExists)
     {
@@ -1916,6 +2046,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<ExamTopicDto>> GetTopicByIdAsync(int topicId)
   {
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<ExamTopicDto>.FailureResponse("Exam not found or access denied");
+
     var topic = await _context.ExamTopics.FirstOrDefaultAsync(x => x.Id == topicId);
 
     if (topic == null)
@@ -1940,6 +2073,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<ExamTopicDto>> CreateTopicAsync(int sectionId, SaveExamTopicDto dto, string createdBy)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<ExamTopicDto>.FailureResponse("Exam not found or access denied");
+
     var section = await _context.ExamSections.FirstOrDefaultAsync(x => x.Id == sectionId);
     if (section == null)
     {
@@ -1992,6 +2128,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<ExamTopicDto>> UpdateTopicAsync(int topicId, SaveExamTopicDto dto, string updatedBy)
   {
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<ExamTopicDto>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamTopics.FirstOrDefaultAsync(x => x.Id == topicId);
     if (entity == null)
     {
@@ -2041,6 +2180,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<bool>> DeleteTopicAsync(int topicId)
   {
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var entity = await _context.ExamTopics.FirstOrDefaultAsync(x => x.Id == topicId);
     if (entity == null)
     {
@@ -2058,6 +2200,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<bool>> ReorderTopicsAsync(int sectionId, List<ReorderTopicDto> reorderDtos, string updatedBy)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<bool>.FailureResponse("Exam not found or access denied");
+
     var sectionExists = await _context.ExamSections.AnyAsync(x => x.Id == sectionId);
     if (!sectionExists)
     {
@@ -2100,6 +2245,9 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> GetTopicQuestionsAsync(int topicId)
   {
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var topicExists = await _context.ExamTopics.AnyAsync(x => x.Id == topicId);
     if (!topicExists)
     {
@@ -2119,6 +2267,12 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<ExamQuestionDto>> AddQuestionToTopicAsync(int topicId, AddExamQuestionDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(new[] { dto.QuestionId }))
+      return ApiResponse<ExamQuestionDto>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<ExamQuestionDto>.FailureResponse("Exam not found or access denied");
+
     var topic = await _context.ExamTopics
       .Include(x => x.ExamSection)
    .ThenInclude(s => s.Exam)
@@ -2202,6 +2356,12 @@ $"Instruction IDs not found: {string.Join(", ", invalidIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> BulkAddQuestionsToTopicAsync(int topicId, BulkAddQuestionsDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(dto.QuestionIds))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var topic = await _context.ExamTopics
         .Include(x => x.ExamSection)
  .ThenInclude(s => s.Exam)
@@ -2289,6 +2449,12 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> ManualAddQuestionsToSectionAsync(int sectionId, ManualQuestionSelectionDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(dto.Questions.Select(q => q.QuestionId)))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var section = await _context.ExamSections
         .Include(x => x.Exam)
 .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -2377,6 +2543,12 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> ManualAddQuestionsToTopicAsync(int topicId, ManualQuestionSelectionDto dto, string createdBy)
   {
+    if (!await CanAccessBankQuestionsAsync(dto.Questions.Select(q => q.QuestionId)))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Question not found or access denied");
+
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var topic = await _context.ExamTopics
        .Include(x => x.ExamSection)
                 .ThenInclude(s => s.Exam)
@@ -2467,6 +2639,9 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> RandomAddQuestionsToSectionAsync(int sectionId, RandomQuestionSelectionDto dto, string createdBy)
   {
+    if (!await CanAccessSectionResourceAsync(sectionId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var section = await _context.ExamSections
   .Include(x => x.Exam)
         .FirstOrDefaultAsync(x => x.Id == sectionId);
@@ -2481,7 +2656,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
       return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Count must be greater than 0");
     }
 
-    var query = _context.Questions.Where(x => x.IsActive);
+    var query = (await ScopeQuestionBankAsync()).Where(x => x.IsActive);
 
     if (dto.CategoryId.HasValue)
     {
@@ -2557,6 +2732,9 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<List<ExamQuestionDto>>> RandomAddQuestionsToTopicAsync(int topicId, RandomQuestionSelectionDto dto, string createdBy)
   {
+    if (!await CanAccessTopicResourceAsync(topicId))
+      return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Exam not found or access denied");
+
     var topic = await _context.ExamTopics
           .Include(x => x.ExamSection)
               .ThenInclude(s => s.Exam)
@@ -2572,7 +2750,7 @@ $"Questions not found: {string.Join(", ", missingIds)}");
       return ApiResponse<List<ExamQuestionDto>>.FailureResponse("Count must be greater than 0");
     }
 
-    var query = _context.Questions.Where(x => x.IsActive);
+    var query = (await ScopeQuestionBankAsync()).Where(x => x.IsActive);
 
     if (dto.CategoryId.HasValue)
     {
@@ -2653,6 +2831,9 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<ExamBuilderDto>> GetExamBuilderAsync(int examId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamBuilderDto>.FailureResponse("Exam not found or access denied");
+
     var exam = await _context.Exams
         .Include(e => e.Sections.Where(s => !s.IsDeleted))
             .ThenInclude(s => s.QuestionSubject)
@@ -2739,6 +2920,9 @@ $"Questions not found: {string.Join(", ", missingIds)}");
 
   public async Task<ApiResponse<ExamBuilderDto>> SaveExamBuilderAsync(int examId, SaveExamBuilderRequest dto, string userId)
   {
+    if (!await CanAccessExamResourceAsync(examId))
+      return ApiResponse<ExamBuilderDto>.FailureResponse("Exam not found or access denied");
+
     var exam = await _context.Exams
         .Include(e => e.Sections.Where(s => !s.IsDeleted))
         .FirstOrDefaultAsync(e => e.Id == examId);
@@ -2746,6 +2930,13 @@ $"Questions not found: {string.Join(", ", missingIds)}");
     if (exam == null)
     {
       return ApiResponse<ExamBuilderDto>.FailureResponse("Exam not found");
+    }
+
+    // Validate all source scopes before deleting or writing any builder section.
+    foreach (var sectionDto in dto.Sections)
+    {
+      if (!await CanAccessQuestionPoolAsync(sectionDto.QuestionSubjectId, sectionDto.QuestionTopicId))
+        return ApiResponse<ExamBuilderDto>.FailureResponse("Question pool not found or access denied");
     }
 
     // Validate sections

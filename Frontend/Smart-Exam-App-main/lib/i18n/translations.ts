@@ -643,6 +643,8 @@ export const translations = {
       saving: "Saving...",
       saved: "Saved",
       saveFailed: "Save failed",
+      retryingSave: "Answers not saved. Retrying…",
+      saveBeforeSubmitFailed: "Your latest answers have not been saved. Keep this page open and try submitting again after the connection recovers.",
       summary: "Summary",
       calculator: "Calculator",
       spreadsheet: "Spreadsheet",
@@ -739,7 +741,7 @@ export const translations = {
       finalized: "Grading finalized. Score: {score}",
       finalizeConfirm: "Finalize grading?",
       finalizeConfirmDesc:
-        "This will submit all grades and the candidate will see their final result. You cannot change grades after finalizing.",
+        "This will submit all grades for result review and publication. Further changes require the regrading workflow.",
       // Grading submission detail
       allAutoGraded:
         "All questions are auto-graded. No manual grading required.",
@@ -2338,6 +2340,8 @@ export const translations = {
       saving: "جارٍ الحفظ...",
       saved: "تم الحفظ",
       saveFailed: "فشل الحفظ",
+      retryingSave: "لم تُحفظ الإجابات. جارٍ إعادة المحاولة…",
+      saveBeforeSubmitFailed: "لم تُحفظ إجاباتك الأخيرة. أبقِ هذه الصفحة مفتوحة وحاول التسليم مجددًا بعد استعادة الاتصال.",
       // Summary labels
       unanswered: "غير مُجاب",
       flagged: "مُعلَّم",
@@ -2406,7 +2410,7 @@ export const translations = {
       finalized: "تم إتمام التصحيح. الدرجة: {score}",
       finalizeConfirm: "إتمام التصحيح؟",
       finalizeConfirmDesc:
-        "سيتم إرسال جميع الدرجات وسيرى المرشح نتيجته النهائية. لا يمكن تغيير الدرجات بعد الإتمام.",
+        "سيتم إرسال جميع الدرجات لمراجعة النتائج ونشرها. تتطلب التغييرات اللاحقة استخدام مسار إعادة التصحيح.",
       // Grading submission detail
       allAutoGraded: "جميع الأسئلة مصححة تلقائياً. لا يلزم تصحيح يدوي.",
       backToGrading: "العودة إلى التصحيح",

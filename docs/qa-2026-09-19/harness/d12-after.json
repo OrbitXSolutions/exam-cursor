@@ -1,0 +1,2351 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:31:53.404Z",
+  "checks": [
+    {
+      "name": "same-department Admin reads own candidate",
+      "passed": true,
+      "at": "2026-09-19T11:32:13.273Z"
+    },
+    {
+      "name": "foreign batch detail does not reveal protected candidate",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "candidateCount": 0
+      },
+      "at": "2026-09-19T11:32:15.376Z"
+    },
+    {
+      "name": "foreign batch metadata requires unresolved ownership decision",
+      "passed": false,
+      "detail": {
+        "unresolvedOwnership": true,
+        "visibleIds": [
+          11
+        ]
+      },
+      "at": "2026-09-19T11:32:18.573Z"
+    },
+    {
+      "name": "foreign batch metadata mutation requires ownership decision",
+      "passed": false,
+      "detail": {
+        "unresolvedOwnership": true,
+        "status": 200
+      },
+      "at": "2026-09-19T11:32:22.829Z"
+    },
+    {
+      "name": "foreign candidate cannot be removed from cohort",
+      "passed": true,
+      "at": "2026-09-19T11:32:26.660Z"
+    },
+    {
+      "name": "foreign member removal preserves original membership",
+      "passed": true,
+      "at": "2026-09-19T11:32:28.340Z"
+    },
+    {
+      "name": "foreign candidate add reveals no success on unavailable candidate",
+      "passed": true,
+      "at": "2026-09-19T11:32:33.042Z"
+    },
+    {
+      "name": "Admin cannot add inaccessible foreign candidate to cohort",
+      "passed": true,
+      "at": "2026-09-19T11:32:35.622Z"
+    },
+    {
+      "name": "inaccessible candidate add does not persist",
+      "passed": true,
+      "at": "2026-09-19T11:32:37.262Z"
+    },
+    {
+      "name": "Instructor remains forbidden from batch management",
+      "passed": true,
+      "at": "2026-09-19T11:32:38.925Z"
+    },
+    {
+      "name": "foreign exam candidate selection is denied",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:32:40.809Z"
+    },
+    {
+      "name": "own exam candidate selection excludes inaccessible foreign candidate",
+      "passed": true,
+      "at": "2026-09-19T11:32:45.852Z"
+    },
+    {
+      "name": "foreign actor cannot assign inaccessible exam",
+      "passed": true,
+      "at": "2026-09-19T11:32:47.724Z"
+    },
+    {
+      "name": "own exam cannot assign inaccessible explicit candidate",
+      "passed": true,
+      "at": "2026-09-19T11:32:53.006Z"
+    },
+    {
+      "name": "filtered assignment respects candidate scope",
+      "passed": true,
+      "at": "2026-09-19T11:32:58.707Z"
+    },
+    {
+      "name": "mixed explicit assignment fails atomically when one candidate is unavailable",
+      "passed": true,
+      "at": "2026-09-19T11:33:04.066Z"
+    },
+    {
+      "name": "mixed explicit rejection leaves both candidates unassigned",
+      "passed": true,
+      "at": "2026-09-19T11:33:06.876Z"
+    },
+    {
+      "name": "own department Admin can assign own candidate",
+      "passed": true,
+      "at": "2026-09-19T11:33:14.127Z"
+    },
+    {
+      "name": "foreign actor cannot unassign protected exam/candidate",
+      "passed": true,
+      "at": "2026-09-19T11:33:16.009Z"
+    },
+    {
+      "name": "same-department Instructor retains assignment authority",
+      "passed": true,
+      "at": "2026-09-19T11:33:23.268Z"
+    },
+    {
+      "name": "inactive batch cannot be assigned",
+      "passed": true,
+      "at": "2026-09-19T11:33:28.413Z"
+    },
+    {
+      "name": "mixed cohort Engineering detail reveals only entitled members",
+      "passed": true,
+      "at": "2026-09-19T11:33:37.753Z"
+    },
+    {
+      "name": "mixed cohort Operations detail reveals only entitled members",
+      "passed": true,
+      "at": "2026-09-19T11:33:37.754Z"
+    },
+    {
+      "name": "batch assignment targets only entitled candidates",
+      "passed": true,
+      "at": "2026-09-19T11:33:42.928Z"
+    },
+    {
+      "name": "batch assignment does not persist foreign candidate assignment",
+      "passed": true,
+      "at": "2026-09-19T11:33:45.744Z"
+    },
+    {
+      "name": "foreign batch deletion requires ownership decision",
+      "passed": false,
+      "detail": {
+        "unresolvedOwnership": true,
+        "status": 200
+      },
+      "at": "2026-09-19T11:33:48.772Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:31:54.671Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:31:54.6653331+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:31:53.9649315+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:31:54.6653331+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:31:53.9649315+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1264.92
+      }
+    },
+    {
+      "at": "2026-09-19T11:31:55.867Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:31:55.8664019+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T15:31:55.1820274+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:31:55.8664019+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T15:31:55.1820274+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1193.4
+      }
+    },
+    {
+      "at": "2026-09-19T11:31:57.091Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:31:57.0903004+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:31:57.0903004+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1223.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:31:58.314Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:31:58.3131121+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T15:31:57.6025121+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:31:58.3131121+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T15:31:57.6025121+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1222.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:02.862Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.d12.after.eng@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 D12 after eng",
+        "fullNameAr": "اختبار حدود الدفعة",
+        "role": "Candidate",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:32:01.677188+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+          "email": "qa26.d12.after.eng@example.test",
+          "displayName": "QA26 D12 after eng",
+          "fullName": "QA26 D12 after eng",
+          "fullNameAr": "اختبار حدود الدفعة",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:32:00.2620325+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:32:01.677188+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+            "email": "qa26.d12.after.eng@example.test",
+            "displayName": "QA26 D12 after eng",
+            "fullName": "QA26 D12 after eng",
+            "fullNameAr": "اختبار حدود الدفعة",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:00.2620325+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4546.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:07.345Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.d12.after.ops@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 D12 after ops",
+        "fullNameAr": "اختبار حدود الدفعة",
+        "role": "Candidate",
+        "departmentId": 9
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:32:06.1802316+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+          "email": "qa26.d12.after.ops@example.test",
+          "displayName": "QA26 D12 after ops",
+          "fullName": "QA26 D12 after ops",
+          "fullNameAr": "اختبار حدود الدفعة",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:32:04.7783013+04:00",
+          "lastLoginDate": null,
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:32:06.1802316+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+            "email": "qa26.d12.after.ops@example.test",
+            "displayName": "QA26 D12 after ops",
+            "fullName": "QA26 D12 after ops",
+            "fullNameAr": "اختبار حدود الدفعة",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:04.7783013+04:00",
+            "lastLoginDate": null,
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4482.35
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:08.076Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches",
+      "request": {
+        "name": "QA26 D12 after Cohort",
+        "description": "Disposable isolation fixture",
+        "isActive": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 0,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": null
+        },
+        "body": {
+          "success": true,
+          "message": "Batch created successfully.",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 0,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 730.01
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:11.100Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 1,
+          "skippedCount": 0,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 1,
+            "skippedCount": 0,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3023.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:13.272Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "rollNo": null,
+              "mobile": null,
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "rollNo": null,
+                "mobile": null,
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2171.38
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:15.376Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 0,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 0,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2102.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:18.573Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches?search=QA26%20D12%20after",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 11,
+              "name": "QA26 D12 after Cohort",
+              "description": "Disposable isolation fixture",
+              "isActive": true,
+              "candidateCount": 0,
+              "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+              "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "createdByName": "QA26 Engineering Admin 1"
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 20,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 11,
+                "name": "QA26 D12 after Cohort",
+                "description": "Disposable isolation fixture",
+                "isActive": true,
+                "candidateCount": 0,
+                "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+                "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "createdByName": "QA26 Engineering Admin 1"
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 20,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3195.79
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:20.881Z",
+      "action": "foreign-export",
+      "status": 200,
+      "bytes": 6538,
+      "file": "d12-after-foreign-export.xlsx"
+    },
+    {
+      "at": "2026-09-19T11:32:22.828Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Batches/11",
+      "request": {
+        "description": "FOREIGN MUTATION"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "FOREIGN MUTATION",
+          "isActive": true,
+          "candidateCount": 0,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": null
+        },
+        "body": {
+          "success": true,
+          "message": "Batch updated successfully.",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "FOREIGN MUTATION",
+            "isActive": true,
+            "candidateCount": 0,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1946.65
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:24.703Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Batches/11",
+      "request": {
+        "description": "Disposable isolation fixture"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": null
+        },
+        "body": {
+          "success": true,
+          "message": "Batch updated successfully.",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1873.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:26.659Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 0,
+          "skippedCount": 1,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) removed from batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 0,
+            "skippedCount": 1,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1954.72
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:28.339Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "rollNo": null,
+              "mobile": null,
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "rollNo": null,
+                "mobile": null,
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1678.46
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:30.451Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 0,
+          "skippedCount": 1,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 0,
+            "skippedCount": 1,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2110.19
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:33.041Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 0,
+          "skippedCount": 1,
+          "errors": [
+            "Candidate 493c2b65-9895-44c9-8f57-9906d880aa04 not found."
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 0,
+            "skippedCount": 1,
+            "errors": [
+              "Candidate 493c2b65-9895-44c9-8f57-9906d880aa04 not found."
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2589.27
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:35.621Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 0,
+          "skippedCount": 1,
+          "errors": [
+            "Candidate 7f88df7a-aa92-47f4-900c-36b8b3464274 not found."
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 0,
+            "skippedCount": 1,
+            "errors": [
+              "Candidate 7f88df7a-aa92-47f4-900c-36b8b3464274 not found."
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2578.15
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:37.261Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "rollNo": null,
+              "mobile": null,
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "rollNo": null,
+                "mobile": null,
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1638.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:38.689Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 0,
+          "skippedCount": 1,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) removed from batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 0,
+            "skippedCount": 1,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1425.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:38.924Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 234.29
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:40.808Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=117&scheduleFrom=2026-09-19T11%3A31%3A38.926Z&scheduleTo=2026-09-19T13%3A32%3A38.926Z&search=qa26.d12.after&pageSize=100",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "dc8b5241d740e0f5e54f229b691f0dba"
+        },
+        "ms": 1882.6
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:45.850Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=117&scheduleFrom=2026-09-19T11%3A31%3A38.926Z&scheduleTo=2026-09-19T13%3A32%3A38.926Z&search=qa26.d12.after&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "rollNo": null,
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "mobile": null,
+              "isActive": true,
+              "isBlocked": false,
+              "examAssigned": false,
+              "examStarted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "rollNo": null,
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "mobile": null,
+                "isActive": true,
+                "isBlocked": false,
+                "examAssigned": false,
+                "examStarted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5040.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:47.723Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "db054cb1c27d1eecb40c7219780ed426"
+        },
+        "ms": 1870.83
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:49.918Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "candidateName": "QA26 D12 after eng",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "candidateName": "QA26 D12 after eng",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2193.3
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:53.006Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Candidate not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "c23bb782d54f5420f8b9005c4a03c552"
+        },
+        "ms": 3086.61
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:55.107Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "candidateName": "QA26 D12 after ops",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "candidateName": "QA26 D12 after ops",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2100.01
+      }
+    },
+    {
+      "at": "2026-09-19T11:32:58.705Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "applyToAllMatchingFilters": true,
+        "search": "qa26.d12.after.ops@example.test"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "No candidates matched the criteria.",
+          "data": null,
+          "errors": [],
+          "traceId": "9287d51f9553e9eea3343ca5da82b2da"
+        },
+        "ms": 3598.09
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:01.017Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "candidateName": "QA26 D12 after ops",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "candidateName": "QA26 D12 after ops",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2308.98
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:04.065Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04",
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Candidate not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "bdce585d2ecf5c9f9d7bdaa7ba86bf71"
+        },
+        "ms": 3047.57
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:06.875Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=117&scheduleFrom=2026-09-19T11%3A31%3A38.926Z&scheduleTo=2026-09-19T13%3A32%3A38.926Z&search=qa26.d12.after&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "rollNo": null,
+              "fullName": "QA26 D12 after ops",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.ops@example.test",
+              "mobile": null,
+              "isActive": true,
+              "isBlocked": false,
+              "examAssigned": false,
+              "examStarted": false
+            },
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "rollNo": null,
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "mobile": null,
+              "isActive": true,
+              "isBlocked": false,
+              "examAssigned": false,
+              "examStarted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 2,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "rollNo": null,
+                "fullName": "QA26 D12 after ops",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.ops@example.test",
+                "mobile": null,
+                "isActive": true,
+                "isBlocked": false,
+                "examAssigned": false,
+                "examStarted": false
+              },
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "rollNo": null,
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "mobile": null,
+                "isActive": true,
+                "isBlocked": false,
+                "examAssigned": false,
+                "examStarted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 2,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2808.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:08.956Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04",
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 2,
+          "successCount": 0,
+          "skippedCount": 2,
+          "skippedDetails": [
+            {
+              "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "candidateName": "QA26 D12 after eng",
+              "reason": "Not currently assigned"
+            },
+            {
+              "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "candidateName": "QA26 D12 after ops",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 2,
+            "successCount": 0,
+            "skippedCount": 2,
+            "skippedDetails": [
+              {
+                "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "candidateName": "QA26 D12 after eng",
+                "reason": "Not currently assigned"
+              },
+              {
+                "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "candidateName": "QA26 D12 after ops",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2079.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:14.126Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5168.93
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:16.008Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "4864b69297ab982dbdd0a478ab7c952d"
+        },
+        "ms": 1880.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:18.348Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2339.1
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:23.267Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4917.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:25.606Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2337.34
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:26.309Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/11/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Batch deactivated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 702.52
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:28.412Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "batchId": 11
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Batch not found or inactive.",
+          "data": null,
+          "errors": [],
+          "traceId": "74381d32303a544b361668cc7f34bf1d"
+        },
+        "ms": 2101.39
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:30.532Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "candidateName": "QA26 D12 after eng",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "candidateName": "QA26 D12 after eng",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2118.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:31.232Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Batches/11/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Batch activated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 698.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:33.562Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Batches/11/candidates",
+      "request": {
+        "candidateIds": [
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalRequested": 1,
+          "affectedCount": 1,
+          "skippedCount": 0,
+          "errors": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) added to batch.",
+          "data": {
+            "totalRequested": 1,
+            "affectedCount": 1,
+            "skippedCount": 0,
+            "errors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2329.53
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:35.659Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "rollNo": null,
+              "mobile": null,
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+              "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "addedByName": "QA26 Engineering Admin 1"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "rollNo": null,
+                "mobile": null,
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:32:10.8532821+04:00",
+                "addedBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+                "addedByName": "QA26 Engineering Admin 1"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2095.62
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:37.752Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 11,
+          "name": "QA26 D12 after Cohort",
+          "description": "Disposable isolation fixture",
+          "isActive": true,
+          "candidateCount": 1,
+          "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+          "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+          "createdByName": "QA26 Engineering Admin 1",
+          "candidates": [
+            {
+              "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "fullName": "QA26 D12 after ops",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.ops@example.test",
+              "rollNo": null,
+              "mobile": null,
+              "isBlocked": false,
+              "addedAt": "2026-09-19T15:33:33.3276073+04:00",
+              "addedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "addedByName": "System Administrator"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 11,
+            "name": "QA26 D12 after Cohort",
+            "description": "Disposable isolation fixture",
+            "isActive": true,
+            "candidateCount": 1,
+            "createdDate": "2026-09-19T15:32:07.8229008+04:00",
+            "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "createdByName": "QA26 Engineering Admin 1",
+            "candidates": [
+              {
+                "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "fullName": "QA26 D12 after ops",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.ops@example.test",
+                "rollNo": null,
+                "mobile": null,
+                "isBlocked": false,
+                "addedAt": "2026-09-19T15:33:33.3276073+04:00",
+                "addedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+                "addedByName": "System Administrator"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2091.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:42.928Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 117,
+        "scheduleFrom": "2026-09-19T11:31:38.926Z",
+        "scheduleTo": "2026-09-19T13:32:38.926Z",
+        "batchId": 11
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5173.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:45.742Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=117&scheduleFrom=2026-09-19T11%3A31%3A38.926Z&scheduleTo=2026-09-19T13%3A32%3A38.926Z&search=qa26.d12.after&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "rollNo": null,
+              "fullName": "QA26 D12 after ops",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.ops@example.test",
+              "mobile": null,
+              "isActive": true,
+              "isBlocked": false,
+              "examAssigned": false,
+              "examStarted": false
+            },
+            {
+              "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+              "rollNo": null,
+              "fullName": "QA26 D12 after eng",
+              "fullNameAr": "اختبار حدود الدفعة",
+              "email": "qa26.d12.after.eng@example.test",
+              "mobile": null,
+              "isActive": true,
+              "isBlocked": false,
+              "examAssigned": true,
+              "examStarted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 2,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "rollNo": null,
+                "fullName": "QA26 D12 after ops",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.ops@example.test",
+                "mobile": null,
+                "isActive": true,
+                "isBlocked": false,
+                "examAssigned": false,
+                "examStarted": false
+              },
+              {
+                "id": "493c2b65-9895-44c9-8f57-9906d880aa04",
+                "rollNo": null,
+                "fullName": "QA26 D12 after eng",
+                "fullNameAr": "اختبار حدود الدفعة",
+                "email": "qa26.d12.after.eng@example.test",
+                "mobile": null,
+                "isActive": true,
+                "isBlocked": false,
+                "examAssigned": true,
+                "examStarted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 2,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2812.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:48.070Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 117,
+        "candidateIds": [
+          "493c2b65-9895-44c9-8f57-9906d880aa04",
+          "7f88df7a-aa92-47f4-900c-36b8b3464274"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 2,
+          "successCount": 1,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+              "candidateName": "QA26 D12 after ops",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 2,
+            "successCount": 1,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "7f88df7a-aa92-47f4-900c-36b8b3464274",
+                "candidateName": "QA26 D12 after ops",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2324.24
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:48.771Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "DELETE",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Batch deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 700.9
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:49.938Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Batches/11",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Batch not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "995d6936d01a1cfd4467aa5b739f144f"
+        },
+        "ms": 1164.19
+      }
+    },
+    {
+      "at": "2026-09-19T11:33:49.939Z",
+      "action": "batch already softdeleted by reproduced vulnerability",
+      "batch": 11
+    }
+  ]
+}

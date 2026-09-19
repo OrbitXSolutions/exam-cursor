@@ -1,0 +1,4391 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:10:51.141Z",
+  "checks": [
+    {
+      "name": "create rejects no-options",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:10:56.018Z"
+    },
+    {
+      "name": "create rejects no-correct",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:10:56.263Z"
+    },
+    {
+      "name": "create rejects two-correct",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:10:56.502Z"
+    },
+    {
+      "name": "create rejects truefalse-extra",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:10:56.737Z"
+    },
+    {
+      "name": "create rejects multi-no-correct",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T11:10:56.973Z"
+    },
+    {
+      "name": "reject individual weight mismatch",
+      "passed": true,
+      "detail": {
+        "status": 404,
+        "message": "Sum of option points must equal the question total points."
+      },
+      "at": "2026-09-19T11:11:01.700Z"
+    },
+    {
+      "name": "individual weight mismatch rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:02.867Z"
+    },
+    {
+      "name": "reject bulk weight mismatch",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "message": "Sum of option points must equal the question total points."
+      },
+      "at": "2026-09-19T11:11:07.538Z"
+    },
+    {
+      "name": "bulk weight mismatch rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:08.711Z"
+    },
+    {
+      "name": "reject adding unbalanced weight",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "message": "Sum of option points must equal the question total points."
+      },
+      "at": "2026-09-19T11:11:13.194Z"
+    },
+    {
+      "name": "adding unbalanced weight rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:14.367Z"
+    },
+    {
+      "name": "reject deleting scored option",
+      "passed": true,
+      "detail": {
+        "status": 404,
+        "message": "Sum of option points must equal the question total points."
+      },
+      "at": "2026-09-19T11:11:19.308Z"
+    },
+    {
+      "name": "deleting scored option rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:20.485Z"
+    },
+    {
+      "name": "reject foreign bulk option id",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "message": "Option not found in this question."
+      },
+      "at": "2026-09-19T11:11:24.944Z"
+    },
+    {
+      "name": "foreign bulk option id rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:26.123Z"
+    },
+    {
+      "name": "reject duplicate bulk option id",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "message": "An option may only be updated once per request."
+      },
+      "at": "2026-09-19T11:11:30.566Z"
+    },
+    {
+      "name": "duplicate bulk option id rejection preserves persisted complete question",
+      "passed": true,
+      "at": "2026-09-19T11:11:31.744Z"
+    },
+    {
+      "name": "individual edit cannot remove sole correct answer",
+      "passed": true,
+      "at": "2026-09-19T11:11:36.452Z"
+    },
+    {
+      "name": "invalid single answer edit preserves state",
+      "passed": true,
+      "at": "2026-09-19T11:11:37.632Z"
+    },
+    {
+      "name": "atomic update accepts new total and matching option weights",
+      "passed": true,
+      "at": "2026-09-19T11:11:45.406Z"
+    },
+    {
+      "name": "atomic update preserves retained option IDs",
+      "passed": true,
+      "at": "2026-09-19T11:11:45.407Z"
+    },
+    {
+      "name": "atomic update removes omitted option and adds new option",
+      "passed": true,
+      "at": "2026-09-19T11:11:45.409Z"
+    },
+    {
+      "name": "atomic update response excludes removed options",
+      "passed": true,
+      "at": "2026-09-19T11:11:45.410Z"
+    },
+    {
+      "name": "invalid atomic sum rejected",
+      "passed": true,
+      "at": "2026-09-19T11:11:45.648Z"
+    },
+    {
+      "name": "invalid atomic sum preserves total body and all options",
+      "passed": true,
+      "at": "2026-09-19T11:11:46.821Z"
+    },
+    {
+      "name": "metadata-only request remains supported when stored options valid",
+      "passed": true,
+      "at": "2026-09-19T11:11:51.065Z"
+    },
+    {
+      "name": "legacy null-weight multi remains supported",
+      "passed": true,
+      "at": "2026-09-19T11:11:54.108Z"
+    },
+    {
+      "name": "subjective needs no choice options",
+      "passed": true,
+      "at": "2026-09-19T11:11:56.442Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:10:52.413Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:52.4074437+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:10:51.7053777+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:52.4074437+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:10:51.7053777+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1269.4
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:53.113Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Lookups/question-types?pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 1,
+              "nameEn": "MCQ_Single",
+              "nameAr": "اختيار من متعدد (إجابة واحدة)",
+              "createdDate": "2024-01-01T00:00:00+00:00",
+              "updatedDate": null,
+              "isDeleted": false
+            },
+            {
+              "id": 2,
+              "nameEn": "MCQ_Multi",
+              "nameAr": "اختيار من متعدد (أكثر من إجابة)",
+              "createdDate": "2024-01-01T00:00:00+00:00",
+              "updatedDate": null,
+              "isDeleted": false
+            },
+            {
+              "id": 3,
+              "nameEn": "TrueFalse",
+              "nameAr": "صح/خطأ",
+              "createdDate": "2024-01-01T00:00:00+00:00",
+              "updatedDate": null,
+              "isDeleted": false
+            },
+            {
+              "id": 5,
+              "nameEn": "Subjective",
+              "nameAr": "مقالي",
+              "createdDate": "2024-01-01T00:00:00+00:00",
+              "updatedDate": "2026-02-13T15:46:18.1026679+00:00",
+              "isDeleted": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 4,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 1,
+                "nameEn": "MCQ_Single",
+                "nameAr": "اختيار من متعدد (إجابة واحدة)",
+                "createdDate": "2024-01-01T00:00:00+00:00",
+                "updatedDate": null,
+                "isDeleted": false
+              },
+              {
+                "id": 2,
+                "nameEn": "MCQ_Multi",
+                "nameAr": "اختيار من متعدد (أكثر من إجابة)",
+                "createdDate": "2024-01-01T00:00:00+00:00",
+                "updatedDate": null,
+                "isDeleted": false
+              },
+              {
+                "id": 3,
+                "nameEn": "TrueFalse",
+                "nameAr": "صح/خطأ",
+                "createdDate": "2024-01-01T00:00:00+00:00",
+                "updatedDate": null,
+                "isDeleted": false
+              },
+              {
+                "id": 5,
+                "nameEn": "Subjective",
+                "nameAr": "مقالي",
+                "createdDate": "2024-01-01T00:00:00+00:00",
+                "updatedDate": "2026-02-13T15:46:18.1026679+00:00",
+                "isDeleted": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 4,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 699.11
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:54.336Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:10:54.3359051+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T15:10:53.6361888+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:10:54.3359051+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T15:10:53.6361888+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1221.3
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:55.726Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "POST",
+      "route": "/api/Lookups/question-subjects",
+      "request": {
+        "nameEn": "QA26 D08 Isolated Options",
+        "nameAr": "اختبار خيارات منعزل"
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 29,
+          "nameEn": "QA26 D08 Isolated Options",
+          "nameAr": "اختبار خيارات منعزل",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "topicsCount": 0,
+          "createdDate": "2026-09-19T15:10:55.4926302+04:00",
+          "updatedDate": null,
+          "isDeleted": false
+        },
+        "body": {
+          "success": true,
+          "message": "Question subject created successfully",
+          "data": {
+            "id": 29,
+            "nameEn": "QA26 D08 Isolated Options",
+            "nameAr": "اختبار خيارات منعزل",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "topicsCount": 0,
+            "createdDate": "2026-09-19T15:10:55.4926302+04:00",
+            "updatedDate": null,
+            "isDeleted": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1389.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.017Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after invalid no-options",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": []
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "At least two options are required for a choice question."
+            ]
+          },
+          "traceId": "00-feee01261384cfaa22a0a35f959e384e-1bba199326393286-00"
+        },
+        "ms": 289.45
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.262Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after invalid no-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "Single-choice and true/false questions require exactly one correct option."
+            ]
+          },
+          "traceId": "00-583a5a46803b1997ac1deef97a106033-afab9675dd3269aa-00"
+        },
+        "ms": 242.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.502Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after invalid two-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "Single-choice and true/false questions require exactly one correct option."
+            ]
+          },
+          "traceId": "00-e8e7a2c6fb87d27eeacce0f8dda4152c-5b2094ee272fdf26-00"
+        },
+        "ms": 237.55
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.736Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after invalid truefalse-extra",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 3,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "T",
+            "textAr": "خيار T",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "F",
+            "textAr": "خيار F",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "Other",
+            "textAr": "خيار Other",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "True/false questions require exactly two options."
+            ]
+          },
+          "traceId": "00-82c9acc7602e67b7fe9146836c6d3baa-c1be7f82d707eb3e-00"
+        },
+        "ms": 232.81
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:56.973Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after invalid multi-no-correct",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "At least one option must be marked as correct."
+            ]
+          },
+          "traceId": "00-40f619d35b0b681b395625f9dd188bc0-09d98170aa991aa6-00"
+        },
+        "ms": 234.8
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:00.049Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after individual weight mismatch",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 156,
+          "bodyEn": "QA26 D08 after individual weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 436,
+              "questionId": 156,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+            },
+            {
+              "id": 437,
+              "questionId": 156,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+            },
+            {
+              "id": 438,
+              "questionId": 156,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346446+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 156,
+            "bodyEn": "QA26 D08 after individual weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 436,
+                "questionId": 156,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+              },
+              {
+                "id": 437,
+                "questionId": 156,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+              },
+              {
+                "id": 438,
+                "questionId": 156,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346446+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3075.13
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:01.700Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/436",
+      "request": {
+        "id": 436,
+        "textEn": "A",
+        "textAr": "خيار A",
+        "isCorrect": true,
+        "points": 7,
+        "order": 0,
+        "attachmentPath": null
+      },
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Sum of option points must equal the question total points.",
+          "data": null,
+          "errors": [],
+          "traceId": "9708c2cf03afe9cc27931cdb4956c598"
+        },
+        "ms": 1649.14
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:02.866Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/156",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 156,
+          "bodyEn": "QA26 D08 after individual weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 436,
+              "questionId": 156,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+            },
+            {
+              "id": 437,
+              "questionId": 156,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+            },
+            {
+              "id": 438,
+              "questionId": 156,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:10:58.6346446+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 156,
+            "bodyEn": "QA26 D08 after individual weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:10:58.6339419+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 436,
+                "questionId": 156,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346383+04:00"
+              },
+              {
+                "id": 437,
+                "questionId": 156,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346443+04:00"
+              },
+              {
+                "id": 438,
+                "questionId": 156,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:10:58.6346446+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1165.21
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:05.892Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after bulk weight mismatch",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 157,
+          "bodyEn": "QA26 D08 after bulk weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:04.49598+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 439,
+              "questionId": 157,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959829+04:00"
+            },
+            {
+              "id": 440,
+              "questionId": 157,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959839+04:00"
+            },
+            {
+              "id": 441,
+              "questionId": 157,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959841+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 157,
+            "bodyEn": "QA26 D08 after bulk weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:04.49598+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 439,
+                "questionId": 157,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959829+04:00"
+              },
+              {
+                "id": 440,
+                "questionId": 157,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959839+04:00"
+              },
+              {
+                "id": 441,
+                "questionId": 157,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959841+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3023.99
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:07.537Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/157/options/bulk",
+      "request": [
+        {
+          "id": 439,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 7,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 440,
+          "textEn": "B",
+          "textAr": "خيار B",
+          "isCorrect": true,
+          "points": 4,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 441,
+          "textEn": "C",
+          "textAr": "خيار C",
+          "isCorrect": false,
+          "points": 0,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Sum of option points must equal the question total points.",
+          "data": null,
+          "errors": [],
+          "traceId": "e77b87c1940cc851ef5a998969b1a996"
+        },
+        "ms": 1642.99
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:08.710Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/157",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 157,
+          "bodyEn": "QA26 D08 after bulk weight mismatch",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:04.49598+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 439,
+              "questionId": 157,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959829+04:00"
+            },
+            {
+              "id": 440,
+              "questionId": 157,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959839+04:00"
+            },
+            {
+              "id": 441,
+              "questionId": 157,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:04.4959841+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 157,
+            "bodyEn": "QA26 D08 after bulk weight mismatch",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:04.49598+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 439,
+                "questionId": 157,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959829+04:00"
+              },
+              {
+                "id": 440,
+                "questionId": 157,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959839+04:00"
+              },
+              {
+                "id": 441,
+                "questionId": 157,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:04.4959841+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1171.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:11.771Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after adding unbalanced weight",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 158,
+          "bodyEn": "QA26 D08 after adding unbalanced weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:10.3568375+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 442,
+              "questionId": 158,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568408+04:00"
+            },
+            {
+              "id": 443,
+              "questionId": 158,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568419+04:00"
+            },
+            {
+              "id": 444,
+              "questionId": 158,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568421+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 158,
+            "bodyEn": "QA26 D08 after adding unbalanced weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:10.3568375+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 442,
+                "questionId": 158,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568408+04:00"
+              },
+              {
+                "id": 443,
+                "questionId": 158,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568419+04:00"
+              },
+              {
+                "id": 444,
+                "questionId": 158,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568421+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3058.51
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:13.193Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions/158/options",
+      "request": {
+        "textEn": "D",
+        "textAr": "خيار D",
+        "isCorrect": true,
+        "points": 1,
+        "order": 0
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Sum of option points must equal the question total points.",
+          "data": null,
+          "errors": [],
+          "traceId": "ddbabf6244b4218cf9bce0ca0eacdb1c"
+        },
+        "ms": 1420.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:14.366Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/158",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 158,
+          "bodyEn": "QA26 D08 after adding unbalanced weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:10.3568375+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 442,
+              "questionId": 158,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568408+04:00"
+            },
+            {
+              "id": 443,
+              "questionId": 158,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568419+04:00"
+            },
+            {
+              "id": 444,
+              "questionId": 158,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:10.3568421+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 158,
+            "bodyEn": "QA26 D08 after adding unbalanced weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:10.3568375+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 442,
+                "questionId": 158,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568408+04:00"
+              },
+              {
+                "id": 443,
+                "questionId": 158,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568419+04:00"
+              },
+              {
+                "id": 444,
+                "questionId": 158,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:10.3568421+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1171.72
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:17.406Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after deleting scored option",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 159,
+          "bodyEn": "QA26 D08 after deleting scored option",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:16.0032347+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 445,
+              "questionId": 159,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032378+04:00"
+            },
+            {
+              "id": 446,
+              "questionId": 159,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032388+04:00"
+            },
+            {
+              "id": 447,
+              "questionId": 159,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032389+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 159,
+            "bodyEn": "QA26 D08 after deleting scored option",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:16.0032347+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 445,
+                "questionId": 159,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032378+04:00"
+              },
+              {
+                "id": 446,
+                "questionId": 159,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032388+04:00"
+              },
+              {
+                "id": 447,
+                "questionId": 159,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032389+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3037.93
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:19.307Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/options/445",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": false,
+        "body": {
+          "success": false,
+          "message": "Sum of option points must equal the question total points.",
+          "data": false,
+          "errors": [],
+          "traceId": "65e36042cec2b4cf7713750668a36721"
+        },
+        "ms": 1900.19
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:20.484Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/159",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 159,
+          "bodyEn": "QA26 D08 after deleting scored option",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:16.0032347+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 445,
+              "questionId": 159,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032378+04:00"
+            },
+            {
+              "id": 446,
+              "questionId": 159,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032388+04:00"
+            },
+            {
+              "id": 447,
+              "questionId": 159,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:16.0032389+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 159,
+            "bodyEn": "QA26 D08 after deleting scored option",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:16.0032347+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 445,
+                "questionId": 159,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032378+04:00"
+              },
+              {
+                "id": 446,
+                "questionId": 159,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032388+04:00"
+              },
+              {
+                "id": 447,
+                "questionId": 159,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:16.0032389+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1175.06
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:23.535Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after foreign bulk option id",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 160,
+          "bodyEn": "QA26 D08 after foreign bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:22.1245044+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 448,
+              "questionId": 160,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245074+04:00"
+            },
+            {
+              "id": 449,
+              "questionId": 160,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245087+04:00"
+            },
+            {
+              "id": 450,
+              "questionId": 160,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245089+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 160,
+            "bodyEn": "QA26 D08 after foreign bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:22.1245044+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 448,
+                "questionId": 160,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245074+04:00"
+              },
+              {
+                "id": 449,
+                "questionId": 160,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245087+04:00"
+              },
+              {
+                "id": 450,
+                "questionId": 160,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245089+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3048.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:24.943Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/160/options/bulk",
+      "request": [
+        {
+          "id": 2147483647,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Option not found in this question.",
+          "data": null,
+          "errors": [],
+          "traceId": "d5db5d098f794d55cf9054912f567e69"
+        },
+        "ms": 1406.37
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:26.121Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/160",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 160,
+          "bodyEn": "QA26 D08 after foreign bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:22.1245044+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 448,
+              "questionId": 160,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245074+04:00"
+            },
+            {
+              "id": 449,
+              "questionId": 160,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245087+04:00"
+            },
+            {
+              "id": 450,
+              "questionId": 160,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:22.1245089+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 160,
+            "bodyEn": "QA26 D08 after foreign bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:22.1245044+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 448,
+                "questionId": 160,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245074+04:00"
+              },
+              {
+                "id": 449,
+                "questionId": 160,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245087+04:00"
+              },
+              {
+                "id": 450,
+                "questionId": 160,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:22.1245089+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1176.82
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:29.162Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after duplicate bulk option id",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 161,
+          "bodyEn": "QA26 D08 after duplicate bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:27.7560602+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 451,
+              "questionId": 161,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.7560641+04:00"
+            },
+            {
+              "id": 452,
+              "questionId": 161,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.7560652+04:00"
+            },
+            {
+              "id": 453,
+              "questionId": 161,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.756068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 161,
+            "bodyEn": "QA26 D08 after duplicate bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:27.7560602+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 451,
+                "questionId": 161,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.7560641+04:00"
+              },
+              {
+                "id": 452,
+                "questionId": 161,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.7560652+04:00"
+              },
+              {
+                "id": 453,
+                "questionId": 161,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.756068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3038.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:30.565Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/161/options/bulk",
+      "request": [
+        {
+          "id": 451,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        },
+        {
+          "id": 451,
+          "textEn": "A",
+          "textAr": "خيار A",
+          "isCorrect": true,
+          "points": 6,
+          "order": 0,
+          "attachmentPath": null
+        }
+      ],
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "An option may only be updated once per request.",
+          "data": null,
+          "errors": [],
+          "traceId": "50084222cbd9695e966e04aa2e7b1c36"
+        },
+        "ms": 1401.69
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:31.742Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/161",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 161,
+          "bodyEn": "QA26 D08 after duplicate bulk option id",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:27.7560602+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 451,
+              "questionId": 161,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.7560641+04:00"
+            },
+            {
+              "id": 452,
+              "questionId": 161,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.7560652+04:00"
+            },
+            {
+              "id": 453,
+              "questionId": 161,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:27.756068+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 161,
+            "bodyEn": "QA26 D08 after duplicate bulk option id",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:27.7560602+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 451,
+                "questionId": 161,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.7560641+04:00"
+              },
+              {
+                "id": 452,
+                "questionId": 161,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.7560652+04:00"
+              },
+              {
+                "id": 453,
+                "questionId": 161,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:27.756068+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1173.87
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:34.803Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after single-key-change",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 1,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 162,
+          "bodyEn": "QA26 D08 after single-key-change",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:33.3867918+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 454,
+              "questionId": 162,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:33.3867949+04:00"
+            },
+            {
+              "id": 455,
+              "questionId": 162,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:33.3867958+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 162,
+            "bodyEn": "QA26 D08 after single-key-change",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:33.3867918+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 454,
+                "questionId": 162,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:33.3867949+04:00"
+              },
+              {
+                "id": 455,
+                "questionId": 162,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:33.3867958+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3058.8
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:36.451Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/454",
+      "request": {
+        "id": 454,
+        "textEn": "A",
+        "textAr": "خيار A",
+        "isCorrect": false,
+        "points": null,
+        "order": 0,
+        "attachmentPath": null
+      },
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Single-choice and true/false questions require exactly one correct option.",
+          "data": null,
+          "errors": [],
+          "traceId": "f12064bc5b4b92de9b27721752a3976c"
+        },
+        "ms": 1644.71
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:37.630Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/162",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 162,
+          "bodyEn": "QA26 D08 after single-key-change",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:33.3867918+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 454,
+              "questionId": 162,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:33.3867949+04:00"
+            },
+            {
+              "id": 455,
+              "questionId": 162,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:33.3867958+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 162,
+            "bodyEn": "QA26 D08 after single-key-change",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:33.3867918+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 454,
+                "questionId": 162,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:33.3867949+04:00"
+              },
+              {
+                "id": 455,
+                "questionId": 162,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:33.3867958+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1177.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:40.673Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after atomic-total-and-options",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 6,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 4,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": 0,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after atomic-total-and-options",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 6,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 4,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            },
+            {
+              "id": 458,
+              "questionId": 163,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": 0,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.269833+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after atomic-total-and-options",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 6,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 4,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              },
+              {
+                "id": 458,
+                "questionId": 163,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": 0,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.269833+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3039.55
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:44.224Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/163",
+      "request": {
+        "bodyEn": "QA26 D08 after changed",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 20,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "id": 456,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 12,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 457,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 8,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 0,
+            "textEn": "new wrong choice",
+            "textAr": "خيار new wrong choice",
+            "isCorrect": false,
+            "points": 0,
+            "order": 2
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            },
+            {
+              "id": 459,
+              "questionId": 163,
+              "textEn": "new wrong choice",
+              "textAr": "خيار new wrong choice",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              },
+              {
+                "id": 459,
+                "questionId": 163,
+                "textEn": "new wrong choice",
+                "textAr": "خيار new wrong choice",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3549.36
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:45.404Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/163",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            },
+            {
+              "id": 459,
+              "questionId": 163,
+              "textEn": "new wrong choice",
+              "textAr": "خيار new wrong choice",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              },
+              {
+                "id": 459,
+                "questionId": 163,
+                "textEn": "new wrong choice",
+                "textAr": "خيار new wrong choice",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1178.59
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:45.647Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/163",
+      "request": {
+        "bodyEn": "SHOULD NOT SAVE",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 99,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "id": 456,
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": 12,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 457,
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": 8,
+            "order": 0,
+            "attachmentPath": null
+          },
+          {
+            "id": 459,
+            "textEn": "new wrong choice",
+            "textAr": "خيار new wrong choice",
+            "isCorrect": false,
+            "points": 0,
+            "order": 2,
+            "attachmentPath": null
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "body": {
+          "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+          "title": "One or more validation errors occurred.",
+          "status": 400,
+          "errors": {
+            "Options": [
+              "Sum of option points must equal the question total points."
+            ]
+          },
+          "traceId": "00-b719aee0c79b626e653d51db041ab0e1-91a3243b03315830-00"
+        },
+        "ms": 235.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:46.819Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/163",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            },
+            {
+              "id": 459,
+              "questionId": 163,
+              "textEn": "new wrong choice",
+              "textAr": "خيار new wrong choice",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              },
+              {
+                "id": 459,
+                "questionId": 163,
+                "textEn": "new wrong choice",
+                "textAr": "خيار new wrong choice",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1170.39
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:48.012Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/163",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            },
+            {
+              "id": 459,
+              "questionId": 163,
+              "textEn": "new wrong choice",
+              "textAr": "خيار new wrong choice",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              },
+              {
+                "id": 459,
+                "questionId": 163,
+                "textEn": "new wrong choice",
+                "textAr": "خيار new wrong choice",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1189.98
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:51.064Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/163",
+      "request": {
+        "bodyEn": "QA26 D08 after changed",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 20,
+        "difficultyLevel": 2,
+        "isActive": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 163,
+          "bodyEn": "QA26 D08 after changed",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 459,
+              "questionId": 163,
+              "textEn": "new wrong choice",
+              "textAr": "خيار new wrong choice",
+              "isCorrect": false,
+              "points": 0,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+            },
+            {
+              "id": 456,
+              "questionId": 163,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": 12,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+            },
+            {
+              "id": 457,
+              "questionId": 163,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": 8,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 163,
+            "bodyEn": "QA26 D08 after changed",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:39.2698287+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 459,
+                "questionId": 163,
+                "textEn": "new wrong choice",
+                "textAr": "خيار new wrong choice",
+                "isCorrect": false,
+                "points": 0,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:43.0437226+04:00"
+              },
+              {
+                "id": 456,
+                "questionId": 163,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": 12,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698319+04:00"
+              },
+              {
+                "id": 457,
+                "questionId": 163,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": 8,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:39.2698329+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3050.21
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:54.106Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after legacy-null-weight",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 2,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": [
+          {
+            "textEn": "A",
+            "textAr": "خيار A",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "B",
+            "textAr": "خيار B",
+            "isCorrect": true,
+            "points": null,
+            "order": 0
+          },
+          {
+            "textEn": "C",
+            "textAr": "خيار C",
+            "isCorrect": false,
+            "points": null,
+            "order": 0
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 164,
+          "bodyEn": "QA26 D08 after legacy-null-weight",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 2,
+          "questionTypeNameEn": "MCQ_Multi",
+          "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:52.7106632+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 460,
+              "questionId": 164,
+              "textEn": "A",
+              "textAr": "خيار A",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:52.7106666+04:00"
+            },
+            {
+              "id": 461,
+              "questionId": 164,
+              "textEn": "B",
+              "textAr": "خيار B",
+              "isCorrect": true,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:52.710668+04:00"
+            },
+            {
+              "id": 462,
+              "questionId": 164,
+              "textEn": "C",
+              "textAr": "خيار C",
+              "isCorrect": false,
+              "points": null,
+              "order": 0,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:11:52.7106682+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 164,
+            "bodyEn": "QA26 D08 after legacy-null-weight",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 2,
+            "questionTypeNameEn": "MCQ_Multi",
+            "questionTypeNameAr": "اختيار من متعدد (أكثر من إجابة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:52.7106632+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 460,
+                "questionId": 164,
+                "textEn": "A",
+                "textAr": "خيار A",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:52.7106666+04:00"
+              },
+              {
+                "id": 461,
+                "questionId": 164,
+                "textEn": "B",
+                "textAr": "خيار B",
+                "isCorrect": true,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:52.710668+04:00"
+              },
+              {
+                "id": 462,
+                "questionId": 164,
+                "textEn": "C",
+                "textAr": "خيار C",
+                "isCorrect": false,
+                "points": null,
+                "order": 0,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:11:52.7106682+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3039.3
+      }
+    },
+    {
+      "at": "2026-09-19T11:11:56.440Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 D08 after subjective-empty",
+        "bodyAr": "اختبار خيارات",
+        "questionTypeId": 5,
+        "subjectId": 29,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "options": []
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 165,
+          "bodyEn": "QA26 D08 after subjective-empty",
+          "bodyAr": "اختبار خيارات",
+          "explanationEn": null,
+          "explanationAr": null,
+          "questionTypeId": 5,
+          "questionTypeNameEn": "Subjective",
+          "questionTypeNameAr": "مقالي",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 29,
+          "subjectNameEn": "QA26 D08 Isolated Options",
+          "subjectNameAr": "اختبار خيارات منعزل",
+          "topicId": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:11:55.7396211+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 165,
+            "bodyEn": "QA26 D08 after subjective-empty",
+            "bodyAr": "اختبار خيارات",
+            "explanationEn": null,
+            "explanationAr": null,
+            "questionTypeId": 5,
+            "questionTypeNameEn": "Subjective",
+            "questionTypeNameAr": "مقالي",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 29,
+            "subjectNameEn": "QA26 D08 Isolated Options",
+            "subjectNameAr": "اختبار خيارات منعزل",
+            "topicId": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:11:55.7396211+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2330.4
+      }
+    }
+  ]
+}

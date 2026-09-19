@@ -20,6 +20,8 @@ using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Smart_Core.Domain.Common;
+using Smart_Core.Application.Validators.Candidate;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Candidate;
 
@@ -205,7 +207,9 @@ public class CandidateService : ICandidateService
                     a.ExamId,
                     a.Status,
                     a.StartedAt,
-                    a.SubmittedAt
+                    a.SubmittedAt,
+                    TotalPoints = a.Questions.Sum(q => q.Points),
+                    TotalQuestions = a.Questions.Count
                 })
                 .ToListAsync();
 
@@ -334,6 +338,13 @@ public class CandidateService : ICandidateService
                             || latestAttempt.Status == AttemptStatus.Cancelled
                             || latestAttempt.Status == AttemptStatus.ForceSubmitted
                             || latestAttempt.Status == AttemptStatus.Terminated);
+
+                       // A completed card represents the saved attempt, not today's changing pool estimate.
+                       if (hasFinishedAttempt && latestAttempt != null)
+                       {
+                           totalPoints = latestAttempt.TotalPoints;
+                           totalQuestions = latestAttempt.TotalQuestions;
+                       }
 
                        var hasAdminOverride = overrideExamIdSet.Contains(e.Id);
 
@@ -534,6 +545,13 @@ public class CandidateService : ICandidateService
             return ApiResponse<CandidateAttemptSessionDto>.FailureResponse("Exam is not available");
         }
 
+        if (!await CandidateAssignmentPolicy.CanStartAsync(_context, exam.Id,
+                exam.AccessPolicy?.RestrictToAssignedCandidates == true, candidateId))
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(CandidateAssignmentPolicy.DeniedMessage);
+
+        if (!await CandidateIdentityPolicy.CanStartAsync(_context, exam.RequireIdVerification, candidateId))
+            return ApiResponse<CandidateAttemptSessionDto>.FailureResponse(CandidateIdentityPolicy.DeniedMessage);
+
         await using var startTransaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
         // Use the same candidate lock as AttemptService, including when no attempt exists yet.
         await _context.Database.SqlQuery<string>(
@@ -622,16 +640,26 @@ public class CandidateService : ICandidateService
             }
         }
 
-        // Check for existing active attempt
-        var existingActive = await _context.Set<Domain.Entities.Attempt.Attempt>()
+        // The candidate lock above already serializes starts, including the empty range.
+        // Resolve the ID without update locks so an optimizer-selected composite scan
+        // cannot retain update locks on other candidates' attempts during the ramp.
+        var existingActiveId = await _context.Set<Domain.Entities.Attempt.Attempt>()
+            .Where(a => a.ExamId == examId && a.CandidateId == candidateId &&
+                (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed))
+            .Select(a => (int?)a.Id)
+            .FirstOrDefaultAsync();
+
+        var existingActive = existingActiveId.HasValue
+            ? await _context.Set<Domain.Entities.Attempt.Attempt>()
             .FromSqlInterpolated(
-                $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [ExamId] = {examId} AND [CandidateId] = {candidateId}")
+                $"SELECT * FROM [Attempts] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {existingActiveId.Value}")
                  .Include(a => a.Questions.OrderBy(q => q.Order))
         .ThenInclude(aq => aq.Answers)
                  .FirstOrDefaultAsync(a =>
             a.ExamId == examId &&
         a.CandidateId == candidateId &&
-        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed));
+        (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed))
+            : null;
 
         if (existingActive != null)
         {
@@ -640,6 +668,7 @@ public class CandidateService : ICandidateService
             {
                 existingActive.Status = AttemptStatus.Expired;
                 existingActive.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+                await CompleteActiveProctorSessionsAsync(existingActive.Id, now, candidateId);
                 await _context.SaveChangesAsync();
             }
             else
@@ -896,6 +925,7 @@ public class CandidateService : ICandidateService
         {
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+            await CompleteActiveProctorSessionsAsync(attempt.Id, now, candidateId);
             await _context.SaveChangesAsync();
             InvalidateAttemptCompletionCaches();
         }
@@ -943,23 +973,32 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         {
             attempt.Status = AttemptStatus.Expired;
             attempt.ExpiryReason = ExpiryReason.TimerExpiredWhileActive;
+            await CompleteActiveProctorSessionsAsync(attempt.Id, now, candidateId);
             await _context.SaveChangesAsync();
             await answerTransaction.CommitAsync();
             InvalidateAttemptCompletionCaches();
             return ApiResponse<bool>.FailureResponse("Attempt has expired. Cannot save answers.");
         }
 
-        // Update status to InProgress if still Started
-        if (attempt.Status == AttemptStatus.Started)
-        {
-            attempt.Status = AttemptStatus.InProgress;
-        }
-
         var questionIds = request.Answers.Select(a => a.QuestionId).Distinct().ToList();
         var attemptQuestions = await _context.Set<AttemptQuestion>()
+            .Include(aq => aq.Question).ThenInclude(q => q.Options)
+            .Include(aq => aq.Question).ThenInclude(q => q.QuestionType)
             .Where(aq => aq.AttemptId == attemptId && questionIds.Contains(aq.QuestionId))
             .ToListAsync();
         var attemptQuestionLookup = attemptQuestions.ToDictionary(aq => aq.QuestionId);
+
+        // Validate the entire batch before changing answers, status, or audit history.
+        foreach (var answerRequest in request.Answers)
+        {
+            if (!attemptQuestionLookup.TryGetValue(answerRequest.QuestionId, out var attemptQuestion))
+                return ApiResponse<bool>.FailureResponse("Question not found in this attempt");
+            var error = CandidateAnswerValidation.Validate(attemptQuestion.Question, answerRequest.SelectedOptionIds, answerRequest.TextAnswer);
+            if (error != null) return ApiResponse<bool>.FailureResponse(error);
+        }
+
+        if (attempt.Status == AttemptStatus.Started && request.Answers.Count > 0)
+            attempt.Status = AttemptStatus.InProgress;
 
         var existingAnswers = await _context.Set<AttemptAnswer>()
             .Where(a => a.AttemptId == attemptId && questionIds.Contains(a.QuestionId))
@@ -1070,7 +1109,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 "Attempt already submitted successfully.");
         }
 
-        if (attempt.Status == AttemptStatus.Expired || attempt.Status == AttemptStatus.Cancelled)
+        if (attempt.Status != AttemptStatus.Started && attempt.Status != AttemptStatus.InProgress && attempt.Status != AttemptStatus.Resumed)
         {
             _logger.LogWarning("Submit failed: Attempt {AttemptId} is {Status} | CandidateId={CandidateId}", attemptId, attempt.Status, candidateId);
             return ApiResponse<CandidateResultSummaryDto>.FailureResponse($"Attempt is {attempt.Status}");
@@ -1083,9 +1122,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             var expiredSubmitRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
                 .Where(a => a.Id == attemptId
                     && a.CandidateId == candidateId
-                    && a.Status != AttemptStatus.Submitted
-                    && a.Status != AttemptStatus.Expired
-                    && a.Status != AttemptStatus.Cancelled
+                    && (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
                     && a.ExpiresAt.HasValue
                     && a.ExpiresAt.Value < now)
                 .ExecuteUpdateAsync(setters => setters
@@ -1177,9 +1214,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var submittedRows = await _context.Set<Domain.Entities.Attempt.Attempt>()
             .Where(a => a.Id == attemptId
                 && a.CandidateId == candidateId
-                && a.Status != AttemptStatus.Submitted
-                && a.Status != AttemptStatus.Expired
-                && a.Status != AttemptStatus.Cancelled
+                && (a.Status == AttemptStatus.Started || a.Status == AttemptStatus.InProgress || a.Status == AttemptStatus.Resumed)
                 && (!a.ExpiresAt.HasValue || a.ExpiresAt.Value >= now))
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(a => a.Status, AttemptStatus.Submitted)
@@ -1442,7 +1477,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var gradedAnswers = await _context.Set<Domain.Entities.Grading.GradedAnswer>()
        .Include(ga => ga.GradingSession)
           .Where(ga => ga.GradingSession.AttemptId == attemptId &&
- ga.GradingSession.Status == GradingStatus.Completed)
+ (ga.GradingSession.Status == GradingStatus.Completed || ga.GradingSession.Status == GradingStatus.AutoGraded))
        .ToDictionaryAsync(ga => ga.QuestionId);
 
         var percentage = result.MaxPossibleScore > 0
@@ -1473,7 +1508,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         var questions = new List<CandidateResultQuestionDto>();
         foreach (var aq in attempt.Questions.OrderBy(q => q.Order))
         {
-            var answer = aq.Answers.FirstOrDefault();
+            var answer = aq.Answers.FirstOrDefault(AnswerContent.HasContent);
             gradedAnswers.TryGetValue(aq.QuestionId, out var gradedAnswer);
 
             var questionDto = new CandidateResultQuestionDto
@@ -1484,7 +1519,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 BodyAr = aq.Question.BodyAr,
                 QuestionTypeName = aq.Question.QuestionType?.NameEn ?? "",
                 Points = aq.Points,
-                ScoreEarned = gradedAnswer?.Score,
+                ScoreEarned = result.Exam.ShowResults ? gradedAnswer?.Score : null,
                 SelectedOptionIds = answer != null && !string.IsNullOrEmpty(answer.SelectedOptionIdsJson)
     ? JsonSerializer.Deserialize<List<int>>(answer.SelectedOptionIdsJson)
           : null,
@@ -1756,6 +1791,20 @@ $"Attempt is {attempt.Status}. Cannot resume.");
 
     #region Private Helpers
 
+    private async Task CompleteActiveProctorSessionsAsync(int attemptId, DateTimeOffset endedAt, string userId)
+    {
+        var sessions = await _context.Set<ProctorSession>()
+            .Where(s => s.AttemptId == attemptId && s.Status == ProctorSessionStatus.Active)
+            .ToListAsync();
+        foreach (var session in sessions)
+        {
+            session.Status = ProctorSessionStatus.Completed;
+            session.EndedAt = endedAt;
+            session.UpdatedDate = endedAt;
+            session.UpdatedBy = userId;
+        }
+    }
+
     private async Task<CandidateEligibilityDto> CheckEligibilityAsync(
         Domain.Entities.Assessment.Exam exam, string candidateId)
     {
@@ -1766,6 +1815,13 @@ $"Attempt is {attempt.Status}. Cannot resume.");
         };
 
         var now = UaeTimeHelper.NowUae;
+
+        if (!await CandidateAssignmentPolicy.CanStartAsync(_context, exam.Id,
+                exam.AccessPolicy?.RestrictToAssignedCandidates == true, candidateId))
+        {
+            eligibility.CanStartNow = false;
+            eligibility.Reasons.Add(CandidateAssignmentPolicy.DeniedMessage);
+        }
 
         // Check schedule (Flexible vs Fixed)
         if (exam.ExamType == ExamType.Fixed)
@@ -2163,7 +2219,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             var optionsList = aq.Question.Options.ToList();
             if (exam.ShuffleOptions)
             {
-                optionsList = optionsList.OrderBy(_ => Guid.NewGuid()).ToList();
+                optionsList = optionsList.OrderBy(o => AttemptOptionOrder.Key(aq.AttemptId, aq.QuestionId, o.Id), StringComparer.Ordinal).ToList();
             }
             else
             {
@@ -2180,7 +2236,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
                 // NO IsCorrect here!
             }).ToList();
 
-            var currentAnswer = aq.Answers.FirstOrDefault();
+            var currentAnswer = aq.Answers.FirstOrDefault(AnswerContent.HasContent);
 
             questionDtos.Add(new CandidateQuestionDto
             {
@@ -2317,7 +2373,7 @@ $"Attempt is {attempt.Status}. Cannot resume.");
             {
                 // IN_PROGRESS
                 var answeredCount = activeAttempt.Questions?.Count(q =>
-                    q.Answers.Any(a => !string.IsNullOrEmpty(a.SelectedOptionIdsJson) || !string.IsNullOrEmpty(a.TextAnswer))) ?? 0;
+                    q.Answers.Any(AnswerContent.HasContent)) ?? 0;
                 var remainingSeconds = (int)(activeAttempt.ExpiresAt!.Value - now).TotalSeconds;
 
                 card.Stage = JourneyStage.InProgress;

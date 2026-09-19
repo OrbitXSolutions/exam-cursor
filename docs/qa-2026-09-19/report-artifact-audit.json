@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-19T14:52:52.617Z",
+  "documents": [
+    "FINAL-QA-REPORT.md",
+    "coverage-audit.md",
+    "phase11-performance-results.md",
+    "extra-attempt-workflow.md"
+  ],
+  "linksChecked": 315,
+  "missingLinks": [],
+  "findingRows": 69,
+  "missingFindingIds": [],
+  "duplicateFindingIds": [],
+  "sevenConclusionsAtEnd": true,
+  "productionFiles": 71,
+  "testFiles": 7,
+  "missingSourceFiles": []
+}

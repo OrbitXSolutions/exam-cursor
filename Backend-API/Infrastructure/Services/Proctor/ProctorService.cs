@@ -197,8 +197,10 @@ public class ProctorService : IProctorService
         {
             dto.AttemptTotalQuestions = await _context.Set<Domain.Entities.Attempt.AttemptQuestion>()
                 .CountAsync(q => q.AttemptId == session.AttemptId);
-            dto.AttemptTotalAnswered = await _context.Set<Domain.Entities.Attempt.AttemptQuestion>()
-                .CountAsync(q => q.AttemptId == session.AttemptId && q.Answers.Any());
+            dto.AttemptTotalAnswered = await _context.Set<AttemptAnswer>()
+                .Where(a => a.AttemptId == session.AttemptId)
+                .Where(AnswerContent.Predicate)
+                .Select(a => a.QuestionId).Distinct().CountAsync();
         }
 
         // Enriched: load identity verification (if exists)
@@ -320,7 +322,7 @@ public class ProctorService : IProctorService
         query = query.OrderByDescending(s => s.StartedAt);
 
         var totalCount = await query.CountAsync();
-        var activeCount = await query.CountAsync(s => s.Status == ProctorSessionStatus.Active);
+        var activeCount = await LiveSessions(query).CountAsync();
         var items = await query
             .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
   .Take(searchDto.PageSize)
@@ -1140,6 +1142,10 @@ UploadEvidenceDto dto, string candidateId)
     public async Task<ApiResponse<ProctorEvidenceDto>> ConfirmEvidenceUploadAsync(
     int evidenceId, long fileSize, string? checksum)
     {
+        if (!await _resourceAuthorization.CanAccessEvidenceAsync(evidenceId))
+            return ApiResponse<ProctorEvidenceDto>.FailureResponse("Evidence not found");
+        if (fileSize <= 0)
+            return ApiResponse<ProctorEvidenceDto>.FailureResponse("File size must be greater than zero");
         var evidence = await _context.Set<ProctorEvidence>()
             .FirstOrDefaultAsync(e => e.Id == evidenceId);
 
@@ -1194,8 +1200,7 @@ UploadEvidenceDto dto, string candidateId)
             return ApiResponse<string>.FailureResponse("Evidence not yet uploaded");
         }
 
-        // Generate secure, time-limited URL (placeholder)
-        var downloadUrl = $"/api/proctor/evidence/{evidenceId}/download?token={Guid.NewGuid()}";
+        var downloadUrl = $"/api/Proctor/evidence/{evidenceId}/download";
 
         return ApiResponse<string>.SuccessResponse(downloadUrl);
     }
@@ -1354,6 +1359,7 @@ UploadEvidenceDto dto, string candidateId)
 
         var sessions = await _context.Set<ProctorSession>()
         .Include(s => s.Decision)
+            .Include(s => s.Attempt)
             .Include(s => s.Events)
             .Where(s => s.ExamId == examId)
             .ToListAsync();
@@ -1378,7 +1384,7 @@ UploadEvidenceDto dto, string candidateId)
             ExamId = examId,
             ExamTitleEn = exam.TitleEn,
             TotalSessions = sessions.Count,
-            ActiveSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Active),
+            ActiveSessions = LiveSessions(sessions.AsQueryable()).Count(),
             CompletedSessions = sessions.Count(s => s.Status == ProctorSessionStatus.Completed),
             HighRiskCount = sessions.Count(s => s.RiskScore >= 50),
             PendingReviewCount = sessions.Count(s => s.Decision == null || s.Decision.Status == ProctorDecisionStatus.Pending),
@@ -1400,10 +1406,10 @@ UploadEvidenceDto dto, string candidateId)
         var now = UaeTimeHelper.NowUae;
         var offlineThreshold = now.AddSeconds(-HeartbeatMissedThresholdSeconds);
 
-        var activeSessions = await _context.Set<ProctorSession>()
+        var activeSessions = await LiveSessions(_context.Set<ProctorSession>())
       .Include(s => s.Candidate)
        .Include(s => s.Events.OrderByDescending(e => e.OccurredAt).Take(1))
- .Where(s => s.ExamId == examId && s.Status == ProctorSessionStatus.Active)
+ .Where(s => s.ExamId == examId)
             .ToListAsync();
 
         var monitoring = activeSessions.Select(s => new LiveMonitoringDto
@@ -1897,6 +1903,9 @@ UploadEvidenceDto dto, string candidateId)
         if (searchDto.Status.HasValue)
             query = query.Where(s => s.Status == searchDto.Status.Value);
 
+        if (searchDto.Status == ProctorSessionStatus.Active)
+            query = LiveSessions(query);
+
         if (searchDto.DecisionStatus.HasValue)
             query = query.Where(s => s.Decision != null && s.Decision.Status == searchDto.DecisionStatus.Value);
 
@@ -1928,6 +1937,15 @@ UploadEvidenceDto dto, string candidateId)
 
         return query;
     }
+
+    // A paused attempt remains monitorable. Terminal attempts belong in session history,
+    // even when an older code path left their session row marked Active.
+    private static IQueryable<ProctorSession> LiveSessions(IQueryable<ProctorSession> query) =>
+        query.Where(s => s.Status == ProctorSessionStatus.Active &&
+            (s.Attempt.Status == AttemptStatus.Started ||
+             s.Attempt.Status == AttemptStatus.InProgress ||
+             s.Attempt.Status == AttemptStatus.Paused ||
+             s.Attempt.Status == AttemptStatus.Resumed));
 
     private bool IsViolationEvent(ProctorEventType eventType, byte severity)
     {
@@ -2115,24 +2133,9 @@ UploadEvidenceDto dto, string candidateId)
     private ProctorSessionDto MapToSessionDto(ProctorSession session)
     {
         // Calculate remaining seconds from the linked Attempt
-        int? remainingSeconds = null;
-        DateTimeOffset? expiresAt = null;
-        string? attemptStatus = null;
-        if (session.Attempt != null)
-        {
-            expiresAt = session.Attempt.ExpiresAt;
-            attemptStatus = session.Attempt.Status.ToString();
-            if (session.Attempt.ExpiresAt.HasValue && session.Attempt.Status == AttemptStatus.InProgress)
-            {
-                remainingSeconds = Math.Max(0, (int)(session.Attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds);
-            }
-            else if (session.Attempt.Status == AttemptStatus.Submitted ||
-                     session.Attempt.Status == AttemptStatus.Terminated ||
-                     session.Attempt.Status == AttemptStatus.Expired)
-            {
-                remainingSeconds = 0;
-            }
-        }
+        var remainingSeconds = CalculateSessionRemainingSeconds(session.Attempt);
+        var expiresAt = session.Attempt?.ExpiresAt;
+        var attemptStatus = session.Attempt?.Status.ToString();
 
         // Calculate session duration
         var duration = session.EndedAt.HasValue
@@ -2252,7 +2255,7 @@ UploadEvidenceDto dto, string candidateId)
             .ToList();
         var latest = imageEvidence?.FirstOrDefault();
         var latestUrl = latest != null && !string.IsNullOrWhiteSpace(latest.FilePath)
-            ? $"/media/{latest.FilePath.TrimStart('/')}"
+            ? $"/api/Proctor/evidence/{latest.Id}/download"
             : null;
 
         return new ProctorSessionListDto
@@ -2267,6 +2270,7 @@ UploadEvidenceDto dto, string candidateId)
             Status = session.Status,
             StartedAt = session.StartedAt,
             EndedAt = session.EndedAt,
+            RemainingSeconds = CalculateSessionRemainingSeconds(session.Attempt),
             TotalViolations = session.TotalViolations,
             CountableViolationCount = session.CountableViolationCount,
             MaxViolationWarnings = session.Exam?.MaxViolationWarnings ?? 0,
@@ -2294,6 +2298,16 @@ UploadEvidenceDto dto, string candidateId)
             BehaviorScore = session.BehaviorScore,
             EnvironmentScore = session.EnvironmentScore
         };
+    }
+
+    private static int CalculateSessionRemainingSeconds(Domain.Entities.Attempt.Attempt? attempt)
+    {
+        if (attempt?.ExpiresAt == null ||
+            attempt.Status is not (AttemptStatus.Started or AttemptStatus.InProgress or AttemptStatus.Paused or AttemptStatus.Resumed))
+            return 0;
+
+        // ExpiresAt already includes granted time and any exam-window cap.
+        return Math.Max(0, (int)(attempt.ExpiresAt.Value - UaeTimeHelper.NowUae).TotalSeconds);
     }
 
     private ProctorEventDto MapToEventDto(ProctorEvent e)
@@ -2333,11 +2347,11 @@ UploadEvidenceDto dto, string candidateId)
 
     private ProctorEvidenceDto MapToEvidenceDto(ProctorEvidence evidence)
     {
-        var previewUrl = !string.IsNullOrWhiteSpace(evidence.FilePath)
-            ? $"/media/{evidence.FilePath.TrimStart('/')}"
+        var previewUrl = evidence.Type == EvidenceType.Image && evidence.IsUploaded && !string.IsNullOrWhiteSpace(evidence.FilePath)
+            ? $"/api/Proctor/evidence/{evidence.Id}/download"
             : null;
         var downloadUrl = evidence.IsUploaded
-            ? previewUrl ?? $"/api/proctor/evidence/{evidence.Id}/download"
+            ? previewUrl
             : null;
 
         return new ProctorEvidenceDto

@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { ExamDropdownItem } from "@/lib/api/exams";
 
 // ============================================
 // TYPES (matching backend DTOs)
@@ -51,10 +52,12 @@ export interface GradedAnswerItem {
   maxPoints: number;
   selectedOptionIds: number[] | null;
   selectedOptions: SelectedOptionItem[] | null;
+  correctOptions: { id: number; textEn: string; textAr: string }[] | null;
   textAnswer: string | null;
   score: number;
   isCorrect: boolean;
   isManuallyGraded: boolean;
+  isGraded: boolean;
   graderComment: string | null;
   modelAnswerEn: string | null;
   modelAnswerAr: string | null;
@@ -94,6 +97,10 @@ export interface ManualGradeRequest {
 // ============================================
 // API FUNCTIONS
 // ============================================
+
+export async function getGradingExamChoices(): Promise<ExamDropdownItem[]> {
+  return await apiClient.get<ExamDropdownItem[]>("/Grading/exams/dropdown") ?? [];
+}
 
 /** Backend GradingStatus: Pending=1, AutoGraded=2, ManualRequired=3, Completed=4 */
 export const GradingStatus = {

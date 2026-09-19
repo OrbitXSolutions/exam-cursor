@@ -75,6 +75,7 @@ interface ProctorSessionListDto {
   status: number;
   statusName: string;
   startedAt: string;
+  remainingSeconds?: number;
   totalViolations: number;
   riskScore?: number;
   decisionStatus?: number;
@@ -101,7 +102,7 @@ function mapToLiveSession(dto: ProctorSessionListDto): LiveSession {
     candidateName: dto.candidateName ?? "",
     examTitle: dto.examTitleEn ?? "",
     startedAt: dto.startedAt,
-    timeRemaining: 0,
+    timeRemaining: Math.ceil(Math.max(0, dto.remainingSeconds ?? 0) / 60),
     status,
     incidentCount: dto.totalViolations ?? 0,
     flagged: dto.isFlagged ?? false,
@@ -1516,16 +1517,12 @@ export function translateSeverity(severity: string, locale?: string): string {
 export async function getAttemptEvents(
   attemptId: number,
 ): Promise<AttemptEventDto[]> {
-  try {
-    const res = await apiClient.get<
-      AttemptEventDto[] | { data?: AttemptEventDto[] }
-    >(`/Attempt/${attemptId}/events`);
-    const events = Array.isArray(res) ? res : (res.data ?? []);
-    return events.map((event) => ({
-      ...event,
-      eventTypeName: getEventTypeName(event.eventType),
-    }));
-  } catch {
-    return [];
-  }
+  const res = await apiClient.get<
+    AttemptEventDto[] | { data?: AttemptEventDto[] }
+  >(`/Attempt/${attemptId}/events`);
+  const events = Array.isArray(res) ? res : (res.data ?? []);
+  return events.map((event) => ({
+    ...event,
+    eventTypeName: getEventTypeName(event.eventType),
+  }));
 }

@@ -8,6 +8,7 @@ public class UserDto
     public string Email { get; set; } = string.Empty;
     public string? DisplayName { get; set; }
     public string? FullName { get; set; }
+    public string? FullNameAr { get; set; }
     public bool IsBlocked { get; set; }
     public string Status { get; set; } = string.Empty;
     public bool EmailConfirmed { get; set; }
@@ -44,6 +45,7 @@ public class UpdateUserDto
 {
     public string? DisplayName { get; set; }
     public string? FullName { get; set; }
+    public string? FullNameAr { get; set; }
     public string? PhoneNumber { get; set; }
     public int? DepartmentId { get; set; }
     public bool ClearDepartment { get; set; } = false;

@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
@@ -398,7 +400,7 @@ export default function ProctorCenterPage() {
               {/* Snapshot Preview / Placeholder */}
               <div className="relative aspect-video bg-muted">
                 {session.latestSnapshotUrl ? (
-                  <img
+                  <EvidenceImage
                     src={session.latestSnapshotUrl}
                     alt={session.candidateName}
                     className="w-full h-full object-cover"

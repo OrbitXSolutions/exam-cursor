@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceImage } from "@/components/proctor/evidence-image"
+
 import { useEffect, useEffectEvent, useState, useCallback, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -1253,7 +1255,7 @@ export default function CandidateExamDetailsPage() {
                         >
                           <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
                             {ss.previewUrl ? (
-                              <img
+                              <EvidenceImage
                                 src={ss.previewUrl}
                                 alt={ss.fileName || "Screenshot"}
                                 className="h-full w-full object-cover"

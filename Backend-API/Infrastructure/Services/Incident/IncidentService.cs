@@ -14,6 +14,7 @@ using Smart_Core.Domain.Entities.Proctor;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Incident;
 
@@ -25,6 +26,7 @@ public class IncidentService : IIncidentService
     private readonly IDepartmentService _departmentService;
     private readonly ICurrentUserService _currentUserService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ResourceAuthorizationService _resourceAuthorization;
 
     public IncidentService(
         ApplicationDbContext context,
@@ -32,7 +34,8 @@ public class IncidentService : IIncidentService
         ICacheService cache,
         IDepartmentService departmentService,
         ICurrentUserService currentUserService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ResourceAuthorizationService resourceAuthorization)
     {
         _context = context;
         _auditService = auditService;
@@ -40,6 +43,7 @@ public class IncidentService : IIncidentService
         _departmentService = departmentService;
         _currentUserService = currentUserService;
         _userManager = userManager;
+        _resourceAuthorization = resourceAuthorization;
     }
 
     private async Task<bool> IsCurrentUserSuperAdminAsync()
@@ -53,10 +57,39 @@ public class IncidentService : IIncidentService
 
     private void InvalidateIncidentCache() => _cache.RemoveByPrefix(CacheKeys.IncidentsPrefix);
 
+    // Keep point reads, cached reads, child resources and writes within the same
+    // scope already used by the incident list, including assigned no-department reviewers.
+    private async Task<IQueryable<IncidentCase>> ScopeCasesAsync(string? actorId = null)
+    {
+        var query = _context.Set<IncidentCase>().AsQueryable();
+        actorId ??= _currentUserService.UserId;
+        if (string.IsNullOrEmpty(actorId)) return query.Where(_ => false);
+        var actor = await _userManager.FindByIdAsync(actorId);
+        if (actor == null || actor.IsDeleted) return query.Where(_ => false);
+        if (await _userManager.IsInRoleAsync(actor, AppRoles.SuperAdmin)) return query;
+        if (actor.DepartmentId.HasValue)
+            return query.Where(c => c.Exam.DepartmentId == actor.DepartmentId.Value);
+        return query.Where(c => c.AssignedTo == actorId);
+    }
+
+    private async Task<bool> CanAccessCaseAsync(int caseId, string? actorId = null)
+        => await (await ScopeCasesAsync(actorId)).AnyAsync(c => c.Id == caseId);
+
+    private bool IsInternalSystemActor(string actorId)
+        => actorId == "System" && string.IsNullOrEmpty(_currentUserService.UserId);
+
     #region Case Management
 
     public async Task<ApiResponse<IncidentCaseDto>> CreateCaseAsync(CreateIncidentCaseDto dto, string userId)
     {
+        if (!IsInternalSystemActor(userId) &&
+            !await _resourceAuthorization.CanAccessAttemptForUserAsync(dto.AttemptId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Attempt not found");
+
+        if (dto.ProctorSessionId.HasValue && !await _context.ProctorSessions.AnyAsync(s =>
+                s.Id == dto.ProctorSessionId.Value && s.AttemptId == dto.AttemptId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Proctor session not found for this attempt");
+
         // Validate attempt exists
         var attempt = await _context.Attempts
       .Include(a => a.Exam)
@@ -134,11 +167,17 @@ public class IncidentService : IIncidentService
             "Case created", "?? ????? ??????",
 new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
+        InvalidateIncidentCache();
+        if (IsInternalSystemActor(userId))
+            return ApiResponse<IncidentCaseDto>.SuccessResponse(MapToCaseDto((await GetCaseWithIncludesAsync(incidentCase.Id))!));
         return await GetCaseAsync(incidentCase.Id);
     }
 
     public async Task<ApiResponse<IncidentCaseDto>> CreateCaseFromProctorAsync(int proctorSessionId, string userId)
     {
+        if (!IsInternalSystemActor(userId) &&
+            !await _resourceAuthorization.CanAccessProctorSessionForUserAsync(proctorSessionId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Proctor session not found");
         var session = await _context.Set<ProctorSession>()
        .Include(s => s.Attempt)
       .Include(s => s.Exam)
@@ -166,6 +205,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> GetCaseAsync(int caseId)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
         var cacheKey = CacheKeys.IncidentCaseById(caseId);
         if (_cache.TryGet<IncidentCaseDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<IncidentCaseDto>.SuccessResponse(cached);
@@ -184,6 +225,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> GetCaseByAttemptAsync(int attemptId)
     {
+        if (!await (await ScopeCasesAsync()).AnyAsync(c => c.AttemptId == attemptId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("No incident case found for this attempt");
         var cacheKey = CacheKeys.IncidentCaseByAttempt(attemptId);
         if (_cache.TryGet<IncidentCaseDto>(cacheKey, out var cached) && cached != null)
             return ApiResponse<IncidentCaseDto>.SuccessResponse(cached);
@@ -195,6 +238,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
       .Include(c => c.Assignee)
             .Include(c => c.Timeline.OrderByDescending(t => t.OccurredAt).Take(20))
          .Include(c => c.EvidenceLinks.OrderBy(e => e.Order))
+            .ThenInclude(e => e.ProctorEvidence)
+         .Include(c => c.EvidenceLinks.OrderBy(e => e.Order))
+            .ThenInclude(e => e.ProctorEvent)
             .Include(c => c.Decisions.OrderByDescending(d => d.DecidedAt).Take(10))
   .Include(c => c.Comments)
 .Include(c => c.Appeals)
@@ -212,6 +258,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> UpdateCaseAsync(UpdateIncidentCaseDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.Id, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
         var incidentCase = await _context.Set<IncidentCase>()
             .FirstOrDefaultAsync(c => c.Id == dto.Id);
 
@@ -334,6 +382,10 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> AssignCaseAsync(AssignCaseDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.CaseId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
+        if (!await _resourceAuthorization.CanAccessUserForUserAsync(dto.AssigneeId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Assignee not found");
         var incidentCase = await _context.Set<IncidentCase>()
        .FirstOrDefaultAsync(c => c.Id == dto.CaseId);
 
@@ -386,6 +438,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> ChangeStatusAsync(ChangeStatusDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.CaseId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
         var incidentCase = await _context.Set<IncidentCase>()
             .FirstOrDefaultAsync(c => c.Id == dto.CaseId);
 
@@ -436,6 +490,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCaseDto>> ReopenCaseAsync(int caseId, string reason, string userId)
     {
+        if (!await CanAccessCaseAsync(caseId, userId))
+            return ApiResponse<IncidentCaseDto>.FailureResponse("Case not found");
         var incidentCase = await _context.Set<IncidentCase>()
               .FirstOrDefaultAsync(c => c.Id == caseId);
 
@@ -473,6 +529,19 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentEvidenceLinkDto>> LinkEvidenceAsync(LinkEvidenceDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.CaseId, userId))
+            return ApiResponse<IncidentEvidenceLinkDto>.FailureResponse("Case not found");
+        if (dto.ProctorEvidenceId.HasValue &&
+            !await _resourceAuthorization.CanAccessEvidenceAsync(dto.ProctorEvidenceId.Value, userId))
+            return ApiResponse<IncidentEvidenceLinkDto>.FailureResponse("Evidence not found");
+        if (dto.ProctorEventId.HasValue)
+        {
+            var sessionId = await _context.ProctorEvents.Where(x => x.Id == dto.ProctorEventId.Value)
+                .Select(x => (int?)x.ProctorSessionId).FirstOrDefaultAsync();
+            if (!sessionId.HasValue ||
+                !await _resourceAuthorization.CanAccessProctorSessionForUserAsync(sessionId.Value, userId))
+                return ApiResponse<IncidentEvidenceLinkDto>.FailureResponse("Event not found");
+        }
         var incidentCase = await _context.Set<IncidentCase>()
            .FirstOrDefaultAsync(c => c.Id == dto.CaseId);
 
@@ -509,6 +578,10 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
         _context.Set<IncidentEvidenceLink>().Add(evidenceLink);
         await _context.SaveChangesAsync();
+        if (evidenceLink.ProctorEvidenceId.HasValue)
+            await _context.Entry(evidenceLink).Reference(e => e.ProctorEvidence).LoadAsync();
+        if (evidenceLink.ProctorEventId.HasValue)
+            await _context.Entry(evidenceLink).Reference(e => e.ProctorEvent).LoadAsync();
 
         await AddTimelineEventAsync(incidentCase.Id, IncidentTimelineEventType.EvidenceLinked, userId,
 "Evidence linked to case",
@@ -521,6 +594,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<List<IncidentEvidenceLinkDto>>> GetCaseEvidenceAsync(int caseId)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<List<IncidentEvidenceLinkDto>>.FailureResponse("Case not found");
         var cacheKey = CacheKeys.IncidentEvidence(caseId);
         if (_cache.TryGet<List<IncidentEvidenceLinkDto>>(cacheKey, out var cached) && cached != null)
             return ApiResponse<List<IncidentEvidenceLinkDto>>.SuccessResponse(cached);
@@ -548,6 +623,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<bool>.FailureResponse("Evidence link not found");
         }
 
+        if (!await CanAccessCaseAsync(link.IncidentCaseId, userId))
+            return ApiResponse<bool>.FailureResponse("Evidence link not found");
+
         if (link.IncidentCase.Status == IncidentStatus.Closed)
         {
             return ApiResponse<bool>.FailureResponse("Cannot remove evidence from a closed case");
@@ -569,6 +647,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentDecisionHistoryDto>> RecordDecisionAsync(RecordDecisionDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.CaseId, userId))
+            return ApiResponse<IncidentDecisionHistoryDto>.FailureResponse("Case not found");
         var incidentCase = await _context.Set<IncidentCase>()
             .Include(c => c.Attempt)
          .FirstOrDefaultAsync(c => c.Id == dto.CaseId);
@@ -653,6 +733,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<List<IncidentDecisionHistoryDto>>> GetDecisionHistoryAsync(int caseId)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<List<IncidentDecisionHistoryDto>>.FailureResponse("Case not found");
         var cacheKey = CacheKeys.IncidentDecisions(caseId);
         if (_cache.TryGet<List<IncidentDecisionHistoryDto>>(cacheKey, out var cached) && cached != null)
             return ApiResponse<List<IncidentDecisionHistoryDto>>.SuccessResponse(cached);
@@ -669,6 +751,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentDecisionHistoryDto>> GetLatestDecisionAsync(int caseId)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<IncidentDecisionHistoryDto>.FailureResponse("Case not found");
         // Latest decision is covered by the full decisions list cache; skip per-item cache
         var decision = await _context.Set<IncidentDecisionHistory>()
            .Where(d => d.IncidentCaseId == caseId)
@@ -689,6 +773,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentCommentDto>> AddCommentAsync(AddCommentDto dto, string userId)
     {
+        if (!await CanAccessCaseAsync(dto.CaseId, userId))
+            return ApiResponse<IncidentCommentDto>.FailureResponse("Case not found");
         var incidentCase = await _context.Set<IncidentCase>()
             .FirstOrDefaultAsync(c => c.Id == dto.CaseId);
 
@@ -738,6 +824,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<IncidentCommentDto>.FailureResponse("You can only edit your own comments");
         }
 
+        if (!await CanAccessCaseAsync(comment.IncidentCaseId, userId))
+            return ApiResponse<IncidentCommentDto>.FailureResponse("Comment not found");
+
         var now = UaeTimeHelper.NowUae;
         comment.Body = dto.Body;
         comment.IsEdited = true;
@@ -761,6 +850,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             return ApiResponse<bool>.FailureResponse("Comment not found");
         }
 
+        if (!await CanAccessCaseAsync(comment.IncidentCaseId, userId))
+            return ApiResponse<bool>.FailureResponse("Comment not found");
+
         comment.IsDeleted = true;
         comment.DeletedBy = userId;
         comment.UpdatedDate = UaeTimeHelper.NowUae;
@@ -773,6 +865,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<List<IncidentCommentDto>>> GetCommentsAsync(int caseId, bool includeInternal = true)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<List<IncidentCommentDto>>.FailureResponse("Case not found");
         var cacheKey = CacheKeys.IncidentComments(caseId) + (includeInternal ? ":all" : ":public");
         if (_cache.TryGet<List<IncidentCommentDto>>(cacheKey, out var cached) && cached != null)
             return ApiResponse<List<IncidentCommentDto>>.SuccessResponse(cached);
@@ -800,6 +894,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<List<IncidentTimelineEventDto>>> GetTimelineAsync(int caseId)
     {
+        if (!await CanAccessCaseAsync(caseId))
+            return ApiResponse<List<IncidentTimelineEventDto>>.FailureResponse("Case not found");
         var timeline = await _context.Set<IncidentTimelineEvent>()
             .Where(t => t.IncidentCaseId == caseId)
             .OrderByDescending(t => t.OccurredAt)
@@ -1144,19 +1240,23 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentDashboardDto>> GetDashboardAsync(int examId)
     {
+        if (!await _resourceAuthorization.CanAccessExamAsync(examId) &&
+            !await (await ScopeCasesAsync()).AnyAsync(c => c.ExamId == examId))
+            return ApiResponse<IncidentDashboardDto>.FailureResponse("Exam not found");
         var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
         if (exam == null)
         {
             return ApiResponse<IncidentDashboardDto>.FailureResponse("Exam not found");
         }
 
-        var cases = await _context.Set<IncidentCase>()
+        var cases = await (await ScopeCasesAsync())
           .Include(c => c.Assignee)
                  .Where(c => c.ExamId == examId)
                  .ToListAsync();
 
+        var caseIds = cases.Select(c => c.Id).ToList();
         var pendingAppeals = await _context.Set<AppealRequest>()
-.CountAsync(a => a.ExamId == examId &&
+.CountAsync(a => caseIds.Contains(a.IncidentCaseId) &&
       (a.Status == AppealStatus.Submitted || a.Status == AppealStatus.InReview));
 
         return ApiResponse<IncidentDashboardDto>.SuccessResponse(BuildDashboard(exam.TitleEn, examId, cases, pendingAppeals));
@@ -1164,12 +1264,14 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
 
     public async Task<ApiResponse<IncidentDashboardDto>> GetGlobalDashboardAsync()
     {
-        var cases = await _context.Set<IncidentCase>()
+        var cases = await (await ScopeCasesAsync())
             .Include(c => c.Assignee)
             .ToListAsync();
 
+        var caseIds = cases.Select(c => c.Id).ToList();
         var pendingAppeals = await _context.Set<AppealRequest>()
-      .CountAsync(a => a.Status == AppealStatus.Submitted || a.Status == AppealStatus.InReview);
+      .CountAsync(a => caseIds.Contains(a.IncidentCaseId) &&
+          (a.Status == AppealStatus.Submitted || a.Status == AppealStatus.InReview));
 
         return ApiResponse<IncidentDashboardDto>.SuccessResponse(BuildDashboard("All Exams", 0, cases, pendingAppeals));
     }
@@ -1222,6 +1324,9 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
       .Include(c => c.Assignee)
             .Include(c => c.Timeline.OrderByDescending(t => t.OccurredAt).Take(50))
       .Include(c => c.EvidenceLinks.OrderBy(e => e.Order))
+          .ThenInclude(e => e.ProctorEvidence)
+      .Include(c => c.EvidenceLinks.OrderBy(e => e.Order))
+          .ThenInclude(e => e.ProctorEvent)
    .Include(c => c.Decisions.OrderByDescending(d => d.DecidedAt))
             .Include(c => c.Comments)
   .Include(c => c.Appeals)
@@ -1478,6 +1583,8 @@ new { source = dto.Source.ToString(), severity = dto.Severity.ToString() });
             ProctorEventId = e.ProctorEventId,
             EvidenceType = evidenceType,
             EvidenceDescription = description,
+            PreviewUrl = e.ProctorEvidence is { Type: EvidenceType.Image, IsUploaded: true, IsExpired: false }
+                ? $"/api/Proctor/evidence/{e.ProctorEvidence.Id}/download" : null,
             NoteEn = e.NoteEn,
             NoteAr = e.NoteAr,
             Order = e.Order,

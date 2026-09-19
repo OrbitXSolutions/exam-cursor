@@ -1,0 +1,3909 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:42:33.799Z",
+  "checks": [
+    {
+      "name": "option order remains stable across repeated reads",
+      "passed": true,
+      "detail": [
+        [
+          {
+            "id": 131,
+            "options": [
+              377,
+              376,
+              378
+            ]
+          },
+          {
+            "id": 134,
+            "options": [
+              386,
+              385
+            ]
+          },
+          {
+            "id": 132,
+            "options": [
+              381,
+              380,
+              379
+            ]
+          },
+          {
+            "id": 141,
+            "options": [
+              397,
+              399,
+              398
+            ]
+          },
+          {
+            "id": 133,
+            "options": [
+              384,
+              383,
+              382
+            ]
+          },
+          {
+            "id": 135,
+            "options": []
+          }
+        ],
+        [
+          {
+            "id": 131,
+            "options": [
+              377,
+              376,
+              378
+            ]
+          },
+          {
+            "id": 134,
+            "options": [
+              386,
+              385
+            ]
+          },
+          {
+            "id": 132,
+            "options": [
+              381,
+              380,
+              379
+            ]
+          },
+          {
+            "id": 141,
+            "options": [
+              397,
+              399,
+              398
+            ]
+          },
+          {
+            "id": 133,
+            "options": [
+              384,
+              383,
+              382
+            ]
+          },
+          {
+            "id": 135,
+            "options": []
+          }
+        ],
+        [
+          {
+            "id": 131,
+            "options": [
+              377,
+              376,
+              378
+            ]
+          },
+          {
+            "id": 134,
+            "options": [
+              386,
+              385
+            ]
+          },
+          {
+            "id": 132,
+            "options": [
+              381,
+              380,
+              379
+            ]
+          },
+          {
+            "id": 141,
+            "options": [
+              397,
+              399,
+              398
+            ]
+          },
+          {
+            "id": 133,
+            "options": [
+              384,
+              383,
+              382
+            ]
+          },
+          {
+            "id": 135,
+            "options": []
+          }
+        ]
+      ],
+      "at": "2026-09-19T11:42:39.776Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:42:35.050Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:42:35.0467285+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:42:34.3490108+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:42:35.0467285+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:42:34.3490108+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1249.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:42:36.252Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:42:36.2521618+04:00",
+          "user": {
+            "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "email": "qa26.eng.candidate1@example.test",
+            "displayName": "QA26 Engineering Candidate 1",
+            "fullName": "QA26 Updated Candidate",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+            "lastLoginDate": "2026-09-19T15:42:35.5616871+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:42:36.2521618+04:00",
+            "user": {
+              "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "email": "qa26.eng.candidate1@example.test",
+              "displayName": "QA26 Engineering Candidate 1",
+              "fullName": "QA26 Updated Candidate",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+              "lastLoginDate": "2026-09-19T15:42:35.5616871+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1199.93
+      }
+    },
+    {
+      "at": "2026-09-19T11:42:37.430Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/193/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 193,
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+          "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+          "remainingSeconds": 2594,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 6,
+          "answeredQuestions": 6,
+          "examSettings": {
+            "shuffleQuestions": true,
+            "shuffleOptions": true,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": true,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 307,
+              "order": 1,
+              "titleEn": "QA26 eng Foundations",
+              "titleAr": "أساسيات اختبار QA26 eng",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": 1,
+              "subjectId": 23,
+              "subjectTitleEn": "QA26 eng Foundations",
+              "subjectTitleAr": "أساسيات اختبار QA26 eng",
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 56,
+              "totalQuestions": 6,
+              "answeredQuestions": 6,
+              "topics": [
+                {
+                  "topicId": 34,
+                  "order": 1,
+                  "titleEn": "QA26 eng Applied Knowledge",
+                  "titleAr": "تطبيق المعرفة QA26 eng",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 50,
+                  "totalQuestions": 5,
+                  "answeredQuestions": 5,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2019,
+                      "questionId": 131,
+                      "order": 1,
+                      "points": 10,
+                      "bodyEn": "QA26 Single: Which number is prime?",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Single",
+                      "questionTypeId": 1,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 377,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 376,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 378,
+                          "textEn": "6",
+                          "textAr": "خيار 6",
+                          "order": 3,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "id": 11,
+                          "fileName": "qa26-reference.png",
+                          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                          "fileType": "Image"
+                        }
+                      ],
+                      "currentAnswer": {
+                        "attemptAnswerId": 559,
+                        "questionId": 131,
+                        "selectedOptionIds": [
+                          376
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2020,
+                      "questionId": 134,
+                      "order": 2,
+                      "points": 10,
+                      "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "TrueFalse",
+                      "questionTypeId": 3,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 386,
+                          "textEn": "False",
+                          "textAr": "خيار False",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 385,
+                          "textEn": "True",
+                          "textAr": "خيار True",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 573,
+                        "questionId": 134,
+                        "selectedOptionIds": [
+                          385
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2021,
+                      "questionId": 132,
+                      "order": 3,
+                      "points": 10,
+                      "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 381,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 380,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 379,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 560,
+                        "questionId": 132,
+                        "selectedOptionIds": [
+                          379
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2023,
+                      "questionId": 133,
+                      "order": 5,
+                      "points": 10,
+                      "bodyEn": "QA26 Equal Multi: Select even numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 384,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 383,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 382,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 561,
+                        "questionId": 133,
+                        "selectedOptionIds": [
+                          382
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2024,
+                      "questionId": 135,
+                      "order": 6,
+                      "points": 10,
+                      "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "Subjective",
+                      "questionTypeId": 5,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 562,
+                        "questionId": 135,
+                        "selectedOptionIds": null,
+                        "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                        "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "topicId": 0,
+                  "order": 2,
+                  "titleEn": "General",
+                  "titleAr": "عام",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 6,
+                  "totalQuestions": 1,
+                  "answeredQuestions": 1,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2022,
+                      "questionId": 141,
+                      "order": 4,
+                      "points": 6,
+                      "bodyEn": "QA26 Browser: Select secure operational practices.",
+                      "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": null,
+                      "options": [
+                        {
+                          "id": 397,
+                          "textEn": "Verify restore procedures",
+                          "textAr": "Verify restore procedures",
+                          "order": 0,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 399,
+                          "textEn": "Share passwords publicly",
+                          "textAr": "Share passwords publicly",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 398,
+                          "textEn": "Review least-privilege access",
+                          "textAr": "Review least-privilege access",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 563,
+                        "questionId": 141,
+                        "selectedOptionIds": [
+                          397
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "questions": []
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2019,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": {
+                "attemptAnswerId": 559,
+                "questionId": 131,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2020,
+              "questionId": 134,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 573,
+                "questionId": 134,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2021,
+              "questionId": 132,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 560,
+                "questionId": 132,
+                "selectedOptionIds": [
+                  379
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2022,
+              "questionId": 141,
+              "order": 4,
+              "points": 6,
+              "bodyEn": "QA26 Browser: Select secure operational practices.",
+              "bodyAr": "اختر ممارسات التشغيل الآمنة",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 397,
+                  "textEn": "Verify restore procedures",
+                  "textAr": "Verify restore procedures",
+                  "order": 0,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 399,
+                  "textEn": "Share passwords publicly",
+                  "textAr": "Share passwords publicly",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 398,
+                  "textEn": "Review least-privilege access",
+                  "textAr": "Review least-privilege access",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 563,
+                "questionId": 141,
+                "selectedOptionIds": [
+                  397
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2023,
+              "questionId": 133,
+              "order": 5,
+              "points": 10,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 561,
+                "questionId": 133,
+                "selectedOptionIds": [
+                  382
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2024,
+              "questionId": 135,
+              "order": 6,
+              "points": 10,
+              "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 562,
+                "questionId": 135,
+                "selectedOptionIds": null,
+                "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+              }
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+              "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 193,
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+            "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+            "remainingSeconds": 2594,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 6,
+            "answeredQuestions": 6,
+            "examSettings": {
+              "shuffleQuestions": true,
+              "shuffleOptions": true,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": true,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 307,
+                "order": 1,
+                "titleEn": "QA26 eng Foundations",
+                "titleAr": "أساسيات اختبار QA26 eng",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": 1,
+                "subjectId": 23,
+                "subjectTitleEn": "QA26 eng Foundations",
+                "subjectTitleAr": "أساسيات اختبار QA26 eng",
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 56,
+                "totalQuestions": 6,
+                "answeredQuestions": 6,
+                "topics": [
+                  {
+                    "topicId": 34,
+                    "order": 1,
+                    "titleEn": "QA26 eng Applied Knowledge",
+                    "titleAr": "تطبيق المعرفة QA26 eng",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 50,
+                    "totalQuestions": 5,
+                    "answeredQuestions": 5,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2019,
+                        "questionId": 131,
+                        "order": 1,
+                        "points": 10,
+                        "bodyEn": "QA26 Single: Which number is prime?",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Single",
+                        "questionTypeId": 1,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 377,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 376,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 378,
+                            "textEn": "6",
+                            "textAr": "خيار 6",
+                            "order": 3,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [
+                          {
+                            "id": 11,
+                            "fileName": "qa26-reference.png",
+                            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                            "fileType": "Image"
+                          }
+                        ],
+                        "currentAnswer": {
+                          "attemptAnswerId": 559,
+                          "questionId": 131,
+                          "selectedOptionIds": [
+                            376
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2020,
+                        "questionId": 134,
+                        "order": 2,
+                        "points": 10,
+                        "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "TrueFalse",
+                        "questionTypeId": 3,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 386,
+                            "textEn": "False",
+                            "textAr": "خيار False",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 385,
+                            "textEn": "True",
+                            "textAr": "خيار True",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 573,
+                          "questionId": 134,
+                          "selectedOptionIds": [
+                            385
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2021,
+                        "questionId": 132,
+                        "order": 3,
+                        "points": 10,
+                        "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 381,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 380,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 379,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 560,
+                          "questionId": 132,
+                          "selectedOptionIds": [
+                            379
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2023,
+                        "questionId": 133,
+                        "order": 5,
+                        "points": 10,
+                        "bodyEn": "QA26 Equal Multi: Select even numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 384,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 383,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 382,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 561,
+                          "questionId": 133,
+                          "selectedOptionIds": [
+                            382
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2024,
+                        "questionId": 135,
+                        "order": 6,
+                        "points": 10,
+                        "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "Subjective",
+                        "questionTypeId": 5,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 562,
+                          "questionId": 135,
+                          "selectedOptionIds": null,
+                          "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                          "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "topicId": 0,
+                    "order": 2,
+                    "titleEn": "General",
+                    "titleAr": "عام",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 6,
+                    "totalQuestions": 1,
+                    "answeredQuestions": 1,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2022,
+                        "questionId": 141,
+                        "order": 4,
+                        "points": 6,
+                        "bodyEn": "QA26 Browser: Select secure operational practices.",
+                        "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": null,
+                        "options": [
+                          {
+                            "id": 397,
+                            "textEn": "Verify restore procedures",
+                            "textAr": "Verify restore procedures",
+                            "order": 0,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 399,
+                            "textEn": "Share passwords publicly",
+                            "textAr": "Share passwords publicly",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 398,
+                            "textEn": "Review least-privilege access",
+                            "textAr": "Review least-privilege access",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 563,
+                          "questionId": 141,
+                          "selectedOptionIds": [
+                            397
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "questions": []
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2019,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": {
+                  "attemptAnswerId": 559,
+                  "questionId": 131,
+                  "selectedOptionIds": [
+                    376
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2020,
+                "questionId": 134,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 573,
+                  "questionId": 134,
+                  "selectedOptionIds": [
+                    385
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2021,
+                "questionId": 132,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 560,
+                  "questionId": 132,
+                  "selectedOptionIds": [
+                    379
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2022,
+                "questionId": 141,
+                "order": 4,
+                "points": 6,
+                "bodyEn": "QA26 Browser: Select secure operational practices.",
+                "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 397,
+                    "textEn": "Verify restore procedures",
+                    "textAr": "Verify restore procedures",
+                    "order": 0,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 399,
+                    "textEn": "Share passwords publicly",
+                    "textAr": "Share passwords publicly",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 398,
+                    "textEn": "Review least-privilege access",
+                    "textAr": "Review least-privilege access",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 563,
+                  "questionId": 141,
+                  "selectedOptionIds": [
+                    397
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2023,
+                "questionId": 133,
+                "order": 5,
+                "points": 10,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 561,
+                  "questionId": 133,
+                  "selectedOptionIds": [
+                    382
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2024,
+                "questionId": 135,
+                "order": 6,
+                "points": 10,
+                "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 562,
+                  "questionId": 135,
+                  "selectedOptionIds": null,
+                  "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                  "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                }
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+                "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1177.66
+      }
+    },
+    {
+      "at": "2026-09-19T11:42:38.600Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/193/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 193,
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+          "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+          "remainingSeconds": 2593,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 6,
+          "answeredQuestions": 6,
+          "examSettings": {
+            "shuffleQuestions": true,
+            "shuffleOptions": true,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": true,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 307,
+              "order": 1,
+              "titleEn": "QA26 eng Foundations",
+              "titleAr": "أساسيات اختبار QA26 eng",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": 1,
+              "subjectId": 23,
+              "subjectTitleEn": "QA26 eng Foundations",
+              "subjectTitleAr": "أساسيات اختبار QA26 eng",
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 56,
+              "totalQuestions": 6,
+              "answeredQuestions": 6,
+              "topics": [
+                {
+                  "topicId": 34,
+                  "order": 1,
+                  "titleEn": "QA26 eng Applied Knowledge",
+                  "titleAr": "تطبيق المعرفة QA26 eng",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 50,
+                  "totalQuestions": 5,
+                  "answeredQuestions": 5,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2019,
+                      "questionId": 131,
+                      "order": 1,
+                      "points": 10,
+                      "bodyEn": "QA26 Single: Which number is prime?",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Single",
+                      "questionTypeId": 1,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 377,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 376,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 378,
+                          "textEn": "6",
+                          "textAr": "خيار 6",
+                          "order": 3,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "id": 11,
+                          "fileName": "qa26-reference.png",
+                          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                          "fileType": "Image"
+                        }
+                      ],
+                      "currentAnswer": {
+                        "attemptAnswerId": 559,
+                        "questionId": 131,
+                        "selectedOptionIds": [
+                          376
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2020,
+                      "questionId": 134,
+                      "order": 2,
+                      "points": 10,
+                      "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "TrueFalse",
+                      "questionTypeId": 3,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 386,
+                          "textEn": "False",
+                          "textAr": "خيار False",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 385,
+                          "textEn": "True",
+                          "textAr": "خيار True",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 573,
+                        "questionId": 134,
+                        "selectedOptionIds": [
+                          385
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2021,
+                      "questionId": 132,
+                      "order": 3,
+                      "points": 10,
+                      "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 381,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 380,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 379,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 560,
+                        "questionId": 132,
+                        "selectedOptionIds": [
+                          379
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2023,
+                      "questionId": 133,
+                      "order": 5,
+                      "points": 10,
+                      "bodyEn": "QA26 Equal Multi: Select even numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 384,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 383,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 382,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 561,
+                        "questionId": 133,
+                        "selectedOptionIds": [
+                          382
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2024,
+                      "questionId": 135,
+                      "order": 6,
+                      "points": 10,
+                      "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "Subjective",
+                      "questionTypeId": 5,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 562,
+                        "questionId": 135,
+                        "selectedOptionIds": null,
+                        "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                        "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "topicId": 0,
+                  "order": 2,
+                  "titleEn": "General",
+                  "titleAr": "عام",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 6,
+                  "totalQuestions": 1,
+                  "answeredQuestions": 1,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2022,
+                      "questionId": 141,
+                      "order": 4,
+                      "points": 6,
+                      "bodyEn": "QA26 Browser: Select secure operational practices.",
+                      "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": null,
+                      "options": [
+                        {
+                          "id": 397,
+                          "textEn": "Verify restore procedures",
+                          "textAr": "Verify restore procedures",
+                          "order": 0,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 399,
+                          "textEn": "Share passwords publicly",
+                          "textAr": "Share passwords publicly",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 398,
+                          "textEn": "Review least-privilege access",
+                          "textAr": "Review least-privilege access",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 563,
+                        "questionId": 141,
+                        "selectedOptionIds": [
+                          397
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "questions": []
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2019,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": {
+                "attemptAnswerId": 559,
+                "questionId": 131,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2020,
+              "questionId": 134,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 573,
+                "questionId": 134,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2021,
+              "questionId": 132,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 560,
+                "questionId": 132,
+                "selectedOptionIds": [
+                  379
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2022,
+              "questionId": 141,
+              "order": 4,
+              "points": 6,
+              "bodyEn": "QA26 Browser: Select secure operational practices.",
+              "bodyAr": "اختر ممارسات التشغيل الآمنة",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 397,
+                  "textEn": "Verify restore procedures",
+                  "textAr": "Verify restore procedures",
+                  "order": 0,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 399,
+                  "textEn": "Share passwords publicly",
+                  "textAr": "Share passwords publicly",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 398,
+                  "textEn": "Review least-privilege access",
+                  "textAr": "Review least-privilege access",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 563,
+                "questionId": 141,
+                "selectedOptionIds": [
+                  397
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2023,
+              "questionId": 133,
+              "order": 5,
+              "points": 10,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 561,
+                "questionId": 133,
+                "selectedOptionIds": [
+                  382
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2024,
+              "questionId": 135,
+              "order": 6,
+              "points": 10,
+              "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 562,
+                "questionId": 135,
+                "selectedOptionIds": null,
+                "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+              }
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+              "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 193,
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+            "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+            "remainingSeconds": 2593,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 6,
+            "answeredQuestions": 6,
+            "examSettings": {
+              "shuffleQuestions": true,
+              "shuffleOptions": true,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": true,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 307,
+                "order": 1,
+                "titleEn": "QA26 eng Foundations",
+                "titleAr": "أساسيات اختبار QA26 eng",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": 1,
+                "subjectId": 23,
+                "subjectTitleEn": "QA26 eng Foundations",
+                "subjectTitleAr": "أساسيات اختبار QA26 eng",
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 56,
+                "totalQuestions": 6,
+                "answeredQuestions": 6,
+                "topics": [
+                  {
+                    "topicId": 34,
+                    "order": 1,
+                    "titleEn": "QA26 eng Applied Knowledge",
+                    "titleAr": "تطبيق المعرفة QA26 eng",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 50,
+                    "totalQuestions": 5,
+                    "answeredQuestions": 5,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2019,
+                        "questionId": 131,
+                        "order": 1,
+                        "points": 10,
+                        "bodyEn": "QA26 Single: Which number is prime?",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Single",
+                        "questionTypeId": 1,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 377,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 376,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 378,
+                            "textEn": "6",
+                            "textAr": "خيار 6",
+                            "order": 3,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [
+                          {
+                            "id": 11,
+                            "fileName": "qa26-reference.png",
+                            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                            "fileType": "Image"
+                          }
+                        ],
+                        "currentAnswer": {
+                          "attemptAnswerId": 559,
+                          "questionId": 131,
+                          "selectedOptionIds": [
+                            376
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2020,
+                        "questionId": 134,
+                        "order": 2,
+                        "points": 10,
+                        "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "TrueFalse",
+                        "questionTypeId": 3,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 386,
+                            "textEn": "False",
+                            "textAr": "خيار False",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 385,
+                            "textEn": "True",
+                            "textAr": "خيار True",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 573,
+                          "questionId": 134,
+                          "selectedOptionIds": [
+                            385
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2021,
+                        "questionId": 132,
+                        "order": 3,
+                        "points": 10,
+                        "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 381,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 380,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 379,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 560,
+                          "questionId": 132,
+                          "selectedOptionIds": [
+                            379
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2023,
+                        "questionId": 133,
+                        "order": 5,
+                        "points": 10,
+                        "bodyEn": "QA26 Equal Multi: Select even numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 384,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 383,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 382,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 561,
+                          "questionId": 133,
+                          "selectedOptionIds": [
+                            382
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2024,
+                        "questionId": 135,
+                        "order": 6,
+                        "points": 10,
+                        "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "Subjective",
+                        "questionTypeId": 5,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 562,
+                          "questionId": 135,
+                          "selectedOptionIds": null,
+                          "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                          "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "topicId": 0,
+                    "order": 2,
+                    "titleEn": "General",
+                    "titleAr": "عام",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 6,
+                    "totalQuestions": 1,
+                    "answeredQuestions": 1,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2022,
+                        "questionId": 141,
+                        "order": 4,
+                        "points": 6,
+                        "bodyEn": "QA26 Browser: Select secure operational practices.",
+                        "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": null,
+                        "options": [
+                          {
+                            "id": 397,
+                            "textEn": "Verify restore procedures",
+                            "textAr": "Verify restore procedures",
+                            "order": 0,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 399,
+                            "textEn": "Share passwords publicly",
+                            "textAr": "Share passwords publicly",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 398,
+                            "textEn": "Review least-privilege access",
+                            "textAr": "Review least-privilege access",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 563,
+                          "questionId": 141,
+                          "selectedOptionIds": [
+                            397
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "questions": []
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2019,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": {
+                  "attemptAnswerId": 559,
+                  "questionId": 131,
+                  "selectedOptionIds": [
+                    376
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2020,
+                "questionId": 134,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 573,
+                  "questionId": 134,
+                  "selectedOptionIds": [
+                    385
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2021,
+                "questionId": 132,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 560,
+                  "questionId": 132,
+                  "selectedOptionIds": [
+                    379
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2022,
+                "questionId": 141,
+                "order": 4,
+                "points": 6,
+                "bodyEn": "QA26 Browser: Select secure operational practices.",
+                "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 397,
+                    "textEn": "Verify restore procedures",
+                    "textAr": "Verify restore procedures",
+                    "order": 0,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 399,
+                    "textEn": "Share passwords publicly",
+                    "textAr": "Share passwords publicly",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 398,
+                    "textEn": "Review least-privilege access",
+                    "textAr": "Review least-privilege access",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 563,
+                  "questionId": 141,
+                  "selectedOptionIds": [
+                    397
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2023,
+                "questionId": 133,
+                "order": 5,
+                "points": 10,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 561,
+                  "questionId": 133,
+                  "selectedOptionIds": [
+                    382
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2024,
+                "questionId": 135,
+                "order": 6,
+                "points": 10,
+                "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 562,
+                  "questionId": 135,
+                  "selectedOptionIds": null,
+                  "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                  "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                }
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+                "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1168.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:42:39.775Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/193/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 193,
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+          "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+          "remainingSeconds": 2592,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "totalQuestions": 6,
+          "answeredQuestions": 6,
+          "examSettings": {
+            "shuffleQuestions": true,
+            "shuffleOptions": true,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": true,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 307,
+              "order": 1,
+              "titleEn": "QA26 eng Foundations",
+              "titleAr": "أساسيات اختبار QA26 eng",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": 1,
+              "subjectId": 23,
+              "subjectTitleEn": "QA26 eng Foundations",
+              "subjectTitleAr": "أساسيات اختبار QA26 eng",
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 56,
+              "totalQuestions": 6,
+              "answeredQuestions": 6,
+              "topics": [
+                {
+                  "topicId": 34,
+                  "order": 1,
+                  "titleEn": "QA26 eng Applied Knowledge",
+                  "titleAr": "تطبيق المعرفة QA26 eng",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 50,
+                  "totalQuestions": 5,
+                  "answeredQuestions": 5,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2019,
+                      "questionId": 131,
+                      "order": 1,
+                      "points": 10,
+                      "bodyEn": "QA26 Single: Which number is prime?",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Single",
+                      "questionTypeId": 1,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 377,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 376,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 378,
+                          "textEn": "6",
+                          "textAr": "خيار 6",
+                          "order": 3,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "id": 11,
+                          "fileName": "qa26-reference.png",
+                          "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                          "fileType": "Image"
+                        }
+                      ],
+                      "currentAnswer": {
+                        "attemptAnswerId": 559,
+                        "questionId": 131,
+                        "selectedOptionIds": [
+                          376
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2020,
+                      "questionId": 134,
+                      "order": 2,
+                      "points": 10,
+                      "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "TrueFalse",
+                      "questionTypeId": 3,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 386,
+                          "textEn": "False",
+                          "textAr": "خيار False",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 385,
+                          "textEn": "True",
+                          "textAr": "خيار True",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 573,
+                        "questionId": 134,
+                        "selectedOptionIds": [
+                          385
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2021,
+                      "questionId": 132,
+                      "order": 3,
+                      "points": 10,
+                      "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 381,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 380,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 379,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 560,
+                        "questionId": 132,
+                        "selectedOptionIds": [
+                          379
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2023,
+                      "questionId": 133,
+                      "order": 5,
+                      "points": 10,
+                      "bodyEn": "QA26 Equal Multi: Select even numbers",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [
+                        {
+                          "id": 384,
+                          "textEn": "3",
+                          "textAr": "خيار 3",
+                          "order": 3,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 383,
+                          "textEn": "4",
+                          "textAr": "خيار 4",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 382,
+                          "textEn": "2",
+                          "textAr": "خيار 2",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 561,
+                        "questionId": 133,
+                        "selectedOptionIds": [
+                          382
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                      }
+                    },
+                    {
+                      "attemptQuestionId": 2024,
+                      "questionId": 135,
+                      "order": 6,
+                      "points": 10,
+                      "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                      "bodyAr": "اختبار QA26",
+                      "questionTypeName": "Subjective",
+                      "questionTypeId": 5,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": 34,
+                      "options": [],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 562,
+                        "questionId": 135,
+                        "selectedOptionIds": null,
+                        "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                        "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "topicId": 0,
+                  "order": 2,
+                  "titleEn": "General",
+                  "titleAr": "عام",
+                  "descriptionEn": null,
+                  "descriptionAr": null,
+                  "totalPoints": 6,
+                  "totalQuestions": 1,
+                  "answeredQuestions": 1,
+                  "questions": [
+                    {
+                      "attemptQuestionId": 2022,
+                      "questionId": 141,
+                      "order": 4,
+                      "points": 6,
+                      "bodyEn": "QA26 Browser: Select secure operational practices.",
+                      "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                      "questionTypeName": "MCQ_Multi",
+                      "questionTypeId": 2,
+                      "isCalculatorAllowed": false,
+                      "sectionId": 307,
+                      "topicId": null,
+                      "options": [
+                        {
+                          "id": 397,
+                          "textEn": "Verify restore procedures",
+                          "textAr": "Verify restore procedures",
+                          "order": 0,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 399,
+                          "textEn": "Share passwords publicly",
+                          "textAr": "Share passwords publicly",
+                          "order": 2,
+                          "attachmentPath": null
+                        },
+                        {
+                          "id": 398,
+                          "textEn": "Review least-privilege access",
+                          "textAr": "Review least-privilege access",
+                          "order": 1,
+                          "attachmentPath": null
+                        }
+                      ],
+                      "attachments": [],
+                      "currentAnswer": {
+                        "attemptAnswerId": 563,
+                        "questionId": 141,
+                        "selectedOptionIds": [
+                          397
+                        ],
+                        "textAnswer": null,
+                        "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "questions": []
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2019,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": {
+                "attemptAnswerId": 559,
+                "questionId": 131,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2020,
+              "questionId": 134,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 573,
+                "questionId": 134,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2021,
+              "questionId": 132,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 560,
+                "questionId": 132,
+                "selectedOptionIds": [
+                  379
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2022,
+              "questionId": 141,
+              "order": 4,
+              "points": 6,
+              "bodyEn": "QA26 Browser: Select secure operational practices.",
+              "bodyAr": "اختر ممارسات التشغيل الآمنة",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 397,
+                  "textEn": "Verify restore procedures",
+                  "textAr": "Verify restore procedures",
+                  "order": 0,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 399,
+                  "textEn": "Share passwords publicly",
+                  "textAr": "Share passwords publicly",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 398,
+                  "textEn": "Review least-privilege access",
+                  "textAr": "Review least-privilege access",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 563,
+                "questionId": 141,
+                "selectedOptionIds": [
+                  397
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2023,
+              "questionId": 133,
+              "order": 5,
+              "points": 10,
+              "bodyEn": "QA26 Equal Multi: Select even numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [
+                {
+                  "id": 384,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 3,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 561,
+                "questionId": 133,
+                "selectedOptionIds": [
+                  382
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+              }
+            },
+            {
+              "attemptQuestionId": 2024,
+              "questionId": 135,
+              "order": 6,
+              "points": 10,
+              "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "isCalculatorAllowed": false,
+              "sectionId": 307,
+              "topicId": 34,
+              "options": [],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 562,
+                "questionId": 135,
+                "selectedOptionIds": null,
+                "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+              }
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+              "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 193,
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "startedAtUtc": "2026-09-19T15:20:51.8852709+04:00",
+            "expiresAtUtc": "2026-09-19T16:25:51.8852709+04:00",
+            "remainingSeconds": 2592,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "totalQuestions": 6,
+            "answeredQuestions": 6,
+            "examSettings": {
+              "shuffleQuestions": true,
+              "shuffleOptions": true,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": true,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 307,
+                "order": 1,
+                "titleEn": "QA26 eng Foundations",
+                "titleAr": "أساسيات اختبار QA26 eng",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": 1,
+                "subjectId": 23,
+                "subjectTitleEn": "QA26 eng Foundations",
+                "subjectTitleAr": "أساسيات اختبار QA26 eng",
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 56,
+                "totalQuestions": 6,
+                "answeredQuestions": 6,
+                "topics": [
+                  {
+                    "topicId": 34,
+                    "order": 1,
+                    "titleEn": "QA26 eng Applied Knowledge",
+                    "titleAr": "تطبيق المعرفة QA26 eng",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 50,
+                    "totalQuestions": 5,
+                    "answeredQuestions": 5,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2019,
+                        "questionId": 131,
+                        "order": 1,
+                        "points": 10,
+                        "bodyEn": "QA26 Single: Which number is prime?",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Single",
+                        "questionTypeId": 1,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 377,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 376,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 378,
+                            "textEn": "6",
+                            "textAr": "خيار 6",
+                            "order": 3,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [
+                          {
+                            "id": 11,
+                            "fileName": "qa26-reference.png",
+                            "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                            "fileType": "Image"
+                          }
+                        ],
+                        "currentAnswer": {
+                          "attemptAnswerId": 559,
+                          "questionId": 131,
+                          "selectedOptionIds": [
+                            376
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2020,
+                        "questionId": 134,
+                        "order": 2,
+                        "points": 10,
+                        "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "TrueFalse",
+                        "questionTypeId": 3,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 386,
+                            "textEn": "False",
+                            "textAr": "خيار False",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 385,
+                            "textEn": "True",
+                            "textAr": "خيار True",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 573,
+                          "questionId": 134,
+                          "selectedOptionIds": [
+                            385
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2021,
+                        "questionId": 132,
+                        "order": 3,
+                        "points": 10,
+                        "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 381,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 380,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 379,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 560,
+                          "questionId": 132,
+                          "selectedOptionIds": [
+                            379
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2023,
+                        "questionId": 133,
+                        "order": 5,
+                        "points": 10,
+                        "bodyEn": "QA26 Equal Multi: Select even numbers",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [
+                          {
+                            "id": 384,
+                            "textEn": "3",
+                            "textAr": "خيار 3",
+                            "order": 3,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 383,
+                            "textEn": "4",
+                            "textAr": "خيار 4",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 382,
+                            "textEn": "2",
+                            "textAr": "خيار 2",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 561,
+                          "questionId": 133,
+                          "selectedOptionIds": [
+                            382
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                        }
+                      },
+                      {
+                        "attemptQuestionId": 2024,
+                        "questionId": 135,
+                        "order": 6,
+                        "points": 10,
+                        "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                        "bodyAr": "اختبار QA26",
+                        "questionTypeName": "Subjective",
+                        "questionTypeId": 5,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": 34,
+                        "options": [],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 562,
+                          "questionId": 135,
+                          "selectedOptionIds": null,
+                          "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                          "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "topicId": 0,
+                    "order": 2,
+                    "titleEn": "General",
+                    "titleAr": "عام",
+                    "descriptionEn": null,
+                    "descriptionAr": null,
+                    "totalPoints": 6,
+                    "totalQuestions": 1,
+                    "answeredQuestions": 1,
+                    "questions": [
+                      {
+                        "attemptQuestionId": 2022,
+                        "questionId": 141,
+                        "order": 4,
+                        "points": 6,
+                        "bodyEn": "QA26 Browser: Select secure operational practices.",
+                        "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                        "questionTypeName": "MCQ_Multi",
+                        "questionTypeId": 2,
+                        "isCalculatorAllowed": false,
+                        "sectionId": 307,
+                        "topicId": null,
+                        "options": [
+                          {
+                            "id": 397,
+                            "textEn": "Verify restore procedures",
+                            "textAr": "Verify restore procedures",
+                            "order": 0,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 399,
+                            "textEn": "Share passwords publicly",
+                            "textAr": "Share passwords publicly",
+                            "order": 2,
+                            "attachmentPath": null
+                          },
+                          {
+                            "id": 398,
+                            "textEn": "Review least-privilege access",
+                            "textAr": "Review least-privilege access",
+                            "order": 1,
+                            "attachmentPath": null
+                          }
+                        ],
+                        "attachments": [],
+                        "currentAnswer": {
+                          "attemptAnswerId": 563,
+                          "questionId": 141,
+                          "selectedOptionIds": [
+                            397
+                          ],
+                          "textAnswer": null,
+                          "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "questions": []
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2019,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": {
+                  "attemptAnswerId": 559,
+                  "questionId": 131,
+                  "selectedOptionIds": [
+                    376
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2020,
+                "questionId": 134,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 573,
+                  "questionId": 134,
+                  "selectedOptionIds": [
+                    385
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2021,
+                "questionId": 132,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 560,
+                  "questionId": 132,
+                  "selectedOptionIds": [
+                    379
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2022,
+                "questionId": 141,
+                "order": 4,
+                "points": 6,
+                "bodyEn": "QA26 Browser: Select secure operational practices.",
+                "bodyAr": "اختر ممارسات التشغيل الآمنة",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 397,
+                    "textEn": "Verify restore procedures",
+                    "textAr": "Verify restore procedures",
+                    "order": 0,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 399,
+                    "textEn": "Share passwords publicly",
+                    "textAr": "Share passwords publicly",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 398,
+                    "textEn": "Review least-privilege access",
+                    "textAr": "Review least-privilege access",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 563,
+                  "questionId": 141,
+                  "selectedOptionIds": [
+                    397
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2023,
+                "questionId": 133,
+                "order": 5,
+                "points": 10,
+                "bodyEn": "QA26 Equal Multi: Select even numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [
+                  {
+                    "id": 384,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 3,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 561,
+                  "questionId": 133,
+                  "selectedOptionIds": [
+                    382
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+                }
+              },
+              {
+                "attemptQuestionId": 2024,
+                "questionId": 135,
+                "order": 6,
+                "points": 10,
+                "bodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "isCalculatorAllowed": false,
+                "sectionId": 307,
+                "topicId": 34,
+                "options": [],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 562,
+                  "questionId": 135,
+                  "selectedOptionIds": null,
+                  "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                  "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+                }
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer all six questions. Multiple-choice items award partial credit for correct selections. Follow messages from your proctor.",
+                "contentAr": "أجب عن جميع الأسئلة الستة واتبع رسائل المراقب."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1173.5
+      }
+    }
+  ]
+}

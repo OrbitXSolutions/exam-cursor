@@ -1,0 +1,1612 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T14:43:19.933Z",
+  "checks": [
+    {
+      "name": "Synthetic source is a 320x240 PNG",
+      "passed": true,
+      "detail": {
+        "bytes": 4522,
+        "sha256": "6684ab6cb0269e028756e6d7f92e1ca385bbd2c492b2f84f1f919204abebed1c"
+      },
+      "at": "2026-09-19T14:43:23.660Z"
+    },
+    {
+      "name": "Image3 snapshot persisted for the isolated own attempt",
+      "passed": true,
+      "detail": {
+        "id": 704,
+        "proctorSessionId": 321,
+        "attemptId": 369,
+        "type": 3,
+        "typeName": "Image",
+        "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+        "fileSize": 4522,
+        "fileSizeFormatted": "4.42 KB",
+        "contentType": "image/png",
+        "startAt": "2026-09-19T18:44:10.8477083+04:00",
+        "endAt": null,
+        "durationSeconds": null,
+        "isUploaded": true,
+        "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+        "previewUrl": "/api/Proctor/evidence/704/download",
+        "downloadUrl": "/api/Proctor/evidence/704/download"
+      },
+      "at": "2026-09-19T14:44:11.088Z"
+    },
+    {
+      "name": "Assigned proctor sees exactly one uploaded Image3",
+      "passed": true,
+      "detail": [
+        {
+          "id": 704,
+          "proctorSessionId": 321,
+          "attemptId": 369,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+          "fileSize": 4522,
+          "fileSizeFormatted": "4.42 KB",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T18:44:10.8477083+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+          "previewUrl": "/api/Proctor/evidence/704/download",
+          "downloadUrl": "/api/Proctor/evidence/704/download"
+        }
+      ],
+      "at": "2026-09-19T14:44:13.625Z"
+    },
+    {
+      "name": "Authorized image download retains exact PNG bytes",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 4522,
+        "sha256": "6684ab6cb0269e028756e6d7f92e1ca385bbd2c492b2f84f1f919204abebed1c"
+      },
+      "at": "2026-09-19T14:44:16.399Z"
+    },
+    {
+      "name": "Image fixture completes normally",
+      "passed": true,
+      "detail": {
+        "status": 2,
+        "attemptId": 369
+      },
+      "at": "2026-09-19T14:44:24.274Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T14:43:21.191Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:43:21.1866967+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T18:43:20.4919376+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:43:21.1866967+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T18:43:20.4919376+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1255.65
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:22.420Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:43:22.4197372+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T18:43:21.7154913+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:43:22.4197372+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T18:43:21.7154913+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1227.61
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:23.659Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T19:43:23.6588481+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T18:43:22.9501957+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T19:43:23.6588481+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T18:43:22.9501957+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1238.33
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:27.684Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams",
+      "request": {
+        "examType": 0,
+        "titleEn": "QA26 D69 Synthetic Image Regression",
+        "titleAr": "اختبار صورة اصطناعية QA26",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T14:42:23.661Z",
+        "endAt": "2026-09-19T15:43:23.661Z",
+        "durationMinutes": 10,
+        "maxAttempts": 1,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "passScore": 5,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "requireProctoring": true,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "screenShareGracePeriod": 20,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0,
+        "departmentId": 8
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 144,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 D69 Synthetic Image Regression",
+          "titleAr": "اختبار صورة اصطناعية QA26",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T14:42:23.661+00:00",
+          "endAt": "2026-09-19T15:43:23.661+00:00",
+          "durationMinutes": 10,
+          "maxAttempts": 1,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": true,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T18:43:26.2411074+04:00",
+          "updatedDate": null,
+          "sectionsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [],
+          "instructions": [],
+          "accessPolicy": {
+            "id": 125,
+            "examId": 144,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T18:43:26.4850378+04:00",
+            "updatedDate": null
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 144,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 D69 Synthetic Image Regression",
+            "titleAr": "اختبار صورة اصطناعية QA26",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T14:42:23.661+00:00",
+            "endAt": "2026-09-19T15:43:23.661+00:00",
+            "durationMinutes": 10,
+            "maxAttempts": 1,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 5,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": true,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T18:43:26.2411074+04:00",
+            "updatedDate": null,
+            "sectionsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [],
+            "instructions": [],
+            "accessPolicy": {
+              "id": 125,
+              "examId": 144,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T18:43:26.4850378+04:00",
+              "updatedDate": null
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4022.33
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:31.280Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/144/sections",
+      "request": {
+        "titleEn": "Image regression",
+        "titleAr": "اختبار الصورة",
+        "order": 1
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 331,
+          "examId": 144,
+          "titleEn": "Image regression",
+          "titleAr": "اختبار الصورة",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "order": 1,
+          "durationMinutes": null,
+          "totalPointsOverride": null,
+          "createdDate": "2026-09-19T18:43:29.835665+04:00",
+          "topicsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sourceType": null,
+          "questionSubjectId": null,
+          "questionTopicId": null,
+          "pickCount": 0,
+          "subjectNameEn": null,
+          "subjectNameAr": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "topics": [],
+          "questions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 331,
+            "examId": 144,
+            "titleEn": "Image regression",
+            "titleAr": "اختبار الصورة",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "order": 1,
+            "durationMinutes": null,
+            "totalPointsOverride": null,
+            "createdDate": "2026-09-19T18:43:29.835665+04:00",
+            "topicsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sourceType": null,
+            "questionSubjectId": null,
+            "questionTopicId": null,
+            "pickCount": 0,
+            "subjectNameEn": null,
+            "subjectNameAr": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "topics": [],
+            "questions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3593.68
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:36.475Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/331/questions/bulk",
+      "request": {
+        "questionIds": [
+          131
+        ],
+        "useOriginalPoints": true,
+        "markAsRequired": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 97,
+            "examId": 144,
+            "examSectionId": 331,
+            "examTopicId": null,
+            "questionId": 131,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T18:43:34.8212651+04:00",
+            "questionBodyEn": "QA26 Single: Which number is prime?",
+            "questionBodyAr": "اختبار QA26",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 97,
+              "examId": 144,
+              "examSectionId": 331,
+              "examTopicId": null,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T18:43:34.8212651+04:00",
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5193.85
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:38.824Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Assessment/exams/144/access-policy",
+      "request": {
+        "isPublic": false,
+        "restrictToAssignedCandidates": true,
+        "isWalkIn": false,
+        "accessCode": null
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 125,
+          "examId": 144,
+          "isPublic": false,
+          "accessCode": null,
+          "restrictToAssignedCandidates": true,
+          "isWalkIn": false,
+          "createdDate": "2026-09-19T18:43:26.4850378+04:00",
+          "updatedDate": "2026-09-19T18:43:38.5846356+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Access policy updated successfully",
+          "data": {
+            "id": 125,
+            "examId": 144,
+            "isPublic": false,
+            "accessCode": null,
+            "restrictToAssignedCandidates": true,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T18:43:26.4850378+04:00",
+            "updatedDate": "2026-09-19T18:43:38.5846356+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2348.66
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:43.975Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/144/publish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam published successfully. Notifications queued.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5149.87
+      }
+    },
+    {
+      "at": "2026-09-19T14:43:57.524Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/144",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 144,
+          "examTitleEn": "QA26 D69 Synthetic Image Regression",
+          "examTitleAr": "اختبار صورة اصطناعية QA26",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T18:43:42.7216923+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 144,
+            "examTitleEn": "QA26 D69 Synthetic Image Regression",
+            "examTitleAr": "اختبار صورة اصطناعية QA26",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T18:43:42.7216923+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 13548.56
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:03.004Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 144,
+        "candidateIds": [
+          "0d70f96e-612a-4bc1-81c9-091201b1a23c"
+        ],
+        "scheduleFrom": "2026-09-19T14:42:23.661Z",
+        "scheduleTo": "2026-09-19T15:43:23.661Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5479.18
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:07.291Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/144/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 369,
+          "examId": 144,
+          "examTitleEn": "QA26 D69 Synthetic Image Regression",
+          "examTitleAr": "اختبار صورة اصطناعية QA26",
+          "startedAtUtc": "2026-09-19T18:44:04.4145871+04:00",
+          "expiresAtUtc": "2026-09-19T18:54:04.4145871+04:00",
+          "remainingSeconds": 597,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 1,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": true,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 331,
+              "order": 1,
+              "titleEn": "Image regression",
+              "titleAr": "اختبار الصورة",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2697,
+                  "questionId": 131,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 Single: Which number is prime?",
+                  "bodyAr": "اختبار QA26",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 331,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 376,
+                      "textEn": "2",
+                      "textAr": "خيار 2",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 377,
+                      "textEn": "4",
+                      "textAr": "خيار 4",
+                      "order": 2,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 378,
+                      "textEn": "6",
+                      "textAr": "خيار 6",
+                      "order": 3,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "id": 11,
+                      "fileName": "qa26-reference.png",
+                      "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                      "fileType": "Image"
+                    }
+                  ],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2697,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 331,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 369,
+            "examId": 144,
+            "examTitleEn": "QA26 D69 Synthetic Image Regression",
+            "examTitleAr": "اختبار صورة اصطناعية QA26",
+            "startedAtUtc": "2026-09-19T18:44:04.4145871+04:00",
+            "expiresAtUtc": "2026-09-19T18:54:04.4145871+04:00",
+            "remainingSeconds": 597,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 1,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": true,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 331,
+                "order": 1,
+                "titleEn": "Image regression",
+                "titleAr": "اختبار الصورة",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2697,
+                    "questionId": 131,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 Single: Which number is prime?",
+                    "bodyAr": "اختبار QA26",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 331,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 376,
+                        "textEn": "2",
+                        "textAr": "خيار 2",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 377,
+                        "textEn": "4",
+                        "textAr": "خيار 4",
+                        "order": 2,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 378,
+                        "textEn": "6",
+                        "textAr": "خيار 6",
+                        "order": 3,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [
+                      {
+                        "id": 11,
+                        "fileName": "qa26-reference.png",
+                        "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                        "fileType": "Image"
+                      }
+                    ],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2697,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 331,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4286.15
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:08.258Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/369",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 321,
+          "attemptId": 369,
+          "examId": 144,
+          "examTitleEn": "QA26 D69 Synthetic Image Regression",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 1,
+          "statusName": "Active",
+          "startedAt": "2026-09-19T18:44:04.4145871+04:00",
+          "endedAt": null,
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 0,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T18:44:04.4145871+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": null,
+          "attemptStatus": null,
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": null,
+          "candidatePhone": null,
+          "examTitleAr": "اختبار صورة اصطناعية QA26",
+          "examDurationMinutes": 10,
+          "examPassScore": 5,
+          "examMaxAttempts": 1,
+          "examTotalQuestions": 0,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 0,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": null,
+          "attemptStartedAt": null,
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 0,
+          "attemptTotalQuestions": 0,
+          "sessionDuration": "3s",
+          "sessionDurationMinutes": 0.1,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 321,
+            "attemptId": 369,
+            "examId": 144,
+            "examTitleEn": "QA26 D69 Synthetic Image Regression",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 1,
+            "statusName": "Active",
+            "startedAt": "2026-09-19T18:44:04.4145871+04:00",
+            "endedAt": null,
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 0,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T18:44:04.4145871+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": null,
+            "attemptStatus": null,
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": null,
+            "candidatePhone": null,
+            "examTitleAr": "اختبار صورة اصطناعية QA26",
+            "examDurationMinutes": 10,
+            "examPassScore": 5,
+            "examMaxAttempts": 1,
+            "examTotalQuestions": 0,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 0,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": null,
+            "attemptStartedAt": null,
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 0,
+            "attemptTotalQuestions": 0,
+            "sessionDuration": "3s",
+            "sessionDurationMinutes": 0.1,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 965.64
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:09.646Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Proctor/heartbeat",
+      "request": {
+        "proctorSessionId": 321,
+        "clientTimestamp": "2026-09-19T14:44:08.259Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "success": true,
+          "serverTime": "2026-09-19T18:44:08.9551367+04:00",
+          "currentRiskScore": 0,
+          "totalViolations": 0,
+          "hasWarning": false,
+          "warningMessage": null,
+          "isExpired": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "success": true,
+            "serverTime": "2026-09-19T18:44:08.9551367+04:00",
+            "currentRiskScore": 0,
+            "totalViolations": 0,
+            "hasWarning": false,
+            "warningMessage": null,
+            "isExpired": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1387.36
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:11.086Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST multipart",
+      "route": "/api/Proctor/snapshot/369",
+      "request": {
+        "filename": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+        "contentType": "image/png",
+        "bytes": 4522
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 704,
+          "proctorSessionId": 321,
+          "attemptId": 369,
+          "type": 3,
+          "typeName": "Image",
+          "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+          "fileSize": 4522,
+          "fileSizeFormatted": "4.42 KB",
+          "contentType": "image/png",
+          "startAt": "2026-09-19T18:44:10.8477083+04:00",
+          "endAt": null,
+          "durationSeconds": null,
+          "isUploaded": true,
+          "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+          "previewUrl": "/api/Proctor/evidence/704/download",
+          "downloadUrl": "/api/Proctor/evidence/704/download"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 704,
+            "proctorSessionId": 321,
+            "attemptId": 369,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+            "fileSize": 4522,
+            "fileSizeFormatted": "4.42 KB",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T18:44:10.8477083+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+            "previewUrl": "/api/Proctor/evidence/704/download",
+            "downloadUrl": "/api/Proctor/evidence/704/download"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1437.8352000000014
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:13.624Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/321/evidence",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 704,
+            "proctorSessionId": 321,
+            "attemptId": 369,
+            "type": 3,
+            "typeName": "Image",
+            "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+            "fileSize": 4522,
+            "fileSizeFormatted": "4.42 KB",
+            "contentType": "image/png",
+            "startAt": "2026-09-19T18:44:10.8477083+04:00",
+            "endAt": null,
+            "durationSeconds": null,
+            "isUploaded": true,
+            "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+            "previewUrl": "/api/Proctor/evidence/704/download",
+            "downloadUrl": "/api/Proctor/evidence/704/download"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 704,
+              "proctorSessionId": 321,
+              "attemptId": 369,
+              "type": 3,
+              "typeName": "Image",
+              "fileName": "QA26-SYNTHETIC-NO-PHYSICAL-CAPTURE.png",
+              "fileSize": 4522,
+              "fileSizeFormatted": "4.42 KB",
+              "contentType": "image/png",
+              "startAt": "2026-09-19T18:44:10.8477083+04:00",
+              "endAt": null,
+              "durationSeconds": null,
+              "isUploaded": true,
+              "uploadedAt": "2026-09-19T18:44:10.8477083+04:00",
+              "previewUrl": "/api/Proctor/evidence/704/download",
+              "downloadUrl": "/api/Proctor/evidence/704/download"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2535.67
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:18.529Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "PUT",
+      "route": "/api/Candidate/attempts/369/answers",
+      "request": {
+        "answers": [
+          {
+            "questionId": 131,
+            "selectedOptionIds": [
+              376
+            ]
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Answers saved successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2128.48
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:20.665Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/attempts/369/submit",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 0,
+          "examId": 144,
+          "examTitleEn": "QA26 D69 Synthetic Image Regression",
+          "examTitleAr": "اختبار صورة اصطناعية QA26",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T18:44:19.4886418+04:00",
+          "totalScore": null,
+          "maxPossibleScore": null,
+          "percentage": null,
+          "isPassed": null,
+          "gradeLabel": null,
+          "allowReview": true,
+          "showCorrectAnswers": true
+        },
+        "body": {
+          "success": true,
+          "message": "Attempt submitted successfully. Results will be available after grading.",
+          "data": {
+            "resultId": 0,
+            "examId": 144,
+            "examTitleEn": "QA26 D69 Synthetic Image Regression",
+            "examTitleAr": "اختبار صورة اصطناعية QA26",
+            "attemptNumber": 1,
+            "submittedAt": "2026-09-19T18:44:19.4886418+04:00",
+            "totalScore": null,
+            "maxPossibleScore": null,
+            "percentage": null,
+            "isPassed": null,
+            "gradeLabel": null,
+            "allowReview": true,
+            "showCorrectAnswers": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2135.08
+      }
+    },
+    {
+      "at": "2026-09-19T14:44:24.273Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/321",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 321,
+          "attemptId": 369,
+          "examId": 144,
+          "examTitleEn": "QA26 D69 Synthetic Image Regression",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T18:44:04.4145871+04:00",
+          "endedAt": "2026-09-19T18:44:19.4886418+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 1,
+          "totalViolations": 0,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T18:44:08.9551367+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T18:54:04.4145871+04:00",
+          "attemptStatus": "Submitted",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": null,
+          "recentEvents": [
+            {
+              "id": 4108,
+              "proctorSessionId": 321,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T18:44:08.9551367+04:00",
+              "sequenceNumber": 1
+            }
+          ],
+          "candidateEmail": "qa26.eng.candidate3@example.test",
+          "candidateNameAr": "اختبار الهندسة 3",
+          "candidateRollNo": null,
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": null,
+          "examTitleAr": "اختبار صورة اصطناعية QA26",
+          "examDurationMinutes": 10,
+          "examPassScore": 5,
+          "examMaxAttempts": 1,
+          "examTotalQuestions": 1,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": false,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": "2026-09-19T18:44:19.4886418+04:00",
+          "attemptStartedAt": "2026-09-19T18:44:04.4145871+04:00",
+          "attemptExtraTimeSeconds": 0,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 1,
+          "sessionDuration": "15s",
+          "sessionDurationMinutes": 0.3,
+          "identityVerification": null,
+          "violationBreakdown": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 321,
+            "attemptId": 369,
+            "examId": 144,
+            "examTitleEn": "QA26 D69 Synthetic Image Regression",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T18:44:04.4145871+04:00",
+            "endedAt": "2026-09-19T18:44:19.4886418+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 1,
+            "totalViolations": 0,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T18:44:08.9551367+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T18:54:04.4145871+04:00",
+            "attemptStatus": "Submitted",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": null,
+            "recentEvents": [
+              {
+                "id": 4108,
+                "proctorSessionId": 321,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T18:44:08.9551367+04:00",
+                "sequenceNumber": 1
+              }
+            ],
+            "candidateEmail": "qa26.eng.candidate3@example.test",
+            "candidateNameAr": "اختبار الهندسة 3",
+            "candidateRollNo": null,
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": null,
+            "examTitleAr": "اختبار صورة اصطناعية QA26",
+            "examDurationMinutes": 10,
+            "examPassScore": 5,
+            "examMaxAttempts": 1,
+            "examTotalQuestions": 1,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": false,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": "2026-09-19T18:44:19.4886418+04:00",
+            "attemptStartedAt": "2026-09-19T18:44:04.4145871+04:00",
+            "attemptExtraTimeSeconds": 0,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 1,
+            "sessionDuration": "15s",
+            "sessionDurationMinutes": 0.3,
+            "identityVerification": null,
+            "violationBreakdown": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3607.14
+      }
+    }
+  ]
+}

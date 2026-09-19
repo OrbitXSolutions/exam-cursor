@@ -90,7 +90,7 @@ public class AiProctorService : IAiProctorService
 
             // 6. Only skip AI if truly zero activity from ALL sources
             var hasProctorEvents = session.TotalEvents > 0 || (session.Events != null && session.Events.Any());
-            var hasAttemptActivity = attemptEvents.Count > 0 || attemptQuestions.Any(q => q.Answers != null && q.Answers.Any());
+            var hasAttemptActivity = attemptEvents.Count > 0 || attemptQuestions.Any(q => q.Answers != null && q.Answers.Any(AnswerContent.HasContent));
             if (!hasProctorEvents && !hasAttemptActivity)
             {
                 return ApiResponse<AiProctorAnalysisResponseDto>.SuccessResponse(new AiProctorAnalysisResponseDto
@@ -243,7 +243,7 @@ public class AiProctorService : IAiProctorService
 
         // --- Exam & Attempt Progress ---
         var totalQuestionsInExam = attemptQuestions.Count;
-        var questionsAnswered = attemptQuestions.Count(q => q.Answers != null && q.Answers.Any());
+        var questionsAnswered = attemptQuestions.Count(q => q.Answers != null && q.Answers.Any(AnswerContent.HasContent));
         var questionsWithCalculator = attemptQuestions.Count(q => q.Question?.IsCalculatorAllowed == true);
 
         // --- Navigation events: which question is current ---

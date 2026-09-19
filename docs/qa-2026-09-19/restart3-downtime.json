@@ -1,0 +1,12 @@
+{
+  "StartUtc": "2026-09-19T11:30:01.1930414Z",
+  "AttemptId": 193,
+  "ProctorSessionId": 145,
+  "PreviousLauncherPid": 51280,
+  "PreviousListenerPid": 52936,
+  "EndUtc": "2026-09-19T11:31:20.5991702Z",
+  "DurationSeconds": 79.599,
+  "NewLauncherPid": 52168,
+  "NewListenerPid": 48376,
+  "ExecSessionId": 58852
+}

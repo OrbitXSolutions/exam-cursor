@@ -1,0 +1,50 @@
+[
+  {
+    "phoneNumber": null,
+    "phoneNumberConfirmed": false,
+    "updatedDate": "2026-09-19T15:51:20.1825445+04:00",
+    "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+    "updatedBy": null,
+    "id": "6a89227e-52df-4c14-98c0-6c1a65754339",
+    "email": "qa26.d34.nodept.admin@example.test",
+    "displayName": "QA26 D34 No Department Admin",
+    "fullName": "QA26 D34 No Department Admin",
+    "fullNameAr": null,
+    "isBlocked": false,
+    "status": "Active",
+    "emailConfirmed": true,
+    "roles": [
+      "Admin"
+    ],
+    "createdDate": "2026-09-19T15:51:18.7800518+04:00",
+    "lastLoginDate": null,
+    "departmentId": null,
+    "departmentNameEn": null,
+    "departmentNameAr": null,
+    "isProtected": false
+  },
+  {
+    "phoneNumber": null,
+    "phoneNumberConfirmed": false,
+    "updatedDate": "2026-09-19T15:51:24.4552749+04:00",
+    "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+    "updatedBy": null,
+    "id": "7f74cbae-a96d-4e78-b016-2cf30b6e24b1",
+    "email": "qa26.d34.nodept.examiner@example.test",
+    "displayName": "QA26 D34 No Department Examiner",
+    "fullName": "QA26 D34 No Department Examiner",
+    "fullNameAr": null,
+    "isBlocked": false,
+    "status": "Active",
+    "emailConfirmed": true,
+    "roles": [
+      "Examiner"
+    ],
+    "createdDate": "2026-09-19T15:51:23.0551775+04:00",
+    "lastLoginDate": null,
+    "departmentId": null,
+    "departmentNameEn": null,
+    "departmentNameAr": null,
+    "isProtected": false
+  }
+]

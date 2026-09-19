@@ -1,0 +1,12 @@
+[
+  {
+    "id": "e78d3aa8-ef17-41af-ab9b-d47c90c7306f",
+    "email": "qa26.token.candidate.1789815429769@example.test",
+    "role": "Candidate"
+  },
+  {
+    "id": "f598fc18-0e1d-4c9b-bde4-a53d8e6c90c4",
+    "email": "qa26.token.admin.1789815460765@example.test",
+    "role": "Admin"
+  }
+]

@@ -1,0 +1,2176 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP workflows and persisted application state. No browser or physical verification.",
+  "startedAt": "2026-09-19T11:48:47.344Z",
+  "checks": [
+    {
+      "name": "Original correct answer persists before question mutation",
+      "passed": true,
+      "at": "2026-09-19T11:49:15.868Z"
+    },
+    {
+      "name": "Active attempt retains the originally presented question body",
+      "passed": false,
+      "detail": {
+        "initial": "QA26 historical integrity 1789818529790: select the blue option",
+        "reloaded": "QA26 historical mutation 1789818529790: select the red option",
+        "mutationAccepted": true
+      },
+      "at": "2026-09-19T11:49:21.878Z"
+    },
+    {
+      "name": "Active attempt preserves original ten-point maximum",
+      "passed": true,
+      "detail": {
+        "points": 10
+      },
+      "at": "2026-09-19T11:49:21.879Z"
+    },
+    {
+      "name": "Originally correct saved answer earns original ten points",
+      "passed": false,
+      "detail": {
+        "score": 0,
+        "maxPossibleScore": 10,
+        "mutationAccepted": true
+      },
+      "at": "2026-09-19T11:49:25.183Z"
+    },
+    {
+      "name": "Historical grading maximum remains original ten points",
+      "passed": true,
+      "detail": {
+        "maxPossibleScore": 10
+      },
+      "at": "2026-09-19T11:49:25.184Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:48:48.591Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:48:48.5879833+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T15:48:47.883606+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:48:48.5879833+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T15:48:47.883606+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1244.89
+      }
+    },
+    {
+      "at": "2026-09-19T11:48:49.789Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:48:49.7892309+04:00",
+          "user": {
+            "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "email": "qa26.protocol.1789817576996.a@example.test",
+            "displayName": "QA26 Protocol Regression a",
+            "fullName": "QA26 Protocol Regression a",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+            "lastLoginDate": "2026-09-19T15:48:49.0942038+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:48:49.7892309+04:00",
+            "user": {
+              "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "email": "qa26.protocol.1789817576996.a@example.test",
+              "displayName": "QA26 Protocol Regression a",
+              "fullName": "QA26 Protocol Regression a",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+              "lastLoginDate": "2026-09-19T15:48:49.0942038+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1197.06
+      }
+    },
+    {
+      "at": "2026-09-19T11:48:53.819Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/QuestionBank/questions",
+      "request": {
+        "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+        "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+        "explanationEn": "The original correct option is blue.",
+        "questionTypeId": 1,
+        "subjectId": 23,
+        "topicId": 34,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "isCalculatorAllowed": false,
+        "options": [
+          {
+            "textEn": "Blue",
+            "textAr": "أزرق",
+            "isCorrect": true,
+            "order": 1
+          },
+          {
+            "textEn": "Red",
+            "textAr": "أحمر",
+            "isCorrect": false,
+            "order": 2
+          }
+        ]
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 166,
+          "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+          "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+          "explanationEn": "The original correct option is blue.",
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 464,
+              "questionId": 166,
+              "textEn": "Blue",
+              "textAr": "أزرق",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+            },
+            {
+              "id": 465,
+              "questionId": 166,
+              "textEn": "Red",
+              "textAr": "أحمر",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 166,
+            "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+            "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+            "explanationEn": "The original correct option is blue.",
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 464,
+                "questionId": 166,
+                "textEn": "Blue",
+                "textAr": "أزرق",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+              },
+              {
+                "id": 465,
+                "questionId": 166,
+                "textEn": "Red",
+                "textAr": "أحمر",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4028.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:48:57.518Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams",
+      "request": {
+        "titleEn": "QA26 Historical Question Integrity 1789818529790",
+        "titleAr": "اختبار ثبات السؤال التاريخي",
+        "examType": 0,
+        "startAt": "2026-09-19T11:47:53.820Z",
+        "endAt": "2026-09-20T11:48:53.820Z",
+        "durationMinutes": 60,
+        "maxAttempts": 1,
+        "passScore": 5,
+        "isActive": true,
+        "showResults": true,
+        "allowReview": true,
+        "showCorrectAnswers": true,
+        "shuffleQuestions": false,
+        "shuffleOptions": false,
+        "requireProctoring": false,
+        "requireIdVerification": false,
+        "requireWebcam": false,
+        "enableScreenMonitoring": false,
+        "screenMonitoringMode": 0,
+        "preventCopyPaste": false,
+        "preventScreenCapture": false,
+        "requireFullscreen": false,
+        "browserLockdown": false,
+        "maxViolationWarnings": 0
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 131,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "examType": 0,
+          "titleEn": "QA26 Historical Question Integrity 1789818529790",
+          "titleAr": "اختبار ثبات السؤال التاريخي",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "startAt": "2026-09-19T11:47:53.82+00:00",
+          "endAt": "2026-09-20T11:48:53.82+00:00",
+          "durationMinutes": 60,
+          "maxAttempts": 1,
+          "shuffleQuestions": false,
+          "shuffleOptions": false,
+          "passScore": 5,
+          "isPublished": false,
+          "isActive": true,
+          "showResults": true,
+          "allowReview": true,
+          "showCorrectAnswers": true,
+          "requireProctoring": false,
+          "requireIdVerification": false,
+          "requireWebcam": false,
+          "enableScreenMonitoring": false,
+          "screenMonitoringMode": 0,
+          "screenShareGracePeriod": 20,
+          "preventCopyPaste": false,
+          "preventScreenCapture": false,
+          "requireFullscreen": false,
+          "browserLockdown": false,
+          "maxViolationWarnings": 10,
+          "createdDate": "2026-09-19T15:48:56.1189325+04:00",
+          "updatedDate": null,
+          "sectionsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sections": [],
+          "instructions": [],
+          "accessPolicy": {
+            "id": 112,
+            "examId": 131,
+            "isPublic": true,
+            "accessCode": null,
+            "restrictToAssignedCandidates": false,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:48:56.3640648+04:00",
+            "updatedDate": null
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 131,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "examType": 0,
+            "titleEn": "QA26 Historical Question Integrity 1789818529790",
+            "titleAr": "اختبار ثبات السؤال التاريخي",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "startAt": "2026-09-19T11:47:53.82+00:00",
+            "endAt": "2026-09-20T11:48:53.82+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 1,
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "passScore": 5,
+            "isPublished": false,
+            "isActive": true,
+            "showResults": true,
+            "allowReview": true,
+            "showCorrectAnswers": true,
+            "requireProctoring": false,
+            "requireIdVerification": false,
+            "requireWebcam": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "requireFullscreen": false,
+            "browserLockdown": false,
+            "maxViolationWarnings": 10,
+            "createdDate": "2026-09-19T15:48:56.1189325+04:00",
+            "updatedDate": null,
+            "sectionsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sections": [],
+            "instructions": [],
+            "accessPolicy": {
+              "id": 112,
+              "examId": 131,
+              "isPublic": true,
+              "accessCode": null,
+              "restrictToAssignedCandidates": false,
+              "isWalkIn": false,
+              "createdDate": "2026-09-19T15:48:56.3640648+04:00",
+              "updatedDate": null
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3697.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:48:58.668Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/131/sections",
+      "request": {
+        "titleEn": "Historical integrity",
+        "titleAr": "ثبات تاريخي",
+        "order": 1
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 312,
+          "examId": 131,
+          "titleEn": "Historical integrity",
+          "titleAr": "ثبات تاريخي",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "order": 1,
+          "durationMinutes": null,
+          "totalPointsOverride": null,
+          "createdDate": "2026-09-19T15:48:58.2074535+04:00",
+          "topicsCount": 0,
+          "questionsCount": 0,
+          "totalPoints": 0,
+          "sourceType": null,
+          "questionSubjectId": null,
+          "questionTopicId": null,
+          "pickCount": 0,
+          "subjectNameEn": null,
+          "subjectNameAr": null,
+          "topicNameEn": null,
+          "topicNameAr": null,
+          "topics": [],
+          "questions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 312,
+            "examId": 131,
+            "titleEn": "Historical integrity",
+            "titleAr": "ثبات تاريخي",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "order": 1,
+            "durationMinutes": null,
+            "totalPointsOverride": null,
+            "createdDate": "2026-09-19T15:48:58.2074535+04:00",
+            "topicsCount": 0,
+            "questionsCount": 0,
+            "totalPoints": 0,
+            "sourceType": null,
+            "questionSubjectId": null,
+            "questionTopicId": null,
+            "pickCount": 0,
+            "subjectNameEn": null,
+            "subjectNameAr": null,
+            "topicNameEn": null,
+            "topicNameAr": null,
+            "topics": [],
+            "questions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1149.5
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:00.514Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/sections/312/questions/bulk",
+      "request": {
+        "questionIds": [
+          166
+        ],
+        "useOriginalPoints": true,
+        "markAsRequired": true
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 58,
+            "examId": 131,
+            "examSectionId": 312,
+            "examTopicId": null,
+            "questionId": 166,
+            "order": 1,
+            "points": 10,
+            "isRequired": true,
+            "createdDate": "2026-09-19T15:48:59.8175791+04:00",
+            "questionBodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+            "questionBodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "difficultyLevelName": "Medium",
+            "originalPoints": 10
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 58,
+              "examId": 131,
+              "examSectionId": 312,
+              "examTopicId": null,
+              "questionId": 166,
+              "order": 1,
+              "points": 10,
+              "isRequired": true,
+              "createdDate": "2026-09-19T15:48:59.8175791+04:00",
+              "questionBodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+              "questionBodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeNameEn": "MCQ_Single",
+              "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+              "difficultyLevelName": "Medium",
+              "originalPoints": 10
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1845.03
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:01.442Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Assessment/exams/131/access-policy",
+      "request": {
+        "isPublic": false,
+        "restrictToAssignedCandidates": true,
+        "isWalkIn": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 112,
+          "examId": 131,
+          "isPublic": false,
+          "accessCode": null,
+          "restrictToAssignedCandidates": true,
+          "isWalkIn": false,
+          "createdDate": "2026-09-19T15:48:56.3640648+04:00",
+          "updatedDate": "2026-09-19T15:49:01.2091445+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Access policy updated successfully",
+          "data": {
+            "id": 112,
+            "examId": 131,
+            "isPublic": false,
+            "accessCode": null,
+            "restrictToAssignedCandidates": true,
+            "isWalkIn": false,
+            "createdDate": "2026-09-19T15:48:56.3640648+04:00",
+            "updatedDate": "2026-09-19T15:49:01.2091445+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 926.99
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:03.991Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assessment/exams/131/publish",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Exam published successfully. Notifications queued.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2548.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:09.173Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 131,
+        "candidateIds": [
+          "b94bc18b-c8a8-46fe-b140-5dd55414b853"
+        ],
+        "scheduleFrom": "2026-09-19T11:47:53.820Z",
+        "scheduleTo": "2026-09-20T11:48:53.820Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 5181.11
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:12.868Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/131/start",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 210,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+          "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+          "remainingSeconds": 3597,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 1,
+          "totalQuestions": 1,
+          "answeredQuestions": 0,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": false,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 312,
+              "order": 1,
+              "titleEn": "Historical integrity",
+              "titleAr": "ثبات تاريخي",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 0,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2088,
+                  "questionId": 166,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                  "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 312,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 464,
+                      "textEn": "Blue",
+                      "textAr": "أزرق",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 465,
+                      "textEn": "Red",
+                      "textAr": "أحمر",
+                      "order": 2,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": null
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2088,
+              "questionId": 166,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+              "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 312,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 464,
+                  "textEn": "Blue",
+                  "textAr": "أزرق",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 465,
+                  "textEn": "Red",
+                  "textAr": "أحمر",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Exam started successfully",
+          "data": {
+            "attemptId": 210,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+            "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+            "remainingSeconds": 3597,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 1,
+            "totalQuestions": 1,
+            "answeredQuestions": 0,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": false,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 312,
+                "order": 1,
+                "titleEn": "Historical integrity",
+                "titleAr": "ثبات تاريخي",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 0,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2088,
+                    "questionId": 166,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                    "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 312,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 464,
+                        "textEn": "Blue",
+                        "textAr": "أزرق",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 465,
+                        "textEn": "Red",
+                        "textAr": "أحمر",
+                        "order": 2,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": null
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2088,
+                "questionId": 166,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 312,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 464,
+                    "textEn": "Blue",
+                    "textAr": "أزرق",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 465,
+                    "textEn": "Red",
+                    "textAr": "أحمر",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3693.91
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:14.710Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "PUT",
+      "route": "/api/Candidate/attempts/210/answers",
+      "request": {
+        "answers": [
+          {
+            "questionId": 166,
+            "selectedOptionIds": [
+              464
+            ]
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Answers saved successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1841.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:15.867Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/210/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 210,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+          "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+          "remainingSeconds": 3594,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 1,
+          "totalQuestions": 1,
+          "answeredQuestions": 1,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": false,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 312,
+              "order": 1,
+              "titleEn": "Historical integrity",
+              "titleAr": "ثبات تاريخي",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 1,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2088,
+                  "questionId": 166,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                  "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 312,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 464,
+                      "textEn": "Blue",
+                      "textAr": "أزرق",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 465,
+                      "textEn": "Red",
+                      "textAr": "أحمر",
+                      "order": 2,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": {
+                    "attemptAnswerId": 596,
+                    "questionId": 166,
+                    "selectedOptionIds": [
+                      464
+                    ],
+                    "textAnswer": null,
+                    "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                  }
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2088,
+              "questionId": 166,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+              "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 312,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 464,
+                  "textEn": "Blue",
+                  "textAr": "أزرق",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 465,
+                  "textEn": "Red",
+                  "textAr": "أحمر",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 596,
+                "questionId": 166,
+                "selectedOptionIds": [
+                  464
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+              }
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 210,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+            "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+            "remainingSeconds": 3594,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 1,
+            "totalQuestions": 1,
+            "answeredQuestions": 1,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": false,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 312,
+                "order": 1,
+                "titleEn": "Historical integrity",
+                "titleAr": "ثبات تاريخي",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 1,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2088,
+                    "questionId": 166,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                    "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 312,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 464,
+                        "textEn": "Blue",
+                        "textAr": "أزرق",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 465,
+                        "textEn": "Red",
+                        "textAr": "أحمر",
+                        "order": 2,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": {
+                      "attemptAnswerId": 596,
+                      "questionId": 166,
+                      "selectedOptionIds": [
+                        464
+                      ],
+                      "textAnswer": null,
+                      "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                    }
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2088,
+                "questionId": 166,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+                "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 312,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 464,
+                    "textEn": "Blue",
+                    "textAr": "أزرق",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 465,
+                    "textEn": "Red",
+                    "textAr": "أحمر",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 596,
+                  "questionId": 166,
+                  "selectedOptionIds": [
+                    464
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                }
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1156.07
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:20.720Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/166",
+      "request": {
+        "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+        "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+        "explanationEn": "The original correct option is blue.",
+        "explanationAr": null,
+        "questionTypeId": 1,
+        "questionCategoryId": null,
+        "subjectId": 23,
+        "topicId": 34,
+        "points": 20,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "isCalculatorAllowed": false,
+        "options": [
+          {
+            "id": 464,
+            "textEn": "Blue",
+            "textAr": "أزرق",
+            "isCorrect": false,
+            "order": 1,
+            "points": null
+          },
+          {
+            "id": 465,
+            "textEn": "Red",
+            "textAr": "أحمر",
+            "isCorrect": true,
+            "order": 2,
+            "points": null
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 166,
+          "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+          "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+          "explanationEn": "The original correct option is blue.",
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 20,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 465,
+              "questionId": 166,
+              "textEn": "Red",
+              "textAr": "أحمر",
+              "isCorrect": true,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+            },
+            {
+              "id": 464,
+              "questionId": 166,
+              "textEn": "Blue",
+              "textAr": "أزرق",
+              "isCorrect": false,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 166,
+            "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+            "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+            "explanationEn": "The original correct option is blue.",
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 20,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 465,
+                "questionId": 166,
+                "textEn": "Red",
+                "textAr": "أحمر",
+                "isCorrect": true,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+              },
+              {
+                "id": 464,
+                "questionId": 166,
+                "textEn": "Blue",
+                "textAr": "أزرق",
+                "isCorrect": false,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4850.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:21.877Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/attempts/210/session",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 210,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+          "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+          "remainingSeconds": 3588,
+          "status": 2,
+          "attemptNumber": 1,
+          "maxAttempts": 1,
+          "totalQuestions": 1,
+          "answeredQuestions": 1,
+          "examSettings": {
+            "shuffleQuestions": false,
+            "shuffleOptions": false,
+            "lockPreviousSections": true,
+            "preventBackNavigation": false,
+            "requireProctoring": false,
+            "requireWebcam": false,
+            "requireFullscreen": false,
+            "preventCopyPaste": false,
+            "preventScreenCapture": false,
+            "browserLockdown": false,
+            "enableScreenMonitoring": false,
+            "screenMonitoringMode": 0,
+            "screenShareGracePeriod": 20
+          },
+          "sections": [
+            {
+              "sectionId": 312,
+              "order": 1,
+              "titleEn": "Historical integrity",
+              "titleAr": "ثبات تاريخي",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "sourceType": null,
+              "subjectId": null,
+              "subjectTitleEn": null,
+              "subjectTitleAr": null,
+              "topicId": null,
+              "topicTitleEn": null,
+              "topicTitleAr": null,
+              "durationMinutes": null,
+              "remainingSeconds": null,
+              "sectionStartedAtUtc": null,
+              "sectionExpiresAtUtc": null,
+              "totalPoints": 10,
+              "totalQuestions": 1,
+              "answeredQuestions": 1,
+              "topics": [],
+              "questions": [
+                {
+                  "attemptQuestionId": 2088,
+                  "questionId": 166,
+                  "order": 1,
+                  "points": 10,
+                  "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+                  "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                  "questionTypeName": "MCQ_Single",
+                  "questionTypeId": 1,
+                  "isCalculatorAllowed": false,
+                  "sectionId": 312,
+                  "topicId": null,
+                  "options": [
+                    {
+                      "id": 464,
+                      "textEn": "Blue",
+                      "textAr": "أزرق",
+                      "order": 1,
+                      "attachmentPath": null
+                    },
+                    {
+                      "id": 465,
+                      "textEn": "Red",
+                      "textAr": "أحمر",
+                      "order": 2,
+                      "attachmentPath": null
+                    }
+                  ],
+                  "attachments": [],
+                  "currentAnswer": {
+                    "attemptAnswerId": 596,
+                    "questionId": 166,
+                    "selectedOptionIds": [
+                      464
+                    ],
+                    "textAnswer": null,
+                    "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                  }
+                }
+              ]
+            }
+          ],
+          "questions": [
+            {
+              "attemptQuestionId": 2088,
+              "questionId": 166,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+              "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "sectionId": 312,
+              "topicId": null,
+              "options": [
+                {
+                  "id": 464,
+                  "textEn": "Blue",
+                  "textAr": "أزرق",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 465,
+                  "textEn": "Red",
+                  "textAr": "أحمر",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": {
+                "attemptAnswerId": 596,
+                "questionId": 166,
+                "selectedOptionIds": [
+                  464
+                ],
+                "textAnswer": null,
+                "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+              }
+            }
+          ],
+          "instructions": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "attemptId": 210,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "startedAtUtc": "2026-09-19T15:49:10.1072322+04:00",
+            "expiresAtUtc": "2026-09-19T16:49:10.1072322+04:00",
+            "remainingSeconds": 3588,
+            "status": 2,
+            "attemptNumber": 1,
+            "maxAttempts": 1,
+            "totalQuestions": 1,
+            "answeredQuestions": 1,
+            "examSettings": {
+              "shuffleQuestions": false,
+              "shuffleOptions": false,
+              "lockPreviousSections": true,
+              "preventBackNavigation": false,
+              "requireProctoring": false,
+              "requireWebcam": false,
+              "requireFullscreen": false,
+              "preventCopyPaste": false,
+              "preventScreenCapture": false,
+              "browserLockdown": false,
+              "enableScreenMonitoring": false,
+              "screenMonitoringMode": 0,
+              "screenShareGracePeriod": 20
+            },
+            "sections": [
+              {
+                "sectionId": 312,
+                "order": 1,
+                "titleEn": "Historical integrity",
+                "titleAr": "ثبات تاريخي",
+                "descriptionEn": null,
+                "descriptionAr": null,
+                "sourceType": null,
+                "subjectId": null,
+                "subjectTitleEn": null,
+                "subjectTitleAr": null,
+                "topicId": null,
+                "topicTitleEn": null,
+                "topicTitleAr": null,
+                "durationMinutes": null,
+                "remainingSeconds": null,
+                "sectionStartedAtUtc": null,
+                "sectionExpiresAtUtc": null,
+                "totalPoints": 10,
+                "totalQuestions": 1,
+                "answeredQuestions": 1,
+                "topics": [],
+                "questions": [
+                  {
+                    "attemptQuestionId": 2088,
+                    "questionId": 166,
+                    "order": 1,
+                    "points": 10,
+                    "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+                    "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                    "questionTypeName": "MCQ_Single",
+                    "questionTypeId": 1,
+                    "isCalculatorAllowed": false,
+                    "sectionId": 312,
+                    "topicId": null,
+                    "options": [
+                      {
+                        "id": 464,
+                        "textEn": "Blue",
+                        "textAr": "أزرق",
+                        "order": 1,
+                        "attachmentPath": null
+                      },
+                      {
+                        "id": 465,
+                        "textEn": "Red",
+                        "textAr": "أحمر",
+                        "order": 2,
+                        "attachmentPath": null
+                      }
+                    ],
+                    "attachments": [],
+                    "currentAnswer": {
+                      "attemptAnswerId": 596,
+                      "questionId": 166,
+                      "selectedOptionIds": [
+                        464
+                      ],
+                      "textAnswer": null,
+                      "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                    }
+                  }
+                ]
+              }
+            ],
+            "questions": [
+              {
+                "attemptQuestionId": 2088,
+                "questionId": 166,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 historical mutation 1789818529790: select the red option",
+                "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "sectionId": 312,
+                "topicId": null,
+                "options": [
+                  {
+                    "id": 464,
+                    "textEn": "Blue",
+                    "textAr": "أزرق",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 465,
+                    "textEn": "Red",
+                    "textAr": "أحمر",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": {
+                  "attemptAnswerId": 596,
+                  "questionId": 166,
+                  "selectedOptionIds": [
+                    464
+                  ],
+                  "textAnswer": null,
+                  "answeredAt": "2026-09-19T15:49:13.5573136+04:00"
+                }
+              }
+            ],
+            "instructions": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1156.32
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:23.717Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/attempts/210/submit",
+      "request": {},
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "resultId": 0,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "attemptNumber": 1,
+          "submittedAt": "2026-09-19T15:49:22.5722+04:00",
+          "totalScore": null,
+          "maxPossibleScore": null,
+          "percentage": null,
+          "isPassed": null,
+          "gradeLabel": null,
+          "allowReview": true,
+          "showCorrectAnswers": true
+        },
+        "body": {
+          "success": true,
+          "message": "Attempt submitted successfully. Results will be available after grading.",
+          "data": {
+            "resultId": 0,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "attemptNumber": 1,
+            "submittedAt": "2026-09-19T15:49:22.5722+04:00",
+            "totalScore": null,
+            "maxPossibleScore": null,
+            "percentage": null,
+            "isPassed": null,
+            "gradeLabel": null,
+            "allowReview": true,
+            "showCorrectAnswers": true
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1837.11
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:24.191Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/210",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Grading session not found for this attempt",
+          "data": null,
+          "errors": [],
+          "traceId": "2184a75624152803d804f7c142df593f"
+        },
+        "ms": 472.88
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:25.181Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/210",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 88,
+          "attemptId": 210,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "gradedBy": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "graderName": "QA26 Protocol Regression a",
+          "status": 2,
+          "statusName": "AutoGraded",
+          "totalScore": 0,
+          "maxPossibleScore": 10,
+          "passScore": 5,
+          "isPassed": false,
+          "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+          "createdDate": "2026-09-19T15:49:24.1780473+04:00",
+          "totalQuestions": 1,
+          "gradedQuestions": 1,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 759,
+              "gradingSessionId": 88,
+              "questionId": 166,
+              "questionBodyEn": "QA26 historical mutation 1789818529790: select the red option",
+              "questionBodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                464
+              ],
+              "selectedOptions": [
+                {
+                  "id": 464,
+                  "textEn": "Blue",
+                  "textAr": "أزرق",
+                  "isCorrect": false
+                }
+              ],
+              "textAnswer": null,
+              "score": 0,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 465,
+                  "textEn": "Red",
+                  "textAr": "أحمر"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 88,
+            "attemptId": 210,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "gradedBy": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "graderName": "QA26 Protocol Regression a",
+            "status": 2,
+            "statusName": "AutoGraded",
+            "totalScore": 0,
+            "maxPossibleScore": 10,
+            "passScore": 5,
+            "isPassed": false,
+            "gradedAt": "2026-09-19T15:49:24.1780473+04:00",
+            "createdDate": "2026-09-19T15:49:24.1780473+04:00",
+            "totalQuestions": 1,
+            "gradedQuestions": 1,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 759,
+                "gradingSessionId": 88,
+                "questionId": 166,
+                "questionBodyEn": "QA26 historical mutation 1789818529790: select the red option",
+                "questionBodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  464
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 464,
+                    "textEn": "Blue",
+                    "textAr": "أزرق",
+                    "isCorrect": false
+                  }
+                ],
+                "textAnswer": null,
+                "score": 0,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 465,
+                    "textEn": "Red",
+                    "textAr": "أحمر"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 479.59
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:30.087Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/questions/166",
+      "request": {
+        "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+        "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+        "explanationEn": "The original correct option is blue.",
+        "explanationAr": null,
+        "questionTypeId": 1,
+        "questionCategoryId": null,
+        "subjectId": 23,
+        "topicId": 34,
+        "points": 10,
+        "difficultyLevel": 2,
+        "isActive": true,
+        "isCalculatorAllowed": false,
+        "options": [
+          {
+            "id": 464,
+            "textEn": "Blue",
+            "textAr": "أزرق",
+            "isCorrect": true,
+            "order": 1,
+            "points": null
+          },
+          {
+            "id": 465,
+            "textEn": "Red",
+            "textAr": "أحمر",
+            "isCorrect": false,
+            "order": 2,
+            "points": null
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 166,
+          "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+          "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+          "explanationEn": "The original correct option is blue.",
+          "explanationAr": null,
+          "questionTypeId": 1,
+          "questionTypeNameEn": "MCQ_Single",
+          "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+          "questionCategoryId": null,
+          "questionCategoryNameEn": "",
+          "questionCategoryNameAr": "",
+          "subjectId": 23,
+          "subjectNameEn": "QA26 eng Foundations",
+          "subjectNameAr": "أساسيات اختبار QA26 eng",
+          "topicId": 34,
+          "topicNameEn": "QA26 eng Applied Knowledge",
+          "topicNameAr": "تطبيق المعرفة QA26 eng",
+          "points": 10,
+          "difficultyLevel": 2,
+          "difficultyLevelName": "Medium",
+          "isActive": true,
+          "isCalculatorAllowed": false,
+          "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+          "updatedDate": null,
+          "isDeleted": false,
+          "options": [
+            {
+              "id": 464,
+              "questionId": 166,
+              "textEn": "Blue",
+              "textAr": "أزرق",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+            },
+            {
+              "id": 465,
+              "questionId": 166,
+              "textEn": "Red",
+              "textAr": "أحمر",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+            }
+          ],
+          "attachments": [],
+          "answerKey": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 166,
+            "bodyEn": "QA26 historical integrity 1789818529790: select the blue option",
+            "bodyAr": "اختبار ثبات السؤال: اختر الأزرق",
+            "explanationEn": "The original correct option is blue.",
+            "explanationAr": null,
+            "questionTypeId": 1,
+            "questionTypeNameEn": "MCQ_Single",
+            "questionTypeNameAr": "اختيار من متعدد (إجابة واحدة)",
+            "questionCategoryId": null,
+            "questionCategoryNameEn": "",
+            "questionCategoryNameAr": "",
+            "subjectId": 23,
+            "subjectNameEn": "QA26 eng Foundations",
+            "subjectNameAr": "أساسيات اختبار QA26 eng",
+            "topicId": 34,
+            "topicNameEn": "QA26 eng Applied Knowledge",
+            "topicNameAr": "تطبيق المعرفة QA26 eng",
+            "points": 10,
+            "difficultyLevel": 2,
+            "difficultyLevelName": "Medium",
+            "isActive": true,
+            "isCalculatorAllowed": false,
+            "createdDate": "2026-09-19T15:48:51.8978228+04:00",
+            "updatedDate": null,
+            "isDeleted": false,
+            "options": [
+              {
+                "id": 464,
+                "questionId": 166,
+                "textEn": "Blue",
+                "textAr": "أزرق",
+                "isCorrect": true,
+                "points": null,
+                "order": 1,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980144+04:00"
+              },
+              {
+                "id": 465,
+                "questionId": 166,
+                "textEn": "Red",
+                "textAr": "أحمر",
+                "isCorrect": false,
+                "points": null,
+                "order": 2,
+                "attachmentPath": null,
+                "createdDate": "2026-09-19T15:48:51.8980171+04:00"
+              }
+            ],
+            "attachments": [],
+            "answerKey": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4902.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:32.439Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/attempt/210",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 60,
+          "examId": 131,
+          "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+          "examTitleAr": "اختبار ثبات السؤال التاريخي",
+          "attemptId": 210,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "totalScore": 0,
+          "maxPossibleScore": 10,
+          "passScore": 5,
+          "percentage": 0,
+          "isPassed": false,
+          "gradeLabel": "F",
+          "isPublishedToCandidate": true,
+          "publishedAt": "2026-09-19T15:49:28.5571699+04:00",
+          "finalizedAt": "2026-09-19T15:49:25.7970643+04:00",
+          "attemptStartedAt": "2026-09-19T15:49:10.1072322+04:00",
+          "attemptSubmittedAt": "2026-09-19T15:49:22.5722+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 60,
+            "examId": 131,
+            "examTitleEn": "QA26 Historical Question Integrity 1789818529790",
+            "examTitleAr": "اختبار ثبات السؤال التاريخي",
+            "attemptId": 210,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "totalScore": 0,
+            "maxPossibleScore": 10,
+            "passScore": 5,
+            "percentage": 0,
+            "isPassed": false,
+            "gradeLabel": "F",
+            "isPublishedToCandidate": true,
+            "publishedAt": "2026-09-19T15:49:28.5571699+04:00",
+            "finalizedAt": "2026-09-19T15:49:25.7970643+04:00",
+            "attemptStartedAt": "2026-09-19T15:49:10.1072322+04:00",
+            "attemptSubmittedAt": "2026-09-19T15:49:22.5722+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2351.06
+      }
+    },
+    {
+      "at": "2026-09-19T11:49:34.792Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamResult/60/publish",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Result is already published",
+          "data": null,
+          "errors": [],
+          "traceId": "a07bd35612155253c2ce429caf4cb008"
+        },
+        "ms": 2350.83
+      }
+    }
+  ]
+}

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n/context"
+import { useAuth } from "@/lib/auth/context"
+import { UserRole } from "@/lib/types"
 import {
   getGradingSessionByAttempt,
   initiateGrading,
@@ -50,6 +52,8 @@ export default function GradeSubmissionPage() {
   const attemptId = Number(submissionId)
   const router = useRouter()
   const { t, dir, language } = useI18n()
+  const { hasRole } = useAuth()
+  const canManageResults = hasRole([UserRole.SuperAdmin, UserRole.Admin, UserRole.Instructor])
 
   const [session, setSession] = useState<GradingSessionDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -76,8 +80,8 @@ export default function GradeSubmissionPage() {
         const initialGrades = new Map<number, GradeState>()
         const manualAnswers = data.answers.filter((a) => a.isManuallyGraded)
         manualAnswers.forEach((a) => {
-          // Only mark as saved if the grader has actually graded this question
-          const wasGraded = a.score > 0 || !!a.graderComment
+          // A saved zero-point grade may legitimately have no feedback.
+          const wasGraded = a.isGraded
           initialGrades.set(a.questionId, {
             points: a.score,
             feedback: a.graderComment || "",
@@ -102,6 +106,7 @@ export default function GradeSubmissionPage() {
 
   const manualQuestions: GradedAnswerItem[] =
     session?.answers.filter((a) => a.isManuallyGraded) || []
+  const automaticAnswers = session?.answers.filter((answer) => !answer.isManuallyGraded) || []
   const currentQuestion = manualQuestions[currentQuestionIndex]
   const currentGrade = currentQuestion ? grades.get(currentQuestion.questionId) : null
   const isUnanswered = currentQuestion
@@ -143,10 +148,10 @@ export default function GradeSubmissionPage() {
       const finalResult = await completeGrading(session.id)
       toast.success(t("grading.finalized", { score: finalResult.totalScore }), {
         description: language === "ar" ? "سيظهر المرشح في صفحة نتائج المرشحين." : "Candidate will appear on Candidate Result page.",
-        action: {
+        action: canManageResults ? {
           label: language === "ar" ? "عرض النتائج" : "View results",
           onClick: () => router.push("/results/candidate-result"),
-        },
+        } : undefined,
       })
       router.push("/grading")
     } catch {
@@ -218,7 +223,7 @@ export default function GradeSubmissionPage() {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">
-            {session.totalScore != null ? Math.round((session.totalScore / session.maxPossibleScore) * 100) : 0}% {t("grading.autoLabel")}
+            {language === "ar" ? "الدرجات التلقائية" : "Automatic score"}: {automaticAnswers.reduce((sum, answer) => sum + answer.score, 0)} / {automaticAnswers.reduce((sum, answer) => sum + answer.maxPoints, 0)}
           </Badge>
           <Button onClick={() => setFinalizeDialogOpen(true)} disabled={!allGraded || finalizing}>
             {finalizing ? (

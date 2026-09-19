@@ -1,0 +1,15 @@
+{
+  "actor": {
+    "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+    "email": "qa26.phase9.scope@example.test",
+    "departmentId": 8,
+    "finalRoles": [
+      "Candidate"
+    ]
+  },
+  "attempts": [
+    216,
+    217
+  ],
+  "allCreatedAttemptsCancelled": true
+}

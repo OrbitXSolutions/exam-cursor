@@ -1,0 +1,1435 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:45:29.168Z",
+  "checks": [],
+  "events": [
+    {
+      "at": "2026-09-19T11:45:30.435Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:45:30.4305161+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:45:29.7352941+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:45:30.4305161+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:45:29.7352941+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1263.65
+      }
+    },
+    {
+      "at": "2026-09-19T11:45:31.816Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.browser.walkin%40example.test",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971500001234",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:42:57.5761572+04:00",
+          "createdBy": null,
+          "updatedBy": null,
+          "id": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+          "email": "qa26.browser.walkin@example.test",
+          "displayName": "QA26 Browser Walk In",
+          "fullName": "QA26 Browser Walk In",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T15:42:54.8079956+04:00",
+          "lastLoginDate": null,
+          "departmentId": null,
+          "departmentNameEn": null,
+          "departmentNameAr": null,
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971500001234",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:42:57.5761572+04:00",
+            "createdBy": null,
+            "updatedBy": null,
+            "id": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+            "email": "qa26.browser.walkin@example.test",
+            "displayName": "QA26 Browser Walk In",
+            "fullName": "QA26 Browser Walk In",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:42:54.8079956+04:00",
+            "lastLoginDate": null,
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1380.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:45:33.605Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt?examId=119&candidateId=dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 200,
+              "examId": 119,
+              "examTitleEn": "QA26 Walk In Registration",
+              "examTitleAr": "اختبار QA26 walkin",
+              "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+              "candidateName": "QA26 Browser Walk In",
+              "startedAt": "2026-09-19T15:43:11.365277+04:00",
+              "submittedAt": "2026-09-19T15:43:47.2213112+04:00",
+              "status": 3,
+              "statusName": "Submitted",
+              "expiryReason": 0,
+              "expiryReasonName": "None",
+              "resumedFromAttemptId": null,
+              "attemptNumber": 1,
+              "totalScore": 0,
+              "isPassed": false
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 200,
+                "examId": 119,
+                "examTitleEn": "QA26 Walk In Registration",
+                "examTitleAr": "اختبار QA26 walkin",
+                "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+                "candidateName": "QA26 Browser Walk In",
+                "startedAt": "2026-09-19T15:43:11.365277+04:00",
+                "submittedAt": "2026-09-19T15:43:47.2213112+04:00",
+                "status": 3,
+                "statusName": "Submitted",
+                "expiryReason": 0,
+                "expiryReasonName": "None",
+                "resumedFromAttemptId": null,
+                "attemptNumber": 1,
+                "totalScore": 0,
+                "isPassed": false
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1788.17
+      }
+    },
+    {
+      "at": "2026-09-19T11:45:35.737Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/193/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 2633,
+              "attemptId": 193,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":1}",
+              "occurredAt": "2026-09-19T15:20:51.8852709+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2635,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":131}",
+              "occurredAt": "2026-09-19T15:21:37.4483423+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2634,
+              "attemptId": 193,
+              "eventType": 11,
+              "eventTypeName": "PasteAttempt",
+              "metadataJson": "{\"blocked\":true}",
+              "occurredAt": "2026-09-19T15:21:38.0432012+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2636,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":132}",
+              "occurredAt": "2026-09-19T15:21:38.5885673+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2637,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:21:39.7653073+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2638,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":135}",
+              "occurredAt": "2026-09-19T15:21:51.3628085+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2639,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":141}",
+              "occurredAt": "2026-09-19T15:22:05.9480039+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2640,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":135}",
+              "occurredAt": "2026-09-19T15:22:07.1004765+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2641,
+              "attemptId": 193,
+              "eventType": 15,
+              "eventTypeName": "TimeAdded",
+              "metadataJson": "{\"adminUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"extraMinutes\":5,\"extraSeconds\":300,\"reason\":\"QA26 verify exact five-minute extension and candidate timer\",\"newExpiresAt\":\"2026-09-19T16:25:51.8852709+04:00\"}",
+              "occurredAt": "2026-09-19T15:23:02.1128957+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2643,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:23:40.5125502+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2647,
+              "attemptId": 193,
+              "eventType": 4,
+              "eventTypeName": "TabSwitched",
+              "metadataJson": "{\"timestamp\":\"2026-09-19T11:24:00.518Z\",\"isMobile\":true}",
+              "occurredAt": "2026-09-19T15:24:00.9976591+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2652,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:29:12.029789+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2657,
+              "attemptId": 193,
+              "eventType": 4,
+              "eventTypeName": "TabSwitched",
+              "metadataJson": "{\"timestamp\":\"2026-09-19T11:31:58.444Z\",\"isMobile\":true}",
+              "occurredAt": "2026-09-19T15:31:59.021166+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2678,
+              "attemptId": 193,
+              "eventType": 4,
+              "eventTypeName": "TabSwitched",
+              "metadataJson": "{\"timestamp\":\"2026-09-19T11:37:53.606Z\",\"isMobile\":true}",
+              "occurredAt": "2026-09-19T15:37:54.1026769+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2679,
+              "attemptId": 193,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":134}",
+              "occurredAt": "2026-09-19T15:41:58.6630764+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2680,
+              "attemptId": 193,
+              "eventType": 4,
+              "eventTypeName": "TabSwitched",
+              "metadataJson": "{\"timestamp\":\"2026-09-19T11:42:52.753Z\",\"isMobile\":true}",
+              "occurredAt": "2026-09-19T15:42:53.2463861+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2703,
+              "attemptId": 193,
+              "eventType": 6,
+              "eventTypeName": "Submitted",
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:44:24.146693+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [
+            {
+              "attemptAnswerId": 559,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+            },
+            {
+              "attemptAnswerId": 573,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "points": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+            },
+            {
+              "attemptAnswerId": 560,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                379
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 7,
+              "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+            },
+            {
+              "attemptAnswerId": 563,
+              "questionId": 141,
+              "questionBodyEn": "QA26 Browser: Select secure operational practices.",
+              "questionBodyAr": "اختر ممارسات التشغيل الآمنة",
+              "questionTypeName": "MCQ_Multi",
+              "points": 6,
+              "selectedOptionIds": [
+                397
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 2,
+              "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+            },
+            {
+              "attemptAnswerId": 561,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                382
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 5,
+              "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+            },
+            {
+              "attemptAnswerId": 562,
+              "questionId": 135,
+              "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "points": 10,
+              "selectedOptionIds": null,
+              "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+              "isCorrect": null,
+              "score": null,
+              "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+            }
+          ],
+          "id": 193,
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "candidateName": "QA26 Updated Candidate",
+          "startedAt": "2026-09-19T15:20:51.8852709+04:00",
+          "submittedAt": "2026-09-19T15:44:24.146693+04:00",
+          "expiresAt": "2026-09-19T16:25:51.8852709+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 6,
+          "answeredQuestions": 6,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T15:20:51.8852709+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 2633,
+                "attemptId": 193,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":1}",
+                "occurredAt": "2026-09-19T15:20:51.8852709+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2635,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":131}",
+                "occurredAt": "2026-09-19T15:21:37.4483423+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2634,
+                "attemptId": 193,
+                "eventType": 11,
+                "eventTypeName": "PasteAttempt",
+                "metadataJson": "{\"blocked\":true}",
+                "occurredAt": "2026-09-19T15:21:38.0432012+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2636,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":132}",
+                "occurredAt": "2026-09-19T15:21:38.5885673+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2637,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:21:39.7653073+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2638,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":135}",
+                "occurredAt": "2026-09-19T15:21:51.3628085+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2639,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":141}",
+                "occurredAt": "2026-09-19T15:22:05.9480039+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2640,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":135}",
+                "occurredAt": "2026-09-19T15:22:07.1004765+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2641,
+                "attemptId": 193,
+                "eventType": 15,
+                "eventTypeName": "TimeAdded",
+                "metadataJson": "{\"adminUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"extraMinutes\":5,\"extraSeconds\":300,\"reason\":\"QA26 verify exact five-minute extension and candidate timer\",\"newExpiresAt\":\"2026-09-19T16:25:51.8852709+04:00\"}",
+                "occurredAt": "2026-09-19T15:23:02.1128957+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2643,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:23:40.5125502+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2647,
+                "attemptId": 193,
+                "eventType": 4,
+                "eventTypeName": "TabSwitched",
+                "metadataJson": "{\"timestamp\":\"2026-09-19T11:24:00.518Z\",\"isMobile\":true}",
+                "occurredAt": "2026-09-19T15:24:00.9976591+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2652,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:29:12.029789+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2657,
+                "attemptId": 193,
+                "eventType": 4,
+                "eventTypeName": "TabSwitched",
+                "metadataJson": "{\"timestamp\":\"2026-09-19T11:31:58.444Z\",\"isMobile\":true}",
+                "occurredAt": "2026-09-19T15:31:59.021166+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2678,
+                "attemptId": 193,
+                "eventType": 4,
+                "eventTypeName": "TabSwitched",
+                "metadataJson": "{\"timestamp\":\"2026-09-19T11:37:53.606Z\",\"isMobile\":true}",
+                "occurredAt": "2026-09-19T15:37:54.1026769+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2679,
+                "attemptId": 193,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":134}",
+                "occurredAt": "2026-09-19T15:41:58.6630764+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2680,
+                "attemptId": 193,
+                "eventType": 4,
+                "eventTypeName": "TabSwitched",
+                "metadataJson": "{\"timestamp\":\"2026-09-19T11:42:52.753Z\",\"isMobile\":true}",
+                "occurredAt": "2026-09-19T15:42:53.2463861+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2703,
+                "attemptId": 193,
+                "eventType": 6,
+                "eventTypeName": "Submitted",
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:44:24.146693+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [
+              {
+                "attemptAnswerId": 559,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T15:21:37.4483423+04:00"
+              },
+              {
+                "attemptAnswerId": 573,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "points": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T15:41:58.6630764+04:00"
+              },
+              {
+                "attemptAnswerId": 560,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  379
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 7,
+                "answeredAt": "2026-09-19T15:21:38.5885673+04:00"
+              },
+              {
+                "attemptAnswerId": 563,
+                "questionId": 141,
+                "questionBodyEn": "QA26 Browser: Select secure operational practices.",
+                "questionBodyAr": "اختر ممارسات التشغيل الآمنة",
+                "questionTypeName": "MCQ_Multi",
+                "points": 6,
+                "selectedOptionIds": [
+                  397
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 2,
+                "answeredAt": "2026-09-19T15:22:05.9480039+04:00"
+              },
+              {
+                "attemptAnswerId": 561,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  382
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 5,
+                "answeredAt": "2026-09-19T15:29:12.029789+04:00"
+              },
+              {
+                "attemptAnswerId": 562,
+                "questionId": 135,
+                "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "points": 10,
+                "selectedOptionIds": null,
+                "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                "isCorrect": null,
+                "score": null,
+                "answeredAt": "2026-09-19T15:22:07.1004765+04:00"
+              }
+            ],
+            "id": 193,
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "candidateName": "QA26 Updated Candidate",
+            "startedAt": "2026-09-19T15:20:51.8852709+04:00",
+            "submittedAt": "2026-09-19T15:44:24.146693+04:00",
+            "expiresAt": "2026-09-19T16:25:51.8852709+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 6,
+            "answeredQuestions": 6,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T15:20:51.8852709+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2131.41
+      }
+    },
+    {
+      "at": "2026-09-19T11:45:37.386Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/196/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 2659,
+              "attemptId": 196,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":2}",
+              "occurredAt": "2026-09-19T15:32:54.756478+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2660,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":131}",
+              "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2661,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":132}",
+              "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2662,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2663,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":134}",
+              "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2666,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:33:14.6781931+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2669,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":131}",
+              "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2670,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":132}",
+              "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2671,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":133}",
+              "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2672,
+              "attemptId": 196,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":134}",
+              "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2691,
+              "attemptId": 196,
+              "eventType": 6,
+              "eventTypeName": "Submitted",
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:43:36.6649569+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [
+            {
+              "attemptAnswerId": 566,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "selectedOptionIds": [
+                377
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 0,
+              "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+            },
+            {
+              "attemptAnswerId": 567,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                380
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 3,
+              "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+            },
+            {
+              "attemptAnswerId": 568,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "points": 10,
+              "selectedOptionIds": [
+                382
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 5,
+              "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+            },
+            {
+              "attemptAnswerId": 569,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "points": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "textAnswer": null,
+              "isCorrect": true,
+              "score": 10,
+              "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+            }
+          ],
+          "id": 196,
+          "examId": 116,
+          "examTitleEn": "QA26 Objective Immediate Review",
+          "examTitleAr": "اختبار QA26 auto",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "startedAt": "2026-09-19T15:32:54.756478+04:00",
+          "submittedAt": "2026-09-19T15:43:36.6649569+04:00",
+          "expiresAt": "2026-09-19T16:32:54.756478+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 2,
+          "totalScore": 18,
+          "isPassed": false,
+          "totalQuestions": 4,
+          "answeredQuestions": 4,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T15:32:54.756478+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 2659,
+                "attemptId": 196,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":2}",
+                "occurredAt": "2026-09-19T15:32:54.756478+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2660,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":131}",
+                "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2661,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":132}",
+                "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2662,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2663,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":134}",
+                "occurredAt": "2026-09-19T15:32:58.272724+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2666,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:33:14.6781931+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2669,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":131}",
+                "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2670,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":132}",
+                "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2671,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":133}",
+                "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2672,
+                "attemptId": 196,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":134}",
+                "occurredAt": "2026-09-19T15:33:21.0083736+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2691,
+                "attemptId": 196,
+                "eventType": 6,
+                "eventTypeName": "Submitted",
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:43:36.6649569+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [
+              {
+                "attemptAnswerId": 566,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "selectedOptionIds": [
+                  377
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 0,
+                "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+              },
+              {
+                "attemptAnswerId": 567,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  380
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 3,
+                "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+              },
+              {
+                "attemptAnswerId": 568,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "points": 10,
+                "selectedOptionIds": [
+                  382
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 5,
+                "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+              },
+              {
+                "attemptAnswerId": 569,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "points": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "textAnswer": null,
+                "isCorrect": true,
+                "score": 10,
+                "answeredAt": "2026-09-19T15:33:21.0083736+04:00"
+              }
+            ],
+            "id": 196,
+            "examId": 116,
+            "examTitleEn": "QA26 Objective Immediate Review",
+            "examTitleAr": "اختبار QA26 auto",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "startedAt": "2026-09-19T15:32:54.756478+04:00",
+            "submittedAt": "2026-09-19T15:43:36.6649569+04:00",
+            "expiresAt": "2026-09-19T16:32:54.756478+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 2,
+            "totalScore": 18,
+            "isPassed": false,
+            "totalQuestions": 4,
+            "answeredQuestions": 4,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T15:32:54.756478+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1647.58
+      }
+    },
+    {
+      "at": "2026-09-19T11:45:39.021Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/200/details",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "events": [
+            {
+              "id": 2681,
+              "attemptId": 200,
+              "eventType": 1,
+              "eventTypeName": "Started",
+              "metadataJson": "{\"attemptNumber\":1}",
+              "occurredAt": "2026-09-19T15:43:11.365277+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2692,
+              "attemptId": 200,
+              "eventType": 2,
+              "eventTypeName": "AnswerSaved",
+              "metadataJson": "{\"questionId\":131}",
+              "occurredAt": "2026-09-19T15:43:39.4477892+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            },
+            {
+              "id": 2694,
+              "attemptId": 200,
+              "eventType": 6,
+              "eventTypeName": "Submitted",
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:43:47.2213112+04:00",
+              "questionTextEn": null,
+              "questionTextAr": null,
+              "answerSummary": null
+            }
+          ],
+          "answerDetails": [
+            {
+              "attemptAnswerId": 578,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "points": 10,
+              "selectedOptionIds": [
+                377
+              ],
+              "textAnswer": null,
+              "isCorrect": false,
+              "score": 0,
+              "answeredAt": "2026-09-19T15:43:39.4477892+04:00"
+            }
+          ],
+          "id": 200,
+          "examId": 119,
+          "examTitleEn": "QA26 Walk In Registration",
+          "examTitleAr": "اختبار QA26 walkin",
+          "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+          "candidateName": "QA26 Browser Walk In",
+          "startedAt": "2026-09-19T15:43:11.365277+04:00",
+          "submittedAt": "2026-09-19T15:43:47.2213112+04:00",
+          "expiresAt": "2026-09-19T17:43:11.365277+04:00",
+          "status": 3,
+          "statusName": "Submitted",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": 0,
+          "isPassed": false,
+          "totalQuestions": 2,
+          "answeredQuestions": 1,
+          "remainingSeconds": 0,
+          "createdDate": "2026-09-19T15:43:11.365277+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "events": [
+              {
+                "id": 2681,
+                "attemptId": 200,
+                "eventType": 1,
+                "eventTypeName": "Started",
+                "metadataJson": "{\"attemptNumber\":1}",
+                "occurredAt": "2026-09-19T15:43:11.365277+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2692,
+                "attemptId": 200,
+                "eventType": 2,
+                "eventTypeName": "AnswerSaved",
+                "metadataJson": "{\"questionId\":131}",
+                "occurredAt": "2026-09-19T15:43:39.4477892+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              },
+              {
+                "id": 2694,
+                "attemptId": 200,
+                "eventType": 6,
+                "eventTypeName": "Submitted",
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:43:47.2213112+04:00",
+                "questionTextEn": null,
+                "questionTextAr": null,
+                "answerSummary": null
+              }
+            ],
+            "answerDetails": [
+              {
+                "attemptAnswerId": 578,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "points": 10,
+                "selectedOptionIds": [
+                  377
+                ],
+                "textAnswer": null,
+                "isCorrect": false,
+                "score": 0,
+                "answeredAt": "2026-09-19T15:43:39.4477892+04:00"
+              }
+            ],
+            "id": 200,
+            "examId": 119,
+            "examTitleEn": "QA26 Walk In Registration",
+            "examTitleAr": "اختبار QA26 walkin",
+            "candidateId": "dd4cbd18-f7ea-4bb9-a0df-aa3a2816c914",
+            "candidateName": "QA26 Browser Walk In",
+            "startedAt": "2026-09-19T15:43:11.365277+04:00",
+            "submittedAt": "2026-09-19T15:43:47.2213112+04:00",
+            "expiresAt": "2026-09-19T17:43:11.365277+04:00",
+            "status": 3,
+            "statusName": "Submitted",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": 0,
+            "isPassed": false,
+            "totalQuestions": 2,
+            "answeredQuestions": 1,
+            "remainingSeconds": 0,
+            "createdDate": "2026-09-19T15:43:11.365277+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1633.91
+      }
+    }
+  ]
+}

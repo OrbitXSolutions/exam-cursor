@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Grading;
 using Smart_Core.Application.Interfaces;
 using Smart_Core.Application.Interfaces.Grading;
+using Smart_Core.Application.Interfaces.Assessment;
 
 namespace Smart_Core.Controllers.Grading;
 
@@ -14,15 +15,18 @@ public class GradingController : ControllerBase
     private readonly IGradingService _gradingService;
     private readonly IAiGradingService _aiGradingService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IAssessmentService _assessmentService;
 
     public GradingController(
         IGradingService gradingService,
         IAiGradingService aiGradingService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IAssessmentService assessmentService)
     {
         _gradingService = gradingService;
         _aiGradingService = aiGradingService;
         _currentUserService = currentUserService;
+        _assessmentService = assessmentService;
     }
 
     #region Grading Lifecycle
@@ -131,6 +135,14 @@ public class GradingController : ControllerBase
     #endregion
 
     #region Queries
+
+    [HttpGet("exams/dropdown")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Examiner")]
+    public async Task<IActionResult> GetGradingExams()
+    {
+        var result = await _assessmentService.GetExamsForDropdownAsync();
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
 
     /// <summary>
     /// Get all grading sessions with pagination and filtering

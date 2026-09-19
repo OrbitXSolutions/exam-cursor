@@ -1,0 +1,338 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:03:16.336Z",
+  "checks": [
+    {
+      "name": "Ops proctor cannot monitor Engineering lifecycle exam",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": [],
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T11:03:23.438Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:03:17.808Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:17.7833673+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:03:17.027593+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:17.7833673+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:03:17.027593+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1469.77
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:19.075Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617589+04:00"
+            },
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617857+04:00"
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617859+04:00"
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617862+04:00"
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617864+04:00"
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.061787+04:00"
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617873+04:00"
+            }
+          ],
+          "availableProctors": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617589+04:00"
+              },
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617857+04:00"
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617859+04:00"
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617862+04:00"
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617864+04:00"
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.061787+04:00"
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617873+04:00"
+              }
+            ],
+            "availableProctors": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1265.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:20.317Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:03:20.3141087+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T15:03:19.6066265+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:03:20.3141087+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T15:03:19.6066265+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1240.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:03:23.437Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/live/exam/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3118.24
+      }
+    }
+  ]
+}

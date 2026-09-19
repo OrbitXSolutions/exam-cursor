@@ -150,6 +150,31 @@ builder.Services.AddAuthentication(options =>
                 context.Token = accessToken;
             }
             return Task.CompletedTask;
+        },
+        OnTokenValidated = async context =>
+        {
+            var userId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+            // JWT signatures stay valid after account administration. Re-check authoritative
+            // account state so blocked, inactive and deleted users cannot keep using one.
+            if (string.IsNullOrWhiteSpace(userId) || !await db.Users.AsNoTracking().AnyAsync(
+                    user => user.Id == userId && !user.IsDeleted && !user.IsBlocked &&
+                        user.Status == UserStatus.Active, context.HttpContext.RequestAborted))
+            {
+                context.Fail("Account is no longer active.");
+                return;
+            }
+
+            // Role changes revoke previously issued privileges. Require a fresh sign-in
+            // rather than trusting stale claims or expanding an existing token's access.
+            var currentRoles = await (from userRole in db.UserRoles
+                                      join role in db.Roles on userRole.RoleId equals role.Id
+                                      where userRole.UserId == userId && role.Name != null
+                                      select role.Name!).ToListAsync(context.HttpContext.RequestAborted);
+            var tokenRoles = context.Principal!.FindAll(ClaimTypes.Role)
+                .Select(claim => claim.Value).ToHashSet(StringComparer.Ordinal);
+            if (!tokenRoles.SetEquals(currentRoles))
+                context.Fail("Account roles have changed. Please sign in again.");
         }
     };
 });

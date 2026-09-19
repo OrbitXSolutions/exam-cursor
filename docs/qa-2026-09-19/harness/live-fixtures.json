@@ -1,0 +1,17 @@
+{
+  "examId": 115,
+  "candidates": [
+    {
+      "email": "qa26.import.a@example.test",
+      "attemptId": 194,
+      "proctorSessionId": 146
+    },
+    {
+      "email": "qa26.import.b@example.test",
+      "attemptId": 195,
+      "proctorSessionId": 147
+    }
+  ],
+  "proctorEmail": "qa26.eng.proctor1@example.test",
+  "foreignProctorEmail": "qa26.ops.proctor1@example.test"
+}

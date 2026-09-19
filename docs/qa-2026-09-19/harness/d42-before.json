@@ -1,0 +1,1282 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:20:17.572Z",
+  "checks": [
+    {
+      "name": "Completed dynamic card points match saved attempt points",
+      "passed": false,
+      "detail": {
+        "cardPoints": 56.57142857142857,
+        "attemptPoints": 56,
+        "latestAttemptId": 193,
+        "status": 3
+      },
+      "at": "2026-09-19T12:20:25.185Z"
+    },
+    {
+      "name": "Completed dynamic card question count matches saved attempt",
+      "passed": true,
+      "detail": {
+        "cardCount": 6,
+        "attemptCount": 6
+      },
+      "at": "2026-09-19T12:20:25.185Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:20:18.821Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:18.8166651+04:00",
+          "user": {
+            "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "email": "qa26.eng.candidate1@example.test",
+            "displayName": "QA26 Engineering Candidate 1",
+            "fullName": "QA26 Updated Candidate",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+            "lastLoginDate": "2026-09-19T16:20:18.1151214+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:18.8166651+04:00",
+            "user": {
+              "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+              "email": "qa26.eng.candidate1@example.test",
+              "displayName": "QA26 Engineering Candidate 1",
+              "fullName": "QA26 Updated Candidate",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+              "lastLoginDate": "2026-09-19T16:20:18.1151214+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1246.33
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:21.619Z",
+      "identity": "qa26.eng.candidate1@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/exams",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 115,
+            "examType": 0,
+            "titleEn": "QA26 Complete Lifecycle",
+            "titleAr": "اختبار QA26 lifecycle",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "passScore": 30,
+            "totalQuestions": 5,
+            "totalPoints": 50,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 116,
+            "examType": 0,
+            "titleEn": "QA26 Objective Immediate Review",
+            "titleAr": "اختبار QA26 auto",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "passScore": 25,
+            "totalQuestions": 4,
+            "totalPoints": 40,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 117,
+            "examType": 1,
+            "titleEn": "QA26 Fixed Assigned Code",
+            "titleAr": "اختبار QA26 fixed-code",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 600,
+            "maxAttempts": 2,
+            "passScore": 20,
+            "totalQuestions": 3,
+            "totalPoints": 30,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 118,
+            "examType": 0,
+            "titleEn": "QA26 Random Topic Pool",
+            "titleAr": "اختبار QA26 pooled",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "passScore": 15,
+            "totalQuestions": 3,
+            "totalPoints": 30,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 119,
+            "examType": 0,
+            "titleEn": "QA26 Walk In Registration",
+            "titleAr": "اختبار QA26 walkin",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 1,
+            "passScore": 10,
+            "totalQuestions": 2,
+            "totalPoints": 20,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 120,
+            "examType": 0,
+            "titleEn": "QA26 Strict Proctored Identity",
+            "titleAr": "اختبار QA26 strict",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "passScore": 10,
+            "totalQuestions": 2,
+            "totalPoints": 20,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 121,
+            "examType": 0,
+            "titleEn": "QA26 Fifty Candidate Load",
+            "titleAr": "اختبار QA26 load",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 600,
+            "maxAttempts": 2,
+            "passScore": 25,
+            "totalQuestions": 4,
+            "totalPoints": 40,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 123,
+            "examType": 0,
+            "titleEn": "QA26 Browser Operational Readiness",
+            "titleAr": "اختبار جاهزية التشغيل",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "startAt": "2026-09-19T10:00:00+04:00",
+            "endAt": "2026-09-21T23:59:00+04:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "passScore": 30,
+            "totalQuestions": 6,
+            "totalPoints": 56.57142857142857,
+            "myAttempts": 1,
+            "myBestIsPassed": true,
+            "latestAttemptId": 193,
+            "latestAttemptStatus": 3,
+            "latestAttemptSubmittedAt": "2026-09-19T15:44:24.146693+04:00",
+            "latestAttemptIsResultPublished": true,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 124,
+            "examType": 0,
+            "titleEn": "QA26 Future Window",
+            "titleAr": "اختبار QA26 future",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-21T11:00:20.015+00:00",
+            "endAt": "2026-09-21T12:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "passScore": 5,
+            "totalQuestions": 1,
+            "totalPoints": 10,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 127,
+            "examType": 0,
+            "titleEn": "QA26 Completion One minute expiry",
+            "titleAr": "اكتمال QA26 One minute expiry",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T11:42:41.305+00:00",
+            "endAt": "2026-09-19T15:43:41.305+00:00",
+            "durationMinutes": 1,
+            "maxAttempts": 1,
+            "passScore": 5,
+            "totalQuestions": 1,
+            "totalPoints": 10,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 128,
+            "examType": 0,
+            "titleEn": "QA26 Completion Objective matrix",
+            "titleAr": "اكتمال QA26 Objective matrix",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T11:43:00.884+00:00",
+            "endAt": "2026-09-19T15:44:00.884+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "passScore": 20,
+            "totalQuestions": 4,
+            "totalPoints": 40,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 129,
+            "examType": 1,
+            "titleEn": "QA26 Completion Fresh fixed window",
+            "titleAr": "اكتمال QA26 Fresh fixed window",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T11:44:11.322+00:00",
+            "endAt": "2026-09-19T15:45:11.322+00:00",
+            "durationMinutes": 60,
+            "maxAttempts": 2,
+            "passScore": 10,
+            "totalQuestions": 2,
+            "totalPoints": 20,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          },
+          {
+            "id": 130,
+            "examType": 0,
+            "titleEn": "QA26 Completion Subjective grading lifecycle",
+            "titleAr": "اكتمال QA26 Subjective grading lifecycle",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T11:44:33.8+00:00",
+            "endAt": "2026-09-19T15:45:33.8+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "passScore": 25,
+            "totalQuestions": 5,
+            "totalPoints": 50,
+            "myAttempts": null,
+            "myBestIsPassed": null,
+            "latestAttemptId": null,
+            "latestAttemptStatus": null,
+            "latestAttemptSubmittedAt": null,
+            "latestAttemptIsResultPublished": false,
+            "canRetake": false,
+            "hasAdminOverride": false
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 115,
+              "examType": 0,
+              "titleEn": "QA26 Complete Lifecycle",
+              "titleAr": "اختبار QA26 lifecycle",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 2,
+              "passScore": 30,
+              "totalQuestions": 5,
+              "totalPoints": 50,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 116,
+              "examType": 0,
+              "titleEn": "QA26 Objective Immediate Review",
+              "titleAr": "اختبار QA26 auto",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 60,
+              "maxAttempts": 2,
+              "passScore": 25,
+              "totalQuestions": 4,
+              "totalPoints": 40,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 117,
+              "examType": 1,
+              "titleEn": "QA26 Fixed Assigned Code",
+              "titleAr": "اختبار QA26 fixed-code",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 600,
+              "maxAttempts": 2,
+              "passScore": 20,
+              "totalQuestions": 3,
+              "totalPoints": 30,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 118,
+              "examType": 0,
+              "titleEn": "QA26 Random Topic Pool",
+              "titleAr": "اختبار QA26 pooled",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 2,
+              "passScore": 15,
+              "totalQuestions": 3,
+              "totalPoints": 30,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 119,
+              "examType": 0,
+              "titleEn": "QA26 Walk In Registration",
+              "titleAr": "اختبار QA26 walkin",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 1,
+              "passScore": 10,
+              "totalQuestions": 2,
+              "totalPoints": 20,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 120,
+              "examType": 0,
+              "titleEn": "QA26 Strict Proctored Identity",
+              "titleAr": "اختبار QA26 strict",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 2,
+              "passScore": 10,
+              "totalQuestions": 2,
+              "totalPoints": 20,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 121,
+              "examType": 0,
+              "titleEn": "QA26 Fifty Candidate Load",
+              "titleAr": "اختبار QA26 load",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T10:55:20.015+00:00",
+              "endAt": "2026-09-20T11:00:20.015+00:00",
+              "durationMinutes": 600,
+              "maxAttempts": 2,
+              "passScore": 25,
+              "totalQuestions": 4,
+              "totalPoints": 40,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 123,
+              "examType": 0,
+              "titleEn": "QA26 Browser Operational Readiness",
+              "titleAr": "اختبار جاهزية التشغيل",
+              "descriptionEn": null,
+              "descriptionAr": null,
+              "startAt": "2026-09-19T10:00:00+04:00",
+              "endAt": "2026-09-21T23:59:00+04:00",
+              "durationMinutes": 60,
+              "maxAttempts": 2,
+              "passScore": 30,
+              "totalQuestions": 6,
+              "totalPoints": 56.57142857142857,
+              "myAttempts": 1,
+              "myBestIsPassed": true,
+              "latestAttemptId": 193,
+              "latestAttemptStatus": 3,
+              "latestAttemptSubmittedAt": "2026-09-19T15:44:24.146693+04:00",
+              "latestAttemptIsResultPublished": true,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 124,
+              "examType": 0,
+              "titleEn": "QA26 Future Window",
+              "titleAr": "اختبار QA26 future",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-21T11:00:20.015+00:00",
+              "endAt": "2026-09-21T12:00:20.015+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 2,
+              "passScore": 5,
+              "totalQuestions": 1,
+              "totalPoints": 10,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 127,
+              "examType": 0,
+              "titleEn": "QA26 Completion One minute expiry",
+              "titleAr": "اكتمال QA26 One minute expiry",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T11:42:41.305+00:00",
+              "endAt": "2026-09-19T15:43:41.305+00:00",
+              "durationMinutes": 1,
+              "maxAttempts": 1,
+              "passScore": 5,
+              "totalQuestions": 1,
+              "totalPoints": 10,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 128,
+              "examType": 0,
+              "titleEn": "QA26 Completion Objective matrix",
+              "titleAr": "اكتمال QA26 Objective matrix",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T11:43:00.884+00:00",
+              "endAt": "2026-09-19T15:44:00.884+00:00",
+              "durationMinutes": 60,
+              "maxAttempts": 2,
+              "passScore": 20,
+              "totalQuestions": 4,
+              "totalPoints": 40,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 129,
+              "examType": 1,
+              "titleEn": "QA26 Completion Fresh fixed window",
+              "titleAr": "اكتمال QA26 Fresh fixed window",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T11:44:11.322+00:00",
+              "endAt": "2026-09-19T15:45:11.322+00:00",
+              "durationMinutes": 60,
+              "maxAttempts": 2,
+              "passScore": 10,
+              "totalQuestions": 2,
+              "totalPoints": 20,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            },
+            {
+              "id": 130,
+              "examType": 0,
+              "titleEn": "QA26 Completion Subjective grading lifecycle",
+              "titleAr": "اكتمال QA26 Subjective grading lifecycle",
+              "descriptionEn": "Dedicated lifecycle acceptance fixture",
+              "descriptionAr": "اختبار دورة حياة الاختبار",
+              "startAt": "2026-09-19T11:44:33.8+00:00",
+              "endAt": "2026-09-19T15:45:33.8+00:00",
+              "durationMinutes": 120,
+              "maxAttempts": 2,
+              "passScore": 25,
+              "totalQuestions": 5,
+              "totalPoints": 50,
+              "myAttempts": null,
+              "myBestIsPassed": null,
+              "latestAttemptId": null,
+              "latestAttemptStatus": null,
+              "latestAttemptSubmittedAt": null,
+              "latestAttemptIsResultPublished": false,
+              "canRetake": false,
+              "hasAdminOverride": false
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2797.17
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:22.839Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:20:22.8393795+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:20:22.1430295+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:20:22.8393795+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:20:22.1430295+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1218.2
+      }
+    },
+    {
+      "at": "2026-09-19T12:20:25.184Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Grading/attempt/193",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 82,
+          "attemptId": 193,
+          "examId": 123,
+          "examTitleEn": "QA26 Browser Operational Readiness",
+          "examTitleAr": "اختبار جاهزية التشغيل",
+          "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "candidateName": "QA26 Updated Candidate",
+          "gradedBy": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "graderName": "QA26 Updated Candidate",
+          "status": 4,
+          "statusName": "Completed",
+          "totalScore": 42,
+          "maxPossibleScore": 56,
+          "passScore": 30,
+          "isPassed": true,
+          "gradedAt": "2026-09-19T15:55:45.9963668+04:00",
+          "createdDate": "2026-09-19T15:44:25.8040124+04:00",
+          "totalQuestions": 6,
+          "gradedQuestions": 6,
+          "manualGradingRequired": 0,
+          "answers": [
+            {
+              "id": 734,
+              "gradingSessionId": 82,
+              "questionId": 131,
+              "questionBodyEn": "QA26 Single: Which number is prime?",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                376
+              ],
+              "selectedOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 735,
+              "gradingSessionId": 82,
+              "questionId": 134,
+              "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                385
+              ],
+              "selectedOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 10,
+              "isCorrect": true,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 736,
+              "gradingSessionId": 82,
+              "questionId": 132,
+              "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                379
+              ],
+              "selectedOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 7,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 737,
+              "gradingSessionId": 82,
+              "questionId": 141,
+              "questionBodyEn": "QA26 Browser: Select secure operational practices.",
+              "questionBodyAr": "اختر ممارسات التشغيل الآمنة",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 6,
+              "selectedOptionIds": [
+                397
+              ],
+              "selectedOptions": [
+                {
+                  "id": 397,
+                  "textEn": "Verify restore procedures",
+                  "textAr": "Verify restore procedures",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 2,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 397,
+                  "textEn": "Verify restore procedures",
+                  "textAr": "Verify restore procedures"
+                },
+                {
+                  "id": 398,
+                  "textEn": "Review least-privilege access",
+                  "textAr": "Review least-privilege access"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 738,
+              "gradingSessionId": 82,
+              "questionId": 133,
+              "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "maxPoints": 10,
+              "selectedOptionIds": [
+                382
+              ],
+              "selectedOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "isCorrect": true
+                }
+              ],
+              "textAnswer": null,
+              "score": 5,
+              "isCorrect": false,
+              "isManuallyGraded": false,
+              "isGraded": true,
+              "graderComment": null,
+              "correctOptions": [
+                {
+                  "id": 382,
+                  "textEn": "2",
+                  "textAr": "خيار 2"
+                },
+                {
+                  "id": 383,
+                  "textEn": "4",
+                  "textAr": "خيار 4"
+                }
+              ],
+              "modelAnswerEn": null,
+              "modelAnswerAr": null
+            },
+            {
+              "id": 739,
+              "gradingSessionId": 82,
+              "questionId": 135,
+              "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+              "questionBodyAr": "اختبار QA26",
+              "questionTypeName": "Subjective",
+              "questionTypeId": 5,
+              "maxPoints": 10,
+              "selectedOptionIds": null,
+              "selectedOptions": null,
+              "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+              "score": 8,
+              "isCorrect": true,
+              "isManuallyGraded": true,
+              "isGraded": true,
+              "graderComment": "QA26 synthetic acceptance grade: 8 of 10 to verify partial manual scoring and total arithmetic.",
+              "correctOptions": [],
+              "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+              "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 82,
+            "attemptId": 193,
+            "examId": 123,
+            "examTitleEn": "QA26 Browser Operational Readiness",
+            "examTitleAr": "اختبار جاهزية التشغيل",
+            "candidateId": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "candidateName": "QA26 Updated Candidate",
+            "gradedBy": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "graderName": "QA26 Updated Candidate",
+            "status": 4,
+            "statusName": "Completed",
+            "totalScore": 42,
+            "maxPossibleScore": 56,
+            "passScore": 30,
+            "isPassed": true,
+            "gradedAt": "2026-09-19T15:55:45.9963668+04:00",
+            "createdDate": "2026-09-19T15:44:25.8040124+04:00",
+            "totalQuestions": 6,
+            "gradedQuestions": 6,
+            "manualGradingRequired": 0,
+            "answers": [
+              {
+                "id": 734,
+                "gradingSessionId": 82,
+                "questionId": 131,
+                "questionBodyEn": "QA26 Single: Which number is prime?",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  376
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 735,
+                "gradingSessionId": 82,
+                "questionId": 134,
+                "questionBodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  385
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 10,
+                "isCorrect": true,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 736,
+                "gradingSessionId": 82,
+                "questionId": 132,
+                "questionBodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  379
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 7,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 737,
+                "gradingSessionId": 82,
+                "questionId": 141,
+                "questionBodyEn": "QA26 Browser: Select secure operational practices.",
+                "questionBodyAr": "اختر ممارسات التشغيل الآمنة",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 6,
+                "selectedOptionIds": [
+                  397
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 397,
+                    "textEn": "Verify restore procedures",
+                    "textAr": "Verify restore procedures",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 2,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 397,
+                    "textEn": "Verify restore procedures",
+                    "textAr": "Verify restore procedures"
+                  },
+                  {
+                    "id": 398,
+                    "textEn": "Review least-privilege access",
+                    "textAr": "Review least-privilege access"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 738,
+                "gradingSessionId": 82,
+                "questionId": 133,
+                "questionBodyEn": "QA26 Equal Multi: Select even numbers",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "maxPoints": 10,
+                "selectedOptionIds": [
+                  382
+                ],
+                "selectedOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "isCorrect": true
+                  }
+                ],
+                "textAnswer": null,
+                "score": 5,
+                "isCorrect": false,
+                "isManuallyGraded": false,
+                "isGraded": true,
+                "graderComment": null,
+                "correctOptions": [
+                  {
+                    "id": 382,
+                    "textEn": "2",
+                    "textAr": "خيار 2"
+                  },
+                  {
+                    "id": 383,
+                    "textEn": "4",
+                    "textAr": "خيار 4"
+                  }
+                ],
+                "modelAnswerEn": null,
+                "modelAnswerAr": null
+              },
+              {
+                "id": 739,
+                "gradingSessionId": 82,
+                "questionId": 135,
+                "questionBodyEn": "QA26 Subjective: Explain two ways to protect exam integrity",
+                "questionBodyAr": "اختبار QA26",
+                "questionTypeName": "Subjective",
+                "questionTypeId": 5,
+                "maxPoints": 10,
+                "selectedOptionIds": null,
+                "selectedOptions": null,
+                "textAnswer": "Use least-privilege access for question banks and monitor suspicious activity. Verify saved answers after reconnect.",
+                "score": 8,
+                "isCorrect": true,
+                "isManuallyGraded": true,
+                "isGraded": true,
+                "graderComment": "QA26 synthetic acceptance grade: 8 of 10 to verify partial manual scoring and total arithmetic.",
+                "correctOptions": [],
+                "modelAnswerEn": "Award 5 points for verified identity, 5 for monitoring with a documented review process.",
+                "modelAnswerAr": "خمس درجات للتحقق من الهوية وخمس للمراقبة والمراجعة."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2343.84
+      }
+    }
+  ]
+}

@@ -1,0 +1,3128 @@
+{
+  "classification": "SIMULATED TEST: actual authenticated HTTP API calls and saved application state. No browser or physical capture.",
+  "startedAt": "2026-09-19T12:08:38.196Z",
+  "checks": [
+    {
+      "name": "Incident persists with candidate and correct attempt",
+      "passed": true,
+      "at": "2026-09-19T12:08:48.688Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read private incident /api/Incident/case/10",
+      "passed": false,
+      "at": "2026-09-19T12:08:50.668Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read private incident /api/Incident/case/by-attempt/197",
+      "passed": false,
+      "at": "2026-09-19T12:08:51.374Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read private incident /api/Incident/case/10/comments",
+      "passed": false,
+      "at": "2026-09-19T12:08:51.858Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read private incident /api/Incident/case/10/timeline",
+      "passed": false,
+      "at": "2026-09-19T12:08:52.344Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read private incident /api/Incident/dashboard/exam/115",
+      "passed": false,
+      "at": "2026-09-19T12:08:53.310Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot modify incident or persist unauthorized title",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "savedTitle": "QA26 unauthorized title mutation"
+      },
+      "at": "2026-09-19T12:08:54.751Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read private incident /api/Incident/case/10",
+      "passed": false,
+      "at": "2026-09-19T12:08:56.161Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read private incident /api/Incident/case/by-attempt/197",
+      "passed": false,
+      "at": "2026-09-19T12:08:56.641Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read private incident /api/Incident/case/10/comments",
+      "passed": false,
+      "at": "2026-09-19T12:08:57.110Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read private incident /api/Incident/case/10/timeline",
+      "passed": false,
+      "at": "2026-09-19T12:08:57.582Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read private incident /api/Incident/dashboard/exam/115",
+      "passed": false,
+      "at": "2026-09-19T12:08:58.521Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot modify incident or persist unauthorized title",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "savedTitle": "QA26 unauthorized title mutation"
+      },
+      "at": "2026-09-19T12:08:59.991Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot read private incident /api/Incident/case/10",
+      "passed": true,
+      "at": "2026-09-19T12:09:01.177Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot read private incident /api/Incident/case/by-attempt/197",
+      "passed": true,
+      "at": "2026-09-19T12:09:01.417Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot read private incident /api/Incident/case/10/comments",
+      "passed": true,
+      "at": "2026-09-19T12:09:01.656Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot read private incident /api/Incident/case/10/timeline",
+      "passed": true,
+      "at": "2026-09-19T12:09:01.895Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot read private incident /api/Incident/dashboard/exam/115",
+      "passed": true,
+      "at": "2026-09-19T12:09:02.132Z"
+    },
+    {
+      "name": "qa26.protocol.1789817576996.a@example.test cannot modify incident or persist unauthorized title",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "savedTitle": "QA26 incident lifecycle and scope"
+      },
+      "at": "2026-09-19T12:09:02.843Z"
+    },
+    {
+      "name": "Foreign incident list excludes engineering case",
+      "passed": true,
+      "at": "2026-09-19T12:09:04.558Z"
+    },
+    {
+      "name": "Foreign global dashboard scoped to its listed cases",
+      "passed": false,
+      "detail": {
+        "foreignDashboard": {
+          "examId": 0,
+          "examTitleEn": "All Exams",
+          "totalCases": 9,
+          "openCases": 8,
+          "inReviewCases": 0,
+          "resolvedCases": 1,
+          "closedCases": 0,
+          "unassignedCases": 9,
+          "criticalSeverityCases": 0,
+          "highSeverityCases": 0,
+          "clearedCount": 0,
+          "suspiciousCount": 1,
+          "invalidatedCount": 0,
+          "escalatedCount": 0,
+          "pendingAppeals": 0,
+          "reviewerWorkload": [],
+          "severityDistribution": [
+            {
+              "severity": 1,
+              "severityName": "Low",
+              "count": 8,
+              "percentage": 88.88888888888889
+            },
+            {
+              "severity": 2,
+              "severityName": "Medium",
+              "count": 1,
+              "percentage": 11.11111111111111
+            },
+            {
+              "severity": 3,
+              "severityName": "High",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 4,
+              "severityName": "Critical",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        }
+      },
+      "at": "2026-09-19T12:09:06.957Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:08:39.443Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:39.4393635+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:08:38.7462728+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:39.4393635+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:08:38.7462728+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1244.73
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:40.667Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:40.6663182+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:08:39.9662986+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:40.6663182+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:08:39.9662986+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1223
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:41.918Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:41.9176087+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:08:41.20991+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:41.9176087+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:08:41.20991+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1250.33
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:43.131Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:43.1305589+04:00",
+          "user": {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "email": "qa26.eng.proctor1@example.test",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+            "lastLoginDate": "2026-09-19T16:08:42.4300332+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:43.1305589+04:00",
+            "user": {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "email": "qa26.eng.proctor1@example.test",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:46:30.4835173+04:00",
+              "lastLoginDate": "2026-09-19T16:08:42.4300332+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1212.06
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:44.349Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:44.3484365+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T16:08:43.6456566+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:44.3484365+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T16:08:43.6456566+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1217.58
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:45.566Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.protocol.1789817576996.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:08:45.5653241+04:00",
+          "user": {
+            "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "email": "qa26.protocol.1789817576996.a@example.test",
+            "displayName": "QA26 Protocol Regression a",
+            "fullName": "QA26 Protocol Regression a",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+            "lastLoginDate": "2026-09-19T16:08:44.860226+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:08:45.5653241+04:00",
+            "user": {
+              "id": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+              "email": "qa26.protocol.1789817576996.a@example.test",
+              "displayName": "QA26 Protocol Regression a",
+              "fullName": "QA26 Protocol Regression a",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:32:58.9172948+04:00",
+              "lastLoginDate": "2026-09-19T16:08:44.860226+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1216.15
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:48.219Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Incident/case",
+      "request": {
+        "attemptId": 197,
+        "proctorSessionId": 149,
+        "source": 2,
+        "severity": 2,
+        "titleEn": "QA26 incident lifecycle and scope",
+        "titleAr": "اختبار مراجعة حادثة",
+        "summaryEn": "Synthetic protocol and screenshot review only."
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 0,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 0,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2652.5
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:48.687Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 0,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 0,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 466.88
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:50.120Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "POST",
+      "route": "/api/Incident/comment",
+      "request": {
+        "caseId": 10,
+        "body": "QA26 internal review comment",
+        "isVisibleToCandidate": false
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 1,
+          "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+          "authorName": "QA26 Engineering Proctor 1",
+          "body": "QA26 internal review comment",
+          "isVisibleToCandidate": false,
+          "isEdited": false,
+          "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+          "editedAt": null
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 1,
+            "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "authorName": "QA26 Engineering Proctor 1",
+            "body": "QA26 internal review comment",
+            "isVisibleToCandidate": false,
+            "isEdited": false,
+            "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+            "editedAt": null
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1431.57
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:50.667Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 544.76
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:51.373Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/by-attempt/197",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 704.39
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:51.858Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/comments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "authorName": "QA26 Engineering Proctor 1",
+            "body": "QA26 internal review comment",
+            "isVisibleToCandidate": false,
+            "isEdited": false,
+            "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+            "editedAt": null
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "authorName": "QA26 Engineering Proctor 1",
+              "body": "QA26 internal review comment",
+              "isVisibleToCandidate": false,
+              "isEdited": false,
+              "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+              "editedAt": null
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 482.75
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:52.343Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/timeline",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 8,
+            "eventType": 6,
+            "eventTypeName": "CommentAdded",
+            "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "actorName": "QA26 Engineering Proctor 1",
+            "descriptionEn": "Comment added",
+            "descriptionAr": "?? ????? ?????",
+            "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+            "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+          },
+          {
+            "id": 7,
+            "eventType": 1,
+            "eventTypeName": "Created",
+            "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "actorName": "QA26 Engineering Proctor 1",
+            "descriptionEn": "Case created",
+            "descriptionAr": "?? ????? ??????",
+            "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+            "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 483.67
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:53.309Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/dashboard/exam/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "totalCases": 1,
+          "openCases": 1,
+          "inReviewCases": 0,
+          "resolvedCases": 0,
+          "closedCases": 0,
+          "unassignedCases": 1,
+          "criticalSeverityCases": 0,
+          "highSeverityCases": 0,
+          "clearedCount": 0,
+          "suspiciousCount": 0,
+          "invalidatedCount": 0,
+          "escalatedCount": 0,
+          "pendingAppeals": 0,
+          "reviewerWorkload": [],
+          "severityDistribution": [
+            {
+              "severity": 1,
+              "severityName": "Low",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 2,
+              "severityName": "Medium",
+              "count": 1,
+              "percentage": 100
+            },
+            {
+              "severity": 3,
+              "severityName": "High",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 4,
+              "severityName": "Critical",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "totalCases": 1,
+            "openCases": 1,
+            "inReviewCases": 0,
+            "resolvedCases": 0,
+            "closedCases": 0,
+            "unassignedCases": 1,
+            "criticalSeverityCases": 0,
+            "highSeverityCases": 0,
+            "clearedCount": 0,
+            "suspiciousCount": 0,
+            "invalidatedCount": 0,
+            "escalatedCount": 0,
+            "pendingAppeals": 0,
+            "reviewerWorkload": [],
+            "severityDistribution": [
+              {
+                "severity": 1,
+                "severityName": "Low",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "severity": 2,
+                "severityName": "Medium",
+                "count": 1,
+                "percentage": 100
+              },
+              {
+                "severity": 3,
+                "severityName": "High",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "severity": 4,
+                "severityName": "Critical",
+                "count": 0,
+                "percentage": 0
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 963.82
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:54.276Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "PUT",
+      "route": "/api/Incident/case",
+      "request": {
+        "id": 10,
+        "titleEn": "QA26 unauthorized title mutation"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 unauthorized title mutation",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 unauthorized title mutation",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 965.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:54.749Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 unauthorized title mutation",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 unauthorized title mutation",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 471.98
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:55.690Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "PUT",
+      "route": "/api/Incident/case",
+      "request": {
+        "id": 10,
+        "titleEn": "QA26 incident lifecycle and scope"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 938.52
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:56.161Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 469.93
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:56.640Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/by-attempt/197",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 478.03
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:57.109Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/comments",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "authorName": "QA26 Engineering Proctor 1",
+            "body": "QA26 internal review comment",
+            "isVisibleToCandidate": false,
+            "isEdited": false,
+            "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+            "editedAt": null
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "authorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "authorName": "QA26 Engineering Proctor 1",
+              "body": "QA26 internal review comment",
+              "isVisibleToCandidate": false,
+              "isEdited": false,
+              "createdAt": "2026-09-19T16:08:49.3944852+04:00",
+              "editedAt": null
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 467.5
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:57.581Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/timeline",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 8,
+            "eventType": 6,
+            "eventTypeName": "CommentAdded",
+            "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "actorName": "QA26 Engineering Proctor 1",
+            "descriptionEn": "Comment added",
+            "descriptionAr": "?? ????? ?????",
+            "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+            "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+          },
+          {
+            "id": 7,
+            "eventType": 1,
+            "eventTypeName": "Created",
+            "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "actorName": "QA26 Engineering Proctor 1",
+            "descriptionEn": "Case created",
+            "descriptionAr": "?? ????? ??????",
+            "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+            "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 469.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:58.520Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/dashboard/exam/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "totalCases": 1,
+          "openCases": 1,
+          "inReviewCases": 0,
+          "resolvedCases": 0,
+          "closedCases": 0,
+          "unassignedCases": 1,
+          "criticalSeverityCases": 0,
+          "highSeverityCases": 0,
+          "clearedCount": 0,
+          "suspiciousCount": 0,
+          "invalidatedCount": 0,
+          "escalatedCount": 0,
+          "pendingAppeals": 0,
+          "reviewerWorkload": [],
+          "severityDistribution": [
+            {
+              "severity": 1,
+              "severityName": "Low",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 2,
+              "severityName": "Medium",
+              "count": 1,
+              "percentage": 100
+            },
+            {
+              "severity": 3,
+              "severityName": "High",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 4,
+              "severityName": "Critical",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "totalCases": 1,
+            "openCases": 1,
+            "inReviewCases": 0,
+            "resolvedCases": 0,
+            "closedCases": 0,
+            "unassignedCases": 1,
+            "criticalSeverityCases": 0,
+            "highSeverityCases": 0,
+            "clearedCount": 0,
+            "suspiciousCount": 0,
+            "invalidatedCount": 0,
+            "escalatedCount": 0,
+            "pendingAppeals": 0,
+            "reviewerWorkload": [],
+            "severityDistribution": [
+              {
+                "severity": 1,
+                "severityName": "Low",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "severity": 2,
+                "severityName": "Medium",
+                "count": 1,
+                "percentage": 100
+              },
+              {
+                "severity": 3,
+                "severityName": "High",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "severity": 4,
+                "severityName": "Critical",
+                "count": 0,
+                "percentage": 0
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 936.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:59.508Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "PUT",
+      "route": "/api/Incident/case",
+      "request": {
+        "id": 10,
+        "titleEn": "QA26 unauthorized title mutation"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 unauthorized title mutation",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 unauthorized title mutation",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 985.53
+      }
+    },
+    {
+      "at": "2026-09-19T12:08:59.989Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 unauthorized title mutation",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 unauthorized title mutation",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 475.42
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:00.938Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "PUT",
+      "route": "/api/Incident/case",
+      "request": {
+        "id": 10,
+        "titleEn": "QA26 incident lifecycle and scope"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 946.01
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:01.175Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 236.15
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:01.415Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/by-attempt/197",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 237.04
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:01.655Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/comments",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 237.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:01.892Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10/timeline",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 234.83
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:02.131Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "GET",
+      "route": "/api/Incident/dashboard/exam/115",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 234.69
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:02.370Z",
+      "identity": "qa26.protocol.1789817576996.a@example.test",
+      "method": "PUT",
+      "route": "/api/Incident/case",
+      "request": {
+        "id": 10,
+        "titleEn": "QA26 unauthorized title mutation"
+      },
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 236.47
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:02.841Z",
+      "identity": "qa26.eng.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "caseNumber": "INC-20260919-0001",
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "attemptId": 197,
+          "attemptNumber": 1,
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "proctorSessionId": 149,
+          "status": 1,
+          "statusName": "Open",
+          "severity": 2,
+          "severityName": "Medium",
+          "source": 2,
+          "sourceName": "ManualReport",
+          "titleEn": "QA26 incident lifecycle and scope",
+          "titleAr": "اختبار مراجعة حادثة",
+          "summaryEn": "Synthetic protocol and screenshot review only.",
+          "summaryAr": null,
+          "riskScoreAtCreate": 0,
+          "totalViolationsAtCreate": 1,
+          "assignedTo": null,
+          "assigneeName": null,
+          "assignedAt": null,
+          "outcome": null,
+          "outcomeName": null,
+          "resolutionNoteEn": null,
+          "resolvedBy": null,
+          "resolverName": null,
+          "resolvedAt": null,
+          "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+          "timeline": [
+            {
+              "id": 8,
+              "eventType": 6,
+              "eventTypeName": "CommentAdded",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Comment added",
+              "descriptionAr": "?? ????? ?????",
+              "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+              "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+            },
+            {
+              "id": 7,
+              "eventType": 1,
+              "eventTypeName": "Created",
+              "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "actorName": "QA26 Engineering Proctor 1",
+              "descriptionEn": "Case created",
+              "descriptionAr": "?? ????? ??????",
+              "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+              "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+            }
+          ],
+          "evidenceLinks": [],
+          "decisions": [],
+          "commentCount": 1,
+          "appealCount": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 10,
+            "caseNumber": "INC-20260919-0001",
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "attemptId": 197,
+            "attemptNumber": 1,
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "proctorSessionId": 149,
+            "status": 1,
+            "statusName": "Open",
+            "severity": 2,
+            "severityName": "Medium",
+            "source": 2,
+            "sourceName": "ManualReport",
+            "titleEn": "QA26 incident lifecycle and scope",
+            "titleAr": "اختبار مراجعة حادثة",
+            "summaryEn": "Synthetic protocol and screenshot review only.",
+            "summaryAr": null,
+            "riskScoreAtCreate": 0,
+            "totalViolationsAtCreate": 1,
+            "assignedTo": null,
+            "assigneeName": null,
+            "assignedAt": null,
+            "outcome": null,
+            "outcomeName": null,
+            "resolutionNoteEn": null,
+            "resolvedBy": null,
+            "resolverName": null,
+            "resolvedAt": null,
+            "createdAt": "2026-09-19T16:08:46.3072925+04:00",
+            "timeline": [
+              {
+                "id": 8,
+                "eventType": 6,
+                "eventTypeName": "CommentAdded",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Comment added",
+                "descriptionAr": "?? ????? ?????",
+                "metadataJson": "{\"commentId\":1,\"isVisibleToCandidate\":false}",
+                "occurredAt": "2026-09-19T16:08:49.8819657+04:00"
+              },
+              {
+                "id": 7,
+                "eventType": 1,
+                "eventTypeName": "Created",
+                "actorId": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "actorName": "QA26 Engineering Proctor 1",
+                "descriptionEn": "Case created",
+                "descriptionAr": "?? ????? ??????",
+                "metadataJson": "{\"source\":\"ManualReport\",\"severity\":\"Medium\"}",
+                "occurredAt": "2026-09-19T16:08:47.5735712+04:00"
+              }
+            ],
+            "evidenceLinks": [],
+            "decisions": [],
+            "commentCount": 1,
+            "appealCount": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 469.85
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:04.557Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/cases?examId=115&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1712.51
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:05.299Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 0,
+          "examTitleEn": "All Exams",
+          "totalCases": 9,
+          "openCases": 8,
+          "inReviewCases": 0,
+          "resolvedCases": 1,
+          "closedCases": 0,
+          "unassignedCases": 9,
+          "criticalSeverityCases": 0,
+          "highSeverityCases": 0,
+          "clearedCount": 0,
+          "suspiciousCount": 1,
+          "invalidatedCount": 0,
+          "escalatedCount": 0,
+          "pendingAppeals": 0,
+          "reviewerWorkload": [],
+          "severityDistribution": [
+            {
+              "severity": 1,
+              "severityName": "Low",
+              "count": 8,
+              "percentage": 88.88888888888889
+            },
+            {
+              "severity": 2,
+              "severityName": "Medium",
+              "count": 1,
+              "percentage": 11.11111111111111
+            },
+            {
+              "severity": 3,
+              "severityName": "High",
+              "count": 0,
+              "percentage": 0
+            },
+            {
+              "severity": 4,
+              "severityName": "Critical",
+              "count": 0,
+              "percentage": 0
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 0,
+            "examTitleEn": "All Exams",
+            "totalCases": 9,
+            "openCases": 8,
+            "inReviewCases": 0,
+            "resolvedCases": 1,
+            "closedCases": 0,
+            "unassignedCases": 9,
+            "criticalSeverityCases": 0,
+            "highSeverityCases": 0,
+            "clearedCount": 0,
+            "suspiciousCount": 1,
+            "invalidatedCount": 0,
+            "escalatedCount": 0,
+            "pendingAppeals": 0,
+            "reviewerWorkload": [],
+            "severityDistribution": [
+              {
+                "severity": 1,
+                "severityName": "Low",
+                "count": 8,
+                "percentage": 88.88888888888889
+              },
+              {
+                "severity": 2,
+                "severityName": "Medium",
+                "count": 1,
+                "percentage": 11.11111111111111
+              },
+              {
+                "severity": 3,
+                "severityName": "High",
+                "count": 0,
+                "percentage": 0
+              },
+              {
+                "severity": 4,
+                "severityName": "Critical",
+                "count": 0,
+                "percentage": 0
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 740.6
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:06.955Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/cases?pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1653.88
+      }
+    },
+    {
+      "at": "2026-09-19T12:09:06.958Z",
+      "fixtures": {
+        "examId": 128,
+        "attemptId": 197,
+        "sessionId": 149,
+        "secondAttemptId": 198,
+        "secondSessionId": 150,
+        "exports": [],
+        "caseId": 10,
+        "commentId": 1
+      },
+      "remaining": "Export jobs pending for subsequent polling; incident remains open for controlled workflow/regression. Unauthorized title restored after each probe."
+    }
+  ]
+}

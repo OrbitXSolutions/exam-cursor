@@ -11,6 +11,7 @@ using Smart_Core.Domain.Entities;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services;
 
@@ -20,17 +21,20 @@ public class MediaStorageService : IMediaStorageService
   private readonly ApplicationDbContext _dbContext;
   private readonly MediaStorageSettings _settings;
     private readonly ILogger<MediaStorageService> _logger;
+    private readonly ResourceAuthorizationService _authorization;
 
     public MediaStorageService(
         IStorageProvider storageProvider,
   ApplicationDbContext dbContext,
    IOptions<MediaStorageSettings> settings,
-        ILogger<MediaStorageService> logger)
+        ILogger<MediaStorageService> logger,
+        ResourceAuthorizationService authorization)
     {
         _storageProvider = storageProvider;
    _dbContext = dbContext;
         _settings = settings.Value;
     _logger = logger;
+        _authorization = authorization;
     }
 
     public async Task<MediaUploadResultDto> UploadAsync(
@@ -110,7 +114,7 @@ _logger.LogInformation("File uploaded successfully: {Id} - {OriginalName}", medi
 
     public async Task<ApiResponse<MediaFileDto>> GetByIdAsync(Guid id)
     {
-       var mediaFile = await _dbContext.Set<MediaFile>()
+       var mediaFile = await (await ScopePrivateMediaAsync(_dbContext.Set<MediaFile>()))
   .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
 
         if (mediaFile == null)
@@ -123,7 +127,7 @@ _logger.LogInformation("File uploaded successfully: {Id} - {OriginalName}", medi
 
     public async Task<(Stream? Stream, string? ContentType, string? FileName)> GetFileStreamAsync(Guid id)
     {
-        var mediaFile = await _dbContext.Set<MediaFile>()
+        var mediaFile = await (await ScopePrivateMediaAsync(_dbContext.Set<MediaFile>()))
             .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
 
         if (mediaFile == null)
@@ -139,10 +143,10 @@ _logger.LogInformation("File uploaded successfully: {Id} - {OriginalName}", medi
     {
   try
         {
- var mediaFile = await _dbContext.Set<MediaFile>()
+ var mediaFile = await (await ScopePrivateMediaAsync(_dbContext.Set<MediaFile>()))
         .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
 
-  if (mediaFile == null)
+        if (mediaFile == null)
         {
         return new MediaDeleteResultDto
           {
@@ -150,6 +154,13 @@ _logger.LogInformation("File uploaded successfully: {Id} - {OriginalName}", medi
      Message = "File not found."
             };
          }
+
+         // Public visibility does not grant administrators of other departments
+         // permission to destroy a file owned by an out-of-scope user.
+         if (!await _authorization.IsCurrentUserSuperAdminAsync() &&
+             (string.IsNullOrWhiteSpace(mediaFile.CreatedBy) ||
+              !await _authorization.CanAccessUserForUserAsync(mediaFile.CreatedBy, deletedBy ?? _authorization.CurrentUserId)))
+             return new MediaDeleteResultDto { Success = false, Message = "File not found." };
 
          // Delete from storage
   var deleted = await _storageProvider.DeleteAsync(mediaFile.Path);
@@ -194,6 +205,7 @@ string? mediaType = null,
    var query = _dbContext.Set<MediaFile>()
             .Where(m => !m.IsDeleted)
   .AsQueryable();
+        query = await ScopePrivateMediaAsync(query);
 
  if (!string.IsNullOrWhiteSpace(folder))
    {
@@ -225,6 +237,18 @@ return ApiResponse<PaginatedResponse<MediaFileDto>>.SuccessResponse(new Paginate
     }
 
     #region Private Methods
+
+    private async Task<IQueryable<MediaFile>> ScopePrivateMediaAsync(IQueryable<MediaFile> query)
+    {
+        var userId = _authorization.CurrentUserId;
+        var sessions = await _authorization.ScopeProctorSessionsAsync(_dbContext.ProctorSessions);
+        var allowedPaths = _dbContext.ProctorEvidence
+            .Where(e => sessions.Any(s => s.Id == e.ProctorSessionId))
+            .Select(e => e.FilePath);
+        return query.Where(m =>
+            (!m.Path.StartsWith("proctor-snapshots/") && !m.Path.StartsWith("proctor-snapshots\\")) ||
+            (userId != null && (m.CreatedBy == userId || allowedPaths.Contains(m.Path))));
+    }
 
     private (bool IsValid, string ErrorMessage, List<string> Errors) ValidateFile(IFormFile file)
     {
@@ -306,7 +330,8 @@ StoredFileName = mediaFile.StoredFileName,
    MediaType = mediaFile.MediaType.ToString(),
   StorageProvider = mediaFile.StorageProvider.ToString(),
     Path = mediaFile.Path,
-   Url = mediaFile.Url,
+  Url = mediaFile.Path.Replace('\\', '/').StartsWith("proctor-snapshots/", StringComparison.OrdinalIgnoreCase)
+      ? $"/api/Media/{mediaFile.Id}/view" : mediaFile.Url,
   Folder = mediaFile.Folder,
   CreatedDate = mediaFile.CreatedDate
       };

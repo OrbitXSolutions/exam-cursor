@@ -1,0 +1,462 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:44:00.517Z",
+  "checks": [
+    {
+      "name": "Unchanged authorized proctor can join same-department socket room",
+      "passed": true,
+      "at": "2026-09-19T12:44:09.195Z"
+    },
+    {
+      "name": "Revoked Proctor cannot act over already-established WebSocket",
+      "passed": false,
+      "detail": {
+        "rejected": false,
+        "deliveredToCandidate": true,
+        "currentRoles": [
+          "Candidate"
+        ]
+      },
+      "at": "2026-09-19T12:44:14.206Z"
+    },
+    {
+      "name": "Revoked-role HTTP credential is rejected before role authorization",
+      "passed": false,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:44:14.438Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:44:01.762Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:44:01.7587778+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:44:01.0634224+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:44:01.7587778+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:44:01.0634224+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1243.22
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:02.965Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.import.a@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:44:02.9642277+04:00",
+          "user": {
+            "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+            "email": "qa26.import.a@example.test",
+            "displayName": "QA26 Import A",
+            "fullName": "QA26 Import A",
+            "fullNameAr": "استيراد ألف",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+            "lastLoginDate": "2026-09-19T16:44:02.2734129+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:44:02.9642277+04:00",
+            "user": {
+              "id": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "email": "qa26.import.a@example.test",
+              "displayName": "QA26 Import A",
+              "fullName": "QA26 Import A",
+              "fullNameAr": "استيراد ألف",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T15:10:20.4135658+04:00",
+              "lastLoginDate": "2026-09-19T16:44:02.2734129+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1200.06
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:05.994Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Roles/add-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "roleName": "Proctor"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User added to role successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3028.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:07.185Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.phase9.scope@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:44:07.1845418+04:00",
+          "user": {
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor",
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:44:07.1845418+04:00",
+            "user": {
+              "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+              "email": "qa26.phase9.scope@example.test",
+              "displayName": "QA26 Phase9 Scope Actor",
+              "fullName": "QA26 Phase9 Scope Actor",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor",
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+              "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1190.56
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:08.019Z",
+      "signalR": "D51 candidate observer",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T12:44:08.254Z",
+      "signalR": "D51 revocable proctor",
+      "event": "connected"
+    },
+    {
+      "at": "2026-09-19T12:44:09.194Z",
+      "signalR": "D51 candidate observer",
+      "event": "PeerJoined",
+      "payload": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "connectionId": "lSPVHLaPRCoWosYw5aM2dA",
+        "role": "proctor",
+        "attemptId": 203
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:11.737Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Roles/remove-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "roleName": "Proctor"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User removed from role successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2540.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:12.242Z",
+      "signalR": "D51 candidate observer",
+      "event": "ReceiveWarning",
+      "payload": {
+        "fromConnectionId": "lSPVHLaPRCoWosYw5aM2dA",
+        "fromUserId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "message": "QA26 D51 revoked-role probe",
+        "attemptId": 203
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:14.205Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:44:11.0404388+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:44:11.0404388+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1446.24
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:14.438Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 231.75
+      }
+    },
+    {
+      "at": "2026-09-19T12:44:15.824Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:44:11.0404388+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:44:11.0404388+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:44:06.4934316+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1384.87
+      }
+    }
+  ]
+}

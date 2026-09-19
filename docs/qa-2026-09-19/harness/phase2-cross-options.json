@@ -1,0 +1,332 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:57:07.006Z",
+  "checks": [
+    {
+      "name": "Foreign options read denied",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "Operation successful",
+        "data": [
+          {
+            "id": 387,
+            "questionId": 136,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true,
+            "points": null,
+            "order": 1,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+          },
+          {
+            "id": 388,
+            "questionId": 136,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": false,
+            "points": null,
+            "order": 2,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+          },
+          {
+            "id": 389,
+            "questionId": 136,
+            "textEn": "6",
+            "textAr": "خيار 6",
+            "isCorrect": false,
+            "points": null,
+            "order": 3,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+          }
+        ],
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T10:57:09.901Z"
+    },
+    {
+      "name": "Foreign same-content option update denied",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "Option updated successfully",
+        "data": {
+          "id": 387,
+          "questionId": 136,
+          "textEn": "2",
+          "textAr": "خيار 2",
+          "isCorrect": true,
+          "points": null,
+          "order": 1,
+          "attachmentPath": null,
+          "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+        },
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T10:57:10.631Z"
+    },
+    {
+      "name": "Foreign question toggle denied",
+      "passed": false,
+      "detail": {
+        "success": true,
+        "message": "Question deactivated successfully",
+        "data": true,
+        "errors": [],
+        "traceId": null
+      },
+      "at": "2026-09-19T10:57:11.345Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:57:08.243Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.instructor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:57:08.2394113+04:00",
+          "user": {
+            "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+            "email": "qa26.eng.instructor1@example.test",
+            "displayName": "QA26 Engineering Instructor 1",
+            "fullName": "QA26 Engineering Instructor 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Instructor"
+            ],
+            "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+            "lastLoginDate": "2026-09-19T14:57:07.5495067+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:57:08.2394113+04:00",
+            "user": {
+              "id": "5701ee5a-4331-49ce-be73-92e5ed7a8df2",
+              "email": "qa26.eng.instructor1@example.test",
+              "displayName": "QA26 Engineering Instructor 1",
+              "fullName": "QA26 Engineering Instructor 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Instructor"
+              ],
+              "createdDate": "2026-09-19T14:46:17.1345431+04:00",
+              "lastLoginDate": "2026-09-19T14:57:07.5495067+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1233.01
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:09.900Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/136/options",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 387,
+            "questionId": 136,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true,
+            "points": null,
+            "order": 1,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+          },
+          {
+            "id": 388,
+            "questionId": 136,
+            "textEn": "4",
+            "textAr": "خيار 4",
+            "isCorrect": false,
+            "points": null,
+            "order": 2,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+          },
+          {
+            "id": 389,
+            "questionId": 136,
+            "textEn": "6",
+            "textAr": "خيار 6",
+            "isCorrect": false,
+            "points": null,
+            "order": 3,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 387,
+              "questionId": 136,
+              "textEn": "2",
+              "textAr": "خيار 2",
+              "isCorrect": true,
+              "points": null,
+              "order": 1,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+            },
+            {
+              "id": 388,
+              "questionId": 136,
+              "textEn": "4",
+              "textAr": "خيار 4",
+              "isCorrect": false,
+              "points": null,
+              "order": 2,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813872+04:00"
+            },
+            {
+              "id": 389,
+              "questionId": 136,
+              "textEn": "6",
+              "textAr": "خيار 6",
+              "isCorrect": false,
+              "points": null,
+              "order": 3,
+              "attachmentPath": null,
+              "createdDate": "2026-09-19T14:54:14.4813873+04:00"
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1656.46
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:10.630Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PUT",
+      "route": "/api/QuestionBank/options/387",
+      "request": {
+        "id": 387,
+        "questionId": 136,
+        "textEn": "2",
+        "textAr": "خيار 2",
+        "isCorrect": true,
+        "points": null,
+        "order": 1,
+        "attachmentPath": null,
+        "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 387,
+          "questionId": 136,
+          "textEn": "2",
+          "textAr": "خيار 2",
+          "isCorrect": true,
+          "points": null,
+          "order": 1,
+          "attachmentPath": null,
+          "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Option updated successfully",
+          "data": {
+            "id": 387,
+            "questionId": 136,
+            "textEn": "2",
+            "textAr": "خيار 2",
+            "isCorrect": true,
+            "points": null,
+            "order": 1,
+            "attachmentPath": null,
+            "createdDate": "2026-09-19T14:54:14.4813862+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 728.23
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:11.344Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PATCH",
+      "route": "/api/QuestionBank/questions/136/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deactivated successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 712.32
+      }
+    },
+    {
+      "at": "2026-09-19T10:57:12.050Z",
+      "identity": "qa26.eng.instructor1@example.test",
+      "method": "PATCH",
+      "route": "/api/QuestionBank/questions/136/toggle-status",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question activated successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 704.55
+      }
+    }
+  ]
+}

@@ -54,8 +54,8 @@ function qBody(ans: GradedAnswerItem, lang: "en" | "ar"): string {
 function correctAnswerText(ans: GradedAnswerItem, lang: "en" | "ar"): string {
   if (lang === "ar" && ans.modelAnswerAr) return ans.modelAnswerAr;
   if (ans.modelAnswerEn) return ans.modelAnswerEn;
-  if (ans.selectedOptions) {
-    const correct = ans.selectedOptions.filter((o) => o.isCorrect);
+  if (ans.correctOptions) {
+    const correct = ans.correctOptions;
     if (correct.length > 0)
       return correct
         .map((o) =>
@@ -361,7 +361,14 @@ export async function exportCandidateReportExcel(
     rows.forEach((rowData, idx) => {
       const row = ws.addRow(rowData);
       const isAlt = idx % 2 === 1;
-      row.height = 15;
+      const wrappedLines = rowData.map((value, column) => {
+        const charactersPerLine = Math.max(1, Math.floor(COL_WIDTHS[column] * 0.8));
+        return String(value).split(/\r?\n/).reduce(
+          (total, line) => total + Math.max(1, Math.ceil(line.length / charactersPerLine)),
+          0,
+        );
+      });
+      row.height = Math.max(15, Math.max(...wrappedLines) * 15 + 4);
       row.eachCell({ includeEmpty: true }, (cell) => {
         cell.alignment = {
           horizontal: "center",

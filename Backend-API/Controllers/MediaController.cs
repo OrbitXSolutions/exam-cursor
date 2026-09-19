@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Smart_Core.Application.DTOs.Common;
@@ -73,6 +74,8 @@ public class MediaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Download(Guid id)
     {
+        Response.Headers.CacheControl = "private, no-store";
+        Response.Headers.XContentTypeOptions = "nosniff";
         var (stream, contentType, fileName) = await _mediaStorageService.GetFileStreamAsync(id);
         
         if (stream == null)
@@ -92,6 +95,8 @@ public class MediaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> View(Guid id)
     {
+        Response.Headers.CacheControl = "private, no-store";
+        Response.Headers.XContentTypeOptions = "nosniff";
         var (stream, contentType, _) = await _mediaStorageService.GetFileStreamAsync(id);
     
         if (stream == null)
@@ -127,9 +132,12 @@ public class MediaController : ControllerBase
     public async Task<IActionResult> GetFiles(
       [FromQuery] string? folder = null,
         [FromQuery] string? mediaType = null,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 20)
+        [FromQuery, Range(1, int.MaxValue)] int pageNumber = 1,
+        [FromQuery, Range(1, int.MaxValue)] int pageSize = 20)
     {
+        if ((long)(pageNumber - 1) * pageSize > int.MaxValue)
+            return BadRequest(new { message = "Requested page exceeds the supported range." });
+
         var result = await _mediaStorageService.GetFilesAsync(folder, mediaType, pageNumber, pageSize);
         return Ok(result);
     }

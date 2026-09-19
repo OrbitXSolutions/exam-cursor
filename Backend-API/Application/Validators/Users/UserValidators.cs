@@ -13,6 +13,9 @@ public class UpdateUserDtoValidator : AbstractValidator<UpdateUserDto>
         RuleFor(x => x.FullName)
  .MaximumLength(200).WithMessage("Full name cannot exceed 200 characters");
 
+        RuleFor(x => x.FullNameAr)
+            .MaximumLength(200).WithMessage("Arabic full name cannot exceed 200 characters");
+
    RuleFor(x => x.PhoneNumber)
  .Matches(@"^\+?[1-9]\d{1,14}$").When(x => !string.IsNullOrEmpty(x.PhoneNumber))
    .WithMessage("Invalid phone number format");

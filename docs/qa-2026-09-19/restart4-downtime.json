@@ -1,0 +1,15 @@
+{
+  "PreviousLauncherPid": 52168,
+  "StartUtc": "2026-09-19T11:41:22.0524712Z",
+  "PreviousListenerPid": 48376,
+  "AttemptId": 193,
+  "ProctorSessionId": 145,
+  "EndUtc": "2026-09-19T11:42:23.2814395Z",
+  "DurationSeconds": 61.281,
+  "NewLauncherPid": 4344,
+  "NewListenerPid": 31492,
+  "ExecSessionId": 38992,
+  "FirstBrowserSaveAcknowledgementUtc": "2026-09-19T11:41:58.663Z",
+  "RecoveryUpperBoundSeconds": 36.611,
+  "MeasurementNote": "EndUtc is the later explicit readiness probe. Root captured successful real-browser autosave earlier, proving recovery by FirstBrowserSaveAcknowledgementUtc."
+}

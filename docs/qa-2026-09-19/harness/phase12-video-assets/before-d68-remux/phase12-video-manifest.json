@@ -1,0 +1,94 @@
+{
+  "classification": "SYNTHETIC CAPTURE TEST: locally generated 8-second animated test pattern and tone; actual authenticated upload, storage and finalization; no physical camera, microphone or screen capture. Browser playback requires separate evidence.",
+  "attemptId": 368,
+  "examId": 143,
+  "candidateId": "44799c41-8cfd-4ab8-a90b-13632121949a",
+  "createdAt": "2026-09-19T14:19:26.365Z",
+  "sha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+  "sizeBytes": 230170,
+  "mimeType": "video/webm; codecs=\"vp8, opus\"",
+  "sourceFile": "phase12-video-assets\\synthetic-vp8-opus-attempt-368.webm",
+  "sourceProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "vp8",
+        "codec_type": "video",
+        "width": 320,
+        "height": 240
+      },
+      {
+        "codec_name": "opus",
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "8.008000",
+      "size": "230170"
+    }
+  },
+  "uploadedAt": "2026-09-19T14:19:37.141Z",
+  "storedProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "vp8",
+        "codec_type": "video",
+        "width": 320,
+        "height": 240
+      },
+      {
+        "codec_name": "opus",
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "8.008000",
+      "size": "230170"
+    }
+  },
+  "finalizeRequestedAt": "2026-09-19T14:19:43.608Z",
+  "finalizeAcceptedAt": "2026-09-19T14:19:44.544Z",
+  "recording": {
+    "evidenceId": 702,
+    "attemptId": 368,
+    "videoUrl": null,
+    "chunksUrl": "/api/Proctor/video-chunks/368",
+    "contentType": "video/webm",
+    "fileSize": 230170,
+    "duration": 611,
+    "startAt": "2026-09-19T18:09:33.6056203+04:00",
+    "endAt": "2026-09-19T18:19:44.7823906+04:00",
+    "expiresAt": "2026-10-19T18:19:45.0134313+04:00",
+    "retentionDays": 0,
+    "retentionMessage": null,
+    "candidateName": "44799c41-8cfd-4ab8-a90b-13632121949a",
+    "examTitle": "QA26 Final Browser Lifecycle",
+    "events": [
+      {
+        "id": 4107,
+        "eventType": "ProctorWarning",
+        "severity": 3,
+        "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+        "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}"
+      }
+    ],
+    "screenshots": []
+  },
+  "proctorSessionId": 320,
+  "verifiedAt": "2026-09-19T14:19:50.495Z",
+  "browserPlayback": {
+    "status": "pending separate real-browser observation",
+    "path": "/proctor-center/video/44799c41-8cfd-4ab8-a90b-13632121949a?attemptId=368",
+    "expected": "Animated color test pattern; about 8 seconds; play advances time; pause/seek/replay work. Audio is a quiet synthetic 440 Hz tone.",
+    "classification": "Playback of synthetic fixture only; no physical device capture claim."
+  },
+  "durationInterpretation": {
+    "decodedSeconds": 8.008,
+    "recordingMetadataSeconds": 611,
+    "chunkEstimateSeconds": 3,
+    "note": "Backend recording duration is attempt elapsed time; chunk metadata assumes 3 seconds each. Player should replace the estimate with actual decoded duration after MSE endOfStream."
+  }
+}

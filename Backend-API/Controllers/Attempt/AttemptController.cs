@@ -258,7 +258,7 @@ public class AttemptController : ControllerBase
     /// Get all events for an attempt (Admin)
     /// </summary>
     [HttpGet("{attemptId}/events")]
-    [Authorize(Roles = "SuperAdmin,Admin,Instructor")]
+    [Authorize(Roles = "SuperAdmin,Admin,Instructor,Proctor")]
     public async Task<IActionResult> GetAttemptEvents(int attemptId)
     {
         var result = await _attemptService.GetAttemptEventsAsync(attemptId);

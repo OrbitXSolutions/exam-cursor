@@ -1,0 +1,360 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:06:52.193Z",
+  "checks": [
+    {
+      "name": "D33 fixedstart bothAPIsreject aftergrace withoutnewattempt",
+      "passed": true,
+      "detail": {
+        "candidate": {
+          "success": false,
+          "message": "The allowed start window has passed. You must start within 15 minutes of the scheduled time (2026-09-19 10:55 UAE).",
+          "data": null,
+          "errors": [],
+          "traceId": "29e2ef754bcced15d62e3bf4397e95f6"
+        },
+        "legacy": {
+          "success": false,
+          "message": "The fixed exam start window has closed (15-minute grace period).",
+          "data": null,
+          "errors": [],
+          "traceId": "ec7cc425db411d274824593f975b7c96"
+        },
+        "before": 1,
+        "after": 1
+      },
+      "at": "2026-09-19T12:07:00.312Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:06:53.470Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:06:53.4658801+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:06:52.7671406+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:06:53.4658801+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:06:52.7671406+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1274.9
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:54.675Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:06:54.6745455+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T16:06:53.9835996+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:06:54.6745455+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T16:06:53.9835996+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1203.6
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:56.312Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt?examId=117&candidateId=0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 209,
+              "examId": 117,
+              "examTitleEn": "QA26 Fixed Assigned Code",
+              "examTitleAr": "اختبار QA26 fixed-code",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+              "submittedAt": null,
+              "status": 5,
+              "statusName": "Cancelled",
+              "expiryReason": 0,
+              "expiryReasonName": "None",
+              "resumedFromAttemptId": null,
+              "attemptNumber": 1,
+              "totalScore": null,
+              "isPassed": null
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 209,
+                "examId": 117,
+                "examTitleEn": "QA26 Fixed Assigned Code",
+                "examTitleAr": "اختبار QA26 fixed-code",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+                "submittedAt": null,
+                "status": 5,
+                "statusName": "Cancelled",
+                "expiryReason": 0,
+                "expiryReasonName": "None",
+                "resumedFromAttemptId": null,
+                "attemptNumber": 1,
+                "totalScore": null,
+                "isPassed": null
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1636.95
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:57.472Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/117/start",
+      "request": {
+        "accessCode": "QA26-FIXED"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "The allowed start window has passed. You must start within 15 minutes of the scheduled time (2026-09-19 10:55 UAE).",
+          "data": null,
+          "errors": [],
+          "traceId": "29e2ef754bcced15d62e3bf4397e95f6"
+        },
+        "ms": 1159.2
+      }
+    },
+    {
+      "at": "2026-09-19T12:06:58.681Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Attempt/start",
+      "request": {
+        "examId": 117,
+        "accessCode": "QA26-FIXED"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "The fixed exam start window has closed (15-minute grace period).",
+          "data": null,
+          "errors": [],
+          "traceId": "ec7cc425db411d274824593f975b7c96"
+        },
+        "ms": 1207.74
+      }
+    },
+    {
+      "at": "2026-09-19T12:07:00.312Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt?examId=117&candidateId=0d70f96e-612a-4bc1-81c9-091201b1a23c",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 209,
+              "examId": 117,
+              "examTitleEn": "QA26 Fixed Assigned Code",
+              "examTitleAr": "اختبار QA26 fixed-code",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+              "submittedAt": null,
+              "status": 5,
+              "statusName": "Cancelled",
+              "expiryReason": 0,
+              "expiryReasonName": "None",
+              "resumedFromAttemptId": null,
+              "attemptNumber": 1,
+              "totalScore": null,
+              "isPassed": null
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 1,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 209,
+                "examId": 117,
+                "examTitleEn": "QA26 Fixed Assigned Code",
+                "examTitleAr": "اختبار QA26 fixed-code",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+                "submittedAt": null,
+                "status": 5,
+                "statusName": "Cancelled",
+                "expiryReason": 0,
+                "expiryReasonName": "None",
+                "resumedFromAttemptId": null,
+                "attemptNumber": 1,
+                "totalScore": null,
+                "isPassed": null
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 1,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1630.05
+      }
+    }
+  ]
+}

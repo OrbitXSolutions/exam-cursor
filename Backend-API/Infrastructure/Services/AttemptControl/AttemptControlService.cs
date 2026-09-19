@@ -10,6 +10,7 @@ using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Infrastructure.Hubs;
 using Smart_Core.Domain.Common;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.AttemptControl;
 
@@ -18,12 +19,15 @@ public class AttemptControlService : IAttemptControlService
     private readonly ApplicationDbContext _db;
     private readonly IHubContext<ProctorHub> _proctorHub;
     private readonly IAuditService _auditService;
+    private readonly ResourceAuthorizationService _authorization;
 
-    public AttemptControlService(ApplicationDbContext db, IHubContext<ProctorHub> proctorHub, IAuditService auditService)
+    public AttemptControlService(ApplicationDbContext db, IHubContext<ProctorHub> proctorHub, IAuditService auditService,
+        ResourceAuthorizationService authorization)
     {
         _db = db;
         _proctorHub = proctorHub;
         _auditService = auditService;
+        _authorization = authorization;
     }
 
     // ── List active attempts with enriched flags ───────────────
@@ -39,10 +43,11 @@ public class AttemptControlService : IAttemptControlService
             AttemptStatus.Resumed
         };
 
+        var accessibleExamIds = await _authorization.GetAccessibleExamIdsAsync();
         var query = _db.Attempts
             .Include(a => a.Exam)
             .Include(a => a.Candidate)
-            .Where(a => !a.IsDeleted);
+            .Where(a => !a.IsDeleted && accessibleExamIds.Contains(a.ExamId));
 
         // Status filter
         if (!string.IsNullOrWhiteSpace(filter.Status)
@@ -165,6 +170,8 @@ public class AttemptControlService : IAttemptControlService
     {
         if (dto.AttemptId <= 0)
             return ApiResponse<ForceEndResultDto>.FailureResponse("AttemptId is required.");
+        if (!await _authorization.CanAccessAttemptForUserAsync(dto.AttemptId, adminUserId))
+            return ApiResponse<ForceEndResultDto>.FailureResponse("Attempt not found.");
 
         var attempt = await _db.Attempts.FirstOrDefaultAsync(a => a.Id == dto.AttemptId && !a.IsDeleted);
         if (attempt == null)
@@ -228,18 +235,11 @@ public class AttemptControlService : IAttemptControlService
             catch { /* fire-and-forget */ }
         });
 
-        // Audit log (fire-and-forget)
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await _auditService.LogSuccessAsync(
-                AuditActions.AttemptForceSubmitted, "Attempt", attempt.Id.ToString(),
-                actorId: adminUserId,
-                metadata: new { attemptId = attempt.Id, reason = dto.Reason });
-            }
-            catch { }
-        });
+        // The audit service uses this request's scoped DbContext; finish before it is disposed.
+        await _auditService.LogSuccessAsync(
+            AuditActions.AttemptForceSubmitted, "Attempt", attempt.Id.ToString(),
+            actorId: adminUserId,
+            metadata: new { attemptId = attempt.Id, reason = dto.Reason });
 
         return ApiResponse<ForceEndResultDto>.SuccessResponse(
             new ForceEndResultDto
@@ -256,6 +256,8 @@ public class AttemptControlService : IAttemptControlService
     {
         if (dto.AttemptId <= 0)
             return ApiResponse<ResumeResultDto>.FailureResponse("AttemptId is required.");
+        if (!await _authorization.CanAccessAttemptForUserAsync(dto.AttemptId, adminUserId))
+            return ApiResponse<ResumeResultDto>.FailureResponse("Attempt not found.");
 
         var attempt = await _db.Attempts
             .Include(a => a.Exam)
@@ -321,6 +323,8 @@ public class AttemptControlService : IAttemptControlService
             return ApiResponse<AddTimeResultDto>.FailureResponse("ExtraMinutes must be greater than 0.");
         if (dto.ExtraMinutes > 480) // max 8 hours
             return ApiResponse<AddTimeResultDto>.FailureResponse("ExtraMinutes cannot exceed 480 (8 hours).");
+        if (!await _authorization.CanAccessAttemptForUserAsync(dto.AttemptId, adminUserId))
+            return ApiResponse<AddTimeResultDto>.FailureResponse("Attempt not found.");
 
         var attempt = await _db.Attempts.FirstOrDefaultAsync(a => a.Id == dto.AttemptId && !a.IsDeleted);
         if (attempt == null)
@@ -363,18 +367,11 @@ public class AttemptControlService : IAttemptControlService
 
         var remaining = CalculateRemainingSeconds(attempt.Status, attempt.ExpiresAt, attempt.SubmittedAt, now);
 
-        // Audit log (fire-and-forget)
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await _auditService.LogSuccessAsync(
-                "AttemptControl.AddTime", "Attempt", attempt.Id.ToString(),
-                actorId: adminUserId,
-                metadata: new { attemptId = attempt.Id, extraMinutes = dto.ExtraMinutes, reason = dto.Reason });
-            }
-            catch { }
-        });
+        // The audit service uses this request's scoped DbContext; finish before it is disposed.
+        await _auditService.LogSuccessAsync(
+            "AttemptControl.AddTime", "Attempt", attempt.Id.ToString(),
+            actorId: adminUserId,
+            metadata: new { attemptId = attempt.Id, extraMinutes = dto.ExtraMinutes, reason = dto.Reason });
 
         // Push time extension to candidate via SignalR (fire-and-forget)
         _ = Task.Run(async () =>

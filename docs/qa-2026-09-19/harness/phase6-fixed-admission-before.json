@@ -1,0 +1,694 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:46:39.475Z",
+  "checks": [
+    {
+      "name": "Fixed grace enforced consistently by both start APIs",
+      "passed": false,
+      "detail": {
+        "candidate": {
+          "success": false,
+          "message": "The allowed start window has passed. You must start within 15 minutes of the scheduled time (2026-09-19 10:55 UAE).",
+          "data": null,
+          "errors": [],
+          "traceId": "fb7c323d7af53216c05c6a36904e3b01"
+        },
+        "legacy": {
+          "success": true,
+          "message": "Attempt started successfully",
+          "data": {
+            "attemptId": 209,
+            "examId": 117,
+            "examTitleEn": "QA26 Fixed Assigned Code",
+            "examTitleAr": "اختبار QA26 fixed-code",
+            "examDescriptionEn": "Dedicated lifecycle acceptance fixture",
+            "examDescriptionAr": "اختبار دورة حياة الاختبار",
+            "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+            "expiresAt": "2026-09-20T01:46:44.0321183+04:00",
+            "remainingSeconds": 35997,
+            "totalQuestions": 3,
+            "answeredQuestions": 0,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "questions": [
+              {
+                "attemptQuestionId": 2085,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2086,
+                "questionId": 132,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2087,
+                "questionId": 134,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        }
+      },
+      "at": "2026-09-19T11:46:46.382Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:46:40.710Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:46:40.7075157+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:46:40.0204761+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:46:40.7075157+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:46:40.0204761+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1232.7
+      }
+    },
+    {
+      "at": "2026-09-19T11:46:41.917Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.candidate3@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:46:41.917234+04:00",
+          "user": {
+            "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "email": "qa26.eng.candidate3@example.test",
+            "displayName": "QA26 Engineering Candidate 3",
+            "fullName": "QA26 Engineering Candidate 3",
+            "fullNameAr": "اختبار الهندسة 3",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+            "lastLoginDate": "2026-09-19T15:46:41.2192536+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:46:41.917234+04:00",
+            "user": {
+              "id": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "email": "qa26.eng.candidate3@example.test",
+              "displayName": "QA26 Engineering Candidate 3",
+              "fullName": "QA26 Engineering Candidate 3",
+              "fullNameAr": "اختبار الهندسة 3",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:46:51.1655101+04:00",
+              "lastLoginDate": "2026-09-19T15:46:41.2192536+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1205.85
+      }
+    },
+    {
+      "at": "2026-09-19T11:46:43.072Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/117/start",
+      "request": {
+        "accessCode": "QA26-FIXED"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "The allowed start window has passed. You must start within 15 minutes of the scheduled time (2026-09-19 10:55 UAE).",
+          "data": null,
+          "errors": [],
+          "traceId": "fb7c323d7af53216c05c6a36904e3b01"
+        },
+        "ms": 1154.23
+      }
+    },
+    {
+      "at": "2026-09-19T11:46:46.382Z",
+      "identity": "qa26.eng.candidate3@example.test",
+      "method": "POST",
+      "route": "/api/Attempt/start",
+      "request": {
+        "examId": 117,
+        "accessCode": "QA26-FIXED"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "attemptId": 209,
+          "examId": 117,
+          "examTitleEn": "QA26 Fixed Assigned Code",
+          "examTitleAr": "اختبار QA26 fixed-code",
+          "examDescriptionEn": "Dedicated lifecycle acceptance fixture",
+          "examDescriptionAr": "اختبار دورة حياة الاختبار",
+          "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+          "expiresAt": "2026-09-20T01:46:44.0321183+04:00",
+          "remainingSeconds": 35997,
+          "totalQuestions": 3,
+          "answeredQuestions": 0,
+          "status": 1,
+          "attemptNumber": 1,
+          "maxAttempts": 2,
+          "questions": [
+            {
+              "attemptQuestionId": 2085,
+              "questionId": 131,
+              "order": 1,
+              "points": 10,
+              "bodyEn": "QA26 Single: Which number is prime?",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Single",
+              "questionTypeId": 1,
+              "isCalculatorAllowed": false,
+              "options": [
+                {
+                  "id": 376,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 377,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 378,
+                  "textEn": "6",
+                  "textAr": "خيار 6",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [
+                {
+                  "id": 11,
+                  "fileName": "qa26-reference.png",
+                  "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                  "fileType": "Image"
+                }
+              ],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2086,
+              "questionId": 132,
+              "order": 2,
+              "points": 10,
+              "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "MCQ_Multi",
+              "questionTypeId": 2,
+              "isCalculatorAllowed": false,
+              "options": [
+                {
+                  "id": 379,
+                  "textEn": "2",
+                  "textAr": "خيار 2",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 380,
+                  "textEn": "3",
+                  "textAr": "خيار 3",
+                  "order": 2,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 381,
+                  "textEn": "4",
+                  "textAr": "خيار 4",
+                  "order": 3,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            },
+            {
+              "attemptQuestionId": 2087,
+              "questionId": 134,
+              "order": 3,
+              "points": 10,
+              "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+              "bodyAr": "اختبار QA26",
+              "questionTypeName": "TrueFalse",
+              "questionTypeId": 3,
+              "isCalculatorAllowed": false,
+              "options": [
+                {
+                  "id": 385,
+                  "textEn": "True",
+                  "textAr": "خيار True",
+                  "order": 1,
+                  "attachmentPath": null
+                },
+                {
+                  "id": 386,
+                  "textEn": "False",
+                  "textAr": "خيار False",
+                  "order": 2,
+                  "attachmentPath": null
+                }
+              ],
+              "attachments": [],
+              "currentAnswer": null
+            }
+          ],
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Attempt started successfully",
+          "data": {
+            "attemptId": 209,
+            "examId": 117,
+            "examTitleEn": "QA26 Fixed Assigned Code",
+            "examTitleAr": "اختبار QA26 fixed-code",
+            "examDescriptionEn": "Dedicated lifecycle acceptance fixture",
+            "examDescriptionAr": "اختبار دورة حياة الاختبار",
+            "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+            "expiresAt": "2026-09-20T01:46:44.0321183+04:00",
+            "remainingSeconds": 35997,
+            "totalQuestions": 3,
+            "answeredQuestions": 0,
+            "status": 1,
+            "attemptNumber": 1,
+            "maxAttempts": 2,
+            "questions": [
+              {
+                "attemptQuestionId": 2085,
+                "questionId": 131,
+                "order": 1,
+                "points": 10,
+                "bodyEn": "QA26 Single: Which number is prime?",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Single",
+                "questionTypeId": 1,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 376,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 377,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 378,
+                    "textEn": "6",
+                    "textAr": "خيار 6",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [
+                  {
+                    "id": 11,
+                    "fileName": "qa26-reference.png",
+                    "filePath": "/media/questions/2026/09/88255dfd-3841-4e5b-b81b-fb315275534a.png",
+                    "fileType": "Image"
+                  }
+                ],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2086,
+                "questionId": 132,
+                "order": 2,
+                "points": 10,
+                "bodyEn": "QA26 Weighted Multi: Select prime numbers",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "MCQ_Multi",
+                "questionTypeId": 2,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 379,
+                    "textEn": "2",
+                    "textAr": "خيار 2",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 380,
+                    "textEn": "3",
+                    "textAr": "خيار 3",
+                    "order": 2,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 381,
+                    "textEn": "4",
+                    "textAr": "خيار 4",
+                    "order": 3,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              },
+              {
+                "attemptQuestionId": 2087,
+                "questionId": 134,
+                "order": 3,
+                "points": 10,
+                "bodyEn": "QA26 TrueFalse: 2 + 2 = 4",
+                "bodyAr": "اختبار QA26",
+                "questionTypeName": "TrueFalse",
+                "questionTypeId": 3,
+                "isCalculatorAllowed": false,
+                "options": [
+                  {
+                    "id": 385,
+                    "textEn": "True",
+                    "textAr": "خيار True",
+                    "order": 1,
+                    "attachmentPath": null
+                  },
+                  {
+                    "id": 386,
+                    "textEn": "False",
+                    "textAr": "خيار False",
+                    "order": 2,
+                    "attachmentPath": null
+                  }
+                ],
+                "attachments": [],
+                "currentAnswer": null
+              }
+            ],
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3308.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:46:48.013Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Attempt/209",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 209,
+          "examId": 117,
+          "examTitleEn": "QA26 Fixed Assigned Code",
+          "examTitleAr": "اختبار QA26 fixed-code",
+          "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+          "candidateName": "QA26 Engineering Candidate 3",
+          "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+          "submittedAt": null,
+          "expiresAt": "2026-09-20T01:46:44.0321183+04:00",
+          "status": 1,
+          "statusName": "Started",
+          "expiryReason": 0,
+          "expiryReasonName": "None",
+          "resumedFromAttemptId": null,
+          "attemptNumber": 1,
+          "totalScore": null,
+          "isPassed": null,
+          "totalQuestions": 3,
+          "answeredQuestions": 0,
+          "remainingSeconds": 35996,
+          "createdDate": "2026-09-19T15:46:44.0321183+04:00"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 209,
+            "examId": 117,
+            "examTitleEn": "QA26 Fixed Assigned Code",
+            "examTitleAr": "اختبار QA26 fixed-code",
+            "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+            "candidateName": "QA26 Engineering Candidate 3",
+            "startedAt": "2026-09-19T15:46:44.0321183+04:00",
+            "submittedAt": null,
+            "expiresAt": "2026-09-20T01:46:44.0321183+04:00",
+            "status": 1,
+            "statusName": "Started",
+            "expiryReason": 0,
+            "expiryReasonName": "None",
+            "resumedFromAttemptId": null,
+            "attemptNumber": 1,
+            "totalScore": null,
+            "isPassed": null,
+            "totalQuestions": 3,
+            "answeredQuestions": 0,
+            "remainingSeconds": 35996,
+            "createdDate": "2026-09-19T15:46:44.0321183+04:00"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1629.83
+      }
+    },
+    {
+      "at": "2026-09-19T11:46:50.360Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Attempt/cancel",
+      "request": {
+        "attemptId": 209,
+        "reason": "QA26 late fixed admission probe cleanup"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Attempt cancelled successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2345.95
+      }
+    }
+  ]
+}

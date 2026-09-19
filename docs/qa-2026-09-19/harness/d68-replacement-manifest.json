@@ -1,0 +1,45 @@
+{
+  "classification": "SYNTHETIC QA fixture correction: original ffmpeg mux incompatible with MSE block ordering; original artifacts retained. No physical capture claim.",
+  "attemptId": 368,
+  "examId": 143,
+  "originalEvidenceId": 702,
+  "originalSha256": "18280e28f169ab5e542b4dd8cc1e743f3cae918cd571c7c0f126db68c3485961",
+  "originalSizeBytes": 230170,
+  "sourceFile": "phase12-video-assets\\synthetic-vp8-opus-attempt-368-video-dts-minus7ms.webm",
+  "sha256": "1b4a27e475a7356f5f218237893709542543d137574c5a3b4ff0b480580f12d1",
+  "sizeBytes": 230169,
+  "archive": "phase12-video-assets\\before-d68-remux",
+  "startedAt": "2026-09-19T14:34:04.374Z",
+  "browserPlayback": "pending",
+  "originalBackwardBlocks": 39,
+  "correctedBackwardBlocks": 0,
+  "uploadRequestedAt": "2026-09-19T14:34:10.144Z",
+  "finalizeRequestedAt": "2026-09-19T14:34:13.431Z",
+  "recording": {
+    "evidenceId": 703,
+    "attemptId": 368,
+    "videoUrl": null,
+    "chunksUrl": "/api/Proctor/video-chunks/368",
+    "contentType": "video/webm",
+    "fileSize": 230169,
+    "duration": 1480,
+    "startAt": "2026-09-19T18:09:33.6056203+04:00",
+    "endAt": "2026-09-19T18:34:14.605486+04:00",
+    "expiresAt": "2026-10-19T18:34:14.8384294+04:00",
+    "retentionDays": 0,
+    "retentionMessage": null,
+    "candidateName": "44799c41-8cfd-4ab8-a90b-13632121949a",
+    "examTitle": "QA26 Final Browser Lifecycle",
+    "events": [
+      {
+        "id": 4107,
+        "eventType": "ProctorWarning",
+        "severity": 3,
+        "occurredAt": "2026-09-19T18:13:20.8737806+04:00",
+        "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 final lifecycle: please acknowledge this proctor check and continue your exam.\"}"
+      }
+    ],
+    "screenshots": []
+  },
+  "completedAt": "2026-09-19T14:34:20.377Z"
+}

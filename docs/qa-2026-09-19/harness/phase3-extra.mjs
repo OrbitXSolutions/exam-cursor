@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { Client,Evidence,adminClient,here,must,privateConfig } from './client.mjs';
+const e=new Evidence('phase3-extra-evidence'),admin=await adminClient(e);
+const m=JSON.parse(fs.readFileSync(path.join(here,'data-manifest.json'),'utf8'));
+const file=path.join(here,'exam-manifest.json'),em=JSON.parse(fs.readFileSync(file,'utf8'));
+const c=new Client({evidence:e});await c.login(m.users.find(x=>x.key==='eng'&&x.role==='Admin').email,privateConfig().password);
+for(const key of ['lifecycle','fixed-code','strict','load']){
+ const x=em.exams.find(x=>x.key===key),p=must(await c.get(`/api/ExamProctor/${x.id}`),'Read actual assignments');
+ e.check(`${key} Engineering proctor assignment persisted (publish auto-assignment explains previous skip)`,p.assignedProctors.some(p=>p.id===x.proctorId),{assignedCount:p.assignedProctors.length});
+}
+const walk=em.exams.find(x=>x.key==='walkin');walk.walkInFields=[];
+for(const f of [{labelEn:'QA26 Organization',labelAr:'جهة العمل QA26',fieldType:1,isRequired:true,displayOrder:1},{labelEn:'QA26 Experience Years',labelAr:'سنوات الخبرة QA26',fieldType:2,isRequired:false,displayOrder:2}])walk.walkInFields.push(must(await c.post(`/api/Assessment/exams/${walk.id}/walkin-fields`,f),'Create dynamic field'));
+const publicInfo=await new Client({evidence:e}).get(`/api/public/exam/${walk.share.shareToken}`);
+e.check('Public walk-in share exposes both configured field types',publicInfo.ok&&publicInfo.data.walkInFields.length===2&&publicInfo.data.walkInFields.some(x=>x.fieldType===2),publicInfo.body);
+const fixed=em.exams.find(x=>x.key==='fixed-code'),ids=fixed.assignedCandidateIds;
+const unassign=await c.post('/api/Assignments/unassign',{examId:fixed.id,candidateIds:[ids[2]]});
+e.check('Candidate can be unassigned before exam start',unassign.ok&&unassign.data.successCount===1,unassign.body);
+const reassigned=await c.post('/api/Assignments/assign',{examId:fixed.id,scheduleFrom:fixed.request.startAt,scheduleTo:fixed.request.endAt,candidateIds:[ids[2]]});
+e.check('Candidate reassignment before start succeeds',reassigned.ok&&reassigned.data.successCount===1,reassigned.body);
+const clone=em.exams.find(x=>x.key==='clone-draft');
+const draftAssignment=await c.post('/api/Assignments/assign',{examId:clone.id,scheduleFrom:fixed.request.startAt,scheduleTo:fixed.request.endAt,candidateIds:[ids[2]]});
+e.check('Draft exam assignment rejected',!draftAssignment.ok,draftAssignment.body);
+const auto=em.exams.find(x=>x.key==='auto');
+must(await c.post(`/api/Assessment/exams/${auto.id}/unpublish`),'Unpublish objective');
+e.check('Unpublish persists draft visibility',must(await c.get(`/api/Assessment/exams/${auto.id}`),'Read unpublished').isPublished===false);
+must(await c.post(`/api/Assessment/exams/${auto.id}/publish`),'Republish objective');
+e.check('Republish restores published visibility',must(await c.get(`/api/Assessment/exams/${auto.id}`),'Read republished').isPublished===true);
+fs.writeFileSync(file,JSON.stringify(em,null,2));
+console.log(JSON.stringify({checks:e.checks.length,failures:e.checks.filter(x=>!x.passed).map(x=>x.name)},null,2));

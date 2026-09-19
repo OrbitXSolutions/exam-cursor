@@ -1,0 +1,16 @@
+{
+  "examId": 128,
+  "attemptId": 197,
+  "sessionId": 149,
+  "secondAttemptId": 198,
+  "secondSessionId": 150,
+  "exports": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "caseId": 10,
+  "commentId": 1,
+  "cancelledExport": 5
+}

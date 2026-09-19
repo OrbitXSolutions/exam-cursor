@@ -1,0 +1,263 @@
+{
+  "classification": "Actual host process measurements during simulated HTTP/SignalR workload; frontend development server is not50 rendered browsers",
+  "host": {
+    "totalMemoryMb": 32384.11,
+    "freeMemoryMb": 9834.07,
+    "utc": "2026-09-19T13:27:39.1840736Z",
+    "classification": "ACTUAL HOST PROCESS MEASUREMENT; workload phase is established separately from its execution manifest",
+    "kind": "host",
+    "logicalProcessors": 32
+  },
+  "sampleStart": "2026-09-19T13:27:39.6984183Z",
+  "sampleEnd": "2026-09-19T13:36:48.0708229Z",
+  "workload": {
+    "start": "2026-09-19T13:28:08.020Z",
+    "barrier": "2026-09-19T13:29:49.493Z",
+    "end": "2026-09-19T13:33:40.479Z",
+    "requestedCount": 50,
+    "attemptsCreated": 50,
+    "reachedFullActiveBarrier": true,
+    "errors": []
+  },
+  "all": {
+    "api": {
+      "samples": 71,
+      "pids": [
+        25228
+      ],
+      "workingSetMb": {
+        "first": 206.85,
+        "last": 349.14,
+        "max": 389.45
+      },
+      "privateMemoryMb": {
+        "first": 109.7,
+        "last": 211.39,
+        "max": 258.61
+      },
+      "hostCpuPercent": {
+        "p50": 0.088,
+        "p95": 0.524,
+        "max": 1.766
+      },
+      "threadsMax": 99,
+      "handlesMax": 2119
+    },
+    "next": {
+      "samples": 71,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1725.16,
+        "last": 1745.13,
+        "max": 1745.13
+      },
+      "privateMemoryMb": {
+        "first": 4261.73,
+        "last": 4276.49,
+        "max": 4276.49
+      },
+      "hostCpuPercent": {
+        "p50": 0.006,
+        "p95": 0.046,
+        "max": 0.224
+      },
+      "threadsMax": 47,
+      "handlesMax": 546
+    }
+  },
+  "beforeRun": {
+    "api": {
+      "samples": 5,
+      "pids": [
+        25228
+      ],
+      "workingSetMb": {
+        "first": 206.85,
+        "last": 205.55,
+        "max": 206.85
+      },
+      "privateMemoryMb": {
+        "first": 109.7,
+        "last": 107.2,
+        "max": 109.7
+      },
+      "hostCpuPercent": {
+        "p50": 0.031,
+        "p95": 0.122,
+        "max": 0.122
+      },
+      "threadsMax": 55,
+      "handlesMax": 796
+    },
+    "next": {
+      "samples": 5,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1725.16,
+        "last": 1726.74,
+        "max": 1726.74
+      },
+      "privateMemoryMb": {
+        "first": 4261.73,
+        "last": 4261.73,
+        "max": 4261.73
+      },
+      "hostCpuPercent": {
+        "p50": 0.023,
+        "p95": 0.046,
+        "max": 0.046
+      },
+      "threadsMax": 47,
+      "handlesMax": 544
+    }
+  },
+  "duringRun": {
+    "api": {
+      "samples": 40,
+      "pids": [
+        25228
+      ],
+      "workingSetMb": {
+        "first": 223.72,
+        "last": 349.99,
+        "max": 389.45
+      },
+      "privateMemoryMb": {
+        "first": 116.04,
+        "last": 213.02,
+        "max": 258.61
+      },
+      "hostCpuPercent": {
+        "p50": 0.17,
+        "p95": 0.696,
+        "max": 1.766
+      },
+      "threadsMax": 99,
+      "handlesMax": 2119
+    },
+    "next": {
+      "samples": 39,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1726.74,
+        "last": 1744.22,
+        "max": 1744.24
+      },
+      "privateMemoryMb": {
+        "first": 4261.73,
+        "last": 4275.6,
+        "max": 4275.72
+      },
+      "hostCpuPercent": {
+        "p50": 0.006,
+        "p95": 0.169,
+        "max": 0.224
+      },
+      "threadsMax": 47,
+      "handlesMax": 546
+    }
+  },
+  "fromFullActiveBarrier": {
+    "api": {
+      "samples": 25,
+      "pids": [
+        25228
+      ],
+      "workingSetMb": {
+        "first": 319.73,
+        "last": 349.99,
+        "max": 389.45
+      },
+      "privateMemoryMb": {
+        "first": 189.64,
+        "last": 213.02,
+        "max": 258.61
+      },
+      "hostCpuPercent": {
+        "p50": 0.154,
+        "p95": 0.399,
+        "max": 0.417
+      },
+      "threadsMax": 99,
+      "handlesMax": 2119
+    },
+    "next": {
+      "samples": 24,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1730.29,
+        "last": 1744.22,
+        "max": 1744.24
+      },
+      "privateMemoryMb": {
+        "first": 4263.16,
+        "last": 4275.6,
+        "max": 4275.72
+      },
+      "hostCpuPercent": {
+        "p50": 0.01,
+        "p95": 0.084,
+        "max": 0.224
+      },
+      "threadsMax": 47,
+      "handlesMax": 546
+    }
+  },
+  "afterRun": {
+    "api": {
+      "samples": 26,
+      "pids": [
+        25228
+      ],
+      "workingSetMb": {
+        "first": 350.06,
+        "last": 349.14,
+        "max": 350.07
+      },
+      "privateMemoryMb": {
+        "first": 213.04,
+        "last": 211.39,
+        "max": 213.04
+      },
+      "hostCpuPercent": {
+        "p50": 0.015,
+        "p95": 0.032,
+        "max": 0.036
+      },
+      "threadsMax": 76,
+      "handlesMax": 1667
+    },
+    "next": {
+      "samples": 27,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1744.22,
+        "last": 1745.13,
+        "max": 1745.13
+      },
+      "privateMemoryMb": {
+        "first": 4275.6,
+        "last": 4276.49,
+        "max": 4276.49
+      },
+      "hostCpuPercent": {
+        "p50": 0,
+        "p95": 0.015,
+        "max": 0.024
+      },
+      "threadsMax": 47,
+      "handlesMax": 544
+    }
+  },
+  "measurementErrors": []
+}

@@ -1,0 +1,60 @@
+{
+  "eng": {
+    "phoneNumber": null,
+    "phoneNumberConfirmed": false,
+    "updatedDate": "2026-09-19T15:16:40.9713105+04:00",
+    "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+    "updatedBy": null,
+    "id": "1de7628d-f5e0-4f92-8881-759821a9d659",
+    "email": "qa26.d12.before.eng@example.test",
+    "displayName": "QA26 D12 before eng",
+    "fullName": "QA26 D12 before eng",
+    "fullNameAr": "اختبار حدود الدفعة",
+    "isBlocked": false,
+    "status": "Active",
+    "emailConfirmed": true,
+    "roles": [
+      "Candidate"
+    ],
+    "createdDate": "2026-09-19T15:16:39.5693982+04:00",
+    "lastLoginDate": null,
+    "departmentId": 8,
+    "departmentNameEn": "QA26 Engineering",
+    "departmentNameAr": "اختبار QA26 الهندسة",
+    "isProtected": false
+  },
+  "ops": {
+    "phoneNumber": null,
+    "phoneNumberConfirmed": false,
+    "updatedDate": "2026-09-19T15:16:45.4497166+04:00",
+    "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+    "updatedBy": null,
+    "id": "2fc2bb7a-9364-4969-946f-d734d8960cec",
+    "email": "qa26.d12.before.ops@example.test",
+    "displayName": "QA26 D12 before ops",
+    "fullName": "QA26 D12 before ops",
+    "fullNameAr": "اختبار حدود الدفعة",
+    "isBlocked": false,
+    "status": "Active",
+    "emailConfirmed": true,
+    "roles": [
+      "Candidate"
+    ],
+    "createdDate": "2026-09-19T15:16:44.0558362+04:00",
+    "lastLoginDate": null,
+    "departmentId": 9,
+    "departmentNameEn": "QA26 Operations",
+    "departmentNameAr": "اختبار QA26 العمليات",
+    "isProtected": false
+  },
+  "batch": {
+    "id": 10,
+    "name": "QA26 D12 before Cohort",
+    "description": "Disposable isolation fixture",
+    "isActive": true,
+    "candidateCount": 0,
+    "createdDate": "2026-09-19T15:16:47.0902129+04:00",
+    "createdBy": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+    "createdByName": null
+  }
+}

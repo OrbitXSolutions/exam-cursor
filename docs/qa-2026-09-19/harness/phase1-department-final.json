@@ -1,0 +1,286 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:49:52.346Z",
+  "checks": [
+    {
+      "name": "Update nonexistent department rejected without server error",
+      "passed": false,
+      "detail": {
+        "success": false,
+        "message": "An internal server error occurred. Please try again later.",
+        "data": null,
+        "errors": [],
+        "traceId": "e4eba2eb096c2c4101fb99b0484bb0d2"
+      },
+      "at": "2026-09-19T10:49:55.398Z"
+    },
+    {
+      "name": "Invalid update preserves department",
+      "passed": true,
+      "at": "2026-09-19T10:49:56.550Z"
+    },
+    {
+      "name": "Deleted department detail unavailable",
+      "passed": true,
+      "at": "2026-09-19T10:49:58.387Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:49:53.563Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:49:53.5598632+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:49:52.8803784+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:49:53.5598632+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:49:52.8803784+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1215.43
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:55.397Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "PUT",
+      "route": "/api/Users/8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+      "request": {
+        "departmentId": 2147483000
+      },
+      "response": {
+        "status": 500,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "An internal server error occurred. Please try again later.",
+          "data": null,
+          "errors": [],
+          "traceId": "e4eba2eb096c2c4101fb99b0484bb0d2"
+        },
+        "ms": 1833.18
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:56.549Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": "+971501234567",
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:49:18.269467+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+          "email": "qa26.eng.candidate1@example.test",
+          "displayName": "QA26 Engineering Candidate 1",
+          "fullName": "QA26 Updated Candidate",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+          "lastLoginDate": "2026-09-19T14:48:58.2084966+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": "+971501234567",
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:49:18.269467+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "8896951a-8184-4fb6-a2ad-bd99cfdb2570",
+            "email": "qa26.eng.candidate1@example.test",
+            "displayName": "QA26 Engineering Candidate 1",
+            "fullName": "QA26 Updated Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:46:37.1111322+04:00",
+            "lastLoginDate": "2026-09-19T14:48:58.2084966+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1150.24
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:57.467Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments",
+      "request": {
+        "nameEn": "QA26 Delete Department Fixture",
+        "nameAr": "اختبار حذف القسم QA26",
+        "code": "QA26_DELETE",
+        "isActive": true
+      },
+      "response": {
+        "status": 201,
+        "ok": true,
+        "data": {
+          "id": 10,
+          "nameEn": "QA26 Delete Department Fixture",
+          "nameAr": "اختبار حذف القسم QA26",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "code": "QA26_DELETE",
+          "isActive": true,
+          "userCount": 0,
+          "createdDate": "2026-09-19T14:49:57.2376483+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Department created successfully.",
+          "data": {
+            "id": 10,
+            "nameEn": "QA26 Delete Department Fixture",
+            "nameAr": "اختبار حذف القسم QA26",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "code": "QA26_DELETE",
+            "isActive": true,
+            "userCount": 0,
+            "createdDate": "2026-09-19T14:49:57.2376483+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 915.77
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:58.156Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Departments/10",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Department deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 688.7
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:58.386Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Departments/10",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Department not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "0e81e74106ac7545312cdf806fccc9ca"
+        },
+        "ms": 229.1
+      }
+    },
+    {
+      "at": "2026-09-19T10:49:58.616Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.inactive.department%40example.test",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "deef8212971d54b111c6966851ea96f6"
+        },
+        "ms": 228.82
+      }
+    }
+  ]
+}

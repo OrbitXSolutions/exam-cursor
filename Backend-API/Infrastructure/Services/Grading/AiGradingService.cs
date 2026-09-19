@@ -11,6 +11,7 @@ using Smart_Core.Application.Interfaces.Grading;
 using Smart_Core.Application.Settings;
 using Smart_Core.Domain.Entities.Grading;
 using Smart_Core.Infrastructure.Data;
+using Smart_Core.Infrastructure.Services.Authorization;
 
 namespace Smart_Core.Infrastructure.Services.Grading;
 
@@ -25,6 +26,7 @@ public class AiGradingService : IAiGradingService
     private readonly OpenAISettings _openAiSettings;
     private readonly ILogger<AiGradingService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ResourceAuthorizationService _authorization;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -36,18 +38,25 @@ public class AiGradingService : IAiGradingService
         ApplicationDbContext context,
         IOptions<OpenAISettings> openAiSettings,
         ILogger<AiGradingService> logger,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        ResourceAuthorizationService authorization)
     {
         _context = context;
         _openAiSettings = openAiSettings.Value;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _authorization = authorization;
     }
 
     public async Task<ApiResponse<AiGradeSuggestResponseDto>> GetAiGradeSuggestionAsync(AiGradeSuggestRequestDto request)
     {
         try
         {
+            var attemptId = await _context.Set<GradingSession>()
+                .Where(s => s.Id == request.GradingSessionId).Select(s => (int?)s.AttemptId).FirstOrDefaultAsync();
+            if (!attemptId.HasValue || !await _authorization.CanAccessAttemptAsync(attemptId.Value))
+                return ApiResponse<AiGradeSuggestResponseDto>.FailureResponse("Grading session not found");
+
             // 1. Load grading session with all needed data
             var session = await _context.Set<GradingSession>()
                 .Include(gs => gs.Attempt)

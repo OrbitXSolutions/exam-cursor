@@ -1,0 +1,252 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:43:08.929Z",
+  "checks": [
+    {
+      "name": "D27 public selection rejects privileged non-Candidate user and mints no token",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "claims": null,
+        "privilegedReadStatus": null
+      },
+      "at": "2026-09-19T11:43:12.324Z"
+    },
+    {
+      "name": "QA target persisted role and department remain unchanged",
+      "passed": true,
+      "detail": {
+        "beforeRoles": [
+          "Admin"
+        ],
+        "afterRoles": [
+          "Admin"
+        ]
+      },
+      "at": "2026-09-19T11:43:13.715Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:43:10.192Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:43:10.1869438+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:43:09.4911696+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:43:10.1869438+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:43:09.4911696+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1261.18
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:11.609Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/6b29defc-204d-4a72-91d5-a95013b46a67",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+          "email": "qa26.ops.admin1@example.test",
+          "displayName": "QA26 Operations Admin 1",
+          "fullName": "QA26 Operations Admin 1",
+          "fullNameAr": "اختبار العمليات 1",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T14:47:00.110969+04:00",
+          "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1415.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:12.323Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/public/exam/SMbD_VeowkwqoipeIBplvizF3x73iSxP0WA_GfBHayNzPROq5rXLUqhcg_ENZMo_/select-candidate",
+      "request": {
+        "candidateId": "6b29defc-204d-4a72-91d5-a95013b46a67"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "This account requires authenticated sign-in",
+          "data": null,
+          "errors": [],
+          "traceId": "a837a3ae4561cd26c54e0952a6dac1e3"
+        },
+        "ms": 713.02
+      }
+    },
+    {
+      "at": "2026-09-19T11:43:13.714Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/6b29defc-204d-4a72-91d5-a95013b46a67",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+          "email": "qa26.ops.admin1@example.test",
+          "displayName": "QA26 Operations Admin 1",
+          "fullName": "QA26 Operations Admin 1",
+          "fullNameAr": "اختبار العمليات 1",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T14:47:00.110969+04:00",
+          "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+          "departmentId": 9,
+          "departmentNameEn": "QA26 Operations",
+          "departmentNameAr": "اختبار QA26 العمليات",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T15:34:17.8943386+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T15:31:56.3822818+04:00",
+            "departmentId": 9,
+            "departmentNameEn": "QA26 Operations",
+            "departmentNameAr": "اختبار QA26 العمليات",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1388.89
+      }
+    }
+  ]
+}

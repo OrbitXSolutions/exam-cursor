@@ -35,6 +35,7 @@ import { toast } from "sonner"
 import { Plus, Search, MoreHorizontal, Edit, Trash2, Building2, Loader2, Power, PowerOff, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   getDepartments,
+  getDepartmentById,
   createDepartment,
   updateDepartment,
   deleteDepartment,
@@ -118,18 +119,24 @@ function DepartmentsContent() {
     setDialogOpen(true)
   }
 
-  const handleEdit = (department: DepartmentListItem) => {
-    setDialogMode("edit")
-    setEditingDepartment(department)
-    setFormData({
-      nameEn: department.nameEn,
-      nameAr: department.nameAr,
-      descriptionEn: "",
-      descriptionAr: "",
-      code: department.code || "",
-      isActive: department.isActive,
-    })
-    setDialogOpen(true)
+  const handleEdit = async (department: DepartmentListItem) => {
+    try {
+      // The list response omits descriptions; load the complete record before editing.
+      const details = await getDepartmentById(department.id)
+      setDialogMode("edit")
+      setEditingDepartment(department)
+      setFormData({
+        nameEn: details.nameEn,
+        nameAr: details.nameAr,
+        descriptionEn: details.descriptionEn || "",
+        descriptionAr: details.descriptionAr || "",
+        code: details.code || "",
+        isActive: details.isActive,
+      })
+      setDialogOpen(true)
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, language === "ar" ? "فشل تحميل القسم" : "Failed to load department"))
+    }
   }
 
   const handleSave = async () => {

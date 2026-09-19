@@ -1,0 +1,115 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T10:46:03.489Z",
+  "checks": [],
+  "events": [
+    {
+      "at": "2026-09-19T10:46:04.758Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:46:04.7545282+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:46:04.0464904+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:46:04.7545282+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:46:04.0464904+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1266.93
+      }
+    },
+    {
+      "at": "2026-09-19T10:46:05.228Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Departments/7",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 7,
+          "nameEn": "QA26 Browser Lab Renamed",
+          "nameAr": "مختبر اختبار المتصفح",
+          "descriptionEn": null,
+          "descriptionAr": null,
+          "code": "QA26UI",
+          "isActive": true,
+          "userCount": 0,
+          "createdDate": "2026-09-19T14:44:46.287077+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 7,
+            "nameEn": "QA26 Browser Lab Renamed",
+            "nameAr": "مختبر اختبار المتصفح",
+            "descriptionEn": null,
+            "descriptionAr": null,
+            "code": "QA26UI",
+            "isActive": true,
+            "userCount": 0,
+            "createdDate": "2026-09-19T14:44:46.287077+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 469.5
+      }
+    }
+  ]
+}

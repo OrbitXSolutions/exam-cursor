@@ -1,5 +1,7 @@
 "use client"
 
+import { EvidenceLink } from "@/components/proctor/evidence-image"
+
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
@@ -532,15 +534,13 @@ export default function IncidentDetailPage() {
                           )}
                         </div>
                         {evidence.previewUrl && (
-                          <a
-                            href={evidence.previewUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <EvidenceLink
+                            src={evidence.previewUrl}
                             className="text-primary hover:underline text-sm flex items-center gap-1"
                           >
                             <Eye className="h-3 w-3" />
                             {t("proctor.viewEvidence")}
-                          </a>
+                          </EvidenceLink>
                         )}
                       </div>
                       {evidence.linkedAt && (

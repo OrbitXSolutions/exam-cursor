@@ -1,0 +1,66 @@
+{
+  "classification": "Actual host process baseline while awaiting the prepared workload;50-candidate workload did not start",
+  "host": {
+    "utc": "2026-09-19T13:05:47.0450704Z",
+    "logicalProcessors": 32,
+    "kind": "host",
+    "freeMemoryMb": 9737.32,
+    "totalMemoryMb": 32384.11,
+    "classification": "ACTUAL HOST RESOURCE MEASUREMENT during separately identified simulated API/SignalR load"
+  },
+  "sampleStart": "2026-09-19T13:05:47.5735266Z",
+  "sampleEnd": "2026-09-19T13:09:56.1505687Z",
+  "workload": {},
+  "all": {
+    "api": {
+      "samples": 41,
+      "pids": [
+        44596
+      ],
+      "workingSetMb": {
+        "first": 236.08,
+        "last": 236.13,
+        "max": 236.2
+      },
+      "privateMemoryMb": {
+        "first": 122.12,
+        "last": 122.43,
+        "max": 122.56
+      },
+      "hostCpuPercent": {
+        "p50": 0.008,
+        "p95": 0.024,
+        "max": 0.031
+      },
+      "threadsMax": 50,
+      "handlesMax": 1067
+    },
+    "next": {
+      "samples": 41,
+      "pids": [
+        36296
+      ],
+      "workingSetMb": {
+        "first": 1850.45,
+        "last": 1753.98,
+        "max": 1850.5
+      },
+      "privateMemoryMb": {
+        "first": 4161.39,
+        "last": 4161.39,
+        "max": 4161.39
+      },
+      "hostCpuPercent": {
+        "p50": 0,
+        "p95": 0.008,
+        "max": 0.024
+      },
+      "threadsMax": 47,
+      "handlesMax": 532
+    }
+  },
+  "beforeRun": null,
+  "fromFullActiveBarrier": null,
+  "afterRun": null,
+  "measurementErrors": []
+}

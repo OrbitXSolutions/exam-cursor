@@ -1,0 +1,679 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T11:09:34.375Z",
+  "checks": [
+    {
+      "name": "D08 disposable question 142 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:38.836Z"
+    },
+    {
+      "name": "D08 disposable question 143 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:42.414Z"
+    },
+    {
+      "name": "D08 disposable question 144 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:45.948Z"
+    },
+    {
+      "name": "D08 disposable question 145 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:49.479Z"
+    },
+    {
+      "name": "D08 disposable question 146 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:52.990Z"
+    },
+    {
+      "name": "D08 disposable question 147 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:09:56.506Z"
+    },
+    {
+      "name": "D08 disposable question 148 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:00.029Z"
+    },
+    {
+      "name": "D08 disposable question 149 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:03.564Z"
+    },
+    {
+      "name": "D08 disposable question 150 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:07.074Z"
+    },
+    {
+      "name": "D08 disposable question 151 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:10.587Z"
+    },
+    {
+      "name": "D08 disposable question 152 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:14.098Z"
+    },
+    {
+      "name": "D08 disposable question 153 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:17.613Z"
+    },
+    {
+      "name": "D08 disposable question 154 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:21.127Z"
+    },
+    {
+      "name": "D08 disposable question 155 deleted from active pool",
+      "passed": true,
+      "at": "2026-09-19T11:10:24.643Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T11:09:35.650Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T16:09:35.6451061+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T15:09:34.9403281+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T16:09:35.6451061+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T15:09:34.9403281+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1272.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:38.335Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/142",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2684.28
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:38.835Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/142",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "0a9f2c63a015d4efc542b18b75777a5d"
+        },
+        "ms": 499.84
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:41.936Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/143",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3098.49
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:42.413Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/143",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "515020c0698071829d938b9b0868dcd1"
+        },
+        "ms": 476.75
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:45.475Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/144",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3060.68
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:45.947Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/144",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "6474c447fb1c31690b9d4f8db7eaa7a7"
+        },
+        "ms": 471.42
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:49.008Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/145",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3059.16
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:49.479Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/145",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "3ffff6b6b44509c1d070ceadda148c20"
+        },
+        "ms": 470.44
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:52.517Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/146",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3037.06
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:52.989Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/146",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "dad8d983ecd05eed076ef049d7f9b79f"
+        },
+        "ms": 471.59
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:56.035Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/147",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3044.92
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:56.506Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/147",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e2909f6104715b0ee8c1122f981bedc6"
+        },
+        "ms": 469.9
+      }
+    },
+    {
+      "at": "2026-09-19T11:09:59.557Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/148",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3049.95
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:00.028Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/148",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "a60733fe8cc6a25e6218a3766dde7580"
+        },
+        "ms": 470.43
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:03.088Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/149",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3058.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:03.563Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/149",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e05a1adb9ec96dfae2a143fab1b0eb21"
+        },
+        "ms": 474.24
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:06.604Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/150",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3040.17
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:07.073Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/150",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "2ec6719aa06c88046c1c0ee95ac3bbf8"
+        },
+        "ms": 468.64
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:10.117Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/151",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3042.78
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:10.586Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/151",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "02689ae978719792e0799d83e4ee5ed5"
+        },
+        "ms": 468.63
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:13.626Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/152",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3038.58
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:14.097Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/152",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "f4fba0b3bac79c50b3151edcd47a1543"
+        },
+        "ms": 470.47
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:17.141Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/153",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3042.33
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:17.612Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/153",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "ae38ffebf988ed8a5ed553b3fddd0575"
+        },
+        "ms": 469.73
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:20.655Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/154",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3041.94
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:21.126Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/154",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "e7e9dd6e571a1bdc9a5ee981d7d5ff19"
+        },
+        "ms": 470.05
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:24.171Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/QuestionBank/questions/155",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "Question deleted successfully",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3043.39
+      }
+    },
+    {
+      "at": "2026-09-19T11:10:24.642Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/QuestionBank/questions/155",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Question not found",
+          "data": null,
+          "errors": [],
+          "traceId": "79cc11e0da1c5d66cdcbf8ec945592cf"
+        },
+        "ms": 470.64
+      }
+    }
+  ]
+}

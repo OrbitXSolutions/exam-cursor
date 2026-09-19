@@ -1,0 +1,3284 @@
+{
+  "classification": "SIMULATED TEST: actual API lifecycle requests and persisted account state",
+  "checks": [
+    {
+      "name": "Candidate active baseline /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:33.948Z"
+    },
+    {
+      "name": "Candidate active baseline /api/Candidate/dashboard",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:35.355Z"
+    },
+    {
+      "name": "Candidate active baseline /api/user-notifications",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:35.843Z"
+    },
+    {
+      "name": "Candidate block fresh login denied",
+      "passed": true,
+      "at": "2026-09-19T10:52:38.432Z"
+    },
+    {
+      "name": "Candidate block old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:38.671Z"
+    },
+    {
+      "name": "Candidate block old JWT denied /api/Candidate/dashboard",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:40.119Z"
+    },
+    {
+      "name": "Candidate block old JWT denied /api/user-notifications",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:40.620Z"
+    },
+    {
+      "name": "Candidate block old JWT hub negotiation denied",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:40.623Z"
+    },
+    {
+      "name": "Candidate restored access /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:43.796Z"
+    },
+    {
+      "name": "Candidate restored access /api/Candidate/dashboard",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:45.208Z"
+    },
+    {
+      "name": "Candidate restored access /api/user-notifications",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:45.686Z"
+    },
+    {
+      "name": "Candidate deactivate fresh login denied",
+      "passed": true,
+      "at": "2026-09-19T10:52:47.549Z"
+    },
+    {
+      "name": "Candidate deactivate old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:47.800Z"
+    },
+    {
+      "name": "Candidate deactivate old JWT denied /api/Candidate/dashboard",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:49.240Z"
+    },
+    {
+      "name": "Candidate deactivate old JWT denied /api/user-notifications",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:49.709Z"
+    },
+    {
+      "name": "Candidate deactivate old JWT hub negotiation denied",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:49.712Z"
+    },
+    {
+      "name": "Candidate restored access /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:53.059Z"
+    },
+    {
+      "name": "Candidate restored access /api/Candidate/dashboard",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:54.523Z"
+    },
+    {
+      "name": "Candidate restored access /api/user-notifications",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:55.017Z"
+    },
+    {
+      "name": "Candidate deleted old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 404
+      },
+      "at": "2026-09-19T10:52:56.931Z"
+    },
+    {
+      "name": "Candidate deleted old JWT denied /api/Candidate/dashboard",
+      "passed": false,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T10:52:57.166Z"
+    },
+    {
+      "name": "Candidate deleted old JWT denied /api/user-notifications",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:52:57.637Z"
+    },
+    {
+      "name": "Admin active baseline /api/Notification/templates",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:03.156Z"
+    },
+    {
+      "name": "Admin active baseline /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:03.394Z"
+    },
+    {
+      "name": "Admin block fresh login denied",
+      "passed": true,
+      "at": "2026-09-19T10:53:05.981Z"
+    },
+    {
+      "name": "Admin block old JWT denied /api/Notification/templates",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:06.215Z"
+    },
+    {
+      "name": "Admin block old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:06.455Z"
+    },
+    {
+      "name": "Admin block old JWT hub negotiation denied",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:06.459Z"
+    },
+    {
+      "name": "Admin restored access /api/Notification/templates",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:09.579Z"
+    },
+    {
+      "name": "Admin restored access /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:09.818Z"
+    },
+    {
+      "name": "Admin deactivate fresh login denied",
+      "passed": true,
+      "at": "2026-09-19T10:53:11.695Z"
+    },
+    {
+      "name": "Admin deactivate old JWT denied /api/Notification/templates",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:11.935Z"
+    },
+    {
+      "name": "Admin deactivate old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:12.168Z"
+    },
+    {
+      "name": "Admin deactivate old JWT hub negotiation denied",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:12.172Z"
+    },
+    {
+      "name": "Admin restored access /api/Notification/templates",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:15.204Z"
+    },
+    {
+      "name": "Admin restored access /api/Departments/my-department",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:15.445Z"
+    },
+    {
+      "name": "Admin deleted old JWT denied /api/Notification/templates",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T10:53:17.315Z"
+    },
+    {
+      "name": "Admin deleted old JWT denied /api/Departments/my-department",
+      "passed": false,
+      "detail": {
+        "status": 404
+      },
+      "at": "2026-09-19T10:53:17.564Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T10:52:28.288Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:52:28.2834447+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T14:52:27.600526+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:52:28.2834447+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T14:52:27.600526+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1413.65
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:32.480Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 Token Revocation Candidate",
+        "role": "Candidate",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:52:31.3159985+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "displayName": "QA26 Token Revocation Candidate",
+          "fullName": "QA26 Token Revocation Candidate",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:52:31.3159985+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "displayName": "QA26 Token Revocation Candidate",
+            "fullName": "QA26 Token Revocation Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4013.98
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:33.712Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:52:33.7113606+04:00",
+          "user": {
+            "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "displayName": "QA26 Token Revocation Candidate",
+            "fullName": "QA26 Token Revocation Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+            "lastLoginDate": "2026-09-19T14:52:33.0069066+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:52:33.7113606+04:00",
+            "user": {
+              "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+              "email": "qa26.token.candidate.1789815148466@example.test",
+              "displayName": "QA26 Token Revocation Candidate",
+              "fullName": "QA26 Token Revocation Candidate",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+              "lastLoginDate": "2026-09-19T14:52:33.0069066+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1230.47
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:33.947Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "fullName": "QA26 Token Revocation Candidate",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "fullName": "QA26 Token Revocation Candidate",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 234.09
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:35.353Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "candidateName": "QA26 Token Revocation Candidate",
+          "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+          "currentDateUtc": "2026-09-19T14:52:33.9510226+04:00",
+          "stats": {
+            "totalExamsAvailable": 54,
+            "totalExamsAvailableChangePercent": 0,
+            "totalAttempts": 0,
+            "totalAttemptsChangePercent": 0,
+            "passRate": 0,
+            "pendingGrading": 0
+          },
+          "examsByStatus": {
+            "upcomingCount": 0,
+            "activeCount": 0,
+            "completedCount": 0
+          },
+          "quickActions": [],
+          "upcomingExams": [
+            {
+              "examId": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات",
+              "examType": 0,
+              "startAt": "2026-03-06T23:51:00+00:00",
+              "endAt": "2026-03-07T23:51:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3",
+              "examType": 0,
+              "startAt": "2026-03-08T03:47:00+00:00",
+              "endAt": "2026-03-10T03:47:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2",
+              "examType": 0,
+              "startAt": "2026-03-08T15:04:00+00:00",
+              "endAt": "2026-04-06T15:04:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار",
+              "examType": 0,
+              "startAt": "2026-03-09T06:36:00+00:00",
+              "endAt": "2026-03-11T06:36:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6",
+              "examType": 0,
+              "startAt": "2026-03-09T07:09:00+00:00",
+              "endAt": "2026-03-11T07:09:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            }
+          ],
+          "recentActivity": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "candidateName": "QA26 Token Revocation Candidate",
+            "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+            "currentDateUtc": "2026-09-19T14:52:33.9510226+04:00",
+            "stats": {
+              "totalExamsAvailable": 54,
+              "totalExamsAvailableChangePercent": 0,
+              "totalAttempts": 0,
+              "totalAttemptsChangePercent": 0,
+              "passRate": 0,
+              "pendingGrading": 0
+            },
+            "examsByStatus": {
+              "upcomingCount": 0,
+              "activeCount": 0,
+              "completedCount": 0
+            },
+            "quickActions": [],
+            "upcomingExams": [
+              {
+                "examId": 39,
+                "titleEn": "Networking Basics",
+                "titleAr": "اساسيات الشبكات",
+                "examType": 0,
+                "startAt": "2026-03-06T23:51:00+00:00",
+                "endAt": "2026-03-07T23:51:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 44,
+                "titleEn": "Exam Demo3",
+                "titleAr": "Exam Demo3",
+                "examType": 0,
+                "startAt": "2026-03-08T03:47:00+00:00",
+                "endAt": "2026-03-10T03:47:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 52,
+                "titleEn": "test 2",
+                "titleAr": "test 2",
+                "examType": 0,
+                "startAt": "2026-03-08T15:04:00+00:00",
+                "endAt": "2026-04-06T15:04:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 45,
+                "titleEn": "ex demo",
+                "titleAr": "اختبار",
+                "examType": 0,
+                "startAt": "2026-03-09T06:36:00+00:00",
+                "endAt": "2026-03-11T06:36:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 48,
+                "titleEn": "EXAM DEMO 6",
+                "titleAr": "الاختبار 6",
+                "examType": 0,
+                "startAt": "2026-03-09T07:09:00+00:00",
+                "endAt": "2026-03-11T07:09:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              }
+            ],
+            "recentActivity": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1404.81
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:35.843Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 486.67
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:38.187Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/dc4e8264-9acd-442b-989c-bcd37c9d4d3d/block",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User blocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2343.16
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:38.431Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Your account has been blocked. Please contact support.",
+          "data": null,
+          "errors": [],
+          "traceId": "1a189c7097355dbcf4997f2c3d114dbb"
+        },
+        "ms": 243.32
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:38.670Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "fullName": "QA26 Token Revocation Candidate",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "fullName": "QA26 Token Revocation Candidate",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 236.41
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:40.117Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "candidateName": "QA26 Token Revocation Candidate",
+          "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+          "currentDateUtc": "2026-09-19T14:52:38.6743535+04:00",
+          "stats": {
+            "totalExamsAvailable": 54,
+            "totalExamsAvailableChangePercent": 0,
+            "totalAttempts": 0,
+            "totalAttemptsChangePercent": 0,
+            "passRate": 0,
+            "pendingGrading": 0
+          },
+          "examsByStatus": {
+            "upcomingCount": 0,
+            "activeCount": 0,
+            "completedCount": 0
+          },
+          "quickActions": [],
+          "upcomingExams": [
+            {
+              "examId": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات",
+              "examType": 0,
+              "startAt": "2026-03-06T23:51:00+00:00",
+              "endAt": "2026-03-07T23:51:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3",
+              "examType": 0,
+              "startAt": "2026-03-08T03:47:00+00:00",
+              "endAt": "2026-03-10T03:47:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2",
+              "examType": 0,
+              "startAt": "2026-03-08T15:04:00+00:00",
+              "endAt": "2026-04-06T15:04:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار",
+              "examType": 0,
+              "startAt": "2026-03-09T06:36:00+00:00",
+              "endAt": "2026-03-11T06:36:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6",
+              "examType": 0,
+              "startAt": "2026-03-09T07:09:00+00:00",
+              "endAt": "2026-03-11T07:09:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            }
+          ],
+          "recentActivity": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "candidateName": "QA26 Token Revocation Candidate",
+            "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+            "currentDateUtc": "2026-09-19T14:52:38.6743535+04:00",
+            "stats": {
+              "totalExamsAvailable": 54,
+              "totalExamsAvailableChangePercent": 0,
+              "totalAttempts": 0,
+              "totalAttemptsChangePercent": 0,
+              "passRate": 0,
+              "pendingGrading": 0
+            },
+            "examsByStatus": {
+              "upcomingCount": 0,
+              "activeCount": 0,
+              "completedCount": 0
+            },
+            "quickActions": [],
+            "upcomingExams": [
+              {
+                "examId": 39,
+                "titleEn": "Networking Basics",
+                "titleAr": "اساسيات الشبكات",
+                "examType": 0,
+                "startAt": "2026-03-06T23:51:00+00:00",
+                "endAt": "2026-03-07T23:51:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 44,
+                "titleEn": "Exam Demo3",
+                "titleAr": "Exam Demo3",
+                "examType": 0,
+                "startAt": "2026-03-08T03:47:00+00:00",
+                "endAt": "2026-03-10T03:47:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 52,
+                "titleEn": "test 2",
+                "titleAr": "test 2",
+                "examType": 0,
+                "startAt": "2026-03-08T15:04:00+00:00",
+                "endAt": "2026-04-06T15:04:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 45,
+                "titleEn": "ex demo",
+                "titleAr": "اختبار",
+                "examType": 0,
+                "startAt": "2026-03-09T06:36:00+00:00",
+                "endAt": "2026-03-11T06:36:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 48,
+                "titleEn": "EXAM DEMO 6",
+                "titleAr": "الاختبار 6",
+                "examType": 0,
+                "startAt": "2026-03-09T07:09:00+00:00",
+                "endAt": "2026-03-11T07:09:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              }
+            ],
+            "recentActivity": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1445.61
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:40.594Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 474.18
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:40.622Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "POST",
+      "route": "/hubs/proctor/negotiate?negotiateVersion=1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "negotiateVersion": 1,
+          "connectionId": "TqTyG0I0Brma7SziRLxyKg",
+          "connectionToken": "bI0u82441ZoFgPMXr0cuQw",
+          "availableTransports": [
+            {
+              "transport": "WebSockets",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            },
+            {
+              "transport": "ServerSentEvents",
+              "transferFormats": [
+                "Text"
+              ]
+            },
+            {
+              "transport": "LongPolling",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            }
+          ]
+        },
+        "ms": 1.79
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:42.298Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/dc4e8264-9acd-442b-989c-bcd37c9d4d3d/unblock",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User unblocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1674.06
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:43.558Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:52:43.5588074+04:00",
+          "user": {
+            "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "displayName": "QA26 Token Revocation Candidate",
+            "fullName": "QA26 Token Revocation Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+            "lastLoginDate": "2026-09-19T14:52:42.8524959+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:52:43.5588074+04:00",
+            "user": {
+              "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+              "email": "qa26.token.candidate.1789815148466@example.test",
+              "displayName": "QA26 Token Revocation Candidate",
+              "fullName": "QA26 Token Revocation Candidate",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+              "lastLoginDate": "2026-09-19T14:52:42.8524959+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1258.8
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:43.795Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "fullName": "QA26 Token Revocation Candidate",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "fullName": "QA26 Token Revocation Candidate",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 235.97
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:45.207Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "candidateName": "QA26 Token Revocation Candidate",
+          "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+          "currentDateUtc": "2026-09-19T14:52:43.8006883+04:00",
+          "stats": {
+            "totalExamsAvailable": 54,
+            "totalExamsAvailableChangePercent": 0,
+            "totalAttempts": 0,
+            "totalAttemptsChangePercent": 0,
+            "passRate": 0,
+            "pendingGrading": 0
+          },
+          "examsByStatus": {
+            "upcomingCount": 0,
+            "activeCount": 0,
+            "completedCount": 0
+          },
+          "quickActions": [],
+          "upcomingExams": [
+            {
+              "examId": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات",
+              "examType": 0,
+              "startAt": "2026-03-06T23:51:00+00:00",
+              "endAt": "2026-03-07T23:51:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3",
+              "examType": 0,
+              "startAt": "2026-03-08T03:47:00+00:00",
+              "endAt": "2026-03-10T03:47:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2",
+              "examType": 0,
+              "startAt": "2026-03-08T15:04:00+00:00",
+              "endAt": "2026-04-06T15:04:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار",
+              "examType": 0,
+              "startAt": "2026-03-09T06:36:00+00:00",
+              "endAt": "2026-03-11T06:36:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6",
+              "examType": 0,
+              "startAt": "2026-03-09T07:09:00+00:00",
+              "endAt": "2026-03-11T07:09:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            }
+          ],
+          "recentActivity": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "candidateName": "QA26 Token Revocation Candidate",
+            "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+            "currentDateUtc": "2026-09-19T14:52:43.8006883+04:00",
+            "stats": {
+              "totalExamsAvailable": 54,
+              "totalExamsAvailableChangePercent": 0,
+              "totalAttempts": 0,
+              "totalAttemptsChangePercent": 0,
+              "passRate": 0,
+              "pendingGrading": 0
+            },
+            "examsByStatus": {
+              "upcomingCount": 0,
+              "activeCount": 0,
+              "completedCount": 0
+            },
+            "quickActions": [],
+            "upcomingExams": [
+              {
+                "examId": 39,
+                "titleEn": "Networking Basics",
+                "titleAr": "اساسيات الشبكات",
+                "examType": 0,
+                "startAt": "2026-03-06T23:51:00+00:00",
+                "endAt": "2026-03-07T23:51:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 44,
+                "titleEn": "Exam Demo3",
+                "titleAr": "Exam Demo3",
+                "examType": 0,
+                "startAt": "2026-03-08T03:47:00+00:00",
+                "endAt": "2026-03-10T03:47:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 52,
+                "titleEn": "test 2",
+                "titleAr": "test 2",
+                "examType": 0,
+                "startAt": "2026-03-08T15:04:00+00:00",
+                "endAt": "2026-04-06T15:04:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 45,
+                "titleEn": "ex demo",
+                "titleAr": "اختبار",
+                "examType": 0,
+                "startAt": "2026-03-09T06:36:00+00:00",
+                "endAt": "2026-03-11T06:36:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 48,
+                "titleEn": "EXAM DEMO 6",
+                "titleAr": "الاختبار 6",
+                "examType": 0,
+                "startAt": "2026-03-09T07:09:00+00:00",
+                "endAt": "2026-03-11T07:09:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              }
+            ],
+            "recentActivity": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1408.57
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:45.684Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 474.73
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:47.313Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/dc4e8264-9acd-442b-989c-bcd37c9d4d3d/deactivate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deactivated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1626.29
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:47.548Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Your account is inactive.",
+          "data": null,
+          "errors": [],
+          "traceId": "3e96acb088694baa1e4496dcb1c963bc"
+        },
+        "ms": 233.28
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:47.799Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "fullName": "QA26 Token Revocation Candidate",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "fullName": "QA26 Token Revocation Candidate",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 249.57
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:49.239Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "candidateName": "QA26 Token Revocation Candidate",
+          "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+          "currentDateUtc": "2026-09-19T14:52:47.804118+04:00",
+          "stats": {
+            "totalExamsAvailable": 54,
+            "totalExamsAvailableChangePercent": 0,
+            "totalAttempts": 0,
+            "totalAttemptsChangePercent": 0,
+            "passRate": 0,
+            "pendingGrading": 0
+          },
+          "examsByStatus": {
+            "upcomingCount": 0,
+            "activeCount": 0,
+            "completedCount": 0
+          },
+          "quickActions": [],
+          "upcomingExams": [
+            {
+              "examId": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات",
+              "examType": 0,
+              "startAt": "2026-03-06T23:51:00+00:00",
+              "endAt": "2026-03-07T23:51:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3",
+              "examType": 0,
+              "startAt": "2026-03-08T03:47:00+00:00",
+              "endAt": "2026-03-10T03:47:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2",
+              "examType": 0,
+              "startAt": "2026-03-08T15:04:00+00:00",
+              "endAt": "2026-04-06T15:04:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار",
+              "examType": 0,
+              "startAt": "2026-03-09T06:36:00+00:00",
+              "endAt": "2026-03-11T06:36:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6",
+              "examType": 0,
+              "startAt": "2026-03-09T07:09:00+00:00",
+              "endAt": "2026-03-11T07:09:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            }
+          ],
+          "recentActivity": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "candidateName": "QA26 Token Revocation Candidate",
+            "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+            "currentDateUtc": "2026-09-19T14:52:47.804118+04:00",
+            "stats": {
+              "totalExamsAvailable": 54,
+              "totalExamsAvailableChangePercent": 0,
+              "totalAttempts": 0,
+              "totalAttemptsChangePercent": 0,
+              "passRate": 0,
+              "pendingGrading": 0
+            },
+            "examsByStatus": {
+              "upcomingCount": 0,
+              "activeCount": 0,
+              "completedCount": 0
+            },
+            "quickActions": [],
+            "upcomingExams": [
+              {
+                "examId": 39,
+                "titleEn": "Networking Basics",
+                "titleAr": "اساسيات الشبكات",
+                "examType": 0,
+                "startAt": "2026-03-06T23:51:00+00:00",
+                "endAt": "2026-03-07T23:51:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 44,
+                "titleEn": "Exam Demo3",
+                "titleAr": "Exam Demo3",
+                "examType": 0,
+                "startAt": "2026-03-08T03:47:00+00:00",
+                "endAt": "2026-03-10T03:47:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 52,
+                "titleEn": "test 2",
+                "titleAr": "test 2",
+                "examType": 0,
+                "startAt": "2026-03-08T15:04:00+00:00",
+                "endAt": "2026-04-06T15:04:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 45,
+                "titleEn": "ex demo",
+                "titleAr": "اختبار",
+                "examType": 0,
+                "startAt": "2026-03-09T06:36:00+00:00",
+                "endAt": "2026-03-11T06:36:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 48,
+                "titleEn": "EXAM DEMO 6",
+                "titleAr": "الاختبار 6",
+                "examType": 0,
+                "startAt": "2026-03-09T07:09:00+00:00",
+                "endAt": "2026-03-11T07:09:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              }
+            ],
+            "recentActivity": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1437.67
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:49.708Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 466.26
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:49.712Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "POST",
+      "route": "/hubs/proctor/negotiate?negotiateVersion=1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "negotiateVersion": 1,
+          "connectionId": "zH743m_gtgcgJHofGseTkg",
+          "connectionToken": "8OCPkToVZs4rLoJMkTNKfg",
+          "availableTransports": [
+            {
+              "transport": "WebSockets",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            },
+            {
+              "transport": "ServerSentEvents",
+              "transferFormats": [
+                "Text"
+              ]
+            },
+            {
+              "transport": "LongPolling",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            }
+          ]
+        },
+        "ms": 1.46
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:51.462Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/dc4e8264-9acd-442b-989c-bcd37c9d4d3d/activate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User activated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1748.84
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:52.816Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.candidate.1789815148466@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:52:52.8169633+04:00",
+          "user": {
+            "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "displayName": "QA26 Token Revocation Candidate",
+            "fullName": "QA26 Token Revocation Candidate",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+            "lastLoginDate": "2026-09-19T14:52:52.0835411+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:52:52.8169633+04:00",
+            "user": {
+              "id": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+              "email": "qa26.token.candidate.1789815148466@example.test",
+              "displayName": "QA26 Token Revocation Candidate",
+              "fullName": "QA26 Token Revocation Candidate",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T14:52:29.9179301+04:00",
+              "lastLoginDate": "2026-09-19T14:52:52.0835411+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1352.81
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:53.058Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+          "email": "qa26.token.candidate.1789815148466@example.test",
+          "fullName": "QA26 Token Revocation Candidate",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+            "email": "qa26.token.candidate.1789815148466@example.test",
+            "fullName": "QA26 Token Revocation Candidate",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 239.68
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:54.521Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "candidateName": "QA26 Token Revocation Candidate",
+          "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+          "currentDateUtc": "2026-09-19T14:52:53.0623429+04:00",
+          "stats": {
+            "totalExamsAvailable": 54,
+            "totalExamsAvailableChangePercent": 0,
+            "totalAttempts": 0,
+            "totalAttemptsChangePercent": 0,
+            "passRate": 0,
+            "pendingGrading": 0
+          },
+          "examsByStatus": {
+            "upcomingCount": 0,
+            "activeCount": 0,
+            "completedCount": 0
+          },
+          "quickActions": [],
+          "upcomingExams": [
+            {
+              "examId": 39,
+              "titleEn": "Networking Basics",
+              "titleAr": "اساسيات الشبكات",
+              "examType": 0,
+              "startAt": "2026-03-06T23:51:00+00:00",
+              "endAt": "2026-03-07T23:51:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 44,
+              "titleEn": "Exam Demo3",
+              "titleAr": "Exam Demo3",
+              "examType": 0,
+              "startAt": "2026-03-08T03:47:00+00:00",
+              "endAt": "2026-03-10T03:47:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 52,
+              "titleEn": "test 2",
+              "titleAr": "test 2",
+              "examType": 0,
+              "startAt": "2026-03-08T15:04:00+00:00",
+              "endAt": "2026-04-06T15:04:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 45,
+              "titleEn": "ex demo",
+              "titleAr": "اختبار",
+              "examType": 0,
+              "startAt": "2026-03-09T06:36:00+00:00",
+              "endAt": "2026-03-11T06:36:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            },
+            {
+              "examId": 48,
+              "titleEn": "EXAM DEMO 6",
+              "titleAr": "الاختبار 6",
+              "examType": 0,
+              "startAt": "2026-03-09T07:09:00+00:00",
+              "endAt": "2026-03-11T07:09:00+00:00",
+              "durationMinutes": 60,
+              "totalQuestions": 0,
+              "totalPoints": 0,
+              "attemptsUsed": 0,
+              "maxAttempts": 1
+            }
+          ],
+          "recentActivity": []
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "candidateName": "QA26 Token Revocation Candidate",
+            "candidateEmail": "qa26.token.candidate.1789815148466@example.test",
+            "currentDateUtc": "2026-09-19T14:52:53.0623429+04:00",
+            "stats": {
+              "totalExamsAvailable": 54,
+              "totalExamsAvailableChangePercent": 0,
+              "totalAttempts": 0,
+              "totalAttemptsChangePercent": 0,
+              "passRate": 0,
+              "pendingGrading": 0
+            },
+            "examsByStatus": {
+              "upcomingCount": 0,
+              "activeCount": 0,
+              "completedCount": 0
+            },
+            "quickActions": [],
+            "upcomingExams": [
+              {
+                "examId": 39,
+                "titleEn": "Networking Basics",
+                "titleAr": "اساسيات الشبكات",
+                "examType": 0,
+                "startAt": "2026-03-06T23:51:00+00:00",
+                "endAt": "2026-03-07T23:51:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 44,
+                "titleEn": "Exam Demo3",
+                "titleAr": "Exam Demo3",
+                "examType": 0,
+                "startAt": "2026-03-08T03:47:00+00:00",
+                "endAt": "2026-03-10T03:47:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 52,
+                "titleEn": "test 2",
+                "titleAr": "test 2",
+                "examType": 0,
+                "startAt": "2026-03-08T15:04:00+00:00",
+                "endAt": "2026-04-06T15:04:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 45,
+                "titleEn": "ex demo",
+                "titleAr": "اختبار",
+                "examType": 0,
+                "startAt": "2026-03-09T06:36:00+00:00",
+                "endAt": "2026-03-11T06:36:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              },
+              {
+                "examId": 48,
+                "titleEn": "EXAM DEMO 6",
+                "titleAr": "الاختبار 6",
+                "examType": 0,
+                "startAt": "2026-03-09T07:09:00+00:00",
+                "endAt": "2026-03-11T07:09:00+00:00",
+                "durationMinutes": 60,
+                "totalQuestions": 0,
+                "totalPoints": 0,
+                "attemptsUsed": 0,
+                "maxAttempts": 1
+              }
+            ],
+            "recentActivity": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1461.09
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:55.016Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 491.83
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:56.694Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Users/dc4e8264-9acd-442b-989c-bcd37c9d4d3d",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1674.95
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:56.929Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "6e485dd059dab3bd8a12c482a9e81b33"
+        },
+        "ms": 234.5
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:57.165Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/dashboard",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found",
+          "data": null,
+          "errors": [],
+          "traceId": "0a04950c7476150c3c3744f6a0e23afa"
+        },
+        "ms": 233.9
+      }
+    },
+    {
+      "at": "2026-09-19T10:52:57.635Z",
+      "identity": "qa26.token.candidate.1789815148466@example.test",
+      "method": "GET",
+      "route": "/api/user-notifications",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "items": [],
+          "totalCount": 0,
+          "page": 1,
+          "pageSize": 20,
+          "totalPages": 0,
+          "hasNextPage": false
+        },
+        "ms": 468.52
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:01.680Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 Token Revocation Admin",
+        "role": "Admin",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T14:53:00.5135913+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "displayName": "QA26 Token Revocation Admin",
+          "fullName": "QA26 Token Revocation Admin",
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Admin"
+          ],
+          "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T14:53:00.5135913+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "displayName": "QA26 Token Revocation Admin",
+            "fullName": "QA26 Token Revocation Admin",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4041.94
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:02.921Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:53:02.9211696+04:00",
+          "user": {
+            "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "displayName": "QA26 Token Revocation Admin",
+            "fullName": "QA26 Token Revocation Admin",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+            "lastLoginDate": "2026-09-19T14:53:02.219845+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:53:02.9211696+04:00",
+            "user": {
+              "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+              "email": "qa26.token.admin.1789815177638@example.test",
+              "displayName": "QA26 Token Revocation Admin",
+              "fullName": "QA26 Token Revocation Admin",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+              "lastLoginDate": "2026-09-19T14:53:02.219845+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1239.36
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:03.154Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 232.27
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:03.393Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "fullName": "QA26 Token Revocation Admin",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "fullName": "QA26 Token Revocation Admin",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 234.68
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:05.743Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/5c66892d-c6c3-4f90-bac9-6280a421ba77/block",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User blocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2347.47
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:05.979Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Your account has been blocked. Please contact support.",
+          "data": null,
+          "errors": [],
+          "traceId": "bc2c57c449e55af054d228c0570dfd5c"
+        },
+        "ms": 235.07
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:06.214Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 230.98
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:06.453Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "fullName": "QA26 Token Revocation Admin",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "fullName": "QA26 Token Revocation Admin",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 236.75
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:06.457Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "POST",
+      "route": "/hubs/proctor/negotiate?negotiateVersion=1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "negotiateVersion": 1,
+          "connectionId": "IWlug1hCWhFrKp-Pv1bFxg",
+          "connectionToken": "3lPARwPWWJMmP-kULT0Rtw",
+          "availableTransports": [
+            {
+              "transport": "WebSockets",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            },
+            {
+              "transport": "ServerSentEvents",
+              "transferFormats": [
+                "Text"
+              ]
+            },
+            {
+              "transport": "LongPolling",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            }
+          ]
+        },
+        "ms": 1.46
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:08.098Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/5c66892d-c6c3-4f90-bac9-6280a421ba77/unblock",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User unblocked successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1637.36
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:09.344Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:53:09.34511+04:00",
+          "user": {
+            "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "displayName": "QA26 Token Revocation Admin",
+            "fullName": "QA26 Token Revocation Admin",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+            "lastLoginDate": "2026-09-19T14:53:08.6435699+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:53:09.34511+04:00",
+            "user": {
+              "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+              "email": "qa26.token.admin.1789815177638@example.test",
+              "displayName": "QA26 Token Revocation Admin",
+              "fullName": "QA26 Token Revocation Admin",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+              "lastLoginDate": "2026-09-19T14:53:08.6435699+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1244.65
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:09.577Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 230.58
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:09.816Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "fullName": "QA26 Token Revocation Admin",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "fullName": "QA26 Token Revocation Admin",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 235.45
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:11.455Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/5c66892d-c6c3-4f90-bac9-6280a421ba77/deactivate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deactivated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1635.26
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:11.693Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Your account is inactive.",
+          "data": null,
+          "errors": [],
+          "traceId": "c926f6102813fb4b2d9251b14b78cc61"
+        },
+        "ms": 237.35
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:11.932Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 235.74
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:12.167Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "fullName": "QA26 Token Revocation Admin",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "fullName": "QA26 Token Revocation Admin",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 228.61
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:12.171Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "POST",
+      "route": "/hubs/proctor/negotiate?negotiateVersion=1",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "body": {
+          "negotiateVersion": 1,
+          "connectionId": "tKA-gQ-6v25EobCBWTvNug",
+          "connectionToken": "qF-44dwWrKpaqoYNPW8uHA",
+          "availableTransports": [
+            {
+              "transport": "WebSockets",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            },
+            {
+              "transport": "ServerSentEvents",
+              "transferFormats": [
+                "Text"
+              ]
+            },
+            {
+              "transport": "LongPolling",
+              "transferFormats": [
+                "Text",
+                "Binary"
+              ]
+            }
+          ]
+        },
+        "ms": 1.33
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:13.768Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users/5c66892d-c6c3-4f90-bac9-6280a421ba77/activate",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User activated successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1594.27
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:14.964Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.token.admin.1789815177638@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T15:53:14.9648251+04:00",
+          "user": {
+            "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "displayName": "QA26 Token Revocation Admin",
+            "fullName": "QA26 Token Revocation Admin",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+            "lastLoginDate": "2026-09-19T14:53:14.2785157+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T15:53:14.9648251+04:00",
+            "user": {
+              "id": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+              "email": "qa26.token.admin.1789815177638@example.test",
+              "displayName": "QA26 Token Revocation Admin",
+              "fullName": "QA26 Token Revocation Admin",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:52:59.1070618+04:00",
+              "lastLoginDate": "2026-09-19T14:53:14.2785157+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1194.89
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:15.202Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 236.12
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:15.443Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+          "email": "qa26.token.admin.1789815177638@example.test",
+          "fullName": "QA26 Token Revocation Admin",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة"
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "userId": "5c66892d-c6c3-4f90-bac9-6280a421ba77",
+            "email": "qa26.token.admin.1789815177638@example.test",
+            "fullName": "QA26 Token Revocation Admin",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة"
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 236.43
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:17.077Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "DELETE",
+      "route": "/api/Users/5c66892d-c6c3-4f90-bac9-6280a421ba77",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User deleted successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1630.35
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:17.313Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Notification/templates",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": [
+          {
+            "id": 1,
+            "eventType": 1,
+            "eventName": "ExamPublished",
+            "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+            "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+            "isActive": true
+          },
+          {
+            "id": 2,
+            "eventType": 2,
+            "eventName": "ResultPublished",
+            "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+            "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          },
+          {
+            "id": 3,
+            "eventType": 3,
+            "eventName": "ExamExpired",
+            "subjectEn": "Exam {{ExamTitle}} Has Expired",
+            "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+            "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+            "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+            "isActive": true
+          }
+        ],
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": [
+            {
+              "id": 1,
+              "eventType": 1,
+              "eventName": "ExamPublished",
+              "subjectEn": "You're Invited: {{ExamTitle}} is Now Available",
+              "subjectAr": "دعوة: {{ExamTitle}} متاح الآن",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYou have been invited to take the following exam:\r\n\r\nExam: {{ExamTitle}}\r\nAvailable From: {{ExamStartDate}}\r\nAvailable Until: {{ExamEndDate}}\r\nDuration: {{ExamDuration}} minutes\r\n\r\nYour Login Credentials:\r\nUsername/Email: {{Username}}\r\nPassword: {{Password}}\r\n\r\nClick here to login and start: {{LoginUrl}}\r\n\r\nIf you did not expect this email, please contact support at {{SupportEmail}}.\r\n\r\nGood luck!",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nلقد تمت دعوتك لإجراء الاختبار التالي:\r\n\r\nالاختبار: {{ExamTitle}}\r\nمتاح من: {{ExamStartDate}}\r\nمتاح حتى: {{ExamEndDate}}\r\nالمدة: {{ExamDuration}} دقيقة\r\n\r\nبيانات تسجيل الدخول الخاصة بك:\r\nاسم المستخدم/البريد الإلكتروني: {{Username}}\r\nكلمة المرور: {{Password}}\r\n\r\nانقر هنا لتسجيل الدخول والبدء: {{LoginUrl}}\r\n\r\nإذا لم تكن تتوقع هذا البريد الإلكتروني، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nبالتوفيق!",
+              "isActive": true
+            },
+            {
+              "id": 2,
+              "eventType": 2,
+              "eventName": "ResultPublished",
+              "subjectEn": "Your Results for {{ExamTitle}} Are Ready",
+              "subjectAr": "نتائج {{ExamTitle}} جاهزة",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nYour results for the exam \"{{ExamTitle}}\" are now available.\r\n\r\nClick here to view your results: {{LoginUrl}}\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nنتائج اختبار \"{{ExamTitle}}\" متاحة الآن.\r\n\r\nانقر هنا لعرض نتائجك: {{LoginUrl}}\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            },
+            {
+              "id": 3,
+              "eventType": 3,
+              "eventName": "ExamExpired",
+              "subjectEn": "Exam {{ExamTitle}} Has Expired",
+              "subjectAr": "انتهت صلاحية اختبار {{ExamTitle}}",
+              "bodyEn": "Dear {{CandidateName}},\r\n\r\nThe exam \"{{ExamTitle}}\" has expired and is no longer available.\r\n\r\nIf you have any questions, please contact support at {{SupportEmail}}.\r\n\r\nBest regards,\r\n{{BrandName}} Team",
+              "bodyAr": "عزيزي {{CandidateName}}،\r\n\r\nانتهت صلاحية اختبار \"{{ExamTitle}}\" ولم يعد متاحاً.\r\n\r\nإذا كان لديك أي أسئلة، يرجى الاتصال بالدعم على {{SupportEmail}}.\r\n\r\nمع أطيب التحيات،\r\nفريق {{BrandName}}",
+              "isActive": true
+            }
+          ],
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 234.76
+      }
+    },
+    {
+      "at": "2026-09-19T10:53:17.561Z",
+      "identity": "qa26.token.admin.1789815177638@example.test",
+      "method": "GET",
+      "route": "/api/Departments/my-department",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "160fdcc8a262c0dd3cc8a9b422aac27d"
+        },
+        "ms": 244.71
+      }
+    }
+  ]
+}

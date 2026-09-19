@@ -1,0 +1,2806 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP assignment and cross-role persistence checks",
+  "startedAt": "2026-09-19T12:33:55.715Z",
+  "checks": [
+    {
+      "name": "Foreign admin cannot read legacy exam proctor roster",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:34:02.927Z"
+    },
+    {
+      "name": "Foreign admin cannot grant exam access via legacy assignment",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "savedRoster": [
+          {
+            "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "displayName": "QA26 Engineering Proctor 1",
+            "fullName": "QA26 Engineering Proctor 1",
+            "email": "qa26.eng.proctor1@example.test",
+            "isAssigned": true,
+            "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+          },
+          {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "email": "qa26.ops.proctor1@example.test",
+            "isAssigned": true,
+            "assignedAt": "2026-09-19T16:34:04.3351204+04:00"
+          }
+        ]
+      },
+      "at": "2026-09-19T12:34:05.766Z"
+    },
+    {
+      "name": "Unauthorized assignment does not unlock foreign candidate session",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:34:09.379Z"
+    },
+    {
+      "name": "SuperAdmin explicitly assigns cross-department proctor",
+      "passed": true,
+      "at": "2026-09-19T12:34:11.725Z"
+    },
+    {
+      "name": "Explicitly assigned proctor can inspect authorized session",
+      "passed": true,
+      "at": "2026-09-19T12:34:15.216Z"
+    },
+    {
+      "name": "Explicitly assigned proctor can read authorized snapshot",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:34:18.012Z"
+    },
+    {
+      "name": "Foreign administrator cannot revoke legitimate assignment",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:34:22.721Z"
+    },
+    {
+      "name": "Explicit revocation immediately removes session access with existing token",
+      "passed": true,
+      "at": "2026-09-19T12:34:25.740Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/logs?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:25.975Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/dashboard",
+      "passed": true,
+      "at": "2026-09-19T12:34:26.215Z"
+    },
+    {
+      "name": "qa26.ops.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/exports?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:26.451Z"
+    },
+    {
+      "name": "qa26.eng.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/logs?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:26.687Z"
+    },
+    {
+      "name": "qa26.eng.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/dashboard",
+      "passed": true,
+      "at": "2026-09-19T12:34:26.923Z"
+    },
+    {
+      "name": "qa26.eng.admin1@example.test cannot read SuperAdmin audit interface /api/Audit/exports?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:27.158Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read SuperAdmin audit interface /api/Audit/logs?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:27.393Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read SuperAdmin audit interface /api/Audit/dashboard",
+      "passed": true,
+      "at": "2026-09-19T12:34:27.627Z"
+    },
+    {
+      "name": "qa26.ops.proctor1@example.test cannot read SuperAdmin audit interface /api/Audit/exports?pageSize=1",
+      "passed": true,
+      "at": "2026-09-19T12:34:27.866Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:33:56.943Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:33:56.9390691+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:33:56.2551087+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:33:56.9390691+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:33:56.2551087+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1224.74
+      }
+    },
+    {
+      "at": "2026-09-19T12:33:58.167Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:33:58.1669725+04:00",
+          "user": {
+            "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+            "email": "qa26.ops.admin1@example.test",
+            "displayName": "QA26 Operations Admin 1",
+            "fullName": "QA26 Operations Admin 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:47:00.110969+04:00",
+            "lastLoginDate": "2026-09-19T16:33:57.4553278+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:33:58.1669725+04:00",
+            "user": {
+              "id": "6b29defc-204d-4a72-91d5-a95013b46a67",
+              "email": "qa26.ops.admin1@example.test",
+              "displayName": "QA26 Operations Admin 1",
+              "fullName": "QA26 Operations Admin 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:47:00.110969+04:00",
+              "lastLoginDate": "2026-09-19T16:33:57.4553278+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1222.99
+      }
+    },
+    {
+      "at": "2026-09-19T12:33:59.375Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.ops.proctor1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:33:59.3748304+04:00",
+          "user": {
+            "id": "17116732-f707-49f1-922e-3b2e09750f08",
+            "email": "qa26.ops.proctor1@example.test",
+            "displayName": "QA26 Operations Proctor 1",
+            "fullName": "QA26 Operations Proctor 1",
+            "fullNameAr": "اختبار العمليات 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Proctor"
+            ],
+            "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+            "lastLoginDate": "2026-09-19T16:33:58.6750674+04:00",
+            "departmentId": 9,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:33:59.3748304+04:00",
+            "user": {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "email": "qa26.ops.proctor1@example.test",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "fullNameAr": "اختبار العمليات 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Proctor"
+              ],
+              "createdDate": "2026-09-19T14:47:20.0004867+04:00",
+              "lastLoginDate": "2026-09-19T16:33:58.6750674+04:00",
+              "departmentId": 9,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1207.11
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:00.577Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.eng.admin1@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:34:00.5773214+04:00",
+          "user": {
+            "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+            "email": "qa26.eng.admin1@example.test",
+            "displayName": "QA26 Engineering Admin 1",
+            "fullName": "QA26 Engineering Admin 1",
+            "fullNameAr": "اختبار الهندسة 1",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Admin"
+            ],
+            "createdDate": "2026-09-19T14:46:10.39012+04:00",
+            "lastLoginDate": "2026-09-19T16:33:59.8789082+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:34:00.5773214+04:00",
+            "user": {
+              "id": "398bb878-5ebd-49c3-8e65-8376d46183a9",
+              "email": "qa26.eng.admin1@example.test",
+              "displayName": "QA26 Engineering Admin 1",
+              "fullName": "QA26 Engineering Admin 1",
+              "fullNameAr": "اختبار الهندسة 1",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Admin"
+              ],
+              "createdDate": "2026-09-19T14:46:10.39012+04:00",
+              "lastLoginDate": "2026-09-19T16:33:59.8789082+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1201.66
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:01.759Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            }
+          ],
+          "availableProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              }
+            ],
+            "availableProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1181.24
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:02.926Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            }
+          ],
+          "availableProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              }
+            ],
+            "availableProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1166.19
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:04.587Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamProctor/assign",
+      "request": {
+        "examId": 115,
+        "proctorIds": [
+          "17116732-f707-49f1-922e-3b2e09750f08"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedReasons": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 proctor(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedReasons": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1659.87
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:05.765Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T16:34:04.3351204+04:00"
+            }
+          ],
+          "availableProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T16:34:04.3351204+04:00"
+              }
+            ],
+            "availableProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1176.96
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:09.378Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 149,
+          "attemptId": 197,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+          "endedAt": "2026-09-19T16:30:02.7145633+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 19,
+          "totalViolations": 1,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:35:17.5525761+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+          "attemptStatus": "Submitted",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": {
+            "id": 1,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "status": 2,
+            "statusName": "Cleared",
+            "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+            "decisionReasonAr": null,
+            "decidedBy": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "deciderName": null,
+            "decidedAt": "2026-09-19T16:30:43.7528515+04:00",
+            "isFinalized": true,
+            "previousStatus": 3,
+            "wasOverridden": true
+          },
+          "recentEvents": [
+            {
+              "id": 177,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:35:17.5525761+04:00",
+              "sequenceNumber": 19
+            },
+            {
+              "id": 175,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:35:07.5383917+04:00",
+              "sequenceNumber": 18
+            },
+            {
+              "id": 174,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:57.5373379+04:00",
+              "sequenceNumber": 17
+            },
+            {
+              "id": 171,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:47.5117785+04:00",
+              "sequenceNumber": 16
+            },
+            {
+              "id": 169,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:37.5151768+04:00",
+              "sequenceNumber": 15
+            },
+            {
+              "id": 168,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 post-reconnect\"}",
+              "occurredAt": "2026-09-19T15:34:35.0123342+04:00",
+              "sequenceNumber": 14
+            },
+            {
+              "id": 167,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 offline warning 1789817667604\"}",
+              "occurredAt": "2026-09-19T15:34:30.0718978+04:00",
+              "sequenceNumber": 13
+            },
+            {
+              "id": 165,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:27.5135286+04:00",
+              "sequenceNumber": 12
+            },
+            {
+              "id": 164,
+              "proctorSessionId": 149,
+              "eventType": 2,
+              "eventTypeName": "TabSwitched",
+              "severity": 2,
+              "severityLabel": "Medium",
+              "isViolation": true,
+              "metadataJson": "{\"source\":\"QA26 tab 1789817664021\"}",
+              "occurredAt": "2026-09-19T15:34:24.5338439+04:00",
+              "sequenceNumber": 11
+            },
+            {
+              "id": 162,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:34:17.5389259+04:00",
+              "sequenceNumber": 10
+            },
+            {
+              "id": 159,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:17.5055857+04:00",
+              "sequenceNumber": 10
+            },
+            {
+              "id": 158,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 simulated\"}",
+              "occurredAt": "2026-09-19T15:34:15.5970958+04:00",
+              "sequenceNumber": 9
+            },
+            {
+              "id": 156,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:34:07.5189903+04:00",
+              "sequenceNumber": 8
+            },
+            {
+              "id": 154,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:07.4953888+04:00",
+              "sequenceNumber": 8
+            },
+            {
+              "id": 153,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789817640441\"}",
+              "occurredAt": "2026-09-19T15:34:02.7581733+04:00",
+              "sequenceNumber": 7
+            },
+            {
+              "id": 152,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:57.5252814+04:00",
+              "sequenceNumber": 6
+            },
+            {
+              "id": 149,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:33:57.490348+04:00",
+              "sequenceNumber": 6
+            },
+            {
+              "id": 147,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:47.5064402+04:00",
+              "sequenceNumber": 5
+            },
+            {
+              "id": 144,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:33:47.4774251+04:00",
+              "sequenceNumber": 5
+            },
+            {
+              "id": 140,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:37.505165+04:00",
+              "sequenceNumber": 4
+            }
+          ],
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "candidateNameAr": null,
+          "candidateRollNo": null,
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": null,
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": "2026-09-19T16:30:02.7145633+04:00",
+          "attemptStartedAt": "2026-09-19T15:33:03.6587839+04:00",
+          "attemptExtraTimeSeconds": 60,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "56m 59s",
+          "sessionDurationMinutes": 57,
+          "identityVerification": null,
+          "violationBreakdown": [
+            {
+              "eventType": "TabSwitched",
+              "count": 1,
+              "severity": "Medium"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 149,
+            "attemptId": 197,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endedAt": "2026-09-19T16:30:02.7145633+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 19,
+            "totalViolations": 1,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:35:17.5525761+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+            "attemptStatus": "Submitted",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": {
+              "id": 1,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "status": 2,
+              "statusName": "Cleared",
+              "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+              "decisionReasonAr": null,
+              "decidedBy": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "deciderName": null,
+              "decidedAt": "2026-09-19T16:30:43.7528515+04:00",
+              "isFinalized": true,
+              "previousStatus": 3,
+              "wasOverridden": true
+            },
+            "recentEvents": [
+              {
+                "id": 177,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:35:17.5525761+04:00",
+                "sequenceNumber": 19
+              },
+              {
+                "id": 175,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:35:07.5383917+04:00",
+                "sequenceNumber": 18
+              },
+              {
+                "id": 174,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:57.5373379+04:00",
+                "sequenceNumber": 17
+              },
+              {
+                "id": 171,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:47.5117785+04:00",
+                "sequenceNumber": 16
+              },
+              {
+                "id": 169,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:37.5151768+04:00",
+                "sequenceNumber": 15
+              },
+              {
+                "id": 168,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 post-reconnect\"}",
+                "occurredAt": "2026-09-19T15:34:35.0123342+04:00",
+                "sequenceNumber": 14
+              },
+              {
+                "id": 167,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 offline warning 1789817667604\"}",
+                "occurredAt": "2026-09-19T15:34:30.0718978+04:00",
+                "sequenceNumber": 13
+              },
+              {
+                "id": 165,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:27.5135286+04:00",
+                "sequenceNumber": 12
+              },
+              {
+                "id": 164,
+                "proctorSessionId": 149,
+                "eventType": 2,
+                "eventTypeName": "TabSwitched",
+                "severity": 2,
+                "severityLabel": "Medium",
+                "isViolation": true,
+                "metadataJson": "{\"source\":\"QA26 tab 1789817664021\"}",
+                "occurredAt": "2026-09-19T15:34:24.5338439+04:00",
+                "sequenceNumber": 11
+              },
+              {
+                "id": 162,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:34:17.5389259+04:00",
+                "sequenceNumber": 10
+              },
+              {
+                "id": 159,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:17.5055857+04:00",
+                "sequenceNumber": 10
+              },
+              {
+                "id": 158,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 simulated\"}",
+                "occurredAt": "2026-09-19T15:34:15.5970958+04:00",
+                "sequenceNumber": 9
+              },
+              {
+                "id": 156,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:34:07.5189903+04:00",
+                "sequenceNumber": 8
+              },
+              {
+                "id": 154,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:07.4953888+04:00",
+                "sequenceNumber": 8
+              },
+              {
+                "id": 153,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789817640441\"}",
+                "occurredAt": "2026-09-19T15:34:02.7581733+04:00",
+                "sequenceNumber": 7
+              },
+              {
+                "id": 152,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:57.5252814+04:00",
+                "sequenceNumber": 6
+              },
+              {
+                "id": 149,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:33:57.490348+04:00",
+                "sequenceNumber": 6
+              },
+              {
+                "id": 147,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:47.5064402+04:00",
+                "sequenceNumber": 5
+              },
+              {
+                "id": 144,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:33:47.4774251+04:00",
+                "sequenceNumber": 5
+              },
+              {
+                "id": 140,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:37.505165+04:00",
+                "sequenceNumber": 4
+              }
+            ],
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "candidateNameAr": null,
+            "candidateRollNo": null,
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": null,
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": "2026-09-19T16:30:02.7145633+04:00",
+            "attemptStartedAt": "2026-09-19T15:33:03.6587839+04:00",
+            "attemptExtraTimeSeconds": 60,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "56m 59s",
+            "sessionDurationMinutes": 57,
+            "identityVerification": null,
+            "violationBreakdown": [
+              {
+                "eventType": "TabSwitched",
+                "count": 1,
+                "severity": "Medium"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3610.88
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:10.093Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/ExamProctor/unassign",
+      "request": {
+        "examId": 115,
+        "proctorIds": [
+          "17116732-f707-49f1-922e-3b2e09750f08"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedReasons": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 proctor(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedReasons": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 713.82
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:11.724Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/ExamProctor/assign",
+      "request": {
+        "examId": 115,
+        "proctorIds": [
+          "17116732-f707-49f1-922e-3b2e09750f08"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedReasons": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 proctor(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedReasons": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1629.9
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:15.215Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "id": 149,
+          "attemptId": 197,
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+          "candidateName": "QA26 Protocol Regression a",
+          "mode": 1,
+          "modeName": "Soft",
+          "status": 2,
+          "statusName": "Completed",
+          "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+          "endedAt": "2026-09-19T16:30:02.7145633+04:00",
+          "deviceFingerprint": null,
+          "userAgent": "node",
+          "ipAddress": "::1",
+          "browserName": "Unknown",
+          "browserVersion": "",
+          "operatingSystem": "Unknown",
+          "screenResolution": null,
+          "totalEvents": 19,
+          "totalViolations": 1,
+          "countableViolationCount": 0,
+          "maxViolationWarnings": 10,
+          "isTerminatedByProctor": false,
+          "terminationReason": null,
+          "riskScore": 0,
+          "faceScore": null,
+          "eyeScore": null,
+          "behaviorScore": null,
+          "environmentScore": null,
+          "riskLevel": "Low",
+          "lastHeartbeatAt": "2026-09-19T15:35:17.5525761+04:00",
+          "heartbeatMissedCount": 0,
+          "isFlagged": false,
+          "remainingSeconds": 0,
+          "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+          "attemptStatus": "Submitted",
+          "attemptIpAddress": null,
+          "attemptDeviceInfo": null,
+          "decision": {
+            "id": 1,
+            "proctorSessionId": 149,
+            "attemptId": 197,
+            "status": 2,
+            "statusName": "Cleared",
+            "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+            "decisionReasonAr": null,
+            "decidedBy": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+            "deciderName": null,
+            "decidedAt": "2026-09-19T16:30:43.7528515+04:00",
+            "isFinalized": true,
+            "previousStatus": 3,
+            "wasOverridden": true
+          },
+          "recentEvents": [
+            {
+              "id": 177,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:35:17.5525761+04:00",
+              "sequenceNumber": 19
+            },
+            {
+              "id": 175,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:35:07.5383917+04:00",
+              "sequenceNumber": 18
+            },
+            {
+              "id": 174,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:57.5373379+04:00",
+              "sequenceNumber": 17
+            },
+            {
+              "id": 171,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:47.5117785+04:00",
+              "sequenceNumber": 16
+            },
+            {
+              "id": 169,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:37.5151768+04:00",
+              "sequenceNumber": 15
+            },
+            {
+              "id": 168,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 post-reconnect\"}",
+              "occurredAt": "2026-09-19T15:34:35.0123342+04:00",
+              "sequenceNumber": 14
+            },
+            {
+              "id": 167,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 offline warning 1789817667604\"}",
+              "occurredAt": "2026-09-19T15:34:30.0718978+04:00",
+              "sequenceNumber": 13
+            },
+            {
+              "id": 165,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:27.5135286+04:00",
+              "sequenceNumber": 12
+            },
+            {
+              "id": 164,
+              "proctorSessionId": 149,
+              "eventType": 2,
+              "eventTypeName": "TabSwitched",
+              "severity": 2,
+              "severityLabel": "Medium",
+              "isViolation": true,
+              "metadataJson": "{\"source\":\"QA26 tab 1789817664021\"}",
+              "occurredAt": "2026-09-19T15:34:24.5338439+04:00",
+              "sequenceNumber": 11
+            },
+            {
+              "id": 162,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:34:17.5389259+04:00",
+              "sequenceNumber": 10
+            },
+            {
+              "id": 159,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:17.5055857+04:00",
+              "sequenceNumber": 10
+            },
+            {
+              "id": 158,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 simulated\"}",
+              "occurredAt": "2026-09-19T15:34:15.5970958+04:00",
+              "sequenceNumber": 9
+            },
+            {
+              "id": 156,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:34:07.5189903+04:00",
+              "sequenceNumber": 8
+            },
+            {
+              "id": 154,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:34:07.4953888+04:00",
+              "sequenceNumber": 8
+            },
+            {
+              "id": 153,
+              "proctorSessionId": 149,
+              "eventType": 59,
+              "eventTypeName": "ProctorWarning",
+              "severity": 3,
+              "severityLabel": "High",
+              "isViolation": false,
+              "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789817640441\"}",
+              "occurredAt": "2026-09-19T15:34:02.7581733+04:00",
+              "sequenceNumber": 7
+            },
+            {
+              "id": 152,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:57.5252814+04:00",
+              "sequenceNumber": 6
+            },
+            {
+              "id": 149,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:33:57.490348+04:00",
+              "sequenceNumber": 6
+            },
+            {
+              "id": 147,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:47.5064402+04:00",
+              "sequenceNumber": 5
+            },
+            {
+              "id": 144,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+              "occurredAt": "2026-09-19T15:33:47.4774251+04:00",
+              "sequenceNumber": 5
+            },
+            {
+              "id": 140,
+              "proctorSessionId": 149,
+              "eventType": 1,
+              "eventTypeName": "Heartbeat",
+              "severity": 0,
+              "severityLabel": "Info",
+              "isViolation": false,
+              "metadataJson": null,
+              "occurredAt": "2026-09-19T15:33:37.505165+04:00",
+              "sequenceNumber": 4
+            }
+          ],
+          "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+          "candidateNameAr": null,
+          "candidateRollNo": null,
+          "candidateDepartment": "QA26 Engineering",
+          "candidatePhone": null,
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "examDurationMinutes": 120,
+          "examPassScore": 30,
+          "examMaxAttempts": 2,
+          "examTotalQuestions": 5,
+          "examRequireWebcam": false,
+          "examEnableScreenMonitoring": true,
+          "examRequireIdVerification": false,
+          "examRequireFullscreen": false,
+          "examPreventCopyPaste": false,
+          "examBrowserLockdown": false,
+          "attemptNumber": 1,
+          "attemptTotalScore": null,
+          "attemptIsPassed": null,
+          "attemptSubmittedAt": "2026-09-19T16:30:02.7145633+04:00",
+          "attemptStartedAt": "2026-09-19T15:33:03.6587839+04:00",
+          "attemptExtraTimeSeconds": 60,
+          "attemptTotalAnswered": 1,
+          "attemptTotalQuestions": 5,
+          "sessionDuration": "56m 59s",
+          "sessionDurationMinutes": 57,
+          "identityVerification": null,
+          "violationBreakdown": [
+            {
+              "eventType": "TabSwitched",
+              "count": 1,
+              "severity": "Medium"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "id": 149,
+            "attemptId": 197,
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "candidateId": "b94bc18b-c8a8-46fe-b140-5dd55414b853",
+            "candidateName": "QA26 Protocol Regression a",
+            "mode": 1,
+            "modeName": "Soft",
+            "status": 2,
+            "statusName": "Completed",
+            "startedAt": "2026-09-19T15:33:03.6587839+04:00",
+            "endedAt": "2026-09-19T16:30:02.7145633+04:00",
+            "deviceFingerprint": null,
+            "userAgent": "node",
+            "ipAddress": "::1",
+            "browserName": "Unknown",
+            "browserVersion": "",
+            "operatingSystem": "Unknown",
+            "screenResolution": null,
+            "totalEvents": 19,
+            "totalViolations": 1,
+            "countableViolationCount": 0,
+            "maxViolationWarnings": 10,
+            "isTerminatedByProctor": false,
+            "terminationReason": null,
+            "riskScore": 0,
+            "faceScore": null,
+            "eyeScore": null,
+            "behaviorScore": null,
+            "environmentScore": null,
+            "riskLevel": "Low",
+            "lastHeartbeatAt": "2026-09-19T15:35:17.5525761+04:00",
+            "heartbeatMissedCount": 0,
+            "isFlagged": false,
+            "remainingSeconds": 0,
+            "expiresAt": "2026-09-19T17:34:03.6587839+04:00",
+            "attemptStatus": "Submitted",
+            "attemptIpAddress": null,
+            "attemptDeviceInfo": null,
+            "decision": {
+              "id": 1,
+              "proctorSessionId": 149,
+              "attemptId": 197,
+              "status": 2,
+              "statusName": "Cleared",
+              "decisionReasonEn": "QA26 decision lifecycle synthetic review",
+              "decisionReasonAr": null,
+              "decidedBy": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "deciderName": null,
+              "decidedAt": "2026-09-19T16:30:43.7528515+04:00",
+              "isFinalized": true,
+              "previousStatus": 3,
+              "wasOverridden": true
+            },
+            "recentEvents": [
+              {
+                "id": 177,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:35:17.5525761+04:00",
+                "sequenceNumber": 19
+              },
+              {
+                "id": 175,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:35:07.5383917+04:00",
+                "sequenceNumber": 18
+              },
+              {
+                "id": 174,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:57.5373379+04:00",
+                "sequenceNumber": 17
+              },
+              {
+                "id": 171,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:47.5117785+04:00",
+                "sequenceNumber": 16
+              },
+              {
+                "id": 169,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:37.5151768+04:00",
+                "sequenceNumber": 15
+              },
+              {
+                "id": 168,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 post-reconnect\"}",
+                "occurredAt": "2026-09-19T15:34:35.0123342+04:00",
+                "sequenceNumber": 14
+              },
+              {
+                "id": 167,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 offline warning 1789817667604\"}",
+                "occurredAt": "2026-09-19T15:34:30.0718978+04:00",
+                "sequenceNumber": 13
+              },
+              {
+                "id": 165,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:27.5135286+04:00",
+                "sequenceNumber": 12
+              },
+              {
+                "id": 164,
+                "proctorSessionId": 149,
+                "eventType": 2,
+                "eventTypeName": "TabSwitched",
+                "severity": 2,
+                "severityLabel": "Medium",
+                "isViolation": true,
+                "metadataJson": "{\"source\":\"QA26 tab 1789817664021\"}",
+                "occurredAt": "2026-09-19T15:34:24.5338439+04:00",
+                "sequenceNumber": 11
+              },
+              {
+                "id": 162,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:34:17.5389259+04:00",
+                "sequenceNumber": 10
+              },
+              {
+                "id": 159,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:17.5055857+04:00",
+                "sequenceNumber": 10
+              },
+              {
+                "id": 158,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 simulated\"}",
+                "occurredAt": "2026-09-19T15:34:15.5970958+04:00",
+                "sequenceNumber": 9
+              },
+              {
+                "id": 156,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:34:07.5189903+04:00",
+                "sequenceNumber": 8
+              },
+              {
+                "id": 154,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:34:07.4953888+04:00",
+                "sequenceNumber": 8
+              },
+              {
+                "id": 153,
+                "proctorSessionId": 149,
+                "eventType": 59,
+                "eventTypeName": "ProctorWarning",
+                "severity": 3,
+                "severityLabel": "High",
+                "isViolation": false,
+                "metadataJson": "{\"proctorUserId\":\"1273bd4b-b3a2-414f-8aca-00b13e102992\",\"message\":\"QA26 protocol warning 1789817640441\"}",
+                "occurredAt": "2026-09-19T15:34:02.7581733+04:00",
+                "sequenceNumber": 7
+              },
+              {
+                "id": 152,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:57.5252814+04:00",
+                "sequenceNumber": 6
+              },
+              {
+                "id": 149,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:33:57.490348+04:00",
+                "sequenceNumber": 6
+              },
+              {
+                "id": 147,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:47.5064402+04:00",
+                "sequenceNumber": 5
+              },
+              {
+                "id": 144,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": "{\"source\":\"QA26 periodic simulated client\"}",
+                "occurredAt": "2026-09-19T15:33:47.4774251+04:00",
+                "sequenceNumber": 5
+              },
+              {
+                "id": 140,
+                "proctorSessionId": 149,
+                "eventType": 1,
+                "eventTypeName": "Heartbeat",
+                "severity": 0,
+                "severityLabel": "Info",
+                "isViolation": false,
+                "metadataJson": null,
+                "occurredAt": "2026-09-19T15:33:37.505165+04:00",
+                "sequenceNumber": 4
+              }
+            ],
+            "candidateEmail": "qa26.protocol.1789817576996.a@example.test",
+            "candidateNameAr": null,
+            "candidateRollNo": null,
+            "candidateDepartment": "QA26 Engineering",
+            "candidatePhone": null,
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "examDurationMinutes": 120,
+            "examPassScore": 30,
+            "examMaxAttempts": 2,
+            "examTotalQuestions": 5,
+            "examRequireWebcam": false,
+            "examEnableScreenMonitoring": true,
+            "examRequireIdVerification": false,
+            "examRequireFullscreen": false,
+            "examPreventCopyPaste": false,
+            "examBrowserLockdown": false,
+            "attemptNumber": 1,
+            "attemptTotalScore": null,
+            "attemptIsPassed": null,
+            "attemptSubmittedAt": "2026-09-19T16:30:02.7145633+04:00",
+            "attemptStartedAt": "2026-09-19T15:33:03.6587839+04:00",
+            "attemptExtraTimeSeconds": 60,
+            "attemptTotalAnswered": 1,
+            "attemptTotalQuestions": 5,
+            "sessionDuration": "56m 59s",
+            "sessionDurationMinutes": 57,
+            "identityVerification": null,
+            "violationBreakdown": [
+              {
+                "eventType": "TabSwitched",
+                "count": 1,
+                "severity": "Medium"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3488.96
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:19.184Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/case/10",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Case not found",
+          "data": null,
+          "errors": [],
+          "traceId": "0dccdf551ba5886dc5134081aec7a3ad"
+        },
+        "ms": 1170.02
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:20.855Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Incident/cases?examId=115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1670.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:20.857Z",
+      "policyObservation": "Incident existing scope is department or specifically assigned no-department case reviewer; cross-department exam assignment is separate.",
+      "incidentStatus": 404,
+      "incidentList": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 10,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 10,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1670.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:21.560Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "POST",
+      "route": "/api/ExamProctor/unassign",
+      "request": {
+        "examId": 115,
+        "proctorIds": [
+          "17116732-f707-49f1-922e-3b2e09750f08"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedReasons": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 proctor(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedReasons": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 701.63
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:22.720Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/ExamProctor/115",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 115,
+          "examTitleEn": "QA26 Complete Lifecycle",
+          "examTitleAr": "اختبار QA26 lifecycle",
+          "assignedProctors": [
+            {
+              "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+              "displayName": "QA26 Engineering Proctor 1",
+              "fullName": "QA26 Engineering Proctor 1",
+              "email": "qa26.eng.proctor1@example.test",
+              "isAssigned": true,
+              "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+            }
+          ],
+          "availableProctors": [
+            {
+              "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+              "displayName": "test proctor",
+              "fullName": "test proctor",
+              "email": "proc@test.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "17116732-f707-49f1-922e-3b2e09750f08",
+              "displayName": "QA26 Operations Proctor 1",
+              "fullName": "QA26 Operations Proctor 1",
+              "email": "qa26.ops.proctor1@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+              "displayName": "QA26 User Regression",
+              "fullName": "QA26 User Regression",
+              "email": "qa26.user-regression@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+              "displayName": "QA26 Browser Proctor",
+              "fullName": "QA26 Browser Proctor",
+              "email": "qa26.browser.proctor@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+              "displayName": "Layla Amr",
+              "fullName": "Layla Amr",
+              "email": "layla.it.proctor@examcore.com",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+              "displayName": "QA26 before inactive",
+              "fullName": "QA26 before inactive",
+              "email": "qa26.user-before-inactive@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            },
+            {
+              "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+              "displayName": "QA26 before deleted",
+              "fullName": "QA26 before deleted",
+              "email": "qa26.user-before-deleted@example.test",
+              "isAssigned": false,
+              "assignedAt": null
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 115,
+            "examTitleEn": "QA26 Complete Lifecycle",
+            "examTitleAr": "اختبار QA26 lifecycle",
+            "assignedProctors": [
+              {
+                "id": "1273bd4b-b3a2-414f-8aca-00b13e102992",
+                "displayName": "QA26 Engineering Proctor 1",
+                "fullName": "QA26 Engineering Proctor 1",
+                "email": "qa26.eng.proctor1@example.test",
+                "isAssigned": true,
+                "assignedAt": "2026-09-19T15:00:33.0617854+04:00"
+              }
+            ],
+            "availableProctors": [
+              {
+                "id": "117a8c19-f747-4d9b-8629-7b9afc10bcfe",
+                "displayName": "test proctor",
+                "fullName": "test proctor",
+                "email": "proc@test.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "17116732-f707-49f1-922e-3b2e09750f08",
+                "displayName": "QA26 Operations Proctor 1",
+                "fullName": "QA26 Operations Proctor 1",
+                "email": "qa26.ops.proctor1@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "1b6fa53c-aa2e-4ddb-9f51-16365c456443",
+                "displayName": "QA26 User Regression",
+                "fullName": "QA26 User Regression",
+                "email": "qa26.user-regression@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "4c4eb16d-93d3-41d9-8881-d4d741212885",
+                "displayName": "QA26 Browser Proctor",
+                "fullName": "QA26 Browser Proctor",
+                "email": "qa26.browser.proctor@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "56931dd5-9681-4406-ab74-0230ebe92233",
+                "displayName": "Layla Amr",
+                "fullName": "Layla Amr",
+                "email": "layla.it.proctor@examcore.com",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "5d247e6c-79fb-444f-aca5-149120d3de8d",
+                "displayName": "QA26 before inactive",
+                "fullName": "QA26 before inactive",
+                "email": "qa26.user-before-inactive@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              },
+              {
+                "id": "9fb1938c-6b17-4c88-89f3-c87e6aee9c38",
+                "displayName": "QA26 before deleted",
+                "fullName": "QA26 before deleted",
+                "email": "qa26.user-before-deleted@example.test",
+                "isAssigned": false,
+                "assignedAt": null
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1159.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:23.187Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/ExamProctor/unassign",
+      "request": {
+        "examId": 115,
+        "proctorIds": [
+          "17116732-f707-49f1-922e-3b2e09750f08"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedReasons": []
+        },
+        "body": {
+          "success": true,
+          "message": "0 proctor(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedReasons": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 464.36
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:25.739Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/149",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Session not found",
+          "data": null,
+          "errors": [],
+          "traceId": "05a5c8875c0427b17820fb8fcb0a740d"
+        },
+        "ms": 2550.7
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:25.974Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/logs?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.22
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:26.214Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/dashboard",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 236.61
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:26.450Z",
+      "identity": "qa26.ops.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/exports?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 233.91
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:26.685Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/logs?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.12
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:26.921Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/dashboard",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.47
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:27.156Z",
+      "identity": "qa26.eng.admin1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/exports?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.33
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:27.391Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/logs?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.14
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:27.626Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/dashboard",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.43
+      }
+    },
+    {
+      "at": "2026-09-19T12:34:27.865Z",
+      "identity": "qa26.ops.proctor1@example.test",
+      "method": "GET",
+      "route": "/api/Audit/exports?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 236.65
+      }
+    }
+  ]
+}

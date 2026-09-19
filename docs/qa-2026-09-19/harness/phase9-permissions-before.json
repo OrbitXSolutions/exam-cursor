@@ -1,0 +1,2249 @@
+{
+  "classification": "SIMULATED TEST: actual HTTP API calls and persisted application state; no browser or physical verification",
+  "startedAt": "2026-09-19T12:31:22.350Z",
+  "checks": [
+    {
+      "name": "Candidate-only cannot enter staff endpoint /api/Grading/attempt/208",
+      "passed": true,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:31:33.814Z"
+    },
+    {
+      "name": "Anonymous cannot enter protected endpoint /api/Grading/attempt/208",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:31:33.818Z"
+    },
+    {
+      "name": "Candidate-only cannot enter staff endpoint /api/ExamResult/attempt/208",
+      "passed": true,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:31:34.053Z"
+    },
+    {
+      "name": "Anonymous cannot enter protected endpoint /api/ExamResult/attempt/208",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:31:34.056Z"
+    },
+    {
+      "name": "Candidate-only cannot enter staff endpoint /api/Assignments/candidates?examId=128",
+      "passed": true,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:31:34.290Z"
+    },
+    {
+      "name": "Anonymous cannot enter protected endpoint /api/Assignments/candidates?examId=128",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:31:34.293Z"
+    },
+    {
+      "name": "Candidate-only cannot enter staff endpoint /api/Users?pageSize=1",
+      "passed": true,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:31:34.529Z"
+    },
+    {
+      "name": "Anonymous cannot enter protected endpoint /api/Users?pageSize=1",
+      "passed": true,
+      "detail": {
+        "status": 401
+      },
+      "at": "2026-09-19T12:31:34.531Z"
+    },
+    {
+      "name": "Unrelated candidate cannot read another candidate resource /api/Candidate/results/my-result/208",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:31:34.993Z"
+    },
+    {
+      "name": "Unrelated candidate cannot read another candidate resource /api/ExamResult/my-result/208",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:31:35.917Z"
+    },
+    {
+      "name": "Unrelated candidate cannot read another candidate resource /api/Grading/my-result/208",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:31:36.380Z"
+    },
+    {
+      "name": "Unrelated candidate cannot read another candidate resource /api/Proctor/session/attempt/203",
+      "passed": true,
+      "detail": {
+        "status": 404
+      },
+      "at": "2026-09-19T12:31:37.310Z"
+    },
+    {
+      "name": "Mixed Candidate/Examiner can grade its current department",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "count": 5
+      },
+      "at": "2026-09-19T12:31:48.681Z"
+    },
+    {
+      "name": "Mixed role respects foreign-department boundary",
+      "passed": true,
+      "detail": {
+        "status": 400
+      },
+      "at": "2026-09-19T12:31:50.546Z"
+    },
+    {
+      "name": "Existing JWT loses previous department grading list after transfer",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "count": 0
+      },
+      "at": "2026-09-19T12:31:57.101Z"
+    },
+    {
+      "name": "Existing JWT uses newly assigned department authorization",
+      "passed": true,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:31:57.102Z"
+    },
+    {
+      "name": "Restored department applies without fresh login",
+      "passed": true,
+      "at": "2026-09-19T12:32:01.514Z"
+    },
+    {
+      "name": "Revoked Examiner role immediately blocks previously issued JWT",
+      "passed": false,
+      "detail": {
+        "status": 200,
+        "exposedAttempts": [
+          206,
+          211,
+          205,
+          204,
+          203
+        ],
+        "currentRoles": [
+          "Candidate"
+        ]
+      },
+      "at": "2026-09-19T12:32:08.747Z"
+    },
+    {
+      "name": "Fresh Candidate-only JWT is denied the same grading endpoint",
+      "passed": true,
+      "detail": {
+        "status": 403
+      },
+      "at": "2026-09-19T12:32:10.190Z"
+    },
+    {
+      "name": "Explicit assignment appears in candidate eligibility",
+      "passed": true,
+      "detail": {
+        "examId": 120,
+        "examType": 0,
+        "titleEn": "QA26 Strict Proctored Identity",
+        "titleAr": "اختبار QA26 strict",
+        "descriptionEn": "Dedicated lifecycle acceptance fixture",
+        "descriptionAr": "اختبار دورة حياة الاختبار",
+        "startAt": "2026-09-19T10:55:20.015+00:00",
+        "endAt": "2026-09-20T11:00:20.015+00:00",
+        "durationMinutes": 120,
+        "maxAttempts": 2,
+        "totalQuestions": 2,
+        "totalPoints": 20,
+        "passScore": 10,
+        "instructions": [
+          {
+            "order": 1,
+            "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+            "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+          }
+        ],
+        "accessPolicy": {
+          "requiresAccessCode": false,
+          "requireProctoring": true,
+          "requireIdVerification": true,
+          "requireWebcam": true,
+          "preventCopyPaste": true,
+          "preventScreenCapture": true,
+          "requireFullscreen": true,
+          "browserLockdown": true,
+          "enableScreenMonitoring": true,
+          "maxViolationWarnings": 3
+        },
+        "eligibility": {
+          "canStartNow": true,
+          "reasons": [],
+          "attemptsUsed": 0,
+          "attemptsRemaining": 2
+        }
+      },
+      "at": "2026-09-19T12:32:14.873Z"
+    },
+    {
+      "name": "Unassignment is reflected immediately for existing candidate JWT",
+      "passed": false,
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-09-19T12:32:18.115Z"
+    },
+    {
+      "name": "Unassigned candidate cannot create strict exam attempt",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "message": "Approved identity verification is required before starting this exam"
+      },
+      "at": "2026-09-19T12:32:18.874Z"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-09-19T12:31:23.595Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "super-admin@smartexam.local",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:31:23.5911291+04:00",
+          "user": {
+            "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "email": "super-admin@smartexam.local",
+            "displayName": "System Administrator",
+            "fullName": "System Administrator",
+            "fullNameAr": "مسؤول النظام",
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "SuperAdmin"
+            ],
+            "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+            "lastLoginDate": "2026-09-19T16:31:22.896313+04:00",
+            "departmentId": null,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:31:23.5911291+04:00",
+            "user": {
+              "id": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+              "email": "super-admin@smartexam.local",
+              "displayName": "System Administrator",
+              "fullName": "System Administrator",
+              "fullNameAr": "مسؤول النظام",
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "SuperAdmin"
+              ],
+              "createdDate": "2026-05-17T15:14:24.7554149+04:00",
+              "lastLoginDate": "2026-09-19T16:31:22.896313+04:00",
+              "departmentId": null,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1242.41
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:24.069Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/by-email/qa26.phase9.scope@example.test",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "User not found.",
+          "data": null,
+          "errors": [],
+          "traceId": "1b53355ec72cc9dbedba458c808f54c5"
+        },
+        "ms": 473.28
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:28.581Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Users",
+      "request": {
+        "email": "qa26.phase9.scope@example.test",
+        "password": "[REDACTED]",
+        "fullName": "QA26 Phase9 Scope Actor",
+        "role": "Candidate",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:31:27.4028553+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "User created successfully.",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:31:27.4028553+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 4511.67
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:29.993Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:31:27.4028553+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": null,
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": null,
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:31:27.4028553+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": null,
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": null,
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1407.6
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:31.412Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User assigned to department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1419.04
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:32.640Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.phase9.scope@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:31:32.6398473+04:00",
+          "user": {
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:31:31.9324954+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:31:32.6398473+04:00",
+            "user": {
+              "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+              "email": "qa26.phase9.scope@example.test",
+              "displayName": "QA26 Phase9 Scope Actor",
+              "fullName": "QA26 Phase9 Scope Actor",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+              "lastLoginDate": "2026-09-19T16:31:31.9324954+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1226.99
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:33.813Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading/attempt/208",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 1172.32
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:33.818Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/Grading/attempt/208",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 2.72
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.053Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/attempt/208",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 233.32
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.055Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/ExamResult/attempt/208",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 1.22
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.289Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=128",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 232.78
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.292Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/Assignments/candidates?examId=128",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 1.41
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.528Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Users?pageSize=1",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 234.72
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.530Z",
+      "identity": "anonymous",
+      "method": "GET",
+      "route": "/api/Users?pageSize=1",
+      "response": {
+        "status": 401,
+        "ok": false,
+        "body": "",
+        "ms": 0.8
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:34.993Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/results/my-result/208",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Access denied",
+          "data": null,
+          "errors": [],
+          "traceId": "d384887e3dbcfdcc851d0ce9f43939fa"
+        },
+        "ms": 461.46
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:35.917Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/ExamResult/my-result/208",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Result not found",
+          "data": null,
+          "errors": [],
+          "traceId": "4a4b6cd823bc4547a95d426ce4313f36"
+        },
+        "ms": 922.59
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:36.379Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading/my-result/208",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Grading result not found",
+          "data": null,
+          "errors": [],
+          "traceId": "f13a9554ad0fd2a9e30a6566488a5cd4"
+        },
+        "ms": 460.76
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:37.310Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Proctor/session/attempt/203",
+      "response": {
+        "status": 404,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Session not found",
+          "data": null,
+          "errors": [],
+          "traceId": "2277f44150792fe91b51d389a60fb521"
+        },
+        "ms": 929.2
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:41.142Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 128,
+        "candidateIds": [
+          "9f5a1162-e1ab-434f-b0ee-e09dce37eabd"
+        ],
+        "scheduleFrom": "2026-09-19T12:30:37.311Z",
+        "scheduleTo": "2026-09-19T13:31:37.311Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3831.5
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:44.140Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Roles/add-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "roleName": "Examiner"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User added to role successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2996.67
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:45.348Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.phase9.scope@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:31:45.3481374+04:00",
+          "user": {
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Examiner",
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:31:44.6549971+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:31:45.3481374+04:00",
+            "user": {
+              "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+              "email": "qa26.phase9.scope@example.test",
+              "displayName": "QA26 Phase9 Scope Actor",
+              "fullName": "QA26 Phase9 Scope Actor",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Examiner",
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+              "lastLoginDate": "2026-09-19T16:31:44.6549971+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1207.71
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:48.680Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 95,
+              "attemptId": 206,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 4,
+              "statusName": "Completed",
+              "totalScore": 10,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 91,
+              "attemptId": 211,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 85,
+              "attemptId": 205,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 84,
+              "attemptId": 204,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 83,
+              "attemptId": 203,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 5,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 95,
+                "attemptId": 206,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 4,
+                "statusName": "Completed",
+                "totalScore": 10,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 91,
+                "attemptId": 211,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 85,
+                "attemptId": 205,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 84,
+                "attemptId": 204,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 83,
+                "attemptId": 203,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 5,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3330.97
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:50.545Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/122",
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Exam not found",
+          "data": null,
+          "errors": [],
+          "traceId": "def6dcbff9abedd099f60a67a0c5dd86"
+        },
+        "ms": 1864.02
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:51.954Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "departmentId": 9
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User assigned to department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1407.05
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:54.989Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 0,
+          "totalPages": 0,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 0,
+            "totalPages": 0,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3033.72
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:57.101Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading/stats/exam/122",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 122,
+          "examTitleEn": "QA26 Operations Isolated Exam",
+          "totalAttempts": 0,
+          "gradedAttempts": 0,
+          "pendingGrading": 0,
+          "manualGradingRequired": 0,
+          "passedCount": 0,
+          "failedCount": 0,
+          "averageScore": 0,
+          "highestScore": 0,
+          "lowestScore": 0,
+          "passRate": 0
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 122,
+            "examTitleEn": "QA26 Operations Isolated Exam",
+            "totalAttempts": 0,
+            "gradedAttempts": 0,
+            "pendingGrading": 0,
+            "manualGradingRequired": 0,
+            "passedCount": 0,
+            "failedCount": 0,
+            "averageScore": 0,
+            "highestScore": 0,
+            "lowestScore": 0,
+            "passRate": 0
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2111.18
+      }
+    },
+    {
+      "at": "2026-09-19T12:31:58.507Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Departments/assign-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "departmentId": 8
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User assigned to department successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1404.43
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:01.513Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 95,
+              "attemptId": 206,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 4,
+              "statusName": "Completed",
+              "totalScore": 10,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 91,
+              "attemptId": 211,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 85,
+              "attemptId": 205,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 84,
+              "attemptId": 204,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 83,
+              "attemptId": 203,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 5,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 95,
+                "attemptId": 206,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 4,
+                "statusName": "Completed",
+                "totalScore": 10,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 91,
+                "attemptId": 211,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 85,
+                "attemptId": 205,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 84,
+                "attemptId": 204,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 83,
+                "attemptId": 203,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 5,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3004.89
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:04.047Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Roles/remove-user",
+      "request": {
+        "userId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+        "roleName": "Examiner"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": true,
+        "body": {
+          "success": true,
+          "message": "User removed from role successfully.",
+          "data": true,
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2532.75
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:07.359Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128&pageSize=100",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "items": [
+            {
+              "id": 95,
+              "attemptId": 206,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 4,
+              "statusName": "Completed",
+              "totalScore": 10,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 91,
+              "attemptId": 211,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 85,
+              "attemptId": 205,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+              "candidateName": "QA26 Engineering Candidate 3",
+              "candidateRollNo": null,
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 84,
+              "attemptId": 204,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+              "candidateName": "QA26 Import B",
+              "candidateRollNo": "QA26-IMP-B",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 0,
+              "maxPossibleScore": 40,
+              "isPassed": false,
+              "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            },
+            {
+              "id": 83,
+              "attemptId": 203,
+              "examId": 128,
+              "examTitleEn": "QA26 Completion Objective matrix",
+              "examTitleAr": "اكتمال QA26 Objective matrix",
+              "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+              "candidateName": "QA26 Import A",
+              "candidateRollNo": "QA26-IMP-A",
+              "status": 2,
+              "statusName": "AutoGraded",
+              "totalScore": 40,
+              "maxPossibleScore": 40,
+              "isPassed": true,
+              "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+              "manualGradingRequired": 0,
+              "isResultFinalized": true
+            }
+          ],
+          "pageNumber": 1,
+          "pageSize": 100,
+          "totalCount": 5,
+          "totalPages": 1,
+          "hasPreviousPage": false,
+          "hasNextPage": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "items": [
+              {
+                "id": 95,
+                "attemptId": 206,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 4,
+                "statusName": "Completed",
+                "totalScore": 10,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T16:08:58.9592552+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 91,
+                "attemptId": 211,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:52:36.9879555+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 85,
+                "attemptId": 205,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "0d70f96e-612a-4bc1-81c9-091201b1a23c",
+                "candidateName": "QA26 Engineering Candidate 3",
+                "candidateRollNo": null,
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:53.3631964+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 84,
+                "attemptId": 204,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "936ba850-29c7-4898-b4e1-f1c6bf510a2d",
+                "candidateName": "QA26 Import B",
+                "candidateRollNo": "QA26-IMP-B",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 0,
+                "maxPossibleScore": 40,
+                "isPassed": false,
+                "gradedAt": "2026-09-19T15:44:37.8458265+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              },
+              {
+                "id": 83,
+                "attemptId": 203,
+                "examId": 128,
+                "examTitleEn": "QA26 Completion Objective matrix",
+                "examTitleAr": "اكتمال QA26 Objective matrix",
+                "candidateId": "062a0b10-77eb-4689-861c-6b9d84dcce6e",
+                "candidateName": "QA26 Import A",
+                "candidateRollNo": "QA26-IMP-A",
+                "status": 2,
+                "statusName": "AutoGraded",
+                "totalScore": 40,
+                "maxPossibleScore": 40,
+                "isPassed": true,
+                "gradedAt": "2026-09-19T15:44:31.3449196+04:00",
+                "manualGradingRequired": 0,
+                "isResultFinalized": true
+              }
+            ],
+            "pageNumber": 1,
+            "pageSize": 100,
+            "totalCount": 5,
+            "totalPages": 1,
+            "hasPreviousPage": false,
+            "hasNextPage": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3310.83
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:08.746Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:32:03.3569472+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": "2026-09-19T16:31:44.6549971+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:32:03.3569472+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:31:44.6549971+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1386.06
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:09.957Z",
+      "identity": "anonymous",
+      "method": "POST",
+      "route": "/api/Auth/login",
+      "request": {
+        "email": "qa26.phase9.scope@example.test",
+        "password": "[REDACTED]"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "accessToken": "[REDACTED]",
+          "refreshToken": "[REDACTED]",
+          "expiration": "2026-09-19T17:32:09.9569857+04:00",
+          "user": {
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:32:09.2601924+04:00",
+            "departmentId": 8,
+            "departmentNameEn": null,
+            "departmentNameAr": null,
+            "isProtected": false
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful.",
+          "data": {
+            "accessToken": "[REDACTED]",
+            "refreshToken": "[REDACTED]",
+            "expiration": "2026-09-19T17:32:09.9569857+04:00",
+            "user": {
+              "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+              "email": "qa26.phase9.scope@example.test",
+              "displayName": "QA26 Phase9 Scope Actor",
+              "fullName": "QA26 Phase9 Scope Actor",
+              "fullNameAr": null,
+              "isBlocked": false,
+              "status": "Active",
+              "emailConfirmed": true,
+              "roles": [
+                "Candidate"
+              ],
+              "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+              "lastLoginDate": "2026-09-19T16:32:09.2601924+04:00",
+              "departmentId": 8,
+              "departmentNameEn": null,
+              "departmentNameAr": null,
+              "isProtected": false
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1208.91
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:10.189Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Grading?examId=128&pageSize=100",
+      "response": {
+        "status": 403,
+        "ok": false,
+        "body": "",
+        "ms": 231.24
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:13.897Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/assign",
+      "request": {
+        "examId": 120,
+        "candidateIds": [
+          "9f5a1162-e1ab-434f-b0ee-e09dce37eabd"
+        ],
+        "scheduleFrom": "2026-09-19T12:30:37.311Z",
+        "scheduleTo": "2026-09-19T13:31:37.311Z"
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) assigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 3705.87
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:14.872Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/exams/120/preview",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examType": 0,
+          "titleEn": "QA26 Strict Proctored Identity",
+          "titleAr": "اختبار QA26 strict",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T10:55:20.015+00:00",
+          "endAt": "2026-09-20T11:00:20.015+00:00",
+          "durationMinutes": 120,
+          "maxAttempts": 2,
+          "totalQuestions": 2,
+          "totalPoints": 20,
+          "passScore": 10,
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+            }
+          ],
+          "accessPolicy": {
+            "requiresAccessCode": false,
+            "requireProctoring": true,
+            "requireIdVerification": true,
+            "requireWebcam": true,
+            "preventCopyPaste": true,
+            "preventScreenCapture": true,
+            "requireFullscreen": true,
+            "browserLockdown": true,
+            "enableScreenMonitoring": true,
+            "maxViolationWarnings": 3
+          },
+          "eligibility": {
+            "canStartNow": true,
+            "reasons": [],
+            "attemptsUsed": 0,
+            "attemptsRemaining": 2
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examType": 0,
+            "titleEn": "QA26 Strict Proctored Identity",
+            "titleAr": "اختبار QA26 strict",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "totalQuestions": 2,
+            "totalPoints": 20,
+            "passScore": 10,
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ],
+            "accessPolicy": {
+              "requiresAccessCode": false,
+              "requireProctoring": true,
+              "requireIdVerification": true,
+              "requireWebcam": true,
+              "preventCopyPaste": true,
+              "preventScreenCapture": true,
+              "requireFullscreen": true,
+              "browserLockdown": true,
+              "enableScreenMonitoring": true,
+              "maxViolationWarnings": 3
+            },
+            "eligibility": {
+              "canStartNow": true,
+              "reasons": [],
+              "attemptsUsed": 0,
+              "attemptsRemaining": 2
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 974.81
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:17.199Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 120,
+        "candidateIds": [
+          "9f5a1162-e1ab-434f-b0ee-e09dce37eabd"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2324.11
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:18.114Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "GET",
+      "route": "/api/Candidate/exams/120/preview",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "examId": 120,
+          "examType": 0,
+          "titleEn": "QA26 Strict Proctored Identity",
+          "titleAr": "اختبار QA26 strict",
+          "descriptionEn": "Dedicated lifecycle acceptance fixture",
+          "descriptionAr": "اختبار دورة حياة الاختبار",
+          "startAt": "2026-09-19T10:55:20.015+00:00",
+          "endAt": "2026-09-20T11:00:20.015+00:00",
+          "durationMinutes": 120,
+          "maxAttempts": 2,
+          "totalQuestions": 2,
+          "totalPoints": 20,
+          "passScore": 10,
+          "instructions": [
+            {
+              "order": 1,
+              "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+              "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+            }
+          ],
+          "accessPolicy": {
+            "requiresAccessCode": false,
+            "requireProctoring": true,
+            "requireIdVerification": true,
+            "requireWebcam": true,
+            "preventCopyPaste": true,
+            "preventScreenCapture": true,
+            "requireFullscreen": true,
+            "browserLockdown": true,
+            "enableScreenMonitoring": true,
+            "maxViolationWarnings": 3
+          },
+          "eligibility": {
+            "canStartNow": true,
+            "reasons": [],
+            "attemptsUsed": 0,
+            "attemptsRemaining": 2
+          }
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "examId": 120,
+            "examType": 0,
+            "titleEn": "QA26 Strict Proctored Identity",
+            "titleAr": "اختبار QA26 strict",
+            "descriptionEn": "Dedicated lifecycle acceptance fixture",
+            "descriptionAr": "اختبار دورة حياة الاختبار",
+            "startAt": "2026-09-19T10:55:20.015+00:00",
+            "endAt": "2026-09-20T11:00:20.015+00:00",
+            "durationMinutes": 120,
+            "maxAttempts": 2,
+            "totalQuestions": 2,
+            "totalPoints": 20,
+            "passScore": 10,
+            "instructions": [
+              {
+                "order": 1,
+                "contentEn": "Answer independently. Your saved answers persist after reload. Submit when finished.",
+                "contentAr": "أجب بشكل مستقل واحفظ إجاباتك ثم أرسل الاختبار."
+              }
+            ],
+            "accessPolicy": {
+              "requiresAccessCode": false,
+              "requireProctoring": true,
+              "requireIdVerification": true,
+              "requireWebcam": true,
+              "preventCopyPaste": true,
+              "preventScreenCapture": true,
+              "requireFullscreen": true,
+              "browserLockdown": true,
+              "enableScreenMonitoring": true,
+              "maxViolationWarnings": 3
+            },
+            "eligibility": {
+              "canStartNow": true,
+              "reasons": [],
+              "attemptsUsed": 0,
+              "attemptsRemaining": 2
+            }
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 914.17
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:18.873Z",
+      "identity": "qa26.phase9.scope@example.test",
+      "method": "POST",
+      "route": "/api/Candidate/exams/120/start",
+      "request": {},
+      "response": {
+        "status": 400,
+        "ok": false,
+        "data": null,
+        "body": {
+          "success": false,
+          "message": "Approved identity verification is required before starting this exam",
+          "data": null,
+          "errors": [],
+          "traceId": "11cf549f5e8b9571d110314da2a64899"
+        },
+        "ms": 757.03
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:20.254Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "GET",
+      "route": "/api/Users/9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "phoneNumber": null,
+          "phoneNumberConfirmed": false,
+          "updatedDate": "2026-09-19T16:32:09.7216769+04:00",
+          "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+          "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+          "email": "qa26.phase9.scope@example.test",
+          "displayName": "QA26 Phase9 Scope Actor",
+          "fullName": "QA26 Phase9 Scope Actor",
+          "fullNameAr": null,
+          "isBlocked": false,
+          "status": "Active",
+          "emailConfirmed": true,
+          "roles": [
+            "Candidate"
+          ],
+          "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+          "lastLoginDate": "2026-09-19T16:32:09.2601924+04:00",
+          "departmentId": 8,
+          "departmentNameEn": "QA26 Engineering",
+          "departmentNameAr": "اختبار QA26 الهندسة",
+          "isProtected": false
+        },
+        "body": {
+          "success": true,
+          "message": "Operation successful",
+          "data": {
+            "phoneNumber": null,
+            "phoneNumberConfirmed": false,
+            "updatedDate": "2026-09-19T16:32:09.7216769+04:00",
+            "createdBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "updatedBy": "d24c13f2-b671-4366-8a25-729a8fcb4744",
+            "id": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+            "email": "qa26.phase9.scope@example.test",
+            "displayName": "QA26 Phase9 Scope Actor",
+            "fullName": "QA26 Phase9 Scope Actor",
+            "fullNameAr": null,
+            "isBlocked": false,
+            "status": "Active",
+            "emailConfirmed": true,
+            "roles": [
+              "Candidate"
+            ],
+            "createdDate": "2026-09-19T16:31:25.9911198+04:00",
+            "lastLoginDate": "2026-09-19T16:32:09.2601924+04:00",
+            "departmentId": 8,
+            "departmentNameEn": "QA26 Engineering",
+            "departmentNameAr": "اختبار QA26 الهندسة",
+            "isProtected": false
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 1379.39
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:22.314Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 120,
+        "candidateIds": [
+          "9f5a1162-e1ab-434f-b0ee-e09dce37eabd"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 0,
+          "skippedCount": 1,
+          "skippedDetails": [
+            {
+              "candidateId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+              "candidateName": "QA26 Phase9 Scope Actor",
+              "reason": "Not currently assigned"
+            }
+          ]
+        },
+        "body": {
+          "success": true,
+          "message": "0 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 0,
+            "skippedCount": 1,
+            "skippedDetails": [
+              {
+                "candidateId": "9f5a1162-e1ab-434f-b0ee-e09dce37eabd",
+                "candidateName": "QA26 Phase9 Scope Actor",
+                "reason": "Not currently assigned"
+              }
+            ]
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2059.03
+      }
+    },
+    {
+      "at": "2026-09-19T12:32:24.601Z",
+      "identity": "super-admin@smartexam.local",
+      "method": "POST",
+      "route": "/api/Assignments/unassign",
+      "request": {
+        "examId": 128,
+        "candidateIds": [
+          "9f5a1162-e1ab-434f-b0ee-e09dce37eabd"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "ok": true,
+        "data": {
+          "totalTargeted": 1,
+          "successCount": 1,
+          "skippedCount": 0,
+          "skippedDetails": []
+        },
+        "body": {
+          "success": true,
+          "message": "1 candidate(s) unassigned successfully.",
+          "data": {
+            "totalTargeted": 1,
+            "successCount": 1,
+            "skippedCount": 0,
+            "skippedDetails": []
+          },
+          "errors": [],
+          "traceId": null
+        },
+        "ms": 2285.7
+      }
+    }
+  ]
+}

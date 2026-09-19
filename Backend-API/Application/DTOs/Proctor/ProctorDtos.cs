@@ -148,6 +148,7 @@ public class ProctorSessionListDto
     public string StatusName => Status.ToString();
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? EndedAt { get; set; }
+    public int RemainingSeconds { get; set; }
     public int TotalViolations { get; set; }
     public int CountableViolationCount { get; set; }
     public int MaxViolationWarnings { get; set; }

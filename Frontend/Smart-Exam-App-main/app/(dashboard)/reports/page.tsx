@@ -153,13 +153,19 @@ export default function ReportsPage() {
     if (!dashboard || candidates.length === 0) return
     const headers = ["Candidate", "Candidate ID", "Score %", "Status", "Date"]
     const rows = candidates.map((c) => [
-      `"${(c.candidateName || "").replace(/"/g, '""')}"`,
-      `"${(c.candidateId || "").replace(/"/g, '""')}"`,
+      c.candidateName || "",
+      c.candidateId || "",
       Math.round(c.percentage),
       c.isPassed ? "Passed" : "Failed",
       new Date(c.finalizedAt).toLocaleString(locale === "ar" ? "ar-SA" : "en-US", { timeZone: "Asia/Dubai" }),
     ])
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+    const csvCell = (value: string | number) => {
+      const text = String(value)
+      // Candidate-provided text must remain text when opened in a spreadsheet.
+      const safeText = typeof value === "string" && /^[\s\u0000-\u001f]*[=+@-]/.test(text) ? `'${text}` : text
+      return `"${safeText.replace(/"/g, '""')}"`
+    }
+    const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n")
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -273,7 +279,7 @@ export default function ReportsPage() {
         />
         <StatCard
           title={t("reports.averageScore")}
-          value={`${dashboard ? Math.round(dashboard.averageScore) : 0}%`}
+          value={`${dashboard ? Math.round(dashboard.averageScore * 100) / 100 : 0} ${locale === "ar" ? "نقطة" : "points"}`}
           icon={Target}
         />
         <StatCard
@@ -283,7 +289,7 @@ export default function ReportsPage() {
         />
         <StatCard
           title={t("reports.highestScore")}
-          value={`${dashboard ? Math.round(dashboard.highestScore) : 0}%`}
+          value={`${dashboard ? Math.round(dashboard.highestScore * 100) / 100 : 0} ${locale === "ar" ? "نقطة" : "points"}`}
           icon={Award}
         />
       </div>

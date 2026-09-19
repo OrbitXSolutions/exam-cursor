@@ -134,6 +134,12 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
     const activeVideo = video
 
     let aborted = false
+    let firstFailure: string | null = null
+    const recordFailure = (stage: string, detail?: unknown) => {
+      const description = detail instanceof Error ? detail.message : typeof detail === "string" ? detail : ""
+      firstFailure ??= stage
+      console.warn("[MSE playback] " + JSON.stringify({ attemptId, stage, detail: description, mediaError: activeVideo.error?.message, mediaErrorCode: activeVideo.error?.code }))
+    }
 
     if (!("MediaSource" in window)) {
       const timeout = setTimeout(() => {
@@ -154,6 +160,11 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
       return () => clearTimeout(timeout)
     }
 
+    const handleMediaError = () => {
+      if (!aborted) recordFailure("Browser media error", activeVideo.error?.message)
+    }
+    activeVideo.addEventListener("error", handleMediaError)
+
     function waitForUpdateEnd(sb: SourceBuffer): Promise<void> {
       if (!sb.updating) return Promise.resolve()
       return new Promise(resolve => {
@@ -170,6 +181,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
           resolve(true)
         }
         const onSourceError = () => {
+          recordFailure("Recording data could not be decoded", activeVideo.error?.message)
           sb.removeEventListener("updateend", onUpdateEnd)
           sb.removeEventListener("error", onSourceError)
           resolve(false)
@@ -178,7 +190,8 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         sb.addEventListener("error", onSourceError)
         try {
           sb.appendBuffer(buf)
-        } catch {
+        } catch (error) {
+          recordFailure("Could not append recording data", error)
           sb.removeEventListener("updateend", onUpdateEnd)
           sb.removeEventListener("error", onSourceError)
           resolve(false)
@@ -206,16 +219,19 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
               sb = ms.addSourceBuffer(codec)
               sourceBufferRef.current = sb
               sb.mode = "sequence"
-            } catch { resolve(false); return }
+            } catch (error) { recordFailure("Could not initialize recording playback", error); resolve(false); return }
 
             // Validate codec by appending chunk 0 (the EBML initialization segment).
-            // A SourceBuffer error here means codec mismatch — try the next one.
+            // An error here may be a codec mismatch or invalid recording data.
             let res0: Response | null = null
-            try { res0 = await fetch(getChunkUrl(activeChunkData.chunks[0].filename)) } catch {}
-            if (!res0 || !res0.ok || aborted) { resolve(false); return }
+            try { res0 = await fetch(getChunkUrl(activeChunkData.chunks[0].filename)) } catch (error) { recordFailure("Could not fetch the first recording chunk", error) }
+            if (!res0 || !res0.ok || aborted) {
+              if (res0 && !res0.ok) recordFailure("Could not fetch the first recording chunk", `HTTP ${res0.status}`)
+              resolve(false); return
+            }
 
             let buf0: ArrayBuffer | null = null
-            try { buf0 = await res0.arrayBuffer() } catch {}
+            try { buf0 = await res0.arrayBuffer() } catch (error) { recordFailure("Could not read the first recording chunk", error) }
             if (!buf0 || aborted) { resolve(false); return }
 
             await waitForUpdateEnd(sb)
@@ -223,7 +239,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
 
             const initOk = await appendChunk(sb, buf0)
             if (!initOk) {
-              // Codec mismatch — signal decode error and let caller try next codec
+              // Signal a decode error and let the caller try the next codec.
               if (ms.readyState === "open") try { ms.endOfStream("decode") } catch {}
               resolve(false)
               return
@@ -267,8 +283,8 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
             }
 
             resolve(true)
-          } catch {
-            if (!aborted) console.error("[MSE] Unexpected error with codec", codec)
+          } catch (error) {
+            if (!aborted) recordFailure("Could not play the recording", error)
             resolve(false)
           }
         }, { once: true })
@@ -288,7 +304,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         }
       }
       if (!aborted) {
-        setError("Could not play video: no compatible codec found. The recording may be in an unsupported format.")
+        setError(firstFailure ?? "Could not play video: no compatible codec found. The recording may be in an unsupported format.")
       }
     }
 
@@ -296,44 +312,12 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
 
     return () => {
       aborted = true
+      activeVideo.removeEventListener("error", handleMediaError)
       mediaSourceRef.current = null
       sourceBufferRef.current = null
       activeVideo.src = ""
     }
-  }, [chunkData, getChunkUrl])
-
-  // Update currentTime from video element
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(video.currentTime)
-    }
-    const handlePlay = () => setIsPlaying(true)
-    const handlePause = () => setIsPlaying(false)
-    const handleEnded = () => setIsPlaying(false)
-    const handleDurationChange = () => {
-      // Accept the real duration when it becomes finite (fires after endOfStream())
-      if (video.duration && isFinite(video.duration) && video.duration > 0) {
-        setTotalDuration(video.duration)
-      }
-    }
-
-    video.addEventListener("timeupdate", handleTimeUpdate)
-    video.addEventListener("play", handlePlay)
-    video.addEventListener("pause", handlePause)
-    video.addEventListener("ended", handleEnded)
-    video.addEventListener("durationchange", handleDurationChange)
-
-    return () => {
-      video.removeEventListener("timeupdate", handleTimeUpdate)
-      video.removeEventListener("play", handlePlay)
-      video.removeEventListener("pause", handlePause)
-      video.removeEventListener("ended", handleEnded)
-      video.removeEventListener("durationchange", handleDurationChange)
-    }
-  }, [])
+  }, [attemptId, chunkData, getChunkUrl])
 
   // Fullscreen change listener
   useEffect(() => {
@@ -468,6 +452,14 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
           className="w-full h-full object-contain"
           playsInline
           muted={isMuted}
+          onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+          onDurationChange={(event) => {
+            const duration = event.currentTarget.duration
+            if (Number.isFinite(duration) && duration > 0) setTotalDuration(duration)
+          }}
         />
       </div>
 
@@ -497,7 +489,7 @@ export function VideoChunkPlayer({ attemptId, className = "" }: VideoChunkPlayer
         {/* Controls row */}
         <div className="flex items-center gap-1 text-white">
           {/* Play/Pause */}
-          <button onClick={togglePlay} className="p-1.5 hover:bg-white/20 rounded transition-colors">
+          <button onClick={togglePlay} aria-label={isPlaying ? "Pause video" : "Play video"} className="p-1.5 hover:bg-white/20 rounded transition-colors">
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           </button>
 

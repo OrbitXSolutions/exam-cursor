@@ -485,8 +485,6 @@ public class ExamResultService : IExamResultService
         }
 
         var cacheKey = CacheKeys.CandidateResultByAttempt(candidateId, attemptId);
-        if (_cache.TryGet<CandidateResultDto>(cacheKey, out var cachedDto) && cachedDto != null)
-            return ApiResponse<CandidateResultDto>.SuccessResponse(cachedDto);
 
         var result = await _context.Set<Result>()
             .Include(r => r.Exam)
@@ -501,6 +499,12 @@ public class ExamResultService : IExamResultService
 
         if (!result.IsPublishedToCandidate)
             return ApiResponse<CandidateResultDto>.FailureResponse("Result is not yet published");
+
+        if (!result.Exam.ShowResults)
+            return ApiResponse<CandidateResultDto>.FailureResponse("Results are not available for this exam");
+
+        if (_cache.TryGet<CandidateResultDto>(cacheKey, out var cachedDto) && cachedDto != null)
+            return ApiResponse<CandidateResultDto>.SuccessResponse(cachedDto);
 
         var percentage = result.MaxPossibleScore > 0
 ? (result.TotalScore / result.MaxPossibleScore) * 100
@@ -532,14 +536,10 @@ public class ExamResultService : IExamResultService
         if (!await _resourceAuthorization.CanAccessCandidateAsync(candidateId))
             return ApiResponse<List<CandidateResultDto>>.FailureResponse("Result not found");
 
-        var cacheKey = CacheKeys.CandidateResultAll(candidateId);
-        if (_cache.TryGet<List<CandidateResultDto>>(cacheKey, out var cachedList) && cachedList != null)
-            return ApiResponse<List<CandidateResultDto>>.SuccessResponse(cachedList);
-
         var results = await _context.Set<Result>()
               .Include(r => r.Exam)
                 .Include(r => r.Attempt)
-       .Where(r => r.CandidateId == candidateId && r.IsPublishedToCandidate)
+       .Where(r => r.CandidateId == candidateId && r.IsPublishedToCandidate && r.Exam.ShowResults)
             .OrderByDescending(r => r.FinalizedAt)
           .ToListAsync();
 
@@ -568,7 +568,6 @@ public class ExamResultService : IExamResultService
                   };
               }).ToList();
 
-        _cache.Set(cacheKey, dtos, CacheKeys.Thirty);
         return ApiResponse<List<CandidateResultDto>>.SuccessResponse(dtos);
     }
 
@@ -601,13 +600,19 @@ public class ExamResultService : IExamResultService
         ? Math.Max(0, exam.MaxAttempts - summary.TotalAttempts)
     : -1; // -1 indicates unlimited
 
-        var bestMaxPossibleScore = await _context.Set<Result>()
-            .Where(r => r.Id == summary.BestResultId)
-            .Select(r => (decimal?)r.MaxPossibleScore)
-            .FirstOrDefaultAsync();
-        var percentage = summary.BestScore.HasValue && bestMaxPossibleScore > 0
-            ? (summary.BestScore.Value / bestMaxPossibleScore.Value) * 100
-     : 0;
+        // Candidate summaries must not reveal hidden or unpublished result aggregates.
+        // Staff refreshing another candidate's summary retain their authorized view.
+        var isOwnSummary = _currentUserService.UserId == candidateId;
+        var visibleResults = await _context.Set<Result>()
+            .Where(r => r.ExamId == examId && r.CandidateId == candidateId &&
+                        (!isOwnSummary || (r.IsPublishedToCandidate && r.Exam.ShowResults)))
+            .OrderByDescending(r => r.TotalScore)
+            .ThenBy(r => r.FinalizedAt)
+            .ToListAsync();
+        var best = visibleResults.FirstOrDefault();
+        var latest = visibleResults.OrderByDescending(r => r.FinalizedAt).FirstOrDefault();
+        decimal? percentage = best == null ? null : best.MaxPossibleScore > 0
+            ? best.TotalScore / best.MaxPossibleScore * 100 : 0;
 
         var dto = new CandidateExamSummaryDto
         {
@@ -620,12 +625,12 @@ public class ExamResultService : IExamResultService
             TotalAttempts = summary.TotalAttempts,
             MaxAttempts = exam?.MaxAttempts ?? 0,
             RemainingAttempts = remainingAttempts,
-            BestAttemptId = summary.BestAttemptId,
-            BestScore = summary.BestScore,
+            BestAttemptId = best?.AttemptId,
+            BestScore = best?.TotalScore,
             BestPercentage = percentage,
-            BestIsPassed = summary.BestIsPassed,
-            LatestScore = summary.LatestScore,
-            LatestIsPassed = summary.LatestIsPassed,
+            BestIsPassed = best?.IsPassed,
+            LatestScore = latest?.TotalScore,
+            LatestIsPassed = latest?.IsPassed,
             LastAttemptAt = summary.LastAttemptAt
         };
 
@@ -741,10 +746,20 @@ public class ExamResultService : IExamResultService
 
         // Get all graded answers for this exam
         var gradedAnswers = await _context.GradedAnswers
-  .Include(ga => ga.GradingSession)
-           .ThenInclude(gs => gs.Attempt)
- .Where(ga => ga.GradingSession.Attempt.ExamId == dto.ExamId &&
-             ga.GradingSession.Status == GradingStatus.Completed)
+            .Where(ga => ga.GradingSession.Attempt.ExamId == dto.ExamId &&
+                (ga.GradingSession.Status == GradingStatus.Completed ||
+                 ga.GradingSession.Status == GradingStatus.AutoGraded))
+            .Select(ga => new
+            {
+                ga.QuestionId,
+                ga.IsCorrect,
+                ga.Score,
+                ga.TextAnswer,
+                ga.SelectedOptionIdsJson,
+                MaxPoints = ga.GradingSession.Attempt.Questions
+                    .Where(aq => aq.QuestionId == ga.QuestionId)
+                    .Select(aq => (decimal?)aq.Points).FirstOrDefault()
+            })
             .ToListAsync();
 
         // Delete existing reports for this exam
@@ -754,27 +769,36 @@ public class ExamResultService : IExamResultService
         _context.Set<QuestionPerformanceReport>().RemoveRange(existingReports);
 
         var reports = new List<QuestionPerformanceReport>();
+        var questionPoints = exam.Questions.GroupBy(q => q.QuestionId)
+            .ToDictionary(g => g.Key, g => g.Max(q => q.Points));
+        // Dynamic builder questions exist in attempt snapshots, not in authored ExamQuestions.
+        foreach (var group in gradedAnswers.GroupBy(a => a.QuestionId))
+            questionPoints[group.Key] = group.Max(a => a.MaxPoints ?? 0);
 
-        foreach (var examQuestion in exam.Questions)
+        foreach (var question in questionPoints)
         {
-            var questionAnswers = gradedAnswers.Where(ga => ga.QuestionId == examQuestion.QuestionId).ToList();
+            var questionAnswers = gradedAnswers.Where(ga => ga.QuestionId == question.Key).ToList();
             var totalAnswers = questionAnswers.Count;
             var correctAnswers = questionAnswers.Count(ga => ga.IsCorrect);
             var incorrectAnswers = totalAnswers - correctAnswers;
+            var unansweredCount = questionAnswers.Count(ga =>
+                string.IsNullOrWhiteSpace(ga.TextAnswer) &&
+                (string.IsNullOrWhiteSpace(ga.SelectedOptionIdsJson) ||
+                 ga.SelectedOptionIdsJson == "[]" || ga.SelectedOptionIdsJson == "null"));
             var correctRate = totalAnswers > 0 ? (decimal)correctAnswers / totalAnswers : 0;
             var avgScore = questionAnswers.Any() ? questionAnswers.Average(ga => ga.Score) : 0;
 
             var report = new QuestionPerformanceReport
             {
                 ExamId = dto.ExamId,
-                QuestionId = examQuestion.QuestionId,
+                QuestionId = question.Key,
                 TotalAnswers = totalAnswers,
                 CorrectAnswers = correctAnswers,
                 IncorrectAnswers = incorrectAnswers,
-                UnansweredCount = 0, // TODO: Calculate from attempts without answers
+                UnansweredCount = unansweredCount,
                 CorrectRate = correctRate,
                 AverageScore = avgScore,
-                MaxPoints = examQuestion.Points,
+                MaxPoints = question.Value,
                 DifficultyIndex = correctRate, // Lower = harder
                 GeneratedAt = now,
                 GeneratedBy = userId,
