@@ -1,0 +1,156 @@
+ROLE & AUTHORITY
+Act as the senior engineer responsible for completing this task end-to-end on the current branch.
+You have full permission to inspect and modify anything required in the repository, including:
+- Backend
+- Frontend
+- Database schema
+- EF migrations
+- Existing seed/configuration data
+- Authentication
+- Existing logging
+- Configuration
+- UI/theme/assets
+- Tests
+- Supporting documentation/config examples
+
+You are expected to work autonomously from analysis through implementation, migration, build, testing, fixing, and final verification.
+
+Do not stop at recommendations or analysis.
+Do not ask for approval for normal implementation decisions.
+Use the existing architecture and patterns wherever possible rather than introducing unnecessary new systems.
+
+Do not let decision block you, stop before completing the end-to-end task
+
+
+Task 1: 
+1. DIGITAL DUBAI SSO + UAE PASS
+
+Add two authentication options:
+
+- Digital Dubai / Government SSO
+- UAE PASS
+
+The majority of candidates already exist in the system using their CORPORATE/ORGANIZATION account/email.
+
+UAE PASS authentication may use the person's PERSONAL identity/account.
+
+Therefore implement a secure linking flow between the authenticated UAE PASS identity and the EXISTING corporate/system user.
+
+
+The corporate/system user must remain the actual application account that owns the existing:
+- Candidate relationship
+- Exams
+- Roles
+- Permissions
+- Existing application data
+
+Do not create duplicate candidate identities unnecessarily.
+
+Modify the database schema and create the required EF migration(s) as needed.
+
+Choose the correct schema/design after inspecting the existing User model and authentication architecture. Do not force a specific column design if a cleaner implementation fits the current architecture better.
+
+FIRST UAE PASS LOGIN / ACCOUNT LINKING:
+
+If UAE PASS authentication succeeds but no system account is linked:
+
+1. Show the authenticated UAE PASS identity.
+2. Ask the user to enter/select the corporate email/account that should be linked.
+3. That corporate/system account must already exist in our database.
+4. If found, securely link the UAE PASS identity to that account.
+5. Continue authentication using the existing system account and its existing roles/permissions/candidate/exam relationships.
+6. If not found, show a clear message such as:
+
+   "No matching corporate account was found. Please contact the support team."
+
+Use the supplied E-Source manual as the BUSINESS/FLOW reference for UAE PASS account linking.
+( Add new col in Iusers table for PersonalLinkAccount) or two col so save personal data from UAE Pass, then Add Extra step to as user 
+you logging as (XXXXXX) Display his personal account info, to continue please enter the corporate account to link with this) 
+
+if he enter the corporate account or else display error the Corporite account not found try again or call adminstartor for support 
+
+(Rephrase and design as you want) this is the explenations
+
+Do not add one to many table .. on the same users add col of corproprate accounts 
+(one user = one corp account)
+
+
+the token and permission all based on current Users Email / Username ( predefine by admin)
+No Change .
+
+Use the CURRENT official UAE PASS documentation as the TECHNICAL reference.
+https://docs.uaepass.ae/
+
+
+Implement the real integration as far as technically possible.
+
+==================================================
+2. SSO / UAE PASS CONFIGURATION & CREDENTIALS
+==================================================
+
+Inspect the official documentation and existing application configuration.
+
+If official sandbox/test credentials or configuration can legitimately be used now, configure them appropriately and use them to test as much of the integration as possible.
+
+If any required value cannot currently be obtained, such as:
+- Client ID
+- Client Secret
+- SSO identifiers
+- UAE PASS production credentials
+- Redirect/Callback URLs
+- Authority/Endpoint URLs
+- Environment-specific values
+
+DO NOT block the implementation.
+
+Instead:
+- create the required configuration structure;
+- add clear placeholder/example values;
+- keep secrets/environment-specific values externally configurable using the application's existing configuration approach;
+- document exactly which values the customer must replace.
+
+Do not invent real customer credentials.
+
+The final solution should allow the customer to provide/change these values without source-code changes.
+
+
+3. LOGGING & TROUBLESHOOTING
+
+DO NOT create a separate logging system.
+
+Inspect and USE the logging infrastructure already implemented in the application.
+
+Extend/improve the existing logging only where required for the new SSO/UAE PASS flows.
+
+Ensure the existing logging can provide enough information to troubleshoot third-party authentication, including where appropriate:
+
+- authentication provider
+- login attempt/result
+- callback processing
+- account-linking attempt/result
+- failed authentication
+- failed linking
+- provider/API errors
+- useful external response/error information where safe
+- correlation/context needed to trace the request
+
+Never log:
+- passwords
+- secrets
+- access tokens
+- refresh tokens
+- authorization codes
+- sensitive credentials
+
+Follow the existing logging architecture and conventions.
+
+You are explicitly authorized to modify the database model.
+
+Create all required EF migrations.
+
+Add/update seed/configuration data where appropriate.
+
+Do not avoid a correct implementation merely because it requires database changes.
+
+Ensure migrations are valid and the application works correctly against the updated schema
+

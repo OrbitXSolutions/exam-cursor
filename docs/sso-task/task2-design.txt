@@ -1,0 +1,96 @@
+==================================================
+4. DIGITAL DUBAI BRANDING — APPLICATION-WIDE
+==================================================
+
+Apply Digital Dubai / Government of Dubai branding consistently across the existing application.
+
+This is primarily a BRANDING/THEME update, NOT an unnecessary redesign of the existing application.
+
+Use the supplied logos, favicon and assets.
+
+Use these official/reference sites:
+
+https://data.dubai/ar/
+https://esource.dsc.gov.ae/login
+
+Use the Digital Dubai official visual identity/color family from data.dubai as the basis for:
+- Primary color
+- Secondary/accent colors
+- Header
+- Footer
+- Buttons
+- Navigation
+- Common components
+- Relevant backgrounds/highlights
+- Application-wide theme
+
+Preserve usability, accessibility and existing functionality.
+
+==================================================
+5. HEADER / FOOTER / LOGOS / FAVICON
+==================================================
+
+Use the supplied E-Source login page as the visual reference for the header identity arrangement.
+
+Header branding should follow this concept:
+
+LEFT:
+Government of Dubai logo/identity
+
+RIGHT:
+Digital Dubai logo/identity
+
+Use the supplied official assets rather than recreating logos manually.
+
+Update the application favicon using the supplied Digital Dubai favicon.
+
+Apply the branding consistently across the application header/footer and shared layout.
+
+Where branding/theme settings are configurable in the current system, store/use them through the existing database/configuration mechanism.
+
+If database-backed branding is appropriate, add the necessary values/schema/data.
+
+Also maintain sensible frontend/default fallback values so the UI still renders correctly if branding settings cannot be loaded.
+
+==================================================
+6. LOGIN PAGE
+==================================================
+
+Update the login Page Design for candidate to be same as e-source system (image attached as ref) 
+ based on the supplied E-Source login page reference.
+only change the content to be for exam. 
+Keep the EXISTING development/test login accounts/options available BELOW these new authentication options for now.
+
+Do not remove them.
+
+The login page should visually belong to Digital Dubai and use the new theme.
+
+==================================================
+7. CANDIDATE + EXAM EXPERIENCE
+==================================================
+
+Give special attention to the Candidate-facing application and Exam experience.
+
+Apply the Digital Dubai branding/theme consistently to:
+- Candidate login
+- Candidate pages
+- Exam screens
+- Exam header/navigation
+- Relevant buttons/cards/status components
+- Other candidate-facing shared components
+
+Do not unnecessarily change the exam workflow or behavior.
+
+This is mainly a visual branding/theming update unless a functional change is required for authentication.
+
+You are explicitly authorized to modify the database model.
+
+Create all required EF migrations.
+
+Add/update seed/configuration data where appropriate.
+
+Do not avoid a correct implementation merely because it requires database changes.
+
+Ensure migrations are valid and the application works correctly against the updated schema
+
+
