@@ -6,7 +6,7 @@ import { Home, ArrowLeft, Search } from "lucide-react"
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background px-4">
+    <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background px-4">
       <div className="text-center max-w-md mx-auto">
         {/* Animated 404 Number */}
         <div className="relative mb-6">

@@ -109,7 +109,7 @@ export default function ReviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <LoadingSpinner size="lg" />
           <p className="text-muted-foreground">{t("common.loading")}</p>
@@ -120,7 +120,7 @@ export default function ReviewPage() {
 
   if (error || !review) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
             <AlertCircle className="h-12 w-12 text-muted-foreground" />
@@ -245,7 +245,7 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30" dir={dir}>
+    <div className="min-h-[var(--app-viewport-height)] bg-muted/30" dir={dir}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background">
         <div className="container flex h-14 items-center justify-between">

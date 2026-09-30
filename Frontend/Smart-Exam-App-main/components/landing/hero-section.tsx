@@ -15,12 +15,12 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 via-white to-emerald-50/30">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-card to-primary/30">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-400/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-emerald-200/10 to-cyan-200/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 to-cyan-200/10 rounded-full blur-3xl" />
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -34,7 +34,7 @@ export function HeroSection() {
         <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
           <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-8 transition-all duration-700 ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 transition-all duration-700 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -48,20 +48,20 @@ export function HeroSection() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <span className="text-slate-900">Secure Online Exams</span>
+            <span className="text-foreground">Secure Online Exams</span>
             <br />
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-primary to-cyan-500 bg-clip-text text-transparent">
               Made Simple
             </span>
           </h1>
 
           {/* Subheadline */}
           <p
-            className={`text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed transition-all duration-700 delay-200 ${
+            className={`text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed transition-all duration-700 delay-200 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            SmartExam provides enterprise-grade proctoring with AI-powered monitoring, ensuring exam integrity while
+            Digital Dubai Exams provides enterprise-grade proctoring with AI-powered monitoring, ensuring exam integrity while
             delivering a seamless experience for candidates and administrators.
           </p>
 
@@ -74,7 +74,7 @@ export function HeroSection() {
             <Link href="https://www.build4it.com/contact" target="_blank" rel="noopener noreferrer">
               <Button
                 size="lg"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 text-lg shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
               >
                 Get Started
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -84,7 +84,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-slate-300 text-slate-700 hover:bg-slate-100 px-8 py-6 text-lg bg-white/50 backdrop-blur-sm hover:scale-105 transition-all duration-300"
+                className="border-slate-300 text-foreground hover:bg-muted px-8 py-6 text-lg bg-card/50 backdrop-blur-sm hover:scale-105 transition-all duration-300"
               >
                 <Play className="mr-2 w-5 h-5" />
                 See How It Works
@@ -106,10 +106,10 @@ export function HeroSection() {
             ].map((feature) => (
               <div
                 key={feature.label}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-slate-200 hover:shadow-lg hover:border-emerald-200 hover:-translate-y-1 transition-all duration-300"
+                className="flex items-center gap-2 px-4 py-2 bg-card rounded-full shadow-md border border-border hover:shadow-lg hover:border-primary/20 hover:-translate-y-1 transition-all duration-300"
               >
-                <feature.icon className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-medium text-slate-700">{feature.label}</span>
+                <feature.icon className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-foreground">{feature.label}</span>
               </div>
             ))}
           </div>
@@ -123,15 +123,15 @@ export function HeroSection() {
         >
           <div className="relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-3xl blur-2xl" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-primary/20 to-cyan-500/20 rounded-3xl blur-2xl" />
 
             {/* Main Image Container */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border">
               {/* Real Photo of Person Taking Exam */}
               <div className="relative aspect-[16/9]">
                 <Image
                   src="/hero-person-taking-exam.jpg"
-                  alt="Student taking online exam with SmartExam proctoring"
+                  alt="Student taking online exam with Digital Dubai Exams proctoring"
                   fill
                   className="object-cover"
                   priority
@@ -145,17 +145,17 @@ export function HeroSection() {
                       <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-2xl">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                              <Eye className="w-5 h-5 text-emerald-400" />
+                            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                              <Eye className="w-5 h-5 text-[var(--brand-sky)]" />
                             </div>
                             <div>
                               <h3 className="text-white font-semibold">Proctoring Active</h3>
                               <p className="text-slate-400 text-sm">All systems normal</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 bg-emerald-500/20 px-3 py-1.5 rounded-full">
-                            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                            <span className="text-emerald-400 text-sm font-medium">Live</span>
+                          <div className="flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full">
+                            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                            <span className="text-[var(--brand-sky)] text-sm font-medium">Live</span>
                           </div>
                         </div>
 
@@ -168,7 +168,7 @@ export function HeroSection() {
                             { label: "Camera Feed", status: "HD Quality", icon: MonitorSmartphone },
                           ].map((item) => (
                             <div key={item.label} className="flex items-center gap-2 bg-slate-700/50 rounded-lg p-3">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              <CheckCircle2 className="w-4 h-4 text-[var(--brand-sky)]" />
                               <div>
                                 <p className="text-white text-sm font-medium">{item.label}</p>
                                 <p className="text-slate-400 text-xs">{item.status}</p>
@@ -184,25 +184,25 @@ export function HeroSection() {
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-6 -right-6 bg-white rounded-xl shadow-xl p-4 border border-slate-200 animate-float hidden lg:block">
+            <div className="absolute -top-6 -right-6 bg-card rounded-xl shadow-xl p-4 border border-border animate-float hidden lg:block">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                   <Shield className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Exam Secure</p>
+                  <p className="text-sm font-semibold text-foreground">Exam Secure</p>
                   <p className="text-xs text-slate-500">No incidents detected</p>
                 </div>
               </div>
             </div>
 
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl p-4 border border-slate-200 animate-float-delayed hidden lg:block">
+            <div className="absolute -bottom-4 -left-4 bg-card rounded-xl shadow-xl p-4 border border-border animate-float-delayed hidden lg:block">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Live Proctoring</p>
+                  <p className="text-sm font-semibold text-foreground">Live Proctoring</p>
                   <p className="text-xs text-slate-500">1,234 active sessions</p>
                 </div>
               </div>

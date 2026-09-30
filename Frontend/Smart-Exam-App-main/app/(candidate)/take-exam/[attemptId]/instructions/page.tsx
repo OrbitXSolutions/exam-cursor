@@ -278,7 +278,7 @@ export default function ExamInstructionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -286,7 +286,7 @@ export default function ExamInstructionsPage() {
 
   if (!examPreview) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+      <div className="min-h-[var(--app-viewport-height)] flex flex-col items-center justify-center bg-background gap-4">
         <XCircle className="h-12 w-12 text-destructive" />
         <p className="text-lg">{t("exams.notFound")}</p>
         <Button variant="outline" asChild>
@@ -334,7 +334,7 @@ export default function ExamInstructionsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col" dir={dir}>
+    <div className="min-h-[var(--app-viewport-height)] bg-muted/30 flex flex-col" dir={dir}>
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container flex h-16 items-center px-6">

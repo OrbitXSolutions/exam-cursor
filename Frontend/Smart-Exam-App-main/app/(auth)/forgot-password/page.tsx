@@ -1,5 +1,10 @@
 "use client"
 
+import Image from "next/image"
+
+import { useBranding } from "@/lib/hooks/use-branding"
+import { BRAND_ASSETS } from "@/lib/branding"
+
 import type React from "react"
 
 import { useState } from "react"
@@ -13,10 +18,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LanguageToggle } from "@/components/layout/language-toggle"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Shield, Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
+import { Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import { toast } from "sonner"
 
 export default function ForgotPasswordPage() {
+  const { orgName } = useBranding()
   const { t, isRTL } = useI18n()
 
   const [email, setEmail] = useState("")
@@ -36,14 +42,12 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="flex min-h-[var(--app-viewport-height)] flex-col" dir={isRTL ? "rtl" : "ltr"}>
       {/* Top Bar */}
       <div className="flex items-center justify-between p-4 md:p-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Shield className="h-5 w-5" />
-          </div>
-          <span className="text-xl font-bold">SmartExam</span>
+          <Image width={99} height={97} src={BRAND_ASSETS.favicon} alt="" className="h-8 w-8" />
+          <span className="text-xl font-bold">{orgName}</span>
         </div>
         <div className="flex items-center gap-2">
           <LanguageToggle />

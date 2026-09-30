@@ -1,4 +1,5 @@
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Constants;
 
 namespace Smart_Core.Domain.Entities;
 
@@ -17,12 +18,12 @@ public class SystemSettings
     public bool PasswordPolicyRequireUppercase { get; set; } = true;
     public bool PasswordPolicyRequireNumbers { get; set; } = true;
     public bool PasswordPolicyRequireSpecialChars { get; set; }
-    public string LogoUrl { get; set; } = "";
-    public string BrandName { get; set; } = "SmartExam";
-    public string FooterText { get; set; } = "";
+    public string LogoUrl { get; set; } = BrandingDefaults.LogoUrl;
+    public string BrandName { get; set; } = BrandingDefaults.Name;
+    public string FooterText { get; set; } = BrandingDefaults.FooterText;
     public string SupportEmail { get; set; } = "";
     public string SupportUrl { get; set; } = "";
-    public string PrimaryColor { get; set; } = "#0d9488";
+    public string PrimaryColor { get; set; } = BrandingDefaults.PrimaryColor;
     public DateTimeOffset CreatedDate { get; set; } = UaeTimeHelper.NowUae;
     public DateTimeOffset? UpdatedDate { get; set; }
 

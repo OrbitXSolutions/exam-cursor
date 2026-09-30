@@ -9,7 +9,6 @@ import { useI18n } from "@/lib/i18n/context"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { FullPageLoader } from "@/components/ui/loading-spinner"
-import { useApplyBrandingColor } from "@/lib/hooks/use-branding"
 import { UserRole } from "@/lib/types"
 import { LicenseExpiredDialog } from "@/components/license-expired-dialog"
 
@@ -60,9 +59,6 @@ export default function DashboardLayout({
   const { isAuthenticated, isLoading, hasRole, user } = useAuth()
   const { isRTL } = useI18n()
 
-  // Apply organization primary color for candidate users
-  const isCandidate = hasRole(UserRole.Candidate)
-  useApplyBrandingColor(isCandidate)
 
   const isPublicPath = PUBLIC_PATHS.some(
     (p) => pathname === p || pathname.startsWith(p + "/")
@@ -110,7 +106,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="flex min-h-[var(--app-viewport-height)]" dir={isRTL ? "rtl" : "ltr"}>
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />

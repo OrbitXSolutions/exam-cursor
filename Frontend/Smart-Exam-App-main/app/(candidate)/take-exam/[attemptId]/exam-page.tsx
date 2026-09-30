@@ -1646,7 +1646,7 @@ export default function ExamPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-[var(--app-viewport-height)] items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -1656,7 +1656,7 @@ export default function ExamPage() {
   if (error || !session) {
     const isExpired = error?.toLowerCase().includes("expired")
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex h-[var(--app-viewport-height)] items-center justify-center bg-background">
         <Card className="w-full max-w-md mx-4">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
@@ -1701,7 +1701,7 @@ export default function ExamPage() {
   const sectionTimeRemaining = currentSection && sectionTimers[currentSection.sectionId]
 
   return (
-    <div className="flex h-screen flex-col bg-background" dir={dir}>
+    <div className="flex h-[var(--app-viewport-height)] flex-col bg-background" dir={dir}>
       {/* Webcam denial / snapshot persistent error banner (only if webcam required) */}
       {session?.examSettings?.requireWebcam && (webcamStatus === "denied" || webcamStatus === "error") && (
         <div className="flex items-center gap-3 border-b bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">

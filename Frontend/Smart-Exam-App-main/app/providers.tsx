@@ -1,5 +1,8 @@
 "use client"
 
+import { BrandingProvider } from "@/lib/hooks/use-branding"
+import { BrandHeader, BrandFooter } from "@/components/layout/brand-chrome"
+
 import type { ReactNode } from "react"
 import { ThemeProvider } from "@/lib/theme/context"
 import { I18nProvider, useI18n } from "@/lib/i18n/context"
@@ -27,8 +30,14 @@ export function Providers({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <I18nProvider>
         <AuthProvider>
-          {children}
-          <AppToaster />
+          <BrandingProvider>
+            <div className="flex min-h-dvh flex-col">
+              <BrandHeader />
+              <div className="min-w-0 flex-1">{children}</div>
+              <BrandFooter />
+            </div>
+            <AppToaster />
+          </BrandingProvider>
         </AuthProvider>
       </I18nProvider>
     </ThemeProvider>

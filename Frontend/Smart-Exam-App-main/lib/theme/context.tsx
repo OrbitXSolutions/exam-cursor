@@ -3,42 +3,26 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 type Theme = "light" | "dark"
-type AccentColor = "emerald" | "blue" | "violet" | "amber" | "rose"
 
 interface ThemeContextType {
   theme: Theme
   setTheme: (theme: Theme) => void
-  accentColor: AccentColor
-  setAccentColor: (color: AccentColor) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-const accentColors: Record<AccentColor, { primary: string; primaryForeground: string }> = {
-  emerald: { primary: "160 84% 39%", primaryForeground: "0 0% 100%" },
-  blue: { primary: "217 91% 60%", primaryForeground: "0 0% 100%" },
-  violet: { primary: "263 70% 50%", primaryForeground: "0 0% 100%" },
-  amber: { primary: "38 92% 50%", primaryForeground: "0 0% 0%" },
-  rose: { primary: "346 77% 49%", primaryForeground: "0 0% 100%" },
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light")
-  const [accentColor, setAccentColorState] = useState<AccentColor>("emerald")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     let active = true
     const savedTheme = localStorage.getItem("theme") as Theme
-    const savedAccent = localStorage.getItem("accentColor") as AccentColor
 
     queueMicrotask(() => {
       if (!active) return
       if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
         setThemeState(savedTheme)
-      }
-      if (savedAccent && accentColors[savedAccent]) {
-        setAccentColorState(savedAccent)
       }
       setMounted(true)
     })
@@ -55,20 +39,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.classList.remove("light", "dark")
     root.classList.add(theme)
 
-    // Apply accent color CSS variables
-    const colors = accentColors[accentColor]
-    root.style.setProperty("--primary", colors.primary)
-    root.style.setProperty("--primary-foreground", colors.primaryForeground)
-  }, [theme, accentColor, mounted])
+    // Brand colors come from the existing organization/system settings provider.
+    // A previous personal accent must not override the application identity on theme changes.
+  }, [theme, mounted])
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
     localStorage.setItem("theme", newTheme)
-  }
-
-  const setAccentColor = (color: AccentColor) => {
-    setAccentColorState(color)
-    localStorage.setItem("accentColor", color)
   }
 
   if (!mounted) {
@@ -76,7 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, accentColor, setAccentColor }}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
   )
 }
 
@@ -88,4 +65,4 @@ export function useTheme() {
   return context
 }
 
-export { accentColors, type AccentColor, type Theme }
+export { type Theme }

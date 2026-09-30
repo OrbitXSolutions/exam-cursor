@@ -17,7 +17,7 @@ export default function UnauthorizedPage() {
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-destructive/5 to-background px-4"
+      className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-gradient-to-br from-background via-destructive/5 to-background px-4"
     >
       <div className="text-center max-w-lg mx-auto">
 

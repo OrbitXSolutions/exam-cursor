@@ -5,15 +5,12 @@ import { useAuth } from "@/lib/auth/context"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { useApplyBrandingColor } from "@/lib/hooks/use-branding"
 import { UserRole } from "@/lib/types"
 
 export default function CandidateLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
 
-  // Apply organization primary color to all candidate pages
-  useApplyBrandingColor()
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -27,7 +24,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -41,7 +38,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   // (and firing API calls) before the useEffect redirect executes.
   if (user.role !== UserRole.Candidate) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
       </div>
     )

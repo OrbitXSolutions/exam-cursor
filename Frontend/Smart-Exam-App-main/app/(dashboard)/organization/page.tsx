@@ -1,5 +1,8 @@
 "use client"
 
+import { DEFAULT_BRANDING, brandingAssetUrl } from "@/lib/branding"
+import { invalidateBrandingCache } from "@/lib/hooks/use-branding"
+
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
@@ -37,7 +40,7 @@ export default function OrganizationPage() {
     officeNumber: "",
     supportUrl: "",
     footerText: "",
-    primaryColor: "#0d9488",
+    primaryColor: DEFAULT_BRANDING.primaryColor,
     isActive: true,
   })
 
@@ -53,7 +56,7 @@ export default function OrganizationPage() {
         officeNumber: data.officeNumber ?? "",
         supportUrl: data.supportUrl ?? "",
         footerText: data.footerText ?? "",
-        primaryColor: data.primaryColor ?? "#0d9488",
+        primaryColor: data.primaryColor ?? DEFAULT_BRANDING.primaryColor,
         isActive: data.isActive,
       })
     } catch {
@@ -80,6 +83,7 @@ export default function OrganizationPage() {
         primaryColor: formData.primaryColor || null,
         isActive: formData.isActive,
       })
+      invalidateBrandingCache()
       toast.success(language === "ar" ? "تم حفظ إعدادات المنظمة" : "Organization settings saved")
     } catch {
       toast.error(language === "ar" ? "فشل في حفظ الإعدادات" : "Failed to save settings")
@@ -95,6 +99,7 @@ export default function OrganizationPage() {
     try {
       const result = await uploadOrganizationImage("logo", file)
       setFormData((prev) => ({ ...prev, logoPath: result.path }))
+      invalidateBrandingCache()
       toast.success(language === "ar" ? "تم رفع الشعار بنجاح" : "Logo uploaded successfully")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload logo")
@@ -111,6 +116,7 @@ export default function OrganizationPage() {
     try {
       const result = await uploadOrganizationImage("favicon", file)
       setFormData((prev) => ({ ...prev, faviconPath: result.path }))
+      invalidateBrandingCache()
       toast.success(language === "ar" ? "تم رفع الأيقونة بنجاح" : "Favicon uploaded successfully")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload favicon")
@@ -123,7 +129,7 @@ export default function OrganizationPage() {
   function getImageUrl(path: string | null): string {
     if (!path) return ""
     // Path is like /organization/logo.png — proxy through Next.js API route
-    return `/api/backend-files${path}`
+    return brandingAssetUrl(path)
   }
 
   if (loading) {
@@ -144,8 +150,8 @@ export default function OrganizationPage() {
           </h1>
           <p className="text-muted-foreground">
             {language === "ar"
-              ? "تخصيص العلامة التجارية ومعلومات الاتصال التي تظهر للمرشحين"
-              : "Customize branding and contact info shown to candidates"}
+              ? "تخصيص العلامة التجارية ومعلومات الاتصال في جميع صفحات النظام"
+              : "Customize branding and contact info throughout the application"}
           </p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
@@ -185,7 +191,7 @@ export default function OrganizationPage() {
                 <div className="space-y-3">
                   <Label>{language === "ar" ? "الشعار" : "Logo"}</Label>
                   <div className="flex items-center gap-4">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 overflow-hidden">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed bg-[var(--brand-sky)] overflow-hidden">
                       {formData.logoPath ? (
                         <img
                           src={getImageUrl(formData.logoPath)}
@@ -225,7 +231,7 @@ export default function OrganizationPage() {
                 <div className="space-y-3">
                   <Label>{language === "ar" ? "الأيقونة المفضلة" : "Favicon"}</Label>
                   <div className="flex items-center gap-4">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 overflow-hidden">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed bg-[var(--brand-sky)] overflow-hidden">
                       {formData.faviconPath ? (
                         <img
                           src={getImageUrl(formData.faviconPath)}
@@ -329,7 +335,7 @@ export default function OrganizationPage() {
                   <Input
                     value={formData.primaryColor}
                     onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    placeholder="#0d9488"
+                    placeholder={DEFAULT_BRANDING.primaryColor}
                     className="max-w-[140px] font-mono text-sm"
                   />
                   <div

@@ -55,7 +55,7 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
 export function StatsSection() {
   return (
-    <section className="py-20 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-r from-primary via-primary to-primary relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -71,10 +71,10 @@ export function StatsSection() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={stat.label} className="text-center group" style={{ animationDelay: `${index * 100}ms` }}>
-              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-primary-foreground mb-2 group-hover:scale-110 transition-transform duration-300">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
               </div>
-              <div className="text-emerald-100 font-medium">{stat.label}</div>
+              <div className="text-primary-foreground font-medium">{stat.label}</div>
             </div>
           ))}
         </div>

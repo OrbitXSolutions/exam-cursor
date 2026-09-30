@@ -53,12 +53,12 @@ public class SettingsController : ControllerBase
         }
         if (dto.Brand != null)
         {
-            entity.LogoUrl = dto.Brand.LogoUrl ?? "";
-            entity.BrandName = dto.Brand.BrandName ?? "SmartExam";
-            entity.FooterText = dto.Brand.FooterText ?? "";
+            entity.LogoUrl = dto.Brand.LogoUrl ?? BrandingDefaults.LogoUrl;
+            entity.BrandName = dto.Brand.BrandName ?? BrandingDefaults.Name;
+            entity.FooterText = dto.Brand.FooterText ?? BrandingDefaults.FooterText;
             entity.SupportEmail = dto.Brand.SupportEmail ?? "";
             entity.SupportUrl = dto.Brand.SupportUrl ?? "";
-            entity.PrimaryColor = dto.Brand.PrimaryColor ?? "#0d9488";
+            entity.PrimaryColor = dto.Brand.PrimaryColor ?? BrandingDefaults.PrimaryColor;
         }
         entity.UpdatedDate = UaeTimeHelper.NowUae;
         entity.EnableLiveVideo = dto.EnableLiveVideo;
@@ -85,12 +85,12 @@ public class SettingsController : ControllerBase
             PasswordPolicyRequireUppercase = true,
             PasswordPolicyRequireNumbers = true,
             PasswordPolicyRequireSpecialChars = false,
-            LogoUrl = "",
-            BrandName = "SmartExam",
-            FooterText = "© SmartExam. All rights reserved.",
+            LogoUrl = BrandingDefaults.LogoUrl,
+            BrandName = BrandingDefaults.Name,
+            FooterText = BrandingDefaults.FooterText,
             SupportEmail = "",
             SupportUrl = "",
-            PrimaryColor = "#0d9488",
+            PrimaryColor = BrandingDefaults.PrimaryColor,
         };
         _db.SystemSettings.Add(entity);
         await _db.SaveChangesAsync();

@@ -63,16 +63,16 @@ export function FeaturesSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-24 bg-white">
+    <section ref={sectionRef} className="py-24 bg-card">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="text-slate-900">Everything You Need for</span>{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="text-foreground">Everything You Need for</span>{" "}
+            <span className="bg-gradient-to-r from-primary via-primary to-cyan-500 bg-clip-text text-transparent">
               Secure Exams
             </span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             A comprehensive platform designed for educational institutions and enterprises to conduct secure, scalable
             online assessments.
           </p>
@@ -82,18 +82,18 @@ export function FeaturesSection() {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className={`group p-6 rounded-2xl bg-gradient-to-br from-slate-50 to-white border border-slate-200 hover:shadow-xl hover:border-emerald-200 hover:-translate-y-2 transition-all duration-500 ${
+              className={`group p-6 rounded-2xl bg-gradient-to-br from-background to-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-2 transition-all duration-500 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${index * 50}ms` }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <feature.icon className="w-7 h-7 text-emerald-600 group-hover:text-white transition-colors" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/90 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                <feature.icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">
+              <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

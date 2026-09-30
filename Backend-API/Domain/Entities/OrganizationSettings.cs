@@ -4,7 +4,7 @@ namespace Smart_Core.Domain.Entities;
 
 /// <summary>
 /// Organization/authority branding settings (single row).
-/// Overrides System Settings brand info for candidate-facing UI.
+/// Overrides System Settings brand info application-wide when active.
 /// </summary>
 public class OrganizationSettings : BaseEntity
 {

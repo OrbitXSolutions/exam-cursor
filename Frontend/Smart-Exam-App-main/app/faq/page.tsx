@@ -13,24 +13,24 @@ const faqCategories = [
     name: "General",
     faqs: [
       {
-        question: "What is SmartExam?",
+        question: "What is Digital Dubai Exams?",
         answer:
-          "SmartExam is an enterprise-grade online examination platform with AI-powered proctoring. It enables institutions to create, deliver, and manage secure online assessments at scale with features like question banks, automated grading, real-time proctoring, and comprehensive analytics.",
+          "Digital Dubai Exams is an enterprise-grade online examination platform with AI-powered proctoring. It enables institutions to create, deliver, and manage secure online assessments at scale with features like question banks, automated grading, real-time proctoring, and comprehensive analytics.",
       },
       {
-        question: "Who is SmartExam designed for?",
+        question: "Who is Digital Dubai Exams designed for?",
         answer:
-          "SmartExam is designed for educational institutions, universities, certification bodies, corporate training departments, and any organization that needs to conduct secure online assessments. We serve clients ranging from small training centers to large government agencies.",
+          "Digital Dubai Exams is designed for educational institutions, universities, certification bodies, corporate training departments, and any organization that needs to conduct secure online assessments. We serve clients ranging from small training centers to large government agencies.",
       },
       {
-        question: "Is SmartExam available in multiple languages?",
+        question: "Is Digital Dubai Exams available in multiple languages?",
         answer:
-          "Yes! SmartExam supports multiple languages including English and Arabic with full RTL (Right-to-Left) support. We can add additional languages based on your requirements.",
+          "Yes! Digital Dubai Exams supports multiple languages including English and Arabic with full RTL (Right-to-Left) support. We can add additional languages based on your requirements.",
       },
       {
-        question: "How secure is SmartExam?",
+        question: "How secure is Digital Dubai Exams?",
         answer:
-          "SmartExam is built with security as a top priority. We use industry-standard encryption, secure data centers, and are SOC 2 compliant. Our AI proctoring system provides multiple layers of exam integrity protection.",
+          "Digital Dubai Exams is built with security as a top priority. We use industry-standard encryption, secure data centers, and are SOC 2 compliant. Our AI proctoring system provides multiple layers of exam integrity protection.",
       },
     ],
   },
@@ -38,9 +38,9 @@ const faqCategories = [
     name: "Proctoring",
     faqs: [
       {
-        question: "What types of proctoring does SmartExam offer?",
+        question: "What types of proctoring does Digital Dubai Exams offer?",
         answer:
-          "SmartExam offers AI-powered automated proctoring that includes tab switching detection, mouse boundary tracking, webcam monitoring, face detection and verification, and behavior analysis. You can also enable live proctor monitoring for high-stakes exams.",
+          "Digital Dubai Exams offers AI-powered automated proctoring that includes tab switching detection, mouse boundary tracking, webcam monitoring, face detection and verification, and behavior analysis. You can also enable live proctor monitoring for high-stakes exams.",
       },
       {
         question: "How does tab switching detection work?",
@@ -53,7 +53,7 @@ const faqCategories = [
           "If the AI cannot detect the candidate's face, it logs an incident and can be configured to show a warning, pause the exam, or notify a proctor. Continuous face absence beyond a threshold can automatically flag the session for review.",
       },
       {
-        question: "Can SmartExam detect multiple people in the frame?",
+        question: "Can Digital Dubai Exams detect multiple people in the frame?",
         answer:
           "Yes, our face detection AI can identify when multiple people appear in the webcam frame. This triggers an immediate alert and incident log, helping prevent unauthorized assistance during exams.",
       },
@@ -65,7 +65,7 @@ const faqCategories = [
       {
         question: "What question types are supported?",
         answer:
-          "SmartExam supports Multiple Choice (single and multiple answers), True/False, Short Answer, Essay/Long Answer, Fill in the Blank, Matching, and Ordering questions. We also support code-based questions with auto-evaluation for programming assessments.",
+          "Digital Dubai Exams supports Multiple Choice (single and multiple answers), True/False, Short Answer, Essay/Long Answer, Fill in the Blank, Matching, and Ordering questions. We also support code-based questions with auto-evaluation for programming assessments.",
       },
       {
         question: "Can I randomize questions and answers?",
@@ -80,7 +80,7 @@ const faqCategories = [
       {
         question: "Can I set different time limits for sections?",
         answer:
-          "Yes, SmartExam supports section-based timing where each section can have its own time limit. You can also allow candidates to move between sections or lock them to complete sections sequentially.",
+          "Yes, Digital Dubai Exams supports section-based timing where each section can have its own time limit. You can also allow candidates to move between sections or lock them to complete sections sequentially.",
       },
     ],
   },
@@ -100,7 +100,7 @@ const faqCategories = [
       {
         question: "What analytics and reports are available?",
         answer:
-          "SmartExam provides comprehensive analytics including score distributions, question-level analysis (difficulty, discrimination index), time analysis, comparison reports, and exportable data for external analysis. Custom reports can be configured.",
+          "Digital Dubai Exams provides comprehensive analytics including score distributions, question-level analysis (difficulty, discrimination index), time analysis, comparison reports, and exportable data for external analysis. Custom reports can be configured.",
       },
     ],
   },
@@ -113,9 +113,9 @@ const faqCategories = [
           "Our standard implementation takes approximately 2 weeks from contract signing to go-live. This includes platform setup, customization, data migration (if needed), integration, and training. Complex implementations may take 4-6 weeks.",
       },
       {
-        question: "Can SmartExam integrate with our existing systems?",
+        question: "Can Digital Dubai Exams integrate with our existing systems?",
         answer:
-          "Yes, SmartExam provides RESTful APIs for integration with LMS platforms (Moodle, Canvas, Blackboard), student information systems, HR systems, and SSO providers (SAML, OAuth). Custom integrations are available.",
+          "Yes, Digital Dubai Exams provides RESTful APIs for integration with LMS platforms (Moodle, Canvas, Blackboard), student information systems, HR systems, and SSO providers (SAML, OAuth). Custom integrations are available.",
       },
       {
         question: "What are the technical requirements for candidates?",
@@ -133,9 +133,9 @@ const faqCategories = [
     name: "Pricing & Plans",
     faqs: [
       {
-        question: "How is SmartExam priced?",
+        question: "How is Digital Dubai Exams priced?",
         answer:
-          "SmartExam offers flexible pricing based on your needs - per exam, per candidate, or annual licensing. Contact our sales team for a customized quote based on your expected usage and required features.",
+          "Digital Dubai Exams offers flexible pricing based on your needs - per exam, per candidate, or annual licensing. Contact our sales team for a customized quote based on your expected usage and required features.",
       },
       {
         question: "Is there a free trial available?",
@@ -176,28 +176,28 @@ export default function FAQPage() {
     .filter((category) => category.faqs.length > 0)
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-card">
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-slate-50 to-white">
+      <section className="pt-32 pb-16 bg-gradient-to-b from-background to-card">
         <div className="container mx-auto px-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-6 font-medium"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary mb-6 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
 
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="text-slate-900">Frequently Asked</span>{" "}
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+            <span className="text-foreground">Frequently Asked</span>{" "}
+            <span className="bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
               Questions
             </span>
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mb-8">
-            {"Find answers to common questions about SmartExam. Can't find what you're looking for? Contact our team."}
+          <p className="text-lg text-muted-foreground max-w-2xl mb-8">
+            {"Find answers to common questions about Digital Dubai Exams. Can't find what you're looking for? Contact our team."}
           </p>
 
           {/* Search */}
@@ -207,7 +207,7 @@ export default function FAQPage() {
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white border-slate-200"
+              className="pl-10 bg-card border-border"
             />
           </div>
         </div>
@@ -219,7 +219,7 @@ export default function FAQPage() {
           <div className="max-w-4xl mx-auto">
             {filteredCategories.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-slate-600 mb-4">No questions found matching your search.</p>
+                <p className="text-muted-foreground mb-4">No questions found matching your search.</p>
                 <Button variant="outline" onClick={() => setSearchQuery("")} className="bg-transparent">
                   Clear Search
                 </Button>
@@ -228,7 +228,7 @@ export default function FAQPage() {
               <div className="space-y-12">
                 {filteredCategories.map((category) => (
                   <div key={category.name}>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-200">
+                    <h2 className="text-2xl font-bold text-foreground mb-6 pb-2 border-b border-border">
                       {category.name}
                     </h2>
                     <div className="space-y-3">
@@ -238,13 +238,13 @@ export default function FAQPage() {
                         return (
                           <div
                             key={key}
-                            className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden hover:border-emerald-200 transition-colors"
+                            className="bg-muted rounded-xl border border-border overflow-hidden hover:border-primary/20 transition-colors"
                           >
                             <button
                               className="w-full px-6 py-4 flex items-center justify-between text-left"
                               onClick={() => toggleItem(key)}
                             >
-                              <span className="font-semibold text-slate-900 pr-4">{faq.question}</span>
+                              <span className="font-semibold text-foreground pr-4">{faq.question}</span>
                               <ChevronDown
                                 className={`w-5 h-5 text-slate-500 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
                               />
@@ -254,7 +254,7 @@ export default function FAQPage() {
                                 isOpen ? "pb-4 max-h-96" : "max-h-0"
                               }`}
                             >
-                              <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
+                              <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                             </div>
                           </div>
                         )
@@ -267,11 +267,11 @@ export default function FAQPage() {
           </div>
 
           {/* Contact CTA */}
-          <div className="max-w-4xl mx-auto mt-16 text-center p-8 bg-emerald-50 rounded-2xl border border-emerald-100">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Still have questions?</h3>
-            <p className="text-slate-600 mb-6">Our team is here to help you find the answers you need.</p>
+          <div className="max-w-4xl mx-auto mt-16 text-center p-8 bg-primary/10 rounded-2xl border border-primary/20">
+            <h3 className="text-xl font-bold text-foreground mb-2">Still have questions?</h3>
+            <p className="text-muted-foreground mb-6">Our team is here to help you find the answers you need.</p>
             <Link href="https://www.build4it.com/contact" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">Contact Support</Button>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Contact Support</Button>
             </Link>
           </div>
         </div>

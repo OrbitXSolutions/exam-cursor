@@ -7,6 +7,7 @@ using Smart_Core.Domain.Entities.Notification;
 using Smart_Core.Domain.Enums;
 using Smart_Core.Infrastructure.Data;
 using Smart_Core.Domain.Common;
+using Smart_Core.Domain.Constants;
 using Smart_Core.Infrastructure.Services.Background;
 
 namespace Smart_Core.Infrastructure.Services.Notification;
@@ -146,10 +147,11 @@ public class NotificationBackgroundService : BackgroundService
         var orgSettings = await db.OrganizationSettings.FirstOrDefaultAsync(stoppingToken);
         var systemSettings = await db.SystemSettings.FirstOrDefaultAsync(stoppingToken);
         var notifSettings = await db.NotificationSettings.FirstOrDefaultAsync(stoppingToken);
-        var brandName = orgSettings?.Name ?? systemSettings?.BrandName ?? "SmartExam";
+        if (orgSettings?.IsActive != true) orgSettings = null;
+        var brandName = BrandingDefaults.Effective(orgSettings?.Name, systemSettings?.BrandName, BrandingDefaults.Name);
         var supportEmail = orgSettings?.SupportEmail ?? systemSettings?.SupportEmail ?? "";
-        var primaryColor = orgSettings?.PrimaryColor ?? systemSettings?.PrimaryColor ?? "#0d9488";
-        var logoUrl = orgSettings?.LogoPath ?? systemSettings?.LogoUrl ?? "";
+        var primaryColor = BrandingDefaults.Effective(orgSettings?.PrimaryColor, systemSettings?.PrimaryColor, BrandingDefaults.PrimaryColor);
+        var logoUrl = BrandingDefaults.Effective(orgSettings?.LogoPath, systemSettings?.LogoUrl, BrandingDefaults.LogoUrl);
         var loginUrl = ResolveLoginUrl(notifSettings?.LoginUrl);
 
         // Build ExamURL from share links (batch lookup for efficiency)
@@ -165,6 +167,10 @@ public class NotificationBackgroundService : BackgroundService
         var baseUrl = loginUrl.Contains("/login")
             ? loginUrl.Replace("/login", "")
             : loginUrl.TrimEnd('/');
+
+        // Bundled branding lives at the public frontend origin, not the API/email client.
+        if (logoUrl.StartsWith("/branding/", StringComparison.Ordinal))
+            logoUrl = baseUrl.TrimEnd('/') + logoUrl;
 
         foreach (var log in logs)
         {
@@ -250,7 +256,7 @@ public class NotificationBackgroundService : BackgroundService
         }
 
         var systemSettings = await db.SystemSettings.FirstOrDefaultAsync(stoppingToken);
-        var brandName = systemSettings?.BrandName ?? "SmartExam";
+        var brandName = BrandingDefaults.Effective(null, systemSettings?.BrandName, BrandingDefaults.Name);
 
         foreach (var log in logs)
         {

@@ -40,12 +40,12 @@ const steps = [
 
 const colorClasses = {
   emerald: {
-    bg: "bg-emerald-500",
-    bgLight: "bg-emerald-50",
-    border: "border-emerald-200",
-    text: "text-emerald-600",
-    shadow: "shadow-emerald-500/20",
-    ring: "ring-emerald-500/20",
+    bg: "bg-primary",
+    bgLight: "bg-primary/10",
+    border: "border-primary/20",
+    text: "text-primary",
+    shadow: "shadow-primary/20",
+    ring: "ring-primary/20",
   },
   blue: {
     bg: "bg-blue-500",
@@ -117,23 +117,23 @@ export function HowItWorksSection() {
     <section
       ref={sectionRef}
       id="how-it-works"
-      className="py-24 bg-gradient-to-b from-white via-slate-50/50 to-white overflow-hidden"
+      className="py-24 bg-gradient-to-b from-card via-background/50 to-card overflow-hidden"
     >
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Play className="w-4 h-4" />
             Simple Process
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            <span className="text-slate-900">How</span>{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
-              SmartExam
+            <span className="text-foreground">How</span>{" "}
+            <span className="bg-gradient-to-r from-primary via-primary to-cyan-500 bg-clip-text text-transparent">
+              Digital Dubai Exams
             </span>{" "}
-            <span className="text-slate-900">Works</span>
+            <span className="text-foreground">Works</span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Manage the entire exam lifecycle in four simple steps.
           </p>
         </div>
@@ -199,13 +199,13 @@ export function HowItWorksSection() {
                       className={`relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-500 ${
                         isActive
                           ? `${colors.bg} text-white shadow-xl ${colors.shadow} scale-110 ring-4 ${colors.ring}`
-                          : "bg-white border-2 border-slate-200 text-slate-400 hover:border-slate-300"
+                          : "bg-card border-2 border-border text-slate-400 hover:border-slate-300"
                       } ${isCurrent ? "animate-pulse-slow" : ""}`}
                     >
                       <step.icon className="w-9 h-9" />
                       <span
                         className={`absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shadow-lg transition-all ${
-                          isActive ? `${colors.bg} text-white` : "bg-slate-100 text-slate-500 border border-slate-200"
+                          isActive ? `${colors.bg} text-white` : "bg-muted text-slate-500 border border-border"
                         }`}
                       >
                         {isActive ? <Check className="w-4 h-4" /> : index + 1}
@@ -218,12 +218,12 @@ export function HowItWorksSection() {
                     className={`rounded-2xl p-6 transition-all duration-300 ${
                       isCurrent
                         ? `${colors.bgLight} ${colors.border} border-2 shadow-lg`
-                        : "bg-white border border-slate-200 hover:shadow-md hover:border-slate-300"
+                        : "bg-card border border-border hover:shadow-md hover:border-slate-300"
                     }`}
                   >
                     <h3
                       className={`text-xl font-bold mb-2 transition-colors ${
-                        isActive ? colors.text : "text-slate-900"
+                        isActive ? colors.text : "text-foreground"
                       }`}
                     >
                       {step.title}
@@ -232,7 +232,7 @@ export function HowItWorksSection() {
 
                     <ul className="space-y-2 mb-4">
                       {step.features.map((feature) => (
-                        <li key={feature} className="text-sm text-slate-600 flex items-start gap-2">
+                        <li key={feature} className="text-sm text-muted-foreground flex items-start gap-2">
                           <span
                             className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${isActive ? colors.bg : "bg-slate-300"}`}
                           />
@@ -244,7 +244,7 @@ export function HowItWorksSection() {
                     <a
                       href="#"
                       className={`inline-flex items-center gap-1 text-sm font-semibold transition-colors ${
-                        isActive ? colors.text : "text-slate-500 hover:text-slate-700"
+                        isActive ? colors.text : "text-slate-500 hover:text-foreground"
                       }`}
                     >
                       {step.link}
@@ -296,7 +296,7 @@ export function HowItWorksSection() {
                 <div className="flex flex-col items-center">
                   <div
                     className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
-                      isActive ? `${colors.bg} text-white shadow-lg ${colors.shadow}` : "bg-slate-100 text-slate-400"
+                      isActive ? `${colors.bg} text-white shadow-lg ${colors.shadow}` : "bg-muted text-slate-400"
                     }`}
                   >
                     <step.icon className="w-7 h-7" />
@@ -306,15 +306,15 @@ export function HowItWorksSection() {
                   )}
                 </div>
                 <div
-                  className={`flex-1 pb-8 rounded-xl p-4 ${isActive ? colors.bgLight : "bg-white"} border ${isActive ? colors.border : "border-slate-200"}`}
+                  className={`flex-1 pb-8 rounded-xl p-4 ${isActive ? colors.bgLight : "bg-card"} border ${isActive ? colors.border : "border-border"}`}
                 >
-                  <h3 className={`text-lg font-bold transition-colors ${isActive ? colors.text : "text-slate-900"}`}>
+                  <h3 className={`text-lg font-bold transition-colors ${isActive ? colors.text : "text-foreground"}`}>
                     {step.title}
                   </h3>
                   <p className="text-sm text-slate-500 mb-3">{step.description}</p>
                   <ul className="space-y-1.5">
                     {step.features.map((feature) => (
-                      <li key={feature} className="text-sm text-slate-600 flex items-start gap-2">
+                      <li key={feature} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span
                           className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${isActive ? colors.bg : "bg-slate-300"}`}
                         />

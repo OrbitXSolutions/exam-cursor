@@ -85,7 +85,7 @@ export default function ExternalLoginPage() {
     router.replace("/login")
   }
 
-  return <main className="flex min-h-screen items-center justify-center p-4" dir={ar ? "rtl" : "ltr"}>
+  return <main className="flex min-h-[var(--app-viewport-height)] items-center justify-center p-4" dir={ar ? "rtl" : "ltr"}>
     <Card className="w-full max-w-md">
       <CardHeader><div className="flex justify-end"><LanguageToggle /></div>
         <CardTitle>{ar ? "إكمال تسجيل الدخول" : "Complete sign in"}</CardTitle>

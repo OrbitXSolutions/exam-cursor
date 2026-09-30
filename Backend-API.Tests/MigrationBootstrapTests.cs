@@ -39,7 +39,9 @@ public sealed class MigrationBootstrapTests : IAsyncLifetime
     {
         await using var database = Database();
         await database.Database.MigrateAsync();
-        var previous = database.Database.GetMigrations().Reverse().Skip(1).First();
+        var previous = database.Database.GetMigrations()
+            .TakeWhile(migration => !migration.EndsWith("_AddExternalIdentityLinks"))
+            .Last();
         var user = new ApplicationUser { Id = "existing-corporate", UserName = "corporate", Email = "corporate@example.invalid" };
         database.Users.Add(user);
         await database.SaveChangesAsync();

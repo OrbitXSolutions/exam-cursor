@@ -113,27 +113,27 @@ export function ProctorShowcase() {
   proctorFeatures.find((f) => f.id === activeTab)
 
   return (
-    <section ref={sectionRef} id="features" className="py-24 bg-slate-50">
+    <section ref={sectionRef} id="features" className="py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-primary to-cyan-500 bg-clip-text text-transparent">
               AI-Powered
             </span>{" "}
-            <span className="text-slate-900">Exam Security</span>
+            <span className="text-foreground">Exam Security</span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Multiple layers of intelligent monitoring ensure exam integrity without disrupting the candidate experience.
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="max-w-6xl mx-auto">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-2 bg-white p-2 rounded-2xl shadow-md mb-8 h-auto">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-2 bg-card p-2 rounded-2xl shadow-md mb-8 h-auto">
             {proctorFeatures.map((feature) => (
               <TabsTrigger
                 key={feature.id}
                 value={feature.id}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <feature.icon className="w-5 h-5" />
                 <span className="hidden sm:inline font-medium">{feature.title.split(" ")[0]}</span>
@@ -151,38 +151,38 @@ export function ProctorShowcase() {
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
               >
-                <div className="grid lg:grid-cols-2 gap-8 items-center bg-white rounded-3xl p-8 shadow-lg border border-slate-200">
+                <div className="grid lg:grid-cols-2 gap-8 items-center bg-card rounded-3xl p-8 shadow-lg border border-border">
                   <div>
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                        <feature.icon className="w-6 h-6 text-emerald-600" />
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <feature.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900">{feature.title}</h3>
+                      <h3 className="text-2xl font-bold text-foreground">{feature.title}</h3>
                     </div>
-                    <p className="text-slate-600 mb-6 leading-relaxed">{feature.description}</p>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">{feature.description}</p>
                     <ul className="space-y-3">
                       {feature.features.map((item) => (
                         <li key={item} className="flex items-center gap-3">
-                          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                          <span className="text-slate-700">{item}</span>
+                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                          <span className="text-foreground">{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
                   {/* Feature Visual - Using React Component */}
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-slate-900">
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl border border-border bg-slate-900">
                     <div className="aspect-video relative">
                       <FeatureComponent />
                     </div>
 
                     {/* Overlay with animated indicator */}
-                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg">
+                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg">
                       <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                       </span>
-                      <span className="text-xs font-medium text-slate-700">Active</span>
+                      <span className="text-xs font-medium text-foreground">Active</span>
                     </div>
                   </div>
                 </div>
@@ -196,17 +196,17 @@ export function ProctorShowcase() {
           {proctorFeatures.map((feature, index) => (
             <div
               key={feature.id}
-              className={`group p-6 rounded-2xl bg-white border border-slate-200 hover:shadow-xl hover:border-emerald-200 hover:-translate-y-2 transition-all duration-300 cursor-pointer ${
+              className={`group p-6 rounded-2xl bg-card border border-border hover:shadow-xl hover:border-primary/20 hover:-translate-y-2 transition-all duration-300 cursor-pointer ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
               onClick={() => handleTabChange(feature.id)}
             >
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:scale-110 transition-all duration-300">
-                <feature.icon className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/90 group-hover:scale-110 transition-all duration-300">
+                <feature.icon className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
               </div>
-              <h4 className="font-semibold text-slate-900 mb-2">{feature.title}</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+              <h4 className="font-semibold text-foreground mb-2">{feature.title}</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

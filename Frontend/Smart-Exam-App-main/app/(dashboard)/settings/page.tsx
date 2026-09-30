@@ -1,5 +1,8 @@
 "use client"
 
+import { DEFAULT_BRANDING } from "@/lib/branding"
+import { invalidateBrandingCache } from "@/lib/hooks/use-branding"
+
 import { useState, useEffect } from "react"
 import { useI18n } from "@/lib/i18n/context"
 import { localizeText } from "@/lib/i18n/runtime"
@@ -41,6 +44,7 @@ export default function SettingsPage() {
     setSaving(true)
     try {
       await updateSystemSettings(settings)
+      invalidateBrandingCache()
       toast.success(localizeText("Settings saved", "تم حفظ الإعدادات", language))
     } catch {
       toast.error(localizeText("Failed to save settings", "فشل حفظ الإعدادات", language))
@@ -60,12 +64,12 @@ export default function SettingsPage() {
   if (!settings) return null
 
   const brand = settings.brand ?? {
-    logoUrl: "",
-    brandName: "SmartExam",
-    footerText: "© SmartExam. All rights reserved.",
+    logoUrl: DEFAULT_BRANDING.logoUrl,
+    brandName: DEFAULT_BRANDING.name,
+    footerText: DEFAULT_BRANDING.footerText,
     supportEmail: "",
     supportUrl: "",
-    primaryColor: "#0d9488",
+    primaryColor: DEFAULT_BRANDING.primaryColor,
   }
 
   const setBrand = (updates: Partial<typeof brand>) => {
@@ -388,13 +392,13 @@ export default function SettingsPage() {
                   onChange={(e) => setBrand({ logoUrl: e.target.value })}
                 />
                 <p className="text-sm text-muted-foreground">
-                  {language === "ar" ? "رابط صورة الشعار (يظهر في الشريط الجانبي والرأس)" : "URL of logo image (shown in sidebar and header)"}
+                  {language === "ar" ? "رابط شعار البوابة مع الإبقاء على الهوية الحكومية الرسمية" : "Portal logo URL (the official government masthead is retained)"}
                 </p>
               </div>
               <div className="space-y-2">
                 <Label>{language === "ar" ? "اسم العلامة التجارية" : "Brand Name"}</Label>
                 <Input
-                  placeholder="SmartExam"
+                  placeholder={DEFAULT_BRANDING.name}
                   value={brand.brandName}
                   onChange={(e) => setBrand({ brandName: e.target.value })}
                 />

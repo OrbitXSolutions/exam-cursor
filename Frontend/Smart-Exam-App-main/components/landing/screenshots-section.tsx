@@ -87,18 +87,18 @@ export function ScreenshotsSection() {
   const CurrentComponent = screenshots[currentIndex].component
 
   return (
-    <section ref={sectionRef} className="py-24 bg-slate-50">
+    <section ref={sectionRef} className="py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="text-slate-900">See</span>{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
-              SmartExam
+            <span className="text-foreground">See</span>{" "}
+            <span className="bg-gradient-to-r from-primary via-primary to-cyan-500 bg-clip-text text-transparent">
+              Digital Dubai Exams
             </span>{" "}
-            <span className="text-slate-900">in Action</span>
+            <span className="text-foreground">in Action</span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Explore the powerful features that make SmartExam the preferred choice for secure online assessments.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Explore the powerful features that make Digital Dubai Exams the preferred choice for secure online assessments.
           </p>
         </div>
 
@@ -131,7 +131,7 @@ export function ScreenshotsSection() {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-card/10 hover:bg-card/20 text-white rounded-full backdrop-blur-sm"
               onClick={prevSlide}
             >
               <ChevronLeft className="w-6 h-6" />
@@ -139,7 +139,7 @@ export function ScreenshotsSection() {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-card/10 hover:bg-card/20 text-white rounded-full backdrop-blur-sm"
               onClick={nextSlide}
             >
               <ChevronRight className="w-6 h-6" />
@@ -148,8 +148,8 @@ export function ScreenshotsSection() {
 
           {/* Caption */}
           <div className="text-center mt-8">
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">{screenshots[currentIndex].title}</h3>
-            <p className="text-slate-600">{screenshots[currentIndex].description}</p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">{screenshots[currentIndex].title}</h3>
+            <p className="text-muted-foreground">{screenshots[currentIndex].description}</p>
           </div>
 
           {/* Dots */}
@@ -158,7 +158,7 @@ export function ScreenshotsSection() {
               <button
                 key={index}
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? "bg-emerald-500 w-8" : "bg-slate-300 hover:bg-slate-400 w-2.5"
+                  index === currentIndex ? "bg-primary w-8" : "bg-slate-300 hover:bg-slate-400 w-2.5"
                 }`}
                 onClick={() => setCurrentIndex(index)}
               />

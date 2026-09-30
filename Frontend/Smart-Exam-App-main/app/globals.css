@@ -4,26 +4,30 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: 0 0% 100%;
+  --brand-header-height: 72px;
+  --app-viewport-height: calc(100dvh - var(--brand-header-height));
+  --brand-sky: #67ccee;
+  --brand-navy: #102a43;
+  --background: 210 40% 98%;
   --foreground: 240 10% 4%;
   --card: 0 0% 100%;
   --card-foreground: 240 10% 4%;
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 4%;
-  --primary: 160 84% 39%;
+  --primary: 198 100% 33%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 240 5% 96%;
-  --secondary-foreground: 240 6% 10%;
+  --secondary: 197 75% 94%;
+  --secondary-foreground: 205 62% 22%;
   --muted: 240 5% 96%;
-  --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 96%;
-  --accent-foreground: 240 6% 10%;
+  --muted-foreground: 215 19% 40%;
+  --accent: 197 75% 94%;
+  --accent-foreground: 205 62% 22%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --border: 240 6% 90%;
   --input: 240 6% 90%;
-  --ring: 160 84% 39%;
-  --chart-1: 160 84% 39%;
+  --ring: 198 100% 33%;
+  --chart-1: 198 100% 33%;
   --chart-2: 217 91% 60%;
   --chart-3: 38 92% 50%;
   --chart-4: 346 77% 49%;
@@ -31,12 +35,12 @@
   --radius: 0.5rem;
   --sidebar: 0 0% 98%;
   --sidebar-foreground: 240 6% 10%;
-  --sidebar-primary: 160 84% 39%;
+  --sidebar-primary: 198 100% 33%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 96%;
+  --sidebar-accent: 197 75% 94%;
   --sidebar-accent-foreground: 240 6% 10%;
   --sidebar-border: 240 6% 90%;
-  --sidebar-ring: 160 84% 39%;
+  --sidebar-ring: 198 100% 33%;
   --success: 142 76% 36%;
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
@@ -50,7 +54,7 @@
   --card-foreground: 0 0% 95%;
   --popover: 240 10% 6%;
   --popover-foreground: 0 0% 95%;
-  --primary: 160 84% 45%;
+  --primary: 195 80% 67%;
   --primary-foreground: 0 0% 0%;
   --secondary: 240 4% 16%;
   --secondary-foreground: 0 0% 95%;
@@ -62,20 +66,20 @@
   --destructive-foreground: 0 0% 100%;
   --border: 240 4% 16%;
   --input: 240 4% 16%;
-  --ring: 160 84% 45%;
-  --chart-1: 160 84% 45%;
+  --ring: 195 80% 67%;
+  --chart-1: 195 80% 67%;
   --chart-2: 217 91% 65%;
   --chart-3: 38 92% 55%;
   --chart-4: 346 77% 55%;
   --chart-5: 263 70% 55%;
   --sidebar: 240 10% 6%;
   --sidebar-foreground: 0 0% 95%;
-  --sidebar-primary: 160 84% 45%;
+  --sidebar-primary: 195 80% 67%;
   --sidebar-primary-foreground: 0 0% 0%;
   --sidebar-accent: 240 4% 16%;
   --sidebar-accent-foreground: 0 0% 95%;
   --sidebar-border: 240 4% 16%;
-  --sidebar-ring: 160 84% 45%;
+  --sidebar-ring: 195 80% 67%;
   --success: 142 76% 45%;
   --success-foreground: 0 0% 0%;
   --warning: 38 92% 55%;
@@ -208,10 +212,10 @@
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
   }
 }
 
@@ -266,4 +270,70 @@
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* The physical logo order deliberately stays the same in Arabic and English. */
+.brand-header {
+  height: var(--brand-header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 10px 20px;
+  background: var(--brand-sky);
+  box-shadow: 0 2px 12px rgb(16 42 67 / 8%);
+}
+.brand-government { height: 52px; width: auto; max-width: 27%; object-fit: contain; }
+.brand-digital-dubai { height: 48px; width: auto; max-width: 62%; object-fit: contain; }
+.brand-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem 1.5rem;
+  padding: .75rem 1.5rem;
+  background: var(--brand-navy);
+  color: #fff;
+  font-size: .75rem;
+  line-height: 1.5;
+}
+.brand-footer a { text-decoration: underline; text-underline-offset: 3px; }
+.login-shell { display: grid; grid-template-columns: minmax(0, 1fr) 420px; min-height: var(--app-viewport-height); }
+.login-introduction {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 8%;
+  background: hsl(var(--background));
+}
+.login-background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .15; pointer-events: none; }
+.login-access { display: flex; flex-direction: column; align-items: center; gap: 2rem; padding: 16px 20px 32px; border-left: 1px solid hsl(var(--border)); background: hsl(var(--background)); }
+.login-access-group { display: flex; flex: 1; width: 100%; flex-direction: column; justify-content: center; gap: 1rem; }
+.login-secure-card { width: 100%; padding: 28px 20px; border-radius: 14px; background: hsl(var(--card)); box-shadow: 0 8px 24px rgb(16 42 67 / 10%); }
+.login-account-panel { border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--card)); }
+.provider-button { display: flex; width: 100%; min-height: 56px; align-items: center; justify-content: center; gap: 12px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 15px; background: #fff; color: #0f172a; font-size: 18px; font-weight: 600; line-height: 1.35; transition: box-shadow .2s; }
+.provider-button:hover:not(:disabled) { box-shadow: 0 4px 15px rgb(16 42 67 / 15%); }
+.provider-button:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+.provider-button:disabled { opacity: .55; cursor: not-allowed; }
+.provider-uaepass-image { padding: 0; border: 0; background: transparent; }
+.dark .login-background { opacity: .08; }
+@media (max-width: 1100px) {
+  .login-shell { grid-template-columns: minmax(0, 1fr); }
+  .login-introduction { min-height: 270px; padding: 40px 6%; }
+  .login-access { border-left: 0; border-top: 1px solid hsl(var(--border)); padding: 20px 6% 36px; }
+  .login-access > nav, .login-access-group { max-width: 440px; }
+}
+@media (max-width: 600px) {
+  :root { --brand-header-height: 60px; }
+  .brand-header { padding: 8px 12px; gap: 12px; }
+  .brand-government { height: 42px; max-width: 27%; }
+  .brand-digital-dubai { height: 42px; max-width: 65%; }
+  .brand-footer { justify-content: center; text-align: center; }
+  .provider-button { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-float-delayed, .animate-pulse-glow, .animate-slide-up,
+  .animate-fade-in, .animate-bounce-subtle, .animate-gradient { animation: none; }
 }

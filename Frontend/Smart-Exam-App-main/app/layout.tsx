@@ -6,13 +6,13 @@ import { Providers } from "./providers"
 
 export const metadata: Metadata = {
   title: {
-    default: "SmartExam - Enterprise Online Examination Platform",
-    template: "%s | SmartExam",
+    default: "Digital Dubai Exams - Enterprise Online Examination Platform",
+    template: "%s | Digital Dubai Exams",
   },
   description:
-    "Enterprise-grade bilingual online examination platform with AI-powered proctoring, automated grading, and real-time analytics. Secure, scalable assessments by Build4IT.",
+    "Enterprise-grade bilingual online examination platform with AI-powered proctoring, automated grading, and real-time analytics. Secure, scalable assessments for Digital Dubai.",
   generator: "Next.js",
-  applicationName: "SmartExam",
+  applicationName: "Digital Dubai Exams",
   keywords: [
     "online exam platform",
     "smart exam",
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "SmartExam",
-    title: "SmartExam - Enterprise Online Examination Platform",
+    siteName: "Digital Dubai Exams",
+    title: "Digital Dubai Exams - Enterprise Online Examination Platform",
     description:
       "Enterprise-grade bilingual online examination platform with AI-powered proctoring, automated grading, and real-time analytics.",
     images: [
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
         url: "/hero-dashboard.jpg",
         width: 1200,
         height: 630,
-        alt: "SmartExam Dashboard - Enterprise Exam Platform",
+        alt: "Digital Dubai Exams Dashboard - Enterprise Exam Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SmartExam - Enterprise Online Examination Platform",
+    title: "Digital Dubai Exams - Enterprise Online Examination Platform",
     description:
       "Enterprise-grade online examination platform with AI-powered proctoring, automated grading, and real-time analytics.",
     images: ["/hero-dashboard.jpg"],
@@ -66,34 +66,18 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: [{ url: "/branding/favicon.png", type: "image/png" }],
+    apple: "/branding/favicon.png",
   },
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#67ccee" },
+    { media: "(prefers-color-scheme: dark)", color: "#102a43" },
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 }
 
 export default function RootLayout({

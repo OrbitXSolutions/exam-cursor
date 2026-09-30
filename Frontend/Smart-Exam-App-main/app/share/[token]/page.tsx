@@ -1,5 +1,10 @@
 "use client"
 
+import Image from "next/image"
+
+import { useBranding } from "@/lib/hooks/use-branding"
+import { BRAND_ASSETS } from "@/lib/branding"
+
 import { useState, useEffect, useEffectEvent } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useI18n } from "@/lib/i18n/context"
@@ -82,6 +87,7 @@ async function walkInRegister(
 export default function ShareExamPage() {
   const params = useParams()
   const router = useRouter()
+  const { orgName } = useBranding()
   const { language } = useI18n()
   const isRTL = language === "ar"
   const token = params.token as string
@@ -213,7 +219,7 @@ export default function ShareExamPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-background">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -221,7 +227,7 @@ export default function ShareExamPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4">
+      <div className="min-h-[var(--app-viewport-height)] flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4">
         <Card className="w-full max-w-md shadow-xl border-0">
           <CardContent className="pt-8 pb-8 flex flex-col items-center text-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10">
@@ -236,21 +242,15 @@ export default function ShareExamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-[var(--app-viewport-height)] bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900" dir={isRTL ? "rtl" : "ltr"}>
 
       {/* Top bar */}
       <div className="border-b bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">
         <div className="flex items-center justify-between px-6 py-3 max-w-3xl mx-auto">
           <div className="flex items-center gap-3">
-            {examInfo?.organizationLogoUrl ? (
-              <img src={examInfo.organizationLogoUrl} alt="Logo" className="h-8 w-8 rounded object-contain" />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <FileText className="h-4 w-4 text-primary" />
-              </div>
-            )}
+            <Image width={99} height={97} src={BRAND_ASSETS.favicon} alt="" className="h-8 w-8 object-contain" />
             <span className="text-sm font-semibold text-foreground">
-              {examInfo?.organizationName || "SmartExam"}
+              {orgName}
             </span>
           </div>
           <div className="flex items-center gap-2">

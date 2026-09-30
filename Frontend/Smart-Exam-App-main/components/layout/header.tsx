@@ -70,26 +70,26 @@ export function Header() {
   })
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-2 border-b bg-background/95 px-3 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Left: Welcome Title */}
-      <div className="flex items-center gap-4">
+      <div className="min-w-0 flex-1 items-center gap-4 hidden sm:flex">
         {user && (
           <div>
-            <h1 className="text-lg font-semibold">{welcomeTitle}</h1>
-            <p className="text-sm text-muted-foreground">{dateSubtitle}</p>
+            <h1 className="truncate text-lg font-semibold">{welcomeTitle}</h1>
+            <p className="truncate text-sm text-muted-foreground">{dateSubtitle}</p>
           </div>
         )}
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         {/* License Status Badge — Admin only */}
         {isAdmin && licenseStatus && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href="/settings/license">
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80 cursor-pointer ${getLicenseBadgeStyle(licenseStatus.stateText)}`}>
+                  <span className={`hidden lg:inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80 cursor-pointer ${getLicenseBadgeStyle(licenseStatus.stateText)}`}>
                     {getLicenseBadgeLabel(licenseStatus.stateText)}
                   </span>
                 </Link>

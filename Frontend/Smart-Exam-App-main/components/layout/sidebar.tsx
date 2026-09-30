@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import type React from "react"
 
 import { useState, useEffect, useMemo } from "react"
@@ -10,6 +12,7 @@ import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { UserRole } from "@/lib/types"
 import { getCandidateVerificationStatus } from "@/lib/api/proctoring"
+import { BRAND_ASSETS } from "@/lib/branding"
 import { useBranding } from "@/lib/hooks/use-branding"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -20,7 +23,6 @@ import {
   ClipboardList,
   Users,
   GraduationCap,
-  Shield,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -223,7 +225,15 @@ export function Sidebar() {
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
   const isCandidate = hasRole(UserRole.Candidate)
-  const { branding, hasOrgBranding, logoSrc, orgName } = useBranding()
+  const { branding, hasOrgBranding, orgName, logoSrc } = useBranding()
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)")
+    const resize = () => setIsCollapsed(media.matches)
+    queueMicrotask(resize)
+    media.addEventListener("change", resize)
+    return () => media.removeEventListener("change", resize)
+  }, [])
 
   // Candidate verification status for sidebar badge
   const [verifiedStatus, setVerifiedStatus] = useState<string | null>(null)
@@ -401,7 +411,7 @@ export function Sidebar() {
       <aside
         dir={isRTL ? "rtl" : "ltr"}
         className={cn(
-          "flex h-screen flex-col bg-sidebar transition-all duration-300",
+          "flex h-[var(--app-viewport-height)] shrink-0 flex-col bg-sidebar transition-all duration-300",
           isRTL ? "border-l" : "border-r",
           isCollapsed ? "w-16" : "w-64",
         )}
@@ -410,15 +420,9 @@ export function Sidebar() {
         <div className="flex h-16 items-center justify-between border-b px-4">
           {!isCollapsed && (
             <Link href={isCandidate ? "/my-exams" : "/dashboard"} className="flex min-w-0 items-center gap-2 text-start">
-              {isCandidate && hasOrgBranding && logoSrc ? (
-                <img src={logoSrc} alt={orgName} className="h-8 w-8 rounded-lg object-contain" />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Shield className="h-5 w-5" />
-                </div>
-              )}
+              <Image width={32} height={32} src={logoSrc === BRAND_ASSETS.digitalDubai ? BRAND_ASSETS.favicon : logoSrc} alt="" className="h-8 w-8 shrink-0 object-contain" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = BRAND_ASSETS.favicon }} />
               <span className="text-lg font-bold truncate">
-                {isCandidate && hasOrgBranding ? orgName : "SmartExam"}
+                {orgName}
               </span>
             </Link>
           )}
@@ -426,6 +430,7 @@ export function Sidebar() {
             variant="ghost"
             size="icon"
             className={cn("h-8 w-8 shrink-0", isCollapsed && "mx-auto")}
+            aria-label={isCollapsed ? "Expand navigation" : "Collapse navigation"}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (

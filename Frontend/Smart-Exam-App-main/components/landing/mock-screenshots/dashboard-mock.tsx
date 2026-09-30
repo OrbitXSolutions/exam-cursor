@@ -27,7 +27,7 @@ export function DashboardMock() {
             <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
               <span className="font-bold text-[8px] sm:text-xs">SE</span>
             </div>
-            <span className="hidden sm:block font-semibold">SmartExam</span>
+            <span className="hidden sm:block font-semibold">Digital Dubai Exams</span>
           </div>
         </div>
         <nav className="flex-1 p-2">

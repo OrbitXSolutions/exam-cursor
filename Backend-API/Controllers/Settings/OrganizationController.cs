@@ -121,25 +121,26 @@ public class OrganizationController : ControllerBase
         ));
     }
 
-    // ─── Public: Effective branding for candidate-facing UI ───────────
+    // ─── Public: Effective branding for every application layout ──────
     [HttpGet("branding")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPublicBranding()
     {
         var org = await _db.OrganizationSettings.FirstOrDefaultAsync();
         var sys = await _db.SystemSettings.FirstOrDefaultAsync();
+        if (org?.IsActive != true) org = null;
 
         var branding = new PublicBrandingDto
         {
-            Name = GetEffective(org?.Name, sys?.BrandName, "SmartExam"),
-            LogoUrl = GetEffective(org?.LogoPath, sys?.LogoUrl, ""),
-            FaviconUrl = org?.FaviconPath ?? "",
-            FooterText = GetEffective(org?.FooterText, sys?.FooterText, ""),
+            Name = GetEffective(org?.Name, sys?.BrandName, BrandingDefaults.Name),
+            LogoUrl = GetEffective(org?.LogoPath, sys?.LogoUrl, BrandingDefaults.LogoUrl),
+            FaviconUrl = GetEffective(org?.FaviconPath, null, BrandingDefaults.FaviconUrl),
+            FooterText = GetEffective(org?.FooterText, sys?.FooterText, BrandingDefaults.FooterText),
             SupportEmail = GetEffective(org?.SupportEmail, sys?.SupportEmail, ""),
             SupportUrl = GetEffective(org?.SupportUrl, sys?.SupportUrl, ""),
             MobileNumber = org?.MobileNumber ?? "",
             OfficeNumber = org?.OfficeNumber ?? "",
-            PrimaryColor = GetEffective(org?.PrimaryColor, sys?.PrimaryColor, "#0d9488"),
+            PrimaryColor = GetEffective(org?.PrimaryColor, sys?.PrimaryColor, BrandingDefaults.PrimaryColor),
             IsActive = org?.IsActive ?? false,
         };
 
@@ -164,11 +165,7 @@ public class OrganizationController : ControllerBase
     }
 
     private static string GetEffective(string? orgValue, string? sysValue, string fallback)
-    {
-        if (!string.IsNullOrWhiteSpace(orgValue)) return orgValue;
-        if (!string.IsNullOrWhiteSpace(sysValue)) return sysValue;
-        return fallback;
-    }
+        => BrandingDefaults.Effective(orgValue, sysValue, fallback);
 
     private static OrganizationSettingsDto MapToDto(OrganizationSettings org)
     {
