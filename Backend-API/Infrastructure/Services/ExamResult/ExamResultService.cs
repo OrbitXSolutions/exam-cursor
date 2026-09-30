@@ -604,6 +604,7 @@ public class ExamResultService : IExamResultService
         // Staff refreshing another candidate's summary retain their authorized view.
         var isOwnSummary = _currentUserService.UserId == candidateId;
         var visibleResults = await _context.Set<Result>()
+            .AsNoTracking()
             .Where(r => r.ExamId == examId && r.CandidateId == candidateId &&
                         (!isOwnSummary || (r.IsPublishedToCandidate && r.Exam.ShowResults)))
             .OrderByDescending(r => r.TotalScore)

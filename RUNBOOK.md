@@ -2,32 +2,50 @@
 
 ## Prerequisites
 - .NET 9 SDK
-- Node.js 18+ with `pnpm`
+- Node.js 20.9+ with Corepack and the repository-pinned `pnpm` version
 - SQL Server (local or remote)
+- EF Core 9 CLI (`dotnet-ef`) for database migrations
 
 ---
 
 ## 1. Run Backend
 
-```powershell
+Create an ignored `Backend-API/appsettings.Development.json` or supply environment variables for the local SQL Server connection, JWT signing key, and encryption key. Both keys must contain at least 32 characters; never put local credentials in tracked configuration. Use a disposable development database.
+
+```sh
 cd Backend-API
-dotnet run
+dotnet restore
+dotnet build --no-restore
 ```
 
-Backend starts at **http://localhost:5221**
-- Swagger UI: http://localhost:5221
+After applying the database migrations below, start in the Development environment:
+
+```sh
+ASPNETCORE_ENVIRONMENT=Development dotnet run --no-launch-profile --no-build --urls http://localhost:5221
+```
+
+Backend and Swagger UI start at **http://localhost:5221**. Swagger is also available when `Swagger:Enabled` is explicitly configured.
 
 ### Database
-- Migrations run automatically in Development
-- Connection string: `appsettings.json` → `ConnectionStrings:DefaultConnection`
+- Migrations are **manual**, including in Development.
+- The runtime uses `ConnectionStrings:DefaultConnection` from normal ASP.NET configuration, including ignored development settings and environment overrides.
+- The design-time factory reads only tracked `appsettings.json`. Always pass the intended development connection explicitly to the EF CLI; do not rely on the runtime override to select the migration target.
+
+From `Backend-API`, with the EF Core 9 CLI on `PATH`:
+
+```sh
+dotnet ef database update --no-build --connection "<local SQL Server connection string>"
+```
+
+Keep the connection value private and preserve TLS certificate verification. For a local CA, configure the client trust store before connecting.
 
 ### Seed Demo Data
 Call the seed endpoint (requires SeedKey in headers or config):
 ```
-POST /api/Seed/run
-Header: X-Seed-Key: demo26
+POST /api/Seed
+Header: X-Seed-Key: <configured AppSettings:SeedKey>
 ```
-Or run seed via app startup if configured.
+This creates the initial roles and administrator. `/api/Seed/demo-data` adds the documented demo users and lookups to the development database. Neither migrations nor seeding run automatically at API startup.
 
 ---
 
@@ -35,14 +53,14 @@ Or run seed via app startup if configured.
 
 ```powershell
 cd Frontend/Smart-Exam-App-main
-pnpm install
-pnpm dev
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev
 ```
 
 Frontend starts at **http://localhost:3000**
 
 ### Environment
-Create `.env.local` (already done if following setup):
+Create an ignored `.env.local`:
 ```
 BACKEND_URL=http://localhost:5221/api
 ```
@@ -127,18 +145,23 @@ All API calls go through Next.js proxy: `/api/proxy` → `BACKEND_URL`
 
 ---
 
-## 7. Certificates Migration
+## 7. Validate a Fresh Checkout
 
-After pulling the latest code: stop the backend, then run `dotnet ef database update` in Backend-API. Migration `AddCertificates` creates the Certificates table. Migrations also run automatically on `dotnet run` in Development.
+Run `dotnet test Backend-API.Tests/Backend-API.Tests.csproj` from the repository root. SQL Server and Redis integration tests use the optional local test settings documented in their fixtures; keep test databases separate from the application database.
+
+From `Frontend/Smart-Exam-App-main`, run `corepack pnpm typecheck`, `corepack pnpm lint`, and `corepack pnpm build`. After switching branches, regenerate Next.js output with a build before interpreting errors in ignored `.next/types` files as source errors.
+
+In a cloud environment with an injected system CA, set `NEXT_TURBOPACK_EXPERIMENTAL_USE_SYSTEM_TLS_CERTS=1` for Next.js build/dev so font downloads retain certificate verification. Verify the API's Swagger document, `/api/Organization/branding`, and a login through the frontend proxy before considering full-stack startup ready.
 
 ---
 
 ## 8. Key Configuration
 
-### Backend (`appsettings.json`)
+### Backend (ignored development configuration or environment variables)
 - `ConnectionStrings:DefaultConnection` - SQL Server
 - `JwtSettings` - token secret, expiry
-- `AppSettings:SeedKey` - for demo seed (e.g. `demo26`)
+- `EncryptionSettings:Key` - local development encryption key
+- `AppSettings:SeedKey` - protects the initial seed endpoint
 
 ### Frontend
 - `BACKEND_URL` in `.env.local` - backend API base URL

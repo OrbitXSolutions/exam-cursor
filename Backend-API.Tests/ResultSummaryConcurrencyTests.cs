@@ -212,6 +212,30 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
         Assert.False(await verify.CandidateExamSummaries.AnyAsync(s => s.CandidateId == emptyCandidate.Id));
     }
 
+    [SqlServerConcurrencyTheory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task RefreshKeepsHiddenResultScoresOutOfCandidateSummary(bool published, bool showResults)
+    {
+        var seed = await SeedAsync(published, showResults);
+        await using var db = Database();
+        var response = await Service(db, seed).RefreshCandidateExamSummaryAsync(
+            seed.ExamId, seed.CandidateId, seed.CandidateId);
+
+        Assert.True(response.Success, response.Message);
+        var summary = response.Data!;
+        Assert.Equal(3, summary.TotalAttempts);
+        Assert.Equal(2, summary.RemainingAttempts);
+        Assert.Null(summary.BestAttemptId);
+        Assert.Null(summary.BestScore);
+        Assert.Null(summary.BestPercentage);
+        Assert.Null(summary.BestIsPassed);
+        Assert.Null(summary.LatestScore);
+        Assert.Null(summary.LatestIsPassed);
+        await AssertRankingAsync(seed);
+    }
+
     [SqlServerFact]
     public async Task FailedSummaryInsertRollsBackAndAnotherRequestCanRetry()
     {
@@ -299,7 +323,7 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
             new CacheService(), new ResourceAuthorizationService(db, manager, currentUser));
     }
 
-    private async Task<Seed> SeedAsync()
+    private async Task<Seed> SeedAsync(bool published = true, bool showResults = true)
     {
         await using var db = Database();
         var department = new Department { NameEn = "Results", NameAr = "Results" };
@@ -314,6 +338,7 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
             Department = department,
             TitleEn = "Results",
             TitleAr = "Results",
+            ShowResults = showResults,
             MaxAttempts = 5,
             DurationMinutes = 60,
             PassScore = 50
@@ -328,7 +353,7 @@ public sealed class ResultSummaryConcurrencyTests : IAsyncLifetime
             PassScore = 50,
             IsPassed = score >= 50,
             FinalizedAt = finalizedAt.AddMinutes(index),
-            IsPublishedToCandidate = false,
+            IsPublishedToCandidate = published,
             IsDeleted = index == 3,
             Attempt = new AttemptEntity
             {

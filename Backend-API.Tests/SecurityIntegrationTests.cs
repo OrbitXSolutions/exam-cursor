@@ -458,7 +458,8 @@ public sealed class SecurityIntegrationTests
                 await client.RejectAsync("JoinScreenRoom", seed.AttemptId, hubRole);
                 await using (var db = fixture.Database())
                 {
-                    var user = await db.Users.SingleAsync(u => u.Id == userId);
+                    // Restore the fixture even when this case soft-deleted the user.
+                    var user = await db.Users.IgnoreQueryFilters().SingleAsync(u => u.Id == userId);
                     user.IsBlocked = false;
                     user.IsDeleted = false;
                     user.Status = UserStatus.Active;

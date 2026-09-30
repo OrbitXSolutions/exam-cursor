@@ -173,8 +173,10 @@ public sealed class RecordingAuthorizationTests
         Assert.Equal(JsonValueKind.Null, metadata.GetProperty("chunksUrl").ValueKind);
         Assert.Equal("TabSwitched", Assert.Single(metadata.GetProperty("events").EnumerateArray())
             .GetProperty("eventType").GetString());
-        Assert.Equal("/media/screenshot.png", Assert.Single(metadata.GetProperty("screenshots").EnumerateArray())
-            .GetProperty("url").GetString());
+        var screenshot = Assert.Single(metadata.GetProperty("screenshots").EnumerateArray());
+        // Screenshots use the authorized evidence route rather than a public media path.
+        Assert.Equal($"/api/Proctor/evidence/{screenshot.GetProperty("id").GetInt32()}/download",
+            screenshot.GetProperty("url").GetString());
 
         var listing = await DataAsync(client, $"video-chunks/{fixture.AttemptId}");
         Assert.Equal(2, listing.GetProperty("totalChunks").GetInt32());

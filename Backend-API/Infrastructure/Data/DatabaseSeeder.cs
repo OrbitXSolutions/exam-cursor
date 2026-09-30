@@ -133,7 +133,7 @@ public class DatabaseSeeder
       await SeedQuestionCategoriesAsync(messages);
 
       // 5. Seed Question Subjects
-      await SeedQuestionSubjectsAsync(messages);
+      await SeedQuestionSubjectsAsync(messages, departments);
 
       // 6. Seed Question Types (if not seeded via configuration)
       await SeedQuestionTypesAsync(messages);
@@ -322,38 +322,38 @@ public class DatabaseSeeder
     var categoriesToSeed = new[]
     {
       // IT Categories
-            new { NameEn = "Programming Fundamentals", NameAr = "??????? ???????" },
-            new { NameEn = "Database Management", NameAr = "????? ????? ????????" },
- new { NameEn = "Networking", NameAr = "???????" },
-      new { NameEn = "Cybersecurity", NameAr = "????? ?????????" },
-  new { NameEn = "Cloud Computing", NameAr = "??????? ????????" },
- new { NameEn = "Software Engineering", NameAr = "????? ?????????" },
-       new { NameEn = "Web Development", NameAr = "????? ?????" },
-        new { NameEn = "Mobile Development", NameAr = "????? ??????? ??????" },
+      new { NameEn = "Programming Fundamentals", NameAr = "أساسيات البرمجة" },
+      new { NameEn = "Database Management", NameAr = "إدارة قواعد البيانات" },
+      new { NameEn = "Networking", NameAr = "الشبكات" },
+      new { NameEn = "Cybersecurity", NameAr = "الأمن السيبراني" },
+      new { NameEn = "Cloud Computing", NameAr = "الحوسبة السحابية" },
+      new { NameEn = "Software Engineering", NameAr = "هندسة البرمجيات" },
+      new { NameEn = "Web Development", NameAr = "تطوير الويب" },
+      new { NameEn = "Mobile Development", NameAr = "تطوير تطبيقات الهاتف" },
 
      // HR Categories
-            new { NameEn = "Recruitment & Selection", NameAr = "??????? ?????????" },
-     new { NameEn = "Employee Relations", NameAr = "?????? ????????" },
-        new { NameEn = "Training & Development", NameAr = "??????? ????????" },
-    new { NameEn = "Performance Management", NameAr = "????? ??????" },
- new { NameEn = "Labor Laws & Compliance", NameAr = "?????? ????? ?????????" },
-new { NameEn = "Compensation & Benefits", NameAr = "????????? ????????" },
+      new { NameEn = "Recruitment & Selection", NameAr = "التوظيف والاختيار" },
+      new { NameEn = "Employee Relations", NameAr = "علاقات الموظفين" },
+      new { NameEn = "Training & Development", NameAr = "التدريب والتطوير" },
+      new { NameEn = "Performance Management", NameAr = "إدارة الأداء" },
+      new { NameEn = "Labor Laws & Compliance", NameAr = "قوانين العمل والامتثال" },
+      new { NameEn = "Compensation & Benefits", NameAr = "التعويضات والمزايا" },
 
             // Finance Categories
-        new { NameEn = "Financial Accounting", NameAr = "???????? ???????" },
-    new { NameEn = "Management Accounting", NameAr = "???????? ????????" },
-            new { NameEn = "Auditing", NameAr = "???????" },
-new { NameEn = "Taxation", NameAr = "???????" },
-            new { NameEn = "Financial Analysis", NameAr = "??????? ??????" },
-  new { NameEn = "Budgeting & Forecasting", NameAr = "???????? ???????" },
-       new { NameEn = "Corporate Finance", NameAr = "????? ???????" },
+      new { NameEn = "Financial Accounting", NameAr = "المحاسبة المالية" },
+      new { NameEn = "Management Accounting", NameAr = "المحاسبة الإدارية" },
+      new { NameEn = "Auditing", NameAr = "التدقيق" },
+      new { NameEn = "Taxation", NameAr = "الضرائب" },
+      new { NameEn = "Financial Analysis", NameAr = "التحليل المالي" },
+      new { NameEn = "Budgeting & Forecasting", NameAr = "إعداد الميزانية والتنبؤ" },
+      new { NameEn = "Corporate Finance", NameAr = "تمويل الشركات" },
 
             // General Categories
-          new { NameEn = "General Knowledge", NameAr = "??????? ????" },
-      new { NameEn = "Communication Skills", NameAr = "?????? ???????" },
-            new { NameEn = "Leadership & Management", NameAr = "??????? ????????" },
-  new { NameEn = "Problem Solving", NameAr = "?? ????????" },
-            new { NameEn = "Critical Thinking", NameAr = "??????? ??????" }
+      new { NameEn = "General Knowledge", NameAr = "المعرفة العامة" },
+      new { NameEn = "Communication Skills", NameAr = "مهارات التواصل" },
+      new { NameEn = "Leadership & Management", NameAr = "القيادة والإدارة" },
+      new { NameEn = "Problem Solving", NameAr = "حل المشكلات" },
+      new { NameEn = "Critical Thinking", NameAr = "التفكير النقدي" }
     };
 
     foreach (var catInfo in categoriesToSeed)
@@ -383,9 +383,10 @@ new { NameEn = "Taxation", NameAr = "???????" },
     await _context.SaveChangesAsync();
   }
 
-  private async Task SeedQuestionSubjectsAsync(List<string> messages)
+  private async Task SeedQuestionSubjectsAsync(List<string> messages, Dictionary<string, int> departments)
   {
-    // Seed demo subjects (General is already seeded via migration)
+    // Subjects belong to departments; make the shared demo subjects available to
+    // each demo department. General is already seeded via migration.
     var subjectsToSeed = new[]
     {
       new { NameEn = "Mathematics", NameAr = "الرياضيات" },
@@ -396,27 +397,31 @@ new { NameEn = "Taxation", NameAr = "???????" },
       new { NameEn = "Business", NameAr = "إدارة الأعمال" }
     };
 
-    foreach (var subjectInfo in subjectsToSeed)
+    foreach (var departmentId in departments.Values)
     {
-      var exists = await _context.QuestionSubjects
-        .AnyAsync(s => s.NameEn == subjectInfo.NameEn);
-
-      if (!exists)
+      foreach (var subjectInfo in subjectsToSeed)
       {
-        var subject = new QuestionSubject
+        var exists = await _context.QuestionSubjects
+          .AnyAsync(s => s.DepartmentId == departmentId && s.NameEn == subjectInfo.NameEn);
+
+        if (!exists)
         {
-          NameEn = subjectInfo.NameEn,
-          NameAr = subjectInfo.NameAr,
-          CreatedDate = UaeTimeHelper.NowUae,
-          CreatedBy = "DemoSeeder"
-        };
+          var subject = new QuestionSubject
+          {
+            DepartmentId = departmentId,
+            NameEn = subjectInfo.NameEn,
+            NameAr = subjectInfo.NameAr,
+            CreatedDate = UaeTimeHelper.NowUae,
+            CreatedBy = "DemoSeeder"
+          };
 
-        _context.QuestionSubjects.Add(subject);
-        messages.Add($"✓ Question Subject '{subjectInfo.NameEn}' created.");
-      }
-      else
-      {
-        messages.Add($"• Question Subject '{subjectInfo.NameEn}' already exists.");
+          _context.QuestionSubjects.Add(subject);
+          messages.Add($"✓ Question Subject '{subjectInfo.NameEn}' created for department {departmentId}.");
+        }
+        else
+        {
+          messages.Add($"• Question Subject '{subjectInfo.NameEn}' already exists in department {departmentId}.");
+        }
       }
     }
 
