@@ -3,6 +3,11 @@ import { getBackendBaseUrl } from "./lib/backend-url.mjs"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  // Next's development access log includes the raw query string. The SSO gateway
+  // emits safe metadata itself; never print callback authorization codes here.
+  logging: {
+    incomingRequests: { ignore: [/^\/api\/sso\//] },
+  },
   images: {
     unoptimized: true,
   },

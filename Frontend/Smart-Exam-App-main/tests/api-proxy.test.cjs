@@ -68,6 +68,61 @@ function jsonResponse(response, status = 200, value = { success: true }) {
   response.end(JSON.stringify(value));
 }
 
+test("SSO gateway preserves separate cookies and returns provider redirects without following them", async () => {
+  respond = (response) => {
+    response.writeHead(302, {
+      Location: "https://provider.example.invalid/authorize?state=test-state",
+      "Set-Cookie": ["correlation=one; Path=/api/sso; HttpOnly; SameSite=Lax", "nonce=two; Path=/api/sso; HttpOnly; SameSite=Lax"],
+    });
+    response.end();
+  };
+  const response = await fetch(`${frontendUrl}/api/sso/start/government?language=ar`, { redirect: "manual" });
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("location"), "https://provider.example.invalid/authorize?state=test-state");
+  assert.equal(response.headers.getSetCookie().length, 2);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(received.url, "/api/sso/start/government?language=ar");
+});
+
+test("SSO callback carries correlation cookies and code only to the backend", async () => {
+  respond = (response) => {
+    response.writeHead(302, { Location: "/external-login", "Set-Cookie": "external=protected; Path=/api/sso; HttpOnly" });
+    response.end();
+  };
+  const response = await fetch(`${frontendUrl}/api/sso/callback/uaepass?code=test-code&state=test-state`, {
+    redirect: "manual", headers: { Cookie: "correlation=one", Authorization: "Bearer unrelated-application-token" },
+  });
+  assert.equal(received.headers.cookie, "correlation=one");
+  assert.equal(received.headers.authorization, undefined);
+  assert.equal(received.url, "/api/sso/callback/uaepass?code=test-code&state=test-state");
+  assert.equal(response.headers.get("location"), "/external-login");
+});
+
+test("SSO linking forwards ownership proof and CSRF header and expires external cookie", async () => {
+  respond = (response) => {
+    response.setHeader("Set-Cookie", "external=; Max-Age=0; Path=/api/sso; HttpOnly");
+    jsonResponse(response);
+  };
+  const payload = { account: "corporate@example.invalid", password: "test-only-password" };
+  const response = await fetch(`${frontendUrl}/api/sso/link`, {
+    method: "POST", headers: { "Content-Type": "application/json", "X-SSO-CSRF": "test-proof", Cookie: "external=protected; csrf=one" },
+    body: JSON.stringify(payload),
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual(JSON.parse(received.body), payload);
+  assert.equal(received.headers["x-sso-csrf"], "test-proof");
+  assert.equal(received.headers.cookie, "external=protected; csrf=one");
+  assert.match(response.headers.getSetCookie()[0], /Max-Age=0/);
+});
+
+test("SSO gateway restricts paths and methods to the external authentication API", async () => {
+  respond = (response) => jsonResponse(response);
+  for (const [route, method] of [["start/evil", "GET"], ["users", "GET"], ["callback/government", "POST"], ["link", "GET"]]) {
+    assert.equal((await fetch(`${frontendUrl}/api/sso/${route}`, { method })).status, 404);
+  }
+});
+
 test("batch removal forwards the DELETE candidate list, query and authorization", async () => {
   const payload = JSON.stringify({ candidateIds: ["candidate-one", "candidate-two"] });
   respond = (response) => {

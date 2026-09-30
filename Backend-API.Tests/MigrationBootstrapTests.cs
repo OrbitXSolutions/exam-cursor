@@ -35,6 +35,45 @@ public sealed class MigrationBootstrapTests : IAsyncLifetime
     }
 
     [SqlServerFact]
+    public async Task ExternalIdentityMigrationUpDownUpPreservesUsersAndEnforcesOneToOneAndCompleteLinks()
+    {
+        await using var database = Database();
+        await database.Database.MigrateAsync();
+        var previous = database.Database.GetMigrations().Reverse().Skip(1).First();
+        var user = new ApplicationUser { Id = "existing-corporate", UserName = "corporate", Email = "corporate@example.invalid" };
+        database.Users.Add(user);
+        await database.SaveChangesAsync();
+        await database.GetService<IMigrator>().MigrateAsync(previous);
+        await database.Database.MigrateAsync();
+        database.ChangeTracker.Clear();
+        user = (await database.Users.FindAsync("existing-corporate"))!;
+        Assert.Equal("corporate@example.invalid", user.Email);
+        Assert.Null(user.UaePassSubject);
+        Assert.Null(user.GovernmentSubject);
+        user.UaePassIssuer = "https://provider.example.invalid";
+        user.UaePassSubject = "StableSubject";
+        user.UaePassLinkedAt = DateTimeOffset.UtcNow;
+        user.IsDeleted = true;
+        await database.SaveChangesAsync();
+        var other = new ApplicationUser { Id = "other-corporate", UaePassIssuer = user.UaePassIssuer,
+            UaePassSubject = user.UaePassSubject, UaePassLinkedAt = user.UaePassLinkedAt };
+        database.Users.Add(other);
+        var duplicate = await Assert.ThrowsAsync<DbUpdateException>(() => database.SaveChangesAsync());
+        Assert.Contains(((SqlException)duplicate.InnerException!).Number, new[] { 2601, 2627 });
+        other.UaePassSubject = "stablesubject"; // Provider subjects remain case-sensitive.
+        await database.SaveChangesAsync();
+        var incomplete = await Assert.ThrowsAsync<SqlException>(() => database.Database.ExecuteSqlRawAsync(
+            "UPDATE AspNetUsers SET GovernmentIssuer = N'https://provider.example.invalid' WHERE Id = N'other-corporate'"));
+        Assert.Equal(547, incomplete.Number);
+        await database.GetService<IMigrator>().MigrateAsync(previous);
+        await database.Database.MigrateAsync();
+        database.ChangeTracker.Clear();
+        Assert.Equal(2, await database.Users.IgnoreQueryFilters().CountAsync());
+        Assert.Null((await database.Users.IgnoreQueryFilters().SingleAsync(u => u.Id == "existing-corporate")).UaePassSubject);
+        Assert.False(database.Database.HasPendingModelChanges());
+    }
+
+    [SqlServerFact]
     public async Task FreshDatabaseAppliesEveryMigrationAndKeepsSeededSubjectWithRequiredDepartment()
     {
         await using var database = Database();

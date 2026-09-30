@@ -115,15 +115,25 @@ ITokenService tokenService,
       return ApiResponse<TokenResponseDto>.FailureResponse("Invalid email or password.");
     }
 
+    return await SignInExistingUserAsync(user.Id);
+  }
+
+  public async Task<ApiResponse<TokenResponseDto>> SignInExistingUserAsync(string userId)
+  {
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null || user.IsDeleted || user.IsBlocked || user.Status != UserStatus.Active ||
+        await _userManager.IsLockedOutAsync(user) || !await _signInManager.CanSignInAsync(user))
+      return ApiResponse<TokenResponseDto>.FailureResponse("Your account is unavailable. Please contact support.");
+
     var roles = await _userManager.GetRolesAsync(user);
     var accessToken = _tokenService.GenerateAccessToken(user, roles);
     var refreshToken = _tokenService.GenerateRefreshToken();
-
     user.RefreshToken = refreshToken;
     user.RefreshTokenExpiryTime = UaeTimeHelper.NowUae.AddHours(
         double.Parse(_configuration["JwtSettings:RefreshTokenExpirationHours"] ?? "20"));
     user.LastLoginDate = UaeTimeHelper.NowUae;
-    await _userManager.UpdateAsync(user);
+    if (!(await _userManager.UpdateAsync(user)).Succeeded)
+      return ApiResponse<TokenResponseDto>.FailureResponse("Sign in could not be completed. Please try again.");
 
     var userDto = user.Adapt<UserDto>();
     userDto.Roles = roles.ToList();

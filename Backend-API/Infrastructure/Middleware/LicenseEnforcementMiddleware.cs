@@ -15,6 +15,7 @@ public class LicenseEnforcementMiddleware
     {
         "/api/auth/login",
         "/api/auth/candidate-login",
+        "/api/sso/",
         "/api/license/status",
         "/api/license/upload",
         "/swagger",

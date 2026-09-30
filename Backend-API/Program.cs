@@ -63,6 +63,7 @@ using Smart_Core.Application.Interfaces.License;
 using Smart_Core.Infrastructure.Services.Logs;
 using Smart_Core.Infrastructure.Services.License;
 using Smart_Core.Infrastructure.Filters.Logs;
+using Smart_Core.Infrastructure.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 ProductionConfiguration.Validate(builder.Configuration, builder.Environment);
@@ -71,6 +72,12 @@ ProductionConfiguration.Validate(builder.Configuration, builder.Environment);
 Serilog.Debugging.SelfLog.Enable(TextWriter.Synchronized(Console.Error));
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    // Remote OIDC diagnostics may include provider payloads. Safe SSO events are
+    // recorded separately through the existing Serilog/SystemLog pipeline.
+    .MinimumLevel.Override("Microsoft.AspNetCore.Authentication.OpenIdConnect", Serilog.Events.LogEventLevel.Fatal)
+    // Hosting's informational request-start events include raw query strings.
+    // Application request middleware already records safe route metadata.
+    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("MachineName", Environment.MachineName)
     .Enrich.WithProperty("EnvironmentName", builder.Environment.EnvironmentName)
@@ -180,6 +187,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddExternalAuthentication(builder.Configuration, builder.Environment);
 
 // Application read caches are bypassed so every node reads authoritative SQL state.
 

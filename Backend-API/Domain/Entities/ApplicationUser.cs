@@ -38,6 +38,14 @@ public class ApplicationUser : IdentityUser
   // Tracking
   public DateTimeOffset? LastLoginDate { get; set; }
 
+  // External identities authenticate this existing account; they never own exam data.
+  public string? UaePassIssuer { get; set; }
+  public string? UaePassSubject { get; set; }
+  public DateTimeOffset? UaePassLinkedAt { get; set; }
+  public string? GovernmentIssuer { get; set; }
+  public string? GovernmentSubject { get; set; }
+  public DateTimeOffset? GovernmentLinkedAt { get; set; }
+
   // In-app notifications
   public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }

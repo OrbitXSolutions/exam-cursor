@@ -13,6 +13,7 @@ interface AuthContextType {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<boolean>
+  acceptSession: (data: LoginApiResponse["data"]) => User
   logout: () => void
   hasRole: (roles: UserRole | UserRole[]) => boolean
 }
@@ -23,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 
 
-interface LoginApiResponse {
+export interface LoginApiResponse {
   success: boolean
   message: string
   data: {
@@ -78,6 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const acceptSession = (data: LoginApiResponse["data"]): User => {
+    const mappedUser: User = {
+      id: data.user.id,
+      email: data.user.email,
+      fullNameEn: data.user.fullName || data.user.displayName,
+      fullNameAr: data.user.fullName || data.user.displayName,
+      role: (data.user.roles[0] || "Candidate") as UserRole,
+      isActive: !data.user.isBlocked,
+      createdDate: data.user.createdDate,
+    }
+
+    apiClient.setToken(data.accessToken)
+    setUser(mappedUser)
+    localStorage.setItem("user", JSON.stringify(mappedUser))
+    localStorage.setItem("refreshToken", data.refreshToken)
+    return mappedUser
+  }
+
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
     const startedAt = Date.now()
@@ -99,20 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result: LoginApiResponse = await response.json()
 
       if (result.success && result.data) {
-        const mappedUser: User = {
-          id: result.data.user.id,
-          email: result.data.user.email,
-          fullNameEn: result.data.user.fullName || result.data.user.displayName,
-          fullNameAr: result.data.user.fullName || result.data.user.displayName,
-          role: (result.data.user.roles[0] || "Candidate") as UserRole,
-          isActive: !result.data.user.isBlocked,
-          createdDate: result.data.user.createdDate,
-        }
-
-        apiClient.setToken(result.data.accessToken)
-        setUser(mappedUser)
-        localStorage.setItem("user", JSON.stringify(mappedUser))
-        localStorage.setItem("refreshToken", result.data.refreshToken)
+        acceptSession(result.data)
 
         toast.success(t("auth.loginSuccess"))
         setIsLoading(false)
@@ -151,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, acceptSession, logout, hasRole }}>
       {children}
     </AuthContext.Provider>
   )

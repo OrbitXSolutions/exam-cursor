@@ -7,6 +7,8 @@ public interface IAuthService
 {
     Task<ApiResponse<TokenResponseDto>> RegisterAsync(RegisterDto dto);
     Task<ApiResponse<TokenResponseDto>> LoginAsync(LoginDto dto);
+    // Internal entry point after a trusted external identity has resolved an existing user.
+    Task<ApiResponse<TokenResponseDto>> SignInExistingUserAsync(string userId);
     Task<ApiResponse<bool>> ConfirmEmailAsync(ConfirmPasswordDto dto);
     Task<ApiResponse<bool>> ForgotPasswordAsync(ForgotPasswordDto dto);
     Task<ApiResponse<bool>> ResetPasswordAsync(ResetPasswordDto dto);

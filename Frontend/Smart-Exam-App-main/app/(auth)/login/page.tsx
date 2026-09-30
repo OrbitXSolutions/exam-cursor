@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { ExternalLoginButtons } from "@/components/auth/external-login-buttons"
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -162,6 +163,7 @@ export default function LoginPage() {
               <CardDescription>{t("auth.loginSubtitle")}</CardDescription>
             </CardHeader>
             <CardContent>
+              <ExternalLoginButtons returnUrl={returnUrl} />
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
 

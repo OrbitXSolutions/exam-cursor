@@ -54,5 +54,21 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         // Global query filter for soft delete
         builder.HasQueryFilter(u => !u.IsDeleted);
+
+        // Provider identifiers are opaque, case-sensitive values. Deleted accounts retain
+        // their reservation: deleting an account must not transfer its external identity.
+        foreach (var property in new[] { nameof(ApplicationUser.UaePassIssuer),
+                     nameof(ApplicationUser.UaePassSubject), nameof(ApplicationUser.GovernmentIssuer),
+                     nameof(ApplicationUser.GovernmentSubject) })
+            builder.Property<string>(property).HasMaxLength(200).UseCollation("Latin1_General_100_BIN2");
+        builder.HasIndex(u => new { u.UaePassIssuer, u.UaePassSubject }).IsUnique()
+            .HasFilter("[UaePassIssuer] IS NOT NULL AND [UaePassSubject] IS NOT NULL");
+        builder.HasIndex(u => new { u.GovernmentIssuer, u.GovernmentSubject }).IsUnique()
+            .HasFilter("[GovernmentIssuer] IS NOT NULL AND [GovernmentSubject] IS NOT NULL");
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_AspNetUsers_UaePassIdentity", "([UaePassIssuer] IS NULL AND [UaePassSubject] IS NULL AND [UaePassLinkedAt] IS NULL) OR ([UaePassIssuer] IS NOT NULL AND [UaePassSubject] IS NOT NULL AND [UaePassLinkedAt] IS NOT NULL)");
+            t.HasCheckConstraint("CK_AspNetUsers_GovernmentIdentity", "([GovernmentIssuer] IS NULL AND [GovernmentSubject] IS NULL AND [GovernmentLinkedAt] IS NULL) OR ([GovernmentIssuer] IS NOT NULL AND [GovernmentSubject] IS NOT NULL AND [GovernmentLinkedAt] IS NOT NULL)");
+        });
     }
 }
