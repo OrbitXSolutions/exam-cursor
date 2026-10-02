@@ -15,6 +15,7 @@ import { getCandidateVerificationStatus } from "@/lib/api/proctoring"
 import { BRAND_ASSETS } from "@/lib/branding"
 import { useBranding } from "@/lib/hooks/use-branding"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
@@ -219,8 +220,14 @@ const userGuideNavItem: NavItem = {
   roles: [UserRole.Admin, UserRole.SuperAdmin, UserRole.Instructor, UserRole.Proctor, UserRole.Examiner],
 }
 
-export function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+export function Sidebar({ mobileOpen, onMobileOpenChange, navigationButtonRef }: {
+  mobileOpen: boolean
+  onMobileOpenChange: (open: boolean) => void
+  navigationButtonRef: React.RefObject<HTMLButtonElement | null>
+}) {
+  const [desktopCollapsed, setIsCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const isCollapsed = !isMobile && desktopCollapsed
   const pathname = usePathname()
   const { t, isRTL, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
@@ -229,11 +236,14 @@ export function Sidebar() {
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)")
-    const resize = () => setIsCollapsed(media.matches)
+    const resize = () => {
+      setIsMobile(media.matches)
+      if (!media.matches) onMobileOpenChange(false)
+    }
     queueMicrotask(resize)
     media.addEventListener("change", resize)
     return () => media.removeEventListener("change", resize)
-  }, [])
+  }, [onMobileOpenChange])
 
   // Candidate verification status for sidebar badge
   const [verifiedStatus, setVerifiedStatus] = useState<string | null>(null)
@@ -324,10 +334,12 @@ export function Sidebar() {
       <Link
         key={item.href}
         href={item.href}
+        aria-label={label}
+        aria-current={isActive ? "page" : undefined}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium transition-all",
           "hover:bg-accent hover:text-accent-foreground",
-          isActive && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+          isActive && "bg-primary/10 text-sidebar-foreground font-semibold hover:bg-primary/15 hover:text-sidebar-foreground",
           isCollapsed && "justify-center px-2",
         )}
       >
@@ -383,6 +395,7 @@ export function Sidebar() {
       <div className="space-y-0.5">
         <button
           type="button"
+          aria-expanded={isOpen}
           onClick={() => setOpenGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }))}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium text-foreground hover:bg-accent"
         >
@@ -406,31 +419,23 @@ export function Sidebar() {
     )
   }
 
-  return (
-    <TooltipProvider>
-      <aside
-        dir={isRTL ? "rtl" : "ltr"}
-        className={cn(
-          "flex h-[var(--app-viewport-height)] shrink-0 flex-col bg-sidebar transition-all duration-300",
-          isRTL ? "border-l" : "border-r",
-          isCollapsed ? "w-16" : "w-64",
-        )}
-      >
+  const content = <>
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between border-b px-4">
+        <div className={cn("flex h-16 shrink-0 items-center justify-between border-b px-4", isMobile && "pe-16")}>
           {!isCollapsed && (
-            <Link href={isCandidate ? "/my-exams" : "/dashboard"} className="flex min-w-0 items-center gap-2 text-start">
+            <Link href={isCandidate ? "/my-exams" : "/dashboard"} onClick={() => onMobileOpenChange(false)} className="flex min-w-0 items-center gap-2 text-start">
               <Image width={32} height={32} src={logoSrc === BRAND_ASSETS.digitalDubai ? BRAND_ASSETS.favicon : logoSrc} alt="" className="h-8 w-8 shrink-0 object-contain" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = BRAND_ASSETS.favicon }} />
-              <span className="text-lg font-bold truncate">
+              <span className="line-clamp-2 text-base font-bold leading-tight" title={orgName}>
                 {orgName}
               </span>
             </Link>
           )}
-          <Button
+          {!isMobile && <Button
             variant="ghost"
             size="icon"
             className={cn("h-8 w-8 shrink-0", isCollapsed && "mx-auto")}
-            aria-label={isCollapsed ? "Expand navigation" : "Collapse navigation"}
+            aria-label={isCollapsed ? (language === "ar" ? "توسيع القائمة" : "Expand navigation") : (language === "ar" ? "طي القائمة" : "Collapse navigation")}
+            aria-expanded={!isCollapsed}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -444,12 +449,12 @@ export function Sidebar() {
             ) : (
               <ChevronLeft className="h-4 w-4" />
             )}
-          </Button>
+          </Button>}
         </div>
 
         {/* Navigation */}
         <ScrollArea className="flex-1 min-h-0 px-3 py-4">
-          <nav dir={isRTL ? "rtl" : "ltr"} className="flex flex-col gap-1">
+          <nav dir={isRTL ? "rtl" : "ltr"} aria-label={language === "ar" ? "القائمة الرئيسية" : "Main navigation"} className="flex flex-col gap-1" onClick={(event) => { if (isMobile && (event.target as Element).closest("a")) onMobileOpenChange(false) }}>
             {/* Main Nav */}
             {mainNavItems.map((item) => (
               renderNavLink(item)
@@ -470,10 +475,12 @@ export function Sidebar() {
                 {verifiedStatus && (
                   <Link
                     href="/verify-identity"
+                    aria-label={language === "ar" ? "التحقق من الهوية" : "Identity"}
+                    aria-current={pathname === "/verify-identity" ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-start text-sm font-medium transition-all",
                       "hover:bg-accent hover:text-accent-foreground",
-                      pathname === "/verify-identity" && "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      pathname === "/verify-identity" && "bg-primary/10 text-sidebar-foreground font-semibold hover:bg-primary/15 hover:text-sidebar-foreground",
                       isCollapsed && "justify-center px-2",
                     )}
                   >
@@ -640,7 +647,7 @@ export function Sidebar() {
         {/* User Section */}
         <div className="border-t p-3">
           {user && (
-            <div className={cn("flex items-center gap-3", isCollapsed && "justify-center")}>
+            <div className={cn("flex items-center gap-3", isCollapsed && "flex-col justify-center")}>
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-medium">
                 {getLocalizedField(user, "fullName", language).charAt(0).toUpperCase()}
               </div>
@@ -652,7 +659,7 @@ export function Sidebar() {
               )}
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={logout}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label={t("nav.logout")} onClick={logout}>
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -661,7 +668,27 @@ export function Sidebar() {
             </div>
           )}
         </div>
-      </aside>
+  </>
+
+  return (
+    <TooltipProvider>
+      {isMobile ? (
+        <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
+          <SheetContent side="left" dir={isRTL ? "rtl" : "ltr"} closeLabel={language === "ar" ? "إغلاق القائمة" : "Close navigation"} aria-describedby={undefined}
+            className="w-[min(320px,90vw)] gap-0 bg-sidebar rtl:data-[state=open]:slide-in-from-right rtl:data-[state=closed]:slide-out-to-right"
+            onCloseAutoFocus={(event) => { event.preventDefault(); navigationButtonRef.current?.focus() }}>
+            <SheetTitle className="sr-only">{language === "ar" ? "القائمة الرئيسية" : "Main navigation"}</SheetTitle>
+            {content}
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <aside dir={isRTL ? "rtl" : "ltr"} className={cn(
+          "sticky top-0 hidden h-[var(--app-viewport-height)] shrink-0 flex-col border-e bg-sidebar md:flex",
+          isCollapsed ? "w-16" : "w-64",
+        )}>
+          {content}
+        </aside>
+      )}
     </TooltipProvider>
   )
 }

@@ -182,14 +182,23 @@ export default function MyExamsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-2xl font-bold text-foreground">{t("myExams.title")}</h1>
         <p className="text-muted-foreground mt-1">{t("myExams.subtitle")}</p>
       </div>
 
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Existing filters stay available without consuming the mobile page height. */}
+      <div className="rounded-xl border bg-card p-3 sm:p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold">{t("common.filter")}</h2>
+          <div className="relative w-full sm:w-64">
+            <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input aria-label={t("common.search")} placeholder={t("common.search")} value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)} className="ps-9" />
+          </div>
+        </div>
+        <div className="exam-filters" role="group" aria-label={t("common.filter")}>
         {(
           [
             { key: "all" as const, labelKey: "candidateDashboard.all" },
@@ -206,26 +215,17 @@ export default function MyExamsPage() {
             key={key}
             type="button"
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 rounded-lg border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent ${
-              filter === key ? "ring-2 ring-primary" : ""
+            aria-pressed={filter === key}
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+              filter === key ? "border-primary bg-primary/10 text-foreground" : "border-transparent bg-background hover:bg-accent"
             }`}
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+            <span className="flex h-6 min-w-6 px-1 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-foreground">
               {filterCounts[key]}
             </span>
             <span>{t(labelKey)}</span>
           </button>
         ))}
-        <div className="ml-auto flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t("common.search")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-48 pl-9"
-            />
-          </div>
         </div>
       </div>
 
@@ -236,7 +236,7 @@ export default function MyExamsPage() {
           description={t("myExams.noExamsDesc")}
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="candidate-exam-grid">
           {filteredExams.map((exam) => {
             const statusKey = getExamStatusKey(exam)
             const statusLabel = statusLabels[statusKey]
@@ -292,12 +292,12 @@ export default function MyExamsPage() {
               primaryAction = {
                 label: t("myExams.continue"),
                 href: `/take-exam/${latestAttemptId}`,
-                icon: <PlayCircle className="mr-2 h-4 w-4" />,
+                icon: <PlayCircle className="h-4 w-4" />,
               }
             } else if (statusKey === "submitted") {
               primaryAction = {
                 label: t("myExams.underReview"),
-                icon: <AlertCircle className="mr-2 h-4 w-4" />,
+                icon: <AlertCircle className="h-4 w-4" />,
                 disabled: true,
               }
             } else if (statusKey === "completed") {
@@ -305,20 +305,20 @@ export default function MyExamsPage() {
                 primaryAction = {
                   label: t("myExams.retake"),
                   href: `/take-exam/${exam.id}/instructions`,
-                  icon: <RotateCcw className="mr-2 h-4 w-4" />,
+                  icon: <RotateCcw className="h-4 w-4" />,
                 }
                 if (canView) {
                   secondaryAction = {
                     label: t("myExams.viewResults"),
                     href: `/results/${latestAttemptId}`,
-                    icon: <Eye className="mr-2 h-4 w-4" />,
+                    icon: <Eye className="h-4 w-4" />,
                   }
                 }
               } else if (canView) {
                 primaryAction = {
                   label: t("myExams.viewResults"),
                   href: `/results/${latestAttemptId}`,
-                  icon: <Eye className="mr-2 h-4 w-4" />,
+                  icon: <Eye className="h-4 w-4" />,
                 }
               }
             } else if (statusKey === "expired" || statusKey === "terminated") {
@@ -326,12 +326,12 @@ export default function MyExamsPage() {
                 primaryAction = {
                   label: t("myExams.retake"),
                   href: `/take-exam/${exam.id}/instructions`,
-                  icon: <RotateCcw className="mr-2 h-4 w-4" />,
+                  icon: <RotateCcw className="h-4 w-4" />,
                 }
               } else {
                 primaryAction = {
                   label: statusLabel,
-                  icon: <XCircle className="mr-2 h-4 w-4" />,
+                  icon: <XCircle className="h-4 w-4" />,
                   disabled: true,
                 }
               }
@@ -340,35 +340,35 @@ export default function MyExamsPage() {
                 primaryAction = {
                   label: t("myExams.startExam"),
                   href: `/take-exam/${exam.id}/instructions`,
-                  icon: <PlayCircle className="mr-2 h-4 w-4" />,
+                  icon: <PlayCircle className="h-4 w-4" />,
                 }
               } else if (!hasAttemptsRemaining) {
                 primaryAction = {
                   label: t("myExams.noAttemptsLeft"),
-                  icon: <XCircle className="mr-2 h-4 w-4" />,
+                  icon: <XCircle className="h-4 w-4" />,
                   disabled: true,
                 }
               } else if (startsInFuture) {
                 primaryAction = {
                   label: t("myExams.notYetAvailable"),
-                  icon: <Clock className="mr-2 h-4 w-4" />,
+                  icon: <Clock className="h-4 w-4" />,
                   disabled: true,
                 }
               } else {
                 primaryAction = {
                   label: t("myExams.startExam"),
-                  icon: <PlayCircle className="mr-2 h-4 w-4" />,
+                  icon: <PlayCircle className="h-4 w-4" />,
                   disabled: true,
                 }
               }
             }
 
             return (
-              <Card key={exam.id} className="overflow-hidden border-2 shadow-md hover:shadow-lg transition-shadow">
+              <Card key={exam.id} className="min-w-0 gap-0 overflow-hidden py-0">
                 {/* Header with Status Badge */}
-                <div className="flex items-start justify-between gap-3 border-b bg-gradient-to-r from-muted/50 to-muted/30 px-5 py-4">
-                  <div className="space-y-1.5 flex-1">
-                    <h3 className="text-xl font-bold leading-tight text-foreground">
+                <div className="flex flex-wrap items-start gap-3 border-b bg-muted/40 px-4 py-4 sm:px-5">
+                  <div className="min-w-0 basis-40 flex-1 space-y-1.5">
+                    <h3 className="break-words text-xl font-bold leading-snug text-foreground">
                       {getLocalizedField(exam, "title", language)}
                     </h3>
                     {exam.descriptionEn || exam.descriptionAr ? (
@@ -380,18 +380,18 @@ export default function MyExamsPage() {
                   <Badge className={`border text-sm px-3 py-1 ${statusClass}`}>{statusLabel}</Badge>
                   {hasOverride && (
                     <Badge className="border border-violet-200 bg-violet-50 text-violet-700 text-xs px-2 py-0.5">
-                      <ShieldPlus className="mr-1 h-3 w-3" />
+                      <ShieldPlus className="h-3 w-3" />
                       {t("examOperations.adminOverride") || "Admin Override"}
                     </Badge>
                   )}
                 </div>
 
-                <CardContent className="space-y-5 p-5">
+                <CardContent className="space-y-4 p-4 sm:p-5">
                   {/* Main Stats Grid - 2x2 */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="candidate-exam-stats">
+                    <div>
+                      <div>
+                        <FileText className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{t("common.questions")}</p>
@@ -399,9 +399,9 @@ export default function MyExamsPage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 p-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900">
-                        <Award className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    <div>
+                      <div>
+                        <Award className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{t("common.points")}</p>
@@ -409,9 +409,9 @@ export default function MyExamsPage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 p-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
-                        <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <div>
+                        <Target className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{t("exams.passScore")}</p>
@@ -419,9 +419,9 @@ export default function MyExamsPage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 rounded-lg bg-purple-50 dark:bg-purple-950/30 p-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
-                        <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <div>
+                      <div>
+                        <Clock className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{t("exams.duration")}</p>
@@ -437,7 +437,7 @@ export default function MyExamsPage() {
                         <User className="h-4 w-4" />
                         {t("myExams.attempts")}
                       </span>
-                      <span className="text-base font-bold text-foreground">
+                      <span dir="ltr" className="text-base font-bold tabular-nums text-foreground">
                         {attemptsUsed} / {exam.maxAttempts === 0 ? "∞" : exam.maxAttempts}
                       </span>
                     </div>
@@ -546,7 +546,7 @@ export default function MyExamsPage() {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3 pt-2">
                     {secondaryAction && (
-                      <Button variant="outline" size="lg" asChild className="flex-1">
+                      <Button variant="outline" size="lg" asChild className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal py-2">
                         <Link href={secondaryAction.href}>
                           {secondaryAction.icon}
                           {secondaryAction.label}
@@ -554,20 +554,20 @@ export default function MyExamsPage() {
                       </Button>
                     )}
                     {primaryAction && primaryAction.href ? (
-                      <Button size="lg" asChild className="flex-1">
+                      <Button size="lg" asChild className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal py-2">
                         <Link href={primaryAction.href}>
                           {primaryAction.icon}
                           {primaryAction.label}
                         </Link>
                       </Button>
                     ) : primaryAction ? (
-                      <Button variant="secondary" size="lg" disabled className="flex-1">
+                      <Button variant="secondary" size="lg" disabled className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal py-2">
                         {primaryAction.icon}
                         {primaryAction.label}
                       </Button>
                     ) : (
-                      <Button variant="secondary" size="lg" disabled className="flex-1">
-                        <XCircle className="mr-2 h-4 w-4" />
+                      <Button variant="secondary" size="lg" disabled className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal py-2">
+                        <XCircle className="h-4 w-4" />
                         {t("common.notAvailable")}
                       </Button>
                     )}

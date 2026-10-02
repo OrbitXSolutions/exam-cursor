@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
@@ -54,6 +54,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false)
+  const navigationButtonRef = useRef<HTMLButtonElement>(null)
   const router = useRouter()
   const pathname = usePathname()
   const { isAuthenticated, isLoading, hasRole, user } = useAuth()
@@ -107,9 +109,9 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-[var(--app-viewport-height)]" dir={isRTL ? "rtl" : "ltr"}>
-      <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Header />
+      <Sidebar mobileOpen={mobileNavigationOpen} onMobileOpenChange={setMobileNavigationOpen} navigationButtonRef={navigationButtonRef} />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <Header onOpenNavigation={() => setMobileNavigationOpen(true)} navigationButtonRef={navigationButtonRef} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
       <LicenseExpiredDialog />

@@ -22,9 +22,9 @@ export function LoginShell({ candidate, returnUrl, children }: {
       <section className="login-introduction" dir={dir} aria-labelledby="login-heading">
         <Image fill priority sizes="(max-width: 1100px) 100vw, 75vw" src={BRAND_ASSETS.background} className="login-background" alt="" aria-hidden="true" />
         <div className="relative">
-          <h1 id="login-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">{ar && orgName === DEFAULT_BRANDING.name ? "منصة اختبارات دبي الرقمية" : orgName}</h1>
-          <h2 className="mt-4 text-xl font-medium sm:text-2xl">{ar ? "منصة الاختبارات والتقييم الآمن" : "Secure Examination and Assessment Platform"}</h2>
-          <p className="mt-4 max-w-4xl text-base leading-relaxed text-muted-foreground">
+          <h1 id="login-heading" className="text-2xl font-bold leading-snug sm:text-[32px]">{ar && orgName === DEFAULT_BRANDING.name ? "منصة اختبارات دبي الرقمية" : orgName}</h1>
+          <h2 className="mt-3 text-lg font-medium leading-snug sm:text-[22px]">{ar ? "منصة الاختبارات والتقييم الآمن" : "Secure Examination and Assessment Platform"}</h2>
+          <p className="mt-3 max-w-4xl text-base leading-relaxed text-muted-foreground">
             {ar
               ? candidate ? "بوابتك الآمنة للاختبارات. سجّل الدخول للوصول إلى الاختبارات المخصصة لك، وإكمال التقييمات، والاطلاع على نتائجك عبر منصة موثوقة." : "بوابة موحدة لإدارة الاختبارات والتقييمات. سجّل الدخول لإعداد الاختبارات وإدارتها ومراقبتها ومراجعة النتائج وفق صلاحيات حسابك."
               : candidate ? "Your secure gateway to examinations. Sign in to access your assigned exams, complete assessments, and view your results through a trusted digital platform." : "A unified gateway for examination and assessment management. Sign in to prepare, manage and monitor exams, and review results with your existing account permissions."}
@@ -41,7 +41,7 @@ export function LoginShell({ candidate, returnUrl, children }: {
         <div className="login-access-group">
           <div className="login-secure-card">
             <h2 className="text-center text-2xl font-bold">{ar ? "دخول آمن" : "Secure Access"}</h2>
-            <p className="mb-6 mt-3 text-center text-sm text-muted-foreground">{ar ? "اختر مزود الهوية للمتابعة" : "Choose your identity provider to continue"}</p>
+            <p className="mb-5 mt-2 text-center text-sm text-muted-foreground">{ar ? "اختر مزود الهوية للمتابعة" : "Choose your identity provider to continue"}</p>
             <ExternalLoginButtons returnUrl={returnUrl} />
             <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">{ar ? "الدخول متاح للمؤسسات والمستخدمين المصرح لهم فقط." : "Access is restricted to authorized organizations and users only."}</p>
           </div>

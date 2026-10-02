@@ -225,7 +225,7 @@ export default function VerifyIdentityPage() {
     const isFlagged = status === "Flagged"
 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir={dir}>
+      <div className="min-h-[calc(var(--app-viewport-height)-4rem)] bg-background flex items-center justify-center p-4" dir={dir}>
         <Card className="max-w-lg w-full">
           <CardHeader className="text-center">
             {isApproved && (
@@ -305,7 +305,7 @@ export default function VerifyIdentityPage() {
   const canProceedToReview = selfieFile && idFile && idNumber.trim()
 
   return (
-    <div className="min-h-screen bg-background" dir={dir}>
+    <div className="min-h-[calc(var(--app-viewport-height)-4rem)] bg-background" dir={dir}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">

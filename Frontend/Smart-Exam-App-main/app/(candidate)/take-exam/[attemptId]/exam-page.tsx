@@ -42,6 +42,7 @@ import { toast } from "sonner"
 import { Flag, Clock, Send, Lock, BookOpen, XCircle, ArrowLeft, ArrowRight, RefreshCw, Camera, CameraOff, CheckCircle2, AlertTriangle, ListChecks, Calculator, Monitor } from "lucide-react"
 import { QuestionRenderer } from "./question-renderer"
 import { ImageZoomModal } from "./image-zoom-modal"
+import { ExamSummaryPanel } from "@/components/exam/exam-summary-panel"
 import { ExamCalculator, CalculatorButton } from "@/components/exam/exam-calculator"
 import { SpreadsheetButton } from "@/components/exam/exam-spreadsheet"
 import dynamic from "next/dynamic"
@@ -197,6 +198,7 @@ export default function ExamPage() {
 
   // Summary panel state
   const [showSummary, setShowSummary] = useState(false)
+  const summaryButtonRef = useRef<HTMLButtonElement>(null)
 
   // Calculator state
   const [showCalculator, setShowCalculator] = useState(false)
@@ -1731,7 +1733,7 @@ export default function ExamPage() {
         <div className="flex sm:hidden items-center justify-between gap-2 mb-2">
           <h1 className="text-sm font-bold truncate flex-1 text-center">{examTitle}</h1>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {answeredCount}/{totalQuestions} · {Math.round(progress)}%
+            <bdi dir="ltr" className="tabular-nums">{answeredCount}/{totalQuestions}</bdi> · {Math.round(progress)}%
           </span>
         </div>
 
@@ -1739,7 +1741,7 @@ export default function ExamPage() {
         <div className="hidden sm:block mb-1">
           <h1 className="text-xl font-bold">{examTitle}</h1>
           <p className="text-xs text-muted-foreground">
-            {t("exam.progress")}: {answeredCount}/{totalQuestions} - {Math.round(progress)}%
+            {t("exam.progress")}: <bdi dir="ltr" className="tabular-nums">{answeredCount}/{totalQuestions}</bdi> - {Math.round(progress)}%
           </p>
         </div>
 
@@ -1750,7 +1752,7 @@ export default function ExamPage() {
             {sectionTimeRemaining !== undefined && sectionTimeRemaining !== null && (
               <div className="flex items-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-2 py-1 sm:px-3 sm:py-1.5 dark:border-orange-900 dark:bg-orange-950">
                 <p className="text-xs font-medium text-orange-600 dark:text-orange-400">
-                  {t("exam.sectionTime")}: {formatTime(sectionTimeRemaining)}
+                  {t("exam.sectionTime")}: <bdi dir="ltr">{formatTime(sectionTimeRemaining)}</bdi>
                 </p>
               </div>
             )}
@@ -1760,15 +1762,15 @@ export default function ExamPage() {
               "flex items-center gap-2 rounded-md border px-2 py-1 sm:px-3 sm:py-1.5",
               examTimeRemaining < 300
                 ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950"
-                : "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950"
+                : "border-primary/20 bg-primary/5"
             )}>
               <p className={cn(
-                "text-xs font-medium",
+                "text-xs font-medium tabular-nums",
                 examTimeRemaining < 300
                   ? "text-red-600 dark:text-red-400"
-                  : "text-blue-600 dark:text-blue-400"
+                  : "text-primary"
               )}>
-                {t("exam.timeRemaining")}: {formatTime(examTimeRemaining)}
+                {t("exam.timeRemaining")}: <bdi dir="ltr">{formatTime(examTimeRemaining)}</bdi>
               </p>
             </div>
 
@@ -1852,7 +1854,7 @@ export default function ExamPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowCalculator(!showCalculator)}
-                className={cn("gap-1.5", showCalculator && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
+                className={cn("gap-1.5", showCalculator && "border-primary bg-primary/10 text-primary hover:bg-primary/15")}
               >
                 <Calculator className="h-4 w-4" />
                 <span className="hidden sm:inline">{t("exam.calculator")}</span>
@@ -1872,8 +1874,11 @@ export default function ExamPage() {
             <Button
               variant="outline"
               size="sm"
+              ref={summaryButtonRef}
+              aria-label={t("exam.summary")}
+              aria-expanded={showSummary}
               onClick={() => setShowSummary(!showSummary)}
-              className={cn("gap-1.5", showSummary && "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900")}
+              className={cn("gap-1.5", showSummary && "border-primary bg-primary/10 text-primary hover:bg-primary/15")}
             >
               <ListChecks className="h-4 w-4" />
               <span className="hidden sm:inline">{t("exam.summary")}</span>
@@ -1959,7 +1964,7 @@ export default function ExamPage() {
                       {isLocked && <Lock className="h-3 w-3" />}
                       <span>{getLocalizedField(section, "title", language)}</span>
                       <Badge variant="secondary" className="text-xs">
-                        {answeredInSection}/{sectionQuestions}
+                        <bdi dir="ltr" className="tabular-nums">{answeredInSection}/{sectionQuestions}</bdi>
                       </Badge>
                     </TabsTrigger>
                   )
@@ -1994,7 +1999,7 @@ export default function ExamPage() {
           // No sections/topics - show ONE question at a time
           <div className="flex h-full flex-col">
             <div className="flex-1 overflow-auto">
-              <div className="mx-auto max-w-5xl p-6">
+              <div className="mx-auto max-w-5xl p-3 sm:p-6">
                 {currentFlatQuestion && (
                   <QuestionCard
                     question={currentFlatQuestion}
@@ -2012,8 +2017,8 @@ export default function ExamPage() {
             </div>
 
             {/* Navigation footer for flat questions */}
-            <div className="border-t bg-card px-6 py-4">
-              <div className="flex items-center justify-between">
+            <div className="border-t bg-card px-3 py-3 sm:px-6 sm:py-4">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
                 <Button
                   onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                   variant="outline"
@@ -2023,7 +2028,7 @@ export default function ExamPage() {
                   {t("common.previous")}
                 </Button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center justify-center gap-2">
                   {/* Calculator button â€” only if current question allows it */}
                   {currentFlatQuestion?.isCalculatorAllowed && (
                     <CalculatorButton
@@ -2031,7 +2036,7 @@ export default function ExamPage() {
                       onClick={() => setShowCalculator(prev => !prev)}
                     />
                   )}
-                  <p className="text-sm font-medium">
+                  <p className="text-center text-xs font-medium sm:text-sm">
                     {t("exam.question")} {currentQuestionIndex + 1} {t("exam.of")} {flatQuestions.length}
                   </p>
                 </div>
@@ -2063,14 +2068,14 @@ export default function ExamPage() {
         </div>
 
         {/* Summary Panel */}
-        {showSummary && (
-          <div className={cn("w-72 bg-muted/20 flex flex-col overflow-hidden shrink-0", dir === "rtl" ? "border-r" : "border-l")}>
-            <div className="border-b px-4 py-3 flex items-center justify-between">
+        <ExamSummaryPanel open={showSummary} onOpenChange={setShowSummary} dir={dir}
+          title={t("exam.summaryTitle")} closeLabel={language === "ar" ? "إغلاق الملخص" : "Close summary"} triggerRef={summaryButtonRef}>
+            <div className="min-h-16 border-b px-4 py-3 pe-16 md:pe-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold flex items-center gap-2">
                 <ListChecks className="h-4 w-4" />
                 {t("exam.summaryTitle")}
               </h2>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowSummary(false)}>
+              <Button variant="ghost" size="icon" className="hidden h-8 w-8 md:inline-flex" aria-label={language === "ar" ? "إغلاق الملخص" : "Close summary"} onClick={() => setShowSummary(false)}>
                 <XCircle className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -2087,7 +2092,7 @@ export default function ExamPage() {
                         <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
                         {t("exam.answered")}
                       </span>
-                      <span className="font-semibold">{answeredCount}/{totalQuestions}</span>
+                      <span className="font-semibold"><bdi dir="ltr" className="tabular-nums">{answeredCount}/{totalQuestions}</bdi></span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
@@ -2159,7 +2164,7 @@ export default function ExamPage() {
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
                             {t("exam.answered")}
                           </span>
-                          <span className="font-medium">{sectionAnswered}/{sectionTotal}</span>
+                          <span className="font-medium"><bdi dir="ltr" className="tabular-nums">{sectionAnswered}/{sectionTotal}</bdi></span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
@@ -2265,8 +2270,7 @@ export default function ExamPage() {
                 )}
               </div>
             </ScrollArea>
-          </div>
-        )}
+        </ExamSummaryPanel>
       </div>
 
       {/* Floating Calculator */}
@@ -2290,7 +2294,7 @@ export default function ExamPage() {
                 <div className="rounded-md border bg-muted/50 p-3 space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span>{t("exam.answered") || "Answered"}</span>
-                    <span className="font-medium text-foreground">{answeredCount} / {totalQuestions}</span>
+                    <span className="font-medium text-foreground"><bdi dir="ltr" className="tabular-nums">{answeredCount} / {totalQuestions}</bdi></span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t("exam.unanswered") || "Unanswered"}</span>
@@ -2350,7 +2354,7 @@ export default function ExamPage() {
                       <div className="rounded-md border bg-muted/50 p-3 space-y-1.5 text-sm">
                         <div className="flex justify-between">
                           <span>{t("exam.answered") || "Answered"}</span>
-                          <span className="font-medium text-foreground">{sectionAnswered} / {sectionTotal}</span>
+                          <span className="font-medium text-foreground"><bdi dir="ltr" className="tabular-nums">{sectionAnswered} / {sectionTotal}</bdi></span>
                         </div>
                         <div className="flex justify-between">
                           <span>{t("exam.unanswered") || "Unanswered"}</span>
@@ -2505,7 +2509,7 @@ function SectionContent({
 
   return (
     <ScrollArea className="h-full">
-      <div className="mx-auto max-w-5xl space-y-6 p-6">
+      <div className="mx-auto max-w-5xl space-y-6 p-3 sm:p-6">
         {/* Section Time Warning Alert */}
         {showTimeWarning && (
           <div className="animate-pulse rounded-lg border-2 border-red-500 bg-red-50 p-4 dark:bg-red-950/40">
@@ -2525,13 +2529,13 @@ function SectionContent({
 
         {/* Builder Section Header - Subject Mode */}
         {isBuilderSection && isSubjectMode && subjectTitle && (
-          <Card className="border-s-4 border-s-purple-500 bg-purple-50/50 dark:bg-purple-950/20">
+          <Card className="border-s-4 border-s-primary bg-primary/5">
             <CardHeader className="py-2">
               <div className="flex items-center justify-center gap-2">
                 <Badge variant="outline" className="text-xs">
                   {t("exam.subject") || "Subject"}
                 </Badge>
-                <CardTitle className="text-lg font-semibold text-purple-900 dark:text-purple-100">
+                <CardTitle className="text-lg font-semibold text-foreground">
                   {subjectTitle}
                 </CardTitle>
               </div>
@@ -2541,7 +2545,7 @@ function SectionContent({
 
         {/* Builder Section Header - Topic Mode */}
         {isBuilderSection && isTopicMode && (
-          <Card className="border-s-4 border-s-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20">
+          <Card className="border-s-4 border-s-primary bg-primary/5">
             <CardHeader className="py-2">
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {subjectTitle && (
@@ -2552,7 +2556,7 @@ function SectionContent({
                 <Badge variant="outline" className="text-xs">
                   {t("exam.topic") || "Topic"}
                 </Badge>
-                <CardTitle className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">
+                <CardTitle className="text-lg font-semibold text-foreground">
                   {topicTitle || getLocalizedField(section, "title", language)}
                 </CardTitle>
               </div>
@@ -2582,7 +2586,7 @@ function SectionContent({
               return (
                 <div key={topic.topicId} className="space-y-4">
                   {/* Topic header */}
-                  <Card className="border-s-4 border-s-blue-500 bg-blue-50/50 dark:bg-blue-950/20">
+                  <Card className="border-s-4 border-s-primary bg-primary/5">
                     <CardHeader className="py-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base font-semibold">
@@ -2726,10 +2730,10 @@ function QuestionCard({
   const questionImage = primaryImage || anyImage
 
   return (
-    <Card className="shadow-sm" dir={language === "ar" ? "rtl" : "ltr"}>
-      <CardHeader className="border-b bg-muted/20 py-3">
+    <Card className="gap-0 overflow-hidden py-0" dir={language === "ar" ? "rtl" : "ltr"}>
+      <CardHeader className="border-b bg-muted/40 px-4 py-4 sm:px-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-2">
+          <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="secondary" className="text-xs">
                 {t("exam.question")} {questionNumber} {t("exam.of")} {totalQuestions}
@@ -2744,12 +2748,14 @@ function QuestionCard({
                 </Badge>
               )}
             </div>
-            <h3 className="text-base font-medium leading-relaxed">{questionBody}</h3>
+            <h3 className="break-words text-base font-medium leading-relaxed">{questionBody}</h3>
           </div>
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 shrink-0"
+            aria-label={isFlagged ? t("exam.unflag") : t("exam.flag")}
+            aria-pressed={isFlagged}
             onClick={() => onToggleFlag(question.questionId)}
           >
             <Flag className={cn("h-4 w-4", isFlagged && "fill-orange-600 text-orange-600")} />
@@ -2768,7 +2774,7 @@ function QuestionCard({
         )}
       </CardHeader>
 
-      <CardContent className="py-4">
+      <CardContent className="px-4 py-4 sm:px-6">
         <QuestionRenderer
           question={question}
           answer={answer}
@@ -2779,5 +2785,4 @@ function QuestionCard({
     </Card>
   )
 }
-
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type Ref } from "react"
 import { useI18n, getLocalizedField } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
 import { LanguageToggle } from "./language-toggle"
@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Bell, User, Settings, LogOut, HelpCircle } from "lucide-react"
+import { Bell, User, Settings, LogOut, HelpCircle, Menu } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { getLicenseStatus, type LicenseStatusResult } from "@/lib/api/license"
@@ -43,7 +43,7 @@ function getLicenseBadgeLabel(stateText: string): string {
   }
 }
 
-export function Header() {
+export function Header({ onOpenNavigation, navigationButtonRef }: { onOpenNavigation: () => void; navigationButtonRef: Ref<HTMLButtonElement> }) {
   const { t, language } = useI18n()
   const { user, logout, hasRole } = useAuth()
   const router = useRouter()
@@ -70,7 +70,10 @@ export function Header() {
   })
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-2 border-b bg-background/95 px-3 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-2 border-b bg-card px-3 sm:px-6">
+      <Button ref={navigationButtonRef} variant="ghost" size="icon" className="md:hidden" onClick={onOpenNavigation} aria-label={language === "ar" ? "فتح القائمة" : "Open navigation"}>
+        <Menu aria-hidden="true" />
+      </Button>
       {/* Left: Welcome Title */}
       <div className="min-w-0 flex-1 items-center gap-4 hidden sm:flex">
         {user && (
@@ -106,6 +109,7 @@ export function Header() {
           variant="ghost"
           size="icon"
           className="relative"
+          aria-label={t("nav.notifications")}
           onClick={() => router.push("/notifications")}
         >
           <Bell className="h-5 w-5" />
@@ -124,7 +128,7 @@ export function Header() {
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2">
+              <Button variant="ghost" className="gap-2 px-2" aria-label={language === "ar" ? "قائمة المستخدم" : "User menu"}>
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium">
                   {getLocalizedField(user, "fullName", language).charAt(0).toUpperCase()}
                 </div>
@@ -137,7 +141,7 @@ export function Header() {
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">{getLocalizedField(user, "fullName", language)}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <p dir="ltr" className="break-all text-xs text-muted-foreground">{user.email}</p>
                   <p className="text-xs text-primary font-medium">
                     {user.role === "Admin" && t("nav.roleAdmin")}
                     {user.role === "Instructor" && t("nav.roleInstructor")}

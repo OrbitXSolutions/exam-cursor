@@ -165,13 +165,13 @@ function MCQSingleChoice({
           <Card
             key={option.id}
             className={cn(
-              "cursor-pointer transition-all hover:border-primary",
+              "gap-0 cursor-pointer py-0 shadow-none transition-colors hover:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
               isSelected && "border-primary bg-primary/5"
             )}
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
+              className="flex cursor-pointer items-start gap-3 min-h-14 px-4 py-4"
               dir={dir}
             >
               <RadioGroupItem
@@ -179,8 +179,8 @@ function MCQSingleChoice({
                 id={`option-${option.id}`}
                 className="mt-0.5"
               />
-              <div className="flex-1 space-y-1.5">
-                <p className="text-sm leading-normal">{optionText}</p>
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <p className="break-words text-base leading-relaxed">{optionText}</p>
                 {option.attachmentPath && (
                   <div className="mt-1 flex justify-center overflow-hidden rounded-md border bg-muted/20">
                     <ImageZoomModal
@@ -240,13 +240,13 @@ function MCQMultipleChoice({
           <Card
             key={option.id}
             className={cn(
-              "cursor-pointer transition-all hover:border-primary",
+              "gap-0 cursor-pointer py-0 shadow-none transition-colors hover:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
               isSelected && "border-primary bg-primary/5"
             )}
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-start gap-3 px-4 py-2.5"
+              className="flex cursor-pointer items-start gap-3 min-h-14 px-4 py-4"
               dir={dir}
             >
               <Checkbox
@@ -255,8 +255,8 @@ function MCQMultipleChoice({
                 onCheckedChange={(checked) => handleChange(option.id, checked as boolean)}
                 className="mt-0.5"
               />
-              <div className="flex-1 space-y-1.5">
-                <p className="text-sm leading-normal">{optionText}</p>
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <p className="break-words text-base leading-relaxed">{optionText}</p>
                 {option.attachmentPath && (
                   <div className="mt-1 flex justify-center overflow-hidden rounded-md border bg-muted/20">
                     <ImageZoomModal
@@ -310,13 +310,13 @@ function TrueFalse({
           <Card
             key={option.id}
             className={cn(
-              "cursor-pointer transition-all hover:border-primary",
+              "gap-0 cursor-pointer py-0 shadow-none transition-colors hover:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
               isSelected && "border-primary bg-primary/5"
             )}
           >
             <Label
               htmlFor={`option-${option.id}`}
-              className="flex cursor-pointer items-center gap-3 px-4 py-2.5"
+              className="flex cursor-pointer items-center gap-3 min-h-14 px-4 py-4"
               dir={dir}
             >
               <RadioGroupItem
